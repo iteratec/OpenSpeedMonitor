@@ -17,21 +17,32 @@
 
 package de.iteratec.osm.report.chart
 
-import static org.junit.Assert.*
-import grails.test.mixin.TestFor
+import grails.test.mixin.*
 
+import org.junit.Before
 import org.junit.Test
+
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.csi.TestDataUtil
 
 /**
  * Test-suite for {@link OsmChartTagLib}.
  */
 @TestFor(OsmChartTagLib)
+@Mock([OsmConfiguration])
 class OsmChartTagLibTests {
+	
+	@Before
+	void setUp(){
+		//test data common for all tests
+		TestDataUtil.createOsmConfig()
+	}
 
 	@Test
 	void testSingleYAxisChartTagWithHighcharts() {
-		mockTagLib(OsmChartTagLib)
-
+		def osmChartTagLib = mockTagLib(OsmChartTagLib)
+		osmChartTagLib.configService = new ConfigService()
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);
@@ -117,8 +128,8 @@ class OsmChartTagLibTests {
 	
 	@Test
 	void testSingleYAxisChartTagWithRickshaw() {
-		mockTagLib(OsmChartTagLib)
-
+		def osmChartTagLib = mockTagLib(OsmChartTagLib)
+		osmChartTagLib.configService = new ConfigService()
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);
@@ -222,8 +233,8 @@ class OsmChartTagLibTests {
 	
 	@Test
 	void testMultipleYAxisChartTagWithRickshaw() {
-		mockTagLib(OsmChartTagLib)
-
+		def osmChartTagLib = mockTagLib(OsmChartTagLib)
+		osmChartTagLib.configService = new ConfigService()
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);
@@ -336,8 +347,8 @@ class OsmChartTagLibTests {
 	
 	@Test
 	void testMultipleYAxisChartTagWithHighchart() {
-		mockTagLib(OsmChartTagLib)
-
+		def osmChartTagLib = mockTagLib(OsmChartTagLib)
+		osmChartTagLib.configService = new ConfigService()
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);

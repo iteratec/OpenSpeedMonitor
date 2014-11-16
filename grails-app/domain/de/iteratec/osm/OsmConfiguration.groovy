@@ -27,6 +27,7 @@ class OsmConfiguration {
 	static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
 	static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
 	static final Boolean DEFAULT_MEASUREMENTS_GENERALLY_ENABLED = false
+	static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
 
 	/* Default (injected) attributes of GORM */
 	Long	id
@@ -46,6 +47,8 @@ class OsmConfiguration {
 	Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
 	/** If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. */
 	Boolean measurementsGenerallyEnabled = DEFAULT_MEASUREMENTS_GENERALLY_ENABLED
+	/** Initial hight of charts when opening dashboards. */
+	Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
 	
     static mapping = {
     }
@@ -56,6 +59,7 @@ class OsmConfiguration {
 		minDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS)
 		maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS)
 		measurementsGenerallyEnabled(defaultValue: DEFAULT_MEASUREMENTS_GENERALLY_ENABLED)
+		initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
     }
 	
 }

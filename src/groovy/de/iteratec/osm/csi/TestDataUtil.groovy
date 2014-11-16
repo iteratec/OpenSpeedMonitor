@@ -1046,6 +1046,7 @@ class TestDataUtil {
 				minDocCompleteTimeInMillisecs: 250,
 				maxDocCompleteTimeInMillisecs: 180000,
 				measurementsGenerallyEnabled: true, 
+				initialChartHeightInPixels: 400
 				).save(failOnError: true)
 	}
 

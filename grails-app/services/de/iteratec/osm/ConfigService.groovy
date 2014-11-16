@@ -79,6 +79,10 @@ class ConfigService {
 		return (Boolean)retrieveConfigValue('measurementsGenerallyEnabled')
 	}
 	
+	Integer getInitialChartHeightInPixels(){
+		return (Integer)retrieveConfigValue('initialChartHeightInPixels')
+	}
+	
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
 		if (osmConfigs.size() != 1 || osmConfigs[0]."${name}" == null) {

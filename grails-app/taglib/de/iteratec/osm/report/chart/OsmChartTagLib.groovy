@@ -17,8 +17,11 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.ConfigService;
+
 class OsmChartTagLib {
 
+	ConfigService configService
 	static namespace = "iteratec"
 
 	def singleYAxisChart = { attrs, body ->
@@ -50,7 +53,7 @@ class OsmChartTagLib {
 		}
 		else // default: rickshaw
 		{
-			String heightOfChart = "400px"
+			String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
 			data.each {
 				it.measurandGroup = MeasurandGroup.NO_MEASURAND
 			}
@@ -94,13 +97,13 @@ class OsmChartTagLib {
 
 		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS)
 		{
-			String heightOfChart = attrs["heightOfChart"] ?: '600px'
+			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
 			def htmlCreater = new HighchartHtmlCreater()
 			out << htmlCreater.createChartHtmlMultipleYAxis(data, title, lineType, width, yAxisMin, yAxisMaxs, divId, false, measurementUnits, xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, yAxesLabels, highChartsTurboThreshold, openDatapointLinksInNewWindow, exportUrl, heightOfChart)
 		}
 		else // default: rickshaw
 		{
-			String heightOfChart = attrs["heightOfChart"] ?: '400px'
+			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
 			def htmlCreater = new RickshawHtmlCreater()
 			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, heightOfChart, yAxesLabels, title, markerEnabled)
 		}
