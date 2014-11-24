@@ -17,37 +17,20 @@
 
 package de.iteratec.osm.util
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
-import org.joda.time.DateTime
-
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetGraphDaoService
-import de.iteratec.osm.csi.EventMeasuredValueService
-import de.iteratec.osm.csi.OsmConfigCacheService
-import de.iteratec.osm.csi.PageMeasuredValueService
-import de.iteratec.osm.csi.ShopMeasuredValueService
-import de.iteratec.osm.csi.TimeToCsMappingCacheService
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.*
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.joda.time.DateTime
 
 /**
  * <p>
@@ -335,7 +318,16 @@ class ServiceMocker {
 		}
 		serviceToMockIn.grailsLinkGenerator = grailsLinkGeneratorMocked.createMock()
 	}
-	
+
+	/**
+	 * Mocks methods of {@link de.iteratec.osm.csi.TimeToCsMappingCacheService}.
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
+	 * @param timeToCsMappings
+	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getTimeToCsMappings()}.
+	 * @param frustrations
+	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
+	 */
 	void mockTimeToCsMappingService(serviceToMockIn, timeToCsMappings, frustrations){
 		def timeToCsMappingCacheService = mockFor(TimeToCsMappingCacheService)
 		
@@ -348,11 +340,25 @@ class ServiceMocker {
 		
 		serviceToMockIn.timeToCsMappingCacheService = timeToCsMappingCacheService.createMock()
 	}
+	/**
+	 * Mocks methods of {@link de.iteratec.osm.ConfigService}.
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
+	 * @param toReturnFromGetDatabaseDriverClassName
+	 * 		To be returned from method {@link de.iteratec.osm.ConfigService#getDatabaseDriverClassName()}.
+	 */
 	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName){
 		def configServiceMock = mockFor(ConfigService, true)
 		configServiceMock.demand.getDatabaseDriverClassName(0..100){ ->
 			return toReturnFromGetDatabaseDriverClassName
 		}
 		serviceToMockIn.configService = configServiceMock.createMock()
+	}
+	void mockProxyService(serviceToMockIn){
+		def proxyServiceMock = mockFor(ProxyService, true)
+		proxyServiceMock.demand.fetchLocations(0..100){WebPageTestServer wptserver ->
+			//do nothing, using tests will have to create necessary locations on their own
+		}
+		serviceToMockIn.proxyService = proxyServiceMock.createMock()
 	}
 }

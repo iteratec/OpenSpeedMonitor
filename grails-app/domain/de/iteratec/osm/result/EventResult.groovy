@@ -243,5 +243,32 @@ class EventResult implements CsiValue {
 		
 		return resultURL;		
 	}
+
+	public String toString(){
+		return "id=${this.id}\n" +
+				"\t\twptStatus=${this.wptStatus}\n" +
+				"\t\tmedianValue=${this.medianValue}\n" +
+				"\t\tnumberOfWptRun=${this.numberOfWptRun}\n" +
+				"\t\tcachedView=${this.cachedView}\n" +
+				"\t\tdocCompleteIncomingBytes=${this.docCompleteIncomingBytes}\n" +
+				"\t\tdocCompleteRequests=${this.docCompleteRequests}\n" +
+				"\t\tdocCompleteTimeInMillisecs=${this.docCompleteTimeInMillisecs}\n" +
+				"\t\tdomTimeInMillisecs=${this.domTimeInMillisecs}\n" +
+				"\t\tfirstByteInMillisecs=${this.firstByteInMillisecs}\n" +
+				"\t\tfullyLoadedIncomingBytes=${this.fullyLoadedIncomingBytes}\n" +
+				"\t\tfullyLoadedRequestCount=${this.fullyLoadedRequestCount}\n" +
+				"\t\tfullyLoadedTimeInMillisecs=${this.fullyLoadedTimeInMillisecs}\n" +
+				"\t\tloadTimeInMillisecs=${this.loadTimeInMillisecs}\n" +
+				"\t\tstartRenderInMillisecs=${this.startRenderInMillisecs}\n" +
+				"\t\tcustomerSatisfactionInPercent=${this.customerSatisfactionInPercent}\n" +
+				"\t\tspeedIndex=${this.speedIndex}\n" +
+				"\t\tdownloadAttempts=${this.downloadAttempts}\n" +
+				"\t\tfirstStatusUpdate=${this.firstStatusUpdate}\n" +
+				"\t\tlastStatusUpdate=${this.lastStatusUpdate}\n" +
+				"\t\tvalidationState=${this.validationState}\n" +
+				"\t\tjobResultDate=${this.jobResultDate}\n" +
+				"\t\tjobResultJobConfigId=${this.jobResultJobConfigId}\n" +
+				"\t\ttag=${this.tag}"
+	}
 	
 }

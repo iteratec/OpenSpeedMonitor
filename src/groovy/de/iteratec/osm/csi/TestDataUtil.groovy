@@ -346,7 +346,7 @@ class TestDataUtil {
 			provideAuthenticateInformation: provideAuthenticateInformation, 
 		).save(failOnError: true)
 	}
-	static createWebPageTestServer(String label, String proxyIdentifier, int active, String baseUrl){
+	static createWebPageTestServer(String label, String proxyIdentifier, boolean active, String baseUrl){
 		new WebPageTestServer(
 			label: label,
 			proxyIdentifier: proxyIdentifier,

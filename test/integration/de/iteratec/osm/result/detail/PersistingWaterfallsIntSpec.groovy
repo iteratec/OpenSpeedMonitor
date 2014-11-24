@@ -87,7 +87,7 @@ class PersistingWaterfallsIntSpec extends IntTestWithDBCleanup {
 //		String har = new File("test/resources/HARs/${resultName}.har").getText()
 //		
 //		//test execution
-//		locationAndResultPersisterService.listenToResult(RESULT_ID_MULTISTEP, xmlResult, har, serverMultistep)
+//		serviceUnderTest.listenToResult(RESULT_ID_MULTISTEP, xmlResult, har, serverMultistep)
 //		
 //		//assertions
 //		int runs = 1
@@ -126,7 +126,7 @@ class PersistingWaterfallsIntSpec extends IntTestWithDBCleanup {
 //		String har = new File("test/resources/HARs/${resultName}.har").getText()
 //		
 //		//test execution
-//		locationAndResultPersisterService.listenToResult(RESULT_ID_NO_MULTISTEP, xmlResult, har, serverNoMultistep)
+//		serviceUnderTest.listenToResult(RESULT_ID_NO_MULTISTEP, xmlResult, har, serverNoMultistep)
 //		
 //		//assertions
 //		int runs = 1
