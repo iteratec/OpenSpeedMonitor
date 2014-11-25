@@ -1,36 +1,147 @@
+/* 
+* OpenSpeedMonitor (OSM)
+* Copyright 2014 iteratec GmbH
+* 
+* Licensed under the Apache License, Version 2.0 (the "License"); 
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+* 
+* 	http://www.apache.org/licenses/LICENSE-2.0
+* 
+* Unless required by applicable law or agreed to in writing, software 
+* distributed under the License is distributed on an "AS IS" BASIS, 
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+* See the License for the specific language governing permissions and 
+* limitations under the License.
+*/
+
+/**
+ * Base-URL-mappings for the application openSpeedMonitor.
+ * @author nkuhn
+ *
+ */
 class UrlMappings {
 
 	static mappings = {
 		
+		/* EventResultDashboard as homepage */
+		'/' (redirect: '/eventResultDashboard/showAll')
+		
 		/* 
 		 * Pages without controller 
 		 */
-//		"/"				(view:"/index")
 		"/about"		(view:"/siteinfo/about")
-		"/blog"			(view:"/siteinfo/blog")
 		"/systeminfo"	(view:"/siteinfo/systeminfo")
-		"/contact"		(view:"/siteinfo/contact")
-		"/terms"		(view:"/siteinfo/terms")
-		"/imprint"		(view:"/siteinfo/imprint")
 		
 		/* 
 		 * Pages with controller
 		 * WARN: No domain/controller should be named "api" or "mobile" or "web"!
 		 */
-        "/"	{
-			controller	= 'home'
-			action		= { 'index' }
-            view		= { 'index' }
-        }
-		"/$controller/$action?/$id?"{
-			constraints {
-				controller(matches:/^((?!(api|mobile|web)).*)$/)
-		  	}
-		}
+        
+		"/$controller/$action?/$id?(.$format)?"() 
 		
+		/*
+		 * For app-info-plugin
+		 */
+		"/admin/manage/$action?"(controller: "adminManage")
+		"/adminManage/$action?"(controller: "errors", action: "urlMapping")
+				
 		/* 
 		 * System Pages without controller 
 		 */
-		"500"	(view:'/error')
+		"403"	(view:'/_errors/403')
+		"404"	(view:'/_errors/404')
+		"500"	(view:'/_errors/error')
+		"503"	(view:'/_errors/503')
+		
+		/*
+		 * wpt-server-proxy-mappings
+		 */
+
+		"/proxy/$wptserver/getLocations.php" {
+			controller = "WptProxy"
+			action = [GET: "getLocations"]
+		}
+
+		"/proxy/$wptserver/runtest.php" {
+			controller = "WptProxy"
+			action = [POST: "runtest"]
+		}
+
+		"/proxy/$wptserver/results/$resultYear/$resultMonth/$resultDay/$resultFolder/$resultId/$fileToDownload" {
+			controller = "WptProxy"
+			action = [GET: "resultFileDownload"]
+		}
+
+		"/proxy/$wptserver/result/$resultId/" {
+			controller = "WptProxy"
+			action = [GET: "result"]
+		}
+
+		"/proxy/$wptserver/xmlResult/$resultId/" {
+			controller = "WptProxy"
+			action = [GET: "xmlResult"]
+		}
+		
+		/*
+		 * rest api of osm
+		 */
+		
+		"/rest/$system/resultsbetween/$timestampFrom/$timestampTo" {
+			controller = "RestApi"
+			action = [GET: "getResults"]
+		}
+		
+		/* Since IT-81 */
+		"/rest/man" {
+			controller = "RestApi"
+			action = [GET: "man"]
+		}
+		
+		/* Since IT-81 */
+		"/rest/allSystems" {
+			controller = "RestApi"
+			action = [GET: "allSystems"]
+		}
+		
+		/* Since IT-81 */
+		"/rest/allBrowsers" {
+			controller = "RestApi"
+			action = [GET: "allBrowsers"]
+		}
+		
+		/* Since IT-81 */
+		"/rest/allPages" {
+			controller = "RestApi"
+			action = [GET: "allPages"]
+		}
+		
+		/* Since IT-81 */
+		"/rest/allLocations" {
+			controller = "RestApi"
+			action = [GET: "allLocations"]
+		}
+		
+		/* Since IT-81 */
+		"/rest/allSteps" {
+			controller = "RestApi"
+			action = [GET: "allSteps"]
+		}
+		
+		/* Since IT-248 */
+		"/rest/$system/csi/$timestampFrom/$timestampTo" {
+			controller = "RestApi"
+			action = [GET: "getSystemCsi"]
+		}
+		
+		"/rest/csi/translateToCustomerSatisfaction" {
+			controller = "RestApi"
+			action = [GET: "translateToCustomerSatisfaction"]
+		}
+		"/rest/csi/frustrations" {
+			controller = "RestApi"
+			action = [GET: "getCsiFrustrationTimings"]
+		}
+	
 	}
 }

@@ -1,0 +1,2 @@
+<%=packageName%>
+<g:render template="../editOrCreate" model="['mode': 'create', 'entityName': 'script', 'entityDisplayName': message(code: 'de.iteratec.iss.script', default: 'Skript'), 'entity': script]" />

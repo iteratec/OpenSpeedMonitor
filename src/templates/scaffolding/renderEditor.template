@@ -188,9 +188,9 @@
 
     private renderBooleanEditor(domainClass, property) {
         if (!cp) {
-            return "<g:checkBox name=\"${property.name}\" value=\"\${${domainInstance}?.${property.name}}\" />"
+            return "<bs:checkBox name=\"${property.name}\" value=\"\${${domainInstance}?.${property.name}}\" />"
         } else {
-            def sb = new StringBuilder("<g:checkBox name=\"${property.name}\" ")
+            def sb = new StringBuilder("<bs:checkBox name=\"${property.name}\" ")
             if (cp.widget) sb << "widget=\"${cp.widget}\" ";
             cp.attributes.each { k, v ->
                 sb << "${k}=\"${v}\" "

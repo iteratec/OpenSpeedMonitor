@@ -1,0 +1,7 @@
+td,th {
+	border: 1px #ccc solid;
+	padding: 0.3em;
+}
+.status {
+	display: block;
+}

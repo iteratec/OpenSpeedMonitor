@@ -1,0 +1,5 @@
+This folder contains xml-files of wpt-results delivered from REST-API of wpt-servers 
+(see https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis).
+
+For these result-xml's a http-archive in ../HARs exists with same file-name (excluding file-extension) result-xml and har are sourced from the 
+same wpt-result.

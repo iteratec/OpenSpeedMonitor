@@ -1,0 +1,28 @@
+.setEventName-warning-line { background: #FFFF99 !important; }
+.setEventName-warning-icon { width: 16px; height: 16px; 
+	background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAANlBMVEX/uwDvrwD/uwD/uwD/uwD/uwD/uwD/uwD/uwD6twD/uwAAAADurwD2tQD7uAD+ugAAAAD/uwDhmeTRAAAADHRSTlMJ8mN1EYcbmiixgACm7WbuAAAAVklEQVR42n3PUQqAIBBFUU1LLc3u/jdbOJoW1P08DA9Gba8+YWJ6gNJoNYIBzAA2chBth5kLmG9YUoG0NHAUwFXwO9LuBQL1giCQb8gC9Oro2vp5rncCIY8L8uEx5ZkAAAAASUVORK5CYII=");
+	}
+.setEventName-warning-icon:hover {  }	
+.setEventName-warning-gutter { width: 12px; }
+
+.eventBlock-top { background: #d4f5fe; border: 1px #999 solid; border-bottom: none; border-top-left-radius: 5px; border-top-right-radius: 5px; }
+.eventBlock-middle {background: #d4f5fe; border: 1px #999 solid; border-top: none; border-bottom: none; }
+.eventBlock-bottom { background: #d4f5fe; border: 1px #999 solid; border-top: none; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; }
+.eventBlock-oneline { background: #d4f5fe; border: 1px #999 solid; border-radius: 5px; }
+
+p#usedVariables span, .placeholder-row label {
+	font-family: monospace;
+	color: #05a; 
+	text-decoration: underline;
+}
+
+.CodeMirror {
+	height: auto;
+}
+
+.CodeMirror-scroll {
+  max-height: 400px;
+  min-height: 200px;
+  overflow-y: hidden;
+  overflow-x: auto;
+}

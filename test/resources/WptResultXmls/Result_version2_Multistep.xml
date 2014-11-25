@@ -1,0 +1,4468 @@
+<response>
+	<statusCode>200</statusCode>
+	<statusText>Ok</statusText>
+	<data>
+		<testId>130425_W1_f606bebc977a3b22c1a9205f70d07a00</testId>
+		<summary>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/
+		</summary>
+		<testUrl>http://www.server.de</testUrl>
+		<location>Agent2-wptdriver:Firefox</location>
+		<connectivity>DSL</connectivity>
+		<bwDown>6000</bwDown>
+		<bwUp>512</bwUp>
+		<latency>50</latency>
+		<plr>0</plr>
+		<label>example.de - Multiple steps with event names + dom elements
+		</label>
+		<completed>Thu, 25 Apr 2013 09:52:21 +0000</completed>
+		<runs>3</runs>
+		<successfulFVRuns>3</successfulFVRuns>
+		<average>
+			<firstView>
+				<testStep>
+					<eventName>Seite laden</eventName>
+					<loadTime>2534</loadTime>
+					<TTFB>790</TTFB>
+					<bytesIn>685783</bytesIn>
+					<bytesInDoc>402320</bytesInDoc>
+					<requests>106</requests>
+					<requestsDoc>51</requestsDoc>
+					<render>1840</render>
+					<fullyLoaded>4961</fullyLoaded>
+					<docTime>2534</docTime>
+					<domTime>849</domTime>
+					<titleTime>818</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Artikel suchen</eventName>
+					<loadTime>2174</loadTime>
+					<TTFB>177</TTFB>
+					<bytesIn>548575</bytesIn>
+					<bytesInDoc>422154</bytesInDoc>
+					<requests>142</requests>
+					<requestsDoc>82</requestsDoc>
+					<render>15</render>
+					<fullyLoaded>3559</fullyLoaded>
+					<docTime>2174</docTime>
+					<domTime>1319</domTime>
+					<titleTime>554</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Artikel-Detailseite laden</eventName>
+					<loadTime>2332</loadTime>
+					<TTFB>244</TTFB>
+					<bytesIn>344700</bytesIn>
+					<bytesInDoc>325232</bytesInDoc>
+					<requests>104</requests>
+					<requestsDoc>76</requestsDoc>
+					<render>18</render>
+					<fullyLoaded>3792</fullyLoaded>
+					<docTime>2332</docTime>
+					<domTime>623</domTime>
+					<titleTime>321</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Produkt auswaehlen</eventName>
+					<loadTime>2318</loadTime>
+					<TTFB>194</TTFB>
+					<bytesIn>896338</bytesIn>
+					<bytesInDoc>622824</bytesInDoc>
+					<requests>73</requests>
+					<requestsDoc>29</requestsDoc>
+					<render>19</render>
+					<fullyLoaded>4655</fullyLoaded>
+					<docTime>2318</docTime>
+					<domTime>600</domTime>
+					<titleTime>251</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Produkt in Warenkorb legen</eventName>
+					<loadTime>2187</loadTime>
+					<TTFB>608</TTFB>
+					<bytesIn>259872</bytesIn>
+					<bytesInDoc>244931</bytesInDoc>
+					<requests>62</requests>
+					<requestsDoc>45</requestsDoc>
+					<render>26</render>
+					<fullyLoaded>2879</fullyLoaded>
+					<docTime>2187</docTime>
+					<domTime>1781</domTime>
+					<titleTime>1560</titleTime>
+					<avgRun>3</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Warenkorb oeffnen</eventName>
+					<loadTime>5128</loadTime>
+					<TTFB>189</TTFB>
+					<bytesIn>839501</bytesIn>
+					<bytesInDoc>809655</bytesInDoc>
+					<requests>68</requests>
+					<requestsDoc>64</requestsDoc>
+					<render>19</render>
+					<fullyLoaded>5777</fullyLoaded>
+					<docTime>5128</docTime>
+					<domTime>4067</domTime>
+					<titleTime>2902</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+			</firstView>
+			<repeatView>
+				<testStep>
+					<eventName>Seite laden</eventName>
+					<loadTime>1155</loadTime>
+					<TTFB>413</TTFB>
+					<bytesIn>93182</bytesIn>
+					<bytesInDoc>36059</bytesInDoc>
+					<requests>39</requests>
+					<requestsDoc>3</requestsDoc>
+					<render>844</render>
+					<fullyLoaded>3583</fullyLoaded>
+					<docTime>1155</docTime>
+					<domTime>489</domTime>
+					<titleTime>478</titleTime>
+					<avgRun>3</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Artikel suchen</eventName>
+					<loadTime>984</loadTime>
+					<TTFB>107</TTFB>
+					<bytesIn>88969</bytesIn>
+					<bytesInDoc>43507</bytesInDoc>
+					<requests>39</requests>
+					<requestsDoc>5</requestsDoc>
+					<render>17</render>
+					<fullyLoaded>2963</fullyLoaded>
+					<docTime>984</docTime>
+					<domTime>699</domTime>
+					<titleTime>422</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Artikel-Detailseite laden</eventName>
+					<loadTime>810</loadTime>
+					<TTFB>195</TTFB>
+					<bytesIn>91621</bytesIn>
+					<bytesInDoc>52702</bytesInDoc>
+					<requests>36</requests>
+					<requestsDoc>3</requestsDoc>
+					<render>21</render>
+					<fullyLoaded>2674</fullyLoaded>
+					<docTime>810</docTime>
+					<domTime>381</domTime>
+					<titleTime>270</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Produkt auswaehlen</eventName>
+					<loadTime>1277</loadTime>
+					<TTFB>183</TTFB>
+					<bytesIn>89095</bytesIn>
+					<bytesInDoc>34902</bytesInDoc>
+					<requests>46</requests>
+					<requestsDoc>2</requestsDoc>
+					<render>20</render>
+					<fullyLoaded>3264</fullyLoaded>
+					<docTime>1277</docTime>
+					<domTime>308</domTime>
+					<titleTime>264</titleTime>
+					<avgRun>2</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Produkt in Warenkorb legen</eventName>
+					<loadTime>1445</loadTime>
+					<TTFB>525</TTFB>
+					<bytesIn>34177</bytesIn>
+					<bytesInDoc>21541</bytesInDoc>
+					<requests>18</requests>
+					<requestsDoc>2</requestsDoc>
+					<render>24</render>
+					<fullyLoaded>2442</fullyLoaded>
+					<docTime>1445</docTime>
+					<domTime>1199</domTime>
+					<titleTime>1119</titleTime>
+					<avgRun>1</avgRun>
+				</testStep>
+				<testStep>
+					<eventName>Warenkorb oeffnen</eventName>
+					<loadTime>2530</loadTime>
+					<TTFB>159</TTFB>
+					<bytesIn>91775</bytesIn>
+					<bytesInDoc>54264</bytesInDoc>
+					<requests>10</requests>
+					<requestsDoc>4</requestsDoc>
+					<render>16</render>
+					<fullyLoaded>3283</fullyLoaded>
+					<docTime>2530</docTime>
+					<domTime>2390</domTime>
+					<titleTime>2185</titleTime>
+					<avgRun>3</avgRun>
+				</testStep>
+			</repeatView>
+		</average>
+		<median>
+			<firstView>
+				<testStep>
+					<eventName>Seite laden</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>2755</loadTime>
+					<TTFB>1302</TTFB>
+					<bytesOut>42091</bytesOut>
+					<bytesOutDoc>22200</bytesOutDoc>
+					<bytesIn>673659</bytesIn>
+					<bytesInDoc>408513</bytesInDoc>
+					<connections>0</connections>
+					<requests>89</requests>
+					<requestsDoc>51</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>99999</result>
+					<render>2136</render>
+					<fullyLoaded>5543</fullyLoaded>
+					<cached>0</cached>
+					<docTime>2755</docTime>
+					<domTime>1332</domTime>
+					<score_cache>55</score_cache>
+					<score_cdn>3</score_cdn>
+					<score_gzip>91</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>94</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>0</score_combine>
+					<score_compress>97</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>267107</gzip_total>
+					<gzip_savings>22425</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>379520</image_total>
+					<image_savings>7949</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>1336</titleTime>
+					<loadEventStart>2752</loadEventStart>
+					<loadEventEnd>2771</loadEventEnd>
+					<domContentLoadedEventStart>2589</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>2649</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>79</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>1</pageNumber>
+					<date>1366883247</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Artikel suchen</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>2123</loadTime>
+					<TTFB>104</TTFB>
+					<bytesOut>96114</bytesOut>
+					<bytesOutDoc>64693</bytesOutDoc>
+					<bytesIn>564851</bytesIn>
+					<bytesInDoc>525845</bytesInDoc>
+					<connections>0</connections>
+					<requests>144</requests>
+					<requestsDoc>103</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>14</render>
+					<fullyLoaded>3406</fullyLoaded>
+					<cached>0</cached>
+					<docTime>2123</docTime>
+					<domTime>942</domTime>
+					<score_cache>50</score_cache>
+					<score_cdn>63</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>95</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>96</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>174147</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>336548</image_total>
+					<image_savings>12998</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>379</titleTime>
+					<loadEventStart>1998</loadEventStart>
+					<loadEventEnd>2019</loadEventEnd>
+					<domContentLoadedEventStart>1067</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>1181</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>79</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>2</pageNumber>
+					<date>1366883256</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Artikel-Detailseite laden</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>1810</loadTime>
+					<TTFB>200</TTFB>
+					<bytesOut>67980</bytesOut>
+					<bytesOutDoc>46921</bytesOutDoc>
+					<bytesIn>342583</bytesIn>
+					<bytesInDoc>325135</bytesInDoc>
+					<connections>0</connections>
+					<requests>102</requests>
+					<requestsDoc>76</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>19</render>
+					<fullyLoaded>3284</fullyLoaded>
+					<cached>0</cached>
+					<docTime>1810</docTime>
+					<domTime>533</domTime>
+					<score_cache>44</score_cache>
+					<score_cdn>88</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>98</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>97</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>52839</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>253887</image_total>
+					<image_savings>6202</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>283</titleTime>
+					<loadEventStart>1809</loadEventStart>
+					<loadEventEnd>1828</loadEventEnd>
+					<domContentLoadedEventStart>765</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>879</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>79</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>3</pageNumber>
+					<date>1366883269</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Produkt auswaehlen</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>2218</loadTime>
+					<TTFB>165</TTFB>
+					<bytesOut>63000</bytesOut>
+					<bytesOutDoc>20801</bytesOutDoc>
+					<bytesIn>871483</bytesIn>
+					<bytesInDoc>606151</bytesInDoc>
+					<connections>0</connections>
+					<requests>65</requests>
+					<requestsDoc>29</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>99999</result>
+					<render>18</render>
+					<fullyLoaded>4874</fullyLoaded>
+					<cached>0</cached>
+					<docTime>2218</docTime>
+					<domTime>492</domTime>
+					<score_cache>47</score_cache>
+					<score_cdn>44</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>89</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>90</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>229949</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>423654</image_total>
+					<image_savings>40750</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>226</titleTime>
+					<loadEventStart>2221</loadEventStart>
+					<loadEventEnd>2242</loadEventEnd>
+					<domContentLoadedEventStart>1017</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>1441</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>79</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>4</pageNumber>
+					<date>1366883275</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Produkt in Warenkorb legen</eventName>
+					<run>3</run>
+					<URL />
+					<loadTime>2127</loadTime>
+					<TTFB>599</TTFB>
+					<bytesOut>54701</bytesOut>
+					<bytesOutDoc>34006</bytesOutDoc>
+					<bytesIn>264475</bytesIn>
+					<bytesInDoc>250291</bytesInDoc>
+					<connections>0</connections>
+					<requests>61</requests>
+					<requestsDoc>45</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>24</render>
+					<fullyLoaded>2689</fullyLoaded>
+					<cached>0</cached>
+					<docTime>2127</docTime>
+					<domTime>1766</domTime>
+					<score_cache>51</score_cache>
+					<score_cdn>60</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>92</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>111873</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>135868</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>1540</titleTime>
+					<loadEventStart>1038</loadEventStart>
+					<loadEventEnd>1047</loadEventEnd>
+					<domContentLoadedEventStart>751</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>924</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>177</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>5</pageNumber>
+					<date>1366883480</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Warenkorb oeffnen</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>5582</loadTime>
+					<TTFB>128</TTFB>
+					<bytesOut>165103</bytesOut>
+					<bytesOutDoc>150736</bytesOutDoc>
+					<bytesIn>823107</bytesIn>
+					<bytesInDoc>793243</bytesInDoc>
+					<connections>0</connections>
+					<requests>68</requests>
+					<requestsDoc>64</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>17</render>
+					<fullyLoaded>6263</fullyLoaded>
+					<cached>0</cached>
+					<docTime>5582</docTime>
+					<domTime>4526</domTime>
+					<score_cache>65</score_cache>
+					<score_cdn>3</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>100</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>292075</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>90326</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de</title>
+					<titleTime>3280</titleTime>
+					<loadEventStart>5363</loadEventStart>
+					<loadEventEnd>5367</loadEventEnd>
+					<domContentLoadedEventStart>5186</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>5245</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>79</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>6</pageNumber>
+					<date>1366883289</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+			</firstView>
+			<repeatView>
+				<testStep>
+					<eventName>Seite laden</eventName>
+					<run>3</run>
+					<URL />
+					<loadTime>1253</loadTime>
+					<TTFB>441</TTFB>
+					<bytesOut>31350</bytesOut>
+					<bytesOutDoc>2343</bytesOutDoc>
+					<bytesIn>123682</bytesIn>
+					<bytesInDoc>36053</bytesInDoc>
+					<connections>0</connections>
+					<requests>38</requests>
+					<requestsDoc>3</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>99999</result>
+					<render>780</render>
+					<fullyLoaded>4614</fullyLoaded>
+					<cached>1</cached>
+					<docTime>1253</docTime>
+					<domTime>516</domTime>
+					<score_cache>18</score_cache>
+					<score_cdn>33</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>89</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>83</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>48545</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>58717</image_total>
+					<image_savings>9507</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>513</titleTime>
+					<loadEventStart>1251</loadEventStart>
+					<loadEventEnd>1262</loadEventEnd>
+					<domContentLoadedEventStart>1181</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>1242</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>114</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>1</pageNumber>
+					<date>1366883498</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Artikel suchen</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>931</loadTime>
+					<TTFB>106</TTFB>
+					<bytesOut>36739</bytesOut>
+					<bytesOutDoc>5251</bytesOutDoc>
+					<bytesIn>105635</bytesIn>
+					<bytesInDoc>58349</bytesInDoc>
+					<connections>0</connections>
+					<requests>41</requests>
+					<requestsDoc>6</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>99999</result>
+					<render>18</render>
+					<fullyLoaded>2854</fullyLoaded>
+					<cached>1</cached>
+					<docTime>931</docTime>
+					<domTime>683</domTime>
+					<score_cache>14</score_cache>
+					<score_cdn>44</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>86</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>54120</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>32776</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>383</titleTime>
+					<loadEventStart>798</loadEventStart>
+					<loadEventEnd>808</loadEventEnd>
+					<domContentLoadedEventStart>669</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>780</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>78</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>2</pageNumber>
+					<date>1366883308</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Artikel-Detailseite laden</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>778</loadTime>
+					<TTFB>162</TTFB>
+					<bytesOut>29278</bytesOut>
+					<bytesOutDoc>4010</bytesOutDoc>
+					<bytesIn>90398</bytesIn>
+					<bytesInDoc>59707</bytesInDoc>
+					<connections>0</connections>
+					<requests>35</requests>
+					<requestsDoc>4</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>23</render>
+					<fullyLoaded>2439</fullyLoaded>
+					<cached>1</cached>
+					<docTime>778</docTime>
+					<domTime>349</domTime>
+					<score_cache>15</score_cache>
+					<score_cdn>75</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>100</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>53305</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>20191</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>243</titleTime>
+					<loadEventStart>778</loadEventStart>
+					<loadEventEnd>787</loadEventEnd>
+					<domContentLoadedEventStart>656</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>776</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>78</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>3</pageNumber>
+					<date>1366883319</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Produkt auswaehlen</eventName>
+					<run>2</run>
+					<URL />
+					<loadTime>1270</loadTime>
+					<TTFB>152</TTFB>
+					<bytesOut>51212</bytesOut>
+					<bytesOutDoc>2666</bytesOutDoc>
+					<bytesIn>91271</bytesIn>
+					<bytesInDoc>34706</bytesInDoc>
+					<connections>0</connections>
+					<requests>50</requests>
+					<requestsDoc>2</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>99999</result>
+					<render>21</render>
+					<fullyLoaded>3290</fullyLoaded>
+					<cached>1</cached>
+					<docTime>1270</docTime>
+					<domTime>336</domTime>
+					<score_cache>0</score_cache>
+					<score_cdn>0</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>78</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>48099</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>735</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>207</titleTime>
+					<loadEventStart>1270</loadEventStart>
+					<loadEventEnd>1287</loadEventEnd>
+					<domContentLoadedEventStart>468</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>859</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>79</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>4</pageNumber>
+					<date>1366883422</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Produkt in Warenkorb legen</eventName>
+					<run>1</run>
+					<URL />
+					<loadTime>1440</loadTime>
+					<TTFB>542</TTFB>
+					<bytesOut>20933</bytesOut>
+					<bytesOutDoc>1668</bytesOutDoc>
+					<bytesIn>31491</bytesIn>
+					<bytesInDoc>19063</bytesInDoc>
+					<connections>0</connections>
+					<requests>16</requests>
+					<requestsDoc>2</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>25</render>
+					<fullyLoaded>1966</fullyLoaded>
+					<cached>1</cached>
+					<docTime>1440</docTime>
+					<domTime>1259</domTime>
+					<score_cache>0</score_cache>
+					<score_cdn>0</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>55</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>26045</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>306</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de
+					</title>
+					<titleTime>1133</titleTime>
+					<loadEventStart>610</loadEventStart>
+					<loadEventEnd>614</loadEventEnd>
+					<domContentLoadedEventStart>455</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>610</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>78</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>5</pageNumber>
+					<date>1366883330</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+				<testStep>
+					<eventName>Warenkorb oeffnen</eventName>
+					<run>3</run>
+					<URL />
+					<loadTime>2685</loadTime>
+					<TTFB>125</TTFB>
+					<bytesOut>19908</bytesOut>
+					<bytesOutDoc>2823</bytesOutDoc>
+					<bytesIn>91796</bytesIn>
+					<bytesInDoc>44268</bytesInDoc>
+					<connections>0</connections>
+					<requests>10</requests>
+					<requestsDoc>4</requestsDoc>
+					<responses_200>0</responses_200>
+					<responses_404>0</responses_404>
+					<responses_other>0</responses_other>
+					<result>0</result>
+					<render>20</render>
+					<fullyLoaded>3750</fullyLoaded>
+					<cached>1</cached>
+					<docTime>2685</docTime>
+					<domTime>2470</domTime>
+					<score_cache>37</score_cache>
+					<score_cdn>0</score_cdn>
+					<score_gzip>100</score_gzip>
+					<score_cookies>-1</score_cookies>
+					<score_keep-alive>100</score_keep-alive>
+					<score_minify>-1</score_minify>
+					<score_combine>100</score_combine>
+					<score_compress>100</score_compress>
+					<score_etags>-1</score_etags>
+					<gzip_total>17769</gzip_total>
+					<gzip_savings>0</gzip_savings>
+					<minify_total>0</minify_total>
+					<minify_savings>0</minify_savings>
+					<image_total>86</image_total>
+					<image_savings>0</image_savings>
+					<optimization_checked>1</optimization_checked>
+					<aft>0</aft>
+					<domElements>0</domElements>
+					<pageSpeedVersion>1.9</pageSpeedVersion>
+					<title>navigated subsite of example.de</title>
+					<titleTime>2300</titleTime>
+					<loadEventStart>2481</loadEventStart>
+					<loadEventEnd>2483</loadEventEnd>
+					<domContentLoadedEventStart>2418</domContentLoadedEventStart>
+					<domContentLoadedEventEnd>2480</domContentLoadedEventEnd>
+					<lastVisualChange>0</lastVisualChange>
+					<browser_name>Firefox</browser_name>
+					<browser_version>17.0.0.4706</browser_version>
+					<server_count>1</server_count>
+					<server_rtt>78</server_rtt>
+					<base_page_cdn />
+					<adult_site>0</adult_site>
+					<expectedRequests />
+					<pageNumber>6</pageNumber>
+					<date>1366883535</date>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_pagespeed.txt
+					</PageSpeedData>
+				</testStep>
+			</repeatView>
+		</median>
+		<run>
+			<id>1</id>
+			<firstView>
+				<results>
+					<testStep>
+						<eventName>Seite laden</eventName>
+						<URL />
+						<loadTime>2755</loadTime>
+						<TTFB>1302</TTFB>
+						<bytesOut>42091</bytesOut>
+						<bytesOutDoc>22200</bytesOutDoc>
+						<bytesIn>673659</bytesIn>
+						<bytesInDoc>408513</bytesInDoc>
+						<connections>0</connections>
+						<requests>89</requests>
+						<requestsDoc>51</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>2136</render>
+						<fullyLoaded>5543</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2755</docTime>
+						<domTime>1332</domTime>
+						<score_cache>55</score_cache>
+						<score_cdn>3</score_cdn>
+						<score_gzip>91</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>94</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>0</score_combine>
+						<score_compress>97</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>267107</gzip_total>
+						<gzip_savings>22425</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>379520</image_total>
+						<image_savings>7949</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1336</titleTime>
+						<loadEventStart>2752</loadEventStart>
+						<loadEventEnd>2771</loadEventEnd>
+						<domContentLoadedEventStart>2589</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>2649</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests ></expectedRequests>
+						<pageNumber>1</pageNumber>
+						<date>1366883247</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel suchen</eventName>
+						<URL />
+						<loadTime>2123</loadTime>
+						<TTFB>104</TTFB>
+						<bytesOut>96114</bytesOut>
+						<bytesOutDoc>64693</bytesOutDoc>
+						<bytesIn>564851</bytesIn>
+						<bytesInDoc>525845</bytesInDoc>
+						<connections>0</connections>
+						<requests>144</requests>
+						<requestsDoc>103</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>14</render>
+						<fullyLoaded>3406</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2123</docTime>
+						<domTime>942</domTime>
+						<score_cache>50</score_cache>
+						<score_cdn>63</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>95</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>96</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>174147</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>336548</image_total>
+						<image_savings>12998</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>379</titleTime>
+						<loadEventStart>1998</loadEventStart>
+						<loadEventEnd>2019</loadEventEnd>
+						<domContentLoadedEventStart>1067</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1181</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>2</pageNumber>
+						<date>1366883256</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel-Detailseite laden</eventName>
+						<URL />
+						<loadTime>1810</loadTime>
+						<TTFB>200</TTFB>
+						<bytesOut>67980</bytesOut>
+						<bytesOutDoc>46921</bytesOutDoc>
+						<bytesIn>342583</bytesIn>
+						<bytesInDoc>325135</bytesInDoc>
+						<connections>0</connections>
+						<requests>102</requests>
+						<requestsDoc>76</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>19</render>
+						<fullyLoaded>3284</fullyLoaded>
+						<cached>0</cached>
+						<docTime>1810</docTime>
+						<domTime>533</domTime>
+						<score_cache>44</score_cache>
+						<score_cdn>88</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>98</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>97</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>52839</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>253887</image_total>
+						<image_savings>6202</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>283</titleTime>
+						<loadEventStart>1809</loadEventStart>
+						<loadEventEnd>1828</loadEventEnd>
+						<domContentLoadedEventStart>765</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>879</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>3</pageNumber>
+						<date>1366883269</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt auswaehlen</eventName>
+						<URL />
+						<loadTime>2218</loadTime>
+						<TTFB>165</TTFB>
+						<bytesOut>63000</bytesOut>
+						<bytesOutDoc>20801</bytesOutDoc>
+						<bytesIn>871483</bytesIn>
+						<bytesInDoc>606151</bytesInDoc>
+						<connections>0</connections>
+						<requests>65</requests>
+						<requestsDoc>29</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>18</render>
+						<fullyLoaded>4874</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2218</docTime>
+						<domTime>492</domTime>
+						<score_cache>47</score_cache>
+						<score_cdn>44</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>89</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>90</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>229949</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>423654</image_total>
+						<image_savings>40750</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>226</titleTime>
+						<loadEventStart>2221</loadEventStart>
+						<loadEventEnd>2242</loadEventEnd>
+						<domContentLoadedEventStart>1017</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1441</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>4</pageNumber>
+						<date>1366883275</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt in Warenkorb legen</eventName>
+						<URL />
+						<loadTime>2023</loadTime>
+						<TTFB>532</TTFB>
+						<bytesOut>55992</bytesOut>
+						<bytesOutDoc>34007</bytesOutDoc>
+						<bytesIn>249957</bytesIn>
+						<bytesInDoc>234089</bytesInDoc>
+						<connections>0</connections>
+						<requests>63</requests>
+						<requestsDoc>45</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>24</render>
+						<fullyLoaded>2957</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2023</docTime>
+						<domTime>1535</domTime>
+						<score_cache>48</score_cache>
+						<score_cdn>61</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>92</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>95157</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>136374</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1319</titleTime>
+						<loadEventStart>987</loadEventStart>
+						<loadEventEnd>996</loadEventEnd>
+						<domContentLoadedEventStart>541</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>709</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>5</pageNumber>
+						<date>1366883283</date>
+					</testStep>
+					<testStep>
+						<eventName>Warenkorb oeffnen</eventName>
+						<URL />
+						<loadTime>5582</loadTime>
+						<TTFB>128</TTFB>
+						<bytesOut>165103</bytesOut>
+						<bytesOutDoc>150736</bytesOutDoc>
+						<bytesIn>823107</bytesIn>
+						<bytesInDoc>793243</bytesInDoc>
+						<connections>0</connections>
+						<requests>68</requests>
+						<requestsDoc>64</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>17</render>
+						<fullyLoaded>6263</fullyLoaded>
+						<cached>0</cached>
+						<docTime>5582</docTime>
+						<domTime>4526</domTime>
+						<score_cache>65</score_cache>
+						<score_cdn>3</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>292075</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>90326</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de</title>
+						<titleTime>3280</titleTime>
+						<loadEventStart>5363</loadEventStart>
+						<loadEventEnd>5367</loadEventEnd>
+						<domContentLoadedEventStart>5186</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>5245</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>6</pageNumber>
+						<date>1366883289</date>
+					</testStep>
+				</results>
+				<pages>
+					<details>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/details/
+					</details>
+					<checklist>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/performance_optimization/
+					</checklist>
+					<breakdown>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/breakdown/
+					</breakdown>
+					<domains>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/domains/
+					</domains>
+					<screenShot>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/screen_shot/
+					</screenShot>
+				</pages>
+				<thumbnails>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Seite+laden/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel+suchen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel-Detailseite+laden/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+auswaehlen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+in+Warenkorb+legen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Warenkorb+oeffnen/waterfall_thumb.png
+						</testStep>
+					</waterfall>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Seite+laden/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel+suchen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel-Detailseite+laden/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+auswaehlen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+in+Warenkorb+legen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Warenkorb+oeffnen/optimization_thumb.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_1_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_2_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_3_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_4_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_5_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_6_screen_thumb.jpg
+						</testStep>
+					</screenShot>
+				</thumbnails>
+				<images>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Seite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Artikel+suchen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Artikel-Detailseite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Produkt+auswaehlen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Produkt+in+Warenkorb+legen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Warenkorb+oeffnen_waterfall.png
+						</testStep>
+					</waterfall>
+					<connectionView>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Seite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Artikel+suchen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Artikel-Detailseite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Produkt+auswaehlen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Produkt+in+Warenkorb+legen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Warenkorb+oeffnen_connection.png
+						</testStep>
+					</connectionView>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Seite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Artikel+suchen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Artikel-Detailseite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Produkt+auswaehlen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Produkt+in+Warenkorb+legen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Warenkorb+oeffnen_optimization.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_1_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_2_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_3_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_4_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_5_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_6_screen.jpg
+						</testStep>
+					</screenShot>
+				</images>
+				<rawData>
+					<headers>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_1_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_2_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_3_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_4_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_5_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_6_report.txt
+						</testStep>
+					</headers>
+					<pageData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_IEWPG.txt
+					</pageData>
+					<requestsData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_IEWTR.txt
+					</requestsData>
+					<utilization>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_progress.csv
+					</utilization>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_pagespeed.txt
+					</PageSpeedData>
+				</rawData>
+			</firstView>
+			<repeatView>
+				<results>
+					<testStep>
+						<eventName>Seite laden</eventName>
+						<URL />
+						<loadTime>1408</loadTime>
+						<TTFB>544</TTFB>
+						<bytesOut>30895</bytesOut>
+						<bytesOutDoc>2343</bytesOutDoc>
+						<bytesIn>83115</bytesIn>
+						<bytesInDoc>36060</bytesInDoc>
+						<connections>0</connections>
+						<requests>40</requests>
+						<requestsDoc>3</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>876</render>
+						<fullyLoaded>3383</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1408</docTime>
+						<domTime>630</domTime>
+						<score_cache>19</score_cache>
+						<score_cdn>57</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>90</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>48289</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>18169</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>603</titleTime>
+						<loadEventStart>1406</loadEventStart>
+						<loadEventEnd>1417</loadEventEnd>
+						<domContentLoadedEventStart>1336</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1397</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>148</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>1</pageNumber>
+						<date>1366883302</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel suchen</eventName>
+						<URL />
+						<loadTime>931</loadTime>
+						<TTFB>106</TTFB>
+						<bytesOut>36739</bytesOut>
+						<bytesOutDoc>5251</bytesOutDoc>
+						<bytesIn>105635</bytesIn>
+						<bytesInDoc>58349</bytesInDoc>
+						<connections>0</connections>
+						<requests>41</requests>
+						<requestsDoc>6</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>18</render>
+						<fullyLoaded>2854</fullyLoaded>
+						<cached>1</cached>
+						<docTime>931</docTime>
+						<domTime>683</domTime>
+						<score_cache>14</score_cache>
+						<score_cdn>44</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>86</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>54120</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>32776</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>383</titleTime>
+						<loadEventStart>798</loadEventStart>
+						<loadEventEnd>808</loadEventEnd>
+						<domContentLoadedEventStart>669</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>780</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>2</pageNumber>
+						<date>1366883308</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel-Detailseite laden</eventName>
+						<URL />
+						<loadTime>778</loadTime>
+						<TTFB>162</TTFB>
+						<bytesOut>29278</bytesOut>
+						<bytesOutDoc>4010</bytesOutDoc>
+						<bytesIn>90398</bytesIn>
+						<bytesInDoc>59707</bytesInDoc>
+						<connections>0</connections>
+						<requests>35</requests>
+						<requestsDoc>4</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>23</render>
+						<fullyLoaded>2439</fullyLoaded>
+						<cached>1</cached>
+						<docTime>778</docTime>
+						<domTime>349</domTime>
+						<score_cache>15</score_cache>
+						<score_cdn>75</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>53305</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>20191</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>243</titleTime>
+						<loadEventStart>778</loadEventStart>
+						<loadEventEnd>787</loadEventEnd>
+						<domContentLoadedEventStart>656</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>776</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>3</pageNumber>
+						<date>1366883319</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt auswaehlen</eventName>
+						<URL />
+						<loadTime>1294</loadTime>
+						<TTFB>204</TTFB>
+						<bytesOut>45859</bytesOut>
+						<bytesOutDoc>2576</bytesOutDoc>
+						<bytesIn>90813</bytesIn>
+						<bytesInDoc>35065</bytesInDoc>
+						<connections>0</connections>
+						<requests>48</requests>
+						<requestsDoc>2</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>20</render>
+						<fullyLoaded>3242</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1294</docTime>
+						<domTime>295</domTime>
+						<score_cache>0</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>78</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>48003</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>784</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>293</titleTime>
+						<loadEventStart>1295</loadEventStart>
+						<loadEventEnd>1314</loadEventEnd>
+						<domContentLoadedEventStart>522</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>914</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>4</pageNumber>
+						<date>1366883324</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt in Warenkorb legen</eventName>
+						<URL />
+						<loadTime>1440</loadTime>
+						<TTFB>542</TTFB>
+						<bytesOut>20933</bytesOut>
+						<bytesOutDoc>1668</bytesOutDoc>
+						<bytesIn>31491</bytesIn>
+						<bytesInDoc>19063</bytesInDoc>
+						<connections>0</connections>
+						<requests>16</requests>
+						<requestsDoc>2</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>25</render>
+						<fullyLoaded>1966</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1440</docTime>
+						<domTime>1259</domTime>
+						<score_cache>0</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>55</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>26045</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>306</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1133</titleTime>
+						<loadEventStart>610</loadEventStart>
+						<loadEventEnd>614</loadEventEnd>
+						<domContentLoadedEventStart>455</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>610</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>5</pageNumber>
+						<date>1366883330</date>
+					</testStep>
+					<testStep>
+						<eventName>Warenkorb oeffnen</eventName>
+						<URL />
+						<loadTime>2008</loadTime>
+						<TTFB>121</TTFB>
+						<bytesOut>19870</bytesOut>
+						<bytesOutDoc>5082</bytesOutDoc>
+						<bytesIn>91762</bytesIn>
+						<bytesInDoc>59259</bytesInDoc>
+						<connections>0</connections>
+						<requests>10</requests>
+						<requestsDoc>4</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>15</render>
+						<fullyLoaded>2609</fullyLoaded>
+						<cached>1</cached>
+						<docTime>2008</docTime>
+						<domTime>1907</domTime>
+						<score_cache>37</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>17749</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>86</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de</title>
+						<titleTime>1685</titleTime>
+						<loadEventStart>1796</loadEventStart>
+						<loadEventEnd>1798</loadEventEnd>
+						<domContentLoadedEventStart>1735</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1794</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>6</pageNumber>
+						<date>1366883335</date>
+					</testStep>
+				</results>
+				<pages>
+					<details>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/details/cached/
+					</details>
+					<checklist>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/performance_optimization/cached/
+					</checklist>
+					<report>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/optimization_report/cached/
+					</report>
+					<breakdown>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/breakdown/
+					</breakdown>
+					<domains>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/domains/
+					</domains>
+					<screenShot>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/screen_shot/cached/
+					</screenShot>
+				</pages>
+				<thumbnails>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Seite+laden/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel+suchen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel-Detailseite+laden/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+auswaehlen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+in+Warenkorb+legen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Warenkorb+oeffnen/Cached_waterfall_thumb.png
+						</testStep>
+					</waterfall>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Seite+laden/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel+suchen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Artikel-Detailseite+laden/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+auswaehlen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Produkt+in+Warenkorb+legen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1/Warenkorb+oeffnen/Cached_optimization_thumb.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_1_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_2_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_3_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_4_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_5_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_6_screen_thumb.jpg
+						</testStep>
+					</screenShot>
+				</thumbnails>
+				<images>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Seite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Artikel+suchen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Artikel-Detailseite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Produkt+auswaehlen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Produkt+in+Warenkorb+legen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Warenkorb+oeffnen_waterfall.png
+						</testStep>
+					</waterfall>
+					<connectionView>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Seite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Artikel+suchen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Artikel-Detailseite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Produkt+auswaehlen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Produkt+in+Warenkorb+legen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Warenkorb+oeffnen_connection.png
+						</testStep>
+					</connectionView>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Seite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Artikel+suchen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Artikel-Detailseite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Produkt+auswaehlen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Produkt+in+Warenkorb+legen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_Warenkorb+oeffnen_optimization.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_1_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_2_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_3_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_4_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_5_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_6_screen.jpg
+						</testStep>
+					</screenShot>
+				</images>
+				<rawData>
+					<headers>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_1_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_2_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_3_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_4_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_5_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_6_report.txt
+						</testStep>
+					</headers>
+					<pageData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_IEWPG.txt
+					</pageData>
+					<requestsData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_IEWTR.txt
+					</requestsData>
+					<utilization>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/1_Cached_progress.csv
+					</utilization>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/1_Cached_pagespeed.txt
+					</PageSpeedData>
+				</rawData>
+			</repeatView>
+		</run>
+		<run>
+			<id>2</id>
+			<firstView>
+				<results>
+					<testStep>
+						<eventName>Seite laden</eventName>
+						<URL />
+						<loadTime>1751</loadTime>
+						<TTFB>339</TTFB>
+						<bytesOut>56485</bytesOut>
+						<bytesOutDoc>22200</bytesOutDoc>
+						<bytesIn>692095</bytesIn>
+						<bytesInDoc>399246</bytesInDoc>
+						<connections>0</connections>
+						<requests>115</requests>
+						<requestsDoc>51</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>1122</render>
+						<fullyLoaded>3991</fullyLoaded>
+						<cached>0</cached>
+						<docTime>1751</docTime>
+						<domTime>409</domTime>
+						<score_cache>50</score_cache>
+						<score_cdn>2</score_cdn>
+						<score_gzip>90</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>87</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>0</score_combine>
+						<score_compress>97</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>265540</gzip_total>
+						<gzip_savings>25479</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>380030</image_total>
+						<image_savings>7949</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>365</titleTime>
+						<loadEventStart>1748</loadEventStart>
+						<loadEventEnd>1763</loadEventEnd>
+						<domContentLoadedEventStart>1586</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1647</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>1</pageNumber>
+						<date>1366883347</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel suchen</eventName>
+						<URL />
+						<loadTime>2318</loadTime>
+						<TTFB>194</TTFB>
+						<bytesOut>95528</bytesOut>
+						<bytesOutDoc>43951</bytesOutDoc>
+						<bytesIn>539508</bytesIn>
+						<bytesInDoc>371169</bytesInDoc>
+						<connections>0</connections>
+						<requests>140</requests>
+						<requestsDoc>72</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>14</render>
+						<fullyLoaded>3710</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2318</docTime>
+						<domTime>1584</domTime>
+						<score_cache>50</score_cache>
+						<score_cdn>64</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>95</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>96</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>161313</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>332888</image_total>
+						<image_savings>12998</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>572</titleTime>
+						<loadEventStart>2099</loadEventStart>
+						<loadEventEnd>2116</loadEventEnd>
+						<domContentLoadedEventStart>1788</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1907</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>2</pageNumber>
+						<date>1366883354</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel-Detailseite laden</eventName>
+						<URL />
+						<loadTime>3480</loadTime>
+						<TTFB>338</TTFB>
+						<bytesOut>72411</bytesOut>
+						<bytesOutDoc>46883</bytesOutDoc>
+						<bytesIn>346275</bytesIn>
+						<bytesInDoc>325525</bytesInDoc>
+						<connections>0</connections>
+						<requests>106</requests>
+						<requestsDoc>76</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>15</render>
+						<fullyLoaded>4908</fullyLoaded>
+						<cached>0</cached>
+						<docTime>3480</docTime>
+						<domTime>826</domTime>
+						<score_cache>44</score_cache>
+						<score_cdn>88</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>97</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>53112</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>254487</image_total>
+						<image_savings>6202</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>425</titleTime>
+						<loadEventStart>3481</loadEventStart>
+						<loadEventEnd>3503</loadEventEnd>
+						<domContentLoadedEventStart>1048</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1171</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>3</pageNumber>
+						<date>1366883366</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt auswaehlen</eventName>
+						<URL />
+						<loadTime>2001</loadTime>
+						<TTFB>174</TTFB>
+						<bytesOut>74829</bytesOut>
+						<bytesOutDoc>20725</bytesOutDoc>
+						<bytesIn>932003</bytesIn>
+						<bytesInDoc>653749</bytesInDoc>
+						<connections>0</connections>
+						<requests>78</requests>
+						<requestsDoc>29</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>19</render>
+						<fullyLoaded>4261</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2001</docTime>
+						<domTime>505</domTime>
+						<score_cache>44</score_cache>
+						<score_cdn>45</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>87</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>90</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>276884</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>423742</image_total>
+						<image_savings>40750</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>232</titleTime>
+						<loadEventStart>2003</loadEventStart>
+						<loadEventEnd>2027</loadEventEnd>
+						<domContentLoadedEventStart>1060</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1479</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>4</pageNumber>
+						<date>1366883374</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt in Warenkorb legen</eventName>
+						<URL />
+						<loadTime>2412</loadTime>
+						<TTFB>694</TTFB>
+						<bytesOut>55247</bytesOut>
+						<bytesOutDoc>33988</bytesOutDoc>
+						<bytesIn>265185</bytesIn>
+						<bytesInDoc>250413</bytesInDoc>
+						<connections>0</connections>
+						<requests>62</requests>
+						<requestsDoc>45</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>31</render>
+						<fullyLoaded>2990</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2412</docTime>
+						<domTime>2041</domTime>
+						<score_cache>51</score_cache>
+						<score_cdn>61</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>92</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>109558</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>138295</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1822</titleTime>
+						<loadEventStart>966</loadEventStart>
+						<loadEventEnd>975</loadEventEnd>
+						<domContentLoadedEventStart>629</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>791</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>5</pageNumber>
+						<date>1366883381</date>
+					</testStep>
+					<testStep>
+						<eventName>Warenkorb oeffnen</eventName>
+						<URL />
+						<loadTime>3992</loadTime>
+						<TTFB>136</TTFB>
+						<bytesOut>164264</bytesOut>
+						<bytesOutDoc>149967</bytesOutDoc>
+						<bytesIn>847708</bytesIn>
+						<bytesInDoc>817844</bytesInDoc>
+						<connections>0</connections>
+						<requests>68</requests>
+						<requestsDoc>64</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>18</render>
+						<fullyLoaded>4658</fullyLoaded>
+						<cached>0</cached>
+						<docTime>3992</docTime>
+						<domTime>2924</domTime>
+						<score_cache>65</score_cache>
+						<score_cdn>3</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>292019</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>90326</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de</title>
+						<titleTime>1800</titleTime>
+						<loadEventStart>3765</loadEventStart>
+						<loadEventEnd>3769</loadEventEnd>
+						<domContentLoadedEventStart>3598</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>3656</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>6</pageNumber>
+						<date>1366883387</date>
+					</testStep>
+				</results>
+				<pages>
+					<details>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/details/
+					</details>
+					<checklist>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/performance_optimization/
+					</checklist>
+					<breakdown>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/breakdown/
+					</breakdown>
+					<domains>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/domains/
+					</domains>
+					<screenShot>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/screen_shot/
+					</screenShot>
+				</pages>
+				<thumbnails>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Seite+laden/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel+suchen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel-Detailseite+laden/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+auswaehlen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+in+Warenkorb+legen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Warenkorb+oeffnen/waterfall_thumb.png
+						</testStep>
+					</waterfall>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Seite+laden/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel+suchen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel-Detailseite+laden/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+auswaehlen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+in+Warenkorb+legen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Warenkorb+oeffnen/optimization_thumb.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_1_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_2_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_3_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_4_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_5_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_6_screen_thumb.jpg
+						</testStep>
+					</screenShot>
+				</thumbnails>
+				<images>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Seite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Artikel+suchen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Artikel-Detailseite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Produkt+auswaehlen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Produkt+in+Warenkorb+legen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Warenkorb+oeffnen_waterfall.png
+						</testStep>
+					</waterfall>
+					<connectionView>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Seite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Artikel+suchen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Artikel-Detailseite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Produkt+auswaehlen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Produkt+in+Warenkorb+legen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Warenkorb+oeffnen_connection.png
+						</testStep>
+					</connectionView>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Seite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Artikel+suchen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Artikel-Detailseite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Produkt+auswaehlen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Produkt+in+Warenkorb+legen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Warenkorb+oeffnen_optimization.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_1_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_2_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_3_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_4_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_5_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_6_screen.jpg
+						</testStep>
+					</screenShot>
+				</images>
+				<rawData>
+					<headers>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_1_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_2_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_3_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_4_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_5_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_6_report.txt
+						</testStep>
+					</headers>
+					<pageData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_IEWPG.txt
+					</pageData>
+					<requestsData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_IEWTR.txt
+					</requestsData>
+					<utilization>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_progress.csv
+					</utilization>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_pagespeed.txt
+					</PageSpeedData>
+				</rawData>
+			</firstView>
+			<repeatView>
+				<results>
+					<testStep>
+						<eventName>Seite laden</eventName>
+						<URL />
+						<loadTime>803</loadTime>
+						<TTFB>253</TTFB>
+						<bytesOut>32642</bytesOut>
+						<bytesOutDoc>2343</bytesOutDoc>
+						<bytesIn>72748</bytesIn>
+						<bytesInDoc>36063</bytesInDoc>
+						<connections>0</connections>
+						<requests>38</requests>
+						<requestsDoc>3</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>875</render>
+						<fullyLoaded>2753</fullyLoaded>
+						<cached>1</cached>
+						<docTime>803</docTime>
+						<domTime>322</domTime>
+						<score_cache>8</score_cache>
+						<score_cdn>20</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>88</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>48464</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>6221</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>318</titleTime>
+						<loadEventStart>802</loadEventStart>
+						<loadEventEnd>816</loadEventEnd>
+						<domContentLoadedEventStart>730</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>791</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>1</pageNumber>
+						<date>1366883399</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel suchen</eventName>
+						<URL />
+						<loadTime>1118</loadTime>
+						<TTFB>106</TTFB>
+						<bytesOut>30624</bytesOut>
+						<bytesOutDoc>3782</bytesOutDoc>
+						<bytesIn>81162</bytesIn>
+						<bytesInDoc>32378</bytesInDoc>
+						<connections>0</connections>
+						<requests>31</requests>
+						<requestsDoc>4</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>14</render>
+						<fullyLoaded>3127</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1118</docTime>
+						<domTime>878</domTime>
+						<score_cache>17</score_cache>
+						<score_cdn>42</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>82</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>44310</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>23099</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>499</titleTime>
+						<loadEventStart>962</loadEventStart>
+						<loadEventEnd>971</loadEventEnd>
+						<domContentLoadedEventStart>850</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>960</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>2</pageNumber>
+						<date>1366883405</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel-Detailseite laden</eventName>
+						<URL />
+						<loadTime>876</loadTime>
+						<TTFB>229</TTFB>
+						<bytesOut>35692</bytesOut>
+						<bytesOutDoc>3509</bytesOutDoc>
+						<bytesIn>114005</bytesIn>
+						<bytesInDoc>54495</bytesInDoc>
+						<connections>0</connections>
+						<requests>40</requests>
+						<requestsDoc>3</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>19</render>
+						<fullyLoaded>2884</fullyLoaded>
+						<cached>1</cached>
+						<docTime>876</docTime>
+						<domTime>429</domTime>
+						<score_cache>17</score_cache>
+						<score_cdn>62</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>53857</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>36701</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>311</titleTime>
+						<loadEventStart>878</loadEventStart>
+						<loadEventEnd>888</loadEventEnd>
+						<domContentLoadedEventStart>748</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>874</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>3</pageNumber>
+						<date>1366883416</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt auswaehlen</eventName>
+						<URL />
+						<loadTime>1270</loadTime>
+						<TTFB>152</TTFB>
+						<bytesOut>51212</bytesOut>
+						<bytesOutDoc>2666</bytesOutDoc>
+						<bytesIn>91271</bytesIn>
+						<bytesInDoc>34706</bytesInDoc>
+						<connections>0</connections>
+						<requests>50</requests>
+						<requestsDoc>2</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>21</render>
+						<fullyLoaded>3290</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1270</docTime>
+						<domTime>336</domTime>
+						<score_cache>0</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>78</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>48099</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>735</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>207</titleTime>
+						<loadEventStart>1270</loadEventStart>
+						<loadEventEnd>1287</loadEventEnd>
+						<domContentLoadedEventStart>468</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>859</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>4</pageNumber>
+						<date>1366883422</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt in Warenkorb legen</eventName>
+						<URL />
+						<loadTime>1457</loadTime>
+						<TTFB>510</TTFB>
+						<bytesOut>22083</bytesOut>
+						<bytesOutDoc>2430</bytesOutDoc>
+						<bytesIn>37365</bytesIn>
+						<bytesInDoc>24895</bytesInDoc>
+						<connections>0</connections>
+						<requests>17</requests>
+						<requestsDoc>3</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>24</render>
+						<fullyLoaded>1971</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1457</docTime>
+						<domTime>1168</domTime>
+						<score_cache>6</score_cache>
+						<score_cdn>16</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>60</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>26043</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>5842</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1109</titleTime>
+						<loadEventStart>638</loadEventStart>
+						<loadEventEnd>643</loadEventEnd>
+						<domContentLoadedEventStart>478</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>638</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>79</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>5</pageNumber>
+						<date>1366883428</date>
+					</testStep>
+					<testStep>
+						<eventName>Warenkorb oeffnen</eventName>
+						<URL />
+						<loadTime>2898</loadTime>
+						<TTFB>230</TTFB>
+						<bytesOut>19817</bytesOut>
+						<bytesOutDoc>5064</bytesOutDoc>
+						<bytesIn>91767</bytesIn>
+						<bytesInDoc>59264</bytesInDoc>
+						<connections>0</connections>
+						<requests>10</requests>
+						<requestsDoc>4</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>14</render>
+						<fullyLoaded>3491</fullyLoaded>
+						<cached>1</cached>
+						<docTime>2898</docTime>
+						<domTime>2792</domTime>
+						<score_cache>37</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>17754</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>86</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de</title>
+						<titleTime>2571</titleTime>
+						<loadEventStart>2582</loadEventStart>
+						<loadEventEnd>2584</loadEventEnd>
+						<domContentLoadedEventStart>2519</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>2581</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>6</pageNumber>
+						<date>1366883433</date>
+					</testStep>
+				</results>
+				<pages>
+					<details>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/details/cached/
+					</details>
+					<checklist>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/performance_optimization/cached/
+					</checklist>
+					<report>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/optimization_report/cached/
+					</report>
+					<breakdown>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/breakdown/
+					</breakdown>
+					<domains>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/domains/
+					</domains>
+					<screenShot>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/screen_shot/cached/
+					</screenShot>
+				</pages>
+				<thumbnails>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Seite+laden/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel+suchen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel-Detailseite+laden/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+auswaehlen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+in+Warenkorb+legen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Warenkorb+oeffnen/Cached_waterfall_thumb.png
+						</testStep>
+					</waterfall>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Seite+laden/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel+suchen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Artikel-Detailseite+laden/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+auswaehlen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Produkt+in+Warenkorb+legen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2/Warenkorb+oeffnen/Cached_optimization_thumb.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_1_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_2_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_3_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_4_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_5_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_6_screen_thumb.jpg
+						</testStep>
+					</screenShot>
+				</thumbnails>
+				<images>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Seite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Artikel+suchen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Artikel-Detailseite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Produkt+auswaehlen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Produkt+in+Warenkorb+legen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Warenkorb+oeffnen_waterfall.png
+						</testStep>
+					</waterfall>
+					<connectionView>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Seite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Artikel+suchen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Artikel-Detailseite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Produkt+auswaehlen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Produkt+in+Warenkorb+legen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Warenkorb+oeffnen_connection.png
+						</testStep>
+					</connectionView>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Seite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Artikel+suchen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Artikel-Detailseite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Produkt+auswaehlen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Produkt+in+Warenkorb+legen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_Warenkorb+oeffnen_optimization.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_1_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_2_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_3_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_4_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_5_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_6_screen.jpg
+						</testStep>
+					</screenShot>
+				</images>
+				<rawData>
+					<headers>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_1_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_2_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_3_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_4_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_5_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_6_report.txt
+						</testStep>
+					</headers>
+					<pageData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_IEWPG.txt
+					</pageData>
+					<requestsData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_IEWTR.txt
+					</requestsData>
+					<utilization>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/2_Cached_progress.csv
+					</utilization>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/2_Cached_pagespeed.txt
+					</PageSpeedData>
+				</rawData>
+			</repeatView>
+		</run>
+		<run>
+			<id>3</id>
+			<firstView>
+				<results>
+					<testStep>
+						<eventName>Seite laden</eventName>
+						<URL />
+						<loadTime>3095</loadTime>
+						<TTFB>729</TTFB>
+						<bytesOut>54774</bytesOut>
+						<bytesOutDoc>22200</bytesOutDoc>
+						<bytesIn>691595</bytesIn>
+						<bytesInDoc>399200</bytesInDoc>
+						<connections>0</connections>
+						<requests>114</requests>
+						<requestsDoc>51</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>2261</render>
+						<fullyLoaded>5349</fullyLoaded>
+						<cached>0</cached>
+						<docTime>3095</docTime>
+						<domTime>807</domTime>
+						<score_cache>50</score_cache>
+						<score_cdn>2</score_cdn>
+						<score_gzip>90</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>87</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>0</score_combine>
+						<score_compress>97</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>265525</gzip_total>
+						<gzip_savings>25479</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>380037</image_total>
+						<image_savings>7949</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>754</titleTime>
+						<loadEventStart>3092</loadEventStart>
+						<loadEventEnd>3114</loadEventEnd>
+						<domContentLoadedEventStart>2924</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>2989</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>177</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>1</pageNumber>
+						<date>1366883446</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel suchen</eventName>
+						<URL />
+						<loadTime>2082</loadTime>
+						<TTFB>232</TTFB>
+						<bytesOut>96799</bytesOut>
+						<bytesOutDoc>44221</bytesOutDoc>
+						<bytesIn>541367</bytesIn>
+						<bytesInDoc>369447</bytesInDoc>
+						<connections>0</connections>
+						<requests>141</requests>
+						<requestsDoc>72</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>18</render>
+						<fullyLoaded>3561</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2082</docTime>
+						<domTime>1430</domTime>
+						<score_cache>50</score_cache>
+						<score_cdn>64</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>95</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>96</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>158799</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>333360</image_total>
+						<image_savings>12998</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>710</titleTime>
+						<loadEventStart>1815</loadEventStart>
+						<loadEventEnd>1833</loadEventEnd>
+						<domContentLoadedEventStart>1429</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1544</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>177</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>2</pageNumber>
+						<date>1366883454</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel-Detailseite laden</eventName>
+						<URL />
+						<loadTime>1705</loadTime>
+						<TTFB>195</TTFB>
+						<bytesOut>72205</bytesOut>
+						<bytesOutDoc>46919</bytesOutDoc>
+						<bytesIn>345243</bytesIn>
+						<bytesInDoc>325035</bytesInDoc>
+						<connections>0</connections>
+						<requests>105</requests>
+						<requestsDoc>76</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>19</render>
+						<fullyLoaded>3183</fullyLoaded>
+						<cached>0</cached>
+						<docTime>1705</docTime>
+						<domTime>510</domTime>
+						<score_cache>46</score_cache>
+						<score_cdn>88</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>97</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>53135</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>253973</image_total>
+						<image_savings>6202</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>255</titleTime>
+						<loadEventStart>1705</loadEventStart>
+						<loadEventEnd>1724</loadEventEnd>
+						<domContentLoadedEventStart>710</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>824</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>177</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>3</pageNumber>
+						<date>1366883466</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt auswaehlen</eventName>
+						<URL />
+						<loadTime>2734</loadTime>
+						<TTFB>244</TTFB>
+						<bytesOut>74111</bytesOut>
+						<bytesOutDoc>20797</bytesOutDoc>
+						<bytesIn>885528</bytesIn>
+						<bytesInDoc>608571</bytesInDoc>
+						<connections>0</connections>
+						<requests>76</requests>
+						<requestsDoc>29</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>21</render>
+						<fullyLoaded>4831</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2734</docTime>
+						<domTime>803</domTime>
+						<score_cache>44</score_cache>
+						<score_cdn>44</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>87</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>90</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>231705</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>423748</image_total>
+						<image_savings>40750</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>296</titleTime>
+						<loadEventStart>2733</loadEventStart>
+						<loadEventEnd>2768</loadEventEnd>
+						<domContentLoadedEventStart>1405</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1828</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>177</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>4</pageNumber>
+						<date>1366883472</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt in Warenkorb legen</eventName>
+						<URL />
+						<loadTime>2127</loadTime>
+						<TTFB>599</TTFB>
+						<bytesOut>54701</bytesOut>
+						<bytesOutDoc>34006</bytesOutDoc>
+						<bytesIn>264475</bytesIn>
+						<bytesInDoc>250291</bytesInDoc>
+						<connections>0</connections>
+						<requests>61</requests>
+						<requestsDoc>45</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>24</render>
+						<fullyLoaded>2689</fullyLoaded>
+						<cached>0</cached>
+						<docTime>2127</docTime>
+						<domTime>1766</domTime>
+						<score_cache>51</score_cache>
+						<score_cdn>60</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>92</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>111873</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>135868</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1540</titleTime>
+						<loadEventStart>1038</loadEventStart>
+						<loadEventEnd>1047</loadEventEnd>
+						<domContentLoadedEventStart>751</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>924</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>177</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>5</pageNumber>
+						<date>1366883480</date>
+					</testStep>
+					<testStep>
+						<eventName>Warenkorb oeffnen</eventName>
+						<URL />
+						<loadTime>5811</loadTime>
+						<TTFB>302</TTFB>
+						<bytesOut>166300</bytesOut>
+						<bytesOutDoc>151935</bytesOutDoc>
+						<bytesIn>847687</bytesIn>
+						<bytesInDoc>817878</bytesInDoc>
+						<connections>0</connections>
+						<requests>68</requests>
+						<requestsDoc>64</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>21</render>
+						<fullyLoaded>6410</fullyLoaded>
+						<cached>0</cached>
+						<docTime>5811</docTime>
+						<domTime>4751</domTime>
+						<score_cache>65</score_cache>
+						<score_cdn>3</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>292021</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>90326</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de</title>
+						<titleTime>3626</titleTime>
+						<loadEventStart>5420</loadEventStart>
+						<loadEventEnd>5424</loadEventEnd>
+						<domContentLoadedEventStart>5257</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>5314</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>6</pageNumber>
+						<date>1366883486</date>
+					</testStep>
+				</results>
+				<pages>
+					<details>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/details/
+					</details>
+					<checklist>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/performance_optimization/
+					</checklist>
+					<breakdown>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/breakdown/
+					</breakdown>
+					<domains>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/domains/
+					</domains>
+					<screenShot>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/screen_shot/
+					</screenShot>
+				</pages>
+				<thumbnails>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Seite+laden/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel+suchen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel-Detailseite+laden/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+auswaehlen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+in+Warenkorb+legen/waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Warenkorb+oeffnen/waterfall_thumb.png
+						</testStep>
+					</waterfall>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Seite+laden/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel+suchen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel-Detailseite+laden/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+auswaehlen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+in+Warenkorb+legen/optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Warenkorb+oeffnen/optimization_thumb.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_1_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_2_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_3_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_4_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_5_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_6_screen_thumb.jpg
+						</testStep>
+					</screenShot>
+				</thumbnails>
+				<images>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Seite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Artikel+suchen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Artikel-Detailseite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Produkt+auswaehlen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Produkt+in+Warenkorb+legen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Warenkorb+oeffnen_waterfall.png
+						</testStep>
+					</waterfall>
+					<connectionView>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Seite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Artikel+suchen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Artikel-Detailseite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Produkt+auswaehlen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Produkt+in+Warenkorb+legen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Warenkorb+oeffnen_connection.png
+						</testStep>
+					</connectionView>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Seite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Artikel+suchen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Artikel-Detailseite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Produkt+auswaehlen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Produkt+in+Warenkorb+legen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Warenkorb+oeffnen_optimization.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_1_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_2_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_3_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_4_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_5_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_6_screen.jpg
+						</testStep>
+					</screenShot>
+				</images>
+				<rawData>
+					<headers>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_1_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_2_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_3_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_4_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_5_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_6_report.txt
+						</testStep>
+					</headers>
+					<pageData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_IEWPG.txt
+					</pageData>
+					<requestsData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_IEWTR.txt
+					</requestsData>
+					<utilization>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_progress.csv
+					</utilization>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_pagespeed.txt
+					</PageSpeedData>
+				</rawData>
+			</firstView>
+			<repeatView>
+				<results>
+					<testStep>
+						<eventName>Seite laden</eventName>
+						<URL />
+						<loadTime>1253</loadTime>
+						<TTFB>441</TTFB>
+						<bytesOut>31350</bytesOut>
+						<bytesOutDoc>2343</bytesOutDoc>
+						<bytesIn>123682</bytesIn>
+						<bytesInDoc>36053</bytesInDoc>
+						<connections>0</connections>
+						<requests>38</requests>
+						<requestsDoc>3</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>780</render>
+						<fullyLoaded>4614</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1253</docTime>
+						<domTime>516</domTime>
+						<score_cache>18</score_cache>
+						<score_cdn>33</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>89</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>83</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>48545</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>58717</image_total>
+						<image_savings>9507</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>513</titleTime>
+						<loadEventStart>1251</loadEventStart>
+						<loadEventEnd>1262</loadEventEnd>
+						<domContentLoadedEventStart>1181</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>1242</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>114</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>1</pageNumber>
+						<date>1366883498</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel suchen</eventName>
+						<URL />
+						<loadTime>903</loadTime>
+						<TTFB>108</TTFB>
+						<bytesOut>41112</bytesOut>
+						<bytesOutDoc>3705</bytesOutDoc>
+						<bytesIn>80109</bytesIn>
+						<bytesInDoc>39793</bytesInDoc>
+						<connections>0</connections>
+						<requests>44</requests>
+						<requestsDoc>4</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>18</render>
+						<fullyLoaded>2908</fullyLoaded>
+						<cached>1</cached>
+						<docTime>903</docTime>
+						<domTime>535</domTime>
+						<score_cache>8</score_cache>
+						<score_cdn>33</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>85</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>44665</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>14304</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>383</titleTime>
+						<loadEventStart>771</loadEventStart>
+						<loadEventEnd>782</loadEventEnd>
+						<domContentLoadedEventStart>664</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>765</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>114</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>2</pageNumber>
+						<date>1366883506</date>
+					</testStep>
+					<testStep>
+						<eventName>Artikel-Detailseite laden</eventName>
+						<URL />
+						<loadTime>775</loadTime>
+						<TTFB>193</TTFB>
+						<bytesOut>32172</bytesOut>
+						<bytesOutDoc>2850</bytesOutDoc>
+						<bytesIn>70459</bytesIn>
+						<bytesInDoc>43905</bytesInDoc>
+						<connections>0</connections>
+						<requests>34</requests>
+						<requestsDoc>2</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>20</render>
+						<fullyLoaded>2698</fullyLoaded>
+						<cached>1</cached>
+						<docTime>775</docTime>
+						<domTime>366</domTime>
+						<score_cache>0</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>94</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>53033</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>429</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>257</titleTime>
+						<loadEventStart>777</loadEventStart>
+						<loadEventEnd>786</loadEventEnd>
+						<domContentLoadedEventStart>655</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>775</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>114</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>3</pageNumber>
+						<date>1366883517</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt auswaehlen</eventName>
+						<URL />
+						<loadTime>1267</loadTime>
+						<TTFB>192</TTFB>
+						<bytesOut>41853</bytesOut>
+						<bytesOutDoc>2598</bytesOutDoc>
+						<bytesIn>85202</bytesIn>
+						<bytesInDoc>34935</bytesInDoc>
+						<connections>0</connections>
+						<requests>40</requests>
+						<requestsDoc>2</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>20</render>
+						<fullyLoaded>3261</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1267</docTime>
+						<domTime>294</domTime>
+						<score_cache>0</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>72</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>47452</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>606</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>291</titleTime>
+						<loadEventStart>1268</loadEventStart>
+						<loadEventEnd>1285</loadEventEnd>
+						<domContentLoadedEventStart>512</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>915</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>4</pageNumber>
+						<date>1366883523</date>
+					</testStep>
+					<testStep>
+						<eventName>Produkt in Warenkorb legen</eventName>
+						<URL />
+						<loadTime>1437</loadTime>
+						<TTFB>522</TTFB>
+						<bytesOut>24859</bytesOut>
+						<bytesOutDoc>1679</bytesOutDoc>
+						<bytesIn>33676</bytesIn>
+						<bytesInDoc>20666</bytesInDoc>
+						<connections>0</connections>
+						<requests>21</requests>
+						<requestsDoc>2</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>99999</result>
+						<render>24</render>
+						<fullyLoaded>3389</fullyLoaded>
+						<cached>1</cached>
+						<docTime>1437</docTime>
+						<domTime>1170</domTime>
+						<score_cache>0</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>50</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>26282</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>257</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de
+						</title>
+						<titleTime>1114</titleTime>
+						<loadEventStart>619</loadEventStart>
+						<loadEventEnd>623</loadEventEnd>
+						<domContentLoadedEventStart>461</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>618</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>5</pageNumber>
+						<date>1366883529</date>
+					</testStep>
+					<testStep>
+						<eventName>Warenkorb oeffnen</eventName>
+						<URL />
+						<loadTime>2685</loadTime>
+						<TTFB>125</TTFB>
+						<bytesOut>19908</bytesOut>
+						<bytesOutDoc>2823</bytesOutDoc>
+						<bytesIn>91796</bytesIn>
+						<bytesInDoc>44268</bytesInDoc>
+						<connections>0</connections>
+						<requests>10</requests>
+						<requestsDoc>4</requestsDoc>
+						<responses_200>0</responses_200>
+						<responses_404>0</responses_404>
+						<responses_other>0</responses_other>
+						<result>0</result>
+						<render>20</render>
+						<fullyLoaded>3750</fullyLoaded>
+						<cached>1</cached>
+						<docTime>2685</docTime>
+						<domTime>2470</domTime>
+						<score_cache>37</score_cache>
+						<score_cdn>0</score_cdn>
+						<score_gzip>100</score_gzip>
+						<score_cookies>-1</score_cookies>
+						<score_keep-alive>100</score_keep-alive>
+						<score_minify>-1</score_minify>
+						<score_combine>100</score_combine>
+						<score_compress>100</score_compress>
+						<score_etags>-1</score_etags>
+						<gzip_total>17769</gzip_total>
+						<gzip_savings>0</gzip_savings>
+						<minify_total>0</minify_total>
+						<minify_savings>0</minify_savings>
+						<image_total>86</image_total>
+						<image_savings>0</image_savings>
+						<optimization_checked>1</optimization_checked>
+						<aft>0</aft>
+						<domElements>0</domElements>
+						<pageSpeedVersion>1.9</pageSpeedVersion>
+						<title>navigated subsite of example.de</title>
+						<titleTime>2300</titleTime>
+						<loadEventStart>2481</loadEventStart>
+						<loadEventEnd>2483</loadEventEnd>
+						<domContentLoadedEventStart>2418</domContentLoadedEventStart>
+						<domContentLoadedEventEnd>2480</domContentLoadedEventEnd>
+						<lastVisualChange>0</lastVisualChange>
+						<browser_name>Firefox</browser_name>
+						<browser_version>17.0.0.4706</browser_version>
+						<server_count>1</server_count>
+						<server_rtt>78</server_rtt>
+						<base_page_cdn />
+						<adult_site>0</adult_site>
+						<expectedRequests />
+						<pageNumber>6</pageNumber>
+						<date>1366883535</date>
+					</testStep>
+				</results>
+				<pages>
+					<details>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/details/cached/
+					</details>
+					<checklist>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/performance_optimization/cached/
+					</checklist>
+					<report>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/optimization_report/cached/
+					</report>
+					<breakdown>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/breakdown/
+					</breakdown>
+					<domains>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/domains/
+					</domains>
+					<screenShot>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/screen_shot/cached/
+					</screenShot>
+				</pages>
+				<thumbnails>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Seite+laden/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel+suchen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel-Detailseite+laden/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+auswaehlen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+in+Warenkorb+legen/Cached_waterfall_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Warenkorb+oeffnen/Cached_waterfall_thumb.png
+						</testStep>
+					</waterfall>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Seite+laden/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel+suchen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Artikel-Detailseite+laden/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+auswaehlen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Produkt+in+Warenkorb+legen/Cached_optimization_thumb.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3/Warenkorb+oeffnen/Cached_optimization_thumb.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_1_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_2_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_3_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_4_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_5_screen_thumb.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_6_screen_thumb.jpg
+						</testStep>
+					</screenShot>
+				</thumbnails>
+				<images>
+					<waterfall>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Seite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Artikel+suchen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Artikel-Detailseite+laden_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Produkt+auswaehlen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Produkt+in+Warenkorb+legen_waterfall.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Warenkorb+oeffnen_waterfall.png
+						</testStep>
+					</waterfall>
+					<connectionView>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Seite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Artikel+suchen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Artikel-Detailseite+laden_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Produkt+auswaehlen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Produkt+in+Warenkorb+legen_connection.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Warenkorb+oeffnen_connection.png
+						</testStep>
+					</connectionView>
+					<checklist>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Seite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Artikel+suchen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Artikel-Detailseite+laden_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Produkt+auswaehlen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Produkt+in+Warenkorb+legen_optimization.png
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_Warenkorb+oeffnen_optimization.png
+						</testStep>
+					</checklist>
+					<screenShot>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_1_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_2_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_3_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_4_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_5_screen.jpg
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_6_screen.jpg
+						</testStep>
+					</screenShot>
+				</images>
+				<rawData>
+					<headers>
+						<testStep>
+							<eventName>Seite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_1_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel suchen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_2_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Artikel-Detailseite laden</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_3_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt auswaehlen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_4_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Produkt in Warenkorb legen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_5_report.txt
+						</testStep>
+						<testStep>
+							<eventName>Warenkorb oeffnen</eventName>
+							http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_6_report.txt
+						</testStep>
+					</headers>
+					<pageData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_IEWPG.txt
+					</pageData>
+					<requestsData>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_IEWTR.txt
+					</requestsData>
+					<utilization>http://wpt.server.de/results/13/04/25/W1/f606bebc977a3b22c1a9205f70d07a00/3_Cached_progress.csv
+					</utilization>
+					<PageSpeedData>http://wpt.server.de/result/130425_W1_f606bebc977a3b22c1a9205f70d07a00/3_Cached_pagespeed.txt
+					</PageSpeedData>
+				</rawData>
+			</repeatView>
+		</run>
+	</data>
+</response>

@@ -1,0 +1,25 @@
+job;id;date;time;validationState;resultStatus;resultURL;FV_Doc;customerSatisfaction
+;;;;;;;;;;;;;;;;csiGroup1, page 1, 15:00
+csiGroup1_FF_BV1_Step01;138806; 2012/11/12;15:15:59;0;200;http://wpt.server/result/1;3167;0.1
+csiGroup1_FF_BV1_Step01;138829; 2012/11/12;15:48:32;0;200;http://wpt.server/result/2;2911;0.1
+;;;;;;;;;;;;;;;;csiGroup1, page 1, 16:00
+csiGroup1_FF_BV1_Step01;138806; 2012/11/12;16:15:59;0;200;http://wpt.server/result/3;3167;0.2
+csiGroup1_FF_BV1_Step01;138829; 2012/11/12;16:48:32;0;200;http://wpt.server/result/4;2911;0.2
+;;;;;;;;;;;;;;;;csiGroup1, page 2, 15:00
+csiGroup1_FF_BV1_Step02;138806; 2012/11/12;15:15:59;0;200;http://wpt.server/result/5;3167;0.3
+csiGroup1_FF_BV1_Step02;138829; 2012/11/12;15:48:32;0;200;http://wpt.server/result/6;2911;0.3
+;;;;;;;;;;;;;;;;csiGroup1, page 2, 16:00
+csiGroup1_FF_BV1_Step02;138806; 2012/11/12;16:15:59;0;200;http://wpt.server/result/7;3167;0.4
+csiGroup1_FF_BV1_Step02;138829; 2012/11/12;16:48:32;0;200;http://wpt.server/result/8;2911;0.4
+;;;;;;;;;;;;;;;;csiGroup2, page 1, 15:00
+csiGroup2_FF_BV1_Step01;138806; 2012/11/12;15:15:59;0;200;http://wpt.server/result/9;3167;0.5
+csiGroup2_FF_BV1_Step01;138829; 2012/11/12;15:48:32;0;200;http://wpt.server/result/10;2911;0.5
+;;;;;;;;;;;;;;;;csiGroup2, page 1, 16:00
+csiGroup2_FF_BV1_Step01;138806; 2012/11/12;16:15:59;0;200;http://wpt.server/result/11;3167;0.6
+csiGroup2_FF_BV1_Step01;138829; 2012/11/12;16:48:32;0;200;http://wpt.server/result/12;2911;0.6
+;;;;;;;;;;;;;;;;csiGroup2, page 2, 15:00
+csiGroup2_FF_BV1_Step02;138806; 2012/11/12;15:15:59;0;200;http://wpt.server/result/13;3167;0.7
+csiGroup2_FF_BV1_Step02;138829; 2012/11/12;15:48:32;0;200;http://wpt.server/result/14;2911;0.7
+;;;;;;;;;;;;;;;;csiGroup2, page 2, 16:00
+csiGroup2_FF_BV1_Step02;138806; 2012/11/12;16:15:59;0;200;http://wpt.server/result/15;3167;0.8
+csiGroup2_FF_BV1_Step02;138829; 2012/11/12;16:48:32;0;200;http://wpt.server/result/16;2911;0.8

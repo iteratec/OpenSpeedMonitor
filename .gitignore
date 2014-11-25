@@ -1,5 +1,47 @@
-.project
+# ignore dolphin temp file
+*.directory
+
+# ignore eclipse-specifics
 .settings
 .classpath
+.project
+
+# ignore intellij-specifics
+*.iml
+*.ipr
+*.iws
+projectFilesBackup
+
+# ignore sublime-specifics
+*.sublime-project
+*.sublime-workspace
+
+# ignore build folders 'n results
 *.class
-target/
+bin/
+build/
+target*/
+classes/
+out/
+web-app/WEB-INF/classes/
+
+# ignore temp files of common text editors
+*~
+*.orig
+# ignore .gradle 
+.gradle/
+
+# ignore .groovy
+.groovy/
+
+# ignore log files
+*.log
+logs/
+*.lnk
+src/java/logging.properties
+
+# misc
+testorder*.txt
+
+# ignore h2 dumps
+*.h2.gzip

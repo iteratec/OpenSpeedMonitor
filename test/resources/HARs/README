@@ -1,0 +1,4 @@
+This folder contains http-archives (see http://www.softwareishard.com/blog/firebug/http-archive-specification/ for specification) exported
+from wpt-servers.
+For these har's a wpt-result-xml-file in ../WptResultXmls exists with same file-name (excluding file-extension) har and wpt-result-xml are sourced from the 
+same wpt-result.

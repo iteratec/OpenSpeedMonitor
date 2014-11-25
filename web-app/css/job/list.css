@@ -1,0 +1,68 @@
+td,th {
+		border: 1px #ccc solid;
+		padding: 0.3em;
+	}
+	
+table#jobtable tr.highlight .status {
+		/* font-weight: bold; */
+}
+
+table#jobtable tr.success td {
+	background: rgb(171, 248, 171) !important;
+}
+
+table#jobtable tr.failure td {
+	background: rgb(255, 194, 194);
+}
+
+.status {
+	display: block;
+}
+.done {
+	
+}
+
+.controlribbon {
+	padding: 0.5em;
+}
+
+label {
+	display: inline !important;
+	margin-right: 1em;
+}
+.cronExpression {
+/*	display: none;*/
+}
+#serverdown {
+	display: none;
+}
+
+ul.tags	{
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+ul.tags li { /*display: inline;*/
+display: block;
+   float: left;
+   margin: 0 3px 0 0;
+   border: 1px #ccc solid;
+   padding: 1px 2px 1px 2px;
+   border-radius: 5px;
+   background: #ddd;
+}
+
+.chosen-container {
+	width: 400px !important;
+	margin-bottom: 10px;
+	border-radius: 4px !important;
+	border: 1px solid #cccccc !important;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 14px;
+	color: #555555 !important;
+}
+
+.inactiveJob {
+	font-weight: normal;
+}

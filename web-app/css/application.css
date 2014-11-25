@@ -1,0 +1,4 @@
+.form-group.error label, .fieldcontain.error label {
+	color: #b94a48;
+	font-weight: bold;
+}
