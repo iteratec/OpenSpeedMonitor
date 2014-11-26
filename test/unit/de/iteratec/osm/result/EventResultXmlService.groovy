@@ -20,6 +20,9 @@ package de.iteratec.osm.result
 import de.iteratec.osm.result.EventResultXmlService
 import grails.test.mixin.*
 import groovy.util.slurpersupport.GPathResult
+import org.junit.Before
+import org.junit.Test
+
 /**
  * Test-suite of {@link de.iteratec.osm.result.EventResultXmlService}.
  */

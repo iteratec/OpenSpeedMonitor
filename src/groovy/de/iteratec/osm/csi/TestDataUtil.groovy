@@ -346,8 +346,8 @@ class TestDataUtil {
 			provideAuthenticateInformation: provideAuthenticateInformation, 
 		).save(failOnError: true)
 	}
-	static createWebPageTestServer(String label, String proxyIdentifier, boolean active, String baseUrl){
-		new WebPageTestServer(
+	static WebPageTestServer createWebPageTestServer(String label, String proxyIdentifier, boolean active, String baseUrl){
+		return new WebPageTestServer(
 			label: label,
 			proxyIdentifier: proxyIdentifier,
 			dateCreated: new Date(),
@@ -684,6 +684,18 @@ class TestDataUtil {
 			wptServer: server1
 		).save(failOnError: true)
 		return [ffAgent1, ieAgent1]	
+	}
+
+	static Location createLocation(WebPageTestServer server, String uniqueIdentifierForServer, Browser browser, Boolean active){
+		return new Location(
+				active: active,
+				valid: 1,
+				uniqueIdentifierForServer: uniqueIdentifierForServer,
+				location: uniqueIdentifierForServer,
+				label: uniqueIdentifierForServer,
+				browser: browser,
+				wptServer: server
+		).save(failOnError: true)
 	}
 
 	static List<Browser> createBrowsersAndAliases() {

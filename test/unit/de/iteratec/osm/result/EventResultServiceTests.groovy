@@ -560,15 +560,6 @@ class EventResultServiceTests {
 	}
 
 	@Test
-	void testGetVersionOfWptXmlResult(){
-		GPathResult xmlResultBeforeMultistep = new XmlSlurper().parse(new File('test/resources/WptResultXmls/Result_version1_BeforeMultistep.xml'))
-		GPathResult xmlResultMultistep = new XmlSlurper().parse(new File('test/resources/WptResultXmls/Result_version2_Multistep.xml'))
-
-		assertEquals(WptXmlResultVersion.BEFORE_MULTISTEP, serviceUnderTest.getVersionOf(xmlResultBeforeMultistep))
-		assertEquals(WptXmlResultVersion.MULTISTEP_1, serviceUnderTest.getVersionOf(xmlResultMultistep))
-	}
-
-	@Test
 	void testFindByJobSinceDate() {
 		List<EventResult> result = serviceUnderTest.findByJobSinceDate(job1, oneHoursAgo)
 

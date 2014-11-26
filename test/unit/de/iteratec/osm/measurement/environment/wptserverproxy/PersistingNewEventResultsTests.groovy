@@ -55,7 +55,7 @@ import static org.junit.Assert.*
  */
 @TestFor(LocationAndResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry])
-class LocationAndResultPersisterServiceTests {
+class PersistingNewEventResultsTests {
 
 	WebPageTestServer server1, server2
 	
@@ -83,6 +83,7 @@ class LocationAndResultPersisterServiceTests {
 			'expectedNumberOfSteps': 1,
 			'expectedNumberOfStepsWithAssociatedPage': 0,
 			'expectedNumberOfCachedViews': 2,
+			'expectedWptResultVersion': WptXmlResultVersion.BEFORE_MULTISTEP
 		],
 		'Result_Multistep_3Runs_6EventNames.xml':
 		['expectedNumberOfLocations': 1,
@@ -93,6 +94,7 @@ class LocationAndResultPersisterServiceTests {
 			'expectedNumberOfSteps': 6,
 			'expectedNumberOfStepsWithAssociatedPage': 0,
 			'expectedNumberOfCachedViews': 2,
+			'expectedWptResultVersion': WptXmlResultVersion.MULTISTEP_1
 		],
 		'Result_NoMultistep_1Run_NotCsiRelevantCauseDocTimeTooHighResponse.xml':
 		['expectedNumberOfLocations': 1,
@@ -103,6 +105,7 @@ class LocationAndResultPersisterServiceTests {
 			'expectedNumberOfSteps': 1,
 			'expectedNumberOfStepsWithAssociatedPage': 0,
 			'expectedNumberOfCachedViews': 2,
+			'expectedWptResultVersion': WptXmlResultVersion.BEFORE_MULTISTEP
 		],
 		'Result_NoMultistep_1Run_JustFirstView.xml':
 		['expectedNumberOfLocations': 1,
@@ -113,6 +116,7 @@ class LocationAndResultPersisterServiceTests {
 			'expectedNumberOfSteps': 1,
 			'expectedNumberOfStepsWithAssociatedPage': 0,
 			'expectedNumberOfCachedViews': 1,
+			'expectedWptResultVersion': WptXmlResultVersion.BEFORE_MULTISTEP
 		],
 		'Result_Multistep_1Run_2EventNamesWithPagePrefix_JustFirstView.xml':
 		['expectedNumberOfLocations': 1,
@@ -123,6 +127,7 @@ class LocationAndResultPersisterServiceTests {
 			'expectedNumberOfSteps': 2,
 			'expectedNumberOfStepsWithAssociatedPage': 2,
 			'expectedNumberOfCachedViews': 1,
+			'expectedWptResultVersion': WptXmlResultVersion.MULTISTEP_1
 		],
 		'Result_Multistep_1Run_2EventNames_PagePrefix.xml':
 		['expectedNumberOfLocations': 1,
@@ -133,6 +138,29 @@ class LocationAndResultPersisterServiceTests {
 			'expectedNumberOfSteps': 2,
 			'expectedNumberOfStepsWithAssociatedPage': 2,
 			'expectedNumberOfCachedViews': 2,
+			'expectedWptResultVersion': WptXmlResultVersion.MULTISTEP_1
+		],
+		'Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml':
+		['expectedNumberOfLocations': 1,
+			'expectedNumberOfJobs': 1,
+			'expectedNumberOfJobRuns': 1,
+			'expectedNumberOfRuns': 1,
+			'expectedResultExecutionDateTime':new DateTime(new Date('Tue, 25 Nov 2014 15:16:33 +0000')),
+			'expectedNumberOfSteps': 1,
+			'expectedNumberOfStepsWithAssociatedPage': 0,
+			'expectedNumberOfCachedViews': 2,
+			'expectedWptResultVersion': WptXmlResultVersion.BEFORE_MULTISTEP
+		],
+		'Result_wptserver2.15_singlestep_1Run_WithVideo.xml':
+		['expectedNumberOfLocations': 1,
+			'expectedNumberOfJobs': 1,
+			'expectedNumberOfJobRuns': 1,
+			'expectedNumberOfRuns': 1,
+			'expectedResultExecutionDateTime':new DateTime(new Date('Tue, 25 Nov 2014 15:38:38 +0000')),
+			'expectedNumberOfSteps': 1,
+			'expectedNumberOfStepsWithAssociatedPage': 0,
+			'expectedNumberOfCachedViews': 2,
+			'expectedWptResultVersion': WptXmlResultVersion.BEFORE_MULTISTEP
 		]
 	]
 
@@ -179,120 +207,6 @@ class LocationAndResultPersisterServiceTests {
 	}
 
 	// tests///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Tests the persisting of {@link Location}s while listening to incoming {@link EventResult}s.
-	 */
-	@Test
-	void testSavingOfLocations() {
-		
-		//mocking of inner services
-
-		mockBrowserService()
-		
-		//create test-specific data
-
-		Integer locationCount = Location.findAll().size()
-		def file = new File('test/resources/WptLocationXmls/locationResponse.xml')
-		GPathResult result = new XmlSlurper().parse(file)
-		
-		//test execution and assertions
-
-		serviceUnderTest.listenToLocations(result, server1)
-		assertTrue(Location.findAll().size() > locationCount)
-
-		locationCount = Location.findAll().size()
-		serviceUnderTest.listenToLocations(result, server1)
-		assertEquals(locationCount, Location.findAll().size())
-
-		serviceUnderTest.listenToLocations(result, server2)
-		assertTrue(Location.findAll().size() > locationCount)
-	}
-	
-	/**
-	 * Tests the update of {@link Location}s identifier while listening to incoming locationResponeses.
-	 */
-	@Test
-	void testUpdateOfLocationIdentifier() {
-		
-		//mocking of inner services
-
-		mockBrowserService()
-		
-		//create test-specific data
-
-		Integer locationCount = Location.findAll().size()
-		def file = new File('test/resources/WptLocationXmls/locationResponse.xml')
-		GPathResult result = new XmlSlurper().parse(file)
-		
-		
-		new Location(
-				active: true,
-				valid: 1,
-				location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
-				label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
-				browser: undefinedBrowser,//z.B. Firefox
-				wptServer: server1
-				).save(failOnError: true);
-		
-		
-		
-		
-		//test execution and assertions
-
-		serviceUnderTest.listenToLocations(result, server1)
-		assertTrue(Location.findAll().size() > locationCount)
-
-		locationCount = Location.findAll().size()
-		serviceUnderTest.listenToLocations(result, server1)
-		assertEquals(locationCount, Location.findAll().size())
-
-		serviceUnderTest.listenToLocations(result, server2)
-		assertTrue(Location.findAll().size() > locationCount)
-	}
-	
-	/**
-	 * Tests the persisting of {@link Location}s while listening to incoming {@link EventResult}s.
-	 * Should create a new Location with the right Browser
-	 */
-	@Test
-	void testUpdatingOfLocationsBrowser() {
-		
-		//mocking of inner services
-
-		mockBrowserService()
-		
-		//create test-specific data
-
-		Integer locationCount = Location.findAll().size()
-		assertEquals(0, locationCount);
-		
-		def file = new File('test/resources/WptLocationXmls/locationResponse.xml')
-		GPathResult result = new XmlSlurper().parse(file)
-		
-		Integer newLocationCount=result.data.location.size();
-		//test execution and assertions
-
-		
-		serviceUnderTest.listenToLocations(result, server1)
-		assertEquals(newLocationCount, Location.findAll().size());
-		
-		//Modifing Result
-		result.data.location.each { xmlResult ->
-			
-			if(xmlResult.Browser=="Chrome") {
-				xmlResult.Browser=Browser.UNDEFINED;
-			}
-			
-		}
-		
-		serviceUnderTest.listenToLocations(result, server1)
-		assertEquals(newLocationCount+1, Location.findAll().size());
-		
-		assertEquals(1, Location.findAllByBrowser(Browser.findByName(Browser.UNDEFINED)).size())
-
-		
-	}
 	
 	/**
 	 * Tests the determination of teststep-count from webpagetest-xml-result. Uses testdata from test/resources.
@@ -300,13 +214,17 @@ class LocationAndResultPersisterServiceTests {
 	 */
 	@Test
 	void testgetTeststepCount(){
-		
-		//test execution and assertions
-		
 		expectedAfterResultListening.each {k,v ->
-			mockEventResultService(k)
 			GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${k}"))
-			assertEquals(v['expectedNumberOfSteps'], serviceUnderTest.getTeststepCount(xmlResult))
+			assertEquals(v['expectedNumberOfSteps'],   new WptResultXml(xmlResult).getTestStepCount())
+		}
+	}
+	
+	@Test
+	void testCreationOfWptResultXml(){
+		expectedAfterResultListening.each {k,v ->
+			GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${k}"))
+			assertEquals(v['expectedWptResultVersion'],   new WptResultXml(xmlResult).version)
 		}
 	}
 	
@@ -325,7 +243,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(nameOfResultXmlFile)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -363,14 +280,14 @@ class LocationAndResultPersisterServiceTests {
 		assertEquals('docCompleteRequests of median uncached-EventResults for event 4 - ', 29, medianUncachedResultsOfEvent4[0].docCompleteRequests)
 		assertEquals('wptStatus of median uncached-EventResults for event 4 - ', 99999, medianUncachedResultsOfEvent4[0].wptStatus)
 		
-		List<EventResult> medianCachedResultsOfEvent2Run3 = EventResult.findAllByMeasuredEvent(event2).findAll{
-			it.medianValue == true && it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
+		List<EventResult> medianCachedResultsOfEvent2Run1 = EventResult.findAllByMeasuredEvent(event2).findAll{
+			it.medianValue == true && it.cachedView == CachedView.CACHED && it.numberOfWptRun == 1
 		}
-		assertEquals('Count of median cached-EventResults for event 2, third run - ', 1, medianCachedResultsOfEvent2Run3.size())
-		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for event 2, third run - ', 903, medianCachedResultsOfEvent2Run3[0].docCompleteTimeInMillisecs)
-		assertEquals('docCompleteRequests of median cached-EventResults for event 2, third run - ', 4, medianCachedResultsOfEvent2Run3[0].docCompleteRequests)
-		assertEquals('wptStatus of median cached-EventResults for event 2, third run - ', 99999, medianCachedResultsOfEvent2Run3[0].wptStatus)
-		
+		assertEquals('Count of median cached-EventResults for event 2, first run - ', 1, medianCachedResultsOfEvent2Run1.size())
+		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for event 2, first run  - ', 931, medianCachedResultsOfEvent2Run1[0].docCompleteTimeInMillisecs)
+		assertEquals('docCompleteRequests of median cached-EventResults for event 2, first run  - ', 6, medianCachedResultsOfEvent2Run1[0].docCompleteRequests)
+		assertEquals('wptStatus of median cached-EventResults for event 2, first run  - ', 99999, medianCachedResultsOfEvent2Run1[0].wptStatus)
+
 		//TestDetailsUrl uncached and without page
 		EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
 		String[] tokensUncached = eventResultUncachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
@@ -379,10 +296,10 @@ class LocationAndResultPersisterServiceTests {
 		assertTrue(tokensUncached[3].contains("0#waterfall_viewProdukt auswaehlen"))
 		
 		//TestDetailsUrl cached and without page
-		EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run3[0]
+		EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
 		String[] tokensCached = eventResultCachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
 		assertTrue(tokensCached[1].contains(xmlResult.data.testId.toString()))
-		assertTrue(tokensCached[2].contains("3"))
+		assertTrue(tokensCached[2].contains("1"))
 		assertTrue(tokensCached[3].contains("1#waterfall_viewArtikel suchen"))
 	}
 	
@@ -401,7 +318,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(nameOfResultXmlFile)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -439,13 +355,13 @@ class LocationAndResultPersisterServiceTests {
 		assertEquals('docCompleteRequests of median uncached-EventResults for event 4 - ', 29, medianUncachedResultsOfEvent4[0].docCompleteRequests)
 		assertEquals('wptStatus of median uncached-EventResults for event 4 - ', 99999, medianUncachedResultsOfEvent4[0].wptStatus)
 		
-		List<EventResult> medianCachedResultsOfEvent2Run3 = EventResult.findAllByMeasuredEvent(event2).findAll{
-			it.medianValue == true && it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
+		List<EventResult> medianCachedResultsOfEvent2Run1 = EventResult.findAllByMeasuredEvent(event2).findAll{
+			it.medianValue == true && it.cachedView == CachedView.CACHED && it.numberOfWptRun == 1
 		}
-		assertEquals('Count of median cached-EventResults for event 2, third run - ', 1, medianCachedResultsOfEvent2Run3.size())
-		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for event 2, third run - ', 903, medianCachedResultsOfEvent2Run3[0].docCompleteTimeInMillisecs)
-		assertEquals('docCompleteRequests of median cached-EventResults for event 2, third run - ', 4, medianCachedResultsOfEvent2Run3[0].docCompleteRequests)
-		assertEquals('wptStatus of median cached-EventResults for event 2, third run - ', 99999, medianCachedResultsOfEvent2Run3[0].wptStatus)
+		assertEquals('Count of median cached-EventResults for event 2, first run - ', 1, medianCachedResultsOfEvent2Run1.size())
+		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for event 2, first run - ', 931, medianCachedResultsOfEvent2Run1[0].docCompleteTimeInMillisecs)
+		assertEquals('docCompleteRequests of median cached-EventResults for event 2, first run - ', 6, medianCachedResultsOfEvent2Run1[0].docCompleteRequests)
+		assertEquals('wptStatus of median cached-EventResults for event 2, first run - ', 99999, medianCachedResultsOfEvent2Run1[0].wptStatus)
 		
 		//TestDetailsUrl uncached and without page
 		EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
@@ -456,10 +372,10 @@ class LocationAndResultPersisterServiceTests {
 		assertTrue(tokensUncached[3].contains("0#waterfall_viewHPProdukt auswaehlen"))
 		
 		//TestDetailsUrl cached and without page
-		EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run3[0]
+		EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
 		String[] tokensCached = eventResultCachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
 		assertTrue(tokensCached[1].contains(xmlResult.data.testId.toString()))
-		assertTrue(tokensCached[2].contains("3"))
+		assertTrue(tokensCached[2].contains("1"))
 		assertTrue(tokensCached[3].contains("1#waterfall_viewHPArtikel suchen"))
 	}
 	
@@ -478,7 +394,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(nameOfResultXmlFile)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -515,7 +430,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(nameOfResultXmlFile)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -580,7 +494,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(nameOfResultXmlFile)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -642,7 +555,6 @@ class LocationAndResultPersisterServiceTests {
 		//test execution and assertions
 		expectedAfterResultListening.each {k,v ->
 			deleteAllRelevantDomains()
-			mockEventResultService(k)
 			listenToResultAndProofCreatedDomains(k, v)
 		}
 	}
@@ -669,7 +581,6 @@ class LocationAndResultPersisterServiceTests {
 		]
 
 		deleteAllRelevantDomains()
-		mockEventResultService(k)
 		shouldFail() {			 listenToResultAndProofCreatedDomains(k, v) }
 		assertEquals(0, Job.count())
 		assertEquals(0, JobResult.count())
@@ -690,7 +601,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(testNameXML)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		mockProxyService(xmlResult.data.location.toString())
 		
@@ -722,7 +632,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(testNameXML)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -760,7 +669,6 @@ class LocationAndResultPersisterServiceTests {
 		mockTimeToCsMappingService()
 		mockPageService()
 		mockJobService()
-		mockEventResultService(testNameXML)
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
@@ -996,13 +904,6 @@ class LocationAndResultPersisterServiceTests {
 			return null
 		}
 		serviceUnderTest.jobService = jobServiceMocked.createMock()
-	}
-	private void mockEventResultService(String nameXmlResultFile){
-		def eventResultServiceMocked = mockFor(EventResultService, true)
-		eventResultServiceMocked.demand.getVersionOf(0..100) { GPathResult xmlResult ->
-			return nameXmlResultFile.contains('NoMultistep') ? WptXmlResultVersion.BEFORE_MULTISTEP : WptXmlResultVersion.MULTISTEP_1
-		}
-		serviceUnderTest.eventResultService = eventResultServiceMocked.createMock()
 	}
 	private void mockMeasuredValueTagService(String tagToReturn){
 		def measuredValueTagService = mockFor(MeasuredValueTagService, true)

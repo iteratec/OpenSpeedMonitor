@@ -17,11 +17,12 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.*
-
-import org.junit.Test
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.junit.Before
+import org.junit.Test
 
 /**
  * Test-suite of {@link CustomerSatisfactionWeightService}.

@@ -23,18 +23,21 @@ import java.util.zip.GZIPOutputStream
 
 import org.springframework.transaction.TransactionStatus
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TimeToCsMappingService
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserService
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.ConfigService
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.result.detail.HarParserService
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
-import de.iteratec.osm.csi.MeasuredValueUpdateService
-import de.iteratec.osm.csi.TimeToCsMappingService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
@@ -44,11 +47,8 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.WptXmlResultVersion
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.result.detail.HarParserService
+import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 
 /**
  * Persists locations and results. Observer of ProxyService.
@@ -121,21 +121,23 @@ class LocationAndResultPersisterService implements iListener{
 			String har,
 			WebPageTestServer wptserverOfResult) {
 			
+		WptResultXml resultXml = new WptResultXml(xmlResultResponse)
+			
 		log.debug("get or persist Job ...")
-		Job jobConfig = Job.findByLabel(xmlResultResponse.data.label.toString())?:persistNewJobConfig(xmlResultResponse, wptserverOfResult).save(failOnError: true)
+		Job jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
 		log.debug("get or persist Job ... DONE")
 		
-		if (jobConfig != null) persistJobResultAndAssociatedEventResults(jobConfig, xmlResultResponse, wptserverOfResult, har)
+		if (jobConfig != null) persistJobResultAndAssociatedEventResults(jobConfig, resultXml, wptserverOfResult, har)
 			
 	}
 			
-	void persistJobResultAndAssociatedEventResults(Job jobConfig, GPathResult xmlResultResponse, WebPageTestServer wptserverOfResult, String har){
+	void persistJobResultAndAssociatedEventResults(Job jobConfig, WptResultXml resultXml, WebPageTestServer wptserverOfResult, String har){
 		
 		log.debug('updating locations ...')
-		updateLocationIfNeededAndPossible(jobConfig, xmlResultResponse, wptserverOfResult);
+		updateLocationIfNeededAndPossible(jobConfig, resultXml, wptserverOfResult);
 		log.debug('updating locations ... DONE')
 		
-		String testId = xmlResultResponse.data.testId.toString()
+		String testId = resultXml.getTestId()
 		log.debug("test-ID for which results should get persisted now=${testId}")
 		if(testId != null){
 			
@@ -143,11 +145,11 @@ class LocationAndResultPersisterService implements iListener{
 			JobResult.withTransaction { TransactionStatus status ->
 				try{
 					log.debug("deleting results marked as pending or running ...")
-					deleteResultsMarkedAsPendingAndRunning(xmlResultResponse.data.label.toString(), testId)
+					deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
 					log.debug("deleting results marked as pending or running ... DONE")
 					log.debug("persisting job result ...")
-					jobRun = JobResult.findByJobConfigLabelAndTestId(xmlResultResponse.data.label.toString(), testId)?:
-						persistNewJobRun(jobConfig, xmlResultResponse, har).save(failOnError: true);
+					jobRun = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)?:
+						persistNewJobRun(jobConfig, resultXml, har).save(failOnError: true);
 					log.debug("persisting job result ... DONE")
 				} catch (Exception e) {
 					status.setRollbackOnly()
@@ -155,7 +157,7 @@ class LocationAndResultPersisterService implements iListener{
 				}
 			}
 					
-			if (jobRun != null) persistResultsForAllTeststeps(jobRun, xmlResultResponse, jobConfig, har)
+			if (jobRun != null) persistResultsForAllTeststeps(jobRun, resultXml, jobConfig, har)
 			
 		}
 	}
@@ -171,13 +173,14 @@ class LocationAndResultPersisterService implements iListener{
 	 * Afterwards that location is associated to the job.
 	 * </p>
 	 * @param job
-	 * @param xmlResultResponse
+	 * @param resultXml
 	 * @param expectedServer
 	 */
-	private void updateLocationIfNeededAndPossible(Job job, GPathResult xmlResultResponse, WebPageTestServer expectedServer) {
-		if(job.getLocation().getUniqueIdentifierForServer()!=xmlResultResponse.data.location.toString() || job.getLocation().getWptServer()!=expectedServer) {
+	private void updateLocationIfNeededAndPossible(Job job, WptResultXml resultXml, WebPageTestServer expectedServer) {
+		String locationStringFromResultXml = resultXml.getLocation()
+		if(job.getLocation().getUniqueIdentifierForServer() != locationStringFromResultXml || job.getLocation().getWptServer() != expectedServer) {
 			try {
-				Location location=getOrFetchLocation(expectedServer, xmlResultResponse.data.location.toString());
+				Location location = getOrFetchLocation(expectedServer, locationStringFromResultXml);
 				job.setLocation(location);
 				job.save(failOnError: true);
 			} catch(IllegalArgumentException e) {
@@ -187,23 +190,18 @@ class LocationAndResultPersisterService implements iListener{
 		}
 	}
 
-	protected Job persistNewJobConfig(GPathResult xmlResultResponse, WebPageTestServer wptserverOfResult){
-		String jobConfLabel = xmlResultResponse.data.label.toString()
+	protected Job persistNewJobConfig(WptResultXml resultXml, WebPageTestServer wptserverOfResult){
+		String jobConfLabel = resultXml.getLabel()
 		log.debug("persisting new Job ${jobConfLabel}")
-		Location location = getOrFetchLocation(wptserverOfResult, xmlResultResponse.data.location.toString());
+		Location location = getOrFetchLocation(wptserverOfResult, resultXml.getLocation());
 		JobGroup jobGroup = JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-
-		if (!xmlResultResponse.data.runs.toString().isInteger())
-			throw new IllegalArgumentException('data/runs missing or no integer in XML result')
-		
 		log.debug("Incoming Result for unknown Job.")	
 			
 		Job jobConfig = new Job(
-				//TODO:script: DefaultScript,
 				location: location,
 				active: false,
 				label: jobConfLabel,
-				runs: xmlResultResponse.data.runs.toString().isInteger() ? xmlResultResponse.data.runs.toInteger() : -1,
+				runs: resultXml.getRunCount(),
 				jobGroup: jobGroup,
 				script: Script.createDefaultScript(jobConfLabel).save(failOnError: true),
 				maxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes()
@@ -211,19 +209,18 @@ class LocationAndResultPersisterService implements iListener{
 		//new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
 		jobConfig.setDescription('')
 		return jobConfig
-
 	}
 
-	protected JobResult persistNewJobRun(Job jobConfig, GPathResult xmlResultResponse, String har){
+	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml, String har){
 
-		String testId = xmlResultResponse.data.testId.toString()
+		String testId = resultXml.getTestId()
 		if(!testId){
 			return
 		}
 		log.debug("persisting new JobResult ${testId}")
 
-		Integer jobRunStatus = xmlResultResponse.statusCode.toInteger()
-		Date testCompletion = xmlResultResponse.data.completed.isEmpty()?new Date():new Date(xmlResultResponse.data.completed.toString())
+		Integer jobRunStatus = resultXml.getStatusCodeOfWholeTest()
+		Date testCompletion = resultXml.getCompletionDate()
 		jobConfig.lastRun = testCompletion
 		jobConfig.save(failOnError: true)
 		JobResult result = new JobResult(
@@ -247,10 +244,9 @@ class LocationAndResultPersisterService implements iListener{
 		
 		return result
 	}
-	void persistResultsForAllTeststeps(JobResult jobRun, GPathResult xmlResultResponse, Job job, String har){
+	void persistResultsForAllTeststeps(JobResult jobRun, WptResultXml resultXml, Job job, String har){
 		
-		Integer testStepCount = getTeststepCount(xmlResultResponse)
-		WptXmlResultVersion xmlResultVersion = eventResultService.getVersionOf(xmlResultResponse)
+		Integer testStepCount = resultXml.getTestStepCount()
 		
 		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap = [:]
 		//TODO: enable parsing of waterfalls again, if nightly deletion is working (see de.iteratec.osm.persistence.DbCleanupService)
@@ -270,7 +266,7 @@ class LocationAndResultPersisterService implements iListener{
 			
 			EventResult.withTransaction { TransactionStatus status ->
 				try{
-					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, xmlResultResponse, xmlResultVersion, job, pageidToWaterfallMap))
+					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
 				} catch (Exception e) {
 					status.setRollbackOnly()
 					log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
@@ -282,11 +278,10 @@ class LocationAndResultPersisterService implements iListener{
 	}
 	
 	protected List<EventResult> persistResultsOfOneTeststep(
-		Integer testStepZeroBasedIndex, JobResult jobRun, GPathResult xmlResultResponse, WptXmlResultVersion xmlResultVersion, 
-		Job job, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap){
+		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap){
 
 		log.debug('getting event name from xml result ...')
-		String measuredEventName = getEventNameFromXmlResult(xmlResultResponse, xmlResultVersion, job, testStepZeroBasedIndex)
+		String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
 		log.debug('getting event name from xml result ... DONE')
 		log.debug('getting waterfall anchor ...')
 		String waterfallAnchor = "${STATIC_PART_WATERFALL_ANCHOR}${measuredEventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
@@ -296,21 +291,28 @@ class LocationAndResultPersisterService implements iListener{
 		log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
 				
 		log.debug("persisting result for step=${event}")
-		Integer runCount = xmlResultResponse.data.runs.text().isInteger() ? xmlResultResponse.data.runs.toInteger() : 0
+		Integer runCount = resultXml.getRunCount()
 		log.debug("runCount=${runCount}")
-		log.debug("xmlResultResponse.data.median.firstView.isEmpty()=${xmlResultResponse.data.median.firstView.isEmpty()}")
-		log.debug("xmlResultResponse.data.median.repeatView.isEmpty()=${xmlResultResponse.data.median.repeatView.isEmpty()}")
 
 		List<EventResult> resultsOfTeststep = []
-		xmlResultResponse.data.run.each{GPathResult run ->
-			
-			EventResult firstViewOfTeststep = persistSingleRunResult(run.firstView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, xmlResultVersion, waterfallAnchor)
+		resultXml.getRunCount().times {Integer runNumber ->
+			EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
 			if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
 			
-			EventResult repeatedViewOfTeststep = persistSingleRunResult(run.repeatView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, xmlResultVersion, waterfallAnchor)
+			EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+			if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+		}
+		/*
+		resultXml.getRunNodes().each{GPathResult run ->
+			
+			EventResult firstViewOfTeststep = persistSingleRunResult(run.firstView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+			if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
+			
+			EventResult repeatedViewOfTeststep = persistSingleRunResult(run.repeatView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
 			if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
 			
 		}
+		*/
 		
 		return resultsOfTeststep
 	}
@@ -325,21 +327,16 @@ class LocationAndResultPersisterService implements iListener{
 	 * @param event
 	 * @return Persisted result. Null if the view node is empty, i.e. the test was a "first view only" and this is the repeated view node
 	 */
-	private EventResult persistSingleRunResult(
-		GPathResult viewNode, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, 
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, WptXmlResultVersion xmlResultVersion, String waterfallAnchor) {
+	private EventResult persistSingleResult(
+		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, 
+		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor) {
 
 		EventResult result
-		if(!viewNode.isEmpty()){
+		if(resultXml.resultExistForRunAndView(runZeroBasedIndex, cachedView)){
 
-			GPathResult run = viewNode.parent()
-			Integer currentRun = run.id.toInteger()
+			GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
+			result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
 
-			GPathResult viewResultsNodeOfThisRun = getStepNode(viewNode.results, testStepZeroBasedIndex)
-
-			CachedView cachedView = getCachedViewValueForResultNode(viewNode)
-
-			result = persistResult(jobRun, event, cachedView, currentRun, isMedian(viewNode, currentRun), viewResultsNodeOfThisRun, pageidToWaterfallMap, xmlResultVersion, waterfallAnchor)
 		}
 		return result
 	}
@@ -356,15 +353,15 @@ class LocationAndResultPersisterService implements iListener{
 	 */
 	protected EventResult persistResult(
 		JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, 
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, WptXmlResultVersion xmlResultVersion, String waterfallAnchor){
+		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
 
 		EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult() 
-		return saveResult(result, jobRun, event, view, run, median, viewTag, pageidToWaterfallMap, xmlResultVersion, waterfallAnchor)
+		return saveResult(result, jobRun, event, view, run, median, viewTag, pageidToWaterfallMap, waterfallAnchor)
 
 	}
 	
 	protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run,Boolean median,
-			GPathResult viewTag, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, WptXmlResultVersion xmlResultVersion, String waterfallAnchor){
+			GPathResult viewTag, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
 
 
 		log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
@@ -536,12 +533,6 @@ class LocationAndResultPersisterService implements iListener{
 		return zipped
 	}
 	
-	protected Integer getTeststepCount(GPathResult xmlResultResponse){
-		return eventResultService.getVersionOf(xmlResultResponse) == WptXmlResultVersion.BEFORE_MULTISTEP?
-		xmlResultResponse.data.median.isEmpty() ? 0 : 1 :
-		xmlResultResponse.data.median.firstView.testStep.size()
-	}
-	
 	/**
 	 * Clear pending/running {@link JobResult}s (i.e. wptStatus is 100 or 101) before persisting final {@link EventResult}s.
 	 * @param jobLabel
@@ -550,66 +541,6 @@ class LocationAndResultPersisterService implements iListener{
 	void deleteResultsMarkedAsPendingAndRunning(String jobLabel, String testId){
 		JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true)
 	}
-	
-	String getEventNameFromXmlResult(GPathResult xmlResultResponse, WptXmlResultVersion xmlResultVersion, Job job, Integer testStepZeroBasedIndex) {
-		String measuredEventName
-		if(xmlResultVersion == WptXmlResultVersion.BEFORE_MULTISTEP) {
-			
-			measuredEventName=job.getEventNameIfUnknown();
-			if(!measuredEventName) measuredEventName=job.getLabel()
-			
-		} else {
-		
-			measuredEventName = xmlResultResponse.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).eventName.toString();
-			
-		}
-		return measuredEventName
-	}
-	
-	/**
-	 * Determines if a node is a median node
-	 *
-	 * @param viewNode expects a view node of an run: (response -> data -> run -> firstView or repeatedView)
-	 * @param currentRun
-	 * @return
-	 */
-	private boolean isMedian(GPathResult viewNode, Integer currentRun) {
-		GPathResult dataNode=viewNode.parent().parent()
-
-		String currentViewName = viewNode.name();
-
-		for (GPathResult child : dataNode.median.children()) {
-
-			// uses always TestStep 1; run value is duplicated for every testStep
-			GPathResult stepNode = getStepNode(child, 0)
-
-			if(child.name().equals(currentViewName) && viewNode.parent().id==stepNode.run) {
-				return true;
-			}
-
-		}
-		return false;
-	}
-	
-	private CachedView getCachedViewValueForResultNode(GPathResult singleViewNode) {
-		
-				if(singleViewNode.name().equals('firstView')) {
-					return CachedView.UNCACHED
-				} else if(singleViewNode.name().equals('repeatView')) {
-					return CachedView.CACHED
-				} else {
-					throw new IllegalFormatException("Expecting firstView or repeatetView, not: "+singleViewNode.name());
-				}
-			}
-		
-			private GPathResult getStepNode(GPathResult node, Integer testStepZeroBasedIndex) {
-		
-				if( node.testStep.isEmpty()) {
-					return node;
-				} else {
-					return node.testStep.getAt(testStepZeroBasedIndex)
-				}
-			}
 	
 	public String getName() {
 		return "LocationAndResultPersisterService"

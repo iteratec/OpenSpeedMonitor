@@ -344,21 +344,4 @@ class EventResultService {
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
 	}
 	
-	/**
-	 * Proofs the structure of the xml-result delivered from webpagetest-server.
-	 * 
-	 * @param xmlResultResponse
-	 * 			xml-result delivered from a webpagetest-server via rest-api.
-	 * @return	{@link WptXmlResultVersion#BEFORE_MULTISTEP} if result was measured with a webpagetest-server/-agent without multistep-adaption.
-	 * 			{@link WptXmlResultVersion#MULTISTEP_1} if result was measured with a webpagetest-server/-agent with first version of multistep-adaption.
-	 * 			
-	 */
-	public WptXmlResultVersion getVersionOf(GPathResult xmlResultResponse){
-		WptXmlResultVersion version = WptXmlResultVersion.BEFORE_MULTISTEP
-		if (!xmlResultResponse.data.median.firstView.testStep.isEmpty()) {
-			version = WptXmlResultVersion.MULTISTEP_1
-		}
-		return version
-	}
-	
 }
