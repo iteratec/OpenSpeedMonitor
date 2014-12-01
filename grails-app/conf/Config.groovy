@@ -24,8 +24,8 @@ import de.iteratec.osm.report.chart.ChartingLibrary
  * 	config files can be ConfigSlurper scripts, Java properties files, or classes 
  * 	in the classpath in ConfigSlurper format
  */
-if (System.properties["${appName}_config_location"]) {
-    grails.config.locations = ["file:" + System.properties["${appName}_config_location"]]
+if (System.env["osm_config_location"]) {
+    grails.config.locations = ["file:" + System.env["osm_config_location"]]
  } else {
 	 grails.config.locations = [
 		 "classpath:${appName}-config.properties",
