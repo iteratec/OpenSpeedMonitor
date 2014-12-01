@@ -21,6 +21,7 @@ import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.csi.MvUpdateEventCleanupService
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
