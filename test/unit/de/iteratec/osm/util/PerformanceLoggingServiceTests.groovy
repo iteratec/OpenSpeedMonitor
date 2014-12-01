@@ -20,9 +20,10 @@ package de.iteratec.osm.util
 
 
 import grails.test.mixin.*
-
+import jline.internal.Log
 import org.apache.log4j.Appender
 import org.apache.log4j.Layout
+import org.apache.log4j.Level
 import org.apache.log4j.Logger
 import org.apache.log4j.SimpleLayout
 import org.apache.log4j.WriterAppender
@@ -37,8 +38,9 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
  */
 @TestFor(PerformanceLoggingService)
 class PerformanceLoggingServiceTests {
-	
+
 	PerformanceLoggingService serviceUnderTest
+
 	@Before
 	void setUp() {
 		serviceUnderTest = service
@@ -51,23 +53,19 @@ class PerformanceLoggingServiceTests {
 	 */
 	@Test
     void testLoggingOfExecutionTime() {
-		
-		Logger rootLogger = Logger.getRootLogger()
-		ByteArrayOutputStream out = new ByteArrayOutputStream()
-		Layout layout = new SimpleLayout()
-		Appender appender = new WriterAppender(layout, out)
-		rootLogger.addAppender(appender)
+
+		ByteArrayOutputStream out = setLogLevel(Level.ERROR)
 		
 		String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
-		serviceUnderTest.logExecutionTime(LogLevel.ERROR, descriptionOfClosureToMeasure, IndentationDepth.NULL){
+		serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, IndentationDepth.NULL){
 			Thread.sleep(1100)
 		}
 		String logMsg = out.toString()
 		assertTrue(logMsg.startsWith("ERROR"))
 		assertTrue(logMsg.indexOf(descriptionOfClosureToMeasure) > -1)
-		String eleapsedInSecondsAsString = logMsg.tokenize().pop()
-		assertTrue(eleapsedInSecondsAsString.isDouble())
-		assertTrue(Double.valueOf(eleapsedInSecondsAsString)>1)
+		String elapsedInSecondsAsString = logMsg.tokenize().pop()
+		assertTrue(elapsedInSecondsAsString.isDouble())
+		assertTrue(Double.valueOf(elapsedInSecondsAsString)>1)
 		
     }
 	/**
@@ -75,18 +73,24 @@ class PerformanceLoggingServiceTests {
 	 */
 	@Test
 	void testNoLoggingOfExecutionTimeDueToLogLevel() {
-		
-		Logger rootLogger = Logger.getRootLogger()
-		ByteArrayOutputStream out = new ByteArrayOutputStream()
-		Layout layout = new SimpleLayout()
-		Appender appender = new WriterAppender(layout, out)
-		rootLogger.addAppender(appender)
-		
+
+		ByteArrayOutputStream out = setLogLevel(Level.ERROR)
+
 		String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
-		serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, , IndentationDepth.NULL){
+		serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, IndentationDepth.NULL){
 			Thread.sleep(1)
 		}
 		assertEquals(0, out.toString().size())
 		
+	}
+
+	private ByteArrayOutputStream setLogLevel(Level level) {
+		Logger performanceLoggingServiceLogger = Logger.getLogger("grails.app.services.de.iteratec.osm.util.PerformanceLoggingService")
+		performanceLoggingServiceLogger.level = level
+		ByteArrayOutputStream out = new ByteArrayOutputStream()
+		Layout layout = new SimpleLayout()
+		Appender appender = new WriterAppender(layout, out)
+		performanceLoggingServiceLogger.addAppender(appender)
+		return out
 	}
 }
