@@ -4,6 +4,8 @@ OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1
 
 _The timings you have to keep track of - always on expressive, well arranged dashboards. Without loosing all the details of the single WebPagetests if needed!_
 
+You want to see it running? No problem, there is a demo up and running at [demo.openspeedmonitor.org][17].
+
 OpenSpeedMonitor is published under [Apache License 2.0][12], so feel free to use, adapt and do whatever you want with the code. If you extend functionality we would appreciate contributions. Technically, OpenSpeedMonitor is based on [grails][3], a jvm based web framework leveraged by the programming language [groovy][2].
 
 Installation
@@ -111,6 +113,14 @@ After wpt server(s), locations and browsers of your measurement environment are 
 
 Views for managing scripts and jobs are available in _Measurement_ section of OpenSpeedMonitor gui. The list views can be filtered. Filters get persisted in local storage of your browser so you don't loose your settings while navigating through application.
 
+Activate measurements
+---------------------
+
+After each start of OpenSpeedMonitor application, measurements are disabled genarally. So even if you set up measurements as described in previous section none of your measurement jobs will start any measurements at all. You will have to activate measurements, initially (requires login with admin rights):
+
+* Navigate to OsmConfiguration (http://[your-app-base-url]/osmConfiguration/edit/1), turn measurement activation _on_ and save configuration.
+* Alternatively you can navigate to OsmConfiguration via menu entry _Go to >> OsmConfigurationController_ 
+
 Visualize results
 ---------------------
 
@@ -207,3 +217,4 @@ Authors
 [14]: https://github.com/WPO-Foundation/webpagetest/pull/151 "pull request multistep"
 [15]: mailto:wpt@iteratec.de "contact us"
 [16]: http://spring.io/tools/ggts "GGTS"
+[17]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
