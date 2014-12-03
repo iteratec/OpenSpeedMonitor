@@ -105,18 +105,13 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	@Before
 	void setUp() {
 		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-			List<JobResult> results = JobResult.getAll().findAll{eventResult in it.eventResults}
+			List<JobResult> results = JobResult.list().findAll{eventResult in it.eventResults}
 			return results.get(0)
 		}
 		
 		System.out.println('Loading CSV-data...');
 		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, measuredValueTagService);
 		System.out.println('Loading CSV-data... DONE');
-		
-		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
-		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-			return mapToFindJobResultByEventResult[eventResult.ident()]
-		}
 		
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)
