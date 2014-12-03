@@ -661,6 +661,36 @@ class TestDataUtil {
 			}
 		}
 	}
+	
+	/**
+	 * <p>
+	 * Loads test-data from customers CSV file and creates missing elements.
+	 * </p>
+	 *
+	 * @param csvFile
+	 *         The CSV file with customer data,
+	 *         not <code>null</code>.
+	 * @param pagesToGenerateDataFor
+	 *         The names of the pages to process (see {@link Page}),
+	 *         not <code>null</code>,
+	 *         not {@linkplain Collection#isEmpty() empty}.
+	 * @param measuredValueTagService
+	 * 		   The {@link MeasuredValueTagService} for generating the tag of {@link EventResult}
+	 */
+	public static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages, MeasuredValueTagService measuredValueTagService) {
+		createJobGroups()
+		createServer()
+		createPages(allPages)
+		createBrowsersAndAliases()
+		createLocations()
+
+		csvFile.eachLine{String csvLine ->
+			if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
+				//				System.out.println('Processing line: ' + csvLine);
+				decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, measuredValueTagService)
+			}
+		}
+	}
 
 	static List<Location> createLocations(){
 		WebPageTestServer server1 = WebPageTestServer.findByLabel('server 1 - wpt example')
@@ -947,11 +977,71 @@ class TestDataUtil {
 				jobResultDate: jobResult.date,
 				jobResultJobConfigId: jobResult.job.ident(),
 				measuredEvent: event,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				).save(failOnError: true)
 
 		jobResult.eventResults.add(eventResult);
 		jobResult.save(failOnError: true)
+	}
+	
+	/**
+	 * <p>
+	 * Creates an event result and assigns it to the specified
+	 * {@link JobResult}.
+	 * </p>
+	 *
+	 * <p>
+	 * None of the arguments may be <code>null</code>.
+	 * </p>
+	 *
+	 * @param job
+	 *         The parent job.
+	 * @param jobResult
+	 *         The job result the event result should be assigned to.
+	 * @param docCompleteTimeInMillisecs
+	 *         The doc-complete-time in milliseconds.
+	 * @param customerSatisfactionInPercent
+	 *         The customer-satisfaction-index in percent.
+	 * @param measuredValueTagService
+	 * 		   The {@link MeasuredValueTagService} for generating the tag of {@link EventResult}
+	 */
+	private static void createEventResult(Job job, JobResult jobResult, int docCompleteTimeInMillisecs, double customerSatisfactionInPercent, MeasuredEvent event, MeasuredValueTagService measuredValueTagService) {
+		JobGroup jobGroup = job.jobGroup
+		Page page = event.testedPage
+		Location location = job.location
+		Browser browser = location.browser
+		
+		String resultTag = measuredValueTagService.createEventResultTag(jobGroup, event, page, browser, location)
+		EventResult eventResult = new EventResult(
+				numberOfWptRun: 1,
+				cachedView: CachedView.UNCACHED,
+				medianValue: true,
+				wptStatus:200,
+				docCompleteTimeInMillisecs: docCompleteTimeInMillisecs,
+				customerSatisfactionInPercent: customerSatisfactionInPercent,
+				jobResultDate: jobResult.date,
+				jobResultJobConfigId: jobResult.job.ident(),
+				measuredEvent: event,
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				tag: resultTag
+				).save(failOnError: true)
+
+		jobResult.eventResults.add(eventResult);
+		jobResult.save(failOnError: true)
+		
+	}
+	
+	public static Map<Long, JobResult> generateMapToFindJobResultByEventResultId(List<JobResult> jobResults){
+		Map<Long, JobResult> resultMap = null
+		if(!jobResults.isEmpty()){
+			resultMap = new HashMap<Long, JobResult>()
+			jobResults.each{JobResult jobResult ->
+				jobResult.eventResults.each{EventResult eventResult ->
+					resultMap[eventResult.ident()] = jobResult
+				}
+			}
+		}
+		return resultMap
 	}
 
 	/**
@@ -1013,6 +1103,68 @@ class TestDataUtil {
 
 		if( columns.length > 8 && !columns[8].isEmpty() ) {
 			createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage);
+		}
+	}
+	
+	/**
+	 * Decodes one line of test data CSV.
+	 *
+	 * @param csvLine
+	 */
+	private static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor, MeasuredValueTagService measuredValueTagService){
+		String[] columns = csvLine.split(';');
+
+		String jobName = columns[0]
+
+		Page page = getPageFromCSVJobName(jobName);
+
+		assertNotNull('Page for job-name ' + jobName + ' may not be null.', page)
+
+		if( !isResultForPageRequired(page, pagesToGenerateDataFor) ) {
+			// If the result is not needed for this test, just return and
+			// do nothing more...
+			return ;
+		}
+
+		JobGroup defaultJobGroup = JobGroup.findByName('CSI');
+		JobGroup jobGroup1 = JobGroup.findByName('csiGroup1');
+		JobGroup jobGroup2 = JobGroup.findByName('csiGroup2');
+
+		Location location =  getLocationCSVJobName(jobName);
+		Date dateOfJobRun = new Date(columns[2]+" "+columns[3]);
+
+
+		assertNotNull(defaultJobGroup)
+		assertNotNull(jobGroup1)
+		assertNotNull(jobGroup2)
+		assertNotNull(location)
+		assertNotNull(dateOfJobRun)
+
+		// Create the job:
+		JobGroup groupOfJob
+		switch(jobName.split('_')[0])
+		{
+			case 'csiGroup1':
+				groupOfJob = jobGroup1
+				break;
+			case 'csiGroup2':
+				groupOfJob = jobGroup2
+				break;
+			default:
+				groupOfJob = defaultJobGroup
+		}
+		Job job = getJobOfCSVJobName(jobName, groupOfJob, location);
+		assertNotNull(job)
+
+		MeasuredEvent eventOfPage = getMeasuredEvent(groupOfJob, page);
+		assertNotNull(eventOfPage)
+
+		JobResult jobResult = createJobResult(columns[6], dateOfJobRun, job, location)
+
+		assertNotNull(jobResult)
+
+		if( columns.length > 8 && !columns[8].isEmpty() ) {
+			createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, measuredValueTagService);
 		}
 	}
 
