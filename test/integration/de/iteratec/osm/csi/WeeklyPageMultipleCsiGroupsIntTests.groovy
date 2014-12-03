@@ -19,7 +19,10 @@ package de.iteratec.osm.csi
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
+
 import java.lang.reflect.UndeclaredThrowableException
+import java.util.Map;
+
 import static org.junit.Assert.*
 
 import org.joda.time.DateTime
@@ -62,6 +65,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	MeasuredValueInterval weekly
 	Map<String, Double> targetValues
 	List<JobGroup> csiGroups
+	Map<Long, JobResult> mapToFindJobResultByEventResult
 
 	static final List<String> pagesToGenerateDataFor = ['HP', 'MES']
 	static final List<String> allPages =[
@@ -108,6 +112,11 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 		System.out.println('Loading CSV-data...');
 		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, measuredValueTagService);
 		System.out.println('Loading CSV-data... DONE');
+		
+		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
+		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
+			return mapToFindJobResultByEventResult[eventResult.ident()]
+		}
 		
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)

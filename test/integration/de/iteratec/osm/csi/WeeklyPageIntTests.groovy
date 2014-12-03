@@ -101,7 +101,6 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		
 		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
 		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-			JobResult jobResult = null
 			return mapToFindJobResultByEventResult[eventResult.ident()]
 		}
 		
