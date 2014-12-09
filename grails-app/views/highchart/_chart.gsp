@@ -23,7 +23,9 @@
 		yAxisScalable="false" optimizeForExport="false"
 		highChartLabels="${highChartLabels}"
 		highChartsTurboThreshold="${highChartsTurboThreshold}"
-		exportUrl="${exportUrl}" />
+		exportUrl="${exportUrl}"
+		heightOfChart="${initialChartHeight}"
+		width="${initialChartWidth}"/>
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />

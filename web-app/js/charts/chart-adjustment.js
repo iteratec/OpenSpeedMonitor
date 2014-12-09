@@ -19,7 +19,7 @@
  * Initialization and event-handlers for chart-adjustment-accordion.
  */
 $(document).ready(function() {
-	var chartAdjustmentIsOnPage = ($('#collapseAdjustment').length > 0); 
+	var chartAdjustmentIsOnPage = ($('#collapseAdjustment').length > 0);
 	if(chartAdjustmentIsOnPage){
 		var adjuster
 		if (CHARTLIB.toUpperCase() == "HIGHCHARTS"){
@@ -46,7 +46,7 @@ function HighchartAdjuster() {
 			if($('#dia-y-axis-min').val().length == 0) $('#dia-y-axis-min').val(chart.yAxis[0].dataMin);
 			if($('#dia-y-axis-max').val().length == 0) $('#dia-y-axis-max').val(chart.yAxis[0].dataMax);
 		}
-		$(".collapse").collapse('hide');
+		$("#collapseAdjustment").collapse('hide');
 		//register events
 		$('#to-enable-marker').bind('change', function(){
 			var toEnableMarkers = $(this).is(':checked');

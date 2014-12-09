@@ -168,7 +168,7 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 	
 	// Scroll to Chartbox
 	if($("#chartbox").length > 0){
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top-60)},{duration: 'fast'});
+        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+180)},{duration: 'fast'});
 	}else{
 		$('html,body').animate({scrollTop: 0},{duration: 'fast'});
 	}
