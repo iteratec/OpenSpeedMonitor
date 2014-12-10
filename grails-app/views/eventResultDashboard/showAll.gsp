@@ -283,7 +283,6 @@
 							chartTitle: chartTitle,
 							yAxisLabel: g.message(code:'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
 							initialChartWidth: '100%',
-							initialChartHeight: '400',
 							chartUnit: '%',
 							globalLineWidth: '2',
 							xAxisMin: fromTimestampForHighChart,

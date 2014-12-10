@@ -46,7 +46,7 @@ class OsmChartTagLib {
 		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
 		
 		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS) {
-			String heightOfChart = attrs["heightOfChart"] ?: 0
+			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}"
 			def htmlCreater = new HighchartHtmlCreater()
 			out << htmlCreater.createChartHtml(data, title, lineType, yType, width, yAxisMin, yAxisMax, divId, false, measurementUnit,
 					xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, heightOfChart, openDatapointLinksInNewWindow, exportUrl)
@@ -97,9 +97,11 @@ class OsmChartTagLib {
 
 		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS)
 		{
-			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
+			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}"
 			def htmlCreater = new HighchartHtmlCreater()
-			out << htmlCreater.createChartHtmlMultipleYAxis(data, title, lineType, width, yAxisMin, yAxisMaxs, divId, false, measurementUnits, xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, yAxesLabels, highChartsTurboThreshold, openDatapointLinksInNewWindow, exportUrl, heightOfChart)
+			out << htmlCreater.createChartHtmlMultipleYAxis(data, title, lineType, width, yAxisMin, yAxisMaxs, divId, false, measurementUnits,
+					xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, yAxesLabels,
+					highChartsTurboThreshold, openDatapointLinksInNewWindow, exportUrl, heightOfChart)
 		}
 		else // default: rickshaw
 		{

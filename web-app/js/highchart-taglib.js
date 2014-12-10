@@ -246,7 +246,8 @@ function createLineChart(
     			measurementUnit, 
     			xAxisMin, xAxisMax, 
     			yAxisMin, yAxisMax,
-    			exportUrl);
+    			exportUrl,
+				heightOfChart);
 	}else{
 		if(!yAxisScalable){
 			createChartWithFixYAxis(
@@ -302,7 +303,9 @@ function createLineChartWithMultipleYAxis(
 		yAxisMin,
 		lineWidthGlobal,
 		optimizeForExport,
-		highChartsTurboThreshold, exportUrl) {
+		highChartsTurboThreshold,
+		exportUrl,
+		heightOfChart) {
 		
 	
 	yTypes=clearUnusedAxes(yTypes, data);
@@ -380,7 +383,8 @@ function createLineChartWithMultipleYAxis(
 	    			measurementUnits, 
 	    			xAxisMin, xAxisMax, 
 	    			yAxisMin, yAxisMaxs,
-	    			exportUrl);
+	    			exportUrl,
+					heightOfChart);
 	    }else{
 	    	createChartWithMultipleScalableYAxis(
 	    			div, 
@@ -390,7 +394,8 @@ function createLineChartWithMultipleYAxis(
 	    			measurementUnits, 
 	    			xAxisMin, xAxisMax, 
 	    			yAxisMin, yAxisMaxs,
-	    			exportUrl);
+	    			exportUrl,
+					heightOfChart);
 	    }		
 	
 }
@@ -403,12 +408,14 @@ function createChartForExport(
 		measurementUnit, 
 		xAxisMin, xAxisMax, 
 		yAxisMin, yAxisMax,
-		exportUrl){
+		exportUrl,
+		heightOfChart){
 	window.chart = new Highcharts.Chart({
 		chart: {
 			renderTo: div,
 			zoomType: 'xy',
-			type: 'line'
+			type: 'line',
+			height: heightOfChart
 		},
 		title: {
 			text: title,
@@ -529,12 +536,14 @@ function createChartWithFixYAxisForMultipleYAxis(
 		measurementUnit, 
 		xAxisMin, xAxisMax, 
 		yAxisMin, yAxisMaxs,
-		exportUrl){
+		exportUrl,
+		heightOfChart){
 	window.chart = new Highcharts.Chart({
 		chart: {
 			renderTo: div,
 			zoomType: 'xy',
-			type: 'line'
+			type: 'line',
+			height: heightOfChart
 		},
 		title: {
 			text: title
@@ -619,14 +628,16 @@ function createChartWithMultipleScalableYAxis(
 		measurementUnit, 
 		xAxisMin, xAxisMax, 
 		yAxisMin, yAxisMax,
-		exportUrl){
+		exportUrl,
+		heightOfChart){
 	
 	
 	window.chart = new Highcharts.Chart({
 		chart: {
 			renderTo: div,
 			zoomType: 'xy',
-			type: 'line'
+			type: 'line',
+			height: heightOfChart
 		},
 		title: {
 			text: title
