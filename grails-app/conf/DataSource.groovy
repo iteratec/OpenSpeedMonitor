@@ -21,7 +21,7 @@
  * The datasources defined in this file are default datasources to be used only when running the app out of the box via run-app.
  * Datasources different from default can and should be defined in separate external config files. 
  * Config param grails.config.locations in Config.groovy contains a list of possible locations for such additional config files.
- * In addition you can add an own location for an external config file via system property "${appName}.config.location"
+ * In addition you can add an own location for an external config file via system property "osm_config_location"
  * 
  * @author nkuhn
  * @see OpenSpeedMonitor-config.groovy.sample

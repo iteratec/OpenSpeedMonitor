@@ -68,6 +68,7 @@
 	<div class ="row">
 		<%-- chart --%>
 		<div id="chartbox">
+		<div class="span12 well">
 			<g:render template="/highchart/chart" 
 				model="[
 					singleYAxis: 'true',
@@ -75,7 +76,7 @@
 					chartTitle: g.message(code: 'de.iteratec.isocsi.csi.defaultdashboard.chart.title', 'default':'Kundenzufriedenheit'),
 					yAxisLabel: 'Kundenzufriedenheit [%]',
 					initialChartWidth: '100%',
-					initialChartHeight: '800',
+					initialChartHeight: '600',
 					chartUnit: '%',
 					globalLineWidth: '4',
 					xAxisMin: fromTimestampForHighChart,
@@ -85,8 +86,9 @@
 					yAxisScalable: 'false',
 					optimizeForExport: 'true',
 					yAxisMin: '60',
-					yAxisMax: '100',
+					yAxisMax: '105',
 					openDataPointLinksInNewWindow: 'false']"/>
+		</div>
 		</div>
 		<%-- table --%>
         <div id="csi-table" class="span12" style="display: none;">

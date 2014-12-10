@@ -23,7 +23,7 @@ $(document).ready(function(){
 	if ($("#selectedAllMeasuredEvents").length > 0 && $("#selectedMeasuredEventsHtmlId").length > 0 ){
 		collectAllValues(allMeasuredEventElements, "#selectedMeasuredEventsHtmlId");
 		initSelectAndCheckBoxFunction("#selectedAllMeasuredEvents", "#selectedMeasuredEventsHtmlId");
-		
+
 		$('#pageSelectHtmlId').change(function() { updateSelectFields("#pageSelectHtmlId", "#selectedMeasuredEventsHtmlId",pagesToEvents, allMeasuredEventElements); });
 		updateSelectFields("#pageSelectHtmlId", "#selectedMeasuredEventsHtmlId",pagesToEvents, allMeasuredEventElements);
 	}
@@ -33,8 +33,8 @@ $(document).ready(function(){
 	}
 	if ($("#selectedAllLocations").length > 0 && $("#selectedLocationsHtmlId").length > 0 ){
 		collectAllValues(allLocations, "#selectedLocationsHtmlId");
-		
-		initSelectAndCheckBoxFunction("#selectedAllLocations", "#selectedLocationsHtmlId");	
+
+		initSelectAndCheckBoxFunction("#selectedAllLocations", "#selectedLocationsHtmlId");
 		$('#selectedBrowsersHtmlId').change(function() { updateSelectFields("#selectedBrowsersHtmlId", "#selectedLocationsHtmlId", browserToLocation, allLocations); });
 		updateSelectFields("#selectedBrowsersHtmlId", "#selectedLocationsHtmlId", browserToLocation, allLocations);
 	}

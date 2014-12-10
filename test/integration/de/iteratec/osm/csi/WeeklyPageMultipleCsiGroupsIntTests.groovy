@@ -20,6 +20,9 @@ package de.iteratec.osm.csi
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 
+import java.lang.reflect.UndeclaredThrowableException
+import java.util.Map;
+
 import static org.junit.Assert.*
 
 import org.joda.time.DateTime
@@ -37,12 +40,15 @@ import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.csi.EventMeasuredValueService
+import de.iteratec.osm.result.JobResultService
 
 @TestMixin(IntegrationTestMixin)
 class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWithDBCleanup {
 
-	static transactional = false
+	static transactional = true
 
 	/** injected by grails */
 	EventMeasuredValueService eventMeasuredValueService
@@ -53,11 +59,13 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	WeightingService weightingService
 	MeanCalcService meanCalcService
 	MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+	MeasuredValueUpdateService measuredValueUpdateService
 
 	MeasuredValueInterval hourly
 	MeasuredValueInterval weekly
 	Map<String, Double> targetValues
 	List<JobGroup> csiGroups
+	Map<Long, JobResult> mapToFindJobResultByEventResult
 
 	static final List<String> pagesToGenerateDataFor = ['HP', 'MES']
 	static final List<String> allPages =[
@@ -85,20 +93,26 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	 */
 	@BeforeClass
 	public static void setUpData() {
+		TestDataUtil.cleanUpDatabase()
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createMeasuredValueIntervals()
 		TestDataUtil.createAggregatorTypes()
 		TestDataUtil.createHoursOfDay()
-		System.out.println('Create some common test-data... DONE');
-
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
-		System.out.println('Loading CSV-data... DONE');
+		System.out.println('Create some common test-data... DONE');		
 	}
 
 	@Before
 	void setUp() {
+		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
+			List<JobResult> results = JobResult.list().findAll{eventResult in it.eventResults}
+			return results.get(0)
+		}
+		
+		System.out.println('Loading CSV-data...');
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, measuredValueTagService);
+		System.out.println('Loading CSV-data... DONE');
+		
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)
 		shop = AggregatorType.findByName(AggregatorType.SHOP)
@@ -127,7 +141,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 		Integer countWeeklyPageMvsToBeCreated = 2
 		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
 		assertEquals(16, results.size())
-		creationAndCalculationOfWeeklyPageValuesTest("MES", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated);
+		creationAndCalculationOfWeeklyPageValuesTest("MES", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
 	}
 
 	@Test
@@ -136,13 +150,13 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 		Integer countWeeklyPageMvsToBeCreated = 2
 		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
 		assertEquals(16, results.size())
-		creationAndCalculationOfWeeklyPageValuesTest("HP", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated);
+		creationAndCalculationOfWeeklyPageValuesTest("HP", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
 	}
 
 	/**
 	 * After pre-calculation of hourly job-{@link MeasuredValue}s the creation and calculation of weekly page-{@link MeasuredValue}s is tested.
 	 */
-	void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated) {
+	void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
 
 		Page testedPage=Page.findByName(pageName);
 
@@ -151,8 +165,8 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 			fail("No data Was generated for the page "+pageName+" Test skipped.")
 		}
 
-		csiGroups.each{ JobGroup jobGroup ->
-			precalcHourlyJobMvs(jobGroup, pageName)
+		results.each { EventResult result ->
+			measuredValueUpdateService.createOrUpdateDependentMvs(result)
 		}
 
 		Date startDate = startOfWeek.toDate()

@@ -33,8 +33,14 @@ import de.iteratec.osm.report.chart.MeasuredValue
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.util.PerformanceLoggingService;
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.result.JobResultService
 
 
 @TestMixin(IntegrationTestMixin)
@@ -52,29 +58,19 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	PageMeasuredValueService pageMeasuredValueService
 	JobService jobService
 	MeasuredValueUpdateService measuredValueUpdateService
+	Map<Long, JobResult> mapToFindJobResultByEventResult
+	
 
 	MeasuredValueInterval hourly
 	MeasuredValueInterval weekly
 	Map<String, Double> targetValues
 	Map<String, Integer> targetResultCounts
 
-	static final List<String> pagesToGenerateDataFor = [
-		'HP',
-		'MES',
-		'SE',
-		'ADS',
-		'WKBS',
-		'WK'
-	]
+	static final List<String> pagesToGenerateDataFor = ['SE']
 	static final String csvName = 'weekly_page_KW50_2012.csv'
 	static final DateTime startOfWeek = new DateTime(2012,11,12,0,0,0)
 	static final List<String> allPages =[
-		'HP',
-		'MES',
 		'SE',
-		'ADS',
-		'WKBS',
-		'WK',
 		Page.UNDEFINED
 	];
 	static AggregatorType pageAggregatorType
@@ -82,18 +78,13 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 
 	@BeforeClass
 	public static void setUpData() {
+		TestDataUtil.cleanUpDatabase()
+		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createMeasuredValueIntervals()
 		TestDataUtil.createAggregatorTypes()
-
-		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
-
 		TestDataUtil.createHoursOfDay()
 		System.out.println('Create some common test-data... DONE');
-
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
-		System.out.println('Loading CSV-data... DONE');
 	}
 
 	/**
@@ -103,43 +94,22 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	 */
 	@Before
 	void setUp() {
+		
+		System.out.println('Loading CSV-data...');
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, measuredValueTagService);
+		System.out.println('Loading CSV-data... DONE');
+		
+		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
+		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
+			return mapToFindJobResultByEventResult[eventResult.ident()]
+		}
+		
+		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
+		
 		System.out.println('Set-up...');
-		targetValues = [
-			'weekly_page.csv':
-			[
-				'HP':89.30,
-				'MES':82.24,
-				'SE':61.83,
-				'ADS':54.95,
-				'WKBS':49.35,
-				'WK':37.93
-			],
-			'weekly_page_KW50_2012.csv':
-			[
-				'HP':95.45,
-				'MES':93.88,
-				'SE':92.97,
-				'ADS':76.94,
-				'WKBS':82.56,
-				'WK':50.81]]
-		targetResultCounts = [
-			'weekly_page_KW50_2012.csv':
-			[
-				'HP':1426,
-				'MES':1344,
-				'SE':1346,
-				'ADS':1553,
-				'WKBS':1395,
-				'WK':1437,
-			],
-			'weekly_page.csv':
-			[
-				'HP':233,
-				'MES':231,
-				'SE':122,
-				'ADS':176,
-				'WKBS':172,
-				'WK':176]]
+		targetValues = ['weekly_page.csv':['SE':61.83], 'weekly_page_KW50_2012.csv':['SE':92.97]]
+		
+		targetResultCounts = ['weekly_page_KW50_2012.csv':['SE':1346], 'weekly_page.csv':['SE':122]]
 
 
 		hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
@@ -153,47 +123,8 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	 */
 	@Test
 	public void testCalculatingWeeklyPageValuesForPage_SE() {
-		calculatingWeeklyPageValuesForPageTest("SE");
-	}
-
-	/**
-	 * Test for Page SE
-	 */
-	@Test
-	public void testCalculatingWeeklyPageValuesForPage_ADS() {
-		calculatingWeeklyPageValuesForPageTest("ADS");
-	}
-
-	/**
-	 * Test for Page WKBS
-	 */
-	@Test
-	public void testCalculatingWeeklyPageValuesForPage_WKBS() {
-		calculatingWeeklyPageValuesForPageTest("WKBS");
-	}
-
-	/**
-	 * Test for Page WK
-	 */
-	@Test
-	public void testCalculatingWeeklyPageValuesForPage_WK() {
-		calculatingWeeklyPageValuesForPageTest("WK");
-	}
-
-	/**
-	 * Test for Page HP
-	 */
-	@Test
-	public void testCalculatingWeeklyPageValuesForPage_HP() {
-		calculatingWeeklyPageValuesForPageTest("HP");
-	}
-
-	/**
-	 * Test for Page MES
-	 */
-	@Test
-	public void testCalculatingWeeklyPageValuesForPage_MES() {
-		calculatingWeeklyPageValuesForPageTest("MES");
+		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
+		calculatingWeeklyPageValuesForPageTest("SE", results);
 	}
 
 	/**
@@ -201,8 +132,8 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	 * The CSV read is {@code weekly_page_KW50_2012.csv}.
 	 * Calculating weekly page-values via {@link PageMeasuredValueService} should provide (nearly) the same results!
 	 */
-	private void calculatingWeeklyPageValuesForPageTest(String pageName) {
-
+	private void calculatingWeeklyPageValuesForPageTest(String pageName, List<EventResult> results) {
+		
 		// Skip Page if no data is generated (SpeedUp Test) see pagesToGenerateDataFor
 		if(!pagesToGenerateDataFor.contains(pageName)) {
 			fail("No data Was generated for the page "+pageName+" Test skipped.")
@@ -214,41 +145,14 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 
 		Page pageToCalculateMvFor = Page.findByName(pageName)
 		JobGroup jobGroup = JobGroup.findByName("CSI")
-
-		System.out.println('createWeeklyPageAggregatorTag(jg, p)...');
-		String tagOfWeeklyMVs = measuredValueTagService.createPageAggregatorTag(jobGroup, pageToCalculateMvFor)
-		System.out.println('createWeeklyPageAggregatorTag(jg, p) results in ' + tagOfWeeklyMVs);
-		System.out.println('createWeeklyPageAggregatorTag(jg, p)... DONE');
-
-		System.out.println('precalcHourlyJobMvs()...');
-		List<MeasuredValue> createdHmvs = []
-		createdHmvs.addAll(precalcHourlyJobMvs(jobGroup, pageName))
-		System.out.println('precalcHourlyJobMvs()... DONE');
-
-		System.out.println('createHourlyMeasuredValueByGroupAndPageIdMap(createdHmvs, measuredValueTagService)...');
-		Map<String, List<MeasuredValue>> hmvsByPagename = TestDataUtil.createHourlyMeasuredValueByGroupAndPageIdMap(createdHmvs, measuredValueTagService)
-		System.out.println('createHourlyMeasuredValueByGroupAndPageIdMap(createdHmvs, measuredValueTagService)... DONE');
-
-		MeasuredValue mvWeeklyPage = new MeasuredValue(
-				started: startDate,
-				interval: weekly,
-				aggregator: pageAggregatorType,
-				tag: tagOfWeeklyMVs,
-				value: null,
-				resultIds: ''
-				).save(failOnError:true)
-
-		assertNotNull(jobGroup)
-
-		MvCachingContainer cachingContainer = new MvCachingContainer(
-				pageToCalcMvFor:pageToCalculateMvFor,
-				csiGroupToCalcMvFor: jobGroup,
-				hmvsByCsiGroupPageCombination:hmvsByPagename)
-
-		System.out.println('calcMv(mvWeeklyPage, cC)...');
-		pageMeasuredValueService.calcMv(mvWeeklyPage, cachingContainer)
-		System.out.println('calcMv(mvWeeklyPage, cC)... DONE');
-
+		
+		results.each { EventResult result ->
+			measuredValueUpdateService.createOrUpdateDependentMvs(result)
+		}
+		
+		List<MeasuredValue> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
+		MeasuredValue mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
+		
 		assertEquals(startDate, mvWeeklyPage.started)
 		assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)
 		assertEquals(pageAggregatorType.name, mvWeeklyPage.aggregator.name)
@@ -258,7 +162,6 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		// Disabled reason: Values differ may from data
 		// int targetResultCount = targetResultCounts[csvName][pageName]?:-1
 		// assertEquals(targetResultCount, mvWeeklyPage.countResultIds())
-
 		assertNotNull(mvWeeklyPage.value)
 
 		double expectedValue = targetValues[csvName][pageName]?:-1
@@ -272,32 +175,4 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 
 		assertEquals(expectedValue, calculated, 5.0d)
 	}
-
-	/**
-	 * <p>
-	 * Pre-calculates some hourly measured values based on the CSV from which the weekly values should be calculated.
-	 * </p>
-	 * 
-	 * @param jobGroup The group to use.
-	 * 
-	 * @return A collection of pre-calculated hourly values.
-	 */
-	private List<MeasuredValue> precalcHourlyJobMvs(JobGroup jobGroup, String pageName){
-
-		DateTime currentDateTime = startOfWeek
-		DateTime endOfWeek = startOfWeek.plusWeeks(1)
-		List<MeasuredValue> createdHmvs = TestDataUtil.precalculateHourlyMeasuredValues(
-			jobGroup, pageName, endOfWeek, currentDateTime, hourly,
-			eventMeasuredValueService,
-			measuredValueTagService,
-			eventResultService, 
-			weightingService, 
-			meanCalcService,
-			measuredValueUpdateEventDaoService
-		)
-		return createdHmvs
-	}
-
-
-
 }

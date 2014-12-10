@@ -146,11 +146,7 @@ class HighchartHtmlCreater {
 		boolean hasTimeType = getHasTimeType(highChartLabels)
 		highChartLabels=getCleanedHighChartMap(data, highChartLabels);
 
-		if (heightOfChart == null) {
-			heightOfChart = '600px'
-		}
-
-		sw << """<div id="${divId}" style="width: ${width}; height: ${heightOfChart};"></div>
+		sw << """<div id="${divId}" style="width: ${width};"></div>
 		<script type="text/javascript">
 			\$(document).ready(function() {
 				window.CHARTLIB = "HIGHCHARTS";
@@ -190,8 +186,8 @@ class HighchartHtmlCreater {
 		if (true ||(xAxisMin && xAxisMax)) {
 			sw << """];
 				createLineChartWithMultipleYAxis("${divId}", "${title}", ${yTypes}, data, "${yAxisMaxs}", "${lineType}",
-					"${measurementUnits}", ${xAxisMin}, ${xAxisMax}, ${markerEnabled}, ${dataLabelsActivated}, ${yAxisScalable}, ${yAxisMin}, ${lineWidthGlobal}, ${optimizeForExport}, ${highChartsTurboThreshold},
-					"${exportUrl}");
+					"${measurementUnits}", ${xAxisMin}, ${xAxisMax}, ${markerEnabled}, ${dataLabelsActivated}, ${yAxisScalable},
+					${yAxisMin}, ${lineWidthGlobal}, ${optimizeForExport}, ${highChartsTurboThreshold}, "${exportUrl}", "${heightOfChart}");
 					});
 				</script>"""
 		}
