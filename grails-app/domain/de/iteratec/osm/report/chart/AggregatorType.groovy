@@ -92,6 +92,7 @@ class AggregatorType {
 	public static final String RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES = "fullyLoadedIncomingBytes${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT = "customerSatisfactionInPercent${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_SPEED_INDEX = "speedIndex${UNCACHED_SUFFIX}"
+	public static final String RESULT_UNCACHED_VISUALLY_COMPLETE = "visuallyCompleteInMillisecs${UNCACHED_SUFFIX}"
 	
 	/**
 	 * The Aggegation Type for cached results
@@ -109,6 +110,7 @@ class AggregatorType {
 	public static final String RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES = "fullyLoadedIncomingBytes${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT = "customerSatisfactionInPercent${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_SPEED_INDEX = "speedIndex${CACHED_SUFFIX}"
+	public static final String RESULT_CACHED_VISUALLY_COMPLETE = "visuallyCompleteInMillisecs${CACHED_SUFFIX}"
 	
 	String name
 	MeasurandGroup measurandGroup

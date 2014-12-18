@@ -232,18 +232,17 @@ public class EventResultDashboardService {
 
 			eventResults.each { EventResult eventResult->
 				
-				URL testsDetailsURL = null	
-
-				if ( eventResult.getTestDetailsWaterfallURL() ){
-					testsDetailsURL = eventResult.getTestDetailsWaterfallURL()
-				}else{
+				URL testsDetailsURL = eventResult.getTestDetailsWaterfallURL()
+				if(!testsDetailsURL){
 					testsDetailsURL = this.buildTestsDetailsURL(eventResult)
 				}
 
 				if(isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
 					Double value=resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
-					String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}"
-					highchartPointsForEachGraph[graphLabel].add(new OsmChartPoint(eventResult.getJobResultDate().getTime(), value, 1, testsDetailsURL))
+					if(value != null){
+						String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}"
+						highchartPointsForEachGraph[graphLabel].add(new OsmChartPoint(eventResult.getJobResultDate().getTime(), value, 1, testsDetailsURL))
+					}
 				}
 			}
 		}
@@ -268,8 +267,10 @@ public class EventResultDashboardService {
 				aggregators.each{ AggregatorType aggregator ->
 					if(isCachedViewEqualToAggregatorTypesView(eventResult, resultMeasuredValueService.getAggregatorTypeCachedViewType(aggregator))) {
 						Double value=resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
-						Long millisStartOfInterval = measuredValueUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
-						eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}"] << value
+						if(value != null){
+							Long millisStartOfInterval = measuredValueUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
+							eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}"] << value
+						}
 					}
 				}
 			}
