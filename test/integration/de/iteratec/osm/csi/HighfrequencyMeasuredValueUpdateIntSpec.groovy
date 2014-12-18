@@ -225,6 +225,8 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 		private volatile Thread calculatorThread
 		private PageMeasuredValueService pageMVService
 		private def log
+
+		public MeasuredValueCalculator(){}
 		
 		public void start(PageMeasuredValueService pageMeasuredValueService, outerLog){
 			calculatorThread = new Thread(this)
@@ -242,7 +244,7 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 	                Thread.sleep(10)
 	            } catch (InterruptedException e){
 	            }
-				log.error "getting dai	ly page-mv's from calculator-thread:"
+				log.error "getting daily page-mv's from calculator-thread:"
 				MeasuredValue.withTransaction {status ->
 					 List<JobGroup> groups = JobGroup.findAllByName('group')
 					 List<Page> pages = Page.findAllByName('HP')
