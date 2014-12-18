@@ -76,25 +76,25 @@ public enum CachedView {
  * @see JobResult
  */
 class EventResult implements CsiValue {
-	
-	public static String TEST_DETAILS_STATIC_URL 			= "details.php?test={testid}&run={wptRun}&cached={cachedType}";
-	
+
+	public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
+
 	OsmConfigCacheService osmConfigCacheService
-	
-	Long	id
-	Date	dateCreated
-	Date	lastUpdated
-	URL		testDetailsWaterfallURL
-	
+
+	Long id
+	Date dateCreated
+	Date lastUpdated
+	URL testDetailsWaterfallURL
+
 	MeasuredEvent measuredEvent
-	
+
 	/** number of the run in wpt */
 	Integer numberOfWptRun
 	CachedView cachedView
 	/** whether this result's doc-ready-time is the median time of all runs (if this jobrun includes just one run allways true) */
 	Boolean medianValue
 	Integer wptStatus
-	
+
 	Integer docCompleteIncomingBytes
 	Integer docCompleteRequests
 	Integer docCompleteTimeInMillisecs
@@ -106,38 +106,39 @@ class EventResult implements CsiValue {
 	Integer loadTimeInMillisecs
 	Integer startRenderInMillisecs
 	Double customerSatisfactionInPercent
-	
+
 	/**
 	 * The WPT speed index received from WPT server.
-	 * 
+	 *
 	 * If value is not available please assign 
 	 * {@link #SPEED_INDEX_DEFAULT_VALUE}.
-	 * 
+	 *
 	 * Never <code>null</code>.
 	 */
-	Integer speedIndex 
-	
+	Integer speedIndex
+	Integer visuallyCompleteInMillisecs
+
 	/**
 	 * This is value is to be used for {@link #speedIndex} if no value is
 	 * available.
-	 * 
+	 *
 	 * @since IT-223
 	 */
 	public static final Integer SPEED_INDEX_DEFAULT_VALUE = -1;
-	
+
 	Integer downloadAttempts
 	Date firstStatusUpdate
 	Date lastStatusUpdate
 	String validationState
 	String tag
 	WebPerformanceWaterfall webPerformanceWaterfall
-	
+
 	// from JobResult 
-	Date jobResultDate	
+	Date jobResultDate
 	Long jobResultJobConfigId
-	
+
 	static belongsTo = JobResult
-	
+
 	static constraints = {
 		id()
 		measuredEvent(nullable: true) // FIXME mze-2013-07-30: CAHNGE IMMEDIATELLY to never be null!
@@ -146,7 +147,7 @@ class EventResult implements CsiValue {
 		numberOfWptRun()
 		cachedView()
 		testDetailsWaterfallURL(nullable: true)
-		
+
 		docCompleteIncomingBytes(nullable: true)
 		docCompleteRequests(nullable: true)
 		docCompleteTimeInMillisecs(nullable: true)
@@ -158,68 +159,69 @@ class EventResult implements CsiValue {
 		loadTimeInMillisecs(nullable: true)
 		startRenderInMillisecs(nullable: true)
 		customerSatisfactionInPercent(nullable: true)
-		speedIndex(nullable: false)
-		
+		speedIndex()
+		visuallyCompleteInMillisecs(nullable: true)
+
 		downloadAttempts(nullable: true)
 		firstStatusUpdate(nullable: true)
 		lastStatusUpdate(nullable: true)
 		validationState(nullable: true)
-		
+
 		// from JobResult
 		jobResultDate()
 		jobResultJobConfigId()
-		
+
 		tag(nullable: true)
 		webPerformanceWaterfall(nullable: true)
 	}
 
 	static mapping = {
-		jobResultDate (index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
-		jobResultJobConfigId (index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
+		jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
+		jobResultJobConfigId(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		medianValue(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		cachedView(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		tag(index: 'EventResultTagIndex')
-		
-		
+
+
 		jobResultDate(index: 'GetLimitedMedianEventResultsBy')
 		tag(index: 'GetLimitedMedianEventResultsBy')
 		medianValue(index: 'GetLimitedMedianEventResultsBy')
 		cachedView(index: 'GetLimitedMedianEventResultsBy')
 	}
-	
+
 	static transients = ['csiRelevant', 'osmConfigCacheService']
-	
+
 	/**
 	 * <b>note:</b> This method is surrogated through groovy-metaclass in unit-tests. If this method has to be changed the analogical implementations in tests has to be updated respectively!
 	 * @see HemvCalculationTests
 	 */
 	@Override
-	public boolean isCsiRelevant(){
+	public boolean isCsiRelevant() {
 		return this.customerSatisfactionInPercent && this.docCompleteTimeInMillisecs &&
-		(this.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
-		this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24))
+				(this.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
+						this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24))
 	}
-	
+
 	@Override
 	public Double retrieveValue() {
 		return customerSatisfactionInPercent
 	}
-	
+
 	@Override
 	Date retrieveDate() {
 		return this.jobResultDate
 	}
-	
+
 	@Override
 	public String retrieveTag() {
 		return this.tag
 	}
-	
+
 	@Override
-	public List<Long> retrieveUnderlyingEventResultIds(){
+	public List<Long> retrieveUnderlyingEventResultIds() {
 		return [this.id]
 	}
-	
+
 	/**
 	 * <p>
 	 * Build up an URL to display details (and jump to Waterfall) of the given {@link EventResult}s.
@@ -228,23 +230,22 @@ class EventResult implements CsiValue {
 	 * 			The associated {@link JobResult} of the given {@link EventResult}s
 	 * @return The created URL <code>null</code> if not possible to build up an URL
 	 */
-	public URL buildTestDetailsURL (JobResult jobRun, String waterfallAnchor)
-	{
+	public URL buildTestDetailsURL(JobResult jobRun, String waterfallAnchor) {
 		URL resultURL = null;
 		String urlString = null;
-		
-		if ( jobRun ){
+
+		if (jobRun) {
 			urlString = jobRun.getWptServerBaseurl() + TEST_DETAILS_STATIC_URL + waterfallAnchor
 			urlString = urlString.replace("{testid}", jobRun.getTestId());
 			urlString = urlString.replace("{wptRun}", this.numberOfWptRun.toString());
-			urlString = urlString.replace("{cachedType}", ( this.cachedView.toString() == "CACHED" ? "1" : "0" ) );
+			urlString = urlString.replace("{cachedType}", (this.cachedView.toString() == "CACHED" ? "1" : "0"));
 			resultURL = new URL(urlString);
 		}
-		
-		return resultURL;		
+
+		return resultURL;
 	}
 
-	public String toString(){
+	public String toString() {
 		return "id=${this.id}\n" +
 				"\t\twptStatus=${this.wptStatus}\n" +
 				"\t\tmedianValue=${this.medianValue}\n" +
@@ -270,5 +271,5 @@ class EventResult implements CsiValue {
 				"\t\tjobResultJobConfigId=${this.jobResultJobConfigId}\n" +
 				"\t\ttag=${this.tag}"
 	}
-	
+
 }

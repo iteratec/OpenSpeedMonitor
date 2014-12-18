@@ -763,6 +763,13 @@ class TestDataUtil {
 		return browsers
 	}
 
+	static Browser createBrowser(String name, double weight){
+		return new Browser(
+			name: name,
+			weight: weight
+		).save(failOnError: true)
+	}
+
 	static void createServer(){
 		WebPageTestServer server1
 		server1 = new WebPageTestServer(
@@ -778,12 +785,12 @@ class TestDataUtil {
 		allPageNames.each{String pageName ->
 			Double weight = 0
 			switch(pageName){
-				case 'HP' : weight = 6		; break
-				case 'MES' : weight = 9		; break
-				case 'SE' : weight = 36		; break
-				case 'ADS' : weight = 43		; break
-				case 'WKBS' : weight = 3		; break
-				case 'WK' : weight = 3		; break
+				case 'HP' : weight = 1		; break
+				case 'MES' : weight = 1		; break
+				case 'SE' : weight = 1		; break
+				case 'ADS' : weight = 1		; break
+				case 'WKBS' : weight = 1		; break
+				case 'WK' : weight = 1		; break
 			}
 			allPages.add(
 				new Page(
@@ -806,6 +813,13 @@ class TestDataUtil {
 				name:'csiGroup2',
 				groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
 		return [group1, group2, group3]
+	}
+
+	static JobGroup createJobGroup(String groupName, JobGroupType groupType){
+		return new JobGroup(
+			name: groupName,
+			groupType: groupType
+		).save(failOnError: true)
 	}
 
 	/**
