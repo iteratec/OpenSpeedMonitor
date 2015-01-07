@@ -23,6 +23,7 @@ import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
 
 import org.quartz.CronScheduleBuilder
+import org.quartz.SchedulerException
 import org.quartz.SimpleScheduleBuilder
 import org.quartz.Trigger
 import org.quartz.TriggerBuilder
@@ -394,8 +395,12 @@ class JobProcessingService {
 				log.info("Ignoring Job ${job.label} as it is already scheduled.")
 			}
 		} else {
-			if (log.infoEnabled) log.info("Scheduling Job ${job.label} (${job.executionSchedule})")
-			CronDispatcherQuartzJob.schedule(cronTrigger, [jobId: job.id])
+			try {
+				log.info("Scheduling Job ${job.label} (${job.executionSchedule})")
+				CronDispatcherQuartzJob.schedule(cronTrigger, [jobId: job.id])
+			} catch (SchedulerException se) {
+				log.info("Job ${job.label} with schedule ${job.executionSchedule} can't be scheduled: ${se.message}", se)
+			}
 		}
 	}
 
