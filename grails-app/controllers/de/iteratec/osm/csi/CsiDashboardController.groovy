@@ -17,13 +17,30 @@
 
 package de.iteratec.osm.csi
 
-import static Contract.*
+import de.iteratec.osm.p13n.CookieBasedSettingsService
+
+import static de.iteratec.osm.util.Constants.*
+
+import de.iteratec.osm.util.OsmCookieService
+import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import de.iteratec.osm.result.EventResultService
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.validation.Validateable
-
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.regex.Pattern
-
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -38,28 +55,11 @@ import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.OsmChartPoint
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.csi.weighting.WeightFactor
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.TreeMapOfTreeMaps
-import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.CustomDateEditorRegistrar
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.util.I18nService
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.regex.Pattern
+
+import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 
 //TODO: implement some tests for this controller
 
@@ -83,6 +83,8 @@ class CsiDashboardController {
 	CustomerSatisfactionHighChartService customerSatisfactionHighChartService
 	CsiHelperService csiHelperService
 	MeasuredValueUtilService measuredValueUtilService
+	OsmCookieService osmCookieService
+	CookieBasedSettingsService cookieBasedSettingsService
 
 	/**
 	 * The Grails engine to generate links.
@@ -114,7 +116,7 @@ class CsiDashboardController {
 		'de.iteratec.isocsi.csi.per.csi.group.daily',
 		'de.iteratec.isocsi.csi.per.csi.group',
 	]
-	
+
 	/**
 	 * <p>
 	 * Performs a redirect with HTTP status code 303 (see other).
@@ -533,7 +535,7 @@ class CsiDashboardController {
 	 *         {@linkplain Map#isEmpty() empty}.
 	 */
 	Map<String, Object> showDefault() {
-		
+
 		DateTime toDate = new DateTime(); // now
 		DateTime fromDate = toDate.minusMonths(3);
 
@@ -550,7 +552,7 @@ class CsiDashboardController {
 		queryParams.jobGroupIds.addAll(csiGroupIds);
 		
 		fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true);
-		
+
 		modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART);
 		modelToRender.put('weekStart', MONDAY_WEEKSTART);
 		modelToRender.put('from', fromDate);
@@ -560,7 +562,7 @@ class CsiDashboardController {
 		modelToRender.put('markerShouldBeEnabled', true);
 		modelToRender.put('debug', params.debug?true:false)
 		modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
-		
+		modelToRender.put('defaultChartTitleFromCookie', osmCookieService.getBase64DecodedCookieValue(COOKIE_KEY_CSI_DASHBOARD_TITLE))
 		return modelToRender;
 	}
 	
@@ -1270,6 +1272,7 @@ class CsiDashboardController {
 			locationsOfBrowsers.put(eachBrowser.getId(), locationIds);
 		}
 		result.put('locationsOfBrowsers', locationsOfBrowsers);
+		result.put("chartRenderingLibrary", cookieBasedSettingsService.getChartingLibraryToUse())
 
 		// Done! :)
 		return result;

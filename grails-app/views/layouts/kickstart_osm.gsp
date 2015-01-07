@@ -59,7 +59,10 @@
 	<g:if test="${ pageProperty(name:'page.include.bottom') }">
    		<g:pageProperty name="page.include.bottom" />
 	</g:if>
-	
+
+	%{--Global modal dialogs--}%
+	<g:render template="/_modals/global"/>
+
 	<!-- Included Javascript files and other resources -->
 	<r:layoutResources />
 </body>

@@ -18,7 +18,8 @@
 package de.iteratec.osm
 /**
  * ConfigService
- * Delivers application-wide configurations.
+ * Delivers application-wide configurations from backend.
+ * @see OsmConfiguration
  */
 class ConfigService {
 
