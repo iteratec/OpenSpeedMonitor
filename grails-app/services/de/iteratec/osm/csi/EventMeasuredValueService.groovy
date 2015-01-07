@@ -161,7 +161,7 @@ class EventMeasuredValueService {
 			newResult, 
 			osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24), 
 			osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) 
-		if(csiRelevance){
+		if(csiRelevance && !toBeCalculated.containsInResultIds(newResult.ident())){
 			if (countResults > 0 && newResult.customerSatisfactionInPercent != null) {
 				Double sumOfPreviousResults = (toBeCalculated.value?toBeCalculated.value:0) * countResults
 				newValue = (sumOfPreviousResults + newResult.customerSatisfactionInPercent) / (countResults + 1)
