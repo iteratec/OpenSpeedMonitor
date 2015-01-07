@@ -17,11 +17,15 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.ConfigService;
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.util.Constants
+import de.iteratec.osm.util.OsmCookieService;
 
 class OsmChartTagLib {
 
 	ConfigService configService
+	CookieBasedSettingsService cookieBasedSettingsService
 	static namespace = "iteratec"
 
 	def singleYAxisChart = { attrs, body ->
@@ -45,13 +49,15 @@ class OsmChartTagLib {
 		Boolean openDatapointLinksInNewWindow = attrs['openDataPointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDataPointLinksInNewWindow'])  : true
 		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
 		
-		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS) {
-			String heightOfChart = attrs["heightOfChart"] ?: 0
+		ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
+		log.debug("chartLibToUse while processing osm chart tgalib=${chartLibToUse}")
+
+		if (chartLibToUse == ChartingLibrary.HIGHCHARTS) {
+			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}"
 			def htmlCreater = new HighchartHtmlCreater()
 			out << htmlCreater.createChartHtml(data, title, lineType, yType, width, yAxisMin, yAxisMax, divId, false, measurementUnit,
 					xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, heightOfChart, openDatapointLinksInNewWindow, exportUrl)
-		}
-		else // default: rickshaw
+		}else if (chartLibToUse == ChartingLibrary.RICKSHAW)
 		{
 			String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
 			data.each {
@@ -62,6 +68,9 @@ class OsmChartTagLib {
 			
 			def htmlCreater = new RickshawHtmlCreater()
 			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, heightOfChart, highChartLabels, title, markerEnabled)
+		}else {
+			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
+					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
 		}
 
 		return out.toString()
@@ -95,17 +104,23 @@ class OsmChartTagLib {
 			title = "";
 		}
 
-		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS)
-		{
-			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
+		ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
+		log.debug("chartLibToUse while processing osm chart taglib=${chartLibToUse}")
+
+		if (chartLibToUse == ChartingLibrary.HIGHCHARTS){
+			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}"
 			def htmlCreater = new HighchartHtmlCreater()
-			out << htmlCreater.createChartHtmlMultipleYAxis(data, title, lineType, width, yAxisMin, yAxisMaxs, divId, false, measurementUnits, xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, yAxesLabels, highChartsTurboThreshold, openDatapointLinksInNewWindow, exportUrl, heightOfChart)
-		}
-		else // default: rickshaw
+			out << htmlCreater.createChartHtmlMultipleYAxis(data, title, lineType, width, yAxisMin, yAxisMaxs, divId, false, measurementUnits,
+					xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, yAxesLabels,
+					highChartsTurboThreshold, openDatapointLinksInNewWindow, exportUrl, heightOfChart)
+		}else if (chartLibToUse == ChartingLibrary.RICKSHAW)
 		{
 			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
 			def htmlCreater = new RickshawHtmlCreater()
 			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, heightOfChart, yAxesLabels, title, markerEnabled)
+		} else {
+			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
+					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
 		}
 
 		return out.toString()

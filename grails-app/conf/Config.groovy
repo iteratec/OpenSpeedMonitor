@@ -154,9 +154,9 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/queueStatus/refresh'                : ["permitAll"],
 	'/connectivityProfile/list'                : ["permitAll"],
 	'/about'                : ["permitAll"],
-	'/job/**'                : ['ROLE_ADMIN','ROLE_SUPER_ADMIN'],
-	'/script/**'                : ['ROLE_ADMIN','ROLE_SUPER_ADMIN'],
-	'/**'                       : ['ROLE_SUPER_ADMIN']
+	'/cookie/**'			: ["permitAll"],
+	'/console/**'                : ['ROLE_SUPER_ADMIN'],
+	'/**'                       : ['ROLE_ADMIN','ROLE_SUPER_ADMIN']
 ]
 
 grails.plugins.dynamicController.mixins = [
@@ -185,8 +185,21 @@ grails.plugins.dynamicController.mixins = [
 	   */
  ]
 
+/*
+*	Configure charting libraries available in OpenSpeedMonitor.
+* 	Default is rickshaw, see http://code.shutterstock.com/rickshaw/
+* 	Highcharts (http://www.highcharts.com/) is possible, too, but licensed proprietary.
+*/
+/** default charting lib */
 grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.RICKSHAW
+/** all available charting libs */
+grails.de.iteratec.osm.report.chart.availableChartTagLibs = [ChartingLibrary.RICKSHAW]
+/** url to highchart's export server (for exporting charts as bitmaps or vector graphics). */
 grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
+
+// if not specified default in code is 30 days
+// unit: seconds
+grails.plugins.cookie.cookieage.default = 60*60*24*36
 
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

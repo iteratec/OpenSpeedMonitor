@@ -17,8 +17,8 @@
 </div>
 
 <r:script>
+
 	var editor = null;
-	
 	var update = function() {
 		if (!editor) {
 			return;
@@ -51,17 +51,19 @@
 		});
 		
 	}
-	
-	$('#scriptTabLink').click(function() {
+
+	$('#scriptTabLink').bind("click", function() {
+		update();
+	});
+	$('#script').bind("change", update);
+
+	$('#script').change();
+	$(document).ready(function(){
 		if (!editor) {
 			editor = createCodemirrorEditor();
 			update();
 		}
 	});
-	
-	$('#script').bind("change", update);
-	//$('#script').change(update);
-	$('#script').change();
 </r:script>
 
 <p style="margin: 0; padding-top: 1em;"><g:message code="job.script.preview.label" /> <a href="" target="_blank" id="editScriptLink">

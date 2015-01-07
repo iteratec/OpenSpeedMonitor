@@ -1,6 +1,7 @@
 <r:require modules="iteratec-chart" />
 
-<!-- TODO merge the single- and multiple-axis-chart-function of highchart -->
+
+%{--TODO merge the single- and multiple-axis-chart-function of highchart--}%
 <g:if test="${singleYAxis}">
 	<iteratec:singleYAxisChart data="${chartData}" yType="${yAxisLabel}"
 		title="${chartTitle}" width="${initialChartWidth}"
@@ -23,7 +24,9 @@
 		yAxisScalable="false" optimizeForExport="false"
 		highChartLabels="${highChartLabels}"
 		highChartsTurboThreshold="${highChartsTurboThreshold}"
-		exportUrl="${exportUrl}" />
+		exportUrl="${exportUrl}"
+		heightOfChart="${initialChartHeight}"
+		width="${initialChartWidth}"/>
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />

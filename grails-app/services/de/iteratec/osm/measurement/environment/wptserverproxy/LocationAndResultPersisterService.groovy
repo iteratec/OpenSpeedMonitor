@@ -386,7 +386,14 @@ class LocationAndResultPersisterService implements iListener{
 		result.jobResultJobConfigId=jobRun.job.ident()
 		JobGroup csiGroup = jobRun.job.jobGroup?:JobGroup.findByName(JobGroup.UNDEFINED_CSI)
 		result.tag = measuredValueTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
-		result.speedIndex = viewTag.SpeedIndex.isEmpty()?EventResult.SPEED_INDEX_DEFAULT_VALUE:viewTag.SpeedIndex.toInteger()
+		if(!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0 ){
+			result.speedIndex = viewTag.SpeedIndex.toInteger()
+		}else {
+			result.speedIndex = EventResult.SPEED_INDEX_DEFAULT_VALUE
+		}
+		if(!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0 ){
+			result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
+		}
 		//TODO: enable saving of waterfalls again, if nightly deletion is working (see de.iteratec.osm.persistence.DbCleanupService)
 		/*
 		WebPerformanceWaterfall waterfall = pageidToWaterfallMap[

@@ -425,14 +425,14 @@ class OsmChartTagLibTests {
 	private String getExpectedHtmlForMultipleYAxisChartWithHighchart(String divId) {
 		def sw = new StringWriter()
 
-		sw <<"""<div id="${divId}" style="width: null; height: 600px;"></div>
+		sw << """<div id="${divId}" style="width: null;"></div>
 		<script type="text/javascript">
 			\$(document).ready(function() {
 				window.CHARTLIB = "HIGHCHARTS";
 				var data = [{name: "job1",yAxis: 1, data:[{x:1373631796000,y:1.5,events:{click:function(e){window.open('https://www.example.com/now');}}},{x:1373635396000,y:3.0},{x:1373638996000,y:2.3,events:{click:function(e){window.open('https://www.example.com/twoHoursAfterNow');}}},]},{name: "job2",yAxis: 0, data:[{x:1373631796000,y:1.5,events:{click:function(e){window.open('https://www.example.com/now');}}},{x:1373635396000,y:3.0},{x:1373638996000,y:2.3,events:{click:function(e){window.open('https://www.example.com/twoHoursAfterNow');}}},]},];
 				createLineChartWithMultipleYAxis("${divId}", "", [{ "label": "Percentages", "labelPosition": 0, "unit": "", "divisor": 1.0, "color": "#000000" },{ "label": "Load Times", "labelPosition": 1, "unit": "", "divisor": 1.0, "color": "#000000" },{ "label": "Load Times", "labelPosition": 1, "unit": "", "divisor": 1.0, "color": "#000000" },{ "label": "Load Times", "labelPosition": 1, "unit": "", "divisor": 1.0, "color": "#000000" },{ "label": "Load Times", "labelPosition": 1, "unit": "", "divisor": 1.0, "color": "#000000" },], data, "100", "null",
-					"ms", 100, 1000, true, false, true, 10, 2, false, 100000,
-					"http://export.highcharts.com");
+					"ms", 100, 1000, true, false, true,
+					10, 2, false, 100000, "http://export.highcharts.com", "600px");
 					});
 				</script>"""
 

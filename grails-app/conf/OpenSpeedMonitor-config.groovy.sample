@@ -16,10 +16,16 @@ grails.de.iteratec.osm.security.initialOsmAdminUser.password='[password-of-admin
 grails.de.iteratec.osm.security.initialOsmRootUser.username='[username-of-superadmin-user-to-be-bootsrapped]'
 grails.de.iteratec.osm.security.initialOsmRootUser.password='[password-of-superadmin-user-to-be-bootsrapped]'
 
-//Configure charting library
-//default is rickshaw, see http://code.shutterstock.com/rickshaw/
-//highcharts (http://www.highcharts.com/) is possible, too, but licensed proprietary
+/*
+*	Configure charting libraries available in OpenSpeedMonitor.
+* 	Default is rickshaw, see http://code.shutterstock.com/rickshaw/
+* 	Highcharts (http://www.highcharts.com/) is possible, too, but licensed proprietary.
+*/
+/** default charting lib */
 grails.de.iteratec.osm.report.chart.chartTagLib = de.iteratec.osm.report.chart.ChartingLibrary.RICKSHAW
+/** all available charting libs */
+grails.de.iteratec.osm.report.chart.availableChartTagLibs = [de.iteratec.osm.report.chart.ChartingLibrary.RICKSHAW]
+/** url to highchart's export server (for exporting charts as bitmaps or vector graphics). */
 grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
 
 // MySQL DataSources

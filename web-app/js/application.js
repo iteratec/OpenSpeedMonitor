@@ -32,3 +32,29 @@ function stringToBoolean(string) {
 		default: return false;
 	}
 }
+function setCookie(key, value, path, shouldExpireInMillisecsFromNow) {
+	var expires = new Date();
+	expires.setTime(expires.getTime() + shouldExpireInMillisecsFromNow);
+	var cookieToSet = key + '=' + btoa(value)  + ';expires=' + expires.toUTCString() + ';path=' + path;
+	console.log(cookieToSet);
+	document.cookie = cookieToSet;
+}
+function getCookie(key) {
+	var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+	return keyValue ? atob(keyValue[2]) : null;
+}
+function setToLocalStorage(key, value) {
+	try{
+		localStorage.setItem(key, value)
+	}catch(e){
+		console.log('Can\'t write data to local storage: ' + e.message);
+	}
+}
+function getFromLocalStorage(key) {
+	try{
+		return localStorage.getItem(key);
+	}catch(e){
+		console.log('Can\'t read data from local storage: ' + e.message);
+	}
+	return null;
+}

@@ -105,11 +105,11 @@ var setChevron = function(accordionElement) {
 }
 function initIntervalSelect() {
 	//initialization///////////////////////
-	var lastIntervalSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.intervalselection');
+	var lastIntervalSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.intervalselection');
 	if(lastIntervalSelection != null) $('#selectedIntervalHtmlId').val(lastIntervalSelection);
 	//register events///////////////////////
 	$('#selectedIntervalHtmlId').on("change", function(event){
-		localStorage.setItem('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
+		setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
 	});
 }
 /**
@@ -168,7 +168,7 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 	
 	// Scroll to Chartbox
 	if($("#chartbox").length > 0){
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top-60)},{duration: 'fast'});
+        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+180)},{duration: 'fast'});
 	}else{
 		$('html,body').animate({scrollTop: 0},{duration: 'fast'});
 	}

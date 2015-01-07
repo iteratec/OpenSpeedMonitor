@@ -37,7 +37,7 @@
 		<g:message code="job.tags.label" default="tags" />
 	</label>
 	<div class="span8">
-		<ul name="tags" style="margin-left:0px;">
+		<ul name="tags" style="margin-left:0px;" id="tags">
 		      <g:each in="${job?.tags}">
 		        <li>${it}</li>
 		      </g:each>

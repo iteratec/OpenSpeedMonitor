@@ -48,11 +48,12 @@ modules = {
 	'iteratec-chart' {
 		defaultBundle 'osm-dashboard'
 
-		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS) {
+		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs.contains(ChartingLibrary.HIGHCHARTS)) {
 			resource url: 'js/highcharts.js'
 			resource url: 'js/highchart-taglib.js'
 			resource url: 'js/exporting.js'
-		} else {
+		}
+		if (grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs.contains(ChartingLibrary.RICKSHAW)) {
 			resource url: 'js/d3/d3.v3.js'
 			resource url: 'css/rickshaw/rickshaw_custom.css'
 			resource url: 'js/rickshaw/rickshaw_custom.js'

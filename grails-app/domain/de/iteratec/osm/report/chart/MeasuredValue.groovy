@@ -136,12 +136,7 @@ class MeasuredValue implements CsiValue {
 	 * @return true if the result already in the list
 	 */
 	boolean containsInResultIds(Long resultId){
-		List<Long> list = getResultIdsAsList()
-		if(list.contains(resultId)){
-			log.error("EventResult in MeasuredValue is already in the list! (EventResult-ID=${newResultId}, MeasuredValue-ID=${this.ident()})")
-			return true
-		}
-		return false
+		return getResultIdsAsList().contains(resultId)
 	}
 	/**
 	 * Adds all {@link EventResult}-identifiers in resultIdsToAddAsList to the list of {@link EventResult}-identifiers, this value was calculated from.
