@@ -17,94 +17,33 @@
 
 package de.iteratec.osm.csi
 
-import java.util.regex.Pattern
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-
+import static de.iteratec.osm.util.Constants.COOKIE_KEY_CSI_DASHBOARD_TITLE
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.OsmCookieService
 
 class CsiHelperService {
-	
-	TimeToCsMappingService timeToCsMappingService
 
-	/**
-	 * Resets actualDateTime to the start of the interval in which it is.
-	 * @param actualDateTime
-	 * @param intervalInMinutes
-	 * @return
-	 * @deprecated Use {@link de.iteratec.osm.report.chart.MeasuredValueUtilService#resetToStartOfActualInterval(DateTime, Integer)} instead
-	 */
-	@Deprecated
-    DateTime resetToStartOfActualInterval(DateTime actualDateTime, Integer intervalInMinutes){
-		DateTime startOfInterval = actualDateTime
-		switch (intervalInMinutes) {
-			case MeasuredValueInterval.WEEKLY:									startOfInterval=startOfInterval.withDayOfWeek(1)
-			case MeasuredValueInterval.DAILY:
-			case MeasuredValueInterval.WEEKLY:									startOfInterval=startOfInterval.withHourOfDay(0)
-			default:															startOfInterval=startOfInterval.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0)
-		}
-		return startOfInterval
-	}
-	/**
-	 * Resets actualDateTime to the end of the interval in which it is.
-	 * @param actualDateTime
-	 * @param intervalInMinutes
-	 * @return
-	 * @deprecated Use {@link de.iteratec.osm.report.chart.MeasuredValueUtilService#resetToEndOfActualInterval(DateTime, Integer)} instead
-	 */
-	@Deprecated
-	DateTime resetToEndOfActualInterval(DateTime actualDateTime, Integer intervalInMinutes){
-		DateTime endOfInterval = actualDateTime
-		return resetToStartOfActualInterval(actualDateTime, intervalInMinutes).plusMinutes(intervalInMinutes)
-	}
+	OsmCookieService osmCookieService
+	ConfigService configService
+	I18nService i18nService
 	
-	JobGroup getCsiJobGroup(){
-		return JobGroup.findByName('CSI')
-	}
-	List<JobGroup> getCsiJobGroups(){
-		return JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION)
-	}
-	
-	String calculateCsisForCsv(String pathToSourceCsv){
-		File file = new File(pathToSourceCsv)
-		String newContent = "job;id;date;time;validationState;resultStatus;resultURL;FV_Doc;customerSatisfaction\n"
-		String newLine = ""
-		file.eachLine{line ->
-			if (!line.startsWith("Job;")) {
-				def tokenized = line.tokenize(";")
-				if (tokenized[7]) {
-					Page page
-					switch (tokenized[0].toLowerCase()){
-						case {Pattern.matches('.*step01.*', it)}: page = Page.findByName('HP') ; break
-						case {Pattern.matches('.*step02.*', it)}: page = Page.findByName('MES') ; break
-						case {Pattern.matches('.*step03.*', it)}: page = Page.findByName('SE') ; break
-						case {Pattern.matches('.*step04.*', it)}: page = Page.findByName('ADS') ; break
-						case {Pattern.matches('.*step05.*', it)}: page = Page.findByName('WKBS') ; break
-						case {Pattern.matches('.*step06.*', it)}: page = Page.findByName('WK') ; break
-					}
-					if (page) {
-						newLine = "${tokenized[0]};${tokenized[1]};${tokenized[2]};${tokenized[3]};${tokenized[4]};${tokenized[5]};${tokenized[6]};${tokenized[7]};"+
-								timeToCsMappingService.getCustomerSatisfactionInPercent(Integer.valueOf(tokenized[7]), page) + "\n"
-						log.info("newLine=${newLine}")
-						newContent += newLine
-					}else{
-						newLine = "${line}\n"
-						log.info("newLine=${newLine}")
-						newContent += newLine
-					}
-				}else{
-					newLine = "${line}\n"
-					log.info("newLine=${newLine}")
-					newContent += newLine
-				}
-			}
-		}
-		File out = new File('/home/nkuhn/tempOutOfTruecrypt/weekly_new.csv')
-		out << newContent
-		return newContent
+	/**
+	 * Provides default title for csi dasboard charts. That default title is composed of a base title and an optional main url under test as suffix.
+	 * </br></br>Components of title:
+	 * <ul>
+	 * <li>base title: defined in i18n, can be overridden by a cookie setting</li>
+	 * <li>main url under test: optional osm config that builds suffix for title</li>
+	 * </ul>
+	 * @return
+	 */
+	String getCsiChartDefaultTitle(){
+		log.info("**********************" + i18nService.msg('de.iteratec.isocsi.csi.defaultdashboard.chart.title', 'Customer Satisfaction (CSI)'))
+		String baseChartTitle = osmCookieService.getBase64DecodedCookieValue(COOKIE_KEY_CSI_DASHBOARD_TITLE) ?:
+			i18nService.msg('de.iteratec.isocsi.csi.defaultdashboard.chart.title', 'Customer Satisfaction (CSI)')
+		String mainUrlUnderTest = configService.getMainUrlUnderTest()
+		mainUrlUnderTest = mainUrlUnderTest ? " ${mainUrlUnderTest}" : ''
+		return "${baseChartTitle}${mainUrlUnderTest}"
 	}
 	
 }
