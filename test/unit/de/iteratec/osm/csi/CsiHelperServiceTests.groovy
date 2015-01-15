@@ -17,18 +17,17 @@
 
 package de.iteratec.osm.csi
 
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.assertThat
-import grails.test.mixin.TestFor
-
-import org.junit.Before
-import org.junit.Test
-
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.MethodToMock
 import de.iteratec.osm.util.OsmCookieService
 import de.iteratec.osm.util.ServiceMocker
+import grails.test.mixin.TestFor
+import org.junit.Before
+import org.junit.Test
+
+import static org.hamcrest.Matchers.is
+import static org.junit.Assert.assertThat
 
 /**
  * Test-suite of {@link CsiHelperService}.
@@ -43,6 +42,11 @@ class CsiHelperServiceTests {
 	void setUp() {
 		serviceUnderTest=service
 		mocker = ServiceMocker.create()
+		//mocks common for all tests
+		mocker.mockService(
+				I18nService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: 'not the concern of these tests')])
 	}
 
 	@Test
