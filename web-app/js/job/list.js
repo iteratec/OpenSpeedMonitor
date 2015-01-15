@@ -127,19 +127,19 @@ JobStatusUpdater = function() {
 
 function filterJobList() {
     var filterText = $.trim($('#filterByLabel').val());
-    localStorage.setItem('de.iteratec.osm.job.list.filters.jobname',filterText);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.jobname',filterText);
     var filterJobGroup = $.trim($('#filterByJobGroup').val());
-    localStorage.setItem('de.iteratec.osm.job.list.filters.jobgroup',filterJobGroup);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.jobgroup',filterJobGroup);
     var filterLocation = $.trim($('#filterByLocation').val());
-    localStorage.setItem('de.iteratec.osm.job.list.filters.location',filterLocation);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.location',filterLocation);
     var filterCheckedJobs = $('#filterCheckedJobs').prop('checked');
-    localStorage.setItem('de.iteratec.osm.job.list.filters.checkedjobs',filterCheckedJobs);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs',filterCheckedJobs);
     var filterInactiveJobs = $('#filterInactiveJobs').prop('checked');
-    localStorage.setItem('de.iteratec.osm.job.list.filters.inactivejobs',filterInactiveJobs);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs',filterInactiveJobs);
     var filterHighlightedJobs = $('#filterHighlightedJobs').prop('checked');
-    localStorage.setItem('de.iteratec.osm.job.list.filters.highlightedjobs',filterHighlightedJobs);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs',filterHighlightedJobs);
     var filterRunningJobs = $('#filterRunningJobs').prop('checked');
-    localStorage.setItem('de.iteratec.osm.job.list.filters.runningjobs',filterRunningJobs);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.runningjobs',filterRunningJobs);
     var checkedTags = $('#filterTags').val();
     $('#filterTags_chosen > ul > li.search-choice').size()
     
@@ -262,14 +262,14 @@ function doOnDomReady(
 		$('#filterTags').chosen({ no_results_text: '' }).change(filterJobList);
 	}
 	
-	var filterValueJobname = localStorage.getItem('de.iteratec.osm.job.list.filters.jobname');
-	var filterValueJobgroup = localStorage.getItem('de.iteratec.osm.job.list.filters.jobgroup');
-	var filterValueLocation = localStorage.getItem('de.iteratec.osm.job.list.filters.location');
+	var filterValueJobname = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
+	var filterValueJobgroup = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
+	var filterValueLocation = getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
 	
-	var filterValueCheckedJobs = stringToBoolean(localStorage.getItem('de.iteratec.osm.job.list.filters.checkedjobs'));
-	var filterValueInactiveJobs = stringToBoolean(localStorage.getItem('de.iteratec.osm.job.list.filters.inactivejobs'));
-	var filterValueHighlightedJobs = stringToBoolean(localStorage.getItem('de.iteratec.osm.job.list.filters.highlightedjobs'));
-	var filterValueRunningJobs = stringToBoolean(localStorage.getItem('de.iteratec.osm.job.list.filters.runningjobs'));
+	var filterValueCheckedJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs'));
+	var filterValueInactiveJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
+	var filterValueHighlightedJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs'));
+	var filterValueRunningJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.runningjobs'));
 	
 	if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
 	if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);

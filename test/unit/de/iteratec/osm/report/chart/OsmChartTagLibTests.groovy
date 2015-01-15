@@ -17,14 +17,14 @@
 
 package de.iteratec.osm.report.chart
 
-import grails.test.mixin.*
-
-import org.junit.Before
-import org.junit.Test
-
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.p13n.CookieBasedSettingsService
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.junit.Before
+import org.junit.Test
 
 /**
  * Test-suite for {@link OsmChartTagLib}.
@@ -32,7 +32,7 @@ import de.iteratec.osm.csi.TestDataUtil
 @TestFor(OsmChartTagLib)
 @Mock([OsmConfiguration])
 class OsmChartTagLibTests {
-	
+
 	@Before
 	void setUp(){
 		//test data common for all tests
@@ -43,6 +43,7 @@ class OsmChartTagLibTests {
 	void testSingleYAxisChartTagWithHighcharts() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
 		osmChartTagLib.configService = new ConfigService()
+		osmChartTagLib.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.HIGHCHARTS}] as CookieBasedSettingsService
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);
@@ -130,6 +131,7 @@ class OsmChartTagLibTests {
 	void testSingleYAxisChartTagWithRickshaw() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
 		osmChartTagLib.configService = new ConfigService()
+		osmChartTagLib.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.RICKSHAW}] as CookieBasedSettingsService
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);
@@ -159,7 +161,7 @@ class OsmChartTagLibTests {
 
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.RICKSHAW
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
-		
+
 		String expectedHtml = getExpectedHtmlForSingleYAxisChartWithRickshaw(targetDivId).stripIndent()
 
 		Map<String, Object> model = [
@@ -190,7 +192,7 @@ class OsmChartTagLibTests {
 		// assertions
 
 		assertEquals(expectedHtml, actualHtml)
-		
+
 	}
 	
 	private String getExpectedHtmlForSingleYAxisChartWithRickshaw(String divId) {
@@ -233,8 +235,10 @@ class OsmChartTagLibTests {
 	
 	@Test
 	void testMultipleYAxisChartTagWithRickshaw() {
+
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
 		osmChartTagLib.configService = new ConfigService()
+		osmChartTagLib.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.RICKSHAW}] as CookieBasedSettingsService
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);
@@ -264,7 +268,7 @@ class OsmChartTagLibTests {
 			twoHoursAfterNowPoint
 		]);
 		List<OsmChartGraph> data = [graph1, graph2]
-		
+
 		OsmChartAxis axis1 = new OsmChartAxis("Percentages", MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE);
 		OsmChartAxis axis2 = new OsmChartAxis("Load Times", MeasurandGroup.LOAD_TIMES, "",1, OsmChartAxis.RIGHT_CHART_SIDE);
 		List<OsmChartAxis> highChartLabels = [axis1, axis2];
@@ -276,7 +280,7 @@ class OsmChartTagLibTests {
 
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.RICKSHAW
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
-		
+
 		String expectedHtml = getExpectedHtmlForMultipleYAxisChartWithRickshaw(targetDivId).stripIndent()
 
 		Map<String, Object> model = [
@@ -296,7 +300,7 @@ class OsmChartTagLibTests {
 			highChartLabels: highChartLabels
 		]
 
-		
+
 		// execute test
 		String actualHtml = applyTemplate(
 				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600px\" '+
@@ -349,6 +353,7 @@ class OsmChartTagLibTests {
 	void testMultipleYAxisChartTagWithHighchart() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
 		osmChartTagLib.configService = new ConfigService()
+		osmChartTagLib.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.HIGHCHARTS}] as CookieBasedSettingsService
 		// create test-specific data
 
 		Date now = new Date(1373631796000L);

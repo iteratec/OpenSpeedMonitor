@@ -48,31 +48,31 @@ class OsmDataSourceServiceSpec {
 	@Test
     void testGetRLikeSupport() {
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.apache.derby.jdbc.ClientDriver')
+		mocker.mockConfigService(serviceUnderTest, 'org.apache.derby.jdbc.ClientDriver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.hsqldb.jdbcDriver')
+		mocker.mockConfigService(serviceUnderTest, 'org.hsqldb.jdbcDriver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 
-		mocker.mockConfigService(serviceUnderTest, 'com.sybase.jdbc.SybDriver')
+		mocker.mockConfigService(serviceUnderTest, 'com.sybase.jdbc.SybDriver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.sqlite.JDBC')
+		mocker.mockConfigService(serviceUnderTest, 'org.sqlite.JDBC', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 
-		mocker.mockConfigService(serviceUnderTest, 'org.postgresql.Driver')
+		mocker.mockConfigService(serviceUnderTest, 'org.postgresql.Driver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'com.microsoft.sqlserver.jdbc.SQLServerDriver')
+		mocker.mockConfigService(serviceUnderTest, 'com.microsoft.sqlserver.jdbc.SQLServerDriver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.h2.Driver')
+		mocker.mockConfigService(serviceUnderTest, 'org.h2.Driver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'com.mysql.jdbc.Driver')
+		mocker.mockConfigService(serviceUnderTest, 'com.mysql.jdbc.Driver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(true))
 		
-		mocker.mockConfigService(serviceUnderTest, 'oracle.jdbc.driver.OracleDriver')
+		mocker.mockConfigService(serviceUnderTest, 'oracle.jdbc.driver.OracleDriver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(true))
     }
 }

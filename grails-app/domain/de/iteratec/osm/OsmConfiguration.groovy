@@ -28,6 +28,7 @@ class OsmConfiguration {
 	static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
 	static final Boolean DEFAULT_MEASUREMENTS_GENERALLY_ENABLED = false
 	static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
+	static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
 
 	/* Default (injected) attributes of GORM */
 	Long	id
@@ -47,8 +48,10 @@ class OsmConfiguration {
 	Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
 	/** If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. */
 	Boolean measurementsGenerallyEnabled = DEFAULT_MEASUREMENTS_GENERALLY_ENABLED
-	/** Initial hight of charts when opening dashboards. */
+	/** Initial height of charts when opening dashboards. */
 	Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
+	/** Main url under test within this osm instance. Got shown in chart title of csi dashboard. */
+	String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
 	
     static mapping = {
     }
@@ -60,6 +63,7 @@ class OsmConfiguration {
 		maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS)
 		measurementsGenerallyEnabled(defaultValue: DEFAULT_MEASUREMENTS_GENERALLY_ENABLED)
 		initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
+		mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
     }
 	
 }

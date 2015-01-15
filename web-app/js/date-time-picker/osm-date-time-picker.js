@@ -22,9 +22,9 @@ var initDatepicker = function(dateformatToSet, weekstartToSet, timespanFromNowIn
 
 	//read previous selections from local storage///////////////////////////////////////////////////////////////////
 
-	var lastTimeframeSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.timeframeselection');
-	var lastFromSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.from');
-	var lastToSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.to');
+	var lastTimeframeSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.timeframeselection')
+	var lastFromSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.from');
+	var lastToSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.to');
 
 	//initialization///////////////////////////////////////////////////////////////////
 	
@@ -65,7 +65,7 @@ var initDatepicker = function(dateformatToSet, weekstartToSet, timespanFromNowIn
 	$('#fromDatepicker').datepicker().on('changeDate', function(ev){
 		var dateAsDdMMyyyy = getDateAs_ddMMyyyy(ev.date);
         $('#from').val(dateAsDdMMyyyy);
-		localStorage.setItem('de.iteratec.osm.result.dashboard.from', dateAsDdMMyyyy);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.from', dateAsDdMMyyyy);
 	    if(!$('#setFromHour').is(':checked')){setFromHour("00:00");}
 	    $("#toDatepicker").datepicker('setStartDate', ev.date);
 	    $("#fromDatepicker").datepicker("hide");
@@ -73,13 +73,13 @@ var initDatepicker = function(dateformatToSet, weekstartToSet, timespanFromNowIn
 	$('#toDatepicker').datepicker().on('changeDate', function(ev){
 		var dateAsDdMMyyyy = getDateAs_ddMMyyyy(ev.date);
         $('#to').val(dateAsDdMMyyyy);
-		localStorage.setItem('de.iteratec.osm.result.dashboard.to', dateAsDdMMyyyy);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.to', dateAsDdMMyyyy);
 		if(!$('#setToHour').is(':checked')){setToHour("23:59");}
 	    $("#toDatepicker").datepicker("hide");
 	});
 	
 	$('#timeframeSelect').on('change', function(ev){
-		localStorage.setItem('de.iteratec.osm.result.dashboard.timeframeselection', this.value);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.timeframeselection', this.value);
 		var preSelection = this.value>0;
 		
 		if(preSelection) setDateAndTimeRespectivePreselection();
@@ -95,10 +95,10 @@ var initTimepicker = function(whetherToShowMeridian) {
 
 	//read previous selections from local storage///////////////////////////////////////////////////////////////////
 
-	var lastFromHourSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.fromHour');
-	var lastToHourSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.toHour');
-	var lastManualFromHourSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.manualFromHour');
-	var lastManualToHourSelection = localStorage.getItem('de.iteratec.osm.result.dashboard.manualToHour');
+	var lastFromHourSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.fromHour');
+	var lastToHourSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.toHour');
+	var lastManualFromHourSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.manualFromHour');
+	var lastManualToHourSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.manualToHour');
 
 	//initialization///////////////////////////////////////////////////////////////////
 	
@@ -123,19 +123,19 @@ var initTimepicker = function(whetherToShowMeridian) {
 	$('#setFromHour').on('change', function(ev){
 		var manualFromHourSelection = $('#setFromHour').is(':checked');
 		$('#fldset-startdate-hour :input').attr("disabled", !manualFromHourSelection);
-		localStorage.setItem('de.iteratec.osm.result.dashboard.manualFromHour', manualFromHourSelection);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.manualFromHour', manualFromHourSelection);
 	});
 	$('#setToHour').on('change', function(ev){
 		var manualToHourSelection = $('#setToHour').is(':checked');
 		$('#fldset-enddate-hour :input').attr("disabled", !manualToHourSelection);
-		localStorage.setItem('de.iteratec.osm.result.dashboard.manualToHour', manualToHourSelection);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.manualToHour', manualToHourSelection);
 	});
 	$('#fromHourTimepicker').on('changeTime.timepicker', function(ev){
-		localStorage.setItem('de.iteratec.osm.result.dashboard.fromHour', ev.time.value);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.fromHour', ev.time.value);
 		$("#fromHour").val(ev.time.value);
 	});
 	$('#toHourTimepicker').on('changeTime.timepicker', function(ev){
-		localStorage.setItem('de.iteratec.osm.result.dashboard.toHour', ev.time.value);
+		setToLocalStorage('de.iteratec.osm.result.dashboard.toHour', ev.time.value);
 		$("#toHour").val(ev.time.value);
 	});
 };
@@ -176,25 +176,25 @@ var setDateAndTimeRespectivePreselection = function() {
 
 };
 var setTo = function(toToSet){
-	localStorage.setItem('de.iteratec.osm.result.dashboard.to', toToSet);
+	setToLocalStorage('de.iteratec.osm.result.dashboard.to', toToSet);
 	$("#to").val(toToSet);
 	$("#toDatepicker").val(toToSet);
 	$("#toDatepicker").datepicker("update");
 };
 var setFrom = function(fromToSet){
-	localStorage.setItem('de.iteratec.osm.result.dashboard.from', fromToSet);
+	setToLocalStorage('de.iteratec.osm.result.dashboard.from', fromToSet);
 	$("#from").val(fromToSet);
 	$("#fromDatepicker").val(fromToSet);
 	$("#fromDatepicker").datepicker("update");
 };
 var setToHour = function(toHourToSet){
-	localStorage.setItem('de.iteratec.osm.result.dashboard.toHour', toHourToSet);
+	setToLocalStorage('de.iteratec.osm.result.dashboard.toHour', toHourToSet);
 	$("#toHour").val(toHourToSet);
 	toHourToSet = toHourToSet=='00:00'?'00:001':toHourToSet;	//hack to fix a bug in bootstrap timepicker
 	$("#toHourTimepicker").timepicker('setTime', toHourToSet);
 };
 var setFromHour = function(fromHourToSet){
-	localStorage.setItem('de.iteratec.osm.result.dashboard.fromHour', fromHourToSet);
+	setToLocalStorage('de.iteratec.osm.result.dashboard.fromHour', fromHourToSet);
 	$("#fromHour").val(fromHourToSet);
 	fromHourToSet = (fromHourToSet=='00:00'||fromHourToSet=='0:00')?'00:001':fromHourToSet;	//hack to fix a bug in bootstrap timepicker
 	$("#fromHourTimepicker").timepicker('setTime', fromHourToSet);

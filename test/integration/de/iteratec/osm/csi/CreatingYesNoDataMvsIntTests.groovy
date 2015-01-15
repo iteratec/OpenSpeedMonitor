@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.report.chart.MeasuredValueUtilService
+
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
 import grails.test.mixin.TestMixin
@@ -54,7 +56,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
 	/** injected by grails */ 
 	PageMeasuredValueService pageMeasuredValueService
 	ShopMeasuredValueService shopMeasuredValueService
-	CsiHelperService csiHelperService
+	MeasuredValueUtilService measuredValueUtilService
 	
 	MeasuredValueInterval hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 	MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
@@ -99,7 +101,8 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
 		wsmvs.each{
 			assertTrue( it.isCalculated() )
 		}
-		Date endOfLastWeek = csiHelperService.resetToEndOfActualInterval(endDate, MeasuredValueInterval.WEEKLY).toDate()
+
+		Date endOfLastWeek = measuredValueUtilService.resetToEndOfActualInterval(endDate, MeasuredValueInterval.WEEKLY).toDate()
 		assert pageMeasuredValueService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages 
 	}
 	

@@ -32,7 +32,7 @@ import de.iteratec.osm.csi.CsiValue
  * </p>
  * 
  * <p>
- * FIXME mze-2013-09-13: Architecture improvement: 
+ * FIXME mze-2013-09-13: Architecture improvement:
  * All calculation relevant changes should be placed here, which means:
  * Instead of code like:
  * <pre>
@@ -102,7 +102,7 @@ class MeasuredValue implements CsiValue {
 		tag(index: 'started_and_iVal_and_aggr_and_tag_idx')
 		closedAndCalculated(defaultValue: false)
 	}
-	
+
 	/**
 	 * <p>
 	 * Returns a list of the database identifiers of {@linkplain
@@ -126,9 +126,17 @@ class MeasuredValue implements CsiValue {
 	 */
 	void addToResultIds(Long newResultId){
 		List<Long> list = getResultIdsAsList()
-		if(list.contains(newResultId)) log.error("Didn't add EventResult to MeasuredValue because it was already in the list! (EventResult-ID=${newResultId}, MeasuredValue-ID=${this.ident()})") 
+		if(list.contains(newResultId)) log.error("Didn't add EventResult to MeasuredValue because it was already in the list! (EventResult-ID=${newResultId}, MeasuredValue-ID=${this.ident()})")
 		list.add(newResultId)
 		resultIds = list.join(DELIMITER_RESULTIDS)
+	}
+	/**
+	 * Check if the ResultId containing in the list of {@link EventResult}-identifiers
+	 * @param resultId
+	 * @return true if the result already in the list
+	 */
+	boolean containsInResultIds(Long resultId){
+		return getResultIdsAsList().contains(resultId)
 	}
 	/**
 	 * Adds all {@link EventResult}-identifiers in resultIdsToAddAsList to the list of {@link EventResult}-identifiers, this value was calculated from.

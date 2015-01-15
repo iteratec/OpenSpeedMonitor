@@ -20,4 +20,6 @@ package de.iteratec.osm.util
 abstract class Constants {
 	public static final String UNIQUE_STRING_DELIMITTER = ':::'
 	public static final String HIGHCHART_LEGEND_DELIMITTER = ' | '
+	public static final String COOKIE_KEY_CSI_DASHBOARD_TITLE = 'de-iteratec-osm-p13n-default-csi-dashboard-title'
+	public static final String COOKIE_KEY_CHARTING_LIB_TO_USE = 'de-iteratec-osm-p13n-charting-lib-to-use'
 }

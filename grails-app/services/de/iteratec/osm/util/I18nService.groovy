@@ -18,13 +18,12 @@
 package de.iteratec.osm.util
 
 import org.springframework.context.MessageSource
-import org.springframework.web.servlet.i18n.SessionLocaleResolver
+import org.springframework.context.i18n.LocaleContextHolder
 
 class I18nService {
 
 	boolean transactional = false
 
-	SessionLocaleResolver localeResolver
 	MessageSource messageSource
 
 	/**
@@ -36,8 +35,8 @@ class I18nService {
 	 * 		Message from i18n-file respective given key.
 	 */
 	String msg(String msgKey, String defaultMessage = null, List objs = null) {
-
-		def msg = messageSource.getMessage(msgKey,objs?.toArray(),defaultMessage,localeResolver.defaultLocale)
+		
+		def msg = messageSource.getMessage(msgKey,objs?.toArray(),defaultMessage,LocaleContextHolder.locale)
 
 		if (msg == null || msg == defaultMessage) {
 			log.warn("No i18n messages specified for msgKey: ${msgKey}")

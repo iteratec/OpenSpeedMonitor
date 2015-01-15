@@ -43,7 +43,7 @@ import org.joda.time.DateTime
  */
 @TestMixin(GrailsUnitTestMixin)
 class ServiceMocker {
-	
+
 	private ServiceMocker(){}
 	public static ServiceMocker create(){
 		return new ServiceMocker()
@@ -253,6 +253,19 @@ class ServiceMocker {
 				browserParam,
 				locationParam)
 		}
+		measuredValueTagServiceMocked.demand.createEventResultTag(1..10000) {
+			JobGroup jobGroupParam,
+			MeasuredEvent measuredEventParam,
+			Page pageParam,
+			Browser browserParam,
+			Location locationParam ->
+
+				return new MeasuredValueTagService().createHourlyEventTag(jobGroupParam,
+						measuredEventParam,
+						pageParam,
+						browserParam,
+						locationParam)
+		}
 		measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) {String mvTag ->
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
@@ -341,24 +354,113 @@ class ServiceMocker {
 		serviceToMockIn.timeToCsMappingCacheService = timeToCsMappingCacheService.createMock()
 	}
 	/**
+	 * Mocks methods of {@link de.iteratec.osm.csi.TimeToCsMappingService}. The methods do not deliver
+	 * sensible return values. Using tests should not depend on these values!
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
+	 */
+	private void mockTTCsMappingService(serviceToMockIn){
+		def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
+		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage ->
+			//not the concern of this test
+		}
+		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
+			//not the concern of this test
+		}
+		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.createMock()
+	}
+	/**
 	 * Mocks methods of {@link de.iteratec.osm.ConfigService}.
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetDatabaseDriverClassName
 	 * 		To be returned from method {@link de.iteratec.osm.ConfigService#getDatabaseDriverClassName()}.
 	 */
-	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName){
+	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes){
 		def configServiceMock = mockFor(ConfigService, true)
 		configServiceMock.demand.getDatabaseDriverClassName(0..100){ ->
 			return toReturnFromGetDatabaseDriverClassName
 		}
+		configServiceMock.demand.getDefaultMaxDownloadTimeInMinutes(0..100){ ->
+			return toReturnFromGetDefaultMaxDownloadTimeInMinutes
+		}
 		serviceToMockIn.configService = configServiceMock.createMock()
 	}
+	/**
+	 * Mocks methods in list methodsToMock in service of class classOfServiceToMock. That service get mocked in owning service serviceToMockIn.
+	 * @param classOfServiceToMock
+	 * 		Class of grails service which should be mocked.
+	 * @param serviceToMockIn
+	 * 		Grails service with the service to mock as instance-variable.
+	 * @param methodsToMock
+	 * 		List of methods that get mocked. For each method a return value is included.
+	 * @see MethodToMock
+	 */
+	void mockService(Class classOfServiceToMock, serviceToMockIn, List<MethodToMock> methodsToMock){
+		def serviceMock = mockFor(classOfServiceToMock, true)
+		methodsToMock.each{methodToMock ->
+			String methodName = methodToMock.method.getName()
+			if (methodToMock.method.getParameterTypes().size()==0){
+				serviceMock.demand."$methodName"(0..100){ ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==1){
+				serviceMock.demand."$methodName"(0..100){paramOne ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==2){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==3){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==4){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==5){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour, paramFive ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==6){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour, paramFive, paramSix ->
+					return methodToMock.toReturn
+				}
+			}else{
+				throw new IllegalArgumentException('Nobody should write functions with more than six parameters. Please refactor your code!')
+			}
+		}
+		String nameOfServiceField = classOfServiceToMock.getSimpleName()
+		nameOfServiceField = nameOfServiceField[0].toLowerCase() + nameOfServiceField.substring(1)
+		serviceToMockIn."$nameOfServiceField" = serviceMock.createMock()
+	}
+	/**
+	 * Mocks methods of{@link ProxyService}.
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
+	 */
 	void mockProxyService(serviceToMockIn){
 		def proxyServiceMock = mockFor(ProxyService, true)
 		proxyServiceMock.demand.fetchLocations(0..100){WebPageTestServer wptserver ->
 			//do nothing, using tests will have to create necessary locations on their own
 		}
 		serviceToMockIn.proxyService = proxyServiceMock.createMock()
+	}
+	/**
+	 * Mocks methods of{@link PageService}.
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
+	 */
+	void mockPageService(serviceToMockIn, Page pageToReturnFromGetPageByStepName, String innerStepNameToReturnFromExcludePagenamePart) {
+		def pageServiceMock = mockFor(PageService, true)
+		pageServiceMock.demand.getPageByStepName(0..100){String stepname ->
+			return pageToReturnFromGetPageByStepName
+		}
+		pageServiceMock.demand.excludePagenamePart(0..100){String stepname ->
+			return innerStepNameToReturnFromExcludePagenamePart
+		}
+		serviceToMockIn.pageService = pageServiceMock.createMock()
 	}
 }

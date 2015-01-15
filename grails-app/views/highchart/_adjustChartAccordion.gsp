@@ -1,5 +1,10 @@
 <%@ page import="de.iteratec.osm.report.chart.ChartingLibrary"%>
 
+%{--This template can be added to a view with a chart. It enables adjustments to the charts layout like adding a title, resizing the--}%
+%{--whole chart or show/hide datapoints.--}%
+%{--The rendering view can provide attribute chartRenderingLibrary to specify the charting library used to render the chart. If attribute is--}%
+%{--missing the default charting library rickshaw is assumed.--}%
+
 <div class="span12 accordion" id="accordion2">
 	<div class="accordion-group">
 		<div class="accordion-heading">
@@ -31,7 +36,7 @@
 						</div>
 					</div>
 					<!-- Y-Axis -->
-					<g:if test="${grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib == ChartingLibrary.HIGHCHARTS}">
+					<g:if test="${chartRenderingLibrary != null && chartRenderingLibrary == ChartingLibrary.HIGHCHARTS}">
 						<!-- highchart -->
 						<g:if test="${singleYAxis}">
 							<div id="adjust_chart_y_axis" class ="row">

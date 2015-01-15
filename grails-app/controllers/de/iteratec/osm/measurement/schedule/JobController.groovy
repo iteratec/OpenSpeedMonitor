@@ -17,21 +17,20 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import grails.converters.JSON
-import grails.gsp.PageRenderer
-import groovy.json.JsonBuilder
-import groovy.time.*
-import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.HttpStatus;
-
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
+import grails.converters.JSON
+import grails.gsp.PageRenderer
+import groovy.json.JsonBuilder
+import groovy.time.TimeCategory
+import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
 
 class JobController {
 	
@@ -53,7 +52,7 @@ class JobController {
 	}
 	
 	void redirectIfNotFound(Job job, String id) {
-		def flashMessageArgs = [getJobI18n(), id];
+		def flashMessageArgs = [getJobI18n(), id]
 		if (!job) {
 			flash.message = message(code: 'default.not.found.message', args: flashMessageArgs)
 			redirect(action: "list")
@@ -81,7 +80,7 @@ class JobController {
 			}
 		} else {
 			jobs = Job.findAllByActive(true)
-			onlyActiveJobs = true;
+			onlyActiveJobs = true
 		}
 		def model = [
 			jobs: jobs, 
@@ -156,7 +155,7 @@ class JobController {
 			}
 		}
 
-		job.properties = params;
+		job.properties = params
 		setVariablesOnJob(params.variables, job)
 		job.tags = params.list('tags')
 		if (!job.save()) {

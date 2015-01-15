@@ -66,6 +66,7 @@ class ResultMeasuredValueService {
 				AggregatorType.RESULT_CACHED_FIRST_BYTE,
 				AggregatorType.RESULT_CACHED_START_RENDER,
 				AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME,
+				AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE,
 				AggregatorType.RESULT_CACHED_DOM_TIME,
 				AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME],
 			(MeasurandGroup.REQUEST_COUNTS):[
@@ -86,6 +87,7 @@ class ResultMeasuredValueService {
 				AggregatorType.RESULT_UNCACHED_FIRST_BYTE,
 				AggregatorType.RESULT_UNCACHED_START_RENDER,
 				AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+				AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE,
 				AggregatorType.RESULT_UNCACHED_DOM_TIME,
 				AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME],
 			(MeasurandGroup.REQUEST_COUNTS):[
@@ -119,7 +121,8 @@ class ResultMeasuredValueService {
 			AggregatorType.RESULT_CACHED_LOAD_TIME,
 			AggregatorType.RESULT_CACHED_START_RENDER,
 			AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT,
-			AggregatorType.RESULT_CACHED_SPEED_INDEX
+			AggregatorType.RESULT_CACHED_SPEED_INDEX,
+			AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE
 		]);
 
 		fillMap.put(CachedView.UNCACHED, [
@@ -134,7 +137,8 @@ class ResultMeasuredValueService {
 			AggregatorType.RESULT_UNCACHED_LOAD_TIME,
 			AggregatorType.RESULT_UNCACHED_START_RENDER,
 			AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT,
-			AggregatorType.RESULT_UNCACHED_SPEED_INDEX
+			AggregatorType.RESULT_UNCACHED_SPEED_INDEX,
+			AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE
 		]);
 
 		return Collections.unmodifiableMap(fillMap);
@@ -210,7 +214,12 @@ class ResultMeasuredValueService {
 				
 			case AggregatorType.RESULT_UNCACHED_SPEED_INDEX:
 			case AggregatorType.RESULT_CACHED_SPEED_INDEX:
-				returnVal= Double.valueOf((double)result.getSpeedIndex())
+				returnVal= Double.valueOf(result.getSpeedIndex())
+				break;
+
+			case AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE:
+			case AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE:
+				returnVal= result.visuallyCompleteInMillisecs ? Double.valueOf(result.visuallyCompleteInMillisecs) : null
 				break;
 
 			default:

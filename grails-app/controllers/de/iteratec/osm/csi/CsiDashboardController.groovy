@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import static Contract.*
+import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import grails.validation.Validateable
 
 import java.text.NumberFormat
@@ -38,28 +38,22 @@ import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.OsmChartPoint
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.TreeMapOfTreeMaps
-import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.CustomDateEditorRegistrar
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.*
 
 //TODO: implement some tests for this controller
 
@@ -83,6 +77,7 @@ class CsiDashboardController {
 	CustomerSatisfactionHighChartService customerSatisfactionHighChartService
 	CsiHelperService csiHelperService
 	MeasuredValueUtilService measuredValueUtilService
+	CookieBasedSettingsService cookieBasedSettingsService
 
 	/**
 	 * The Grails engine to generate links.
@@ -93,18 +88,18 @@ class CsiDashboardController {
 
 	public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 	public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
-	private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING);
+	private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
 	
-	public static final String DAILY_AGGR_GROUP_PAGE = 'daily_page';
-	public static final String DAILY_AGGR_GROUP_SHOP = 'daily_shop';
+	public static final String DAILY_AGGR_GROUP_PAGE = 'daily_page'
+	public static final String DAILY_AGGR_GROUP_SHOP = 'daily_shop'
 	
 	String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
 	public final static int MONDAY_WEEKSTART = 1
 	public final static List<String> AGGREGATOR_GROUP_VALUES = [
 		AggregatorType.MEASURED_EVENT,
-		DAILY_AGGR_GROUP_PAGE, // TODO mze-2013-11-06: Unsaubere Lösung, da sonst die konstannten aus AggregatorType verwendet werden. Ähnliches Szenarion wie in IT-210.
+		DAILY_AGGR_GROUP_PAGE, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
 		AggregatorType.PAGE,
-		DAILY_AGGR_GROUP_SHOP, // TODO mze-2013-11-06: Unsaubere Lösung, da sonst die konstannten aus AggregatorType verwendet werden. Ähnliches Szenarion wie in IT-210.
+		DAILY_AGGR_GROUP_SHOP, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
 		AggregatorType.SHOP
 	]
 	public final static List<String> AGGREGATOR_GROUP_LABELS = [
@@ -114,7 +109,7 @@ class CsiDashboardController {
 		'de.iteratec.isocsi.csi.per.csi.group.daily',
 		'de.iteratec.isocsi.csi.per.csi.group',
 	]
-	
+
 	/**
 	 * <p>
 	 * Performs a redirect with HTTP status code 303 (see other).
@@ -183,7 +178,7 @@ class CsiDashboardController {
 
 		// Workaround based on:
 		// http://fillinginthegaps.wordpress.com/2008/12/26/grails-301-moved-permanently-redirect/
-		Map paramsWithoutGrailsActionNameOfOldAction = urlParams.findAll({ Map.Entry m -> !m.getKey().toString().startsWith('_action') });
+		Map paramsWithoutGrailsActionNameOfOldAction = urlParams.findAll({ Map.Entry m -> !m.getKey().toString().startsWith('_action') })
 		String uri = grailsLinkGenerator.link(action: actionNameToRedirectTo, params: paramsWithoutGrailsActionNameOfOldAction)
 		response.setStatus(303)
 		response.setHeader("Location", uri)
@@ -212,8 +207,8 @@ class CsiDashboardController {
 	 */
 	Map<String, Object> showAll(ShowAllCommand cmd) {
 
-		Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-		cmd.copyRequestDataToViewModelMap(modelToRender);
+		Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
+		cmd.copyRequestDataToViewModelMap(modelToRender)
 		
 		// Validate command for errors if there was a non-empty, non-"only-language-change" request:
 		if( !ControllerUtils.isEmptyRequest(params) ) {
@@ -222,36 +217,36 @@ class CsiDashboardController {
 				modelToRender.put('command', cmd)
 			} else {
 			
-				boolean warnAboutLongProcessingTimeInsteadOfShowingData = false;
+				boolean warnAboutLongProcessingTimeInsteadOfShowingData = false
 				
 				if(!cmd.overwriteWarningAboutLongProcessingTime)
 				{
-					int countOfSelectedEvents = cmd.selectedMeasuredEventIds.size();
+					int countOfSelectedEvents = cmd.selectedMeasuredEventIds.size()
 					if(countOfSelectedEvents < 1)
 					{
 						// User checked: "Select all"
-						countOfSelectedEvents = ((Collection)modelToRender.get('measuredEvents')).size();
+						countOfSelectedEvents = ((Collection)modelToRender.get('measuredEvents')).size()
 					}
 					
-					int selectedAggregationIntervallInMintues = MeasuredValueInterval.HOURLY;
+					int selectedAggregationIntervallInMintues = MeasuredValueInterval.HOURLY
 					switch(cmd.aggrGroup)
 					{
 						case AggregatorType.PAGE:
 						case DAILY_AGGR_GROUP_PAGE:
-							selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY;
-							break;
+							selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
+							break
 						case AggregatorType.SHOP:
 						case DAILY_AGGR_GROUP_SHOP:
-							selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY;
-							break;
+							selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
+							break
 						default: // do nothing, take default.
-							break;
+							break
 					}
 
-					int countOfSelectedBrowser = cmd.selectedBrowsers.size();
+					int countOfSelectedBrowser = cmd.selectedBrowsers.size()
 					if( countOfSelectedBrowser < 1 )
 					{
-						countOfSelectedBrowser = ((List)modelToRender.get('browsers')).size();
+						countOfSelectedBrowser = ((List)modelToRender.get('browsers')).size()
 					}
 					
 					warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(
@@ -259,19 +254,19 @@ class CsiDashboardController {
 							selectedAggregationIntervallInMintues,
 							cmd.selectedFolder.size(),
 							cmd.selectedPage.size(),
-							countOfSelectedBrowser);
+							countOfSelectedBrowser)
 				}
 			
 				if( warnAboutLongProcessingTimeInsteadOfShowingData )
 				{
 					modelToRender.put('warnAboutLongProcessingTime', true)
 				} else {
-					fillWithAproximateMeasuredValueData(modelToRender, cmd, true);
+					fillWithAproximateMeasuredValueData(modelToRender, cmd, true)
 				}
 			}
 		}
 
-		return modelToRender;
+		return modelToRender
 	}
 
 	/**
@@ -298,34 +293,34 @@ class CsiDashboardController {
 		requiresArgumentNotNull('modelToRender', modelToRender)
 		requiresArgumentNotNull('cmd', cmd)
 
-		Interval timeFrame = cmd.getSelectedTimeFrame();
+		Interval timeFrame = cmd.getSelectedTimeFrame()
 		
-		Set<JobGroup> csiGroups = jobGroupDaoService.findCSIGroups();
+		Set<JobGroup> csiGroups = jobGroupDaoService.findCSIGroups()
 		Set<Long> csiGroupIds = csiGroups
 		
-		MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams();
+		MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams()
 		
 		switch(cmd.aggrGroup)
 		{
 			case AggregatorType.PAGE:
 				MeasuredValueInterval weeklyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-				fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph);
-				break;
+				fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph)
+				break
 			case DAILY_AGGR_GROUP_PAGE:
 				MeasuredValueInterval dailyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-				fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph);
-				break;
+				fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph)
+				break
 			case AggregatorType.SHOP:
 				MeasuredValueInterval weeklyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-				fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false);
-				break;
+				fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false)
+				break
 			case DAILY_AGGR_GROUP_SHOP:
 				MeasuredValueInterval dailyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-				fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false);
-				break;
+				fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false)
+				break
 			default: // AggregatorType.MEASURED_EVENT
-				fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams);
-				break;
+				fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
+				break
 		}
 	}
 
@@ -350,13 +345,13 @@ class CsiDashboardController {
 	{
 		// TODO Test this: Structure and data...
 
-		Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes());
+		Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 		
 		
-		List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval);
+		List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval)
 
-		DateTime resetFromDate = fixedTimeFrame.getStart();
-		DateTime resetToDate = fixedTimeFrame.getEnd();
+		DateTime resetFromDate = fixedTimeFrame.getStart()
+		DateTime resetToDate = fixedTimeFrame.getEnd()
 		
 		if( withTargetGraph ) 
 		{
@@ -400,13 +395,13 @@ class CsiDashboardController {
 	{
 		// TODO Test this: Structure and data...
 
-		Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY);
+		Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY)
 		
 		List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
 				fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams)
 
-		DateTime resetFromDate = fixedTimeFrame.getStart();
-		DateTime resetToDate = fixedTimeFrame.getEnd();
+		DateTime resetFromDate = fixedTimeFrame.getStart()
+		DateTime resetToDate = fixedTimeFrame.getEnd()
 
 //		csiValueMap.putAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
 //			resetFromDate.minusDays(1), resetToDate.plusDays(1)))
@@ -454,17 +449,17 @@ class CsiDashboardController {
 		boolean moveGraphsByOneWeek)
 	{
 		// TODO Test this: Structure and data...
-		Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes());
+		Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 		
-		DateTime resetFromDate = fixedTimeFrame.getStart();
-		DateTime resetToDate = fixedTimeFrame.getEnd();
+		DateTime resetFromDate = fixedTimeFrame.getStart()
+		DateTime resetToDate = fixedTimeFrame.getEnd()
 		
 		List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedShopMeasuredValuesAsHighChartMap(
-				fixedTimeFrame, interval, measuredValuesQueryParams);
+				fixedTimeFrame, interval, measuredValuesQueryParams)
 
 		if(moveGraphsByOneWeek==true) {
-			moveDataPointsOneWeekForward(graphs);
-			resetFromDate=resetFromDate.plusWeeks(1);
+			moveDataPointsOneWeekForward(graphs)
+			resetFromDate=resetFromDate.plusWeeks(1)
 		}
 			
 		Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
@@ -519,7 +514,7 @@ class CsiDashboardController {
 	 * @return The fixed time frame, never <code>null</code>.
 	 */
 	private Interval fixTimeFrame(Interval timeFrameToFix, int intervalRangeInMinutes) {
-		return measuredValueUtilService.fixTimeFrameToMatchIntervalRange(timeFrameToFix, intervalRangeInMinutes);
+		return measuredValueUtilService.fixTimeFrameToMatchIntervalRange(timeFrameToFix, intervalRangeInMinutes)
 	}
 
 	/**
@@ -533,35 +528,34 @@ class CsiDashboardController {
 	 *         {@linkplain Map#isEmpty() empty}.
 	 */
 	Map<String, Object> showDefault() {
-		
-		DateTime toDate = new DateTime(); // now
-		DateTime fromDate = toDate.minusMonths(3);
 
-		Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-		Interval timeFrame = new Interval(fromDate, toDate);
+		DateTime toDate = new DateTime() // now
+		DateTime fromDate = toDate.minusMonths(3)
+
+		Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
+		Interval timeFrame = new Interval(fromDate, toDate)
 		
-		MvQueryParams queryParams = new MvQueryParams();
+		MvQueryParams queryParams = new MvQueryParams()
 		
 		List<String> namesOfCsiGroupsAndStaticGraphsToShow = [
 			'live',
 			i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
 		Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll{namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)}
-		Set<Long> csiGroupIds = csiGroupsToShow.collect({it.id});
-		queryParams.jobGroupIds.addAll(csiGroupIds);
+		Set<Long> csiGroupIds = csiGroupsToShow.collect({it.id})
+		queryParams.jobGroupIds.addAll(csiGroupIds)
 		
-		fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true);
-		
-		modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART);
-		modelToRender.put('weekStart', MONDAY_WEEKSTART);
-		modelToRender.put('from', fromDate);
-		modelToRender.put('to', toDate);
-		modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()));
-		modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()));
-		modelToRender.put('markerShouldBeEnabled', true);
+		fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
+
+		modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
+		modelToRender.put('weekStart', MONDAY_WEEKSTART)
+		modelToRender.put('from', fromDate)
+		modelToRender.put('to', toDate)
+		modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
+		modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
+		modelToRender.put('markerShouldBeEnabled', true)
 		modelToRender.put('debug', params.debug?true:false)
 		modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
-		
-		return modelToRender;
+		return modelToRender
 	}
 	
 	/**
@@ -572,24 +566,24 @@ class CsiDashboardController {
 	 */
 	private List<OsmChartGraph> moveDataPointsOneWeekForward(List<OsmChartGraph> graphs) {
 			
-		List<OsmChartGraph> movedGraphs=[];
+		List<OsmChartGraph> movedGraphs=[]
 		
 		graphs.each {OsmChartGraph graph ->
 			
-			List<OsmChartPoint> oldList=graph.getPoints();
-			graph.setPoints([]);
+			List<OsmChartPoint> oldList=graph.getPoints()
+			graph.setPoints([])
 			
 			oldList.each {OsmChartPoint point ->
 				
-				DateTime time=new DateTime(point.time);
-				time=time.plusWeeks(1);
+				DateTime time=new DateTime(point.time)
+				time=time.plusWeeks(1)
 				
-				OsmChartPoint movedPoint=new OsmChartPoint(time.toDate().getTime(), point.measuredValue, point.countOfAggregatedResults, point.sourceURL);
-				graph.getPoints().add(movedPoint);
+				OsmChartPoint movedPoint=new OsmChartPoint(time.toDate().getTime(), point.measuredValue, point.countOfAggregatedResults, point.sourceURL)
+				graph.getPoints().add(movedPoint)
 			}
 		}
 		
-		return graphs;
+		return graphs
 	}
  
 	/**
@@ -598,12 +592,12 @@ class CsiDashboardController {
 	 * @see <a href="http://tools.ietf.org/html/rfc4180#section-2">http://tools.ietf.org/html/rfc4180#section-2</a> (2).
 	 */
 	@Deprecated
-	private static final String CRLF = String.valueOf((char)13) + String.valueOf((char)10); 
+	private static final String CRLF = String.valueOf((char)13) + String.valueOf((char)10) 
 	
 	/**
 	 * The {@link DateTimeFormat} used for CSV export and table view.
 	 */
-	private static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss");
+	private static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 	
 //	/**
 //	 * The {@link NumberFormat} used to format CSI values for CSV export and table view.
@@ -628,30 +622,30 @@ class CsiDashboardController {
 	 */
 	public Map<String, Object> csiValuesCsv(ShowAllCommand cmd) {
 		
-		Map<String, Object> modelToRender = new HashMap<String, Object>();
+		Map<String, Object> modelToRender = new HashMap<String, Object>()
 		
 		if( request.queryString && cmd.validate() )
 		{
-			fillWithAproximateMeasuredValueData(modelToRender, cmd, false);
+			fillWithAproximateMeasuredValueData(modelToRender, cmd, false)
 			cmd.copyRequestDataToViewModelMap(modelToRender)
 		} else {		
 			redirectWith303('showAll', params)
 			return
 		}
 		
-		String filename = modelToRender['aggrGroup'] + '_' + modelToRender['fromFormatted']  + '_to_' +  modelToRender['toFormatted'] + '.csv';
+		String filename = modelToRender['aggrGroup'] + '_' + modelToRender['fromFormatted']  + '_to_' +  modelToRender['toFormatted'] + '.csv'
 		
-		response.setHeader('Content-disposition', 'attachment; filename=' + filename);
-		response.setContentType("text/csv;header=present;charset=UTF-8");
+		response.setHeader('Content-disposition', 'attachment; filename=' + filename)
+		response.setContentType("text/csv;header=present;charset=UTF-8")
 		
-		Writer responseWriter = new OutputStreamWriter(response.getOutputStream());
+		Writer responseWriter = new OutputStreamWriter(response.getOutputStream())
 		
-		List<OsmChartGraph> csiValues = modelToRender['wptCustomerSatisfactionValues'];
-		writeCSV(csiValues, responseWriter, RequestContextUtils.getLocale(request), false);
+		List<OsmChartGraph> csiValues = modelToRender['wptCustomerSatisfactionValues']
+		writeCSV(csiValues, responseWriter, RequestContextUtils.getLocale(request), false)
 		
 		response.getOutputStream().flush()
-		response.sendError(200, 'OK');
-		return null;
+		response.sendError(200, 'OK')
+		return null
 	}
 
 	/**
@@ -678,15 +672,15 @@ class CsiDashboardController {
 	 */
 	private static void writeCSV(List<OsmChartGraph> source, Writer target, Locale localeForNumberFormat, boolean repeatCSITargetValueColumns) throws IOException
 	{
-		NumberFormat csvCSIValueFormat = NumberFormat.getNumberInstance(localeForNumberFormat);
+		NumberFormat csvCSIValueFormat = NumberFormat.getNumberInstance(localeForNumberFormat)
 		
 		// Sort graph points by time
-		TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>();
+		TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>()
 		for(OsmChartGraph eachCSIValueEntry : source)
 		{
 			for(OsmChartPoint eachPoint : eachCSIValueEntry.getPoints())
 			{
-				pointsByGraphByTime.getOrCreate(eachPoint.time).put(eachCSIValueEntry.getLabel(), eachPoint);
+				pointsByGraphByTime.getOrCreate(eachPoint.time).put(eachCSIValueEntry.getLabel(), eachPoint)
 			}
 		}
 		
@@ -696,65 +690,65 @@ class CsiDashboardController {
 		)
 		
 		// Create CSV header:
-		List<String> csvHeader = new LinkedList<String>();
-		csvHeader.add('Zeitpunkt'); // TODO i18n?
-		csvHeader.add('Ziel-CSI'); // TODO i18n?
+		List<String> csvHeader = new LinkedList<String>()
+		csvHeader.add('Zeitpunkt') // TODO i18n?
+		csvHeader.add('Ziel-CSI') // TODO i18n?
 
-		List<String> graphLabelsInOrderOfHeader = new LinkedList<String>();
+		List<String> graphLabelsInOrderOfHeader = new LinkedList<String>()
 		
 		for(OsmChartGraph eachGraph : source)
 		{
-			csvHeader.add(eachGraph.getLabel());
+			csvHeader.add(eachGraph.getLabel())
 			if(repeatCSITargetValueColumns)
 			{
-				csvHeader.add('Ziel-CSI'); // TODO i18n?
+				csvHeader.add('Ziel-CSI') // TODO i18n?
 			}
-			csvHeader.add('Delta'); // TODO i18n?
+			csvHeader.add('Delta') // TODO i18n?
 			
-			graphLabelsInOrderOfHeader.add(eachGraph.getLabel());
+			graphLabelsInOrderOfHeader.add(eachGraph.getLabel())
 		}
 		
-		csvWriter.writeHeader(csvHeader.toArray(new String[csvHeader.size()]));
+		csvWriter.writeHeader(csvHeader.toArray(new String[csvHeader.size()]))
 		
 		// The target graph:
-		CsTargetGraph targetGraph = CsTargetGraph.list().get(0); // TODO Move DB access to DAO.
+		CsTargetGraph targetGraph = CsTargetGraph.list().get(0) // TODO Move DB access to DAO.
 		
 		for(Map.Entry<Long, TreeMap<String, OsmChartPoint>> eachPointByGraphOfTime : pointsByGraphByTime)
 		{
-			List<String> row = new LinkedList<String>();
+			List<String> row = new LinkedList<String>()
 			
-			DateTime time = new DateTime(eachPointByGraphOfTime.getKey());
-			double targetValue = targetGraph.getPercentOfDate(time);
+			DateTime time = new DateTime(eachPointByGraphOfTime.getKey())
+			double targetValue = targetGraph.getPercentOfDate(time)
 			
-			row.add(CSV_TABLE_DATE_TIME_FORMAT.print(time));
+			row.add(CSV_TABLE_DATE_TIME_FORMAT.print(time))
 			
-			row.add(csvCSIValueFormat.format(targetValue));
+			row.add(csvCSIValueFormat.format(targetValue))
 			
 			for(String eachGraphLabel : graphLabelsInOrderOfHeader)
 			{
-				OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel);
+				OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel)
 				if( point != null )
 				{
-					row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue)));
+					row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue)))
 					if(repeatCSITargetValueColumns)
 					{
-						row.add(csvCSIValueFormat.format(roundDouble(targetValue)));
+						row.add(csvCSIValueFormat.format(roundDouble(targetValue)))
 					}
 					row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue - targetValue)))
 				} else {
-					row.add("");
+					row.add("")
 					if(repeatCSITargetValueColumns)
 					{
-						row.add("");
+						row.add("")
 					}
-					row.add("");
+					row.add("")
 				}
 			}
 			
-			csvWriter.writeRow(row);
+			csvWriter.writeRow(row)
 		}
 		
-		csvWriter.flush();
+		csvWriter.flush()
 	}
 	
 	/**
@@ -767,7 +761,7 @@ class CsiDashboardController {
 	 */
 	static private double roundDouble(double valueToRound)
 	{
-		return new BigDecimal(valueToRound).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+		return new BigDecimal(valueToRound).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
 	} 
 	
 	/**
@@ -931,7 +925,7 @@ class CsiDashboardController {
 		 * should be done as requested, <code>false</code> indicates that 
 		 * the user hasn't been warned before, so there is no overwrite.
 		 */
-		Boolean overwriteWarningAboutLongProcessingTime;
+		Boolean overwriteWarningAboutLongProcessingTime
 		
 		/**
 		 * Flag for manual debugging.
@@ -1069,7 +1063,7 @@ class CsiDashboardController {
 				
 			}
 
-			return new Interval(start, end);
+			return new Interval(start, end)
 		}
 		
 		/**
@@ -1123,7 +1117,7 @@ class CsiDashboardController {
 			viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
 			viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
-			CustomDateEditor dateEditor = CustomDateEditorRegistrar.createCustomDateEditor();
+			CustomDateEditor dateEditor = CustomDateEditorRegistrar.createCustomDateEditor()
 
 			dateEditor.setValue(this.from)
 			viewModelToCopyTo.put('from', dateEditor.getAsText())
@@ -1159,28 +1153,28 @@ class CsiDashboardController {
 				throw new IllegalStateException('Query params are not available from an invalid command.')
 			}
 
-			MvQueryParams result = new MvQueryParams();
+			MvQueryParams result = new MvQueryParams()
 
-			result.jobGroupIds.addAll(this.selectedFolder);
+			result.jobGroupIds.addAll(this.selectedFolder)
 
 			if( !this.selectedAllMeasuredEvents )
 			{
-				result.measuredEventIds.addAll(this.selectedMeasuredEventIds);
+				result.measuredEventIds.addAll(this.selectedMeasuredEventIds)
 			}
 
-			result.pageIds.addAll(this.selectedPage);
+			result.pageIds.addAll(this.selectedPage)
 
 			if( !this.selectedAllBrowsers )
 			{
-				result.browserIds.addAll(this.selectedBrowsers);
+				result.browserIds.addAll(this.selectedBrowsers)
 			}
 
 			if( !this.selectedAllLocations )
 			{
-				result.locationIds.addAll(this.selectedLocations);
+				result.locationIds.addAll(this.selectedLocations)
 			}
 
-			return result;
+			return result
 		}
 	}
 
@@ -1215,22 +1209,22 @@ class CsiDashboardController {
 		result.put('folders', jobGroupDaoService.findCSIGroups().sort(false, { it.name }))
 
 		// Pages
-		List<Page> pages = pageDaoService.findAll().sort(false, { it.name });
+		List<Page> pages = pageDaoService.findAll().sort(false, { it.name })
 		result.put('pages', pages)
 
 		// MeasuredEvents
-		List<MeasuredEvent> measuredEvents = measuredEventDaoService.findAll().sort(false, { it.name });
+		List<MeasuredEvent> measuredEvents = measuredEventDaoService.findAll().sort(false, { it.name })
 		result.put('measuredEvents', measuredEvents)
 
 		// Browsers
-		List<Browser> browsers = browserDaoService.findAll().sort(false, { it.name });
+		List<Browser> browsers = browserDaoService.findAll().sort(false, { it.name })
 		result.put('browsers', browsers)
 
 		// Locations
 		List<Location> locations = locationDaoService.findAll().
 				sort(false, { Location it -> it.getWptServer().label }).
 				sort(false, { Location it -> it.getBrowser().name }).
-				sort(false, { Location it -> it.location });
+				sort(false, { Location it -> it.location })
 		result.put('locations', locations)
 
 		// JavaScript-Utility-Stuff:
@@ -1241,38 +1235,40 @@ class CsiDashboardController {
 		Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
 		for(Page eachPage : pages)
 		{
-			Set<Long> eventIds = new HashSet<Long>();
+			Set<Long> eventIds = new HashSet<Long>()
 
 			Collection<Long> ids = measuredEvents.findResults {
 				it.testedPage.getId() == eachPage.getId() ? it.getId() : null }
 			if( !ids.isEmpty() )
 			{
-				eventIds.addAll(ids);
+				eventIds.addAll(ids)
 			}
 
-			eventsOfPages.put(eachPage.getId(), eventIds);
+			eventsOfPages.put(eachPage.getId(), eventIds)
 		}
-		result.put('eventsOfPages', eventsOfPages);
+		result.put('eventsOfPages', eventsOfPages)
 
 		// --- Map<BrowserID, Set<LocationID>> for fast view filtering:
 		Map<Long, Set<Long>> locationsOfBrowsers = new HashMap<Long, Set<Long>>()
 		for(Browser eachBrowser : browsers)
 		{
-			Set<Long> locationIds = new HashSet<Long>();
+			Set<Long> locationIds = new HashSet<Long>()
 
 			Collection<Long> ids = locations.findResults {
 				it.browser.getId() == eachBrowser.getId() ? it.getId() : null }
 			if( !ids.isEmpty() )
 			{
-				locationIds.addAll(ids);
+				locationIds.addAll(ids)
 			}
 
-			locationsOfBrowsers.put(eachBrowser.getId(), locationIds);
+			locationsOfBrowsers.put(eachBrowser.getId(), locationIds)
 		}
-		result.put('locationsOfBrowsers', locationsOfBrowsers);
+		result.put('locationsOfBrowsers', locationsOfBrowsers)
+		result.put("chartRenderingLibrary", cookieBasedSettingsService.getChartingLibraryToUse())
+		result.put('defaultChartTitle', csiHelperService.getCsiChartDefaultTitle())
 
 		// Done! :)
-		return result;
+		return result
 	}
 
 	def downloadBrowserWeights(){
@@ -1380,13 +1376,13 @@ class CsiDashboardController {
 		int countOfSelectedPages,
 		int countOfSelectedBrowser)
 	{
-		int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes();
+		int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes()
 		
-		long expectedCountOfGraphs = countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser;
-		long expectedPointsOfEachGraph = Math.round( minutesInTimeFrame / selectedAggregationIntervallInMintues );
-		long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph;
+		long expectedCountOfGraphs = countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser
+		long expectedPointsOfEachGraph = Math.round( minutesInTimeFrame / selectedAggregationIntervallInMintues )
+		long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph
 
-		return expectedTotalNumberOfPoints > 10000;
+		return expectedTotalNumberOfPoints > 10000
 	}
 	
 	/**
@@ -1404,13 +1400,13 @@ class CsiDashboardController {
 		switch (interval.intervalInMinutes) {
 			case MeasuredValueInterval.WEEKLY:
 				maxDays = 26*7
-				break;
+				break
 			case MeasuredValueInterval.DAILY:
 				maxDays = 6*7
-				break;
+				break
 			default:
 				maxDays = 2*7
-				break;
+				break
 		}
 		return daysBetween.isGreaterThan(new Days(maxDays))
 	}
@@ -1427,17 +1423,17 @@ class CsiDashboardController {
 			log.error('An error occurred while creating csv-representation of measurement-data', e)
 			flash.tableDataError = i18nService.msg('de.iteratec.ism.measurement.conversion.errormessage', 'Bei der Umwandlung der Messdaten f&uuml;r die tabellarischen Darstellung ist ein Fehler aufgetreten!')
 		}
-		return csvAsString;
+		return csvAsString
 	}
 	private String tryToFormatForTable(List<OsmChartGraph> csiValueMap, boolean includeCsTargetGraphs){
-		StringWriter writer = new StringWriter();
-		writeCSV(csiValueMap, writer, RequestContextUtils.getLocale(request), true);
-		String csvAsString = writer.toString();
+		StringWriter writer = new StringWriter()
+		writeCSV(csiValueMap, writer, RequestContextUtils.getLocale(request), true)
+		String csvAsString = writer.toString()
 		if( csvAsString.endsWith('\n') )
 		{
-			csvAsString = csvAsString.substring(0, csvAsString.length() - 1);
+			csvAsString = csvAsString.substring(0, csvAsString.length() - 1)
 		}
-		return csvAsString;
+		return csvAsString
 	}
 
 }

@@ -15,21 +15,18 @@
 * limitations under the License.
 */
 
-
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMappingService
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.BrowserService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupType
+import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.issc.*
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.detail.HarParserService

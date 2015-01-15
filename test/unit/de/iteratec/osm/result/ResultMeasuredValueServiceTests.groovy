@@ -152,8 +152,10 @@ class ResultMeasuredValueServiceTests {
 		fullyLoadedTime=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		loadTime=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_LOAD_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		startRender=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_START_RENDER, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
+
 		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT, measurandGroup: MeasurandGroup.PERCENTAGES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_SPEED_INDEX, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
+		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, measurandGroup: MeasurandGroup.REQUEST_SIZES).save(failOnError: true)
@@ -167,6 +169,7 @@ class ResultMeasuredValueServiceTests {
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_START_RENDER, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT, measurandGroup: MeasurandGroup.PERCENTAGES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_SPEED_INDEX, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
+		new AggregatorType(name: AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
@@ -409,7 +412,8 @@ class ResultMeasuredValueServiceTests {
 			AggregatorType.RESULT_CACHED_LOAD_TIME,
 			AggregatorType.RESULT_CACHED_START_RENDER,
 			AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT,
-			AggregatorType.RESULT_CACHED_SPEED_INDEX
+			AggregatorType.RESULT_CACHED_SPEED_INDEX,
+				AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE
 		];
 
 		/* test */
@@ -442,7 +446,8 @@ class ResultMeasuredValueServiceTests {
 			AggregatorType.RESULT_UNCACHED_LOAD_TIME,
 			AggregatorType.RESULT_UNCACHED_START_RENDER,
 			AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT,
-			AggregatorType.RESULT_UNCACHED_SPEED_INDEX
+			AggregatorType.RESULT_UNCACHED_SPEED_INDEX,
+				AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE
 		];
 
 		/* test */
