@@ -84,8 +84,8 @@ function createSplineChart(div, title, yType, data, maxValue, lineType, measurem
             plotOptions: plotOptions,
             exporting: {
             	scale: 1,
-            	sourceWidth: 1000,
-            	sourceHeight: 700,
+            	sourceWidth: 900,
+            	sourceHeight: 500,
             	url: exportUrl
             },
             
@@ -470,13 +470,14 @@ function createChartForExport(
 		plotOptions: plotOptions,
 		exporting: {
 			scale: 1,
-			sourceWidth: 1000,
-			sourceHeight: 700,
+			sourceWidth: 900,
+			sourceHeight: 500,
 			url: exportUrl
 		},
 		
 		series: data
-	});	
+	});
+	window.chart.exporting.sourceHeight
 	
 }
 
@@ -519,8 +520,8 @@ function createChartWithFixYAxis(
 		plotOptions: plotOptions,
 		exporting: {
 			scale: 1,
-			sourceWidth: 1000,
-			sourceHeight: 700,
+			sourceWidth: 900,
+			sourceHeight: 500,
 			url: exportUrl
 		},
 		series: data
@@ -562,8 +563,8 @@ function createChartWithFixYAxisForMultipleYAxis(
 		plotOptions: plotOptions,
 		exporting: {
 			scale: 1,
-			sourceWidth: 1000,
-			sourceHeight: 700,
+			sourceWidth: 900,
+			sourceHeight: 500,
 			url: exportUrl
 		},
 		series:  data
@@ -600,7 +601,7 @@ function createChartWithScalableYAxis(
 		yAxis: {
 			title: {
 				text: yType
-			},
+			}
 		},
 		tooltip: {
 			formatter: function() { 
@@ -611,9 +612,10 @@ function createChartWithScalableYAxis(
 		plotOptions: plotOptions,
 		exporting: {
 			scale: 1,
-			sourceWidth: 1000,
-			sourceHeight: 700,
+			sourceWidth: 900,
+			sourceHeight: 500,
 			url: exportUrl
+
 		},
 		
 		series: data
@@ -657,8 +659,8 @@ function createChartWithMultipleScalableYAxis(
 		plotOptions: plotOptions,
 		exporting: {
 			scale: 1,
-			sourceWidth: 1000,
-			sourceHeight: 700,
+			sourceWidth: 900,
+			sourceHeight: 500,
 			url: exportUrl
 		},
 		

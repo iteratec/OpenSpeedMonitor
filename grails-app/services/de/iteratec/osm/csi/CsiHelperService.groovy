@@ -38,7 +38,6 @@ class CsiHelperService {
 	 * @return
 	 */
 	String getCsiChartDefaultTitle(){
-		log.info("**********************" + i18nService.msg('de.iteratec.isocsi.csi.defaultdashboard.chart.title', 'Customer Satisfaction (CSI)'))
 		String baseChartTitle = osmCookieService.getBase64DecodedCookieValue(COOKIE_KEY_CSI_DASHBOARD_TITLE) ?:
 			i18nService.msg('de.iteratec.isocsi.csi.defaultdashboard.chart.title', 'Customer Satisfaction (CSI)')
 		String mainUrlUnderTest = configService.getMainUrlUnderTest()
