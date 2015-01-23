@@ -149,7 +149,7 @@ class LocationAndResultPersisterService implements iListener{
 					log.debug("deleting results marked as pending or running ... DONE")
 					log.debug("persisting job result ...")
 					jobRun = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)?:
-						persistNewJobRun(jobConfig, resultXml, har).save(failOnError: true);
+						persistNewJobRun(jobConfig, resultXml).save(failOnError: true);
 					log.debug("persisting job result ... DONE")
 				} catch (Exception e) {
 					status.setRollbackOnly()
@@ -211,7 +211,7 @@ class LocationAndResultPersisterService implements iListener{
 		return jobConfig
 	}
 
-	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml, String har){
+	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){
 
 		String testId = resultXml.getTestId()
 		if(!testId){
@@ -227,7 +227,6 @@ class LocationAndResultPersisterService implements iListener{
 		job: jobConfig,
 		date: testCompletion,
 		testId: testId,
-		har: har?new HttpArchive(harData: zip(har)):null,
 		httpStatusCode: jobRunStatus,
 		jobConfigLabel: jobConfig.label,
 		jobConfigRuns: jobConfig.runs,
