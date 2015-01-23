@@ -68,7 +68,17 @@ class JobService {
 	 */
 	List<Map> listJobsWithTags() {
 		return Job.executeQuery("""SELECT new map(tagLink.tagRef as jobId, tagLink.tag.name as tag)
-								   FROM TagLink tagLink 
+								   FROM TagLink tagLink
 								   WHERE tagLink.type = 'job'""")
-	}	
+	}
+
+	void updateActivity(Job job, boolean activityToSet){
+		job.active = activityToSet
+		job.save(failOnError: true)
+	}
+
+	void updateExecutionSchedule(Job job, String executionSchedule){
+		job.executionSchedule = executionSchedule
+		job.save(failOnError: true)
+	}
 }

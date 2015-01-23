@@ -106,7 +106,9 @@ var setChevron = function(accordionElement) {
 function initIntervalSelect() {
 	//initialization///////////////////////
 	var lastIntervalSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.intervalselection');
-	if(lastIntervalSelection != null) $('#selectedIntervalHtmlId').val(lastIntervalSelection);
+	var intervalSelectionFromQueryParam = $.getUrlVar('selectedInterval');
+	if(intervalSelectionFromQueryParam != null) $('#selectedIntervalHtmlId').val(intervalSelectionFromQueryParam);
+	else if(lastIntervalSelection != null) $('#selectedIntervalHtmlId').val(lastIntervalSelection);
 	//register events///////////////////////
 	$('#selectedIntervalHtmlId').on("change", function(event){
 		setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());

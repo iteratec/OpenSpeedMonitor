@@ -83,6 +83,7 @@ $(document).ready(function() {
 			.removeAttr('readonly');
 		$('#maxDownloadTimeInMinutes a').css('visibility', 'hidden');
 	});
+
 });
 
 // from http://stackoverflow.com/a/21375637

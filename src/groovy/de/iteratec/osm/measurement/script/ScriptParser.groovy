@@ -17,6 +17,10 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.PageService
+
 /**
  * Represents a one-line statement in a script
  * 
@@ -87,10 +91,14 @@ class ScriptEventNameCmdWarning {
 /**
  * A parser for WPTServer scripts respecting only logData, setEventName,
  * navigate and execAndWait statements.
+ * Registered as Spring Bean.
  *  
  * @author dri
  */
 class ScriptParser {
+
+	PageService pageService
+
 	// Keywords and pattern used for parsing
 	final static String logDataCmd = 'logData'  
 	final static String setEventNameCmd = 'setEventName'  
@@ -129,6 +137,8 @@ class ScriptParser {
 	 * every odd number marks a line where a step ends.
 	 */
 	public List<Integer> steps
+
+	private PageService pageService
 		
 	/**
 	 * Parse the given navigationScript
@@ -295,6 +305,23 @@ class ScriptParser {
 		eventNames = [eventNames].flatten()
 		steps = [steps].flatten()
 		return statements 
+	}
+
+	public List<Page> getTestedPages(){
+		List<Page> testedPages = []
+		this.eventNames.each {eventName ->
+			testedPages << ( MeasuredEvent.findByName(pageService.excludePagenamePart(eventName))?.testedPage ?: Page.findByName(Page.UNDEFINED) )
+		}
+		return testedPages
+	}
+
+	public getMeasuredEvents(){
+		List<MeasuredEvent> events = []
+		this.eventNames.each {eventName ->
+			MeasuredEvent measuredEvent = MeasuredEvent.findByName(pageService.excludePagenamePart(eventName))
+			if (measuredEvent) events << measuredEvent
+		}
+		return events
 	}
 	
 	/**
