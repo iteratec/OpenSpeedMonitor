@@ -330,4 +330,6 @@ class ScriptParser {
 	public ScriptParser(String navigationScript) {
 		interpret(navigationScript)
 	}
+	public ScriptParser() {
+	}
 }
