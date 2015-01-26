@@ -27,8 +27,8 @@ if (typeof jQuery !== 'undefined') {
 function stringToBoolean(string) {
 	if(!string) return false;
 	switch(string.toLowerCase()){
-		case "true": case "yes": case "1": return true;
-		case "false": case "no": case "0": case null: return false;
+		case "true": case "yes": case "1": case "on": return true;
+		case "false": case "no": case "0": case "off": case null: return false;
 		default: return false;
 	}
 }
@@ -58,3 +58,20 @@ function getFromLocalStorage(key) {
 	}
 	return null;
 }
+$.extend({
+	getUrlVars: function(){
+		var vars = [], hash;
+		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		for(var i = 0; i < hashes.length; i++)
+		{
+			var hash = hashes[i].split('=');
+			var key = decodeURIComponent(hash[0]);
+			vars.push(key);
+			vars[key] = decodeURIComponent(hash[1]);
+		}
+		return vars;
+	},
+	getUrlVar: function(name){
+		return $.getUrlVars()[name];
+	}
+});

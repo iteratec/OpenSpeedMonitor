@@ -79,9 +79,23 @@ class ConfigService {
 	boolean areMeasurementsGenerallyEnabled(){
 		return (Boolean)retrieveConfigValue('measurementsGenerallyEnabled')
 	}
-	
+
+	/**
+	 * Gets initial height of charts when opening dashboards from osm-configuration.
+	 * @see OsmConfiguration
+	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+	 */
 	Integer getInitialChartHeightInPixels(){
 		return (Integer)retrieveConfigValue('initialChartHeightInPixels')
+	}
+
+	/**
+	 * Gets main url under test within this osm instance from osm-configuration. That url got shown in chart title of csi dashboard.
+	 * @see OsmConfiguration
+	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+	 */
+	String getMainUrlUnderTest(){
+		return (String)retrieveConfigValue('mainUrlUnderTest')
 	}
 	
 	private Object retrieveConfigValue(String name) {

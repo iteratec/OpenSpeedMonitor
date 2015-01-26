@@ -56,9 +56,18 @@ var initDatepicker = function(dateformatToSet, weekstartToSet, timespanFromNowIn
 
 	//set previous selections ///////////////////////////////////////////////////////////////////
 
-	if(lastTimeframeSelection != null) $('#timeframeSelect').val(lastTimeframeSelection);
-	if(lastFromSelection != null) setFrom(lastFromSelection);
-	if(lastToSelection != null) setTo(lastToSelection);
+	var fromDateFromQueryParams = $.getUrlVar('from');
+	var toDateFromQueryParams = $.getUrlVar('to');
+	var selectedTimeFrameIntervalFromQueryParams = $.getUrlVar('selectedTimeFrameInterval');
+
+	if(fromDateFromQueryParams != null) setFrom(fromDateFromQueryParams);
+	else if(lastFromSelection != null) setFrom(lastFromSelection);
+
+	if(selectedTimeFrameIntervalFromQueryParams != null) $('#timeframeSelect').val(selectedTimeFrameIntervalFromQueryParams);
+	else if(lastTimeframeSelection != null) $('#timeframeSelect').val(lastTimeframeSelection);
+
+	if(toDateFromQueryParams != null) setTo(toDateFromQueryParams);
+	else if(lastToSelection != null) setTo(lastToSelection);
 
 	//register events///////////////////////////////////////////////////////////////////
 	
@@ -113,10 +122,22 @@ var initTimepicker = function(whetherToShowMeridian) {
 
 	//set previous selections ///////////////////////////////////////////////////////////////////
 
-	if(lastFromHourSelection != null) setFromHour(lastFromHourSelection);
-	if(lastToHourSelection != null) setToHour(lastToHourSelection);
-	if(lastManualFromHourSelection !=null) setManualFromHourCheckbox(lastManualFromHourSelection);
-	if(lastManualToHourSelection !=null) setManualToHourCheckbox(lastManualToHourSelection);
+	var fromHourFromQueryParams = $.getUrlVar('fromHour');
+	var toHourFromQueryParams = $.getUrlVar('toHour');
+	var setFromHourFromQueryParam = $.getUrlVar('setFromHour');
+	var setToHourFromQueryParam = $.getUrlVar('setToHour');
+
+	if(fromHourFromQueryParams != null) setFromHour(fromHourFromQueryParams);
+	else if(lastFromHourSelection != null) setFromHour(lastFromHourSelection);
+
+	if(toHourFromQueryParams != null) setToHour(toHourFromQueryParams);
+	else if(lastToHourSelection != null) setToHour(lastToHourSelection);
+
+	if(setFromHourFromQueryParam !=null) setManualFromHourCheckbox(setFromHourFromQueryParam);
+	else if(lastManualFromHourSelection !=null) setManualFromHourCheckbox(lastManualFromHourSelection);
+
+	if(setToHourFromQueryParam != null) setManualToHourCheckbox(setToHourFromQueryParam)
+	else if(lastManualToHourSelection !=null) setManualToHourCheckbox(lastManualToHourSelection);
 
 	//register events///////////////////////////////////////////////////////////////////
 

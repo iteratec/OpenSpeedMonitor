@@ -17,40 +17,16 @@
 
 package de.iteratec.osm.api
 
-import de.iteratec.osm.api.RestApiController
-
-import static org.junit.Assert.*
 
 import grails.test.mixin.*
-import org.junit.*
-import de.iteratec.osm.api.RestApiController.ResultsRequestCommand
 
 /**
- * Test-suite of {@link RestApiConfigController}.
- * 
- * @author mze
- * @since IT-81
+ * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(RestApiController)
-class RestApiControllerTests {
+@TestFor(JobLinkService)
+class JobLinkServiceSpec {
 
-	private RestApiController controllerUnderTest;
-	
-	@Before
-    public void setUp() {
-		controllerUnderTest = (RestApiController) controller;
+    void testSomething() {
+        fail "Implement me"
     }
-
-	@After
-    public void tearDown() {
-		controllerUnderTest = null;
-    }
-
-	@Test
-	public void testResultsRequestCommand()
-	{
-		ResultsRequestCommand out = new ResultsRequestCommand();
-		
-		assertFalse(out.validate());
-	}
 }

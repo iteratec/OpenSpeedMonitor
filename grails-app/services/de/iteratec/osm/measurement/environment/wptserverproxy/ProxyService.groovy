@@ -144,9 +144,12 @@ class ProxyService {
 		}
 		
 		if (jobLabel.length() > 0 && statusCode >= 200 && xmlResultResponse.data.runs.toString().isInteger()) {
-			
-			def har = httpRequestService.getWptServerHttpGetResponse(wptserverOfResult, 'export.php', ['test': params.resultId], ContentType.TEXT, [Accept : 'application/json'])
-			log.trace("har=${har.data.str}")
+
+			// nkuhn, 2015-01-22: disabled cause unused at the moment:
+//			def har = httpRequestService.getWptServerHttpGetResponse(wptserverOfResult, 'export.php', ['test': params.resultId], ContentType.TEXT, [Accept : 'application/json'])
+//			String harDate = har.data.str
+//			log.trace("har=${har.data.str}")
+
 			log.debug("${this.listener.size} iListener(s) listen to the fetching of results")
 			
 			try {
@@ -155,7 +158,7 @@ class ProxyService {
 				this.listener.each {
 					it.listenToResult(
 							xmlResultResponse,
-							har.data.str,
+							'',
 							wptserverOfResult
 							)
 				}

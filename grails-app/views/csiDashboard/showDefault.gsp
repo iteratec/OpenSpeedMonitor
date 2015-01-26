@@ -73,7 +73,7 @@
 				model="[
 					singleYAxis: 'true',
 					chartData: wptCustomerSatisfactionValues,
-					chartTitle: defaultChartTitleFromCookie ?: g.message(code: 'de.iteratec.isocsi.csi.defaultdashboard.chart.title', 'default':'Customer Satisfaction (CSI)'),
+					chartTitle: defaultChartTitle,
 					yAxisLabel: 'Kundenzufriedenheit [%]',
 					initialChartWidth: '100%',
 					initialChartHeight: '600',

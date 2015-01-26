@@ -17,12 +17,16 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.result.PageService
+
 import static org.junit.Assert.*
 import grails.test.mixin.*
 import grails.test.mixin.support.*
 
 @TestMixin(GrailsUnitTestMixin)
 class ScriptParserTestSpec {
+
+	PageService pageService
 
     void testBV1_Komplett_egon_Wpt_Explorer() {
         ScriptParser parser = new ScriptParser()

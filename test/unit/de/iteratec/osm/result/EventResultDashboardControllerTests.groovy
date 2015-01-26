@@ -17,18 +17,21 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.result.EventResultDashboardController.ShowAllCommand
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.measurement.schedule.*
+import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.ChartingLibrary
+import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import de.iteratec.osm.result.EventResultDashboardController.ShowAllCommand
+import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.CustomDateEditorRegistrar
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
@@ -38,7 +41,6 @@ import org.junit.Test
 import org.mockito.Mockito
 
 import static org.mockito.Mockito.when
-
 
 /**
  * <p>
@@ -99,6 +101,8 @@ class EventResultDashboardControllerTests {
 
 		this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
 		controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
+
+		controllerUnderTest.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.RICKSHAW}] as CookieBasedSettingsService
 	}
 
 	/**
@@ -643,7 +647,7 @@ class EventResultDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(15, result.size());
+		assertEquals(16, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))

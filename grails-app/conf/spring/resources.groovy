@@ -15,6 +15,8 @@
 * limitations under the License.
 */
 
+
+import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService;
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService;
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService;
@@ -33,5 +35,6 @@ beans = {
 	measuredEventDaoService(DefaultMeasuredEventDaoService)
 	browserDaoService(DefaultBrowserDaoService)
 	locationDaoService(DefaultLocationDaoService)
-	graphiteSocketProvider(DefaultGraphiteSocketProvider) 
+	graphiteSocketProvider(DefaultGraphiteSocketProvider)
+	scriptParser(ScriptParser) { bean -> bean.autowire = true }
 }

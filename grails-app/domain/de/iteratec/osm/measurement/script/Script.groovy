@@ -17,12 +17,10 @@
 
 package de.iteratec.osm.measurement.script
 
-import org.grails.databinding.BindUsing
-
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.PageService
+import org.grails.databinding.BindUsing
 
 /**
  * <p>
@@ -86,17 +84,7 @@ class Script {
 		try{			
 			ScriptParser parser = new ScriptParser(navigationScript)
 			measuredEventsCount = parser.measuredEventsCount
-			testedPages = []
-			parser.eventNames.each {eventName -> 
-				testedPages << ( MeasuredEvent.findByName(pageService.excludePagenamePart(eventName))?.testedPage ?: Page.findByName(Page.UNDEFINED) )
-//				String eventNamePagenameExcluded = pageService.excludePagenamePart(eventName)
-//				MeasuredEvent measuredEvent = MeasuredEvent.findByName(eventNamePagenameExcluded)
-//				if(measuredEvent != null && measuredEvent.testedPage != null) {
-//					testedPages << measuredEvent.testedPage
-//				} else {
-//					testedPages << Page.findByName(Page.UNDEFINED)
-//				}
-			}
+			testedPages = parser.getTestedPages()
 		} catch (Exception e) {
 			log.error("An error occurred while parsing of script: ${this}", e)
 		}

@@ -23,7 +23,6 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
@@ -44,7 +43,7 @@ import org.joda.time.DateTime
  */
 @TestMixin(GrailsUnitTestMixin)
 class ServiceMocker {
-	
+
 	private ServiceMocker(){}
 	public static ServiceMocker create(){
 		return new ServiceMocker()
@@ -386,6 +385,56 @@ class ServiceMocker {
 			return toReturnFromGetDefaultMaxDownloadTimeInMinutes
 		}
 		serviceToMockIn.configService = configServiceMock.createMock()
+	}
+	/**
+	 * Mocks methods in list methodsToMock in service of class classOfServiceToMock. That service get mocked in owning service serviceToMockIn.
+	 * @param classOfServiceToMock
+	 * 		Class of grails service which should be mocked.
+	 * @param serviceToMockIn
+	 * 		Grails service with the service to mock as instance-variable.
+	 * @param methodsToMock
+	 * 		List of methods that get mocked. For each method a return value is included.
+	 * @see MethodToMock
+	 */
+	void mockService(Class classOfServiceToMock, serviceToMockIn, List<MethodToMock> methodsToMock){
+		def serviceMock = mockFor(classOfServiceToMock, true)
+		methodsToMock.each{methodToMock ->
+			String methodName = methodToMock.method.getName()
+			if (methodToMock.method.getParameterTypes().size()==0){
+				serviceMock.demand."$methodName"(0..100){ ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==1){
+				serviceMock.demand."$methodName"(0..100){paramOne ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==2){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==3){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==4){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==5){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour, paramFive ->
+					return methodToMock.toReturn
+				}
+			}else if (methodToMock.method.getParameterTypes().size()==6){
+				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour, paramFive, paramSix ->
+					return methodToMock.toReturn
+				}
+			}else{
+				throw new IllegalArgumentException('Nobody should write functions with more than six parameters. Please refactor your code!')
+			}
+		}
+		String nameOfServiceField = classOfServiceToMock.getSimpleName()
+		nameOfServiceField = nameOfServiceField[0].toLowerCase() + nameOfServiceField.substring(1)
+		serviceToMockIn."$nameOfServiceField" = serviceMock.createMock()
 	}
 	/**
 	 * Mocks methods of{@link ProxyService}.

@@ -151,7 +151,7 @@
 							model="[
 							singleYAxis: 'true', 
 							chartData: wptCustomerSatisfactionValues,
-							chartTitle: chartTitle,
+							chartTitle: defaultChartTitle,
 							yAxisLabel: g.message(code:'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
 							initialChartWidth: '100%',
 							chartUnit: '%',

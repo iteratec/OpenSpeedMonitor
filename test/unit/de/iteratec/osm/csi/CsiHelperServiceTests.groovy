@@ -17,71 +17,125 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.*
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.MethodToMock
+import de.iteratec.osm.util.OsmCookieService
+import de.iteratec.osm.util.ServiceMocker
+import grails.test.mixin.TestFor
+import org.junit.Before
+import org.junit.Test
 
-import org.joda.time.DateTime
-import org.junit.*
-
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import static org.hamcrest.Matchers.is
+import static org.junit.Assert.assertThat
 
 /**
  * Test-suite of {@link CsiHelperService}.
  */
 @TestFor(CsiHelperService)
-@Mock([MeasuredValue, JobGroup])
 class CsiHelperServiceTests {
 	
 	CsiHelperService serviceUnderTest
+	ServiceMocker mocker
 	
 	@Before
 	void setUp() {
 		serviceUnderTest=service
+		mocker = ServiceMocker.create()
+		//mocks common for all tests
+		mocker.mockService(
+				I18nService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: 'not the concern of these tests')])
 	}
 
 	@Test
-    void testResetToStartOfActualInterval() {
-		DateTime now = new DateTime(2013, 1, 10, 13, 43, 12, 234)
+	void testGetDefaultCsiChartTitle(){
 		
-		DateTime hourlyReseted = new DateTime(2013, 1, 10, 13, 0, 0, 0)
-		assertEquals(hourlyReseted, serviceUnderTest.resetToStartOfActualInterval(now, MeasuredValueInterval.HOURLY))
+		//test specific data
+		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
+		final String expectedMainUrlUnderTest = 'www.example.com'
 		
-		DateTime dailyReseted = new DateTime(2013, 1, 10, 0, 0, 0, 0)
-		assertEquals(dailyReseted, serviceUnderTest.resetToStartOfActualInterval(now, MeasuredValueInterval.DAILY))
+		//test specific mocks
+		mocker.mockService(
+				ConfigService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: expectedMainUrlUnderTest)])
+		mocker.mockService(
+				OsmCookieService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: expectedDefaultTitleFromCookie)])
 		
-		DateTime weeklyReseted = new DateTime(2013, 1, 7, 0, 0, 0, 0)
-		assertEquals(weeklyReseted, serviceUnderTest.resetToStartOfActualInterval(now, MeasuredValueInterval.WEEKLY))
-    }
-	
-	@Test
-	void testResetToEndOfActualInterval() {
-		DateTime dateTime = new DateTime(2013, 1, 10, 13, 43, 12)
-		DateTime hourlyReseted = new DateTime(2013, 1, 10, 14, 0, 0, 0)
-		DateTime dailyReseted = new DateTime(2013, 1, 11, 0, 0, 0, 0)
-		DateTime weeklyReseted = new DateTime(2013, 1, 14, 0, 0, 0, 0)
-		
-		assertEquals(hourlyReseted, serviceUnderTest.resetToEndOfActualInterval(dateTime, MeasuredValueInterval.HOURLY))
-		assertEquals(dailyReseted, serviceUnderTest.resetToEndOfActualInterval(dateTime, MeasuredValueInterval.DAILY))
-		assertEquals(weeklyReseted, serviceUnderTest.resetToEndOfActualInterval(dateTime, MeasuredValueInterval.WEEKLY))
+		//test execution and assertions
+		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is("${expectedDefaultTitleFromCookie} ${expectedMainUrlUnderTest}".toString()))
 	}
-	
 	@Test
-	void testGetCsiGroups(){
-		List<JobGroup> csiGroups = serviceUnderTest.getCsiJobGroups()
-		assertEquals(0, csiGroups.size())
+	void testGetDefaultCsiChartTitleWithNullAsMainUrlUnderTest(){
 		
-		String csiGroupName = 'CSI'
-		new JobGroup(
-				name:csiGroupName,
-				groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		csiGroupName = 'CSI Lhotse'
-		new JobGroup(
-				name:csiGroupName,
-				groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-				
-		csiGroups = serviceUnderTest.getCsiJobGroups()
-		assertEquals(2, csiGroups.size())
+		//test specific data
+		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
+		final String expectedDefaultTitleFromI18n = 'Customer satisfaction index (CSI) - i18n'
+		final String expectedMainUrlUnderTest = 'www.example.com'
+		
+		//test specific mocks
+		mocker.mockService(
+				ConfigService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: null)])
+		mocker.mockService(
+				OsmCookieService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: expectedDefaultTitleFromCookie)])
+		
+		//test execution and assertions
+		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is("${expectedDefaultTitleFromCookie}".toString()))
+	}
+	@Test
+	void testGetDefaultCsiChartTitleWithNullAsDefaultTitleFromCookie(){
+		
+		//test specific data
+		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
+		final String expectedDefaultTitleFromI18n = 'Customer satisfaction index (CSI) - i18n'
+		final String expectedMainUrlUnderTest = 'www.example.com'
+		
+		//test specific mocks
+		mocker.mockService(
+				ConfigService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: expectedMainUrlUnderTest)])
+		mocker.mockService(
+				OsmCookieService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: null)])
+		mocker.mockService(
+			I18nService.class, 
+			serviceUnderTest,
+			[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: expectedDefaultTitleFromI18n)])
+		//test execution and assertions
+		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is("${expectedDefaultTitleFromI18n} ${expectedMainUrlUnderTest}".toString()))
+	}
+	@Test
+	void testGetDefaultCsiChartTitleWithNullAsDefaultTitleFromCookieAndMainUrlUnderTest(){
+		
+		//test specific data
+		final String expectedDefaultTitleFromCookie = 'Customer satisfaction index (CSI) - cookie'
+		final String expectedDefaultTitleFromI18n = 'Customer satisfaction index (CSI) - i18n'
+		final String expectedMainUrlUnderTest = 'www.example.com'
+		
+		//test specific mocks
+		mocker.mockService(
+				ConfigService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: ConfigService.getMethod('getMainUrlUnderTest'), toReturn: null)])
+		mocker.mockService(
+				OsmCookieService.class,
+				serviceUnderTest,
+				[new MethodToMock(method: OsmCookieService.getMethod('getBase64DecodedCookieValue', String.class), toReturn: null)])
+		mocker.mockService(
+			I18nService.class,
+			serviceUnderTest,
+			[new MethodToMock(method: I18nService.getMethod('msg', String.class, String.class), toReturn: expectedDefaultTitleFromI18n)])
+		//test execution and assertions
+		assertThat(serviceUnderTest.getCsiChartDefaultTitle(), is(expectedDefaultTitleFromI18n))
 	}
 }

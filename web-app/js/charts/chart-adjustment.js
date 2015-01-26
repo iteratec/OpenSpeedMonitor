@@ -81,7 +81,11 @@ function HighchartAdjuster() {
 			if ($.isNumeric(diaWidth) && $.isNumeric(diaHeight)
 					&& parseInt(diaWidth)>0 && parseInt(diaWidth)<=maxWidth
 					&& parseInt(diaHeight)>0 && parseInt(diaHeight)<=maxHeight) {
-				chart.setSize($('#dia-width').val(), $('#dia-height').val());
+				var diaWidth = $('#dia-width').val();
+				var diaHeight = $('#dia-height').val();
+                chart.setSize(diaWidth, diaHeight);
+				chart.options.exporting.sourceWidth=diaWidth;
+				chart.options.exporting.sourceHeight=diaHeight;
 			}else{
 				window.alert("Width and height of diagram has to be numeric values and maximum is 5.000 x 3.000 pixel!");
 			}

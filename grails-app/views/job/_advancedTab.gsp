@@ -6,8 +6,12 @@
 	$(document).ready(function() {
 		$('#provideAuthenticateInformation').click(function() {
 			$('.authInfo').toggle($(this).prop('checked'));
+			document.getElementById('authPassword').setAttribute('type', 'password');
 		});
 		$('.authInfo').toggle($('#provideAuthenticateInformation').prop('checked'));
+		if ($('#provideAuthenticateInformation').prop('checked')){
+			document.getElementById('authPassword').setAttribute('type', 'password');
+		}
 	});
 </r:script>
 
@@ -26,7 +30,7 @@
 		<g:message code="script.authUser.label" default="Benutzer" />
 	</label>
 	<div class="span9">
-		<g:textField name="authUsername" id="authUsername" value="${job?.authUsername}" />
+		<g:textField name="authUsername" id="authUsername" value="${job?.authUsername}" autocomplete="off"/>
 	</div>
 </div>
 <div class="row form-group authInfo fieldcontain ${hasErrors(bean: job, field: 'authPassword', 'error')}">
@@ -34,6 +38,6 @@
 		<g:message code="script.authPassword.label" default="Passwort" />
 	</label>
 	<div class="span9">
-		<g:passwordField name="authPassword" id="authPassword" value="${job?.authPassword}" />
+		<g:textField name="authPassword" id="authPassword" value="${job?.authPassword}" />
 	</div>
 </div>
