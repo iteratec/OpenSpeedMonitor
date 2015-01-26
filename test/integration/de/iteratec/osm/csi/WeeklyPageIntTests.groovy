@@ -59,6 +59,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	JobService jobService
 	MeasuredValueUpdateService measuredValueUpdateService
 	Map<Long, JobResult> mapToFindJobResultByEventResult
+
 	
 
 	MeasuredValueInterval hourly
@@ -99,11 +100,20 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, measuredValueTagService);
 		System.out.println('Loading CSV-data... DONE');
 		
-		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
-		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-			return mapToFindJobResultByEventResult[eventResult.ident()]
+//		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
+//		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
+//			return mapToFindJobResultByEventResult[eventResult.ident()]
+//		}
+		JobResultService.metaClass.findJobResultByEventResult = {EventResult eventResult ->
+			JobResult jobResultToReturn
+			JobResult.list().each {jobResult ->
+				if(jobResult.eventResults*.ident().contains(eventResult.ident())) {
+					jobResultToReturn = jobResult
+				}
+			}
+			return jobResultToReturn
 		}
-		
+
 		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
 		
 		System.out.println('Set-up...');
@@ -149,10 +159,10 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		results.each { EventResult result ->
 			measuredValueUpdateService.createOrUpdateDependentMvs(result)
 		}
-		
+
 		List<MeasuredValue> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
 		MeasuredValue mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
-		
+
 		assertEquals(startDate, mvWeeklyPage.started)
 		assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)
 		assertEquals(pageAggregatorType.name, mvWeeklyPage.aggregator.name)
