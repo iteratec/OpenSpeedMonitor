@@ -12,15 +12,15 @@
 
 			<div class="span3" id="spied-nav">
 				<ul class="nav nav-pills nav-stacked affix">
-					<li class=""><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
-					<li class=""><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
-					<li class=""><a href="#csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI</a></li>
-					<li class=""><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
-					<li class=""><a href="#csi-frustrations">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI frustrations</a></li>
-					<li class=""><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
-					<li class=""><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
-					<li class=""><a href="#job-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job deactivation</a></li>
-					<li class=""><a href="#job-set-schedule">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Set execution schedule</a></li>
+					<li><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
+					<li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
+					<li><a href="#csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI</a></li>
+					<li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
+					<li><a href="#csi-frustrations">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI frustrations</a></li>
+					<li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
+					<li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
+					<li><a href="#job-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job deactivation</a></li>
+					<li><a href="#job-set-schedule">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Set execution schedule</a></li>
 				</ul>
 			</div>
 			<div class="span9 content">
