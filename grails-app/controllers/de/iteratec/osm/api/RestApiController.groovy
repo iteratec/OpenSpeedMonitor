@@ -335,7 +335,7 @@ class RestApiController {
 	 * @since IT-81
 	 */
 	public Map<String, Object> man() {
-		return [:]; // Just render the documentation gsp. 
+		return [protectedFunctionHint:'This method is protected. You need a valid api key, ask your osm administrator for one.']
 	}
 	
 	/**
@@ -657,7 +657,7 @@ class RestApiController {
 	public Map<String, Object> getResultUrls(){
 
 		Job job = Job.get(params.id)
-		if( job == null ) sendSimpleResponseAsStream(response, 400, "Job with id ${params.id} doesn't exist!")
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
 
 		if( params.timestampFrom == null || params.timestampTo == null ) sendSimpleResponseAsStream(response, 400, 'Params timestampFrom and timestampTo must be set.')
 
@@ -709,7 +709,7 @@ class RestApiController {
 		if( !params.validApiKey.allowedForJobDeactivation ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to deactivate jobs.")
 
 		Job job = Job.get(params.id)
-		if( job == null ) sendSimpleResponseAsStream(response, 400, "Job with id ${params.id} doesn't exist!")
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
 
 		jobService.updateActivity(job, false)
 
@@ -729,7 +729,7 @@ class RestApiController {
 		if( !params.validApiKey.allowedForJobSetExecutionSchedule ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
 
 		Job job = Job.get(params.id)
-		if( job == null ) sendSimpleResponseAsStream(response, 400, "Job with id ${params.id} doesn't exist!")
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
 
 		def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
 		String schedule = jsonSlurper.executionSchedule
