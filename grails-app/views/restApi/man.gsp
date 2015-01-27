@@ -5,8 +5,8 @@
 <meta name="layout" content="kickstart_osm" />
 </head>
 
-%{--data-target=".navbar-static" data-spy="scroll" data-twttr-rendered="true"--}%
-<body data-spy="scroll" data-target="#spied-nav">
+%{--<body data-spy="scroll" data-target="#spied-nav">--}%
+<body>
 
 	<div class="container">
 	<div class="row">
@@ -596,15 +596,17 @@
 	
 	--%>
 	<r:script>
-		$('body').scrollspy({
-			target: '#spied-nav',
-			offset: 100
-		});
-		var offset = 60;
-		$('#spied-nav ul li a').click(function(event) {
-			event.preventDefault();
-			$($(this).attr('href'))[0].scrollIntoView();
-			scrollBy(0, -offset);
+		$(document).ready(function(){
+			$('body').scrollspy({
+				target: '#spied-nav',
+				offset: 100
+			});
+			var offset = 60;
+			$('#spied-nav ul li a').click(function(event) {
+				event.preventDefault();
+				$($(this).attr('href'))[0].scrollIntoView();
+				scrollBy(0, -offset);
+			});
 		});
 	</r:script>
 </body>
