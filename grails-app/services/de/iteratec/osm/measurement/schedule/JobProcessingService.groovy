@@ -78,7 +78,7 @@ class JobProcessingService {
 	/**
 	 * Time to wait during Job processing before each check if results are available
 	 */
-	private int pollDelaySeconds = 15
+	private int pollDelaySeconds = 30
 	/**
 	 * Time to wait after maxDownloadTime of a job has been exceeded before declaring
 	 * a timeout error
