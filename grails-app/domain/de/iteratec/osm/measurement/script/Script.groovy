@@ -82,7 +82,7 @@ class Script {
 	
 	private void parseScript() {
 		try{			
-			ScriptParser parser = new ScriptParser(navigationScript)
+			ScriptParser parser = new ScriptParser(pageService, navigationScript)
 			measuredEventsCount = parser.measuredEventsCount
 			testedPages = parser.getTestedPages()
 		} catch (Exception e) {

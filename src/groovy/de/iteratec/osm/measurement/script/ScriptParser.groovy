@@ -327,9 +327,8 @@ class ScriptParser {
 	/**
 	 * Initialize parser and interpret the given script.
 	 */
-	public ScriptParser(String navigationScript) {
+	public ScriptParser(PageService pageService, String navigationScript) {
+		this.pageService = pageService
 		interpret(navigationScript)
-	}
-	public ScriptParser() {
 	}
 }

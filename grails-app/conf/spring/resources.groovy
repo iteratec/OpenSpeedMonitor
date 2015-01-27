@@ -16,14 +16,13 @@
 */
 
 
-import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService;
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService;
-import de.iteratec.osm.measurement.schedule.DefaultPageDaoService;
-import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider;
-import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService;
-import de.iteratec.osm.measurement.environment.DefaultBrowserDaoService;
-import de.iteratec.osm.measurement.environment.DefaultLocationDaoService;
+import de.iteratec.osm.measurement.environment.DefaultBrowserDaoService
+import de.iteratec.osm.measurement.environment.DefaultLocationDaoService
+import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
+import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
+import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
+import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
+import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.util.CustomDateEditorRegistrar
 
 // Place your Spring DSL code here
@@ -36,5 +35,4 @@ beans = {
 	browserDaoService(DefaultBrowserDaoService)
 	locationDaoService(DefaultLocationDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
-	scriptParser(ScriptParser) { bean -> bean.autowire = true }
 }

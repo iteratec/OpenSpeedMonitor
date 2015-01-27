@@ -33,6 +33,7 @@ class JobLinkService {
 
     LinkGenerator grailsLinkGenerator
     PageService pageService
+    ScriptParser scriptParser
 
     String getLinkToTabularResultsFor(Job job, GString fromFormatted, GString fromHourFormatted, GString toFormatted, GString toHourFormatted) {
         return grailsLinkGenerator.link(
@@ -54,7 +55,7 @@ class JobLinkService {
 
     Map<String,String> getResultVisualizingLinksFor(Job job, DateTime start, DateTime end) {
 
-        ScriptParser parser = new ScriptParser(job.script.getParsedNavigationScript(job))
+        ScriptParser parser = new ScriptParser(pageService, job.script.getParsedNavigationScript(job))
         List<Long> eventIds = parser.getMeasuredEvents()*.id
         List<Long> pageIds = parser.getTestedPages()*.id
 
