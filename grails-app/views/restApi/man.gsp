@@ -4,7 +4,7 @@
 <title>Manual of REST API</title>
 <meta name="layout" content="kickstart_osm" />
 </head>
-<body>
+<body data-spy="scroll" data-target="#spied-nav">
 %{--<body data-spy="scroll" data-target="#spied-nav">--}%
 	<div class="container">
 
