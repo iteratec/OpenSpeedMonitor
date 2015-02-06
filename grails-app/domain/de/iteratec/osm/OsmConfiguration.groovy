@@ -29,6 +29,7 @@ class OsmConfiguration {
 	static final Boolean DEFAULT_MEASUREMENTS_GENERALLY_ENABLED = false
 	static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
 	static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
+    static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 0
 
 	/* Default (injected) attributes of GORM */
 	Long	id
@@ -52,6 +53,8 @@ class OsmConfiguration {
 	Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
 	/** Main url under test within this osm instance. Got shown in chart title of csi dashboard. */
 	String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
+    /** Maximum Number of months osm keeps results in database   */
+    Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
 	
     static mapping = {
     }
@@ -64,6 +67,6 @@ class OsmConfiguration {
 		measurementsGenerallyEnabled(defaultValue: DEFAULT_MEASUREMENTS_GENERALLY_ENABLED)
 		initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
 		mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
+        maxDataStorageTimeInMonths(defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS)
     }
-	
 }

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.persistence
 
+import de.iteratec.osm.result.JobResult
 import grails.gorm.DetachedCriteria
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
@@ -67,7 +68,7 @@ class DbCleanupService {
 			lt 'startDate', toDeleteBefore
 		}
 		def count = dc.count()
-		
+
 		// Optional:
 		// dc = dc.build{
 		//     projections { property('username') }
@@ -85,5 +86,22 @@ class DbCleanupService {
 			WebPerformanceWaterfall.withSession { session -> session.clear() }
 		}
 	}
+
+    /**
+     * Deletes all {@link EventResult}s {@link JobResult}s {@link HttpArchive}s {@link MeasuredValue}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
+     * @param toDeleteBefore	All results-data before this date get deleted.
+     */
+    void deleteResultsDataBefore(Date toDeleteBefore){
+        log.info "Deleting all results-data before: ${toDeleteBefore}"
+
+        //deleting code
+        try {
+            JobResult.list().findAll { it.date.before(toDeleteBefore) }*.delete(flush: true)
+        }catch (org.springframework.dao.DataIntegrityViolationException e) {
+            log.error("Could not delete JobResults recursive")
+        }
+
+        log.info "... DONE"
+    }
 	
 }

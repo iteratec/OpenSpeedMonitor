@@ -97,6 +97,16 @@ class ConfigService {
 	String getMainUrlUnderTest(){
 		return (String)retrieveConfigValue('mainUrlUnderTest')
 	}
+
+    /**
+     * Gets max result-data storage time in months from osm-configuration.
+     * @return Time in months to store results of the application.
+     * @see OsmConfiguration
+     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+     */
+    Integer getMaxDataStorageTimeInMonths(){
+        return (Integer)retrieveConfigValue('maxDataStorageTimeInMonths')
+    }
 	
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
