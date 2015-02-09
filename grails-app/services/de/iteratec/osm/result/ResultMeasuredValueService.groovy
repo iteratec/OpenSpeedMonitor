@@ -159,62 +159,62 @@ class ResultMeasuredValueService {
 		switch (aggType.name) {
 			case AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME:
 			case AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME:
-				returnVal= Double.valueOf(result.getDocCompleteTimeInMillisecs())
+				returnVal= result.getDocCompleteTimeInMillisecs() ? Double.valueOf(result.getDocCompleteTimeInMillisecs()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_DOM_TIME:
 			case AggregatorType.RESULT_CACHED_DOM_TIME:
-				returnVal= Double.valueOf(result.getDomTimeInMillisecs())
+				returnVal= result.getDomTimeInMillisecs() ? Double.valueOf(result.getDomTimeInMillisecs()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_FIRST_BYTE:
 			case AggregatorType.RESULT_CACHED_FIRST_BYTE:
-				returnVal= Double.valueOf(result.getFirstByteInMillisecs())
+				returnVal= result.getFirstByteInMillisecs() ? Double.valueOf(result.getFirstByteInMillisecs()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT:
 			case AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT:
-				returnVal= Double.valueOf(result.getFullyLoadedRequestCount())
+				returnVal= result.getFullyLoadedRequestCount() ? Double.valueOf(result.getFullyLoadedRequestCount()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME:
 			case AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME:
-				returnVal= Double.valueOf(result.getFullyLoadedTimeInMillisecs())
+				returnVal= result.getFullyLoadedTimeInMillisecs() ? Double.valueOf(result.getFullyLoadedTimeInMillisecs()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_LOAD_TIME:
 			case AggregatorType.RESULT_CACHED_LOAD_TIME:
-				returnVal= Double.valueOf(result.getLoadTimeInMillisecs())
+				returnVal= result.getLoadTimeInMillisecs() ? Double.valueOf(result.getLoadTimeInMillisecs()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_START_RENDER:
 			case AggregatorType.RESULT_CACHED_START_RENDER:
-				returnVal= Double.valueOf(result.getStartRenderInMillisecs())
+				returnVal= result.getStartRenderInMillisecs() ? Double.valueOf(result.getStartRenderInMillisecs()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES:
 			case AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES:
-				returnVal= Double.valueOf(result.getDocCompleteIncomingBytes())
+				returnVal= result.getDocCompleteIncomingBytes() ? Double.valueOf(result.getDocCompleteIncomingBytes()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS:
 			case AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS:
-				returnVal= Double.valueOf(result.getDocCompleteRequests())
+				returnVal= result.getDocCompleteRequests() ? Double.valueOf(result.getDocCompleteRequests()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES:
 			case AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES:
-				returnVal= Double.valueOf(result.getFullyLoadedIncomingBytes())
+				returnVal= result.getFullyLoadedIncomingBytes() ? Double.valueOf(result.getFullyLoadedIncomingBytes()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT:
 			case AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT:
-				returnVal= Double.valueOf(result.getCustomerSatisfactionInPercent())
+				returnVal= result.getCustomerSatisfactionInPercent() ? Double.valueOf(result.getCustomerSatisfactionInPercent()) : null
 				break;
 				
 			case AggregatorType.RESULT_UNCACHED_SPEED_INDEX:
 			case AggregatorType.RESULT_CACHED_SPEED_INDEX:
-				returnVal= Double.valueOf(result.getSpeedIndex())
+				returnVal= result.getSpeedIndex() ? Double.valueOf(result.getSpeedIndex()) : null
 				break;
 
 			case AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE:

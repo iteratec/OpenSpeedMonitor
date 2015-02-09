@@ -264,8 +264,10 @@ class LocationAndResultPersisterService implements iListener{
 		testStepCount.times{nullBasedTeststepIndex ->
 			
 			EventResult.withTransaction { TransactionStatus status ->
+                log.debug("Persisting EventResults of jobRun: ${jobRun}: Start of transaction, transaction status=${status}")
 				try{
 					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
+                    log.debug("Persisting EventResults of jobRun: ${jobRun}: End of transaction, transaction status=${status}")
 				} catch (Exception e) {
 					status.setRollbackOnly()
 					log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
