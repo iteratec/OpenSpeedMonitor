@@ -17,23 +17,20 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.isj.quartzjobs.*
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
+import org.quartz.*
+import org.hibernate.StaleObjectStateException
 
-import org.quartz.CronScheduleBuilder
-import org.quartz.SchedulerException
-import org.quartz.SimpleScheduleBuilder
-import org.quartz.Trigger
-import org.quartz.TriggerBuilder
-import org.quartz.TriggerKey
-
-import de.iteratec.isj.quartzjobs.*
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class JobExecutionException extends Exception{
 	public String htmlResult
@@ -74,6 +71,7 @@ class JobProcessingService {
 	ProxyService proxyService
 	def quartzScheduler
 	ConfigService configService
+    PerformanceLoggingService performanceLoggingService
 	
 	/**
 	 * Time to wait during Job processing before each check if results are available
@@ -83,8 +81,8 @@ class JobProcessingService {
 	 * Time to wait after maxDownloadTime of a job has been exceeded before declaring
 	 * a timeout error
 	 */
-	private final int declareTimeoutAfterMaxDownloadTimePlusSeconds = 60 
-	
+	private final int declareTimeoutAfterMaxDownloadTimePlusSeconds = 60
+
 	public void setPollDelaySeconds(int pollDelaySeconds) {
 		this.pollDelaySeconds = pollDelaySeconds
 	}
@@ -163,36 +161,78 @@ class JobProcessingService {
 	 * test execution.
 	 */
 	private JobResult persistUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus = null) {
+
 		// If no testId was provided some error occurred and needs to be logged
 		JobResult result
 		if (testId) { 
 			result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
 		}
+
 		if (!result) {
-			result = new JobResult(
-				job: job,
-				date: new Date(),
-				testId: testId ?: UUID.randomUUID() as String,
-				har: null,
-				description: '',
-				jobConfigLabel: job.label,
-				jobConfigRuns: job.runs,
-				wptServerLabel: job.location.wptServer.label,
-				wptServerBaseurl: job.location.wptServer.baseUrl,
-				locationLabel: job.location.label,
-				locationLocation: job.location.location,
-				locationBrowser: job.location.browser.name,
-				locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer, 
-				jobGroupName: job.jobGroup.name)
-		}
-		result.httpStatusCode = statusCode
-		if (wptStatus != null)
-			result.wptStatus = wptStatus
-		result.save(failOnError: true, flush: true)
-		return result
+
+            return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus)
+
+		}else{
+
+            updateStatusAndPersist(result, job, testId, statusCode, wptStatus)
+            return result
+        }
+
 	}
-	
-	private Map parseXmlResponse(String xml, WebPageTestServer wptserver) {
+
+    private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus){
+        log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
+
+        if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)){
+
+            updateStatus(result, statusCode, wptStatus)
+
+            try{
+
+                result.save(failOnError: true, flush: true)
+
+            }catch(StaleObjectStateException staleObjectStateException){
+                String logMessage = "Updating status of existing JobResult: Job ${job.label}, test-id=${testId}" +
+                        "\n\t-> httpStatusCode of result couldn't get updated from ${result.httpStatusCode}->${statusCode}"
+                if (wptStatus != null) logMessage += "\n\twptStatus of result couldn't get updated from ${result.wptStatus}->${wptStatus}"
+                log.error(logMessage, staleObjectStateException)
+            }
+
+        }
+    }
+
+    private void updateStatus(JobResult result, int statusCode, String wptStatus) {
+        log.debug("Updating status of existing JobResult: httpStatusCode: ${result.httpStatusCode}->${statusCode}")
+        result.httpStatusCode = statusCode
+        if (wptStatus != null) {
+            log.debug("Updating status of existing JobResult: wptStatus: ${result.wptStatus}->${wptStatus}")
+            result.wptStatus = wptStatus
+        }
+    }
+
+    private JobResult persistNewUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus) {
+        JobResult result = new JobResult(
+                job: job,
+                date: new Date(),
+                testId: testId ?: UUID.randomUUID() as String,
+                har: null,
+                description: '',
+                jobConfigLabel: job.label,
+                jobConfigRuns: job.runs,
+                wptServerLabel: job.location.wptServer.label,
+                wptServerBaseurl: job.location.wptServer.baseUrl,
+                locationLabel: job.location.label,
+                locationLocation: job.location.location,
+                locationBrowser: job.location.browser.name,
+                locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
+                jobGroupName: job.jobGroup.name,
+                httpStatusCode: statusCode)
+        if (wptStatus != null) result.wptStatus = wptStatus
+        log.debug("Persisting of unfinished result: Job ${job.label}, test-id=${testId} -> persisting new JobResult=${result}")
+        return result.save(failOnError: true, flush: true)
+    }
+
+    private Map parseXmlResponse(String xml, WebPageTestServer wptserver) {
 		GPathResult response = new XmlSlurper().parseText(xml)
 		Map params = [:]
 		params.statusCode = response.statusCode.toInteger()
@@ -262,12 +302,16 @@ class JobProcessingService {
 			if (!wptserver) {
 				throw new JobExecutionException("Missing wptServer in job ${job.label}");
 			}
-			HttpResponseDecorator result = proxyService.runtest(wptserver, parameters);
+
+            HttpResponseDecorator result
+            performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
+                result = proxyService.runtest(wptserver, parameters);
+            }
 			statusCode = result.getStatus()
 			if (statusCode != 200) {
 				throw new JobExecutionException("ProxyService.runtest() returned status code ${statusCode}");
 			}
-			if (log.infoEnabled) log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}")
+			log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}")
 			
 			params = parseXmlResponse(result.data.text, wptserver)
 			
@@ -276,16 +320,19 @@ class JobProcessingService {
 				Date endDate = new Date() + job.maxDownloadTimeInMinutes.minutes
 				// build and schedule subtrigger for polling every pollDelaySeconds seconds.
 				// Polling is stopped by pollJobRun() when the running test is finished or on endDate at the latest
+                log.debug("Building subtrigger for polling for job ${job.label} and test-id ${params.testId} (enddate ${endDate})")
 				CronDispatcherQuartzJob.schedule(buildSubTrigger(job, params.testId, endDate), jobDataMap)
 				// schedule a timeout trigger which will fire once after endDate + a delay of
 				// declareTimeoutAfterMaxDownloadTimePlusSeconds seconds and perform cleaning operations.
 				// This will also set this job run's status to 504 Timeout.
 				Date timeoutDate = endDate + declareTimeoutAfterMaxDownloadTimePlusSeconds.seconds
+                log.debug("Building timeout trigger for job ${job.label} and test-id ${params.testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
 				CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(job, params.testId, timeoutDate), jobDataMap)
 			}
 			
 			return true
 		} catch (Exception e) {
+            log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now.")
 			persistUnfinishedJobResult(job, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
 			return false
 		}
@@ -319,10 +366,15 @@ class JobProcessingService {
 		int statusCode = 400
 		try
 		{
-			statusCode = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
-			persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
+                statusCode = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
+            }
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
+                persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
+            }
 		} catch (Exception e) {
 			statusCode = 400
+            log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now")
 			persistUnfinishedJobResult(job, testId, statusCode, e.getMessage())
 		} finally {
 			if (statusCode >= 200) {
