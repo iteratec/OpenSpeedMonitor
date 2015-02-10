@@ -223,35 +223,37 @@ environments {
             if (!catalinaBase) catalinaBase = '.'   // just in case
             def logFolder = "${catalinaBase}/logs/"
 
-            List<String> identifiersToLogExplicitlyFor = []
-            identifiersToLogExplicitlyFor << 'grails.app.conf'
-            identifiersToLogExplicitlyFor << 'grails.app.filters'
-            identifiersToLogExplicitlyFor << 'grails.app.taglib'
-            identifiersToLogExplicitlyFor << 'grails.app.domain'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isj'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.osm'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isocsi'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.ispc'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isr'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.iss'
-            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.issc'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.chart'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isj'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.osm'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isocsi'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
-            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.jmx'
-
-//			doesn't work cause we can't access grailsApplictaion or there are no serviceClasses/controllerClasses:
+//            doesn't work cause we can't access grailsApplictaion or there are no serviceClasses/controllerClasses:
+//            List<String> identifiersToLogExplicitlyFor = []
+//            identifiersToLogExplicitlyFor << 'grails.app.conf'
+//            identifiersToLogExplicitlyFor << 'grails.app.filters'
+//            identifiersToLogExplicitlyFor << 'grails.app.taglib'
+//            identifiersToLogExplicitlyFor << 'grails.app.domain'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isj'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.osm'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isocsi'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.ispc'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isr'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.iss'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.issc'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.chart'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isj'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.osm'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isocsi'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.jmx'
 //			identifiersToLogExplicitlyFor.addAll(grailsApplication.serviceClasses.collect {"grails.app.services.${it.fullName}"})
 //			identifiersToLogExplicitlyFor.addAll(grailsApplication.controllerClasses.collect {"grails.app.controllers.${it.fullName}"})
 
             appenders {
 
-                console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-                rollingFile name: "stacktrace", maxFileSize: 1024, file: "${logFolder}${appName}-stacktrace.log", layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n")
+                console(
+                        name:'stdout',
+                        layout:pattern(conversionPattern: '%c{2} %m%n'),
+                        threshold: org.apache.log4j.Level.ERROR
+                )
 
                 /**
                  * Standard-appender for openSpeedMonitor-app. One Logging-level for the whole application.
@@ -261,7 +263,7 @@ environments {
                         name: 'osmAppender',
                         datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
                         fileName: "logs/${appName}.log",
-                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n"),
+                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         threshold: org.apache.log4j.Level.ERROR
                 )
                 /**
@@ -271,7 +273,7 @@ environments {
                  RollingFileAppender rollingFileAppender = new RollingFileAppender(
                      name: 'osmAppenderDetails',
                      fileName: "logs/${appName}Details.log",
-                     layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n"),
+                     layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                      maxFileSize: '20MB',
                      maxBackupIndex: 5,
                      threshold: org.apache.log4j.Level.DEBUG
@@ -283,9 +285,18 @@ environments {
                 asyncAppender.addAppender(rollingFileAppender)
                 appender asyncAppender
             }
+            // Per default all is logged for application artefacts.
+            // Appenders apply their own threshold level to limit logs.
             all(
                     osmAppender: [
-                            'grails.app',
+                            'grails.app'
+                    ],
+                    asyncOsmAppenderDetails: [
+                            'grails.app'
+                    ]
+            )
+            error(
+                    osmAppender: [
                             'org.codehaus.groovy.grails.commons',            // core / classloading
                             'org.codehaus.groovy.grails.web.mapping',        // URL mapping
                             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -299,7 +310,6 @@ environments {
                             'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
                     ],
                     asyncOsmAppenderDetails: [
-                            'grails.app',
                             'org.codehaus.groovy.grails.commons',            // core / classloading
                             'org.codehaus.groovy.grails.web.mapping',        // URL mapping
                             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -315,81 +325,7 @@ environments {
             )
         }
 
-//		log4j = {
-//			/*
-//			 * log4j-LogLevel:
-//
-//				off
-//				fatal
-//				error
-//				warn
-//				info
-//				debug
-//				trace
-//				all
-//
-//			 */
-//			appenders {
-////				def logFolder = "/home/hauke/iteradata/temp/"
-//				console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-//				appender new DailyRollingFileAppender(
-//					name: 'osmAppender',
-//					datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
-//					fileName: "logs/${appName}.log",
-//					layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n")
-//					)
-//			}
-//
-//			debug(stdout: ['grails.app'], osmAppender: ['grails.app'])
-//
-//			error(stdout: [
-//					'org.codehaus.groovy.grails.web.servlet',        // controllers
-//				   'org.codehaus.groovy.grails.web.pages',          // GSP
-//				   'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-//				   'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-//				   'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-//				   'org.codehaus.groovy.grails.commons',            // core / classloading
-//				   'org.codehaus.groovy.grails.plugins',            // plugins
-//				   'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//				   'org.springframework',
-//				   'org.hibernate',
-//				   'net.sf.ehcache.hibernate'])
-//
-//		}
-		
     }
-	test {
-		grails.logging.jul.usebridge = true
-		
-		grails.dbconsole.enabled = true
-		grails.dbconsole.urlRoot = '/admin/dbconsole'
-		
-		// grails console-plugin, see https://github.com/sheehan/grails-console
-		grails.plugin.console.enabled = true // Whether to enable the plugin. Default is true for the development environment, false otherwise.
-		grails.plugin.console.fileStore.remote.enabled = true // Whether to include the remote file store functionality. Default is true.
-		
-		log4j = {
-			appenders {
-				console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-			}
-			
-			info(stdout: ['grails.app', 'co.freeside.betamax'])
-			
-			info(stdout: [
-					'org.codehaus.groovy.grails.web.servlet',        // controllers
-				   'org.codehaus.groovy.grails.web.pages',          // GSP
-				   'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-				   'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-				   'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-				   'org.codehaus.groovy.grails.commons',            // core / classloading
-				   'org.codehaus.groovy.grails.plugins',            // plugins
-				   'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-				   'org.springframework',
-				   'org.hibernate',
-				   'net.sf.ehcache.hibernate'])
-			
-		}
-	}
     production {
 		
 		//base url of osm instance can be configured here or in external configuration file (see grails-app/conf/OpenSpeedMonitor-config.groovy.sample)
@@ -409,37 +345,39 @@ environments {
 			def catalinaBase = System.properties.getProperty('catalina.base')
 			if (!catalinaBase) catalinaBase = '.'   // just in case
 			def logFolder = "${catalinaBase}/logs/"
-			
-			List<String> identifiersToLogExplicitlyFor = []
-			identifiersToLogExplicitlyFor << 'grails.app.conf'
-			identifiersToLogExplicitlyFor << 'grails.app.filters'
-			identifiersToLogExplicitlyFor << 'grails.app.taglib'
-			identifiersToLogExplicitlyFor << 'grails.app.domain'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isj'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.osm'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isocsi'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.ispc'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isr'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.iss'
-			identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.issc'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.chart'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isj'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.osm'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isocsi'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
-			identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.jmx'
-					
-//			doesn't work cause we can't access grailsApplictaion or there are no serviceClasses/controllerClasses:
+
+//            doesn't work cause we can't access grailsApplictaion or there are no serviceClasses/controllerClasses:
+//            List<String> identifiersToLogExplicitlyFor = []
+//            identifiersToLogExplicitlyFor << 'grails.app.conf'
+//            identifiersToLogExplicitlyFor << 'grails.app.filters'
+//            identifiersToLogExplicitlyFor << 'grails.app.taglib'
+//            identifiersToLogExplicitlyFor << 'grails.app.domain'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isj'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.osm'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isocsi'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.ispc'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isr'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.iss'
+//            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.issc'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.chart'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isj'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.osm'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isocsi'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
+//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.jmx'
 //			identifiersToLogExplicitlyFor.addAll(grailsApplication.serviceClasses.collect {"grails.app.services.${it.fullName}"})
 //			identifiersToLogExplicitlyFor.addAll(grailsApplication.controllerClasses.collect {"grails.app.controllers.${it.fullName}"})
 			
 			appenders {
 				
-				console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-				rollingFile name: "stacktrace", maxFileSize: 1024, file: "${logFolder}${appName}-stacktrace.log", layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n")
-				
+				console(
+                        name:'stdout',
+                        layout:pattern(conversionPattern: '%c{2} %m%n'),
+                        threshold: org.apache.log4j.Level.ERROR
+                )
+
 				/** 
 				 * Standard-appender for openSpeedMonitor-app. One Logging-level for the whole application.
 				 *	Nothing else is logged.   
@@ -448,7 +386,7 @@ environments {
 					name: 'osmAppender',
 					datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
 					fileName: "${logFolder}${appName}.log",
-					layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n"),
+					layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                     threshold: org.apache.log4j.Level.ERROR
 					)
                 /**
@@ -458,7 +396,7 @@ environments {
                 RollingFileAppender rollingFileAppender = new RollingFileAppender(
                         name: 'osmAppenderDetails',
                         fileName: "${logFolder}${appName}Details.log",
-                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] %-5p %c{2} (line %L): %m%n"),
+                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         maxFileSize: '20MB',
                         maxBackupIndex: 5,
                         threshold: org.apache.log4j.Level.DEBUG
@@ -470,23 +408,31 @@ environments {
                 asyncAppender.addAppender(rollingFileAppender)
                 appender asyncAppender
 			}
+            // Per default all is logged for application artefacts.
+            // Appenders apply their own threshold level to limit logs.
 			all(
 				osmAppender: [
-                    'grails.app',
-                    'org.codehaus.groovy.grails.commons',            // core / classloading
-                    'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                    'org.codehaus.groovy.grails.web.pages',          // GSP
-                    'org.codehaus.groovy.grails.web.servlet',        // controllers
-                    'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-                    'org.codehaus.groovy.grails.plugins',            // plugins
-                    'org.springframework',
-                    'net.sf.ehcache.hibernate',
-                    'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-                    'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
+                    'grails.app'
                 ],
                 asyncOsmAppenderDetails: [
-                        'grails.app',
+                    'grails.app'
+                ]
+            )
+            error(
+                osmAppender: [
+                        'org.codehaus.groovy.grails.commons',            // core / classloading
+                        'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+                        'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                        'org.codehaus.groovy.grails.web.pages',          // GSP
+                        'org.codehaus.groovy.grails.web.servlet',        // controllers
+                        'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+                        'org.codehaus.groovy.grails.plugins',            // plugins
+                        'org.springframework',
+                        'net.sf.ehcache.hibernate',
+                        'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+                        'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
+                ],
+                asyncOsmAppenderDetails: [
                         'org.codehaus.groovy.grails.commons',            // core / classloading
                         'org.codehaus.groovy.grails.web.mapping',        // URL mapping
                         'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -501,5 +447,37 @@ environments {
                 ]
             )
 		}
+    }
+    test {
+        grails.logging.jul.usebridge = true
+
+        grails.dbconsole.enabled = true
+        grails.dbconsole.urlRoot = '/admin/dbconsole'
+
+        // grails console-plugin, see https://github.com/sheehan/grails-console
+        grails.plugin.console.enabled = true // Whether to enable the plugin. Default is true for the development environment, false otherwise.
+        grails.plugin.console.fileStore.remote.enabled = true // Whether to include the remote file store functionality. Default is true.
+
+        log4j = {
+            appenders {
+                console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+            }
+
+            info(stdout: ['grails.app', 'co.freeside.betamax'])
+
+            info(stdout: [
+                    'org.codehaus.groovy.grails.web.servlet',        // controllers
+                    'org.codehaus.groovy.grails.web.pages',          // GSP
+                    'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                    'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+                    'org.codehaus.groovy.grails.commons',            // core / classloading
+                    'org.codehaus.groovy.grails.plugins',            // plugins
+                    'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+                    'org.springframework',
+                    'org.hibernate',
+                    'net.sf.ehcache.hibernate'])
+
+        }
     }
 }

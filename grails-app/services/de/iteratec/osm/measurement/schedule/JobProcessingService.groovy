@@ -304,7 +304,7 @@ class JobProcessingService {
 			}
 
             HttpResponseDecorator result
-            performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
+            performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", PerformanceLoggingService.IndentationDepth.TWO){
                 result = proxyService.runtest(wptserver, parameters);
             }
 			statusCode = result.getStatus()
@@ -374,7 +374,7 @@ class JobProcessingService {
             }
 		} catch (Exception e) {
 			statusCode = 400
-            log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now")
+            log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
 			persistUnfinishedJobResult(job, testId, statusCode, e.getMessage())
 		} finally {
 			if (statusCode >= 200) {
