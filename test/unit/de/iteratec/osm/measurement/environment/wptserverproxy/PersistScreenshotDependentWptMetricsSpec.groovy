@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.PageService
+import de.iteratec.osm.util.PerformanceLoggingService
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
@@ -109,6 +110,7 @@ class PersistScreenshotDependentWptMetricsSpec {
             // not the concern of this test
         }
         mocker.mockTTCsMappingService(serviceUnderTest)
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
     }
 
     void tearDown() {

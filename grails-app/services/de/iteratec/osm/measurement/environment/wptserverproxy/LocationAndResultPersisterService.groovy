@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
 
 import java.util.zip.GZIPOutputStream
@@ -50,6 +51,8 @@ import de.iteratec.osm.result.WptXmlResultVersion
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
 /**
  * Persists locations and results. Observer of ProxyService.
  * @author rschuett, nkuhn
@@ -72,8 +75,10 @@ class LocationAndResultPersisterService implements iListener{
 	MetricReportingService metricReportingService
 	HarParserService harParserService
 	ConfigService configService
+    PerformanceLoggingService performanceLoggingService
 
-	/**
+
+    /**
 	 * Persisting non-existent locations.
 	 */
 	@Override
@@ -123,11 +128,16 @@ class LocationAndResultPersisterService implements iListener{
 			
 		WptResultXml resultXml = new WptResultXml(xmlResultResponse)
 			
-		log.debug("get or persist Job ...")
-		Job jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
-		log.debug("get or persist Job ... DONE")
-		
-		if (jobConfig != null) persistJobResultAndAssociatedEventResults(jobConfig, resultXml, wptserverOfResult, har)
+        Job jobConfig
+        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+            jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
+        }
+
+		if (jobConfig != null) {
+            performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult and EventResults for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+                persistJobResultAndAssociatedEventResults(jobConfig, resultXml, wptserverOfResult, har)
+            }
+        }
 			
 	}
 			
@@ -153,7 +163,8 @@ class LocationAndResultPersisterService implements iListener{
 					log.debug("persisting job result ... DONE")
 				} catch (Exception e) {
 					status.setRollbackOnly()
-					log.error('an error occurred while deleting pending and persisting new JobResult', e)
+					log.error("An error occurred while deleting pending and persisting new JobResult: " +
+                            "job=${jobConfig.label}, test-id=${testId}", e)
 				}
 			}
 					
@@ -264,8 +275,10 @@ class LocationAndResultPersisterService implements iListener{
 		testStepCount.times{nullBasedTeststepIndex ->
 			
 			EventResult.withTransaction { TransactionStatus status ->
+                log.debug("Persisting EventResults of jobRun: ${jobRun}: Start of transaction, transaction status=${status}")
 				try{
 					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
+                    log.debug("Persisting EventResults of jobRun: ${jobRun}: End of transaction, transaction status=${status}")
 				} catch (Exception e) {
 					status.setRollbackOnly()
 					log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)

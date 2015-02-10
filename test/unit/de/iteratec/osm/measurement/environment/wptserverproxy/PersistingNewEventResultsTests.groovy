@@ -32,6 +32,7 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WaterfallEntry
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
@@ -197,6 +198,7 @@ class PersistingNewEventResultsTests {
 		
 		serviceUnderTest.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
 										   getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
 	}
 	
 	@After

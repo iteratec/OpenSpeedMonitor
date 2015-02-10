@@ -17,12 +17,15 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.*
 
 import java.util.concurrent.locks.ReentrantLock
 
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 interface iListener {
 	public String getName()
@@ -51,6 +54,7 @@ class ProxyService {
 	private final ReentrantLock lock = new ReentrantLock()
 	
 	HttpRequestService httpRequestService
+    PerformanceLoggingService performanceLoggingService
 	
 	/**
 	 * Listeners can register as oberservers.
@@ -151,21 +155,26 @@ class ProxyService {
 //			log.trace("har=${har.data.str}")
 
 			log.debug("${this.listener.size} iListener(s) listen to the fetching of results")
-			
-			try {
-				lock.lockInterruptibly();
-								
-				this.listener.each {
-					it.listenToResult(
-							xmlResultResponse,
-							'',
-							wptserverOfResult
-							)
-				}
-				
-			} finally {
-				lock.unlock();
-			}
+
+            try {
+
+                performanceLoggingService.logExecutionTime(DEBUG, "Start of listening to a new successful result of job ${jobLabel}: locking interruptibly", PerformanceLoggingService.IndentationDepth.THREE){
+                    lock.lockInterruptibly();
+                }
+
+                performanceLoggingService.logExecutionTime(DEBUG, "Listening to a new successful result of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.THREE){
+                    this.listener.each {
+                        it.listenToResult(
+                                xmlResultResponse,
+                                '',
+                                wptserverOfResult
+                        )
+                    }
+                }
+
+            } finally {
+                lock.unlock();
+            }
 			
 		}
 		

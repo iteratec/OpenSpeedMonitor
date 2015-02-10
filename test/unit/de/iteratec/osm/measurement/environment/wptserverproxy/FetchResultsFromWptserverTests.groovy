@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.util.PerformanceLoggingService
+
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
@@ -74,6 +76,7 @@ class FetchResultsFromWptserverTests {
 			return restClient
 		}
 		serviceUnderTest.httpRequestService = httpRequestService
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
 
 		createTestDataCommonToAllTests()
 	}
