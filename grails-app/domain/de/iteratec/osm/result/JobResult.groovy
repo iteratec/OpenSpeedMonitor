@@ -132,18 +132,6 @@ class JobResult {
 		captureVideo(nullable: true)
 		downloadResultXml(nullable: true)
 		downloadDetails(nullable: true)
-
-
-
-
-
-
-
-
-
-
-
-
 		frequencyInMin(nullable: true)
 		maxDownloadAttempts(nullable: true)
 
@@ -186,12 +174,12 @@ class JobResult {
 		return (testId?:id)?:super.toString()
 	}
 
-//    public void setJob(Job job){
-//        this.job = job
-//        if(job != null) {
-//            job.addResult(this)
-//        }
-//    }
+    public void setJob(Job job){
+        this.job = job
+        if(job != null) {
+            job.jobResults.add(this)
+        }
+    }
 
 
 	/**

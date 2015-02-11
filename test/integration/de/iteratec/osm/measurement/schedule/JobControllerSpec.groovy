@@ -2,28 +2,30 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.HttpArchive
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.*
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 import org.joda.time.DateTime
 import org.junit.Before
 import org.junit.Test
-import de.iteratec.osm.measurement.script.Script
 
+import static de.iteratec.osm.csi.TestDataUtil.*
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.*
+
+/**
+ * We need an integration test because there is no support for unit test with cascading in Hibernate 3.X
+ *
+ */
 @TestMixin(IntegrationTestMixin)
 class JobControllerSpec extends IntTestWithDBCleanup {
 
     JobController controllerUnderTest = new JobController()
     private int jobIdCount = 0
-    private int serverIdCount = 0
 
     DateTime executionDateBeforeCleanUpDate = new DateTime()
     Job deleteJob
@@ -31,132 +33,90 @@ class JobControllerSpec extends IntTestWithDBCleanup {
 
     @Before
     void setup() {
-        TestDataUtil.createOsmConfig()
+        createOsmConfig()
         createData()
     }
 
     @Test
     void delete() {
         controllerUnderTest.params.id = deleteJob.id.toString()
+        JobResult deleteResult = deleteJob.getJobResults().iterator().next()
+        HttpArchive deleteArchive = deleteResult.getHttpArchives().iterator().next()
+        EventResult deleteEventResult = deleteResult.getEventResults().iterator().next()
+        assertThat(deleteResult, (notNullValue()))
+        assertThat(deleteArchive, (notNullValue()))
+        assertThat(deleteEventResult, (notNullValue()))
+
         int oldJobCount = Job.count()
+
         assert JobResult.count() == 2
         assert EventResult.count() == 2
-        assert MeasuredEvent.count() == 1
         assert HttpArchive.count() == 2
+
+        assertThat(Job.list(), hasItem(deleteJob))
+        assertThat(Job.list(), hasItem(deleteJob))
+        assertThat(EventResult.list(), hasItem(deleteEventResult))
+        assertThat(HttpArchive.list(), hasItem(deleteArchive))
+
         controllerUnderTest.delete()
-        assert Job.count() == oldJobCount-1
-        assert !Job.list().contains(deleteJob)
-        assert JobResult.count() == 1
-        assert EventResult.count() == 1
-        assert MeasuredEvent.count() == 1
-        assert HttpArchive.count() == 1
-        deleteJob.results.each {
-            assert !JobResult.list().contains(it)
-            it.eventResults.each {event ->
-                assert !EventResult.list().contains(event)
-            }
-            it.httpArchives.each {archive->
-                assert !HttpArchive.list().contains(archive)
-            }
-        }
+
+        List<Job> allJobs = Job.list()
+        List<JobResult> allJobResults = JobResult.list()
+        List<EventResult> allEventResults = EventResult.list()
+        List<HttpArchive> allHttpArchives = HttpArchive.list()
+        List<MeasuredEvent> allMeasuredEvents = MeasuredEvent.list()
+
+        assertThat(allJobs, not(hasItem(deleteJob)))
+        assertThat(allHttpArchives, not(hasItem(deleteArchive)))
+        assertThat(allJobResults, not(hasItem(deleteResult)))
+        assertThat(allEventResults, not(hasItem(deleteEventResult)))
+
+        assertThat(allJobs.size(), is(oldJobCount - 1))
+        assertThat(allEventResults.size(), is(1))
+        assertThat(allHttpArchives.size(), is(1))
+        assertThat(allMeasuredEvents.size(), is(1))
+        assert allJobs.size() == oldJobCount - 1
+        assert allJobResults.size() == 1
+        assert allEventResults.size() == 1
+        assert allHttpArchives.size() == 1
+        assert allMeasuredEvents.size() == 1
     }
 
     private void createData() {
-        WebPageTestServer server = createServer()
-        JobGroup group = createJobGroup("TestGroup")
-        Browser browser = createBrowser("FF")
-        Location ffAgent1 = createLocation(browser, server)
-
-        Page homepage = createPage("homepage")
+        WebPageTestServer server = createWebPageTestServer("server - wpt server", "server - wpt server", true, "http://iteratec.de")
+        JobGroup group = createJobGroup("Testgroup", JobGroupType.CSI_AGGREGATION)
+        Browser browser = createBrowser("FF", 0.55)
+        Location ffAgent1 = createLocation(server, "1", browser, true)
+        Page homepage = createPages(["homepage"]).get(0)
 
         Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 
-        deleteJob = createJob(ffAgent1, script, group)
-        for(i in 1..9){
-            createJob(ffAgent1, script, group)
+        deleteJob = createJob("BV${jobIdCount} - Step 01", script, ffAgent1, group, "This is job ${jobIdCount++}...", 5, false, 10)
+        for (i in 1..9) {
+            createJob("BV${jobIdCount} - Step 01", script, ffAgent1, group, "This is job ${jobIdCount++}...", 5, false, 10)
         }
 
-        JobResult jobResultWithBeforeCleanupDate =createJobResult(deleteJob)
+        JobResult jobResultWithBeforeCleanupDate = createJobResult(deleteJob)
 
-        JobResult jobResultWithAfterCleanupDate = createJobResult(createJob(ffAgent1,script,group))
+        JobResult jobResultWithAfterCleanupDate = createJobResult(createJob("BV${jobIdCount} - Step 01", script, ffAgent1, group, "This is job ${jobIdCount++}...", 5, false, 10))
 
-        MeasuredEvent measuredEvent = new MeasuredEvent()
-        measuredEvent.setName('Test event')
-        measuredEvent.setTestedPage(homepage)
-        measuredEvent.save(failOnError: true)
+        MeasuredEvent measuredEvent = createMeasuredEvent('Test event', homepage).save(failOnError: true)
 
         String eventResultTag = "$group.id;$measuredEvent.id;$homepage.id;$browser.id;$ffAgent1.id";
 
-        EventResult eventResult1 = createEventResult(jobResultWithBeforeCleanupDate,eventResultTag)
-        jobResultWithBeforeCleanupDate.eventResults.add(eventResult1)
+        EventResult eventResult1 = createEventResult(jobResultWithBeforeCleanupDate, eventResultTag)
+        jobResultWithBeforeCleanupDate.addToEventResults(eventResult1)
         jobResultWithBeforeCleanupDate.save(failOnError: true)
 
-        new HttpArchive(jobResult: jobResultWithBeforeCleanupDate).save(failOnError: true)
-
-        EventResult eventResult2 =createEventResult(jobResultWithAfterCleanupDate,eventResultTag)
-        jobResultWithAfterCleanupDate.eventResults.add(eventResult2)
+        createHttpArchive(jobResultWithBeforeCleanupDate)
+        EventResult eventResult2 = createEventResult(jobResultWithAfterCleanupDate, eventResultTag)
+        jobResultWithAfterCleanupDate.addToEventResults(eventResult2)
         jobResultWithAfterCleanupDate.save(failOnError: true)
 
-        new HttpArchive(jobResult: jobResultWithAfterCleanupDate).save(failOnError: false)
+        createHttpArchive(jobResultWithAfterCleanupDate)
     }
 
-    private WebPageTestServer createServer() {
-        new WebPageTestServer(
-                baseUrl: "http://server${serverIdCount}.wpt.server.de",
-                active: true,
-                label: "server ${serverIdCount++} - wpt server",
-                proxyIdentifier: "server ${serverIdCount++} - wpt server"
-        ).save(failOnError: true);
-    }
-
-    private static JobGroup createJobGroup(String groupName) {
-        new JobGroup(
-                name: groupName,
-                groupType: JobGroupType.CSI_AGGREGATION
-        ).save(failOnError: true)
-    }
-
-    private static Browser createBrowser(String browserName) {
-        new Browser(
-                name: browserName,
-                weight: 0.55).save(failOnError: true)
-
-    }
-
-    private static Location createLocation(Browser browser, WebPageTestServer server) {
-        new Location(
-                active: true,
-                valid: 1,
-                location: 'physNetLabAgent01-FF',
-                label: 'physNetLabAgent01 - FF up to date',
-                browser: browser,
-                wptServer: server
-        ).save(failOnError: true)
-    }
-
-    private static Page createPage(String pageName) {
-        new Page(
-                name: pageName,
-                weight: 0.5
-        ).save(failOnError: true)
-    }
-
-    private Job createJob(Location agent, Script script, JobGroup group) {
-        new Job(
-                id: jobIdCount++,
-                active: false,
-                label: "BV${jobIdCount} - Step 01",
-                description: "This is job ${jobIdCount++}...",
-                location: agent,
-                frequencyInMin: 5,
-                runs: 1,
-                jobGroup: group,
-                script: script,
-                maxDownloadTimeInMinutes: 60
-        ).save(failOnError: true)
-    }
-
-    private JobResult createJobResult(Job job){
+       private JobResult createJobResult(Job job) {
         new JobResult(
                 job: job,
                 date: executionDateBeforeCleanUpDate.toDate(),
@@ -172,7 +132,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         ).save(failOnError: true)
     }
 
-    private static EventResult createEventResult(JobResult jobResult, eventResultTag){
+    private static EventResult createEventResult(JobResult jobResult, eventResultTag) {
         new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,

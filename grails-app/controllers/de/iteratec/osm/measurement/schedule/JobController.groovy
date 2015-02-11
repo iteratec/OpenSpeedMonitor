@@ -174,7 +174,6 @@ class JobController {
 		def flashMessageArgs = [getJobI18n(), job.label]
 
 		try {
-            job.results.clear()
 			job.delete(flush: true)
 			flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
 			redirect(action: "list")
