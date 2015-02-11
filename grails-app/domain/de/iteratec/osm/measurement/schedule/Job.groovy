@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.result.JobResult
 import grails.util.Environment
 
 import org.grails.databinding.BindUsing
@@ -149,6 +150,8 @@ class Job implements Taggable {
 	boolean provideAuthenticateInformation
 	String authUsername
 	String authPassword
+    Collection<JobResult> results = []
+    static hasMany = [results: JobResult]
 	
 	/**
 	 * The {@link JobGroup} this job is assigned to <em>or</em> 
@@ -217,6 +220,7 @@ class Job implements Taggable {
 	static mapping = {
 		sort 'label':'asc'
 		customConnectivityProfile defaultValue: false
+        cascade: "all-delete-orphan"
 	}
 	
 	def beforeValidate() {
@@ -240,6 +244,9 @@ class Job implements Taggable {
 			}
 		}
 	}
+    public void addResult(JobResult result){
+        results.add(result)
+    }
 	
 	def afterInsert() {
 		performQuartzScheduling(active)

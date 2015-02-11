@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.result
 
-
+import org.apache.tools.ant.taskdefs.condition.Http
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -58,8 +58,10 @@ class JobResult {
 	 * one job-results.
 	 * </p>
 	 */
-	Collection<EventResult> eventResults = []
-	static hasMany = [eventResults: EventResult]
+    Collection<EventResult> eventResults = []
+    Collection<HttpArchive> httpArchives = []
+	static hasMany = [eventResults: EventResult,httpArchives:HttpArchive]
+
 
 	/** timestamp of execution */
 	Date date
@@ -130,6 +132,18 @@ class JobResult {
 		captureVideo(nullable: true)
 		downloadResultXml(nullable: true)
 		downloadDetails(nullable: true)
+
+
+
+
+
+
+
+
+
+
+
+
 		frequencyInMin(nullable: true)
 		maxDownloadAttempts(nullable: true)
 
@@ -171,6 +185,14 @@ class JobResult {
 	String toString(){
 		return (testId?:id)?:super.toString()
 	}
+
+//    public void setJob(Job job){
+//        this.job = job
+//        if(job != null) {
+//            job.addResult(this)
+//        }
+//    }
+
 
 	/**
 	 * Returns a Event result identified by it's MeasuredEvent, CachedView and Run.
@@ -243,4 +265,8 @@ class JobResult {
 		def str = state[httpStatusCode]
 		return str ?: 'Unknown'
 	}
+
+    public void addHttpArchive(HttpArchive httpArchive) {
+            if(!httpArchives.contains(httpArchive)) httpArchives.add(httpArchive)
+    }
 }
