@@ -52,6 +52,9 @@ modules = {
             resource url: 'js/highcharts.js'
             resource url: 'js/highchart-taglib.js'
             resource url: 'js/exporting.js'
+            resource url: 'js/charts/rgbcolor.js'
+            resource url: 'js/charts/StackBlur.js'
+            resource url: 'js/charts/canvg.js'
         }
         if (grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs.contains(ChartingLibrary.RICKSHAW)) {
             resource url: 'js/d3/d3.v3.js'
@@ -62,6 +65,7 @@ modules = {
             resource url: 'js/rickshaw/html2canvas.svg.js'
         }
 
+        resource url: 'js/charts/chart-export.js'
         resource url: 'js/charts/chart-adjustment.js'
     }
     /**

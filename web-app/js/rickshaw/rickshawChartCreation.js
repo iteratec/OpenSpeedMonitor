@@ -983,10 +983,10 @@ function ChartExporter(args) {
       });
       deferrerCollection.push($.Deferred());
       self.renderDomElementOnNewCanvasWithDelay(document.querySelector(".rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
-  
+
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var retVal = self.prepareNewBlankCanvas();
+        var retVal = prepareNewBlankCanvas(".graph");
         var canvas = retVal.canvas;
         var ctx = retVal.ctx;
         
@@ -1025,8 +1025,8 @@ function ChartExporter(args) {
         
         //convert to image
         try {
-          self.downloadCanvas(canvas, "png");
-          self.removeObjectFromDom("#canvas_everything_merged");
+          downloadCanvas(canvas, "png");
+//          removeObjectFromDom("#canvas_everything_merged");
         } 
         catch(err) {} // handle IE        
       });
@@ -1115,7 +1115,6 @@ function ChartExporter(args) {
         canvas.setAttribute('id', newCanvasId);
         canvas.setAttribute('style', "display:none");
         document.body.appendChild(canvas);
-        var date  = new Date();
         deferrer.resolve();
       },
       width: 3000,
@@ -1152,7 +1151,6 @@ function ChartExporter(args) {
   }
 
   this.mergeCanvases = function(originalElementId, sourceCanvasId, targetContext, bodyRect, graphOffsetTop, graphOffsetLeft) {
-    var date  = new Date();
     curElemRect = document.querySelector(originalElementId).getBoundingClientRect();
     curElemOffsetTop = curElemRect.top - bodyRect.top;
     curElemOffsetLeft = curElemRect.left - bodyRect.left;
@@ -1160,7 +1158,7 @@ function ChartExporter(args) {
     distanceLeft = curElemOffsetLeft - graphOffsetLeft;
     useMe = document.querySelector(sourceCanvasId);
     targetContext.drawImage(useMe,distanceLeft,distanceTop);
-    self.removeObjectFromDom(sourceCanvasId);
+    removeObjectFromDom(sourceCanvasId);
   }
 
   this.mergeCanvasesFromSourceObject = function(originalElement, sourceCanvasId, targetContext, bodyRect, graphOffsetTop, graphOffsetLeft) {
@@ -1171,7 +1169,7 @@ function ChartExporter(args) {
     distanceLeft = curElemOffsetLeft - graphOffsetLeft;
     useMe = document.querySelector(sourceCanvasId);
     targetContext.drawImage(useMe,distanceLeft,distanceTop);
-    self.removeObjectFromDom(sourceCanvasId);
+    removeObjectFromDom(sourceCanvasId);
   }
 
   this.mergeLabelCanvases = function(originalElement, sourceCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft) {
@@ -1186,66 +1184,8 @@ function ChartExporter(args) {
     ctx.rotate(-90*Math.PI/180);
     useMe = document.querySelector(sourceCanvasId);
     ctx.drawImage(useMe, (((originalElement.width()) / 2) * -1), (((originalElement.height()) / 2) * -1));
-    self.removeObjectFromDom(sourceCanvasId);
+    removeObjectFromDom(sourceCanvasId);
     ctx.restore();
-  }
-
-  this.constructFileName = function(fileType) {
-    var currentdate = new Date(); 
-    var datetime = "" + currentdate.getFullYear() + "-"  
-                    + (currentdate.getMonth()+1)  + "-" 
-                    + currentdate.getDate() + "_"
-                    + currentdate.getHours() + "-"  
-                    + currentdate.getMinutes() + "-" 
-                    + currentdate.getSeconds() + "";
-    
-    var curAreaName = (window.location.pathname.indexOf("eventResultDashboard") > -1) ? "event" : "csi";
-    return ("osm_" + curAreaName + "_" + datetime + "." + fileType + "");
-  }
-
-  this.prepareNewBlankCanvas = function() {
-    var canvas = document.createElement('canvas');
-    canvas.setAttribute('id', 'canvas_everything_merged');
-    canvas.setAttribute('style', "display:none");
-    canvas.width = 3000;
-    canvas.height = 5000;
-    document.body.appendChild(canvas);
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-    ctx.canvas.width  = $(".graph").width();
-    ctx.canvas.height = $(".graph").height();
-    ctx.globalCompositeOperation = "destination-under";
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    return {
-      canvas: canvas,
-      ctx: ctx
-    };
-  }
-
-  this.removeObjectFromDom = function(objectId) {
-    useMe = document.querySelector(objectId);
-    useMe.parentNode.removeChild(useMe);
-  }
-
-  this.downloadCanvas = function(canvas, fileType) { // currently, most browsers only support toDataURL with mimeTypes 'jpeg' and 'png'
-    var canvasdata = canvas.toDataURL("image/" + fileType + "");      
-    var pngimg = '<img src="'+canvasdata+'">'; 
-    
-    newA = document.createElement('a');
-    newA.setAttribute('href', '');
-    newA.setAttribute('id', 'converteddataurl');
-    newA.setAttribute('style', "display:none");
-    document.body.appendChild(newA);
-    
-    var a = document.getElementById("converteddataurl");
-    
-    var newFileName = self.constructFileName(fileType);
-    a.download = newFileName;
-    a.href = canvasdata;
-    a.click();
-    removeObjectFromDom("#converteddataurl");
   }
   
   this.initialize(args);
