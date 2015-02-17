@@ -84,5 +84,12 @@
 				</div>
 			</div>
 		</div>
+	
+    <div class="accordion-footer">
+    </div>
 	</div>
 </div>
+<!-- rkrkrk DEBUG -->
+<g:if test="${params.rkDebug == 'true'}">
+<canvas id="canvas_everything_merged" width="1170" height="400"></canvas>
+</g:if>

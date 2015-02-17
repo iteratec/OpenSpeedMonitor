@@ -30,5 +30,9 @@
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
+<!-- rkrkrk DEBUG -->
+<%@ page import="de.iteratec.osm.report.chart.ChartingLibrary"%>
+<g:if test="${chartRenderingLibrary != null && ((chartRenderingLibrary != ChartingLibrary.HIGHCHARTS) || (params.rkDebug == 'true'))}">
+  <button class="span btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.save.name"/></button>
+</g:if>
 </div>
-
