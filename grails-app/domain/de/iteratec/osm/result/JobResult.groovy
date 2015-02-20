@@ -17,7 +17,8 @@
 
 package de.iteratec.osm.result
 
-
+import grails.gorm.DetachedCriteria
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -243,4 +244,61 @@ class JobResult {
 		def str = state[httpStatusCode]
 		return str ?: 'Unknown'
 	}
+
+    public List<HttpArchive> getHttpArchives() {
+        return HttpArchive.findAllByJobResult(this)
+    }
+
+    /**
+     *
+     * @return
+     */
+    def beforeDelete() {
+
+        HttpArchive.withNewSession { session ->
+            def dc = new DetachedCriteria(HttpArchive).build {
+                eq 'jobResult', this
+            }
+            int count = dc.count()
+
+            int batchSize = 50
+            0.step(count, batchSize) { offset ->
+                dc.list(offset: offset, max: batchSize).each { HttpArchive httpArchive ->
+                    HttpArchive.withTransaction { status ->
+                        try {
+                            log.info("... try to delete HttpArchive")
+                            httpArchive.delete(flush: true)
+                        } catch (Exception e) {
+                            log.error("httpArchive could not deleted")
+                        }
+                    }
+                }
+                session.flush()
+                session.clear()
+            }
+        }
+
+        EventResult.withNewSession { session ->
+            def dc = new DetachedCriteria(EventResult).build {
+                eq 'jobResultDate', this.date
+            }
+            int count = dc.count()
+
+            int batchSize = 50
+            0.step(count, batchSize) { offset ->
+                dc.list(offset: offset, max: batchSize).each { EventResult eventResult ->
+                    EventResult.withTransaction { status ->
+                        try {
+                            log.info("... try to delete EventResult")
+                            eventResult.delete(flush: true)
+                        } catch (Exception e) {
+                            log.error("EventResult could not deleted")
+                        }
+                    }
+                }
+                session.flush()
+                session.clear()
+            }
+        }
+    }
 }

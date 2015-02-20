@@ -40,9 +40,10 @@ class DbCleanupJob {
 		Date toDeleteWaterfallsBefore = new DateTime().minusWeeks(configService.getDetailDataStorageTimeInWeeks()).toDate()
         dbCleanupService.deleteWaterfallsBefore(toDeleteWaterfallsBefore)
 
-        if(configService.getMaxDataStorageTimeInMonths() > 0){
-            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-            dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
-        }
+
+//        if(configService.getMaxDataStorageTimeInMonths() > 0){
+//            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
+//            dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
+//        }
 	}
 }

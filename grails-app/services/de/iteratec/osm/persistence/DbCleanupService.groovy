@@ -17,7 +17,11 @@
 
 package de.iteratec.osm.persistence
 
+import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
@@ -29,8 +33,11 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 class DbCleanupService {
 
     static transactional = true
-	
+
 	EventResultDaoService eventResultDaoService
+    PerformanceLoggingService performanceLoggingService
+
+    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
 	/**
 	 * Deletes all {@link WebPerformanceWaterfall}s and associated {@link WaterfallEntry}s before date toDeleteBefore.
@@ -94,14 +101,61 @@ class DbCleanupService {
     void deleteResultsDataBefore(Date toDeleteBefore){
         log.info "Deleting all results-data before: ${toDeleteBefore}"
 
-        //deleting code
-        try {
-            JobResult.list().findAll { it.date.before(toDeleteBefore) }*.delete(flush: true)
-        }catch (org.springframework.dao.DataIntegrityViolationException e) {
-            log.error("Could not delete JobResults recursive")
+        //TODO: batching does not persist in database
+        // use gorm-batching
+        JobResult.withSession { session ->
+            def dc = new DetachedCriteria(JobResult).build {
+                lt 'date', toDeleteBefore
+            }
+            int count = dc.count()
+
+            //batch size -> hibernate doc recommends 10..50
+            int batchSize = 50
+            0.step(count, batchSize) { offset ->
+                dc.list(offset: offset, max: batchSize).each { JobResult jobResult ->
+                    JobResult.withTransaction { status ->
+                        try {
+                            log.info("try to delete JobResult with dependened objects... delete JobResult: {$jobResult.id}")
+                            jobResult.delete(flush: true)
+                        } catch (Exception e) {
+                            log.error("JobResult could not deleted")
+                            status.setRollbackOnly()
+                        }
+                    }
+                }
+                //clear hibernate session first-level cache
+                session.flush()
+                session.clear()
+                propertyInstanceMap.getProperties().clear()
+            }
+        }
+
+        MeasuredValue.withSession { session ->
+            def dc = new DetachedCriteria(MeasuredValue).build {
+                lt 'started', toDeleteBefore
+            }
+            int count = dc.count()
+
+            int batchSize = 50
+            0.step(count, batchSize) { offset ->
+                dc.list(offset: offset, max: batchSize).each { MeasuredValue measuredValue ->
+                    MeasuredValue.withTransaction { status ->
+                        try {
+                            log.info("try to delete MeasuredValue with dependened objects... delete MeasuredValue: {$measuredValue.id}")
+                            measuredValue.delete(flush: true)
+                        } catch (Exception e) {
+                            log.error("MeasuredValue could not deleted")
+                            status.setRollbackOnly()
+                        }
+                    }
+                }
+                session.flush()
+                session.clear()
+                propertyInstanceMap.getProperties().clear()
+            }
         }
 
         log.info "... DONE"
     }
-	
 }
+

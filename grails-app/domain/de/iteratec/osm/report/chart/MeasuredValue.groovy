@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.gorm.DetachedCriteria
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.csi.CsiValue
@@ -288,5 +290,36 @@ class MeasuredValue implements CsiValue {
 	public List<Long> retrieveUnderlyingEventResultIds(){
 		return this.getResultIdsAsList()
 	}
-	
+
+    public List<MeasuredValueUpdateEvent> getMeasuredValueUpdateEvents() {
+        return MeasuredValueUpdateEvent.findAllByMeasuredValueId(this.ident())
+    }
+
+    def beforeDelete() {
+
+        MeasuredValue.withNewSession { session ->
+            def dc = new DetachedCriteria(MeasuredValueUpdateEvent).build {
+                eq 'measuredValueId', this.id
+            }
+            def count = dc.count()
+
+            def batchSize = 50
+            0.step(count, batchSize) { offset ->
+                dc.list(offset: offset, max: batchSize).each { MeasuredValueUpdateEvent measuredValueUpdateEvent ->
+                    MeasuredValueUpdateEvent.withTransaction { status ->
+                        try {
+                            log.info("... try to delete MeasuredValueUpdateEvent")
+                            measuredValueUpdateEvent.delete(flush: true)
+                        } catch (Exception e) {
+                            log.error("MeasuredValueUpdateEvent could not deleted")
+                            status.setRollbackOnly()
+                        }
+
+                    }
+                }
+                session.flush()
+                session.clear()
+            }
+        }
+    }
 }
