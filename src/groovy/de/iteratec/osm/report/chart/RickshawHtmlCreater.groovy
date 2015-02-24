@@ -117,22 +117,24 @@ class RickshawHtmlCreater {
 		def sw = new StringWriter()
 		def measurandGroup = graph.measurandGroup.toString();
 		def prefix = ""
+        String testingAgent
 
 		sw << """[ """
-		graph.getPoints().each {
+		graph.getPoints().each {eachPoint ->
 
 			def url = "undefined"
-			def measuredValue = it.measuredValue
+			def measuredValue = eachPoint.measuredValue
 
 			if(measurandGroup == "LOAD_TIMES" || measurandGroup == "REQUEST_SIZES" ) {
 				measuredValue = measuredValue / 1000;
 			}
 
-			if (it.sourceURL != null) {
-				url = it.sourceURL.toString();
+			if (eachPoint.sourceURL != null) {
+				url = eachPoint.sourceURL.toString();
 			}
 
-			sw << prefix +""" { x: ${it.time / 1000}, y: ${measuredValue}, url: "${url}" } """
+            testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
+			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${measuredValue}, url: "${url}" ${testingAgent} }"""
 			prefix = ","
 		}
 		sw << """ ]"""

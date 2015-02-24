@@ -48,7 +48,7 @@ class DbCleanupService {
 		log.info "Deleting all waterfalls before: ${toDeleteBefore}"
 		
 //		deleteWaterfallsBeforeViaHql(toDeleteBefore)
-//		deleteWaterfallsBeforeViaGormBatching(toDeleteBefore)
+//		deleteWaterfallsBeforeViaGormBatching(JobtoDeleteBefore)
 		
 		log.info "... DONE"
     }

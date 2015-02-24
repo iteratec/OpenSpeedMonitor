@@ -578,7 +578,7 @@ class CsiDashboardController {
 				DateTime time=new DateTime(point.time)
 				time=time.plusWeeks(1)
 				
-				OsmChartPoint movedPoint=new OsmChartPoint(time.toDate().getTime(), point.measuredValue, point.countOfAggregatedResults, point.sourceURL)
+				OsmChartPoint movedPoint=new OsmChartPoint(time.toDate().getTime(), point.measuredValue, point.countOfAggregatedResults, point.sourceURL, point.testingAgent)
 				graph.getPoints().add(movedPoint)
 			}
 		}

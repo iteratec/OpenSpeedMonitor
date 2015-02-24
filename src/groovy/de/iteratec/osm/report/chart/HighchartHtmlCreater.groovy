@@ -152,6 +152,7 @@ class HighchartHtmlCreater {
 				window.CHARTLIB = "HIGHCHARTS";
 				var data = ["""
 
+        String testingAgent
 		Integer labelPos=0;
 		for (OsmChartGraph eachGraph : data) {
 
@@ -165,13 +166,14 @@ class HighchartHtmlCreater {
 					sw << "[parseDate(\"" + eachPoint.time + "\")," + eachPoint.measuredValue + "],"
 				}
 				else {
+                    testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
+                    sw << '{x:' + eachPoint.time + ',y:' + eachPoint.measuredValue + testingAgent
 					if( eachPoint.hasAnSourceURL() && openDatapointLinksInNewWindow ) {
-						sw << '{x:' + eachPoint.time + ',y:' + eachPoint.measuredValue + ',events:{click:function(e){window.open(\'' + eachPoint.sourceURL + '\');}}' + '},'
+						sw << ',events:{click:function(e){window.open(\'' + eachPoint.sourceURL + '\');}}'
 					}else if( eachPoint.hasAnSourceURL() && !openDatapointLinksInNewWindow ){
-						sw << '{x:' + eachPoint.time + ',y:' + eachPoint.measuredValue + ',events:{click:function(e){window.location.href = \'' + eachPoint.sourceURL + '\';}}' + '},'
-					}else {
-						sw << '{x:' + eachPoint.time + ',y:' + eachPoint.measuredValue + '},'
+						sw << ',events:{click:function(e){window.location.href = \'' + eachPoint.sourceURL + '\';}}'
 					}
+                    sw << '},'
 				}
 			}
 			sw << "]},";

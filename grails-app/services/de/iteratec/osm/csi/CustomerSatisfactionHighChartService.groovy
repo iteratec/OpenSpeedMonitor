@@ -198,7 +198,7 @@ class CustomerSatisfactionHighChartService {
 				double value = valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
 				
 				URL linkForPoint = getLinkFor(eachCsiVal)
-				points.add(new OsmChartPoint(curTimestamp, value, eachCsiVal.countResultIds(), linkForPoint))
+				points.add(new OsmChartPoint(curTimestamp, value, eachCsiVal.countResultIds(), linkForPoint, null))
 			}
 		}
 
@@ -369,8 +369,8 @@ class CustomerSatisfactionHighChartService {
 		CsTargetGraph actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
 		
 		if (actualTargetGraph) {
-			OsmChartPoint fromPoint = new OsmChartPoint(getHighchartCompatibleTimestampFrom(fromDate.toDate()), (double) actualTargetGraph.getPercentOfDate(fromDate), 1, null);
-			OsmChartPoint toPoint = new OsmChartPoint(getHighchartCompatibleTimestampFrom(toDate.toDate()), (double) actualTargetGraph.getPercentOfDate(toDate), 1, null);
+			OsmChartPoint fromPoint = new OsmChartPoint(getHighchartCompatibleTimestampFrom(fromDate.toDate()), (double) actualTargetGraph.getPercentOfDate(fromDate), 1, null, null);
+			OsmChartPoint toPoint = new OsmChartPoint(getHighchartCompatibleTimestampFrom(toDate.toDate()), (double) actualTargetGraph.getPercentOfDate(toDate), 1, null, null);
 			
 			OsmChartGraph graph=new OsmChartGraph();
 			graph.setLabel(actualTargetGraph.label);

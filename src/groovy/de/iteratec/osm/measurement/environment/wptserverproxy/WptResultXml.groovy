@@ -47,6 +47,10 @@ class WptResultXml {
 		return responseNode.data.testId.toString()
 	}
 
+    String getTestAgent() {
+        return responseNode.data.tester.toString()
+    }
+
 	Integer getStatusCodeOfWholeTest() {
 		return responseNode.statusCode.toInteger()
 	}

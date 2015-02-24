@@ -2439,7 +2439,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 	},
 
-	formatter: function(series, x, y, formattedX, formattedY, d) {
+	formatter: function(series, x, y, formattedX, formattedY, d, testAgent) {
 		return series.name + ':&nbsp;' + formattedY;
 	},
 
@@ -2509,7 +2509,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 				distance: distance,
 				order: j,
 				name: series.name,
-				url: value.url
+				url: value.url,
+                testAgent: value.testAgent
 			};
 
 			if (!nearestPoint || distance < nearestPoint.distance) {
@@ -2590,7 +2591,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		var series = point.series;
 		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
 
-		item.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point);
+		item.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, point.testAgent);
 		item.style.top = this.graph.y(point.value.y0 + point.value.y) + 'px';
 
 		this.element.appendChild(item);

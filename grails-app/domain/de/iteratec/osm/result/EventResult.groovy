@@ -117,6 +117,8 @@ class EventResult implements CsiValue {
 	 */
 	Integer speedIndex
 	Integer visuallyCompleteInMillisecs
+    /** tester from result xml */
+    String testAgent
 
 	/**
 	 * This is value is to be used for {@link #speedIndex} if no value is
@@ -173,6 +175,8 @@ class EventResult implements CsiValue {
 
 		tag(nullable: true)
 		webPerformanceWaterfall(nullable: true)
+
+        testAgent(nullable: true)
 	}
 
 	static mapping = {

@@ -51,10 +51,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph=new OsmChartGraph();
 		graph.setLabel("job1");
@@ -139,10 +139,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph=new OsmChartGraph();
 		graph.setLabel("job1");
@@ -246,10 +246,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph1=new OsmChartGraph();
 		graph1.setMeasurandGroup(MeasurandGroup.LOAD_TIMES)
@@ -361,10 +361,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph1=new OsmChartGraph();
 		graph1.setMeasurandGroup(MeasurandGroup.LOAD_TIMES)

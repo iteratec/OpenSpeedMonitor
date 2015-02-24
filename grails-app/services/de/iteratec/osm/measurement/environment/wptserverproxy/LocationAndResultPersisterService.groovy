@@ -234,20 +234,22 @@ class LocationAndResultPersisterService implements iListener{
 		Date testCompletion = resultXml.getCompletionDate()
 		jobConfig.lastRun = testCompletion
 		jobConfig.save(failOnError: true)
+
 		JobResult result = new JobResult(
-		job: jobConfig,
-		date: testCompletion,
-		testId: testId,
-		httpStatusCode: jobRunStatus,
-		jobConfigLabel: jobConfig.label,
-		jobConfigRuns: jobConfig.runs,
-		wptServerLabel: jobConfig.location.wptServer.label,
-		wptServerBaseurl: jobConfig.location.wptServer.baseUrl,
-		locationLabel: jobConfig.location.label,
-		locationLocation: jobConfig.location.location,
-		locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer, 
-		locationBrowser: jobConfig.location.browser.name,
-		jobGroupName: jobConfig.jobGroup.name)
+            job: jobConfig,
+            date: testCompletion,
+            testId: testId,
+            httpStatusCode: jobRunStatus,
+            jobConfigLabel: jobConfig.label,
+            jobConfigRuns: jobConfig.runs,
+            wptServerLabel: jobConfig.location.wptServer.label,
+            wptServerBaseurl: jobConfig.location.wptServer.baseUrl,
+            locationLabel: jobConfig.location.label,
+            locationLocation: jobConfig.location.location,
+            locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer,
+            locationBrowser: jobConfig.location.browser.name,
+            jobGroupName: jobConfig.jobGroup.name
+        )
 		
 		//new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
 		result.setDescription('')
@@ -436,6 +438,7 @@ class LocationAndResultPersisterService implements iListener{
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}
+        result.testAgent=jobRun.testAgent
 
 		jobRun.eventResults.add(result)
 		// FIXME: 2014-01-27-nku

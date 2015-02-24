@@ -66,7 +66,9 @@ class JobResult {
 	Date date
 	/** wpt-test-id */
 	String testId
-	
+    /** tester from result xml */
+    String testAgent
+
 	/** An optional String containing error messages from WPT server **/
 	String wptStatus
 	/** status code returned by WPT server (such as 200, 101, ...) **/
@@ -118,6 +120,7 @@ class JobResult {
 
 	static constraints = {
 		testId()
+        testAgent(nullable: true)
 		date()
 		wptStatus(nullable: true)
 		httpStatusCode()

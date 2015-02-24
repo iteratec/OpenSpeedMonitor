@@ -76,9 +76,11 @@ function createSplineChart(div, title, yType, data, maxValue, lineType, measurem
                 max: maxValue
             },
             tooltip: {
-         		formatter: function() { 
-        		return '<b>'+ this.series.name +'</b><br />'+ 
-				Highcharts.dateFormat('%e. %b %H:%M %Z', this.x) +':- '+ this.y +' ' + measurementUnit; }
+                crosshairs: [true, true],
+         		formatter: function() {
+                    var testAgentPart = this.point.testAgent ? '<br/>Test Agent: ' + this.point.testAgent : '';
+                    return '<b>'+ this.series.name +'</b><br/>'+
+				        Highcharts.dateFormat('%e. %b %H:%M %Z', this.x) +':- '+ this.y +' ' + measurementUnit + testAgentPart; }
 
             },
             plotOptions: plotOptions,
@@ -462,9 +464,11 @@ function createChartForExport(
 			}
 		},
 		tooltip: {
-			formatter: function() { 
-				return '<b>'+ this.series.name +'</b><br />'+ 
-				Highcharts.dateFormat('%e. %b %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit; }
+            crosshairs: [true, true],
+			formatter: function() {
+                var testAgentPart = this.point.testAgent ? '<br/>Test Agent: ' + this.point.testAgent : '';
+				return '<b>'+ this.series.name +'</b><br/>'+
+				    Highcharts.dateFormat('%e. %b %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit + testAgentPart; }
 		
 		},
 		plotOptions: plotOptions,
@@ -513,9 +517,11 @@ function createChartWithFixYAxis(
 			max: yAxisMax
 		},
 		tooltip: {
-			formatter: function() { 
-				return '<b>'+ this.series.name +'</b><br />'+ 
-				Highcharts.dateFormat('%e.%m.%Y %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit; }
+            crosshairs: [true, true],
+			formatter: function() {
+                var testAgentPart = this.point.testAgent ? '<br/>Test Agent: ' + this.point.testAgent : '';
+				return '<b>'+ this.series.name +'</b><br />'+
+				    Highcharts.dateFormat('%e.%m.%Y %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit + testAgentPart; }
 		},
 		plotOptions: plotOptions,
 		exporting: {
@@ -556,9 +562,11 @@ function createChartWithFixYAxisForMultipleYAxis(
 		},
 		yAxis: getYAxisArrayFix(yTypes, yAxisMaxs, yAxisMin),
 		tooltip: {
-			formatter: function() { 
-				return '<b>'+ this.series.name +'</b><br />'+ 
-				Highcharts.dateFormat('%e.%m.%Y %H:%M', this.x) +' | '+ this.y; }
+            crosshairs: [true, true],
+			formatter: function() {
+                var testAgentPart = this.point.testAgent ? '<br/>Test Agent: ' + this.point.testAgent : '';
+				return '<b>'+ this.series.name +'</b><br />'+
+				    Highcharts.dateFormat('%e.%m.%Y %H:%M', this.x) +' | ' + this.y + testAgentPart; }
 		},
 		plotOptions: plotOptions,
 		exporting: {
@@ -604,9 +612,11 @@ function createChartWithScalableYAxis(
 			}
 		},
 		tooltip: {
-			formatter: function() { 
-				return '<b>'+ this.series.name +'</b><br />'+ 
-				Highcharts.dateFormat('%e. %b %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit; }
+            crosshairs: [true, true],
+			formatter: function() {
+                var testAgentPart = this.point.testAgent ? '<br/>Test Agent: ' + this.point.testAgent : '';
+				return '<b>'+ this.series.name +'</b><br />'+
+				    Highcharts.dateFormat('%e. %b %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit + testAgentPart; }
 		
 		},
 		plotOptions: plotOptions,
@@ -651,9 +661,11 @@ function createChartWithMultipleScalableYAxis(
 		},
 		yAxis: getYAxisArrayScalable(yTypes),
 		tooltip: {
-			formatter: function() { 
-				return '<b>'+ this.series.name +'</b><br />'+ 
-				Highcharts.dateFormat('%e. %b %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit; }
+            crosshairs: [true, true],
+			formatter: function() {
+                var testAgentPart = this.point.testAgent ? '<br/>Test Agent: ' + this.point.testAgent : '';
+                return '<b>'+ this.series.name +'</b><br />'+
+				    Highcharts.dateFormat('%e. %b %H:%M', this.x) +' | '+ this.y +' ' + measurementUnit + testAgentPart; }
 		
 		},
 		plotOptions: plotOptions,
