@@ -660,11 +660,11 @@ Rickshaw.Graph = function(args) {
 	};
 
 	this.onUpdate = function(callback) {
-	  if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-    } else {
-      console.log("rk1");
+//	  if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
+//    } else {
+//      console.log("rk1");
       this.updateCallbacks.push(callback);
-    }	  
+//    }	  
 	};
 
 	this.onConfigure = function(callback) {
@@ -1878,11 +1878,11 @@ Rickshaw.Graph.Axis.X = function(args) {
 		}
 
 		 this.graph.onUpdate( function() { 
-       if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-       } else {
-         console.log("rk7");
+//       if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
+//       } else {
+//         console.log("rk7");
          self.render();
-       }
+//       }
 		 });
 	};
 
@@ -2004,11 +2004,11 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 		var self = this;
 		
 		 this.graph.onUpdate( function() {
-       if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-       } else {
-         console.log("rk6");
+//       if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
+//       } else {
+//         console.log("rk6");
          self.render();
-       }
+//       }
 		 } );
 	},
 
@@ -2325,7 +2325,7 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
 		
                 var label = line.element.getElementsByTagName('span')[0];
                 label.onclick = function(e){
-                        updatesSuspended = true;
+//                        updatesSuspended = true;
 
                         var disableAllOtherLines = line.series.disabled;
                         if ( ! disableAllOtherLines ) {
@@ -2367,9 +2367,9 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
                                 });
 
                         }
-                        updatesSuspended = false;
+//                        updatesSuspended = false;
                         //trigger render
-                        self.graph.render();
+//                        self.graph.render();
                 };
 
 	};
@@ -3143,11 +3143,11 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			self.previews.push(graph);
 			
 			parent.onUpdate(function() { 
-			  if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-	       } else {
-  			  console.log("rk2");
+//			  if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
+//	       } else {
+//  			  console.log("rk2");
   			  graph.render(); self.render();
-			  }
+//			  }
 			});
 
 			parent.onConfigure(function(args) { 
