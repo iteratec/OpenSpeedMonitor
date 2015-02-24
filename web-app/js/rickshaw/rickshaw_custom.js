@@ -660,11 +660,7 @@ Rickshaw.Graph = function(args) {
 	};
 
 	this.onUpdate = function(callback) {
-//	  if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-//    } else {
-//      console.log("rk1");
       this.updateCallbacks.push(callback);
-//    }	  
 	};
 
 	this.onConfigure = function(callback) {
@@ -1749,7 +1745,7 @@ Rickshaw.Graph.Annotate = function(args) {
 		}, this );
 	};
 
-	this.graph.onUpdate( function() { console.log("rk9");self.update() } );
+	this.graph.onUpdate( function() { self.update() } );
 };
 Rickshaw.namespace('Rickshaw.Graph.Axis.Time');
 
@@ -1833,7 +1829,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 		} );
 	};
 
-	this.graph.onUpdate( function() { console.log("rk8");self.render() } );
+	this.graph.onUpdate( function() { self.render() } );
 };
 
 Rickshaw.namespace('Rickshaw.Graph.Axis.X');
@@ -1877,12 +1873,8 @@ Rickshaw.Graph.Axis.X = function(args) {
 			this.vis = this.graph.vis;
 		}
 
-		 this.graph.onUpdate( function() { 
-//       if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-//       } else {
-//         console.log("rk7");
+		 this.graph.onUpdate( function() {
          self.render();
-//       }
 		 });
 	};
 
@@ -2004,11 +1996,7 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 		var self = this;
 		
 		 this.graph.onUpdate( function() {
-//       if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-//       } else {
-//         console.log("rk6");
          self.render();
-//       }
 		 } );
 	},
 
@@ -2290,7 +2278,7 @@ Rickshaw.Graph.Behavior.Series.Order = function(args) {
 	});
 
 	// hack to make jquery-ui sortable behave
-	this.graph.onUpdate( function() { console.log("rk5");
+	this.graph.onUpdate( function() {
 		var h = window.getComputedStyle(self.legend.element).height;
 		self.legend.element.style.height = h;
 	} );
@@ -2325,17 +2313,16 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
 		
                 var label = line.element.getElementsByTagName('span')[0];
                 label.onclick = function(e){
-//                        updatesSuspended = true;
 
                         var disableAllOtherLines = line.series.disabled;
                         if ( ! disableAllOtherLines ) {
                                 for ( var i = 0; i < self.legend.lines.length; i++ ) {
                                         var l = self.legend.lines[i];
-                                        if ( line.series === l.series ) {console.log("rka");
+                                        if ( line.series === l.series ) {
                                                 // noop
-                                        } else if ( l.series.disabled ) {console.log("rkb");
+                                        } else if ( l.series.disabled ) {
                                                 // noop
-                                        } else {console.log("rkc");
+                                        } else {
                                                 disableAllOtherLines = true;
                                                 break;
                                         }
@@ -2343,33 +2330,30 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
                         }
 
                         // show all or none
-                        if ( disableAllOtherLines ) {console.log("rkc1");
+                        if ( disableAllOtherLines ) {
 
                                 // these must happen first or else we try ( and
 								// probably fail ) to make a no line graph
                                 line.series.enable();
                                 line.element.classList.remove('disabled');
 
-                                self.legend.lines.forEach(function(l){console.log("rkd");
-                                        if ( line.series === l.series ) {console.log("rke");
+                                self.legend.lines.forEach(function(l){
+                                        if ( line.series === l.series ) {
                                                 // noop
-                                        } else {console.log("rkf");
+                                        } else {
                                                 l.series.disable();
                                                 l.element.classList.add('disabled');
                                         }
                                 });
 
-                        } else {console.log("rkg");
+                        } else {
 
-                                self.legend.lines.forEach(function(l){console.log("rkh");
+                                self.legend.lines.forEach(function(l){
                                         l.series.enable();
                                         l.element.classList.remove('disabled');
                                 });
 
                         }
-//                        updatesSuspended = false;
-                        //trigger render
-//                        self.graph.render();
                 };
 
 	};
@@ -2744,7 +2728,6 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 		// but triggering the re-render would lose the added
 		// behavior of the series toggle
 //		this.graph.onUpdate( function() {
-//		console.log("rk4");
 //		} );
 	},
 
@@ -2901,7 +2884,7 @@ Rickshaw.Graph.RangeSlider = Rickshaw.Class.create({
 
 		this.build();
 
-		graph.onUpdate( function() { console.log("rk3");this.update() }.bind(this) );
+		graph.onUpdate( function() { this.update() }.bind(this) );
 	},
 
 	build: function() {
@@ -3142,12 +3125,8 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
 			
-			parent.onUpdate(function() { 
-//			  if ((typeof updatesSuspended !== 'undefined') && (updatesSuspended === true)) { // noop
-//	       } else {
-//  			  console.log("rk2");
+			parent.onUpdate(function() {
   			  graph.render(); self.render();
-//			  }
 			});
 
 			parent.onConfigure(function(args) { 
