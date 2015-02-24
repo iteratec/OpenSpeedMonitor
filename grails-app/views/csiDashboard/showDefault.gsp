@@ -17,6 +17,8 @@
 </style>
 </head>
 <body>
+  <%-- main menu --%>
+  <g:render template="/layouts/mainMenu"/>
 	<%-- heading --%>
 	<div class="row">
 		<div class="span12">

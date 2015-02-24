@@ -22,7 +22,7 @@
 				<g:if test="${job.script}">
 					<br />
 					<a
-						href="<g:createLink controller="script" action="edit" id="${job.script.id}"/>">
+						href="<g:createLink controller="script" action="edit" id="${job.script.id}"/>" class="skript">
 						${job.script.label}
 					</a>
 					<span title="${message(code: 'script.measuredEventsCount.label')}">(${job.script.measuredEventsCount})</span>
@@ -32,7 +32,7 @@
 			</td>
 			<td class="jobgroup">${job.jobGroup.name}</td>
 			<td class="location">${job.location.removeBrowser(job.location.uniqueIdentifierForServer ?: job.location.location)}</td>
-			<td>${job.location.browser.name != Browser.UNDEFINED ? job.location.browser.name : ''}</td>
+			<td class="browser">${job.location.browser.name != Browser.UNDEFINED ? job.location.browser.name : ''}</td>
 			<td><g:render template="timeago"
 					model="${['date': job.lastRun, 
 					  		'defaultmessage': message(code: 'job.lastRun.label.never', default: 'Noch nie'),

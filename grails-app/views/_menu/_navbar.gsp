@@ -9,7 +9,7 @@
 			</a>
 
 			<a class="brand" href="${createLink(uri: '/')}">
-				<img class="logo" src="${resource(dir:'images',file:'OpenSpeedMonitor-onblack-monitorWritingLight_250pxHeight.gif')}" alt="${meta(name:'app.name')}" />
+        <img class="logo" src="${resource(dir:'images',file:'OpenSpeedMonitor-onblack-monitorWritingLight_250pxHeight.gif')}" alt="${meta(name:'app.name')}" />
 			</a>
 
        		<div class="nav-collapse">

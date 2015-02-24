@@ -245,7 +245,9 @@ function RickshawGraphBuilder(args) {
 
     grids.each(function(index) {
       if (index < numberOfGrids - 1) {
-        this.remove();
+        if (typeof this.remove == 'function') {
+          this.remove();
+        }
       }
     });
   }

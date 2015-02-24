@@ -3,13 +3,13 @@
 		<g:message code="script.label.label" default="Name"/>
 		<span class="required-indicator">*</span>
 	</label>
-	<g:textField name="label" value="${script?.label}" />
+	<g:textField name="label" value="${script?.label}" class="width_31em"/>
 </div>
 <div class="fieldcontain ${hasErrors(bean: script, field: 'description', 'error')}">
 	<label for="description">
 		<g:message code="script.description.label" default="Beschreibung" />
 	</label>
-	<g:textField name="description" value="${script?.description}" />
+    <textarea class="form-control width_31em" name="description" id="description" rows="3">${script?.description}</textarea>
 </div>
 <div class="fieldcontain ${hasErrors(bean: script, field: 'navigationScript', 'error')}">
 	<label for="navigationScript">
