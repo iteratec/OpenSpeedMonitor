@@ -134,7 +134,7 @@ class RickshawHtmlCreater {
 			}
 
             testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
-			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${measuredValue}, url: "${url}" ${testingAgent} }"""
+			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${measuredValue}, url: "${url}" ${testingAgent}}"""
 			prefix = ","
 		}
 		sw << """ ]"""
