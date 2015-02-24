@@ -107,6 +107,20 @@ class ConfigService {
     Integer getMaxDataStorageTimeInMonths(){
         return (Integer)retrieveConfigValue('maxDataStorageTimeInMonths')
     }
+
+    /**
+     * Activates measurements generally.
+     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+     */
+    void activateMeasurementsGenerally(){
+        List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
+        if (osmConfigs.size() != 1 || osmConfigs[0].measurementsGenerallyEnabled == null) {
+            throw new IllegalStateException("measurementsGenerallyEnabled couldn\'t be read from Configuration!")
+        }else{
+            osmConfigs[0].measurementsGenerallyEnabled = true
+            osmConfigs[0].save(failOnError: true)
+        }
+    }
 	
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()

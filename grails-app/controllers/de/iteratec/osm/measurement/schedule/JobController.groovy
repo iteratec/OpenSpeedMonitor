@@ -329,6 +329,11 @@ class JobController {
 	def tags(String term) {
 		render Job.findAllTagsWithCriteria([max:5]) { ilike('name', "${term}%") } as JSON
 	}
+
+    def activateMeasurementsGenerally(){
+        configService.activateMeasurementsGenerally()
+        redirect(action: 'list')
+    }
 	
 	private void setVariablesOnJob(Map variables, Job job) {
 		job.firstViewOnly = !params.repeatedView

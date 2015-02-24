@@ -35,6 +35,11 @@
 					<g:message 
 						code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.content" 
 						default="Measurements are generally disabled! Even active jobs won't get started until measurements are genrally enabled again. Ask your administrator for activation."/>
+                    <br>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+                        <g:actionSubmit class="btn btn-small btn-warning" action="activateMeasurementsGenerally"
+                                        value="${message(code: 'de.iteratec.osm.measurement.schedule.general.activation.label', default: 'Activate measurements')}" />
+                    </sec:ifAnyGranted>
 				</div>
 				<%-- 
 				here should be a link for enabling measurements generally  
