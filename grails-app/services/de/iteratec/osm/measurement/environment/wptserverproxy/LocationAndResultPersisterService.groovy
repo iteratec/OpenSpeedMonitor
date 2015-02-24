@@ -225,6 +225,7 @@ class LocationAndResultPersisterService implements iListener{
 	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){
 
 		String testId = resultXml.getTestId()
+
 		if(!testId){
 			return
 		}
@@ -248,7 +249,8 @@ class LocationAndResultPersisterService implements iListener{
             locationLocation: jobConfig.location.location,
             locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer,
             locationBrowser: jobConfig.location.browser.name,
-            jobGroupName: jobConfig.jobGroup.name
+            jobGroupName: jobConfig.jobGroup.name,
+            testAgent:resultXml.getTestAgent()
         )
 		
 		//new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
