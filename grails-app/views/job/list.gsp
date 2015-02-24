@@ -52,7 +52,7 @@
 				<a href="#" id="updateHints" class="icon-question-sign icon-large" rel="popover"
 				data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"></a>
 			</p>
-			<div class="row">
+			<div class="row noIdent">
 				<h5><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern"/></h5>
 				<input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
 					placeholder="<g:message code="Job.list.filter" default="Jobs filtern" />"
@@ -70,7 +70,7 @@
 				</g:each>
 				</select>
 			</div>
-      <div class="row">
+      <div class="row noIdent">
         <input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterBySkript"
         placeholder="<g:message code="Job.list.filterBySkript" default="Nach Skriptname filtern" />"
         name="filters.filterBySkript" value="${filters?.filterBySkript}" />

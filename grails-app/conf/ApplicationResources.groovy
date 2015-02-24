@@ -40,7 +40,7 @@ modules = {
         resource url: 'js/date-time-picker/osm-date-time-picker.js'
         resource url: 'js/date-time-picker/bootstrap-timepicker.min.js'
         //for debugging:
-        //		resource url: 'js/date-time-picker/bootstrap-timepicker.js'
+        //        resource url: 'js/date-time-picker/bootstrap-timepicker.js'
     }
     /**
      * Charting-stuff (external library-code and osm-specifics).

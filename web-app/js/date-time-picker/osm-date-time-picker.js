@@ -103,7 +103,7 @@ var initTimepicker = function(whetherToShowMeridian) {
 	//initialization///////////////////////////////////////////////////////////////////
 	
 	$('#fromHourTimepicker').timepicker({
-		showMeridian: whetherToShowMeridian
+    showMeridian: whetherToShowMeridian
 	});
 	$('#toHourTimepicker').timepicker({
 		showMeridian: whetherToShowMeridian
@@ -171,7 +171,7 @@ var setDateAndTimeRespectivePreselection = function() {
 	setFrom(getDateAs_ddMMyyyy(start));
 	setFromHour(start.getHours().toString() + ":" + start.getMinutes().toString())
 
-    setTo(getDateAs_ddMMyyyy(now));
+  setTo(getDateAs_ddMMyyyy(now));
 	setToHour(now.getHours().toString() + ":" + now.getMinutes().toString())
 
 };
