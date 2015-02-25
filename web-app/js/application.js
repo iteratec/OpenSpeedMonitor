@@ -75,3 +75,8 @@ $.extend({
 		return $.getUrlVars()[name];
 	}
 });
+function domainDeleteConfirmation(message,list){
+    var defaultMessage = "Are you sure?"
+    return confirm(message ? message : defaultMessage);
+
+}

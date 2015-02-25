@@ -69,11 +69,10 @@
 				<g:if test="${ mode == 'edit' }">
 					<g:actionSubmit class="btn btn-danger" action="delete"
 						value="${message(code: 'default.button.delete.label', default: 'Löschen')}"
-						onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');" />  
-									
-						  
-						   
-					<g:if test="${ entityName == 'job'}">
+                        onclick="return domainDeleteConfirmation('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}',[]);"/>
+
+
+                    <g:if test="${ entityName == 'job'}">
 						<g:actionSubmit class="btn btn-info" action="execute" value="${message(code: 'de.iteratec.isj.job.test', default: 'Test')}" 
 						    onclick="this.form.target='_blank';return true;" />
 					</g:if> 

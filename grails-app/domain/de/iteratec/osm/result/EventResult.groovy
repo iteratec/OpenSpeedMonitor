@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
@@ -136,8 +137,8 @@ class EventResult implements CsiValue {
 	// from JobResult 
 	Date jobResultDate
 	Long jobResultJobConfigId
-
-	static belongsTo = JobResult
+    JobResult jobResult
+	static belongsTo = [jobResult:JobResult]
 
 	static constraints = {
 		id()

@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.*
 @TestMixin(IntegrationTestMixin)
 class JobControllerSpec extends IntTestWithDBCleanup {
 
-    JobController controllerUnderTest = new JobController()
+    JobController controllerUnderTest
     private int jobIdCount = 0
 
     DateTime executionDateBeforeCleanUpDate = new DateTime()
@@ -33,6 +33,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
 
     @Before
     void setup() {
+        controllerUnderTest = new JobController()
         createOsmConfig()
         createData()
     }
@@ -40,23 +41,19 @@ class JobControllerSpec extends IntTestWithDBCleanup {
     @Test
     void delete() {
         controllerUnderTest.params.id = deleteJob.id.toString()
-        JobResult deleteResult = deleteJob.getJobResults().iterator().next()
-        HttpArchive deleteArchive = deleteResult.getHttpArchives().iterator().next()
-        EventResult deleteEventResult = deleteResult.getEventResults().iterator().next()
-        assertThat(deleteResult, (notNullValue()))
-        assertThat(deleteArchive, (notNullValue()))
-        assertThat(deleteEventResult, (notNullValue()))
-
+        List<JobResult> jobResults = JobResult.findAllByJob(deleteJob)
+        List<HttpArchive> httpArchives =  []
+        List<EventResult> eventResults = []
+        jobResults.each {
+            httpArchives.addAll(HttpArchive.findAllByJobResult(it))
+            eventResults.addAll(EventResult.findAllByJobResult(it))
+        }
         int oldJobCount = Job.count()
-
-        assert JobResult.count() == 2
-        assert EventResult.count() == 2
-        assert HttpArchive.count() == 2
-
-        assertThat(Job.list(), hasItem(deleteJob))
-        assertThat(Job.list(), hasItem(deleteJob))
-        assertThat(EventResult.list(), hasItem(deleteEventResult))
-        assertThat(HttpArchive.list(), hasItem(deleteArchive))
+        //We have to assert that no MeasuredEvent will be deleted
+        int oldMeasuredEventCount = MeasuredEvent.count()
+        assert jobResults.size() == 1
+        assert eventResults.size() == 1
+        assert httpArchives.size() == 1
 
         controllerUnderTest.delete()
 
@@ -64,22 +61,18 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         List<JobResult> allJobResults = JobResult.list()
         List<EventResult> allEventResults = EventResult.list()
         List<HttpArchive> allHttpArchives = HttpArchive.list()
-        List<MeasuredEvent> allMeasuredEvents = MeasuredEvent.list()
 
         assertThat(allJobs, not(hasItem(deleteJob)))
-        assertThat(allHttpArchives, not(hasItem(deleteArchive)))
-        assertThat(allJobResults, not(hasItem(deleteResult)))
-        assertThat(allEventResults, not(hasItem(deleteEventResult)))
+        assertThat(allHttpArchives as Iterable<ArrayList<HttpArchive>>, not(hasItems(httpArchives)))
+        assertThat(allJobResults as Iterable<List<JobResult>>, not(hasItems(jobResults)))
+        assertThat(allEventResults as Iterable<ArrayList<EventResult>>, not(hasItems(eventResults)))
 
-        assertThat(allJobs.size(), is(oldJobCount - 1))
-        assertThat(allEventResults.size(), is(1))
-        assertThat(allHttpArchives.size(), is(1))
-        assertThat(allMeasuredEvents.size(), is(1))
         assert allJobs.size() == oldJobCount - 1
         assert allJobResults.size() == 1
         assert allEventResults.size() == 1
         assert allHttpArchives.size() == 1
-        assert allMeasuredEvents.size() == 1
+        assert MeasuredEvent.count() == oldMeasuredEventCount
+
     }
 
     private void createData() {
@@ -134,6 +127,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
 
     private static EventResult createEventResult(JobResult jobResult, eventResultTag) {
         new EventResult(
+                jobResult: jobResult,
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
                 medianValue: true,
@@ -154,7 +148,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 validationState: 'validationState',
                 customerSatisfactionInPercent: 1,
                 jobResultDate: jobResult.date,
-                jobResultJobConfigId: jobResult.job.ident(),
+                jobResultJobConfigId: 1,
                 measuredEvent: null,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 tag: eventResultTag

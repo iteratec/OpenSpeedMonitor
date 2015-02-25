@@ -47,9 +47,4 @@ class HttpArchive {
 	static mapping = {
 		harData(sqlType: 'blob')
 	}
-
-    public void setJobResult(JobResult result){
-        this.jobResult = result
-        if(this.jobResult != null) this.jobResult.addHttpArchive(this)
-    }
 }

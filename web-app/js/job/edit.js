@@ -105,3 +105,7 @@ function fixChoosen() {
          $parent.css("overflow", "");
    });
 }
+function domainDeleteConfirmation(message,list){
+    return confirm("{0}");
+
+}

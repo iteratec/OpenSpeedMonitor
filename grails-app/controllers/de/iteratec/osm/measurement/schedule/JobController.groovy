@@ -20,8 +20,12 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
+import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.HttpArchive
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -169,22 +173,90 @@ class JobController {
 	}
 	
 	def delete() {
-		Job job = Job.get(params.id)
-		redirectIfNotFound(job, params.id)
-		def flashMessageArgs = [getJobI18n(), job.label]
+        long before = System.nanoTime()
+        Job job = Job.get(params.id)
+        println "fetching JobResults"
+        List<JobResult> jobResults = JobResult.findAllByJob(job)
+        List<EventResult> eventResults = []
+        List<HttpArchive> httpArchives = []
+        jobResults.each {
+            eventResults.addAll(EventResult.findAllByJobResult(it))
+            httpArchives.addAll(HttpArchive.findAllByJobResult(it))
+        }
+        println jobResults.min{it.date}.date
+        println jobResults.max{it.date}.date
+        println "-----"
+        redirectIfNotFound(job, params.id)
+        def flashMessageArgs = [getJobI18n(), job.label]
 
-		try {
-			job.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
-			redirect(action: "list")
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: flashMessageArgs)
-			redirect(action: "edit", id: job.id)
-		}
-	}
-	
-	/**
+        try {
+//            deleteArchive(jobResults)
+//            deleteEventResults(jobResults)
+//            deleteJobResults(job.id)
+            deleteObjectsFromDatabase(httpArchives)
+            deleteObjectsFromDatabase(eventResults)
+            deleteObjectsFromDatabase(jobResults)
+            job.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
+            redirect(action: "list")
+        } catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: flashMessageArgs)
+            redirect(action: "edit", id: job.id)
+        }
+        println "Time to delete: "+(System.nanoTime()-before)/1000000000 +"seconds"
+    }
+
+    private void deleteJobResults(long jobID){
+        println "---Start deleting JobResults---"
+        long before = System.nanoTime()
+        long deletedJobResults = JobResult.executeUpdate("delete JobResult a where a.job.id = ?",[jobID])
+
+        println "Time to delete all $deletedJobResults JobResults for job id $jobID ${(System.nanoTime()-before)/1000000} ms"
+
+    }
+
+    private void deleteArchive(List<JobResult> results){
+        println "---Start deleting HttpArchives---"
+        int deletedArchives = 0
+        long first = System.nanoTime()
+        results.eachWithIndex {result,index->
+            long before = System.nanoTime()
+            deletedArchives+=HttpArchive.executeUpdate("delete HttpArchive a where a.jobResult.id = ?",[result.id])
+            println "Time to delete intervall $index/${results.size()}: ${(System.nanoTime()-before)/1000000} ms"
+        }
+        println "Time to delete $deletedArchives HttpArchives : ${(System.nanoTime()-first)/1000000} ms"
+    }
+
+    private void deleteEventResults(List<JobResult> results){
+        println "---Start deleting EventResults---"
+        long deletedEventResults = 0
+        long first = System.nanoTime()
+        results.eachWithIndex {result,index->
+            long before = System.nanoTime()
+            deletedEventResults += EventResult.executeUpdate("delete EventResult e where e.jobResult.id = ?",[result.id])
+            println "Time to delete intervall $index/${results.size()}: ${(System.nanoTime()-before)/1000000} ms"
+        }
+        println "Time to delete $deletedEventResults EventResults : ${(System.nanoTime()-first)/1000000} ms"
+
+    }
+
+    private void deleteObjectsFromDatabase(List<Object> archives){
+        if(archives.size()>0)println "Deleting ${archives.size()} objects of ${archives.get(0).class}"
+        while(!archives.isEmpty()){
+            long before = System.nanoTime()
+            List<Object> list
+            (archives.size()>5000)? (list = archives.subList(0,4999)) : (list = archives)
+//            archives.get(0).class.withTransaction {
+//               archives.get(0).class.deleteAll(list)
+//            }
+            list*.delete(flush: true)
+            list.clear()
+            println "Time for delete intervall ${(System.nanoTime()-before)/1000000}"
+        }
+
+    }
+
+    /**
 	 * Execute handler for each job selected using the checkboxes
 	 * @param handler A closure which gets the corresponding job as first parameter
 	 */
