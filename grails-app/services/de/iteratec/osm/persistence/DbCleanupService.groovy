@@ -34,7 +34,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition
  */
 class DbCleanupService {
 
-    static transactional = true
+    static transactional = false
 
 	EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService
@@ -118,24 +118,20 @@ class DbCleanupService {
                     try {
                         log.info("try to delete JobResult with dependened objects... delete JobResult: {$jobResult.id}")
 
-                        HttpArchive.executeUpdate("delete HttpArchive ha where ha.jobResult = :jobResult", [jobResult: jobResult])
+                        HttpArchive.findAllByJobResult(jobResult)*.delete()
 
                         jobResult.getEventResults().each {EventResult eventResult ->
-                            EventResult.executeUpdate("delete EventResult er where er = :eventResult", [eventResult: eventResult])
+                            eventResult.delete()
                         }
 
-                        JobResult.executeUpdate("delete JobResult jr where jr = :jobResult", [jobResult: jobResult])
+                        jobResult.delete()
                     } catch (Exception e) {
                         log.error("JobResult could not deleted ${e}" )
                     }
                 }
             }
             //clear hibernate session first-level cache
-            JobResult.withSession { session ->
-                session.flush()
-                session.clear()
-                propertyInstanceMap.getProperties().clear()
-            }
+            JobResult.withSession { session -> session.clear() }
         }
 
         dc = new DetachedCriteria(MeasuredValue).build {
@@ -148,21 +144,33 @@ class DbCleanupService {
             MeasuredValue.withNewTransaction {
                 dc.list(offset: offset, max: batchSize).each { MeasuredValue measuredValue ->
                     try {
-                        log.info("try to delete MeasuredValue with dependened objects... delete MeasuredValue: {$measuredValue.id}")
+                        def innerDc = new DetachedCriteria(MeasuredValueUpdateEvent).build {
+                            eq 'measuredValueId', measuredValue.id
+                        }
+                        int innerCount = innerDc.count()
 
-                        MeasuredValueUpdateEvent.executeUpdate("delete MeasuredValueUpdateEvent mvue where mvue.measuredValueId = :measuredValueId", [measuredValueId: measuredValue.id])
+                        0.step(innerCount, batchSize){ innerOffset ->
+                            MeasuredValueUpdateEvent.withNewTransaction {
+                                innerDc.list(offset:  innerOffset, max: batchSize).each { MeasuredValueUpdateEvent measuredValueUpdateEvent ->
+                                    try{
+                                        log.info("try to delete MeasuredValueUpdateEvent {$measuredValueUpdateEvent.id}")
+                                        measuredValueUpdateEvent.delete()
+                                    }catch (Exception e){
+                                        log.error("MeasuredValueUpdateEvent could not deleted ${e}")
+                                    }
+                                }
+                            }
+                            MeasuredValueUpdateEvent.withSession { session -> session.clear() }
+                        }
 
-                        MeasuredValue.executeUpdate("delete MeasuredValue mv where mv = :measuredValue", [measuredValue: measuredValue])
+                        log.info("try to delete MeasuredValue {$measuredValue.id}")
+                        measuredValue.delete()
                     } catch (Exception e) {
                         log.error("MeasuredValue could not deleted ${e}")
                     }
                 }
             }
-            MeasuredValue.withSession { session ->
-                session.flush()
-                session.clear()
-                propertyInstanceMap.getProperties().clear()
-            }
+            MeasuredValue.withSession { session -> session.clear() }
         }
 
         log.info "... DONE"
