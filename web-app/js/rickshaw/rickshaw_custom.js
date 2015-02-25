@@ -3096,28 +3096,28 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			
 			var graph;
 
-			// copy series
-			var series = [];
-			parent.series.forEach(function(eachSeries) {
-				var entry = {};
-				entry.color = eachSeries.color;
-				entry.data = eachSeries.data.slice(0);
-				entry.label = eachSeries.label;
-				entry.measurandGroup = eachSeries.measurandGroup;
-				entry.name = eachSeries.name;
-				entry.path = eachSeries.path;
-				entry.stroke = eachSeries.stroke;
-				entry.disable= eachSeries.disable;
-				entry.enable= eachSeries.enable;
-				entry.scale= eachSeries.scale;
-				entry.yFormatter= eachSeries.yFormatter;
-				series.push(entry);
-			});
-			series.active = function() {return graph.series;};
-			graphArgs.series = series;
+			// // copy series
+			// var series = [];
+			// parent.series.forEach(function(eachSeries) {
+			// 	var entry = {};
+			// 	entry.color = eachSeries.color;
+			// 	entry.data = eachSeries.data.slice(0);
+			// 	entry.label = eachSeries.label;
+			// 	entry.measurandGroup = eachSeries.measurandGroup;
+			// 	entry.name = eachSeries.name;
+			// 	entry.path = eachSeries.path;
+			// 	entry.stroke = eachSeries.stroke;
+			// 	entry.disable= eachSeries.disable;
+			// 	entry.enable= eachSeries.enable;
+			// 	entry.scale= eachSeries.scale;
+			// 	entry.yFormatter= eachSeries.yFormatter;
+			// 	series.push(entry);
+			// });
+			// series.active = function() {return graph.series;};
+			// graphArgs.series = series;
 			
 			graphArgs.stack = false; // if true, slider preview can not be drawn
-			graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
+			// graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
 
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
