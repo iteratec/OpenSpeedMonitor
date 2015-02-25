@@ -26,6 +26,8 @@ import grails.gorm.DetachedCriteria
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.dao.EventResultDaoService
+//import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.DefaultTransactionDefinition
 
 /**
  * Provides methods for cleanup db. Can be used by quartz-jobs.
@@ -103,52 +105,60 @@ class DbCleanupService {
 
         //TODO: batching does not persist in database
         // use gorm-batching
-        JobResult.withSession { session ->
-            def dc = new DetachedCriteria(JobResult).build {
-                lt 'date', toDeleteBefore
-            }
-            int count = dc.count()
+        def dc = new DetachedCriteria(JobResult).build {
+            lt 'date', toDeleteBefore
+        }
+        int count = dc.count()
 
-            //batch size -> hibernate doc recommends 10..50
-            int batchSize = 50
-            0.step(count, batchSize) { offset ->
+        //batch size -> hibernate doc recommends 10..50
+        int batchSize = 50
+        0.step(count, batchSize) { offset ->
+            JobResult.withNewTransaction {
                 dc.list(offset: offset, max: batchSize).each { JobResult jobResult ->
-                    JobResult.withTransaction { status ->
-                        try {
-                            log.info("try to delete JobResult with dependened objects... delete JobResult: {$jobResult.id}")
-                            jobResult.delete(flush: true)
-                        } catch (Exception e) {
-                            log.error("JobResult could not deleted")
-                            status.setRollbackOnly()
+                    try {
+                        log.info("try to delete JobResult with dependened objects... delete JobResult: {$jobResult.id}")
+
+                        HttpArchive.executeUpdate("delete HttpArchive ha where ha.jobResult = :jobResult", [jobResult: jobResult])
+
+                        jobResult.getEventResults().each {EventResult eventResult ->
+                            EventResult.executeUpdate("delete EventResult er where er = :eventResult", [eventResult: eventResult])
                         }
+
+                        JobResult.executeUpdate("delete JobResult jr where jr = :jobResult", [jobResult: jobResult])
+                    } catch (Exception e) {
+                        log.error("JobResult could not deleted ${e}" )
                     }
                 }
-                //clear hibernate session first-level cache
+            }
+            //clear hibernate session first-level cache
+            JobResult.withSession { session ->
                 session.flush()
                 session.clear()
                 propertyInstanceMap.getProperties().clear()
             }
         }
 
-        MeasuredValue.withSession { session ->
-            def dc = new DetachedCriteria(MeasuredValue).build {
-                lt 'started', toDeleteBefore
-            }
-            int count = dc.count()
+        dc = new DetachedCriteria(MeasuredValue).build {
+            lt 'started', toDeleteBefore
+        }
+        count = dc.count()
 
-            int batchSize = 50
-            0.step(count, batchSize) { offset ->
+        batchSize = 50
+        0.step(count, batchSize) { offset ->
+            MeasuredValue.withNewTransaction {
                 dc.list(offset: offset, max: batchSize).each { MeasuredValue measuredValue ->
-                    MeasuredValue.withTransaction { status ->
-                        try {
-                            log.info("try to delete MeasuredValue with dependened objects... delete MeasuredValue: {$measuredValue.id}")
-                            measuredValue.delete(flush: true)
-                        } catch (Exception e) {
-                            log.error("MeasuredValue could not deleted")
-                            status.setRollbackOnly()
-                        }
+                    try {
+                        log.info("try to delete MeasuredValue with dependened objects... delete MeasuredValue: {$measuredValue.id}")
+
+                        MeasuredValueUpdateEvent.executeUpdate("delete MeasuredValueUpdateEvent mvue where mvue.measuredValueId = :measuredValueId", [measuredValueId: measuredValue.id])
+
+                        MeasuredValue.executeUpdate("delete MeasuredValue mv where mv = :measuredValue", [measuredValue: measuredValue])
+                    } catch (Exception e) {
+                        log.error("MeasuredValue could not deleted ${e}")
                     }
                 }
+            }
+            MeasuredValue.withSession { session ->
                 session.flush()
                 session.clear()
                 propertyInstanceMap.getProperties().clear()

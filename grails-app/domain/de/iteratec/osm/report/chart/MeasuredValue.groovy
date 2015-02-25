@@ -294,32 +294,4 @@ class MeasuredValue implements CsiValue {
     public List<MeasuredValueUpdateEvent> getMeasuredValueUpdateEvents() {
         return MeasuredValueUpdateEvent.findAllByMeasuredValueId(this.ident())
     }
-
-    def beforeDelete() {
-
-        MeasuredValue.withNewSession { session ->
-            def dc = new DetachedCriteria(MeasuredValueUpdateEvent).build {
-                eq 'measuredValueId', this.id
-            }
-            def count = dc.count()
-
-            def batchSize = 50
-            0.step(count, batchSize) { offset ->
-                dc.list(offset: offset, max: batchSize).each { MeasuredValueUpdateEvent measuredValueUpdateEvent ->
-                    MeasuredValueUpdateEvent.withTransaction { status ->
-                        try {
-                            log.info("... try to delete MeasuredValueUpdateEvent")
-                            measuredValueUpdateEvent.delete(flush: true)
-                        } catch (Exception e) {
-                            log.error("MeasuredValueUpdateEvent could not deleted")
-                            status.setRollbackOnly()
-                        }
-
-                    }
-                }
-                session.flush()
-                session.clear()
-            }
-        }
-    }
 }
