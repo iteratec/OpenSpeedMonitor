@@ -53,7 +53,7 @@ import org.springframework.beans.propertyeditors.CustomDateEditor
  * @author mze
  * @since IT-106
  */
-class EventResultController {
+class TabularResultPresentationController {
 
     private final static String DATE_FORMAT_STRING = 'dd.mm.yyyy'
     private final static int MONDAY_WEEKSTART = 1
@@ -243,26 +243,26 @@ class EventResultController {
         static constraints = {
             from(nullable: true, validator: {Date currentFrom, EventResultsCommandBase cmd ->
                 boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentFrom == null) return ['nullWithManualSelection']
+                if(manualTimeframe && currentFrom == null) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.from.nullWithManualSelection']
             })
             to(nullable:true, validator: { Date currentTo, EventResultsCommandBase cmd ->
                 boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentTo == null) return ['nullWithManualSelection']
-                else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['beforeFromDate']
+                if(manualTimeframe && currentTo == null) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.to.nullWithManualSelection']
+                else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.to.beforeFromDate']
             })
             fromHour(nullable: true, validator: {String currentFromHour, EventResultsCommandBase cmd ->
                 boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentFromHour == null) return ['nullWithManualSelection']
+                if(manualTimeframe && currentFromHour == null) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.fromHour.nullWithManualSelection']
             })
             toHour(nullable: true, validator: {String currentToHour, EventResultsCommandBase cmd ->
                 boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
                 if(manualTimeframe && currentToHour == null) {
-                    return ['nullWithManualSelection']
+                    return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.toHour.nullWithManualSelection']
                 }
                 else if(manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
                     DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
                     DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                    if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['inCombinationWithDateBeforeFrom']
+                    if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.toHour.inCombinationWithDateBeforeFrom']
                 }
             })
             max(nullable:true)
@@ -392,7 +392,7 @@ class EventResultController {
 
     /**
      * <p>
-     * Command of {@link EventResultController#listResults(ListResultsCommand)}.
+     * Command of {@link TabularResultPresentationController#listResults(ListResultsCommand)}.
      * </p>
      *
      * <p>

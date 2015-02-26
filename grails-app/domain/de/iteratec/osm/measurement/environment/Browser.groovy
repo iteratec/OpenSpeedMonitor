@@ -27,12 +27,13 @@ class Browser {
 
     String name
     Double weight
+    static final Double minWeight = 0
 
     static hasMany = [browserAliases: BrowserAlias]
 
     static constraints = {
-        name(unique:true)
-        weight()
+        name(unique:true, maxSize: 255)
+        weight(min: this.minWeight)
     }
 
     static transients = ['undefinedBrowser']

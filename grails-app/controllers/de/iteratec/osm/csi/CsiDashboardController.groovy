@@ -1286,7 +1286,7 @@ class CsiDashboardController {
 	def downloadPageWeights(){
 		DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
 		response.setHeader("Content-disposition",
-				"attachment; filename=${dtFormater.print(new DateTime())}browser_weights.csv")
+				"attachment; filename=${dtFormater.print(new DateTime())}page_weights.csv")
 		response.contentType = "text/csv"
 		StringBuilder builder = new StringBuilder()
 		builder.append('name;weight\n')

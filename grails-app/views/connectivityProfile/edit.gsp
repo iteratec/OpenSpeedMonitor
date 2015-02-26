@@ -27,6 +27,10 @@
 		</fieldset>
 		<div class="form-actions">
 			<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
+        <a href="<g:createLink action="list" />" class="btn btn-warning"
+         onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');">
+          <g:message code="default.button.cancel.label" default="Abbrechen" />
+        </a>
       <a href="#DeleteModal" role="button" class="btn btn-danger" data-toggle="modal">${message(code: 'default.button.delete.label', default: 'Delete')}</a>
 <%--			<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />  --%>
             <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>

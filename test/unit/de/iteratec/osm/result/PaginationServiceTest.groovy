@@ -27,8 +27,8 @@ import org.mockito.Mockito
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
-import de.iteratec.osm.result.EventResultController.ListResultsCommand
-import de.iteratec.osm.result.EventResultController.ListResultsForSpecificJobCommand
+import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
+import de.iteratec.osm.result.TabularResultPresentationController.ListResultsForSpecificJobCommand
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser

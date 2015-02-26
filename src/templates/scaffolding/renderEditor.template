@@ -179,6 +179,7 @@
 				if (cp.min != null) sb << ' min="' << cp.min << '"'
 				if (cp.max != null) sb << ' max="' << cp.max << '"'
 				if (isRequired()) sb << ' required=""'
+        if (cp.maxSize) sb << ' maxlength="' << cp.maxSize << '"'
 				sb << ' value="${' << domainInstance << '.' << property.name << '}"'
 				sb << '/>'
             }
