@@ -17,6 +17,14 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.HttpArchive
+import de.iteratec.osm.result.JobResult
+import grails.gorm.DetachedCriteria
+import org.grails.datastore.gorm.AbstractGormApi
+import org.grails.datastore.gorm.GormInstanceApi
+import org.grails.datastore.mapping.core.Session
+
 
 class JobService {
 
@@ -81,4 +89,60 @@ class JobService {
 		job.executionSchedule = executionSchedule
 		job.save(failOnError: true)
 	}
+
+    /**
+     * Deletes a Job with all JobResults, HttpArchives and EventResults
+     *
+     * @param job Job that should be deleted
+     * @param c Closure to call if something couldn't be deleted
+     */
+    void deleteJob(Job job, Closure c){
+        def dc = new DetachedCriteria(JobResult).build {
+            eq 'job', job
+        }
+        int count = dc.count()
+        int batchSize = 100
+        Job.withSession { session ->
+            0.step(count,batchSize){offset->
+                Job.withTransaction {
+                    dc.list(offset: 0,max: batchSize).eachWithIndex {JobResult jobResult,int index->
+                        println "dc.count() = ${dc.count()}"
+                        try {
+                            log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
+                            List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
+                            batchDelete(httpArchives,batchSize)
+//                            FIXME with IT-456 there will be now cascading delete from JobResult to EventResult    and the following lines should be activated
+//                            List<EventResult> eventResults = jobResult.getEventResults()
+//                            batchDelete(eventResults,batchSize)
+                            jobResult.delete()
+                            println "deleted ${index+offset}"
+                        } catch (Exception e){
+                            println "couldn't delete"
+                            log.error("Couldn't delete JobResult ${e}")
+                            c.call()
+                        }
+                    }
+                }
+                session.flush()
+                session.clear()
+            }
+            Job.withTransaction {
+                job.delete(flush: true)
+            }
+        }
+    }
+    /**
+     * Delets a List ob objects with a new Transaction and will delete up to batchSize objects with one transaction
+     * @param objects Objects to be deleted
+     * @param batchSize maximum delete interval
+     */
+    private void batchDelete(List objects,int batchSize){
+        0.step(objects.size(),batchSize){off->
+            Job.withTransaction {
+                int max = off+batchSize
+                max = (max>objects.size())?objects.size():max
+                objects.subList(off,max)*.delete()
+            }
+        }
+    }
 }

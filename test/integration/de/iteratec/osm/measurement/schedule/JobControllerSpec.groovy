@@ -46,7 +46,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         List<EventResult> eventResults = []
         jobResults.each {
             httpArchives.addAll(HttpArchive.findAllByJobResult(it))
-            eventResults.addAll(EventResult.findAllByJobResult(it))
+            eventResults.addAll(it.eventResults)
         }
         int oldJobCount = Job.count()
         //We have to assert that no MeasuredEvent will be deleted
@@ -62,15 +62,15 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         List<EventResult> allEventResults = EventResult.list()
         List<HttpArchive> allHttpArchives = HttpArchive.list()
 
-        assertThat(allJobs, not(hasItem(deleteJob)))
         assertThat(allHttpArchives as Iterable<ArrayList<HttpArchive>>, not(hasItems(httpArchives)))
         assertThat(allJobResults as Iterable<List<JobResult>>, not(hasItems(jobResults)))
         assertThat(allEventResults as Iterable<ArrayList<EventResult>>, not(hasItems(eventResults)))
 
-        assert allJobs.size() == oldJobCount - 1
         assert allJobResults.size() == 1
         assert allEventResults.size() == 1
         assert allHttpArchives.size() == 1
+        assert allJobs.size() == oldJobCount - 1
+        assertThat(allJobs, not(hasItem(deleteJob)))
         assert MeasuredEvent.count() == oldMeasuredEventCount
 
     }
