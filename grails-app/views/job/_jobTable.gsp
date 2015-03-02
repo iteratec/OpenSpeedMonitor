@@ -36,7 +36,7 @@
 			<td><g:render template="timeago"
 					model="${['date': job.lastRun, 
 					  		'defaultmessage': message(code: 'job.lastRun.label.never', default: 'Noch nie'),
-					  		'url': createLink(controller: 'eventResult', action: 'listResultsForJob', params: ['job.id': job.id], absolute: true)]}" /></td>
+					  		'url': createLink(controller: 'tabularResultPresentation', action: 'listResultsForJob', params: ['job.id': job.id], absolute: true)]}" /></td>
 			<td>
 				<g:if test="${job.active}">
 					<g:hiddenField name="job_active" class="job_active" value="true" />

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+
 class BrowserAlias {
 
     static belongsTo = [browser: Browser]
@@ -24,6 +25,13 @@ class BrowserAlias {
     String alias
 
     static constraints = {
-        alias(unique: true, maxSize: 255)
+        alias(unique: true, nullable: false, maxSize: 255, validator: {String currentAlias ->
+            if(currentAlias.trim() == "") {
+                def rk = 1
+                return [
+                    'de.iteratec.osm.measurement.environment.browserAlias.alias.validator.error'
+                ]
+            }
+        })
     }
 }

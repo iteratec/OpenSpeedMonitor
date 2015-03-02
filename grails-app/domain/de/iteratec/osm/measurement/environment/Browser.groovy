@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+
 class Browser {
 
     /**

@@ -88,7 +88,7 @@
 		</g:else>
 		<p>
 			<g:actionSubmit
-				value="${g.message(code: 'de.iteratec.isr.TabularResultPresentationController.listResults.show', 'default':'Show')}"
+				value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
 				action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" class="btn btn-primary"
 				style="margin-top: 16px;" />
 		</p>

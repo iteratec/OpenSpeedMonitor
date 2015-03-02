@@ -38,7 +38,6 @@ private renderFieldForProperty(p, owningClass, prefix = "") {
 				<label for="${prefix}${p.name}" class="control-label"><g:message code="${domainClass.propertyName}.${prefix}${p.name}.label" default="${p.naturalName}" /><% if (required) { %><span class="required-indicator">*</span><% } %></label>
 				<div class="controls">
 					${renderEditor(p)}
-					<span class="help-inline">\${hasErrors(bean: ${propertyName}, field: '${p.name}', 'error')}</span>
 				</div>
 			</div>
 <%  }   } %>

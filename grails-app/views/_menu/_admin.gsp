@@ -24,7 +24,7 @@
 						<i class="icon-sitemap"></i>
 						All Controller
 					</a>
-					<ul class="dropdown-menu">
+					<ul class="dropdown-menu scrollable">
 						<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.logicalPropertyName } }">
               <g:if test="${c.logicalPropertyName != 'home'}">
 	              <g:if test="${['AdminManageController', 'BrowserController', 'BrowserAliasController', 'ConnectivityProfileController', 'ConsoleController', 'CsTargetGraphController', 'CsTargetValueController', 'CsiDashboardController', 'EventResultDashboardController', 'GraphitePathController', 'GraphiteServerController', 'HighchartPointDetailsController', 'JobController', 'JobGroupController', 'LocationController', 'LoginController', 'LogoutController', 'MeasuredEventController', 'MeasuredValueController', 'OsmConfigurationController', 'PageController', 'QueueStatusController', 'ScriptController', 'WebPageTestServerController', 'WptProxyController'].contains(c?.fullName?.substring(c?.fullName?.lastIndexOf('.')+1))}">
