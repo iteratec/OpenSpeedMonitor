@@ -100,35 +100,10 @@ select[multiple], select[size] {
 }
 .dropdown-menu .scrollable {
   height: auto;
-  max-height: 300px;
+  max-height: 80vh;
   overflow-x: hidden;
 }
 
 a.dropdown-toggle {
     position: relative;
-}
-
-a.dropdown-toggle::before {
-    content: '';
-    display: inline-block;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-bottom: 7px solid #CCC;
-    border-bottom-color: rgba(0, 0, 0, 0.2);
-    position: absolute;
-    bottom: -2px;
-    right: 7px;
-    display: none;
-}
-a.dropdown-toggle::after {
-    content: '';
-    display: inline-block;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-bottom: 6px solid white;
-    position: absolute;
-    bottom: -2px;
-    right: 8px;
-    z-index: 1001;
-    display: none;
 }

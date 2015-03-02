@@ -2535,9 +2535,6 @@ table th[class*="span"],
   -moz-border-radius: 0 6px 6px 6px;
   border-radius: 0 6px 6px 6px;
 }
-.dropdown-submenu:hover > .dropdown-menu {
-  display: block;
-}
 .dropup .dropdown-submenu > .dropdown-menu {
   top: auto;
   bottom: 0;

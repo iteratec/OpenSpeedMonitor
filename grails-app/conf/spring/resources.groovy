@@ -27,6 +27,7 @@ import de.iteratec.osm.util.CustomDoubleRegistrar
 
 // Place your Spring DSL code here
 beans = {
+    customPropertyEditorRegistrar(CustomDoubleRegistrar)
     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
     aggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
     jobGroupDaoService(DefaultJobGroupDaoService)
@@ -35,5 +36,4 @@ beans = {
     browserDaoService(DefaultBrowserDaoService)
     locationDaoService(DefaultLocationDaoService)
     graphiteSocketProvider(DefaultGraphiteSocketProvider)
-    customPropertyEditorRegistrar(CustomDoubleRegistrar)
 }
