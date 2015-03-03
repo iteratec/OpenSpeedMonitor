@@ -112,9 +112,9 @@ class DbCleanupService {
 
         //batch size -> hibernate doc recommends 10..50
         int batchSize = 50
-        0.step(count, batchSize) { offset ->
+        0.step(count, batchSize) {
             JobResult.withNewTransaction {
-                dc.list(offset: offset, max: batchSize).each { JobResult jobResult ->
+                dc.list(max: batchSize).each { JobResult jobResult ->
                     try {
                         log.info("try to delete JobResult with dependened objects... delete JobResult: {$jobResult.id}")
 
@@ -140,9 +140,9 @@ class DbCleanupService {
         count = dc.count()
 
         batchSize = 50
-        0.step(count, batchSize) { offset ->
+        0.step(count, batchSize) {
             MeasuredValue.withNewTransaction {
-                dc.list(offset: offset, max: batchSize).each { MeasuredValue measuredValue ->
+                dc.list(max: batchSize).each { MeasuredValue measuredValue ->
                     try {
                         def innerDc = new DetachedCriteria(MeasuredValueUpdateEvent).build {
                             eq 'measuredValueId', measuredValue.id
