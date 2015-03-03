@@ -65,11 +65,12 @@
 				 onclick="return confirm('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}');">
 					<g:message code="default.button.cancel.label" default="Abbrechen" />
 				</a>
-				
+
 				<g:if test="${ mode == 'edit' }">
+
 					<g:actionSubmit class="btn btn-danger" action="delete"
 						value="${message(code: 'default.button.delete.label', default: 'Löschen')}"
-                        onclick="return domainDeleteConfirmation('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}',[]);"/>
+                        onclick="return domainDeleteConfirmation('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}',${entity?.id});"/>
 
 
                     <g:if test="${ entityName == 'job'}">

@@ -33,6 +33,7 @@ import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
+import org.codehaus.groovy.grails.web.json.parser.JSONParser
 import org.hibernate.criterion.DetachedCriteria
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -185,7 +186,15 @@ class JobController {
         }
         flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
         redirect(action: "list")
-        println "Time to delete: "+(System.nanoTime()-before)/1000000000 +"seconds"
+        log.debug("Time to delete Job: "+(System.nanoTime()-before)/1000000000 +"seconds")
+    }
+
+    def createDeleteConfirmationTest(int id){
+        Job job = Job.get(id)
+        List<JobResult> results = JobResult.findAllByJob(job)
+        Date first = results.min{it.date}.date
+        Date last = results.max{it.date}.date
+        render(new JsonBuilder("First Result: ${first.format('dd.MM.yy')} Last Result: ${last.format('dd.MM.yy')} Result amount: ${results.size()}").toString())
     }
 
 

@@ -106,18 +106,15 @@ class JobService {
             0.step(count,batchSize){offset->
                 Job.withTransaction {
                     dc.list(offset: 0,max: batchSize).eachWithIndex {JobResult jobResult,int index->
-                        println "dc.count() = ${dc.count()}"
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
                             List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
                             batchDelete(httpArchives,batchSize)
-//                            FIXME with IT-456 there will be now cascading delete from JobResult to EventResult    and the following lines should be activated
+//                            FIXME with IT-456 there will be no cascading delete from JobResult to EventResult and the following lines should be activated
 //                            List<EventResult> eventResults = jobResult.getEventResults()
 //                            batchDelete(eventResults,batchSize)
                             jobResult.delete()
-                            println "deleted ${index+offset}"
                         } catch (Exception e){
-                            println "couldn't delete"
                             log.error("Couldn't delete JobResult ${e}")
                             c.call()
                         }
@@ -132,7 +129,7 @@ class JobService {
         }
     }
     /**
-     * Delets a List ob objects with a new Transaction and will delete up to batchSize objects with one transaction
+     * Deletes a List of objects with a new Transaction and will delete up to batchSize objects with one transaction
      * @param objects Objects to be deleted
      * @param batchSize maximum delete interval
      */
