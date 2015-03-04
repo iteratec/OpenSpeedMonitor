@@ -17,16 +17,18 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.Status
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import grails.gorm.DetachedCriteria
-import org.grails.datastore.gorm.AbstractGormApi
-import org.grails.datastore.gorm.GormInstanceApi
-import org.grails.datastore.mapping.core.Session
-
+import grails.transaction.Transactional
 
 class JobService {
+    static transactional = false
+    BatchActivityService batchActivityService
 
 	/**
 	 * <p>
@@ -79,12 +81,12 @@ class JobService {
 								   FROM TagLink tagLink
 								   WHERE tagLink.type = 'job'""")
 	}
-
+    @Transactional
 	void updateActivity(Job job, boolean activityToSet){
 		job.active = activityToSet
 		job.save(failOnError: true)
 	}
-
+    @Transactional
 	void updateExecutionSchedule(Job job, String executionSchedule){
 		job.executionSchedule = executionSchedule
 		job.save(failOnError: true)
@@ -94,9 +96,12 @@ class JobService {
      * Deletes a Job with all JobResults, HttpArchives and EventResults
      *
      * @param job Job that should be deleted
-     * @param c Closure to call if something couldn't be deleted
      */
-    void deleteJob(Job job, Closure c){
+    void deleteJob(Job job){
+        if(batchActivityService.runningBatch(Job.class,job.id)){
+            return
+        }
+        BatchActivity activity = batchActivityService.getActiveBatchActivity(Job.class,job.id,Activity.delete, "Job ${job.label} delete")
         def dc = new DetachedCriteria(JobResult).build {
             eq 'job', job
         }
@@ -105,6 +110,13 @@ class JobService {
         Job.withSession { session ->
             0.step(count,batchSize){offset->
                 Job.withTransaction {
+                    int max = offset+batchSize
+                    max = max<count?max:count
+                    BatchActivity.withTransaction {
+                        activity.progress = "Delete intervall $offset - $max"
+                        activity.stage = "Delete JobResults"
+                        activity.save(flush: true)
+                    }
                     dc.list(offset: 0,max: batchSize).eachWithIndex {JobResult jobResult,int index->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
@@ -114,17 +126,36 @@ class JobService {
 //                            List<EventResult> eventResults = jobResult.getEventResults()
 //                            batchDelete(eventResults,batchSize)
                             jobResult.delete()
+                            BatchActivity.withTransaction {
+                                activity.successfulActions++
+                                activity.save(flush: true)
+                            }
                         } catch (Exception e){
                             log.error("Couldn't delete JobResult ${e}")
-                            c.call()
+                            BatchActivity.withTransaction {
+                                activity.failures++
+                                activity.lastFailureMessage = "Couldn't delete JobResult: ${jobResult.id} - ${e}"
+                                activity.save(flush: true)
+                            }
                         }
                     }
                 }
                 session.flush()
                 session.clear()
             }
+            BatchActivity.withTransaction {
+                activity.stage = "Delete Job"
+                activity.save(flush: true)
+            }
             Job.withTransaction {
                 job.delete(flush: true)
+            }
+            BatchActivity.withTransaction {
+                activity.stage = ""
+                activity.progress = "done"
+                activity.endDate = new Date()
+                activity.status = Status.done
+                activity.save(flush: true)
             }
         }
     }

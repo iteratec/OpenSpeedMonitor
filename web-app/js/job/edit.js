@@ -107,7 +107,7 @@ function fixChoosen() {
 }
 function domainDeleteConfirmation(message,id){
     var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationTest";
-    var confirmMessage = "abc";
+    var confirmMessage = "";
     jQuery.ajax({
         type : 'GET',
         url : link,

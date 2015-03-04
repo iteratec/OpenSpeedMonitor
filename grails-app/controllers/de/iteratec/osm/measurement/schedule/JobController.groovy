@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.batch.BatchActivityController
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
@@ -179,22 +180,19 @@ class JobController {
         long before = System.nanoTime()
         Job job = Job.get(params.id)
         redirectIfNotFound(job, params.id)
-        def flashMessageArgs = [getJobI18n(), job.label]
-        jobService.deleteJob(job){
-            flash.message = message(code: 'default.not.deleted.message', args: flashMessageArgs)
-            redirect(action: "edit", id: job.id)
-        }
-        flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
-        redirect(action: "list")
+        jobService.deleteJob(job)
+        redirect(controller: "batchActivity", action: "list")
         log.debug("Time to delete Job: "+(System.nanoTime()-before)/1000000000 +"seconds")
     }
 
     def createDeleteConfirmationTest(int id){
         Job job = Job.get(id)
         List<JobResult> results = JobResult.findAllByJob(job)
-        Date first = results.min{it.date}.date
-        Date last = results.max{it.date}.date
-        render(new JsonBuilder("First Result: ${first.format('dd.MM.yy')} Last Result: ${last.format('dd.MM.yy')} Result amount: ${results.size()}").toString())
+        JobResult firstDate = results.min{it.date}
+        JobResult lastDate = results.max{it.date}
+        String first = firstDate ? "First Result: ${firstDate.date.format('dd.MM.yy')} ":""
+        String last = lastDate ? "Last Result: ${lastDate.date.format('dd.MM.yy')} " :""
+        render(new JsonBuilder("$first$last"+ "Result amount: ${results.size()}").toString())
     }
 
 
