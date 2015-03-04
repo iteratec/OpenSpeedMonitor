@@ -143,6 +143,7 @@ class PaginationService {
 						'selectedFolder': cmd.getSelectedFolder(),
 						'selectedPage': cmd.getSelectedPage(),
 						'selectedBrowsers': cmd.getSelectedBrowsers(),
+                        'selectedAllBrowsers' : cmd.getSelectedAllBrowsers(),
 						'_selectedAllBrowsers': cmd.getSelectedAllBrowsers(),
 						'_selectedAllMeasuredEvents': cmd.getSelectedMeasuredEventIds(),
 						'selectedAllMeasuredEvents': cmd.getSelectedAllMeasuredEvents(),
