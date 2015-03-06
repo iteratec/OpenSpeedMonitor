@@ -39,7 +39,7 @@
 
   function downloadCanvas(canvas, fileType) { // currently, most browsers only support toDataURL with mimeTypes 'jpeg' and 'png'
     var canvasdata = canvas.toDataURL("image/" + fileType + "");      
-    var pngimg = '<img src="'+canvasdata+'">'; 
+    var pngimg = '<img src="'+canvasdata+'">';
     
     newA = document.createElement('a');
     newA.setAttribute('href', '');

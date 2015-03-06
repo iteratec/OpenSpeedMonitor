@@ -124,11 +124,18 @@ function HighchartExporter(args) {
       html = html.replace(/<tspan x=\".*?\">/gi, '');
       html = html.replace(/<\/tspan>/gi, '');
       canvg(canvas, html);
-  
+
       //convert to image
       try {
-        downloadCanvas(canvas, "png");
-        removeObjectFromDom("#canvas_everything_merged");
+        //checking if image data gathered from canvas is not a blank image, otherwise restarting Exporter function, presuming that svg image meanwhile has completed rendering
+        var dataConverted = canvas.toDataURL("image/png");
+        if(dataConverted.indexOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") > -1) {
+          removeObjectFromDom("#canvas_everything_merged");
+          HighchartExporter(args);console.log('1');
+        } else {
+          downloadCanvas(canvas, "png");
+          removeObjectFromDom("#canvas_everything_merged");
+        }
       } 
       catch(err) {} // handle IE  
     });

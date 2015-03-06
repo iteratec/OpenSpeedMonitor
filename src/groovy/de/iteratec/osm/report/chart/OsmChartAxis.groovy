@@ -64,7 +64,7 @@ public class OsmChartAxis {
 		}
 		
 		this.group=group;
-		this.labelI18NIdentifier=i18NIdentifier;
+        this.labelI18NIdentifier=i18NIdentifier;
 		this.labelPosition=labelPosition;
 		this.divisor=divisor;
 		this.unit=unit;

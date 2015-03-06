@@ -102,7 +102,9 @@ function RickshawGraphBuilder(args) {
       var measurandGroup = self.graph.measurandGroupsManager
           .getMeasurandGroup(axis.measurandGroup);
       if (measurandGroup.label) {
-        var label = measurandGroup.label + " "
+        var lastIndex = measurandGroup.label.lastIndexOf(" ")
+        var str = measurandGroup.label.substring(0, lastIndex);
+        var label = str + " "
             + measurandGroup.yValueFormatterForAxis.unit
         containerOfLabel.html(label);
       }

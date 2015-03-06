@@ -42,9 +42,10 @@
 			if ($(nextRow).hasClass('jobsRow')) {
 				var jobsRowVisible = $(nextRow).is(":visible");
 				if (!jobsRowVisible || $(nextRow).attr('status') != status) {
-					$.each($('tbody tr', nextRow), function() {
-						$(this).toggle($(this).attr('data-statuscode') == status);
-					});
+          $.each($('tbody tr', nextRow), function() {
+            $(this).parent().parent().toggle($(this).attr('data-statuscode') == status);
+            $(this).parent().parent().prev().toggle($(this).attr('data-statuscode') == status);
+          });
 					$(nextRow).attr('status', status);
 				
 					$('.arrow').toggleClass('icon-chevron-down', false);
