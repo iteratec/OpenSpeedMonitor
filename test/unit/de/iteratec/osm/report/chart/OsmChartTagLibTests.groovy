@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -23,6 +23,7 @@ import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+
 import org.junit.Before
 import org.junit.Test
 
@@ -108,15 +109,15 @@ class OsmChartTagLibTests {
 		// assertions
 
 		assertEquals(expectedHtml, actualHtml)
-		
+
 	}
-	
+
 	private String getExpectedHtmlForSingleYAxisChartWithHighcharts(String divId, String width, String title, String yType, String maxValue, String lineType, String data) {
 		def sw = new StringWriter()
 
 		sw  = """<div id="${divId}" style="width: ${width};"></div>
 			<script type="text/javascript">
-				\$(document).ready(function() { 
+				\$(document).ready(function() {
 					window.CHARTLIB = "HIGHCHARTS";
 					var data = [${data}];
 		createLineChart("myDivId", "Antwortzeit WPT-Monitore", "Antwortzeit [ms]", data, 100, "null",
@@ -126,7 +127,7 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 	@Test
 	void testSingleYAxisChartTagWithRickshaw() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
@@ -194,7 +195,7 @@ class OsmChartTagLibTests {
 		assertEquals(expectedHtml, actualHtml)
 
 	}
-	
+
 	private String getExpectedHtmlForSingleYAxisChartWithRickshaw(String divId) {
 		def sw = new StringWriter()
 
@@ -202,9 +203,9 @@ class OsmChartTagLibTests {
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
 			<div id="rickshaw_main">
-				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>	
+				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
-				<div id="rickshaw_chart"></div>				
+				<div id="rickshaw_chart"></div>
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
@@ -232,7 +233,7 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 	@Test
 	void testMultipleYAxisChartTagWithRickshaw() {
 
@@ -310,7 +311,7 @@ class OsmChartTagLibTests {
 		// assertions
 		assertEquals(expectedHtml, actualHtml)
 	}
-	
+
 	private String getExpectedHtmlForMultipleYAxisChartWithRickshaw(String divId) {
 		def sw = new StringWriter()
 
@@ -318,9 +319,9 @@ class OsmChartTagLibTests {
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
 			<div id="rickshaw_main">
-				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>	
+				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
-				<div id="rickshaw_chart"></div>				
+				<div id="rickshaw_chart"></div>
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
@@ -348,7 +349,7 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 	@Test
 	void testMultipleYAxisChartTagWithHighchart() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
@@ -383,7 +384,7 @@ class OsmChartTagLibTests {
 			twoHoursAfterNowPoint
 		]);
 		List<OsmChartGraph> data = [graph1, graph2]
-		
+
 		OsmChartAxis axis1 = new OsmChartAxis("Percentages", MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE);
 		OsmChartAxis axis2 = new OsmChartAxis("Load Times", MeasurandGroup.LOAD_TIMES, "",1, OsmChartAxis.RIGHT_CHART_SIDE);
 		OsmChartAxis axis3 = new OsmChartAxis("Load Times", MeasurandGroup.REQUEST_COUNTS, "",1, OsmChartAxis.RIGHT_CHART_SIDE);
@@ -392,12 +393,12 @@ class OsmChartTagLibTests {
 		List<OsmChartAxis> highChartLabels = [axis1, axis2, axis3, axis4, axis5];
 
 		String divId = 'myDivId'
-		
+
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.HIGHCHARTS
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
-		
+
 		String expectedHtml = getExpectedHtmlForMultipleYAxisChartWithHighchart(divId).stripIndent()
-		
+
 		Map<String, Object> model = [
 			data: data,
 			divId: divId,
@@ -413,20 +414,20 @@ class OsmChartTagLibTests {
 			highChartLabels: highChartLabels
 		]
 
-		
+
 		// execute test
 		String actualHtml = applyTemplate(
 				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600px\" '+
 				'xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" ' +
-				'yAxisMax=\"${yAxisMax}\" measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" ' + 
-				'dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" ' + 
+				'yAxisMax=\"${yAxisMax}\" measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" ' +
+				'dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" ' +
 				'highChartLabels=\"${highChartLabels}\" />',
 				model).stripIndent()
 
 		// assertions
 		assertEquals(expectedHtml, actualHtml)
 	}
-	
+
 	private String getExpectedHtmlForMultipleYAxisChartWithHighchart(String divId) {
 		def sw = new StringWriter()
 
@@ -443,5 +444,5 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 }

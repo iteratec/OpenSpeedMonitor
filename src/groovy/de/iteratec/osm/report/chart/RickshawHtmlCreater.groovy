@@ -132,7 +132,6 @@ class RickshawHtmlCreater {
 			if (eachPoint.sourceURL != null) {
 				url = eachPoint.sourceURL.toString();
             }
-			}
 
             testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
 			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${measuredValue}, url: "${url}" ${testingAgent}}"""

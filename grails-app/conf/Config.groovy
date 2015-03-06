@@ -1,37 +1,36 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 import de.iteratec.osm.report.chart.ChartingLibrary
+
 import org.apache.log4j.AsyncAppender
 import org.apache.log4j.DailyRollingFileAppender
 import org.apache.log4j.RollingFileAppender
 
 /*
+* OpenSpeedMonitor (OSM)
+* Copyright 2014 iteratec GmbH
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* 	http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+
+/*
  * locations to search for config files that get merged into the main config:
- * 	config files can be ConfigSlurper scripts, Java properties files, or classes 
+ * 	config files can be ConfigSlurper scripts, Java properties files, or classes
  * 	in the classpath in ConfigSlurper format
  */
 if (System.properties["osm_config_location"]) {
 	log.info('system property for external configuration found')
     grails.config.locations = ["file:" + System.properties["osm_config_location"]]
 } else {
-    grails.config.locations = ["classpath:${appName}-config.properties", "classpath:${appName}-config.groovy", "file:${userHome}/.grails/${appName}-config.properties", "file:${userHome}/.grails/${appName}-config.groovy"]
-}
- } else {
 	 grails.config.locations = [
 		 "classpath:${appName}-config.properties",
 		 "classpath:${appName}-config.groovy",
@@ -40,7 +39,7 @@ if (System.properties["osm_config_location"]) {
  }
 
 // config for all environments //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
+
 grails.databinding.useSpringBinder=true //Added to run CustomDateEditor: http://grails.1312388.n4.nabble.com/backward-compatability-of-Grails-2-3-0-databinder-td4650325.html
 grails.databinding.convertEmptyStringsToNull = false
 
@@ -163,6 +162,7 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/console/**'                				: ['ROLE_SUPER_ADMIN'],
 	'/apiKey/**'								: ['ROLE_SUPER_ADMIN'],
 	'/**'                       				: ['ROLE_ADMIN','ROLE_SUPER_ADMIN']
+]
 
 grails.plugins.dynamicController.mixins = [
     'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
@@ -461,8 +461,6 @@ environments {
                         'net.sf.ehcache.hibernate',
                         'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
                         'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
-                        'org.hibernate.SQL',
-                        'org.hibernate.transaction' 	//hibernate],
                 ],
                 asyncOsmAppenderDetails: [
                         'org.codehaus.groovy.grails.commons',            // core / classloading
