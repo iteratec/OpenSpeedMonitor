@@ -21,8 +21,7 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.p13n.CookieBasedSettingsService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.test.mixin.*
 
 import org.junit.Before
 import org.junit.Test
@@ -107,8 +106,7 @@ class OsmChartTagLibTests {
 				model).stripIndent()
 
 		// assertions
-
-		assertEquals(expectedHtml, actualHtml)
+        assertEquals(expectedHtml, actualHtml)
 
 	}
 
