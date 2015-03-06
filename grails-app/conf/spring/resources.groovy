@@ -24,15 +24,17 @@ import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.CustomDoubleRegistrar
 
 // Place your Spring DSL code here
 beans = {
-	customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-	aggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
-	jobGroupDaoService(DefaultJobGroupDaoService)
-	pageDaoService(DefaultPageDaoService)
-	measuredEventDaoService(DefaultMeasuredEventDaoService)
-	browserDaoService(DefaultBrowserDaoService)
-	locationDaoService(DefaultLocationDaoService)
+    customPropertyEditorRegistrar(CustomDoubleRegistrar)
+    customPropertyEditorRegistrar(CustomDateEditorRegistrar)
+    aggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
+    jobGroupDaoService(DefaultJobGroupDaoService)
+    pageDaoService(DefaultPageDaoService)
+    measuredEventDaoService(DefaultMeasuredEventDaoService)
+    browserDaoService(DefaultBrowserDaoService)
+    locationDaoService(DefaultLocationDaoService)
 	graphiteSocketProvider(DefaultGraphiteSocketProvider)
 }

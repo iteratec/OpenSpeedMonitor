@@ -17,6 +17,8 @@
 </style>
 </head>
 <body>
+  <%-- main menu --%>
+  <g:render template="/layouts/mainMenu"/>
 	<%-- heading --%>
 	<div class="row">
 		<div class="span12">
@@ -58,7 +60,7 @@
 		<div class="span1">
 			<div id="chart-table-toggle" class="btn-group" data-toggle="buttons-radio" id="job-filter-toggle">
 	 			<button type="button" class="btn btn-small active" id="chart-toggle"><g:message code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung" /></button>
-		 		<button type="button" class="btn btn-small" id="table-toggle"><g:message code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung" /></button>
+		 		<button type="button" class="btn btn-small" id="table-toggle"><g:message code="de.iteratec.isocsi.csi.button.tableView" default="Tabellendarstellung" /></button>
 			</div>
 		</div>
 	</div>

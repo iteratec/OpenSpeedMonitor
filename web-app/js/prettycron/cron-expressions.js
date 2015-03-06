@@ -22,7 +22,7 @@ function getPrettyCron(cronExpression) {
 function updatePrettyCrons() {
 	$.each($('abbr.cronExpression'), function(index, elem) {
 		var cronExpression = elem.innerHTML;
-		$(elem).attr('title', getPrettyCron(cronExpression));
+    $(elem).attr('title', getPrettyCron(cronExpression));
 	});
 }
 

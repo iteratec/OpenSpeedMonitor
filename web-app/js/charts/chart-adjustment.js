@@ -21,9 +21,11 @@
 $(document).ready(function() {
 	var chartAdjustmentIsOnPage = ($('#collapseAdjustment').length > 0);
 	if(chartAdjustmentIsOnPage){
-		var adjuster
+    var adjuster
+    var exporter
 		if (CHARTLIB.toUpperCase() == "HIGHCHARTS"){
 			adjuster = new HighchartAdjuster();
+			exporter = new  HighchartExporter();
 		} else if (CHARTLIB.toUpperCase() == "RICKSHAW"){
 			// done in rickshawChartCreation.js
 		} else {
@@ -73,23 +75,26 @@ function HighchartAdjuster() {
 				);
 			}
 		});
-		$('#dia-change-chartsize').bind('click', function(){
-			var diaWidth = $('#dia-width').val()
-			var diaHeight = $('#dia-height').val()
-			var maxWidth = 5000
-			var maxHeight = 3000
-			if ($.isNumeric(diaWidth) && $.isNumeric(diaHeight)
-					&& parseInt(diaWidth)>0 && parseInt(diaWidth)<=maxWidth
-					&& parseInt(diaHeight)>0 && parseInt(diaHeight)<=maxHeight) {
+    $('#dia-change-chartsize').bind('click', function(){
+      var diaWidth = $('#dia-width').val()
+      var diaHeight = $('#dia-height').val()
+      var maxWidth = 5000
+      var minWidth = 540
+      var maxHeight = 3000
+      if ($.isNumeric(diaWidth) && $.isNumeric(diaHeight)
+          && parseInt(diaWidth)>0 && parseInt(diaWidth)<=maxWidth && parseInt(diaWidth) >= minWidth
+          && parseInt(diaHeight)>0 && parseInt(diaHeight)<=maxHeight) {
 				var diaWidth = $('#dia-width').val();
 				var diaHeight = $('#dia-height').val();
                 chart.setSize(diaWidth, diaHeight);
 				chart.options.exporting.sourceWidth=diaWidth;
 				chart.options.exporting.sourceHeight=diaHeight;
-			}else{
-				window.alert("Width and height of diagram has to be numeric values and maximum is 5.000 x 3.000 pixel!");
-			}
-		});
+      }else{
+        window.alert("Width and height of diagram has to be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels.");
+      }
+    });
+
+      
 		if (multipleYAxis){
 			$('#dia-change-yaxis').bind('click', function(){
 				var diaYAxisMin = $('#dia-y-axis-min').val()
@@ -107,4 +112,39 @@ function HighchartAdjuster() {
 		});
 	}
 	this.initialize();
+}
+
+function HighchartExporter(args) {
+  var self = this;
+  
+  this.initialize = function(args) {
+    
+    //convert and download highcharts
+    d3.select("#dia-save-chart-as-png").on("click", function(){
+      var retVal = prepareNewBlankCanvas("svg");
+      var canvas = retVal.canvas;
+      
+      var html = d3.select("svg").node().parentNode.innerHTML;
+      html = html.replace(/<tspan x=\".*?\">/gi, '');
+      html = html.replace(/<\/tspan>/gi, '');
+      canvg(canvas, html);
+
+      //convert to image
+      try {
+        //checking if image data gathered from canvas is not a blank image, otherwise restarting Exporter function, presuming that svg image meanwhile has completed rendering
+        var dataConverted = canvas.toDataURL("image/png");
+        if(dataConverted.indexOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") > -1) {
+          removeObjectFromDom("#canvas_everything_merged");
+          HighchartExporter(args);console.log('1');
+        } else {
+          downloadCanvas(canvas, "png");
+          removeObjectFromDom("#canvas_everything_merged");
+        }
+      } 
+      catch(err) {} // handle IE  
+    });
+  
+  }
+  
+  this.initialize(args);
 }

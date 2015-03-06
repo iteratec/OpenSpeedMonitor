@@ -80,7 +80,7 @@
 					<tr class="jobsRow" data-queue="${location.id}">
 						<td colspan="10">
 						<g:each var="job" in="${location.executingJobs}">
-							<strong>${job.key.label}</strong>
+              <strong>${job.key.label}</strong>
 							<table>
 							<thead>
 							 <tr>
@@ -92,7 +92,7 @@
 							<g:each var="jobResult" in="${job.value}">
 								<tr data-statuscode="${jobResult.httpStatusCode}">
 								<td>
-									<a href="${jobResult.wptStatus}">${jobResult.getSatusCodeMessage()}</a>
+									<a href="../job/edit/${jobResult.job.id}">${jobResult.getSatusCodeMessage()}</a>
 								 </td>
 								 <td>
 									<g:render template="../job/timeago" model="${[date: jobResult.date]}" />

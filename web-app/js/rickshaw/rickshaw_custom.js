@@ -660,7 +660,7 @@ Rickshaw.Graph = function(args) {
 	};
 
 	this.onUpdate = function(callback) {
-		this.updateCallbacks.push(callback);
+      this.updateCallbacks.push(callback);
 	};
 
 	this.onConfigure = function(callback) {
@@ -1873,7 +1873,9 @@ Rickshaw.Graph.Axis.X = function(args) {
 			this.vis = this.graph.vis;
 		}
 
-		 this.graph.onUpdate( function() { self.render() } );
+		 this.graph.onUpdate( function() {
+         self.render();
+		 });
 	};
 
 	this.setSize = function(args) {
@@ -1993,7 +1995,9 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 		var self = this;
 		
-		 this.graph.onUpdate( function() { self.render() } );
+		 this.graph.onUpdate( function() {
+         self.render();
+		 } );
 	},
 
 	setSize: function(args) {
@@ -2274,7 +2278,7 @@ Rickshaw.Graph.Behavior.Series.Order = function(args) {
 	});
 
 	// hack to make jquery-ui sortable behave
-	this.graph.onUpdate( function() { 
+	this.graph.onUpdate( function() {
 		var h = window.getComputedStyle(self.legend.element).height;
 		self.legend.element.style.height = h;
 	} );
@@ -2350,7 +2354,6 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
                                 });
 
                         }
-                        
                 };
 
 	};
@@ -2725,7 +2728,8 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 		// we could bind this.render.bind(this) here
 		// but triggering the re-render would lose the added
 		// behavior of the series toggle
-		this.graph.onUpdate( function() {} );
+//		this.graph.onUpdate( function() {
+//		} );
 	},
 
 	render: function() {
@@ -3117,12 +3121,14 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			// graphArgs.series = series;
 			
 			graphArgs.stack = false; // if true, slider preview can not be drawn
-			// graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
+			graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
 
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
 			
-			parent.onUpdate(function() { graph.render(); self.render() });
+			parent.onUpdate(function() {
+  			  graph.render(); self.render();
+			});
 
 			parent.onConfigure(function(args) { 
 				// don't propagate height

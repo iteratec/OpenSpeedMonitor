@@ -34,7 +34,7 @@
 					<h4><g:message code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.header" default="Warning!"/></h4>
 					<g:message 
 						code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.content" 
-						default="Measurements are generally disabled! Even active jobs won't get started until measurements are genrally enabled again. Ask your administrator for activation."/>
+						default="Measurements are generally disabled! Even active jobs won't get started until measurements are generally enabled again. Ask your administrator for activation."/>
                     <br>
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
                         <g:actionSubmit class="btn btn-small btn-warning" action="activateMeasurementsGenerally"
@@ -57,22 +57,35 @@
 				<a href="#" id="updateHints" class="icon-question-sign icon-large" rel="popover"
 				data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"></a>
 			</p>
-			<h5><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" /></h5>
-			<input type="text" onkeyup="filterJobList()" id="filterByLabel"
-				placeholder="<g:message code="de.iteratec.isj.Job.list.filter" default="Jobs filtern" />"
-				name="filters.filterByLabel" value="${filters?.filterByLabel}" />
-			<input type="text" onkeyup="filterJobList()" id="filterByJobGroup"
-				placeholder="<g:message code="de.iteratec.isj.Job.list.filterByGroup" default="Job-Gruppen filtern" />" 
-				name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}" />
-			<input type="text" onkeyup="filterJobList()" id="filterByLocation"
-				placeholder="<g:message code="de.iteratec.isj.Job.list.filterByLocation" default="Locations filtern" />" 
-				name="filters.filterByLocation" value="${filters?.filterByLocation}" />
-			<select id="filterTags" multiple data-placeholder="${message(code: 'job.filter.filterTags')}" class="chosen-select"
-				name="filters.filterTags">
-			<g:each in="${Job.allTags}">
-				<option ${ filters && it in filters.filterTags ? 'selected' : '' }>${it}</option>
-			</g:each>
-			</select>
+			<div class="row noIdent">
+				<h5><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern"/></h5>
+				<input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
+					placeholder="<g:message code="Job.list.filter" default="Jobs filtern" />"
+					name="filters.filterByLabel" value="${filters?.filterByLabel}" />
+				<input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByJobGroup"
+					placeholder="<g:message code="Job.list.filterByGroup" default="Job-Gruppen filtern" />" 
+					name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}" />
+				<input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLocation"
+					placeholder="<g:message code="Job.list.filterByLocation" default="Locations filtern" />" 
+					name="filters.filterByLocation" value="${filters?.filterByLocation}" />
+				<select id="filterTags" multiple data-placeholder="${message(code: 'job.filter.filterTags')}" class="chosen-select span2"
+					name="filters.filterTags">
+				<g:each in="${Job.allTags}">
+					<option ${ filters && it in filters.filterTags ? 'selected' : '' }>${it}</option>
+				</g:each>
+				</select>
+			</div>
+      <div class="row noIdent">
+        <input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterBySkript"
+        placeholder="<g:message code="Job.list.filterBySkript" default="Nach Skriptname filtern" />"
+        name="filters.filterBySkript" value="${filters?.filterBySkript}" />
+        <input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByJobGroup"
+          placeholder="<g:message code="de.iteratec.isj.Job.list.filterByGroup" default="Job-Gruppen filtern" />" 
+          name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}" style="visibility: hidden; "/>
+        <input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByBrowser"
+        placeholder="<g:message code="Job.list.filterByBrowser" default="Browser filtern" />" 
+        name="filters.filterByBrowser" value="${filters?.filterByBrowser}" />
+      </div>
 			<div>
 			<g:checkBox onchange="filterJobList()"
 				id="filterCheckedJobs" class="checkbox inline"

@@ -2,7 +2,7 @@
 	<div class="placeholder-row" id="${variable.name}">
 		<label for="variables.${variable.name}">&#x24;{${variable.name}}</label>
 		<g:if test="${ variable.editable }">
-			<input id="variables.${variable.name}" type="text" name="variables.${variable.name}" value="${variable.value}" />
+			<input id="variables.${variable.name}" type="text" name="variables.${variable.name}" value="${variable.value}" class="width_31em" />
 		</g:if>
 		<g:else>
 			<input id="variables.${variable.name}" type="hidden" name="variables.${variable.name}" value="${variable.value}" />

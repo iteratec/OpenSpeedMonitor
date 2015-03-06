@@ -24,6 +24,19 @@ if (typeof jQuery !== 'undefined') {
 		});
 	})(jQuery);
 }
+
+jQuery('ul.nav li.dropdown').hover(function() {
+  jQuery(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn();
+}, function() {
+  jQuery(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut();
+});
+
+jQuery('li.dropdown-submenu').hover(function() {
+  jQuery(this).children('ul').stop(true, true).delay(100).fadeIn();
+}, function() {
+  jQuery(this).children('ul').stop(true, true).delay(100).fadeOut();
+});
+
 function stringToBoolean(string) {
 	if(!string) return false;
 	switch(string.toLowerCase()){

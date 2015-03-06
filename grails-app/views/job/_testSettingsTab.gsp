@@ -28,7 +28,7 @@
 		<g:message code="job.description.label" default="description" />
 	</label>
 	<div class="span8">
-		<textarea class="form-control" name="description" id="description" rows="3">${job?.description?.trim()}</textarea>
+		<textarea class="form-control width_31em" name="description" id="description" rows="3">${job?.description?.trim()}</textarea>
 	</div>
 </div>
 
@@ -37,7 +37,7 @@
 		<g:message code="job.tags.label" default="tags" />
 	</label>
 	<div class="span8">
-		<ul name="tags" style="margin-left:0px;" id="tags">
+		<ul name="tags" style="margin-left:0px;" id="tags" class="width_31em">
 		      <g:each in="${job?.tags}">
 		        <li>${it}</li>
 		      </g:each>

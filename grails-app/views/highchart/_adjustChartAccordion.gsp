@@ -9,7 +9,7 @@
 	<div class="accordion-group">
 		<div class="accordion-heading">
 			<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#collapseAdjustment">
-			<g:message code="de.iteratec.chart.adjustment.name"/>
+			<g:message code="de.iteratec.chart.adjustment.name" default="Diagramm anpassen"/>
 			</a>
 		</div>
 		<div id="collapseAdjustment" class="accordion-body collapse in">
@@ -84,5 +84,8 @@
 				</div>
 			</div>
 		</div>
+	
+    <div class="accordion-footer">
+    </div>
 	</div>
 </div>

@@ -18,7 +18,7 @@ td, th {
 	
 	<div class="controlribbon">
 		<h5><g:message code="script.list.label.filter" default="Skripte filtern" /></h5>
-		<input type="text" id="filterByLabel" onkeyup="filterScriptList()" placeholder="<g:message code="script.list.filter.name" default="Nach Skript-Namen" />" />
+		<input type="text" id="filterByLabel" onkeyup="filterScriptList()" oninput="filterScriptList()" placeholder="<g:message code="script.list.filter.name" default="Nach Skript-Namen" />" />
 	</div>
 	<div class="controlribbon">
 		<a href="<g:createLink action="create" />" class="btn btn-primary">

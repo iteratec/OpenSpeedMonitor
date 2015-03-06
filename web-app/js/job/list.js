@@ -131,7 +131,11 @@ function filterJobList() {
     var filterJobGroup = $.trim($('#filterByJobGroup').val());
     setToLocalStorage('de.iteratec.osm.job.list.filters.jobgroup',filterJobGroup);
     var filterLocation = $.trim($('#filterByLocation').val());
-    setToLocalStorage('de.iteratec.osm.job.list.filters.location',filterLocation);
+    setToLocalStorage('de.iteratec.osm.job.list.filters.location',filterLocation);    
+    var filterSkript = $.trim($('#filterBySkript').val());
+    setToLocalStorage('de.iteratec.osm.job.list.filters.skript',filterSkript);    
+    var filterBrowser = $.trim($('#filterByBrowser').val());
+    setToLocalStorage('de.iteratec.osm.job.list.filters.browser',filterBrowser);    
     var filterCheckedJobs = $('#filterCheckedJobs').prop('checked');
     setToLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs',filterCheckedJobs);
     var filterInactiveJobs = $('#filterInactiveJobs').prop('checked');
@@ -146,12 +150,16 @@ function filterJobList() {
     var reText = new RegExp(filterText, 'i');
     var reJobGroup = new RegExp(filterJobGroup, 'i');
     var reLocation = new RegExp(filterLocation, 'i');
+    var reBrowser = new RegExp(filterBrowser, 'i');
+    var reSkript = new RegExp(filterSkript, 'i');
     
 	$('table tbody tr').each(function() {
 		var tr = $(this);
 		var jobName = $('.jobName', tr).text();
 		var jobGroup = $('.jobgroup', tr).text();
-		var location = $('.location', tr).text();
+    var location = $('.location', tr).text();
+    var browser = $('.browser', tr).text();
+    var skript = $('.skript', tr).text();
     	var showRow = true;
     	if (showRow && filterHighlightedJobs) { showRow = tr.hasClass('highlight'); }
     	if (showRow && filterCheckedJobs) { showRow = $('.jobCheckbox', tr).prop('checked'); }
@@ -159,7 +167,9 @@ function filterJobList() {
     	if (showRow && filterRunningJobs) { showRow = $('.running', tr).length > 0; }
     	
     	if (showRow && filterJobGroup !== '') { showRow = jobGroup.search(reJobGroup) > -1; }
-    	if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
+      if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
+      if (showRow && filterBrowser !== '') { showRow = browser.search(reBrowser) > -1; }
+      if (showRow && filterSkript !== '') { showRow = skript.search(reSkript) > -1; }
     	if (showRow && filterText !== '') { showRow = jobName.search(reText) > -1; }
     	
     	if (showRow && checkedTags) {

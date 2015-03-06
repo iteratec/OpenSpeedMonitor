@@ -179,6 +179,7 @@
 				if (cp.min != null) sb << ' min="' << cp.min << '"'
 				if (cp.max != null) sb << ' max="' << cp.max << '"'
 				if (isRequired()) sb << ' required=""'
+        if (cp.maxSize) sb << ' maxlength="' << cp.maxSize << '"'
 				sb << ' value="${' << domainInstance << '.' << property.name << '}"'
 				sb << '/>'
             }
@@ -209,6 +210,7 @@
                 return "\${${domainInstance}?.${property.name}?.toString()}"
             } else {
                 def sb = new StringBuilder("<bs:datePicker name=\"${property.name}\" ")
+                if (isRequired()) sb << ' required=""'
                 if (cp.format) sb << "format=\"${cp.format}\" "
                 if (cp.widget) sb << "widget=\"${cp.widget}\" "
                 cp.attributes.each { k, v ->

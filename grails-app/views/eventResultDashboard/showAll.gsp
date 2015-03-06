@@ -178,7 +178,7 @@
 										value="${selectedAggrGroupValuesCached}" />
 								</div>
 								<div class="span3">
-									<h6><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES" default="Ladezeiten" /></h6>
+									<h6><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES" default="Ladezeiten [s]" /></h6>
 									<div class="input-append">
 										<label for="appendedInputBelowLoadTimes">
 											<g:message code="de.iteratec.isr.wptrd.labels.trimbelow" default="Trim below" />
@@ -193,7 +193,7 @@
 										<input name="trimAboveLoadTimes" id="appendedInputAboveLoadTimes" value="${trimAboveLoadTimes}" class="span1 content-box" type="text" placeholder="...">
 										<span class="add-on"> ms</span>
 									</div>
-									<h6><g:message code="de.iteratec.isr.measurand.group.REQUEST_COUNTS" default="Anzahl Requests" /></h6>
+									<h6><g:message code="de.iteratec.isr.measurand.group.REQUEST_COUNTS" default="Anzahl Requests [c]" /></h6>
 									<div class="input-append">
 										<label for="appendedInputBelowRequestCounts">
 											<g:message code="de.iteratec.isr.wptrd.labels.trimbelow" default="Trim below" />
@@ -208,7 +208,7 @@
 										<input name="trimAboveRequestCounts" id="appendedInputAboveRequestCounts" value="${trimAboveRequestCounts}" class="span1 content-box" type="text" placeholder="...">
 										<span class="add-on"> REQ</span>
 									</div>
-									<h6><g:message code="de.iteratec.isr.measurand.group.REQUEST_SIZES" default="Anzahl Requests" /></h6>
+									<h6><g:message code="de.iteratec.isr.measurand.group.REQUEST_SIZES" default="Gr&ouml;&szlig;e Requests [kb]" /></h6>
 									<div class="input-append">
 										<label for="appendedInputBelowRequestSizes">
 											<g:message code="de.iteratec.isr.wptrd.labels.trimbelow" default="Trim below" />

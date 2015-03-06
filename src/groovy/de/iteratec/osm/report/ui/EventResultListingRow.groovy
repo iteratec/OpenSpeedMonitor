@@ -33,7 +33,7 @@ import de.iteratec.osm.result.MeasuredEvent
  * 
  * @author mze
  * 
- * @since IT-106 (Extracted from {@link EventResultController} 
+ * @since IT-106 (Extracted from {@link TabularResultPresentationController} 
  *         since 8th October 2013) 
  */
 public class EventResultListingRow {
