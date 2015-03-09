@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.batch
 
-import de.iteratec.osm.measurement.schedule.Job
-
 /**
  * BatchActivityController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
@@ -41,5 +39,13 @@ class BatchActivityController {
 
     def show(){
         [batchActivityInstance: BatchActivity.get(params.id)]
+    }
+
+    /**
+     *
+     * @return new Content from BatchaActivityTable
+     */
+    def updateTable(){
+        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list()])
     }
 }

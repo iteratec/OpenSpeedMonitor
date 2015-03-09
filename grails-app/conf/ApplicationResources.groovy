@@ -153,4 +153,7 @@ modules = {
 
 		resource url: 'js/eventresult/listResult.js'
 	}
+    'batchactivity'{
+        resource '/js/batchactivity/list.js'
+    }
 }
