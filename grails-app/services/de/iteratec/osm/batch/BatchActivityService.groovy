@@ -41,4 +41,31 @@ class BatchActivityService {
         return (BatchActivity.findByDomainAndIdWithinDomainAndStatus(c.toString(), idWithinDomain, Status.active) != null)
     }
 
+    /**
+     *  Updates a BatchActivity with values from the given map and saves it
+     *
+     * @param BatchActivity BatchActivity to update
+     * @param map with following possible entries:
+     *      "errors": Integer,
+     *      "failures": Integer,
+     *      "lastFailureMessage": String,
+     *      "progress": Integer,
+     *      "progressWithinStage": String,
+     *      "stage": String,
+     *      "status": Status,
+     *      "successfulActions": Integer,
+     *      "endDate": Date
+     */
+    public void updateStatus(BatchActivity activity,Map<String,Object> map){
+        def allowed = ["errors","failures","lastFailureMessage","progress","progressWithinStage","stage","status","successfulActions","endDate"]
+        map.each {key,value->
+            if(allowed.contains(key)){
+                activity[key] = value
+            } else{
+                log.error("$key not allowed for ${activity.class}")
+            }
+        }
+        activity.save(flush: true)
+    }
+
 }

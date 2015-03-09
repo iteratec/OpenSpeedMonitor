@@ -112,11 +112,7 @@ class JobService {
                 Job.withTransaction {
                     int max = offset+batchSize
                     max = max<count?max:count
-                    BatchActivity.withTransaction {
-                        activity.progress = "Delete intervall $offset - $max"
-                        activity.stage = "Delete JobResults"
-                        activity.save(flush: true)
-                    }
+                    batchActivityService.updateStatus(activity,["progress":"Delete intervall $offset - $max","stage":"Delete JobResults"])
                     dc.list(offset: 0,max: batchSize).eachWithIndex {JobResult jobResult,int index->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
@@ -126,37 +122,21 @@ class JobService {
 //                            List<EventResult> eventResults = jobResult.getEventResults()
 //                            batchDelete(eventResults,batchSize)
                             jobResult.delete()
-                            BatchActivity.withTransaction {
-                                activity.successfulActions++
-                                activity.save(flush: true)
-                            }
+                            batchActivityService.updateStatus(activity,["successfulActions":++activity.getSuccessfulActions()])
                         } catch (Exception e){
                             log.error("Couldn't delete JobResult ${e}")
-                            BatchActivity.withTransaction {
-                                activity.failures++
-                                activity.lastFailureMessage = "Couldn't delete JobResult: ${jobResult.id} - ${e}"
-                                activity.save(flush: true)
-                            }
+                            batchActivityService.updateStatus(activity,["failures":++activity.getFailures(),"lastFailureMessage":"Couldn't delete JobResult: ${jobResult.id} - ${e}"])
                         }
                     }
                 }
                 session.flush()
                 session.clear()
             }
-            BatchActivity.withTransaction {
-                activity.stage = "Delete Job"
-                activity.save(flush: true)
-            }
+            batchActivityService.updateStatus(activity,["stage":"Delete Job"])
             Job.withTransaction {
                 job.delete(flush: true)
             }
-            BatchActivity.withTransaction {
-                activity.stage = ""
-                activity.progress = "done"
-                activity.endDate = new Date()
-                activity.status = Status.done
-                activity.save(flush: true)
-            }
+            batchActivityService.updateStatus(activity,["stage":"","progress":"done","endDate":new Date(),"status":Status.done])
         }
     }
     /**
