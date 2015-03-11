@@ -175,7 +175,7 @@ class JobController {
         redirect(controller: "batchActivity", action: "list")
     }
 
-    def createDeleteConfirmationTest(int id){
+    def createDeleteConfirmationText(int id){
         Job job = Job.get(id)
         List<JobResult> results = JobResult.findAllByJob(job)
         JobResult firstDate = results.min{it.date}

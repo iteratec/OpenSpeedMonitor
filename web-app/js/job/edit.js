@@ -106,7 +106,7 @@ function fixChoosen() {
    });
 }
 function domainDeleteConfirmation(message,id){
-    var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationTest";
+    var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationText";
     var confirmMessage = "";
     jQuery.ajax({
         type : 'GET',
@@ -119,5 +119,5 @@ function domainDeleteConfirmation(message,id){
         error: function(result) {
             confirmMessage = message;
     }});
-    return confirm(confirmMessage);
+    return confirmMessage;
 }

@@ -90,6 +90,7 @@ $.extend({
 });
 function domainDeleteConfirmation(message,id){
     var defaultMessage = "Are you sure?"
+    console.log("def");
     return confirm(message ? message : defaultMessage);
 
 }
