@@ -19,13 +19,9 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.batch.BatchActivityController
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -34,11 +30,7 @@ import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
-import org.codehaus.groovy.grails.web.json.parser.JSONParser
-import org.hibernate.criterion.DetachedCriteria
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
-import org.springframework.transaction.TransactionStatus
 
 class JobController {
 	
@@ -177,12 +169,10 @@ class JobController {
 	}
 	
 	def delete() {
-        long before = System.nanoTime()
         Job job = Job.get(params.id)
         redirectIfNotFound(job, params.id)
         jobService.deleteJob(job)
         redirect(controller: "batchActivity", action: "list")
-        log.debug("Time to delete Job: "+(System.nanoTime()-before)/1000000000 +"seconds")
     }
 
     def createDeleteConfirmationTest(int id){

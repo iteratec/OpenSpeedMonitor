@@ -1,5 +1,5 @@
 /**
- * Refreshes the table data every 5 seconds
+ * updates the batchActivity table
  * @param updateTableUrl url to updateTableMethod within BatchActivityController
  */
 function updateBatchActivity(updateTableUrl) {
@@ -13,7 +13,11 @@ function updateBatchActivity(updateTableUrl) {
         }
     });
 }
-
+/**
+ * Refreshes the table data every 5 seconds
+ * @param updateTableUrl url to updateTableMethod within BatchActivityController
+ * @param checkUrl url to check if an update is necessary
+ */
 function updateIfNecessary(updateTableUrl, checkUrl) {
     setInterval(function () {
         var check = "false";
@@ -30,7 +34,6 @@ function updateIfNecessary(updateTableUrl, checkUrl) {
             }
         });
         if (check == "true") {
-            console.log("aye");
             updateBatchActivity(updateTableUrl);
         }
 
