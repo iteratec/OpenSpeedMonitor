@@ -164,4 +164,15 @@ public final class OsmChartPoint {
 	public boolean hasAnSourceURL() {
 		return this.sourceURL != null
 	}
+
+    public boolean equals(Object o){
+        OsmChartPoint osmChartPoint = (OsmChartPoint) o
+        if (this.time == osmChartPoint.time
+                && this.measuredValue == osmChartPoint.measuredValue
+                && this.countOfAggregatedResults == osmChartPoint.countOfAggregatedResults
+                && this.sourceURL == osmChartPoint.sourceURL
+                && this.testingAgent == osmChartPoint.testingAgent)
+            return true
+        return false
+    }
 }
