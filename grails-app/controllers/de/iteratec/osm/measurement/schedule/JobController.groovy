@@ -22,6 +22,7 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -29,7 +30,6 @@ import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
 class JobController {
@@ -169,22 +169,24 @@ class JobController {
 	}
 	
 	def delete() {
-		Job job = Job.get(params.id)
-		redirectIfNotFound(job, params.id)
-		def flashMessageArgs = [getJobI18n(), job.label]
+        Job job = Job.get(params.id)
+        redirectIfNotFound(job, params.id)
+        jobService.deleteJob(job)
+        redirect(controller: "batchActivity", action: "list")
+    }
 
-		try {
-			job.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
-			redirect(action: "list")
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: flashMessageArgs)
-			redirect(action: "edit", id: job.id)
-		}
-	}
-	
-	/**
+    def createDeleteConfirmationTest(int id){
+        Job job = Job.get(id)
+        List<JobResult> results = JobResult.findAllByJob(job)
+        JobResult firstDate = results.min{it.date}
+        JobResult lastDate = results.max{it.date}
+        String first = firstDate ? "First Result: ${firstDate.date.format('dd.MM.yy')} ":""
+        String last = lastDate ? "Last Result: ${lastDate.date.format('dd.MM.yy')} " :""
+        render(new JsonBuilder("$first$last"+ "Result amount: ${results.size()}").toString())
+    }
+
+
+    /**
 	 * Execute handler for each job selected using the checkboxes
 	 * @param handler A closure which gets the corresponding job as first parameter
 	 */

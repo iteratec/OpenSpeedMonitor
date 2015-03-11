@@ -67,7 +67,11 @@
 				</a>
 				
 				<g:if test="${ mode == 'edit' }">
-	   			<a href="#DeleteModal" role="button" class="btn btn-danger" data-toggle="modal">${message(code: 'default.button.delete.label', default: 'Delete')}</a>
+	   			<a href="#DeleteModal" role="button" class="btn btn-danger" data-toggle="modal"
+                   onclick="return domainDeleteConfirmation('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Sind Sie sicher?')}',${entity?.id});">
+                    ${message(code: 'default.button.delete.label', default: 'Delete')}
+                </a>
+
   <%--
 					<g:actionSubmit class="btn btn-danger" action="delete"
 						value="${message(code: 'default.button.delete.label', default: 'Löschen')}"

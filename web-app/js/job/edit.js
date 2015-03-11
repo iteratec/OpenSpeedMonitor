@@ -105,3 +105,19 @@ function fixChoosen() {
          $parent.css("overflow", "");
    });
 }
+function domainDeleteConfirmation(message,id){
+    var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationTest";
+    var confirmMessage = "";
+    jQuery.ajax({
+        type : 'GET',
+        url : link,
+        data: {id:id},
+        async:   false,
+        success: function(result) {
+            confirmMessage = message + "\n" + result.toString();
+        },
+        error: function(result) {
+            confirmMessage = message;
+    }});
+    return confirm(confirmMessage);
+}
