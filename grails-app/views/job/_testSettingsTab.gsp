@@ -23,6 +23,8 @@
 	</div>
 </div>
 
+<g:render template="checkbox" model="${['booleanAttribute': 'persistNonMedianResults', 'job': job]}" />
+
 <div class="row form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
 	<label for="description" class="span3 text-right">
 		<g:message code="job.description.label" default="description" />
