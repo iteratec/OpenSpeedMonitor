@@ -23,7 +23,8 @@ package de.iteratec.osm.batch
  */
 class BatchActivityController {
 
-//	def index = { }
+    BatchActivityService batchActivityService
+//    static Date last = new Date()
 
     def list(){
         [batchActivities:BatchActivity.list()]
@@ -41,11 +42,25 @@ class BatchActivityController {
         [batchActivityInstance: BatchActivity.get(params.id)]
     }
 
+    def delete(){
+        BatchActivity activity = BatchActivity.get(params.id)
+        activity.delete(flush: true)
+        redirect(action: 'list')
+    }
+
     /**
      *
-     * @return new Content from BatchaActivityTable
+     * @return new Content from BatchActivityTable
      */
     def updateTable(){
         render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list()])
+    }
+
+    def checkForUpdate(){
+        if(BatchActivity.findByStatus(Status.active)){
+            render("true")
+        } else{
+            render("false")
+        }
     }
 }

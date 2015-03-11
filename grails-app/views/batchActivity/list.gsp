@@ -15,14 +15,16 @@
     <div id="tabelle">
 
         <g:render template="batchActivityTable" model="${['batchActivities': batchActivities]}"/>
-        <div class="pagination">
-            <bs:paginate total="${batchActivities.size()}"/>
-        </div>
+        %{--<div class="pagination">--}%
+            %{--<bs:paginate total="${batchActivities.size()}"/>--}%
+        %{--</div>--}%
     </div>
 </section>
 <r:script>
 		$(document).ready(
-			updateBatchActivity('${createLink(action: 'updateTable', absolute: true)}')
+			updateIfNecessary('${createLink(action: 'updateTable', absolute: true)}',
+			'${createLink(action: 'checkForUpdate', absolute: true)}'
+			)
 		);
 </r:script>
 </body>

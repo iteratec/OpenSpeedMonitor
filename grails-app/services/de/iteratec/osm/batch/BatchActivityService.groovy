@@ -19,7 +19,6 @@ class BatchActivityService {
                 domain: c.toString(),
                 idWithinDomain: idWithinDomain,
                 name: name,
-                errors: 0,
                 failures: 0,
                 lastFailureMessage: "",
                 progress: 0,
