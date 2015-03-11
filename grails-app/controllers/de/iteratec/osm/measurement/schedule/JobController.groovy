@@ -170,7 +170,8 @@ class JobController {
 	
 	def delete() {
         Job job = Job.get(params.id)
-        redirectIfNotFound(job, params.id)
+        //FIXME
+        //redirectIfNotFound(job,id)
         jobService.deleteJob(job)
         redirect(controller: "batchActivity", action: "list")
     }

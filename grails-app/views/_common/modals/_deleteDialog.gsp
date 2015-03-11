@@ -28,7 +28,7 @@ This is the standard dialog that initiates the delete action.
 
 <script>
     function changeText(){
-        var text = domainDeleteConfirmation('${message(code: 'default.button.unsavedChanges.confirm.message', default: 'Are you sure?')}',${item ? item.id : params.id});
+        var text = domainDeleteConfirmation('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}',${item ? item.id : params.id});
         $('#DeleteModal').find('p').html(text);
     }
 </script>
