@@ -5,6 +5,8 @@ package de.iteratec.osm.batch
  */
 class BatchActivityService {
 
+    static transactional = false
+
     /**
      * Creates a new BatchActivity
      * @param c Class of the affected Domain
@@ -14,20 +16,24 @@ class BatchActivityService {
      * @return
      */
     public BatchActivity getActiveBatchActivity(Class c,long idWithinDomain, Activity activity,String name){
-        return new BatchActivity(
-            activity: activity,
-                domain: c.toString(),
-                idWithinDomain: idWithinDomain,
-                name: name,
-                failures: 0,
-                lastFailureMessage: "",
-                progress: 0,
-                progressWithinStage: "",
-                stage: "",
-                status: Status.active,
-                startDate: new Date(),
-                successfulActions: 0,
-        )
+        BatchActivity batchActivity
+        BatchActivity.withTransaction {
+            batchActivity = new BatchActivity(
+                    activity: activity,
+                    domain: c.toString(),
+                    idWithinDomain: idWithinDomain,
+                    name: name,
+                    failures: 0,
+                    lastFailureMessage: "",
+                    progress: 0,
+                    progressWithinStage: "",
+                    stage: "",
+                    status: Status.active,
+                    startDate: new Date(),
+                    successfulActions: 0,
+            ).save(failOnError: true, flush: true)
+        }
+        return batchActivity
     }
 
     /**
@@ -37,7 +43,7 @@ class BatchActivityService {
      * @return
      */
     public boolean runningBatch(Class c,long idWithinDomain){
-        return (BatchActivity.findByDomainAndIdWithinDomainAndStatus(c.toString(), idWithinDomain, Status.active) != null)
+        return (BatchActivity.findByDomainAndIdWithinDomainAndStatus(c.toString(), idWithinDomain, Status.ACTIVE) != null)
     }
 
     /**

@@ -106,6 +106,14 @@ function fixChoosen() {
    });
 }
 function domainDeleteConfirmation(message,id){
+
+    return "Job deletion will be implemented soon..."
+
+    //TODO: add the following again if async job deletion works.
+    // link to controller action has to be absolute (defined in gsp)
+    //(see therefor http://blogs.bytecode.com.au/glen/2011/07/04/using-grails-links-from-javascript-a-micropattern.html)
+
+    /*
     var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationText";
     var confirmMessage = "";
     jQuery.ajax({
@@ -120,4 +128,5 @@ function domainDeleteConfirmation(message,id){
             confirmMessage = message;
     }});
     return confirmMessage;
+     */
 }

@@ -17,7 +17,17 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.isj.quartzjobs.*
+import grails.async.Promise
+
+import static grails.async.Promises.*
+
+import grails.converters.JSON
+import grails.gsp.PageRenderer
+import groovy.json.JsonBuilder
+import groovy.time.TimeCategory
+
+import org.springframework.http.HttpStatus
+
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
@@ -26,11 +36,6 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.converters.JSON
-import grails.gsp.PageRenderer
-import groovy.json.JsonBuilder
-import groovy.time.TimeCategory
-import org.springframework.http.HttpStatus
 
 class JobController {
 	
@@ -168,14 +173,6 @@ class JobController {
 		}
 	}
 	
-	def delete() {
-        Job job = Job.get(params.id)
-        //FIXME
-        //redirectIfNotFound(job,id)
-        jobService.deleteJob(job)
-        redirect(controller: "batchActivity", action: "list")
-    }
-
     def createDeleteConfirmationText(int id){
         Job job = Job.get(id)
         List<JobResult> results = JobResult.findAllByJob(job)
@@ -184,6 +181,24 @@ class JobController {
         String first = firstDate ? "First Result: ${firstDate.date.format('dd.MM.yy')} ":""
         String last = lastDate ? "Last Result: ${lastDate.date.format('dd.MM.yy')} " :""
         render(new JsonBuilder("$first$last"+ "Result amount: ${results.size()}").toString())
+    }
+
+    def delete() {
+
+        Job job = Job.get(params.id)
+
+        //TODO: get the following to work
+
+        /*
+        Promise p = task {
+			jobService.deleteJob(job)
+        }
+        p.onComplete {
+            log.info("Deletion of Job ${job} completed.")
+        }
+        */
+
+        redirect(controller: "batchActivity", action: "list")
     }
 
 
@@ -204,8 +219,8 @@ class JobController {
 		} else {
 			redirect(action: 'list', model: [filters: params.filters])
 		}
-	}	
-	
+	}
+
 	def execute() {
 		if (params.id) {
 			Job job = new Job(params)

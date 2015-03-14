@@ -17,14 +17,14 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
-import grails.gorm.DetachedCriteria
-import grails.transaction.Transactional
 
 class JobService {
     static transactional = false
@@ -41,7 +41,7 @@ class JobService {
 	 *         group is not a CSI-group, else the group
 	 */
 	JobGroup getCsiJobGroupOf(Job job){
-		JobGroup group = job.getJobGroup();
+		JobGroup group = job.getJobGroup()
 		/*- 
 		 * Use of defensive programming intended here:
 		 * 
@@ -49,14 +49,14 @@ class JobService {
 		 * and was never manually(!) assigned.
 		 */
 		if( group != null && group.getGroupType() == JobGroupType.CSI_AGGREGATION ) {
-			return group;
+			return group
 		} else {
-			return null;
+			return null
 		}
 	}
 
 	private List<Job> findByJobGroup(JobGroup group){
-		return Job.findAllByJobGroup(group).asList();
+		return Job.findAllByJobGroup(group).asList()
 	}
 	List<Job> getAllCsiJobs(){
 		List<Job> csiJobs = []
@@ -91,7 +91,7 @@ class JobService {
 		job.executionSchedule = executionSchedule
 		job.save(failOnError: true)
 	}
-
+	
     /**
      * Deletes a Job with all JobResults, HttpArchives and EventResults
      *
@@ -101,7 +101,7 @@ class JobService {
         if(batchActivityService.runningBatch(Job.class,job.id)){
             return
         }
-        BatchActivity activity = batchActivityService.getActiveBatchActivity(Job.class,job.id,Activity.delete, "Job ${job.label} delete")
+        BatchActivity activity = batchActivityService.getActiveBatchActivity(Job.class,job.id,Activity.DELETE, "Job ${job.label} delete")
         def dc = new DetachedCriteria(JobResult).build {
             eq 'job', job
         }

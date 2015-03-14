@@ -57,7 +57,7 @@ class BatchActivityController {
     }
 
     def checkForUpdate(){
-        if(BatchActivity.findByStatus(Status.active)){
+        if(BatchActivity.findByStatus(Status.ACTIVE)){
             render("true")
         } else{
             render("false")
