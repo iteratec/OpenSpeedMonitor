@@ -55,8 +55,7 @@ jQuery.fn.visibilityToggle = function() {
     });
 };
 
-$(document).ready(function() {	
-	$('#cronStringInstructions').popover();
+function doOnDomReady(nextExecutionLink) {
 	$('#connectivityProfile').append($('<option></option>').val('null').text('Custom'));
 	if ($('#customConnectivityProfile').val() == 'true') {
 		$('#connectivityProfile option:last-child').attr('selected', 'selected');
@@ -68,8 +67,7 @@ $(document).ready(function() {
 	$('#active').change(function () {
 		$('[name="executionSchedule"]').keyup();
 	});
-	$('[name="executionSchedule"]').keyup()
-	
+
 	$('#connectivityProfile').change(function() {
 		var custom = $('#connectivityProfile :selected').text() == 'Custom';
 		$('#connectivityProfileDetails').toggle(custom);
@@ -84,7 +82,28 @@ $(document).ready(function() {
 		$('#maxDownloadTimeInMinutes a').css('visibility', 'hidden');
 	});
 
-});
+    var cronExpression = $('#execution-schedule').val();
+    jQuery.ajax({
+        type: 'POST',
+        data: 'value=' + cronExpression,
+        url: nextExecutionLink,
+        success: function (data, textStatus) {
+
+            //$('#execution-schedule').val(execScheduleWithSeconds);
+            //alert(data);
+            $('#cronhelp-next-execution').html(
+                data + ' ' + warnInactive(data, '(derzeit nicht aktiv)') + ' '
+            );
+            FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
+            $('#cronhelp-readable-expression').html(
+                data ? getPrettyCron(cronExpression) : ''
+            );
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {}
+    });
+
+};
 
 // from http://stackoverflow.com/a/21375637
 // necessary to prevent Chosen from being cut off in tabs
@@ -111,7 +130,7 @@ function domainDeleteConfirmation(message,id){
 
     //TODO: add the following again if async job deletion works.
     // link to controller action has to be absolute (defined in gsp)
-    //(see therefor http://blogs.bytecode.com.au/glen/2011/07/04/using-grails-links-from-javascript-a-micropattern.html)
+    //(see therefor job/edit.gsp or http://blogs.bytecode.com.au/glen/2011/07/04/using-grails-links-from-javascript-a-micropattern.html)
 
     /*
     var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationText";
@@ -129,4 +148,30 @@ function domainDeleteConfirmation(message,id){
     }});
     return confirmMessage;
      */
+}
+function toggleCronInstructions(){
+    var cronInstructions = document.querySelector('#cron-instructions');
+    cronInstructions.style.display=="none" ?
+        cronInstructions.style.display="inline" : cronInstructions.style.display="none";
+}
+function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLink) {
+    jQuery.ajax({
+        type: 'POST',
+        data: 'value=' + execScheduleWithSeconds,
+        url: nextExecutionLink,
+        success: function (data, textStatus) {
+
+            $('#execution-schedule').val(execScheduleWithSeconds);
+            $('#cronhelp-next-execution').html(
+                data + ' ' + warnInactive(data, '(derzeit nicht aktiv)') + ' '
+            );
+            FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
+            $('#cronhelp-readable-expression').html(
+                data ? getPrettyCron(execScheduleWithSeconds) : ''
+            );
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+        }
+    });
 }
