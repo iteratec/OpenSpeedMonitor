@@ -142,6 +142,26 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [GET: "getCsiFrustrationTimings"]
 		}
-	
+		"/rest/job/$id/resultUrls/$timestampFrom/$timestampTo" {
+			controller = "RestApi"
+			action = [GET: "getResultUrls"]
+		}
+		/*
+		 * Following PUT rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by
+		 * naming convention of action methods.
+		 */
+		"/rest/job/$id/activate" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeyActivateJob"]
+		}
+		"/rest/job/$id/deactivate" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeyDeactivateJob"]
+		}
+		"/rest/job/$id/setExecutionSchedule" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeySetExecutionSchedule"]
+		}
+
 	}
 }

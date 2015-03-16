@@ -69,7 +69,7 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 		
 		// mocks common for all tests
 		
-		jobProcessingService.proxyService = [ runtest: { WebPageTestServer wptserver, Map params -> 
+		jobProcessingService.proxyService = [ runtest: { WebPageTestServer wptserver, Map params ->
 			if (params.f == 'xml') {
 				String xml = """\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -88,9 +88,7 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 </response>
 			"""
 				BasicHttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 200, null)
-				return new HttpResponseDecorator(httpResponse, new Object() {
-					public final String text = xml;
-				})
+				return new HttpResponseDecorator(httpResponse, [text: xml] as Object)
 			} else {
 				BasicHttpResponse httpResponse = new BasicHttpResponse(HttpVersion.HTTP_1_1, 302, null)
 				HttpResponseDecorator d = new HttpResponseDecorator(httpResponse, null)
@@ -203,14 +201,17 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 		Job job = createJob(true, EVERY_15_SECONDS)
 		
 		//test execution /////////////////////////////////////////////////////////////
+		//launchJobRun returns false, because it fails and catch the exception
 		jobProcessingService.launchJobRun(job)
 		// manual first execution cause quartz scheduling doesn't seem to work trustable in tests
 		jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
 		
 		//assertions /////////////////////////////////////////////////////////////
 		
-		// ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJunRun()
+		// ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
 		TriggerKey subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
+
+		// no Job in  JobStore, because no Triger was created --> returns null
 		Trigger subtrigger = jobProcessingService.quartzScheduler.getTrigger(subtriggerKey)
 		assertNotNull(subtrigger)
 
@@ -289,7 +290,7 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 			JobResult.list()*.delete(flush: true, failOnError: true)
 		}
 	}
-	
+
 
 	private Job createJob(boolean active, String executionSchedule = null){
 		Job wptJobToSchedule = new Job(

@@ -41,6 +41,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 			</fieldset>
 	</div>
 </fieldset>
+
 <input type="hidden" name="from" id="from" value="${from}">
 <input type="hidden" name="fromHour" id="fromHour" value="${fromHour}">
 <fieldset id="fldset-enddate">	<%--------------------------------------------------------------------- manual end date --%>

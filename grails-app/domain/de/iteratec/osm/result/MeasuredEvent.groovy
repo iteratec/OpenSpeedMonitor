@@ -59,7 +59,7 @@ class MeasuredEvent {
 	Page testedPage
 
 	static constraints = {
-		name(nullable: false, blank: false, unique: true)
+		name(nullable: false, blank: false, unique: true, maxSize: 255)
 		testedPage(nullable: false)
 	}
 

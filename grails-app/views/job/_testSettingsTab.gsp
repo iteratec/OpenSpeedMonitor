@@ -23,12 +23,14 @@
 	</div>
 </div>
 
+<g:render template="checkbox" model="${['booleanAttribute': 'persistNonMedianResults', 'job': job]}" />
+
 <div class="row form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
 	<label for="description" class="span3 text-right">
 		<g:message code="job.description.label" default="description" />
 	</label>
 	<div class="span8">
-		<textarea class="form-control" name="description" id="description" rows="3">${job?.description?.trim()}</textarea>
+		<textarea class="form-control width_31em" name="description" id="description" rows="3">${job?.description?.trim()}</textarea>
 	</div>
 </div>
 
@@ -37,7 +39,7 @@
 		<g:message code="job.tags.label" default="tags" />
 	</label>
 	<div class="span8">
-		<ul name="tags" style="margin-left:0px;" id="tags">
+		<ul name="tags" style="margin-left:0px;" id="tags" class="width_31em">
 		      <g:each in="${job?.tags}">
 		        <li>${it}</li>
 		      </g:each>
@@ -70,28 +72,22 @@
 	</div>
 </div>
 <div class="row form-group ${hasErrors(bean: job, field: 'executionSchedule', 'error')}">
-	<label class="span3 text-right" for="executionSchedule">
+	<label class="span3 text-right" for="executionScheduleShown">
 		<g:message code="job.executionSchedule.label" default="executionSchedule" />
 	</label>
 	<div class="span8">
-		<g:remoteField 
-			action="nextExecution"
-			absolute="true"
-			class="form-control" 
-			name="executionSchedule" 
-			value="${job?.executionSchedule}"
-			id="execution-schedule"
-			onSuccess=
-				"\$('#cronhelp-next-execution').html(
-					data + ' ' + warnInactive(data, '${message(code: "job.executionScheduleSetButInactive.label", default: "(derzeit nicht aktiv)")}') + ' '
-				)
-				;FutureOnlyTimeago.init(\$('abbr.timeago'), '${createLink(action: 'nextExecution', absolute: true)}')
-				;\$('#cronhelp-readable-expression').html(data?getPrettyCron(\$('#execution-schedule').val()):'');"
-		/>
-        <a href="#" id="cronStringInstructions" class="icon-question-sign icon-large" rel="popover"
-        	data-placement="bottom" data-content="${render(template: "cronInstructions")}" data-html="true"></a>
+
+        <input type="text" id="execution-schedule-shown" class="form-control"
+               value="${job.executionSchedule ? job.executionSchedule.substring(job.executionSchedule.indexOf(' ')+1, job.executionSchedule.size()) : ''}"
+               onkeyup="updateExecScheduleInformations('0 ' + this.value, '${createLink(action: 'nextExecution', absolute: true)}')">
+        <input type="text" id="execution-schedule" name="executionSchedule" value="${job?.executionSchedule}" style="display: none">
+        <i class="icon-question-sign icon-large clickable-icon" onclick="toggleCronInstructions()"></i>
         <br><span id="cronhelp-readable-expression"></span>
 		<br><span id="cronhelp-next-execution"></span>
+        <br>
+        <span id="cron-instructions" style="display: none;">
+            <g:render template="cronInstructions"></g:render>
+        </span>
 	</div>
 </div>
 

@@ -17,9 +17,9 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.result.EventResultController.EventResultsCommandBase
-import de.iteratec.osm.result.EventResultController.ListResultsCommand;
-import de.iteratec.osm.result.EventResultController.ListResultsForSpecificJobCommand
+import de.iteratec.osm.result.TabularResultPresentationController.EventResultsCommandBase
+import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand;
+import de.iteratec.osm.result.TabularResultPresentationController.ListResultsForSpecificJobCommand
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
 
@@ -143,6 +143,7 @@ class PaginationService {
 						'selectedFolder': cmd.getSelectedFolder(),
 						'selectedPage': cmd.getSelectedPage(),
 						'selectedBrowsers': cmd.getSelectedBrowsers(),
+                        'selectedAllBrowsers' : cmd.getSelectedAllBrowsers(),
 						'_selectedAllBrowsers': cmd.getSelectedAllBrowsers(),
 						'_selectedAllMeasuredEvents': cmd.getSelectedMeasuredEventIds(),
 						'selectedAllMeasuredEvents': cmd.getSelectedAllMeasuredEvents(),

@@ -50,7 +50,7 @@
 		<g:hasErrors bean="${command}">
 			<div class="alert alert-error">
 				<strong><g:message
-						code="de.iteratec.isocsi.EventResultController.selectionErrors.title"
+						code="de.iteratec.isocsi.TabularResultPresentationController.selectionErrors.title"
 						default="You missed something on selection" /></strong>
 				<ul>
 					<g:eachError var="eachError" bean="${command}">
@@ -88,7 +88,7 @@
 		</g:else>
 		<p>
 			<g:actionSubmit
-				value="${g.message(code: 'de.iteratec.isr.EventResultController.listResults.show', 'default':'Show')}"
+				value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
 				action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" class="btn btn-primary"
 				style="margin-top: 16px;" />
 		</p>

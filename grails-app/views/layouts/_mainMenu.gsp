@@ -1,5 +1,5 @@
 <%-- determine main-tab an set variable respectively --%>
-<g:if test="${controllerName.equals('eventResultDashboard')||controllerName.equals('eventResult')}"><g:set var="mainTab" value="results" /></g:if>
+<g:if test="${controllerName.equals('eventResultDashboard')||controllerName.equals('tabularResultPresentation')}"><g:set var="mainTab" value="results" /></g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi" /></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management" /></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management" /></g:elseif>
@@ -41,8 +41,8 @@
 			<li class="controller glyphicon glyphicon-dashboard ${controllerName.equals('eventResultDashboard')?'active':''}">
 				<g:link controller="eventResultDashboard" action="showAll"><i class="icon-signal"></i> <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard" /></g:link>
 			</li>
-			<li class="controller ${controllerName.equals('eventResult')?'active':''}">
-	            <g:link controller="eventResult" action="listResults"><i class="icon-th-list"></i> <g:message code="de.iteratec.result.title" default="Einzelergebnisse" /></g:link>
+			<li class="controller ${controllerName.equals('tabularResultPresentation')?'active':''}">
+	            <g:link controller="tabularResultPresentation" action="listResults"><i class="icon-th-list"></i> <g:message code="de.iteratec.result.title" default="Einzelergebnisse" /></g:link>
 	        </li>
 		</g:elseif>
 		<g:elseif test="${mainTab.equals('csi')}">

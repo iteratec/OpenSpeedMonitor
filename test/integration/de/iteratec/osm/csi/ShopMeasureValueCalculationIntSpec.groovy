@@ -51,14 +51,14 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
     void setUp() {
 		
 		//test-data common to all tests
+		TestDataUtil.cleanUpDatabase()
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createMeasuredValueIntervals()
 		TestDataUtil.createAggregatorTypes()
 		TestDataUtil.createHoursOfDay()
 		TestDataUtil.createJobGroups()
+		TestDataUtil.createBrowsersAndAliases()
 		createPages()
-		createBrowsers()
-		
     }
 	
     void testCalculationOfDailyShopMv() {
@@ -124,12 +124,12 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		
 		Date startOfDailyInterval = measuredValueUtilService.resetToStartOfActualInterval(START, MeasuredValueInterval.DAILY).toDate()
 		List<MeasuredValue> smvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
-			startOfDailyInterval, 
-			startOfDailyInterval, 
-			MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY), 
+			startOfDailyInterval,
+			startOfDailyInterval,
+			MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY),
 			[JobGroup.findByName('CSI')]
 		)
-		
+
 		//assertions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 		List<MeasuredValue> allMvs = MeasuredValue.list()
 		List<MeasuredValue> hourlyEventMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.HOURLY && it.aggregator.name == AggregatorType.MEASURED_EVENT}
@@ -211,40 +211,5 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 			).save(failOnError:true)
 		}
 		
-	}
-	
-	void createBrowsers(){
-		String browserName="undefined"
-		Browser.findByName(browserName)?:new Browser(
-			name: browserName,
-			weight: 0)
-				.addToBrowserAliases(alias: "undefined")
-				.save(failOnError: true)
-		browserName="IE"
-		Browser browserIE = Browser.findByName(browserName)?:new Browser(
-			name: browserName,
-			weight: 45)
-				.addToBrowserAliases(alias: "IE")
-				.addToBrowserAliases(alias: "IE8")
-				.addToBrowserAliases(alias: "Internet Explorer")
-				.addToBrowserAliases(alias: "Internet Explorer 8")
-				.save(failOnError: true)
-		browserName="FF"
-		Browser browserFF = Browser.findByName(browserName)?:new Browser(
-			name: browserName,
-			weight: 55)
-				.addToBrowserAliases(alias: "FF")
-				.addToBrowserAliases(alias: "FF7")
-				.addToBrowserAliases(alias: "Firefox")
-				.addToBrowserAliases(alias: "Firefox7")
-				.save(failOnError: true)
-	}
-	
-	void createOsmConfiguration(){
-		new OsmConfiguration(
-			detailDataStorageTimeInWeeks: 2,
-			defaultMaxDownloadTimeInMinutes: 60,
-			minDocCompleteTimeInMillisecs: 250,
-			maxDocCompleteTimeInMillisecs: 180000).save(failOnError: true)
 	}
 }

@@ -32,6 +32,7 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WaterfallEntry
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
@@ -197,6 +198,7 @@ class PersistingNewEventResultsTests {
 		
 		serviceUnderTest.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
 										   getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
 	}
 	
 	@After
@@ -770,11 +772,11 @@ class PersistingNewEventResultsTests {
 		//TODO 2013-10-24: proof all CSI-relevant attributes of job_results
 
 		//check for steps
-		List<MeasuredEvent> steps = MeasuredEvent.list()
-		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfSteps - ", expectedValues['expectedNumberOfSteps'], steps.size())
-		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfStepsWithAssociatedPage - ", expectedValues['expectedNumberOfStepsWithAssociatedPage'], 
-			steps.findAll{!it.testedPage.isUndefinedPage()}.size())
-		
+        List<MeasuredEvent> steps = MeasuredEvent.list()
+        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfSteps - ", expectedValues['expectedNumberOfSteps'], steps.size())
+        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfStepsWithAssociatedPage - ", expectedValues['expectedNumberOfStepsWithAssociatedPage'],
+                steps.findAll { !it.testedPage.isUndefinedPage() }.size())
+
 
 		//check for results
 		List<EventResult> allResults = EventResult.list()

@@ -22,7 +22,7 @@ import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.result.EventResultController.ListResultsCommand
+import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
 import de.iteratec.osm.util.CustomDateEditorRegistrar
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
@@ -32,15 +32,15 @@ import org.junit.Test
 import org.mockito.Mockito
 
 /**
- * Test-suite of {@link EventResultController}.
+ * Test-suite of {@link TabularResultPresentationController}.
  * 
  * @author mze
  * @since IT-106
  */
-@TestFor(EventResultController)
-class EventResultControllerTests {
+@TestFor(TabularResultPresentationController)
+class TabularResultPresentationControllerTests {
 	
-	EventResultController controllerUnderTest
+	TabularResultPresentationController controllerUnderTest
 	
 	// Mocks:
 	
@@ -78,7 +78,7 @@ class EventResultControllerTests {
 	}
 
 	/**
-	 * Test for {@link EventResultController.ListResultsCommand}.
+	 * Test for {@link TabularResultPresentationController.ListResultsCommand}.
 	 */
 	@Test
 	void testListResultsCommand_emptyCommandIsInvalid() {
@@ -94,7 +94,7 @@ class EventResultControllerTests {
 	
 	
 	/**
-	 * Test for  {@link EventResultController.ListResultsCommand}.
+	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromEmptyRequestArgsIsInvalid()
@@ -112,7 +112,7 @@ class EventResultControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link EventResultController.ListResultsCommand}.
+	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults()
@@ -199,7 +199,7 @@ class EventResultControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link EventResultController.ListResultsCommand}.
+	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate()
@@ -231,7 +231,7 @@ class EventResultControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link EventResultController.ListResultsCommand}.
+	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour()
@@ -263,7 +263,7 @@ class EventResultControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link EventResultController.ListResultsCommand}.
+	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute()

@@ -17,12 +17,16 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.result.PageService
 import grails.converters.JSON
 
 import org.springframework.dao.DataIntegrityViolationException
 import de.iteratec.osm.result.MeasuredEvent
 
 class ScriptController {
+
+	PageService pageService
+
 	private String getScriptI18n() {
 		return message(code: 'de.iteratec.iss.script', default: 'Skript')
 	}
@@ -118,7 +122,7 @@ class ScriptController {
 	}
 	
 	def parseScript(String navigationScript) {
-		ScriptParser parser = new ScriptParser(navigationScript)
+		ScriptParser parser = new ScriptParser(pageService, navigationScript)
 		Map output = [:]
 		if (parser.warnings)
 			output.warnings = parser.warnings.groupBy { it.lineNumber }

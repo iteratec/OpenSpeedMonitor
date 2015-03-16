@@ -17,20 +17,25 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.isj.quartzjobs.*
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
-import de.iteratec.osm.measurement.script.PlaceholdersUtility
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
-import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import grails.async.Promise
+
+import static grails.async.Promises.*
+
 import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
-import org.springframework.dao.DataIntegrityViolationException
+
 import org.springframework.http.HttpStatus
+
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
+import de.iteratec.osm.measurement.script.PlaceholdersUtility
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 
 class JobController {
 	
@@ -168,23 +173,30 @@ class JobController {
 		}
 	}
 	
-	def delete() {
-		Job job = Job.get(params.id)
-		redirectIfNotFound(job, params.id)
-		def flashMessageArgs = [getJobI18n(), job.label]
+    def createDeleteConfirmationText(int id){
+        Job job = Job.get(id)
+        List<JobResult> results = JobResult.findAllByJob(job)
+        JobResult firstDate = results.min{it.date}
+        JobResult lastDate = results.max{it.date}
+        String first = firstDate ? "First Result: ${firstDate.date.format('dd.MM.yy')} ":""
+        String last = lastDate ? "Last Result: ${lastDate.date.format('dd.MM.yy')} " :""
+        render(new JsonBuilder("$first$last"+ "Result amount: ${results.size()}").toString())
+    }
 
-		try {
-			job.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: flashMessageArgs)
-			redirect(action: "list")
-		}
-		catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: flashMessageArgs)
-			redirect(action: "edit", id: job.id)
-		}
-	}
-	
-	/**
+    def delete() {
+        Job job = Job.get(params.id)
+
+        Promise p = task {
+			jobService.deleteJob(job)
+        }
+        p.onComplete {
+            log.info("Deletion of Job ${job} completed.")
+        }
+        redirect(controller: "batchActivity", action: "list")
+    }
+
+
+    /**
 	 * Execute handler for each job selected using the checkboxes
 	 * @param handler A closure which gets the corresponding job as first parameter
 	 */
@@ -201,8 +213,8 @@ class JobController {
 		} else {
 			redirect(action: 'list', model: [filters: params.filters])
 		}
-	}	
-	
+	}
+
 	def execute() {
 		if (params.id) {
 			Job job = new Job(params)
@@ -249,6 +261,8 @@ class JobController {
 		model['cronstring'] = params.value
 		if (!params.noprepend)
 			model['prepend'] = message(code: 'job.nextRun.label')
+        log.error(params)
+        log.error(model)
 		render(template: 'timeago', model: model)
 	}
 	
@@ -329,6 +343,11 @@ class JobController {
 	def tags(String term) {
 		render Job.findAllTagsWithCriteria([max:5]) { ilike('name', "${term}%") } as JSON
 	}
+
+    def activateMeasurementsGenerally(){
+        configService.activateMeasurementsGenerally()
+        redirect(action: 'list')
+    }
 	
 	private void setVariablesOnJob(Map variables, Job job) {
 		job.firstViewOnly = !params.repeatedView

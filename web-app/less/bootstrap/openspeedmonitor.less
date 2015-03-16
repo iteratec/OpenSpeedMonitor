@@ -8,7 +8,7 @@
 
 .iteratec-element-select { 
 		height: 150px  !important; 
-		width: 95%  !important; 
+		min-width: 100%  !important; 
 }
 .iteratec-element-select.default-not-visible { 
 	.iteratec-element-select;
@@ -42,4 +42,73 @@
   color: @white;
   font-size: 10pt;
   white-space: nowrap;
+}
+
+#highcharts-0 {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.radio.inline, .checkbox.inline {
+    margin-right: 5px;
+}
+
+select {
+    width: auto !important;
+}
+
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+ // height: 25px !important;
+  height: 25px;
+  padding: 4px 6px !important;
+  line-height: 20px !important;
+}
+
+.width_31em {
+    width: 31em !important;
+}
+
+.noIdent {
+    margin-left: 0 !important;
+}
+
+.input-append .add-on, .input-prepend .add-on {
+    height: 25px !important;
+    line-height: 25px !important;
+}
+.btn {
+    line-height: 25px !important;
+}
+
+select[multiple], select[size] {
+    //height: auto !important;
+}
+.dropdown-menu .scrollable {
+  height: auto;
+  max-height: 80vh;
+  overflow-x: hidden;
+}
+
+a.dropdown-toggle {
+    position: relative;
+}
+i.clickable-icon {
+  cursor: pointer;
+  .text-info
 }

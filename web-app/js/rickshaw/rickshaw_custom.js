@@ -660,7 +660,7 @@ Rickshaw.Graph = function(args) {
 	};
 
 	this.onUpdate = function(callback) {
-		this.updateCallbacks.push(callback);
+      this.updateCallbacks.push(callback);
 	};
 
 	this.onConfigure = function(callback) {
@@ -1873,7 +1873,9 @@ Rickshaw.Graph.Axis.X = function(args) {
 			this.vis = this.graph.vis;
 		}
 
-		 this.graph.onUpdate( function() { self.render() } );
+		 this.graph.onUpdate( function() {
+         self.render();
+		 });
 	};
 
 	this.setSize = function(args) {
@@ -1993,7 +1995,9 @@ Rickshaw.Graph.Axis.Y = Rickshaw.Class.create( {
 
 		var self = this;
 		
-		 this.graph.onUpdate( function() { self.render() } );
+		 this.graph.onUpdate( function() {
+         self.render();
+		 } );
 	},
 
 	setSize: function(args) {
@@ -2274,7 +2278,7 @@ Rickshaw.Graph.Behavior.Series.Order = function(args) {
 	});
 
 	// hack to make jquery-ui sortable behave
-	this.graph.onUpdate( function() { 
+	this.graph.onUpdate( function() {
 		var h = window.getComputedStyle(self.legend.element).height;
 		self.legend.element.style.height = h;
 	} );
@@ -2350,7 +2354,6 @@ Rickshaw.Graph.Behavior.Series.Toggle = function(args) {
                                 });
 
                         }
-                        
                 };
 
 	};
@@ -2439,7 +2442,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 	},
 
-	formatter: function(series, x, y, formattedX, formattedY, d) {
+	formatter: function(series, x, y, formattedX, formattedY, d, testAgent) {
 		return series.name + ':&nbsp;' + formattedY;
 	},
 
@@ -2509,7 +2512,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 				distance: distance,
 				order: j,
 				name: series.name,
-				url: value.url
+				url: value.url,
+                testAgent: value.testAgent
 			};
 
 			if (!nearestPoint || distance < nearestPoint.distance) {
@@ -2590,7 +2594,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		var series = point.series;
 		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
 
-		item.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point);
+		item.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, point.testAgent);
 		item.style.top = this.graph.y(point.value.y0 + point.value.y) + 'px';
 
 		this.element.appendChild(item);
@@ -2724,7 +2728,8 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 		// we could bind this.render.bind(this) here
 		// but triggering the re-render would lose the added
 		// behavior of the series toggle
-		this.graph.onUpdate( function() {} );
+//		this.graph.onUpdate( function() {
+//		} );
 	},
 
 	render: function() {
@@ -3095,25 +3100,25 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			
 			var graph;
 
-			// copy series
-			var series = [];
-			parent.series.forEach(function(eachSeries) {
-				var entry = {};
-				entry.color = eachSeries.color;
-				entry.data = eachSeries.data.slice(0);
-				entry.label = eachSeries.label;
-				entry.measurandGroup = eachSeries.measurandGroup;
-				entry.name = eachSeries.name;
-				entry.path = eachSeries.path;
-				entry.stroke = eachSeries.stroke;
-				entry.disable= eachSeries.disable;
-				entry.enable= eachSeries.enable;
-				entry.scale= eachSeries.scale;
-				entry.yFormatter= eachSeries.yFormatter;
-				series.push(entry);
-			});
-			series.active = function() {return graph.series;};
-			graphArgs.series = series;
+			// // copy series
+			// var series = [];
+			// parent.series.forEach(function(eachSeries) {
+			// 	var entry = {};
+			// 	entry.color = eachSeries.color;
+			// 	entry.data = eachSeries.data.slice(0);
+			// 	entry.label = eachSeries.label;
+			// 	entry.measurandGroup = eachSeries.measurandGroup;
+			// 	entry.name = eachSeries.name;
+			// 	entry.path = eachSeries.path;
+			// 	entry.stroke = eachSeries.stroke;
+			// 	entry.disable= eachSeries.disable;
+			// 	entry.enable= eachSeries.enable;
+			// 	entry.scale= eachSeries.scale;
+			// 	entry.yFormatter= eachSeries.yFormatter;
+			// 	series.push(entry);
+			// });
+			// series.active = function() {return graph.series;};
+			// graphArgs.series = series;
 			
 			graphArgs.stack = false; // if true, slider preview can not be drawn
 			graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
@@ -3121,7 +3126,9 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
 			
-			parent.onUpdate(function() { graph.render(); self.render() });
+			parent.onUpdate(function() {
+  			  graph.render(); self.render();
+			});
 
 			parent.onConfigure(function(args) { 
 				// don't propagate height

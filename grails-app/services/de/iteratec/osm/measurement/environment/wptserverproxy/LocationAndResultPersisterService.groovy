@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
 
 import java.util.zip.GZIPOutputStream
@@ -50,6 +52,8 @@ import de.iteratec.osm.result.WptXmlResultVersion
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
 /**
  * Persists locations and results. Observer of ProxyService.
  * @author rschuett, nkuhn
@@ -72,8 +76,10 @@ class LocationAndResultPersisterService implements iListener{
 	MetricReportingService metricReportingService
 	HarParserService harParserService
 	ConfigService configService
+    PerformanceLoggingService performanceLoggingService
 
-	/**
+
+    /**
 	 * Persisting non-existent locations.
 	 */
 	@Override
@@ -123,11 +129,16 @@ class LocationAndResultPersisterService implements iListener{
 			
 		WptResultXml resultXml = new WptResultXml(xmlResultResponse)
 			
-		log.debug("get or persist Job ...")
-		Job jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
-		log.debug("get or persist Job ... DONE")
-		
-		if (jobConfig != null) persistJobResultAndAssociatedEventResults(jobConfig, resultXml, wptserverOfResult, har)
+        Job jobConfig
+        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+            jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
+        }
+
+		if (jobConfig != null) {
+            performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult and EventResults for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+                persistJobResultAndAssociatedEventResults(jobConfig, resultXml, wptserverOfResult, har)
+            }
+        }
 			
 	}
 			
@@ -149,11 +160,12 @@ class LocationAndResultPersisterService implements iListener{
 					log.debug("deleting results marked as pending or running ... DONE")
 					log.debug("persisting job result ...")
 					jobRun = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)?:
-						persistNewJobRun(jobConfig, resultXml, har).save(failOnError: true);
+						persistNewJobRun(jobConfig, resultXml).save(failOnError: true);
 					log.debug("persisting job result ... DONE")
 				} catch (Exception e) {
 					status.setRollbackOnly()
-					log.error('an error occurred while deleting pending and persisting new JobResult', e)
+					log.error("An error occurred while deleting pending and persisting new JobResult: " +
+                            "job=${jobConfig.label}, test-id=${testId}", e)
 				}
 			}
 					
@@ -211,9 +223,10 @@ class LocationAndResultPersisterService implements iListener{
 		return jobConfig
 	}
 
-	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml, String har){
+	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){
 
 		String testId = resultXml.getTestId()
+
 		if(!testId){
 			return
 		}
@@ -223,21 +236,23 @@ class LocationAndResultPersisterService implements iListener{
 		Date testCompletion = resultXml.getCompletionDate()
 		jobConfig.lastRun = testCompletion
 		jobConfig.save(failOnError: true)
+
 		JobResult result = new JobResult(
-		job: jobConfig,
-		date: testCompletion,
-		testId: testId,
-		har: har?new HttpArchive(harData: zip(har)):null,
-		httpStatusCode: jobRunStatus,
-		jobConfigLabel: jobConfig.label,
-		jobConfigRuns: jobConfig.runs,
-		wptServerLabel: jobConfig.location.wptServer.label,
-		wptServerBaseurl: jobConfig.location.wptServer.baseUrl,
-		locationLabel: jobConfig.location.label,
-		locationLocation: jobConfig.location.location,
-		locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer, 
-		locationBrowser: jobConfig.location.browser.name,
-		jobGroupName: jobConfig.jobGroup.name)
+            job: jobConfig,
+            date: testCompletion,
+            testId: testId,
+            httpStatusCode: jobRunStatus,
+            jobConfigLabel: jobConfig.label,
+            jobConfigRuns: jobConfig.runs,
+            wptServerLabel: jobConfig.location.wptServer.label,
+            wptServerBaseurl: jobConfig.location.wptServer.baseUrl,
+            locationLabel: jobConfig.location.label,
+            locationLocation: jobConfig.location.location,
+            locationUniqueIdentifierForServer: jobConfig.location.uniqueIdentifierForServer,
+            locationBrowser: jobConfig.location.browser.name,
+            jobGroupName: jobConfig.jobGroup.name,
+            testAgent:resultXml.getTestAgent()
+        )
 		
 		//new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
 		result.setDescription('')
@@ -263,16 +278,18 @@ class LocationAndResultPersisterService implements iListener{
 		log.debug("starting persistance of ${testStepCount} event results for test steps")
 		List<EventResult> resultsOfTeststep = []
 		testStepCount.times{nullBasedTeststepIndex ->
-			
+			//TODO: possible to catch non median results at this position  and check if they should persist or not
+
 			EventResult.withTransaction { TransactionStatus status ->
+                log.debug("Persisting EventResults of jobRun: ${jobRun}: Start of transaction, transaction status=${status}")
 				try{
 					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
+                    log.debug("Persisting EventResults of jobRun: ${jobRun}: End of transaction, transaction status=${status}")
 				} catch (Exception e) {
 					status.setRollbackOnly()
 					log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
 				}
 			}
-			
 		}
 		informDependents(resultsOfTeststep)
 	}
@@ -289,18 +306,23 @@ class LocationAndResultPersisterService implements iListener{
 		log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
 		MeasuredEvent event = getMeasuredEvent(measuredEventName);
 		log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
-				
+
 		log.debug("persisting result for step=${event}")
 		Integer runCount = resultXml.getRunCount()
 		log.debug("runCount=${runCount}")
 
 		List<EventResult> resultsOfTeststep = []
 		resultXml.getRunCount().times {Integer runNumber ->
-			EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
-			if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
-			
-			EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
-			if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+            if( resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
+                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex)) ) {
+                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+                if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
+            }
+            if( resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
+                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex)) ) {
+                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+                if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+            }
 		}
 		/*
 		resultXml.getRunNodes().each{GPathResult run ->
@@ -332,12 +354,9 @@ class LocationAndResultPersisterService implements iListener{
 		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor) {
 
 		EventResult result
-		if(resultXml.resultExistForRunAndView(runZeroBasedIndex, cachedView)){
+        GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
+        result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
 
-			GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
-			result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
-
-		}
 		return result
 	}
 
@@ -355,7 +374,7 @@ class LocationAndResultPersisterService implements iListener{
 		JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, 
 		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
 
-		EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult() 
+		EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult()
 		return saveResult(result, jobRun, event, view, run, median, viewTag, pageidToWaterfallMap, waterfallAnchor)
 
 	}
@@ -424,6 +443,7 @@ class LocationAndResultPersisterService implements iListener{
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}
+        result.testAgent=jobRun.testAgent
 
 		jobRun.eventResults.add(result)
 		// FIXME: 2014-01-27-nku

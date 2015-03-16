@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -21,8 +21,8 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.p13n.CookieBasedSettingsService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.test.mixin.*
+
 import org.junit.Before
 import org.junit.Test
 
@@ -51,10 +51,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph=new OsmChartGraph();
 		graph.setLabel("job1");
@@ -106,17 +106,16 @@ class OsmChartTagLibTests {
 				model).stripIndent()
 
 		// assertions
+        assertEquals(expectedHtml, actualHtml)
 
-		assertEquals(expectedHtml, actualHtml)
-		
 	}
-	
+
 	private String getExpectedHtmlForSingleYAxisChartWithHighcharts(String divId, String width, String title, String yType, String maxValue, String lineType, String data) {
 		def sw = new StringWriter()
 
 		sw  = """<div id="${divId}" style="width: ${width};"></div>
 			<script type="text/javascript">
-				\$(document).ready(function() { 
+				\$(document).ready(function() {
 					window.CHARTLIB = "HIGHCHARTS";
 					var data = [${data}];
 		createLineChart("myDivId", "Antwortzeit WPT-Monitore", "Antwortzeit [ms]", data, 100, "null",
@@ -126,7 +125,7 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 	@Test
 	void testSingleYAxisChartTagWithRickshaw() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
@@ -139,10 +138,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph=new OsmChartGraph();
 		graph.setLabel("job1");
@@ -194,7 +193,7 @@ class OsmChartTagLibTests {
 		assertEquals(expectedHtml, actualHtml)
 
 	}
-	
+
 	private String getExpectedHtmlForSingleYAxisChartWithRickshaw(String divId) {
 		def sw = new StringWriter()
 
@@ -202,9 +201,9 @@ class OsmChartTagLibTests {
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
 			<div id="rickshaw_main">
-				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>	
+				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
-				<div id="rickshaw_chart"></div>				
+				<div id="rickshaw_chart"></div>
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
@@ -221,7 +220,7 @@ class OsmChartTagLibTests {
 				var args = {
 					divId: "${divId}",
 					title: "Antwortzeit WPT-Monitore",
-					data : [ { measurandGroup: "NO_MEASURAND",   yAxisLabel: "Antwortzeit [ms]", name: "job1",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" } , { x: 1373635396, y: 3.0, url: "undefined" } , { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" }  ] } ],
+					data : [ { measurandGroup: "NO_MEASURAND",   yAxisLabel: "Antwortzeit [ms]", name: "job1",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
 					heightOfChart :  400,
 					NUMBER_OF_YAXIS_TICKS : 5,
 					drawPointMarkers: true
@@ -232,7 +231,7 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 	@Test
 	void testMultipleYAxisChartTagWithRickshaw() {
 
@@ -246,10 +245,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph1=new OsmChartGraph();
 		graph1.setMeasurandGroup(MeasurandGroup.LOAD_TIMES)
@@ -310,7 +309,7 @@ class OsmChartTagLibTests {
 		// assertions
 		assertEquals(expectedHtml, actualHtml)
 	}
-	
+
 	private String getExpectedHtmlForMultipleYAxisChartWithRickshaw(String divId) {
 		def sw = new StringWriter()
 
@@ -318,9 +317,9 @@ class OsmChartTagLibTests {
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
 			<div id="rickshaw_main">
-				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>	
+				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
-				<div id="rickshaw_chart"></div>				
+				<div id="rickshaw_chart"></div>
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
@@ -337,7 +336,7 @@ class OsmChartTagLibTests {
 				var args = {
 					divId: "${divId}",
 					title: "Antwortzeit WPT-Monitore",
-					data : [ { measurandGroup: "LOAD_TIMES",   yAxisLabel: "Load Times", name: "job1",  data: [  { x: 1373631796, y: 0.0015, url: "https://www.example.com/now" } , { x: 1373635396, y: 0.003, url: "undefined" } , { x: 1373638996, y: 0.0023, url: "https://www.example.com/twoHoursAfterNow" }  ] },  { measurandGroup: "PERCENTAGES",   yAxisLabel: "Percentages", name: "job2",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" } , { x: 1373635396, y: 3.0, url: "undefined" } , { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" }  ] } ],
+					data : [ { measurandGroup: "LOAD_TIMES",   yAxisLabel: "Load Times", name: "job1",  data: [  { x: 1373631796, y: 0.0015, url: "https://www.example.com/now" }, { x: 1373635396, y: 0.003, url: "undefined" }, { x: 1373638996, y: 0.0023, url: "https://www.example.com/twoHoursAfterNow" } ] },  { measurandGroup: "PERCENTAGES",   yAxisLabel: "Percentages", name: "job2",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
 					heightOfChart :  600,
 					NUMBER_OF_YAXIS_TICKS : 5,
 					drawPointMarkers: false
@@ -348,7 +347,7 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 	@Test
 	void testMultipleYAxisChartTagWithHighchart() {
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
@@ -361,10 +360,10 @@ class OsmChartTagLibTests {
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
 		OsmChartPoint nowPoint = new OsmChartPoint(now.getTime(), 1.5d, 1, new URL(
-				"https://www.example.com/now"));
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null);
+				"https://www.example.com/now"), null);
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(oneHourAfterNow.getTime(), 3d, 1, null, null);
 		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(twoHoursAfterNow.getTime(), 2.3d, 1, new URL(
-				"https://www.example.com/twoHoursAfterNow"));
+				"https://www.example.com/twoHoursAfterNow"), null);
 
 		OsmChartGraph graph1=new OsmChartGraph();
 		graph1.setMeasurandGroup(MeasurandGroup.LOAD_TIMES)
@@ -383,7 +382,7 @@ class OsmChartTagLibTests {
 			twoHoursAfterNowPoint
 		]);
 		List<OsmChartGraph> data = [graph1, graph2]
-		
+
 		OsmChartAxis axis1 = new OsmChartAxis("Percentages", MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE);
 		OsmChartAxis axis2 = new OsmChartAxis("Load Times", MeasurandGroup.LOAD_TIMES, "",1, OsmChartAxis.RIGHT_CHART_SIDE);
 		OsmChartAxis axis3 = new OsmChartAxis("Load Times", MeasurandGroup.REQUEST_COUNTS, "",1, OsmChartAxis.RIGHT_CHART_SIDE);
@@ -392,12 +391,12 @@ class OsmChartTagLibTests {
 		List<OsmChartAxis> highChartLabels = [axis1, axis2, axis3, axis4, axis5];
 
 		String divId = 'myDivId'
-		
+
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.HIGHCHARTS
 		grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
-		
+
 		String expectedHtml = getExpectedHtmlForMultipleYAxisChartWithHighchart(divId).stripIndent()
-		
+
 		Map<String, Object> model = [
 			data: data,
 			divId: divId,
@@ -413,20 +412,20 @@ class OsmChartTagLibTests {
 			highChartLabels: highChartLabels
 		]
 
-		
+
 		// execute test
 		String actualHtml = applyTemplate(
 				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600px\" '+
 				'xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" ' +
-				'yAxisMax=\"${yAxisMax}\" measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" ' + 
-				'dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" ' + 
+				'yAxisMax=\"${yAxisMax}\" measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" ' +
+				'dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" ' +
 				'highChartLabels=\"${highChartLabels}\" />',
 				model).stripIndent()
 
 		// assertions
 		assertEquals(expectedHtml, actualHtml)
 	}
-	
+
 	private String getExpectedHtmlForMultipleYAxisChartWithHighchart(String divId) {
 		def sw = new StringWriter()
 
@@ -443,5 +442,5 @@ class OsmChartTagLibTests {
 
 		sw.toString()
 	}
-	
+
 }

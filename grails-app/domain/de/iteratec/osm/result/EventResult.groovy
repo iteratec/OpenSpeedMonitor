@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
@@ -117,6 +118,8 @@ class EventResult implements CsiValue {
 	 */
 	Integer speedIndex
 	Integer visuallyCompleteInMillisecs
+    /** tester from result xml */
+    String testAgent
 
 	/**
 	 * This is value is to be used for {@link #speedIndex} if no value is
@@ -173,6 +176,8 @@ class EventResult implements CsiValue {
 
 		tag(nullable: true)
 		webPerformanceWaterfall(nullable: true)
+
+        testAgent(nullable: true)
 	}
 
 	static mapping = {

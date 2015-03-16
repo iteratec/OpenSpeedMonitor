@@ -139,8 +139,8 @@ var updateSelectFields = function(fromSelector, toSelector, fromTo, allElements)
 };
 
 var initChosenSelects = function(noResultsTextForChosenSelects){
-	$('#selectedMeasuredEventsHtmlId').chosen({ search_contains: true, no_results_text: noResultsTextForChosenSelects });
-	$('#selectedLocationsHtmlId').chosen({ search_contains: true, no_results_text: noResultsTextForChosenSelects });
+	$('#selectedMeasuredEventsHtmlId').chosen({ search_contains: true, width: "100%", no_results_text: noResultsTextForChosenSelects });
+	$('#selectedLocationsHtmlId').chosen({ search_contains: true, width: "100%", no_results_text: noResultsTextForChosenSelects });
 }
 
 $('#simple-job-filter').click(function(){

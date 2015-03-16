@@ -97,6 +97,30 @@ class ConfigService {
 	String getMainUrlUnderTest(){
 		return (String)retrieveConfigValue('mainUrlUnderTest')
 	}
+
+    /**
+     * Gets max result-data storage time in months from osm-configuration.
+     * @return Time in months to store results of the application.
+     * @see OsmConfiguration
+     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+     */
+    Integer getMaxDataStorageTimeInMonths(){
+        return (Integer)retrieveConfigValue('maxDataStorageTimeInMonths')
+    }
+
+    /**
+     * Activates measurements generally.
+     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+     */
+    void activateMeasurementsGenerally(){
+        List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
+        if (osmConfigs.size() != 1 || osmConfigs[0].measurementsGenerallyEnabled == null) {
+            throw new IllegalStateException("measurementsGenerallyEnabled couldn\'t be read from Configuration!")
+        }else{
+            osmConfigs[0].measurementsGenerallyEnabled = true
+            osmConfigs[0].save(failOnError: true)
+        }
+    }
 	
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()

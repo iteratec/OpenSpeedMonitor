@@ -20,6 +20,8 @@
 }
 .graph {
 	background-color: white;
+  margin-left: auto;
+  margin-right: auto;
 }
 .rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label {
 	position: absolute;
@@ -51,7 +53,8 @@
 }
 .rickshaw_legend {
 	display: table !important;
-    margin: 10px auto !important;
+    margin-top: 10px !important;
+    margin-left: -25px !important;
 }
 .rickshaw_legend .action {
 	opacity: 0.4 !important;

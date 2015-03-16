@@ -17,41 +17,37 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.api.json.JSONLocationBox
+import de.iteratec.osm.api.json.JSONNameBox
+import de.iteratec.osm.api.json.Result
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TimeToCsMappingService
+import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobService
+import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.result.*
+import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.validation.Validateable
-
-import javax.persistence.NoResultException
-
+import groovy.json.JsonSlurper
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
-import org.springframework.http.HttpStatus
+import org.quartz.CronExpression
 
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.api.json.JSONLocationBox
-import de.iteratec.osm.api.json.JSONNameBox
-import de.iteratec.osm.api.json.Result
-import de.iteratec.osm.csi.TimeToCsMappingService
-import de.iteratec.osm.csi.weighting.WeightFactor
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
-import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import javax.persistence.NoResultException
 
 /**
  * RestApiController
@@ -71,7 +67,11 @@ class RestApiController {
 	MeasuredValueTagService measuredValueTagService
 	PerformanceLoggingService performanceLoggingService
 	TimeToCsMappingService timeToCsMappingService
-	
+	LinkGenerator grailsLinkGenerator
+	JobService jobService
+	PageService pageService
+	JobLinkService jobLinkService
+
 	/**
 	 * <p>
 	 * A request to receive results via REST-API.
@@ -278,8 +278,6 @@ class RestApiController {
 		}
 	}
 	
-	LinkGenerator grailsLinkGenerator;
-	
 	/**
 	 * <p>
 	 * Performs a redirect with HTTP status code 303 (see other).
@@ -337,7 +335,7 @@ class RestApiController {
 	 * @since IT-81
 	 */
 	public Map<String, Object> man() {
-		return [:]; // Just render the documentation gsp. 
+		return [protectedFunctionHint:'This method is protected. You need a valid api key, ask your osm administrator for one.']
 	}
 	
 	/**
@@ -483,11 +481,7 @@ class RestApiController {
 		
 		DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
 		DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo); 
-		
-		if( endDateTimeInclusive.isBefore(startDateTimeInclusive) ) {
-			sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')
-			return null
-		}
+		if( endDateTimeInclusive.isBefore(startDateTimeInclusive) ) sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
 		
 		Duration requestedDuration = new Duration(startDateTimeInclusive, endDateTimeInclusive);
 		
@@ -495,10 +489,9 @@ class RestApiController {
 			String errorMessage = 'The requested time-frame is wider than ' + 
 				MAX_TIME_FRAME_DURATION_IN_HOURS + 
 				' hours. This is too large to process. Please choose a smaler time-frame.'
-			sendSimpleResponseAsStream(response, HttpStatus.REQUEST_ENTITY_TOO_LARGE, errorMessage)
-			return null
+			sendSimpleResponseAsStream(response, 413, errorMessage)
 		}
-		
+
 		Date startTimeInclusive = startDateTimeInclusive.toDate();
 		Date endTimeInclusive = endDateTimeInclusive.toDate();
 
@@ -507,8 +500,7 @@ class RestApiController {
 			queryParams = cmd.createMvQueryParams(jobGroupDaoService, pageDaoService, measuredEventDaoService, browserDaoService, locationDaoService);
 		} catch(NoResultException nre)
 		{
-			sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some request arguments could not be found: ' + nre.getMessage())
-			return null
+			sendSimpleResponseAsStream(response, 404, 'Some request arguments could not be found: ' + nre.getMessage())
 		}
 		
 		response.setContentType("application/json;charset=UTF-8");
@@ -537,21 +529,6 @@ class RestApiController {
 		return sendObjectAsJSON(results, params.pretty && params.pretty == 'true');
 	}
 
-	private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, HttpStatus httpStatus, String message) {
-		response.setContentType('text/plain;charset=UTF-8')
-		response.status=httpStatus.value()
-
-		Writer textOut = new OutputStreamWriter(response.getOutputStream())
-		textOut.write(message)
-		response.status=httpStatus
-
-		textOut.flush()
-		response.getOutputStream().flush()
-
-		textOut.flush()
-		response.getOutputStream().flush()
-	}
-	
 	public Map<String, Object> getSystemCsi(ResultsRequestCommand cmd) {
 		
 		//FIXME: REMOVE IF Databinder is changed to new version
@@ -639,15 +616,12 @@ class RestApiController {
 	 * 	The calculated customer satisfaction for the given doc complete time.
 	 */
 	public Map<String, Object> translateToCustomerSatisfaction(Integer docCompleteTimeInMillisecs, String pageName){
-		if( docCompleteTimeInMillisecs == null || pageName == null ) {
-			sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'Params docCompleteTimeInMillisecs AND pageName must be set.')
-			return null
-		}
-		Page page = Page.findByName(pageName) 
-		if( page == null ) {
-			sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "Page with name ${pageName} couldn't be found")
-			return null
-		}
+
+		if( docCompleteTimeInMillisecs == null || pageName == null ) sendSimpleResponseAsStream(response, 400, 'Params docCompleteTimeInMillisecs AND pageName must be set.')
+
+		Page page = Page.findByName(pageName)
+		if( page == null ) sendSimpleResponseAsStream(response, 400, "Page with name ${pageName} couldn't be found")
+
 		return sendObjectAsJSON(
 			['docCompleteTimeInMillisecs': docCompleteTimeInMillisecs, 'customerSatisfactionInPercent': timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTimeInMillisecs, page)], 
 			params.pretty && params.pretty == 'true'
@@ -661,21 +635,118 @@ class RestApiController {
 	 * @return The complete list of {@link CustomerFrustration}s for {@link Page} with given pageName.
 	 */
 	public Map<String, Object> getCsiFrustrationTimings(String pageName){
-		if( pageName == null ) {
-			sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'Param pageName must be set.')
-			return null
-		}
+
+		if( pageName == null ) sendSimpleResponseAsStream(response, 400, 'Param pageName must be set.')
+
 		Page page = Page.findByName(pageName)
-		if( page == null ) {
-			sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "Page with name ${pageName} couldn't be found.")
-			return null
-		}
+		if( page == null ) sendSimpleResponseAsStream(response, 400, "Page with name ${pageName} couldn't be found.")
+
 		List<Integer> cachedFrustrations = timeToCsMappingService.getCachedFrustrations(page)
 		return sendObjectAsJSON(
 			['page': pageName, 'cachedFrustrations': cachedFrustrations, 'count': cachedFrustrations.size()],
 			params.pretty && params.pretty == 'true'
 		)
 	}
+
+	/**
+	 * Gets url's to visualize results of given {@link Job} in given period.
+	 * @param frequencyInMinutes
+	 * @param durationInMinutes
+	 * @return
+	 */
+	public Map<String, Object> getResultUrls(){
+
+		Job job = Job.get(params.id)
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+
+		if( params.timestampFrom == null || params.timestampTo == null ) sendSimpleResponseAsStream(response, 400, 'Params timestampFrom and timestampTo must be set.')
+
+		DateTime start = API_DATE_FORMAT.parseDateTime(params.timestampFrom)
+		DateTime end = API_DATE_FORMAT.parseDateTime(params.timestampTo)
+		if( end.isBefore(start) ) sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
+
+		Map<String, String> visualizingLinks = jobLinkService.getResultVisualizingLinksFor(job, start, end)
+
+		Map objectToSend =
+				[
+				'job': job.label,
+				'from': start,
+				'to': end
+			]
+		return sendObjectAsJSON(
+				objectToSend += visualizingLinks,
+				params.pretty && params.pretty == 'true'
+		)
+	}
+
+	/**
+	 * Activates the job of submitted id. It gets activated no matter whether it was active/inactive before.
+	 * This function can't be called without a valid apiKey as parameter.
+	 * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+	 */
+	public Map<String, Object> securedViaApiKeyActivateJob(){
+
+		if( !params.validApiKey.allowedForJobActivation ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to activate jobs.")
+
+		Job job = Job.get(params.id)
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+
+		jobService.updateActivity(job, true)
+
+		sendObjectAsJSON(
+				job.refresh(),
+				params.pretty && params.pretty == 'true'
+		)
+	}
+
+	/**
+	 * Deactivates the job of submitted id. It gets deactivated no matter whether it was active/inactive before.
+	 * This function can't be called without a valid apiKey as parameter.
+	 * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+	 */
+	public Map<String, Object> securedViaApiKeyDeactivateJob(){
+
+		if( !params.validApiKey.allowedForJobDeactivation ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to deactivate jobs.")
+
+		Job job = Job.get(params.id)
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+
+		jobService.updateActivity(job, false)
+
+		sendObjectAsJSON(
+				job.refresh(),
+				params.pretty && params.pretty == 'true'
+		)
+	}
+	/**
+	 * Updates execution schedule of Job with submitted id. Schedule must ba a valid quartz schedule.
+	 * This function can't be called without a valid apiKey as parameter.
+	 * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+	 * @see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
+	 */
+	public Map<String, Object> securedViaApiKeySetExecutionSchedule(){
+
+		if( !params.validApiKey.allowedForJobSetExecutionSchedule ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
+
+		Job job = Job.get(params.id)
+		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+
+		def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
+		String schedule = jsonSlurper.executionSchedule
+		if( schedule == null ) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
+
+		if( !CronExpression.isValidExpression(schedule) )
+			sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
+			"(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
+
+		jobService.updateExecutionSchedule(job, schedule)
+
+		sendObjectAsJSON(
+			job.refresh(),
+			params.pretty && params.pretty == 'true'
+		)
+	}
+
 	
 	/**
 	 * <p>
@@ -701,7 +772,28 @@ class RestApiController {
 		render converter
 		return null
 	}
-	
+
+	/**
+	 * Sends error message with given error httpStatus and message as http response and breaks action (no subsequent
+	 * action code is executed).
+	 * @param response
+	 * @param httpStatus
+	 * @param message
+	 */
+	private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, Integer httpStatus, String message) {
+		response.setContentType('text/plain;charset=UTF-8')
+		response.status=httpStatus
+
+		Writer textOut = new OutputStreamWriter(response.getOutputStream())
+		textOut.write(message)
+		response.status=httpStatus
+
+		textOut.flush()
+		response.getOutputStream().flush()
+
+		render ''
+	}
+
 	
 	/**
 	 * Fix to support Databinding of URLMapping Variables to CommandObjects, 

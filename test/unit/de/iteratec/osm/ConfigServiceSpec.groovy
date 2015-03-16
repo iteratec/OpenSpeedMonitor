@@ -105,4 +105,18 @@ class ConfigServiceSpec {
 		//test executions and assertions
 		assertThat(serviceUnderTest.getInitialChartHeightInPixels(), is(expectedInitialChartHeight))
 	}
+
+    void testActivatingMeasurements(){
+        //test-specific data
+        OsmConfiguration conf = new OsmConfiguration(measurementsGenerallyEnabled: false).save(failOnError: true)
+        assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(false))
+        //test execution
+        serviceUnderTest.activateMeasurementsGenerally()
+        // assertions
+        assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(true))
+        //test execution
+        serviceUnderTest.activateMeasurementsGenerally()
+        // assertions
+        assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(true))
+    }
 }

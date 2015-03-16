@@ -241,7 +241,7 @@ public class EventResultDashboardService {
 					Double value=resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
 					if(value != null){
 						String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}"
-						highchartPointsForEachGraph[graphLabel].add(new OsmChartPoint(eventResult.getJobResultDate().getTime(), value, 1, testsDetailsURL))
+						highchartPointsForEachGraph[graphLabel].add(new OsmChartPoint(eventResult.getJobResultDate().getTime(), value, 1, testsDetailsURL, eventResult.testAgent))
 					}
 				}
 			}
@@ -312,7 +312,7 @@ public class EventResultDashboardService {
 					if (countValues > 0) {
 						sum = 0
 						value.each {singleValue -> sum += singleValue}
-						highchartPointsForEachGraph[graphLabel] << new OsmChartPoint(millisStartOfInterval, sum/countValues, countValues, testsDetailsURL)
+						highchartPointsForEachGraph[graphLabel] << new OsmChartPoint(millisStartOfInterval, sum/countValues, countValues, testsDetailsURL, null)
 					}
 				}
 			}

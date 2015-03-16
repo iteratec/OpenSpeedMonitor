@@ -17,7 +17,9 @@
 
 package de.iteratec.osm.result
 
-
+import grails.gorm.DetachedCriteria
+import org.apache.tools.ant.taskdefs.condition.Http
+import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -58,14 +60,18 @@ class JobResult {
 	 * one job-results.
 	 * </p>
 	 */
-	Collection<EventResult> eventResults = []
+    Collection<EventResult> eventResults = []
 	static hasMany = [eventResults: EventResult]
+
+    static hasOne = HttpArchive
 
 	/** timestamp of execution */
 	Date date
 	/** wpt-test-id */
 	String testId
-	
+    /** tester from result xml */
+    String testAgent
+
 	/** An optional String containing error messages from WPT server **/
 	String wptStatus
 	/** status code returned by WPT server (such as 200, 101, ...) **/
@@ -117,6 +123,7 @@ class JobResult {
 
 	static constraints = {
 		testId()
+        testAgent(nullable: true)
 		date()
 		wptStatus(nullable: true)
 		httpStatusCode()
@@ -242,5 +249,5 @@ class JobResult {
 		def state = [0: 'Failure', 100: 'Pending', 101: 'Running', 200: 'Finished', 400: 'Error', 404: 'Not found', 504: 'Timeout']
 		def str = state[httpStatusCode]
 		return str ?: 'Unknown'
-	}
+    }
 }

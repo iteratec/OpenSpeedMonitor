@@ -2,7 +2,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="span2">
-				<h4>Product</h4>
+				<h4><g:message code="default.product.title"/></h4>
 				<ul class="unstyled">
 					<li>
 			    		<i class="icon-home"></i>
@@ -12,7 +12,7 @@
 				</ul>
 			</div>
 			<div class="span2">
-				<h4>Company</h4>
+				<h4><g:message code="default.company.title"/></h4>
 				<ul class="unstyled">
 					<li>
 			    		<i class="icon-info-sign"></i>
@@ -29,7 +29,7 @@
 				</ul>
 			</div>
 			<div class="span8">
-				<h4>Information</h4>
+				<h4><g:message code="default.info.title"/></h4>
 				<p>
 				Developed by <a href="http://www.iteratec.de/" target="_blank">iteratec GmbH</a> (office Hamburg).
 				</p>
@@ -40,6 +40,6 @@
 			</div>
 		</div>
 	
-		<p class="pull-right"><a href="#">Back to top</a></p>
+		<p class="pull-right"><a href="#"><g:message code="default.back.top.label"/></a></p>
 	</div>
 </footer>

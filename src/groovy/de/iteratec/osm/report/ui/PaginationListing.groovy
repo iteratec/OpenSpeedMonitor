@@ -134,17 +134,102 @@ public class PaginationListing {
 	public String getPrevLink(){
 		return this.prevLink
 	}
-	
-	/**
-	 * <p>
-	 * Gives the maximum number of shown records at paginated page
-	 * </p>
-	 * 
-	 * @return The maximum number of shown records
-	 */
-	public Integer getMaxCount() {
-		return this.max
-	}
+
+    /**
+     * <p>
+     * Has current offset more then five pagination pages before
+     * </p>
+     * @return true if current offset has more then five pagination pages before
+     */
+    public moreThenFivePagesBefore(){
+        if(currentOffset > max*5)
+            return true
+        return false
+    }
+
+    /**
+     * <p>
+     * Has current offset more then five pages after
+     * </p>
+     * @return true if current offset has more then five page after
+     */
+    public moreThenFivePagesAfter(){
+        if(currentOffset + max*5 < total)
+            return true
+        return false
+    }
+
+    /**
+     * <p>
+     * Returns count of beginning pagination
+     * </p>
+     * @return count of beginning pagination
+     */
+    public Integer calculateStartListing(){
+        Integer begin;
+        if(moreThenFivePagesBefore())
+            return ( (offset - max*5)/max )
+        else
+            return 0
+    }
+
+    /**
+     * <p>
+     * Return count of ending pagination
+     * </p>
+     * @return count of ending pagination
+     */
+    public Integer calculateEndListing(){
+        Integer end;
+        if(moreThenFivePagesAfter())
+            return ( (offset + max*5)/max )
+        else
+            return total/max
+    }
+
+    /**
+     * <p>
+     * Is the given pageCount the active page
+     * </p>
+     * @param pageCount
+     * @return true if the pageCount is the active page
+     */
+    public boolean isActive(Integer pageCount){
+        if(pageCount == currentOffset/max)
+            return true
+        return false
+    }
+
+    /**
+     * <p>
+     * Returns the current offset
+     * </p>
+     * @return current offset
+     */
+    public Integer getOffset(){
+        return currentOffset
+    }
+
+    /**
+     * <p>
+     * Gives the maximum number of shown records at paginated page
+     * </p>
+     *
+     * @return The maximum number of shown records
+     */
+    public Integer getMax(){
+        return max
+    }
+
+    /**
+     * <p>
+     * Returns total count of elements from selection
+     * </p>
+     * @return total count of elements from selection
+     */
+    public Integer getTotal(){
+        return total
+    }
 	
 	/**
 	 * The listing rows.

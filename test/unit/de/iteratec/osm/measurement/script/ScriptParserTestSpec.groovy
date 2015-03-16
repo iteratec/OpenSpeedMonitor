@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.result.PageService
+
 import static org.junit.Assert.*
 import grails.test.mixin.*
 import grails.test.mixin.support.*
@@ -24,9 +26,10 @@ import grails.test.mixin.support.*
 @TestMixin(GrailsUnitTestMixin)
 class ScriptParserTestSpec {
 
+	PageService pageService
+
     void testBV1_Komplett_egon_Wpt_Explorer() {
-        ScriptParser parser = new ScriptParser()
-		List<ScriptStatement> statements = parser.interpret("""
+        ScriptParser parser = new ScriptParser(pageService, """
 ignoreErrors	1
 combineSteps
 ///step:Abmelden
@@ -63,7 +66,7 @@ execAndWait	document.getElementById('idOfLogoutButton').click();
     }
 	
 	void testEmptyScript() {
-		ScriptParser parser = new ScriptParser('')
+		ScriptParser parser = new ScriptParser(pageService, '')
 		checkSizes(
 			parser: parser,
 			measuredEvents: 0,
@@ -74,7 +77,7 @@ execAndWait	document.getElementById('idOfLogoutButton').click();
 	}
 	
 	void testSetEventNameOnlyScript() {
-		ScriptParser parser = new ScriptParser('setEventName 456')
+		ScriptParser parser = new ScriptParser(pageService, 'setEventName 456')
 		checkSizes(
 			parser: parser,
 			measuredEvents: 0,
@@ -87,7 +90,7 @@ execAndWait	document.getElementById('idOfLogoutButton').click();
 	}
 	
 	void testPageViewCommandOnlyScript() {
-		ScriptParser parser = new ScriptParser('navigate http://example.com')
+		ScriptParser parser = new ScriptParser(pageService, 'navigate http://example.com')
 		checkSizes(
 			parser: parser,
 			measuredEvents: 1,
@@ -99,7 +102,7 @@ execAndWait	document.getElementById('idOfLogoutButton').click();
 	}
 	
 	void testGlobalLogDataZeroScript() {
-		ScriptParser parser = new ScriptParser("""
+		ScriptParser parser = new ScriptParser(pageService, """
 logData 0
 setEventName	eventA
 exec dsasda
@@ -121,7 +124,7 @@ navigate http://testsite.de
 	}
 	
 	void testAlternatingLogData01Script() {
-		ScriptParser parser = new ScriptParser("""
+		ScriptParser parser = new ScriptParser(pageService, """
 //schritt 1
 logData 0
 exec dsasda

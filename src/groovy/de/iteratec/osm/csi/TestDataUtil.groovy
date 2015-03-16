@@ -327,7 +327,7 @@ class TestDataUtil {
 			uploadedBytes: 0,
 		).save(failOnError: true)
 	}
-	static Job createJob(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active){
+	static Job createJob(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active, Integer maxDownloadTimeInMinutes){
 		return new Job(
 			label: label,
 			script: script,
@@ -335,7 +335,8 @@ class TestDataUtil {
 			jobGroup: group,
 			description: description,
 			runs: runs,
-			active: active
+			active: active,
+            maxDownloadTimeInMinutes: maxDownloadTimeInMinutes
 		).save(failOnError: true)
 	}
 	static createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation){
@@ -1224,7 +1225,8 @@ class TestDataUtil {
 				minDocCompleteTimeInMillisecs: 250,
 				maxDocCompleteTimeInMillisecs: 180000,
 				measurementsGenerallyEnabled: true, 
-				initialChartHeightInPixels: 400
+				initialChartHeightInPixels: 400,
+                maxDataStorageTimeInMonths: 12
 				).save(failOnError: true)
 	}
 

@@ -919,6 +919,7 @@ class EventResultDashboardControllerTests {
 		out.selectedAllMeasuredEvents = false
 		out.selectedAllBrowsers = false
 		out.selectedAllLocations = false
+        out.selectedTimeFrameInterval = 0
 
 		// Do we fill all fields?
 		assertTrue(out.validate())

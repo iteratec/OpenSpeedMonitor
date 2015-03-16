@@ -19,7 +19,7 @@
 
 $.fn.fixedHeader = function (options) {
  var config = {
-   topOffset: 40
+   topOffset: 52
    //bgColor: 'white'
  };
  if (options){ $.extend(config, options); }

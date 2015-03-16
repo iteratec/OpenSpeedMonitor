@@ -24,11 +24,24 @@ if (typeof jQuery !== 'undefined') {
 		});
 	})(jQuery);
 }
+
+jQuery('ul.nav li.dropdown').hover(function() {
+  jQuery(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn();
+}, function() {
+  jQuery(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut();
+});
+
+jQuery('li.dropdown-submenu').hover(function() {
+  jQuery(this).children('ul').stop(true, true).delay(100).fadeIn();
+}, function() {
+  jQuery(this).children('ul').stop(true, true).delay(100).fadeOut();
+});
+
 function stringToBoolean(string) {
 	if(!string) return false;
 	switch(string.toLowerCase()){
-		case "true": case "yes": case "1": return true;
-		case "false": case "no": case "0": case null: return false;
+		case "true": case "yes": case "1": case "on": return true;
+		case "false": case "no": case "0": case "off": case null: return false;
 		default: return false;
 	}
 }
@@ -57,4 +70,29 @@ function getFromLocalStorage(key) {
 		console.log('Can\'t read data from local storage: ' + e.message);
 	}
 	return null;
+}
+$.extend({
+	getUrlVars: function(){
+		var vars = [], hash;
+		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+		for(var i = 0; i < hashes.length; i++)
+		{
+			var hash = hashes[i].split('=');
+			var key = decodeURIComponent(hash[0]);
+			vars.push(key);
+			vars[key] = decodeURIComponent(hash[1]);
+		}
+		return vars;
+	},
+	getUrlVar: function(name){
+		return $.getUrlVars()[name];
+	}
+});
+/**
+ * This method will just return the given message. We use it,
+ * so you can override it for a specialised delete conformation for the given domain
+ */
+function domainDeleteConfirmation(message,id){
+    return message;
+
 }

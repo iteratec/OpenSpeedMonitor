@@ -17,6 +17,9 @@
 
 package de.iteratec.osm.measurement.schedule.quartzjobs
 
+import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
+
+import de.iteratec.osm.util.PerformanceLoggingService
 import org.quartz.JobExecutionContext;
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.TriggerGroup
@@ -24,7 +27,8 @@ import de.iteratec.osm.measurement.schedule.JobProcessingService
 
 class CronDispatcherQuartzJob {
 	JobProcessingService jobProcessingService
-	
+    PerformanceLoggingService performanceLoggingService
+
     static triggers = {}
 
     def execute(JobExecutionContext context) {
@@ -37,12 +41,17 @@ class CronDispatcherQuartzJob {
 			println "CronDispatcherJob: No job found with id $id"
 		} else {
 			if (triggerGroup == TriggerGroup.QUARTZ_TRIGGER_GROUP.value()) {
-				println "CronDispatcherJob: Launching job ${job.label} at ${context.getFireTime().toString()}..."
-				jobProcessingService.launchJobRun(job)
+                performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Launching job ${job.label}", PerformanceLoggingService.IndentationDepth.ONE){
+                    jobProcessingService.launchJobRun(job)
+                }
 			} else if (triggerGroup == TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value()) {
-				jobProcessingService.pollJobRun(job, testId)
+                performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Polling of job ${job.label}", PerformanceLoggingService.IndentationDepth.ONE){
+                    jobProcessingService.pollJobRun(job, testId)
+                }
 			} else if (triggerGroup == TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value()) {
-				jobProcessingService.handleJobRunTimeout(job, testId)
+                performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Handle Job run timeout for job ${job.label}", PerformanceLoggingService.IndentationDepth.ONE){
+                    jobProcessingService.handleJobRunTimeout(job, testId)
+                }
 			}
 		} 
     }

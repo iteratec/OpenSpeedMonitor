@@ -15,10 +15,10 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.report.chart;
+package de.iteratec.osm.report.chart
 
-import java.net.URL;
-import java.util.Date;
+import groovy.transform.EqualsAndHashCode
+
 
 /**
  * <p>
@@ -40,6 +40,7 @@ import java.util.Date;
  * @author mze
  * @since IT-78
  */
+@EqualsAndHashCode(includeFields=true)
 public final class OsmChartPoint {
 
 	/**
@@ -53,7 +54,7 @@ public final class OsmChartPoint {
 	 * hover info dialog to inform the user about values background
 	 * </p>
 	 */
-	public final int countOfAggregatedResults;
+	public final int countOfAggregatedResults
 
 	/**
 	 * <p>
@@ -66,7 +67,7 @@ public final class OsmChartPoint {
 	 * 
 	 * @see #countOfAggregatedResults
 	 */
-	public final double measuredValue;
+	public final double measuredValue
 
 	/**
 	 * <p>
@@ -82,7 +83,7 @@ public final class OsmChartPoint {
 	 * 
 	 * @see #hasAnSourceURL()
 	 */
-	public final URL sourceURL;
+	public final URL sourceURL
 
 	/**
 	 * <p>
@@ -98,13 +99,18 @@ public final class OsmChartPoint {
 	 * @see #measuredValue
 	 * @see Date#getTime()
 	 */
-	public final long time;
+	public final long time
+	
+	/**
+	 * Measuring machine name (can contain ip adress) 
+	 */
+	public final String testingAgent
 
 	/**
 	 * <p>
 	 * Creates a new Highchart point.
 	 * </p>
-	 * 
+	 *
 	 * @param time
 	 *            The time the value was measured (milliseconds since Epoch); a
 	 *            value >= 0 - for sure there is no web-page-test-measuring
@@ -121,90 +127,52 @@ public final class OsmChartPoint {
 	 *             {@code countOfAggregatedResults} is less than 0.
 	 */
 	public OsmChartPoint(final long time, final double measuredValue,
-						 final int countOfAggregatedResults, final URL sourceURL)
+						 final int countOfAggregatedResults, final URL sourceURL, final String testAgent)
 			throws IllegalArgumentException {
-		super();
+		super()
 
 		if (time < 0) {
 			throw new IllegalArgumentException(
-					"The time could not be less than 0.");
+					"The time could not be less than 0.")
 		}
 
 		if (countOfAggregatedResults < 0) {
 			throw new IllegalArgumentException(
-					"The count of aggregated results could not be less than 0.");
+					"The count of aggregated results could not be less than 0.")
 		}
 
-		this.time = time;
-		this.measuredValue = measuredValue;
-		this.countOfAggregatedResults = countOfAggregatedResults;
-		this.sourceURL = sourceURL;
-	}
-
-	/**
-	 * Two Highchart points are equal if and only if all properties/field values
-	 * are equal.
-	 */
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof OsmChartPoint)) {
-			return false;
-		}
-		final OsmChartPoint other = (OsmChartPoint) obj;
-		if (this.countOfAggregatedResults != other.countOfAggregatedResults) {
-			return false;
-		}
-		if (Double.doubleToLongBits(this.measuredValue) != Double
-				.doubleToLongBits(other.measuredValue)) {
-			return false;
-		}
-		if (this.sourceURL == null) {
-			if (other.sourceURL != null) {
-				return false;
-			}
-		} else if (!this.sourceURL.equals(other.sourceURL)) {
-			return false;
-		}
-		if (this.time != other.time) {
-			return false;
-		}
-		return true;
+		this.time = time
+		this.measuredValue = measuredValue
+		this.countOfAggregatedResults = countOfAggregatedResults
+		this.sourceURL = sourceURL
+		this.testingAgent = testAgent
 	}
 
 	/**
 	 * <p>
 	 * Has this point a source {@link URL} with more details about its value?
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * This is the recommend way to check for an URL. Your schould use this
 	 * method instead of comaparing {@link #sourceURL} with <code>null</code>.
 	 * </p>
-	 * 
+	 *
 	 * @return <code>true</code> if it has a source URL, <code>false</code>
 	 *         else.
 	 */
 	public boolean hasAnSourceURL() {
-		return this.sourceURL != null;
+		return this.sourceURL != null
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = (prime * result) + this.countOfAggregatedResults;
-		long temp;
-		temp = Double.doubleToLongBits(this.measuredValue);
-		result = (prime * result) + (int) (temp ^ (temp >>> 32));
-		result = (prime * result)
-				+ ((this.sourceURL == null) ? 0 : this.sourceURL.hashCode());
-		result = (prime * result) + (int) (this.time ^ (this.time >>> 32));
-		return result;
-	}
+    public boolean equals(Object o){
+        OsmChartPoint osmChartPoint = (OsmChartPoint) o
+        if (this.time == osmChartPoint.time
+                && this.measuredValue == osmChartPoint.measuredValue
+                && this.countOfAggregatedResults == osmChartPoint.countOfAggregatedResults
+                && this.sourceURL == osmChartPoint.sourceURL
+                && this.testingAgent == osmChartPoint.testingAgent)
+            return true
+        return false
+    }
 }

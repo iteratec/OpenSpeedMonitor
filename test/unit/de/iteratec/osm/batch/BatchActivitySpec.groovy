@@ -15,9 +15,20 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.result
+package de.iteratec.osm.batch
 
-class JobResultController {
 
-    static scaffold = true
+
+import grails.test.mixin.*
+import org.junit.*
+
+/**
+ * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
+ */
+@TestFor(BatchActivity)
+class BatchActivitySpec {
+
+    void testSomething() {
+       fail "Implement me"
+    }
 }
