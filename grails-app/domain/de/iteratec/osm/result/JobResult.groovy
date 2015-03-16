@@ -60,7 +60,7 @@ class JobResult {
 	 * one job-results.
 	 * </p>
 	 */
-	Collection<EventResult> eventResults = []
+    Collection<EventResult> eventResults = []
 	static hasMany = [eventResults: EventResult]
 
     static hasOne = HttpArchive
@@ -249,5 +249,5 @@ class JobResult {
 		def state = [0: 'Failure', 100: 'Pending', 101: 'Running', 200: 'Finished', 400: 'Error', 404: 'Not found', 504: 'Timeout']
 		def str = state[httpStatusCode]
 		return str ?: 'Unknown'
-	}
+    }
 }

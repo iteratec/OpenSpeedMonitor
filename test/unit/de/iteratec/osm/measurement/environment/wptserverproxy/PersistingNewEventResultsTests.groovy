@@ -772,11 +772,11 @@ class PersistingNewEventResultsTests {
 		//TODO 2013-10-24: proof all CSI-relevant attributes of job_results
 
 		//check for steps
-		List<MeasuredEvent> steps = MeasuredEvent.list()
-		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfSteps - ", expectedValues['expectedNumberOfSteps'], steps.size())
-		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfStepsWithAssociatedPage - ", expectedValues['expectedNumberOfStepsWithAssociatedPage'], 
-			steps.findAll{!it.testedPage.isUndefinedPage()}.size())
-		
+        List<MeasuredEvent> steps = MeasuredEvent.list()
+        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfSteps - ", expectedValues['expectedNumberOfSteps'], steps.size())
+        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfStepsWithAssociatedPage - ", expectedValues['expectedNumberOfStepsWithAssociatedPage'],
+                steps.findAll { !it.testedPage.isUndefinedPage() }.size())
+
 
 		//check for results
 		List<EventResult> allResults = EventResult.list()

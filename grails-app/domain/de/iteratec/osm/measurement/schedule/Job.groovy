@@ -51,6 +51,7 @@ class Job implements Taggable {
     boolean active;
     boolean firstViewOnly;
     boolean captureVideo;
+    boolean persistNonMedianResults = true;
     /**
      * Stop Test at Document Complete.
      */
@@ -170,6 +171,7 @@ class Job implements Taggable {
     
         firstViewOnly(nullable: true)
         captureVideo(nullable: true)
+        persistNonMedianResults(nullable: false)
         
         web10(nullable: true)
         noscript(nullable: true)
@@ -217,6 +219,7 @@ class Job implements Taggable {
     static mapping = {
         sort 'label':'asc'
         customConnectivityProfile defaultValue: false
+        persistNonMedianResults defaultValue: '1'
     }
     
     def beforeValidate() {

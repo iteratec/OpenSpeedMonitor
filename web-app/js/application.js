@@ -88,3 +88,11 @@ $.extend({
 		return $.getUrlVars()[name];
 	}
 });
+/**
+ * This method will just return the given message. We use it,
+ * so you can override it for a specialised delete conformation for the given domain
+ */
+function domainDeleteConfirmation(message,id){
+    return message;
+
+}

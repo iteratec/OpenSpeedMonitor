@@ -17,8 +17,18 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.Status
+import de.iteratec.osm.result.HttpArchive
+import de.iteratec.osm.result.JobResult
 
 class JobService {
+    static transactional = false
+    BatchActivityService batchActivityService
 
 	/**
 	 * <p>
@@ -31,7 +41,7 @@ class JobService {
 	 *         group is not a CSI-group, else the group
 	 */
 	JobGroup getCsiJobGroupOf(Job job){
-		JobGroup group = job.getJobGroup();
+		JobGroup group = job.getJobGroup()
 		/*- 
 		 * Use of defensive programming intended here:
 		 * 
@@ -39,14 +49,14 @@ class JobService {
 		 * and was never manually(!) assigned.
 		 */
 		if( group != null && group.getGroupType() == JobGroupType.CSI_AGGREGATION ) {
-			return group;
+			return group
 		} else {
-			return null;
+			return null
 		}
 	}
 
 	private List<Job> findByJobGroup(JobGroup group){
-		return Job.findAllByJobGroup(group).asList();
+		return Job.findAllByJobGroup(group).asList()
 	}
 	List<Job> getAllCsiJobs(){
 		List<Job> csiJobs = []
@@ -71,14 +81,76 @@ class JobService {
 								   FROM TagLink tagLink
 								   WHERE tagLink.type = 'job'""")
 	}
-
+    @Transactional
 	void updateActivity(Job job, boolean activityToSet){
 		job.active = activityToSet
 		job.save(failOnError: true)
 	}
-
+    @Transactional
 	void updateExecutionSchedule(Job job, String executionSchedule){
 		job.executionSchedule = executionSchedule
 		job.save(failOnError: true)
 	}
+	
+    /**
+     * Deletes a Job with all JobResults, HttpArchives and EventResults
+     *
+     * @param job Job that should be deleted
+     */
+    void deleteJob(Job job){
+        if(batchActivityService.runningBatch(Job.class,job.id)){
+            return
+        }
+        BatchActivity activity = batchActivityService.getActiveBatchActivity(Job.class,job.id,Activity.DELETE, "Job ${job.label} delete")
+        def dc = new DetachedCriteria(JobResult).build {
+            eq 'job', job
+        }
+        int count = dc.count()
+        int batchSize = 100
+        Job.withSession { session ->
+            0.step(count,batchSize){offset->
+                Job.withTransaction {
+                    int max = offset+batchSize
+                    max = max<count?max:count
+                    batchActivityService.updateStatus(activity,["progress":"Delete intervall $offset - $max","stage":"Delete JobResults"])
+                    dc.list(offset: 0,max: batchSize).eachWithIndex {JobResult jobResult,int index->
+                        try {
+                            log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
+                            List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
+                            batchDelete(httpArchives,batchSize)
+//                            FIXME with IT-456 there will be no cascading delete from JobResult to EventResult and the following lines should be activated
+//                            List<EventResult> eventResults = jobResult.getEventResults()
+//                            batchDelete(eventResults,batchSize)
+                            jobResult.delete()
+                            batchActivityService.updateStatus(activity,["successfulActions":++activity.getSuccessfulActions()])
+                        } catch (Exception e){
+                            log.error("Couldn't delete JobResult ${e}")
+                            batchActivityService.updateStatus(activity,["failures":++activity.getFailures(),"lastFailureMessage":"Couldn't delete JobResult: ${jobResult.id} - ${e}"])
+                        }
+                    }
+                }
+                session.flush()
+                session.clear()
+            }
+            batchActivityService.updateStatus(activity,["stage":"Delete Job"])
+            Job.withTransaction {
+                job.delete(flush: true)
+            }
+            batchActivityService.updateStatus(activity,["stage":"","progress":"done","endDate":new Date(),"status":Status.done])
+        }
+    }
+    /**
+     * Deletes a List of objects with a new Transaction and will delete up to batchSize objects with one transaction
+     * @param objects Objects to be deleted
+     * @param batchSize maximum delete interval
+     */
+    private void batchDelete(List objects,int batchSize){
+        0.step(objects.size(),batchSize){off->
+            Job.withTransaction {
+                int max = off+batchSize
+                max = (max>objects.size())?objects.size():max
+                objects.subList(off,max)*.delete()
+            }
+        }
+    }
 }

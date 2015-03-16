@@ -24,6 +24,8 @@ import static org.junit.Assert.assertThat
 
 import org.junit.Test
 
+import static org.junit.Assert.assertTrue
+
 /**
  * <p>
  * Test-suite of {@link OsmChartPoint}.
@@ -68,6 +70,7 @@ public class OsmChartPointTests {
         OsmChartPoint differentTestAgent = new OsmChartPoint(
                 TIME, VALUE, COUNT_OF_AGGREGATED_RESULTS, URL, 'myAgent - 192.168.1.2')
 
+//        assertTrue(out.equals(equalsToOut))
 		assertThat(out, equalTo(equalsToOut))
 		assertThat(out.hashCode(), equalTo(equalsToOut.hashCode()))
 

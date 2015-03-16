@@ -21,6 +21,8 @@
 	<r:require modules="bootstrap"/>
 	<r:require modules="bootstrap_utils"/>
 
+    <r:require modules="core"/>
+
 	<r:layoutResources />
 	<g:layoutHead />
 
