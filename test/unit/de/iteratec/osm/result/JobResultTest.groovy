@@ -40,21 +40,20 @@ class JobResultTest {
 		JobResult shouldNotBeFound = new JobResult(testId: "TestJob2").save([failOnError: true, validate: false]);
 		JobResult expectedResult = new JobResult(testId: "TestJob").save([failOnError: true, validate: false]);
 
-		EventResult dummyData = new EventResult().save([failOnError: true, validate: false]);
-		EventResult searchCondition = new EventResult().save([failOnError: true, validate: false]);
+		EventResult dummyData = new EventResult( jobResult: expectedResult ).save([failOnError: true, validate: false]);
+		EventResult searchCondition = new EventResult( jobResult: expectedResult ).save([failOnError: true, validate: false]);
 
 		// Create dependencies
-		expectedResult.eventResults.add(dummyData)
-		expectedResult.eventResults.add(searchCondition)
 		expectedResult.save([failOnError: true, validate: false]);
 
 		// Check database
 		assertEquals(1, (JobResult.list().findAll{it.getEventResults().contains(searchCondition)}).size());
 
 		// Run test:
-		assertEquals(expectedResult.testId, new JobResultService().findJobResultByEventResult(searchCondition).testId);
+		assertEquals(expectedResult.testId, searchCondition.jobResult.testId);
 	}
 
+	/* Invalid test since JobResult does not have a eventResults-list anymore
 	@Test
 	public void testFindBy_EventResultInconsistentDB() {
 		// Create test data
@@ -75,11 +74,13 @@ class JobResultTest {
 		assertEquals(2, (JobResult.list().findAll{it.getEventResults().contains(invalidUse)}).size());
 
 		// Run test:
+		//This should test findJobResultByEventResult(), but function doesn't exist anymore
 		try {
-			new JobResultService().findJobResultByEventResult(invalidUse);
+			//new JobResultService().findJobResultByEventResult(invalidUse);
 			fail("SQLException expected")
 		} catch(SQLException expected) {}
 	}
+	//*/
 
 	@Test
 	public void testTryToGetTestsDetailsURL_withURL_wptServerBaseurl_endsWithSlash() {

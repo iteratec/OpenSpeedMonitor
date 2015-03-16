@@ -18,21 +18,27 @@
 package de.iteratec.osm.csi
 
 import static org.junit.Assert.*
+
+import java.util.Date;
+
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Before
+
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.api.ShopCsiService
 import de.iteratec.osm.api.SystemCSI
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.schedule.Job
 
 /**
  *
@@ -128,12 +134,17 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
     }
 	
 	void createEventResult(MeasuredEvent event, String tag, double value){
+		JobResult expectedResult = new JobResult(testId: "TestJob").save(validate: false);
+		
+		// TODO: Create a dummy data for expectedResult to pass it to EventResult
+		
 		new EventResult(
 			measuredEvent: event,
 			wptStatus: 200,
 			medianValue: true,
 			numberOfWptRun: 1,
 			cachedView: CachedView.UNCACHED,
+			jobResult: expectedResult,
 			jobResultDate: START.plusDays(1).toDate(),
 			jobResultJobConfigId: 1,
 			tag: tag,

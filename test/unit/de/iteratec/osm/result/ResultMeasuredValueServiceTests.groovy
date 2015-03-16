@@ -241,12 +241,13 @@ class ResultMeasuredValueServiceTests {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: runInHour_One,
 				jobResultDate: runInHour_One.date,
 				jobResultJobConfigId: runInHour_One.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
 				).save(failOnError: true)
-		runInHour_One.eventResults.add(resultRunInHour_One)
+		
 		runInHour_One.save(failOnError: true)
 
 		/* Secound Run in Hour */
@@ -285,12 +286,13 @@ class ResultMeasuredValueServiceTests {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: runInHour_Two,
 				jobResultDate: runInHour_Two.date,
 				jobResultJobConfigId: runInHour_Two.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
 				).save(failOnError: true)
-		runInHour_Two.eventResults.add(resultRunInHour_Two)
+		
 		runInHour_Two.save(failOnError: true)
 
 		/* Run in before Hour */
@@ -329,12 +331,13 @@ class ResultMeasuredValueServiceTests {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: runBeforeHour,
 				jobResultDate: runBeforeHour.date,
 				jobResultJobConfigId: runBeforeHour.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
 				).save(failOnError: true)
-		runBeforeHour.eventResults.add(resultRunBeforeHour)
+		
 		runBeforeHour.save(failOnError: true)
 
 		/* Run in after Hour */
@@ -373,12 +376,13 @@ class ResultMeasuredValueServiceTests {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: runAfterHour,
 				jobResultDate: runAfterHour.date,
 				jobResultJobConfigId: runAfterHour.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
 				).save(failOnError: true)
-		runAfterHour.eventResults.add(resultRunAfterHour)
+		
 		runAfterHour.save(failOnError: true)
 	}
 

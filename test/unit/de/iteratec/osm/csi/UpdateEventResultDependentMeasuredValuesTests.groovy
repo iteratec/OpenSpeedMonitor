@@ -254,13 +254,13 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			wptStatus: 0,
 			validationState : 'validationState',
 			customerSatisfactionInPercent: cs,
+			jobResult: jobResult,
 			jobResultDate: jobResult.date,
 			jobResultJobConfigId: jobResult.job.ident(),
 			measuredEvent: event,
 			speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 			tag: resultTag).save(failOnError: true)
 			
-			jobResult.eventResults.add(returnValue)
 			jobResult.save(failOnError: true)
 			
 			return returnValue

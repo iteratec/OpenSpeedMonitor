@@ -44,7 +44,7 @@ class MeasuredValueUpdateService {
 	 * @param newResult
 	 */
 	void createOrUpdateDependentMvs(EventResult newResult) {
-		JobResult jobResult = jobResultService.findJobResultByEventResult(newResult)
+		JobResult jobResult = newResult.jobResult;
 		DateTime testCompletion = new DateTime(jobResult.date)
 		
 		DateTime hourlyStart = measuredValueUtilService.resetToStartOfActualInterval(testCompletion, MeasuredValueInterval.HOURLY)

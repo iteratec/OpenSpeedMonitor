@@ -78,8 +78,8 @@ class MeasuredValueTagServiceTests {
 		JobResult jobResult = new JobResult(job: job, testId: testId).save(validate: false)
 		MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page).save(validate: false)
 
-		EventResult eventResult=new EventResult(wptStatus: eventResultStatus, measuredEvent: measuredEvent).save(validate: false)
-		jobResult.eventResults.add(eventResult)
+		EventResult eventResult=new EventResult(jobResult: jobResult, wptStatus: eventResultStatus, measuredEvent: measuredEvent).save(validate: false)
+		
 		jobResult.save(failOnError: true, validate: false)
 
 		new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)

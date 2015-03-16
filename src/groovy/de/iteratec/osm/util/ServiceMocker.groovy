@@ -185,9 +185,15 @@ class ServiceMocker {
 			JobResult jobResult1 = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
 			JobResult jobResult2 = JobResult.findByTestId(testIdOfJobRunCsiGroup2)
 			
+			return (eventResult.jobResult.id == jobResult1.id) ?
+				jobResult1:
+				jobResult2
+			
+			/*
 			return jobResult1.eventResults.contains(eventResult)?
 				jobResult1:
 				jobResult2
+			//*/
 			
 		}
 		serviceToMockIn.jobResultService = jobResultService.createMock()

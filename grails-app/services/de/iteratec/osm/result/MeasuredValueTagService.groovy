@@ -213,7 +213,7 @@ class MeasuredValueTagService {
 	 */
 	String createPageAggregatorTagByEventResult(EventResult newResult){
 		String pageTag
-		JobResult jobResult = jobResultService.findJobResultByEventResult(newResult)
+		JobResult jobResult = newResult.jobResult
 		Job job = jobResult.job
 		if (job) {
 			JobGroup jobGroup = jobService.getCsiJobGroupOf(job)

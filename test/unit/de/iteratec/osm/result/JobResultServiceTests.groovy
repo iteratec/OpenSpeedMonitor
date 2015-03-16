@@ -46,28 +46,29 @@ class JobResultServiceTests {
 
 		//find jobResult1
 
-		EventResult eventResult1 = new EventResult().save(validate: false)
-		jobResult1.addToEventResults(eventResult1).save(validate: false)
-		JobResult jobResultRetrieved = serviceUnderTest.findJobResultByEventResult(eventResult1)
+		EventResult eventResult1 = new EventResult(jobResult: jobResult1).save(validate: false)
+		jobResult1.save(validate: false)
+		JobResult jobResultRetrieved = eventResult1.jobResult
 		assertNotNull(jobResultRetrieved)
 		assertEquals(jobResult1, jobResultRetrieved)
 
-		EventResult eventResult2 = new EventResult().save(validate: false)
-		jobResult2.addToEventResults(eventResult2).save(validate: false)
-		jobResultRetrieved = serviceUnderTest.findJobResultByEventResult(eventResult2)
+		EventResult eventResult2 = new EventResult(jobResult: jobResult2).save(validate: false)
+		jobResult2.save(validate: false)
+		jobResultRetrieved = eventResult2.jobResult
 		assertNotNull(jobResultRetrieved)
 		assertEquals(jobResult2, jobResultRetrieved)
 
 		//find jobResult2
 
-		EventResult eventResult3 = new EventResult().save(validate: false)
-		jobResult2.addToEventResults(eventResult3).save(validate: false)
-		jobResultRetrieved = serviceUnderTest.findJobResultByEventResult(eventResult3)
+		EventResult eventResult3 = new EventResult(jobResult: jobResult2).save(validate: false)
+		jobResult2.save(validate: false)
+		jobResultRetrieved = eventResult3.jobResult
 		assertNotNull(jobResultRetrieved)
 		assertEquals(jobResult2, jobResultRetrieved)
 
 	}
 
+	/* This case is not possible anymore since jobResult has no eventResult-list anymore
 	@Test
 	void testFindJobResultByEventResultWithDuplicateEntry(){
 
@@ -76,10 +77,11 @@ class JobResultServiceTests {
 		EventResult eventResult1 = new EventResult().save(validate: false)
 		jobResult1.addToEventResults(eventResult1).save(validate: false)
 		jobResult1.addToEventResults(eventResult1).save(validate: false)
-		JobResult jobResultRetrieved = serviceUnderTest.findJobResultByEventResult(eventResult1)
+		JobResult jobResultRetrieved = eventResult1.jobResult
 		assertNotNull(jobResultRetrieved)
 		assertEquals(jobResult1, jobResultRetrieved)
 	}
+	//*/
 
 	@Test
 	void testTryToFindById() {

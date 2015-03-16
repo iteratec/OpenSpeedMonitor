@@ -221,7 +221,7 @@ class EventResultService {
 			locationBrowser ==~ browserCondition
 			date > timestamp
 		}.list().each { JobResult eachJobResult ->
-			result.addAll(eachJobResult.eventResults)
+			result.addAll(eachJobResult.getEventResults())
 		}
 		
 		return result
@@ -241,7 +241,7 @@ class EventResultService {
 			date >= fromDate
 			date <= toDate
 		}.list().each { JobResult eachJobResult ->
-			result.addAll(eachJobResult.eventResults)
+			result.addAll(eachJobResult.getEventResults())
 		}
 		
 		return result
@@ -287,7 +287,7 @@ class EventResultService {
 		JobResult jobResultsInDateRange = JobResult.findAllByDateBetween(fromDate, toDate)
 		Collection<EventResult> temp = []
 		
-		jobResultsInDateRange.each {temp.addAll(it.eventResults)}
+		jobResultsInDateRange.each {temp.addAll(it.getEventResults())}
 		
 		/**
 		 * Convert to Map in format

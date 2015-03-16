@@ -177,13 +177,14 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: jobRunDatePlus_Zero,
 				jobResultDate: jobRunDatePlus_Zero.date,
 				jobResultJobConfigId: jobRunDatePlus_Zero.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				tag: eventResultTag
 				).save(failOnError: true)
-		jobRunDatePlus_Zero.eventResults.add(resultRunDatePlus_Zero)
+		
 		jobRunDatePlus_Zero.save(failOnError: true)
 
 		/* + 10 Minutes */
@@ -222,13 +223,14 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: jobRunDatePlus_Ten,
 				jobResultDate: jobRunDatePlus_Ten.date,
 				jobResultJobConfigId: jobRunDatePlus_Ten.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				tag: eventResultTag,
 				).save(failOnError: true)
-		jobRunDatePlus_Ten.eventResults.add(resultRunDatePlus_Ten)
+		
 		jobRunDatePlus_Ten.save(failOnError: true)
 
 		/* + 20 Minutes */
@@ -267,13 +269,14 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: jobRunDatePlus_Twenty,
 				jobResultDate: jobRunDatePlus_Twenty.date,
 				jobResultJobConfigId: jobRunDatePlus_Twenty.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				tag: eventResultTag,
 				).save(failOnError: true)
-		jobRunDatePlus_Twenty.eventResults.add(resultRunDatePlus_Twenty)
+		
 		jobRunDatePlus_Twenty.save(failOnError: true)
 
 		/* + 30 Minutes */
@@ -312,13 +315,14 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: jobRunDatePlus_Thirty,
 				jobResultDate: jobRunDatePlus_Thirty.date,
 				jobResultJobConfigId: jobRunDatePlus_Thirty.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				tag: eventResultTag,
 				).save(failOnError: true)
-		jobRunDatePlus_Thirty.eventResults.add(resultRunDatePlus_Thirty)
+		
 		jobRunDatePlus_Thirty.save(failOnError: true)
 
 
@@ -358,13 +362,14 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 				validationState : 'validationState',
 				harData: 'harData',
 				customerSatisfactionInPercent:  1,
+				jobResult: jobRunDatePlus_Day,
 				jobResultDate: jobRunDatePlus_Day.date,
 				jobResultJobConfigId: jobRunDatePlus_Day.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				tag: eventResultTag,
 				).save(failOnError: true)
-		jobRunDatePlus_Day.eventResults.add(resultRunDatePlus_Day)
+		
 		jobRunDatePlus_Day.save(failOnError: true)
 		
 		new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_1, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError:true)

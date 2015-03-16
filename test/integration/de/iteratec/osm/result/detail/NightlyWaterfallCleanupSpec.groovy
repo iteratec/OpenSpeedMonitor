@@ -20,6 +20,7 @@ package de.iteratec.osm.result.detail
 import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import org.joda.time.DateTime
 import org.junit.Before
 import org.junit.Test
@@ -94,6 +95,7 @@ class NightlyWaterfallCleanupSpec extends IntTestWithDBCleanup {
 	}
 	
 	void createWaterfall(DateTime startTime, Integer numberOfEntries){
+		JobResult jr = new JobResult(testId: "TestJob").save(validate: false);
 		
 		EventResult result = new EventResult(
 			wptStatus: 200,
@@ -101,6 +103,7 @@ class NightlyWaterfallCleanupSpec extends IntTestWithDBCleanup {
 			numberOfWptRun: 1,
 			cachedView: CachedView.UNCACHED,
 			speedIndex: 12,
+			jobResult: jr,
 			jobResultDate: new Date(),
 			jobResultJobConfigId: 1)
 		
@@ -150,6 +153,7 @@ class NightlyWaterfallCleanupSpec extends IntTestWithDBCleanup {
 				numberOfWptRun: 1,
 				cachedView: CachedView.UNCACHED,
 				speedIndex: 12,
+				jobResult: jr,
 				jobResultDate: new Date(),
 				jobResultJobConfigId: 1).save(failOnError: true, flush: true)
 		}

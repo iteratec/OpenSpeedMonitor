@@ -254,14 +254,14 @@ class EventResultDashboardServiceTests {
 				docCompleteTimeInMillisecs: 1,
 				domTimeInMillisecs: 2,
 				customerSatisfactionInPercent: 0,
+				jobResult: jobResult,
 				jobResultDate: jobResult.date,
 				jobResultJobConfigId: jobResult.job.ident(),
 				measuredEvent: measuredEvent,
 				tag:'1;1;1;1;1',
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
 				).save(failOnError: true)
-
-		jobResult.eventResults.add(eventResultCached);
+		
 		jobResult.save(failOnError: true)
 
 		eventResultUncached = new EventResult(
@@ -272,14 +272,14 @@ class EventResultDashboardServiceTests {
 				docCompleteTimeInMillisecs: 10,
 				domTimeInMillisecs: 20,
 				customerSatisfactionInPercent: 0,
+				jobResult: jobResult2,
 				jobResultDate: jobResult2.date,
 				jobResultJobConfigId: jobResult2.job.ident(),
 				measuredEvent: measuredEvent,
 				tag:'2;1;1;1;1',
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
 				).save(failOnError: true)
-
-		jobResult2.eventResults.add(eventResultUncached);
+		
 		jobResult2.save(failOnError: true)
 	}
 
@@ -630,8 +630,8 @@ class EventResultDashboardServiceTests {
 		eventResultDaoService.demand.tryToFindById(1..10000) {
 			long databaseId ->
 				return databaseId == 1?
-					jobResult.eventResults[0]:
-					jobResult2.eventResults[0]
+					eventResultCached:
+					eventResultUncached
 		}
 		serviceUnderTest.eventResultDaoService = eventResultDaoService.createMock()
 	}

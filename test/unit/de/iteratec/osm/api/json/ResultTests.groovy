@@ -79,7 +79,7 @@ class ResultTests {
 		eventResult.customerSatisfactionInPercent = 1.5112d;
 
 		JobResult jobResult = new JobResult();
-		jobResult.eventResults.add(eventResult);
+		eventResult.jobResult = jobResult;
 		jobResult.locationLocation = 'agent01';
 		jobResult.locationUniqueIdentifierForServer = 'agent01:IE';
 		jobResult.locationBrowser = 'Firefox7';
@@ -120,15 +120,20 @@ class ResultTests {
 				};
 		eventResult.measuredEvent = event;
 		eventResult.customerSatisfactionInPercent = 1.5112d;
-
+		
+		Job job = new Job();
+		job.location = new Location();
+		job.location.wptServer = new WebPageTestServer();
+		job.location.wptServer.baseUrl = "";
+		
 		JobResult jobResult = new JobResult();
+		eventResult.jobResult = jobResult;
+		jobResult.job = job;
 		jobResult.locationLocation = 'agent01';
 		jobResult.locationUniqueIdentifierForServer = 'agent01:IE';
 		jobResult.locationBrowser = 'Firefox7';
 
-		// THIS line is missing!! : jobResult.eventResults.add(eventResult);
-
-		// Run the test
+		// Run the test (should throw java.lang.IllegalArgumentException)
 		new Result(jobResult, eventResult);
 	}
 

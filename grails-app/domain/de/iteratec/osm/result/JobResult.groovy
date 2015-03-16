@@ -60,8 +60,8 @@ class JobResult {
 	 * one job-results.
 	 * </p>
 	 */
-    Collection<EventResult> eventResults = []
-	static hasMany = [eventResults: EventResult]
+	//Collection<EventResult> eventResults = []
+	static hasMany = EventResult
 
     static hasOne = HttpArchive
 
@@ -172,7 +172,7 @@ class JobResult {
 		date (index: 'date_idx')
 		testId (index: 'testId_and_jobConfigLabel_idx')
 		jobConfigLabel (index: 'testId_and_jobConfigLabel_idx')
-		eventResults(column: "job_result_id", joinTable: false)
+		//eventResults(column: "job_result_id", joinTable: false)
 		wptStatus(type: 'text')
 	}
 	String toString(){
@@ -195,6 +195,26 @@ class JobResult {
 	public EventResult findEventResult(MeasuredEvent event, CachedView view, Integer run) {
 		Collection<EventResult> results = this.getEventResults();
 		return results.find{it.measuredEvent == event && it.cachedView == view && it.numberOfWptRun == run}
+	}
+	/**
+	 * Returns a list of Event results connected to this job result
+	 *
+	 * @return list<EventResult>
+	 *
+	 */
+	public List<EventResult> getEventResults(){
+		// Note: Grails uses the grails.gorm.CriteriaBuilder in test-mode,
+		// but the HibernateCriteriaBuilder in productive mode!?
+		// -> different types! Why ever... so we use def-declaration here.
+		def criteria = EventResult.createCriteria()
+
+		List results = criteria.list {
+			jobResult {
+				eq("id", this.id)
+			}
+		}
+
+		return results;
 	}
 	/**
 	 * Returns the median {@link EventResult} of the uncached view for one {@link MeasuredEvent}.

@@ -104,7 +104,7 @@ class ShopMeasuredValueService {
 	 */
 	void markMvAsOutdated(DateTime start, EventResult newResult, MeasuredValueInterval interval){
 		
-		JobResult jobResult = jobResultService.findJobResultByEventResult(newResult)
+		JobResult jobResult = newResult.jobResult;
 		JobGroup jobGroup = jobService.getCsiJobGroupOf(jobResult.job)
 		String shopTag = measuredValueTagService.createShopAggregatorTag(jobGroup)
 		
