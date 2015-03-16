@@ -172,15 +172,29 @@ class JobController {
 			render(view: 'list', model: getListModel(!job.active) << ['massExecutionResults': massExecutionResults])
 		}
 	}
-	
+    
+    /**
+     * Creates a text to represent which data will be gone if the job with the given id will be deleted
+     * @param id Job id
+     * @return
+     */
     def createDeleteConfirmationText(int id){
-        Job job = Job.get(id)
-        List<JobResult> results = JobResult.findAllByJob(job)
-        JobResult firstDate = results.min{it.date}
-        JobResult lastDate = results.max{it.date}
-        String first = firstDate ? "First Result: ${firstDate.date.format('dd.MM.yy')} ":""
-        String last = lastDate ? "Last Result: ${lastDate.date.format('dd.MM.yy')} " :""
-        render(new JsonBuilder("$first$last"+ "Result amount: ${results.size()}").toString())
+        Job job1 = Job.get(id)
+        def query = JobResult.where {job == job1}
+        Date minDate = JobResult.createCriteria().get {
+            projections {
+                min "date"
+            }
+        }
+        Date maxDate = JobResult.createCriteria().get {
+            projections {
+                max "date"
+            }
+        }
+        int count = query.count()
+        String first = minDate ? "First Result: ${minDate.format('dd.MM.yy')} ":""
+        String last = maxDate ? "Last Result: ${maxDate.format('dd.MM.yy')} " :""
+        render(new JsonBuilder("$first$last"+ "Result amount: ${count}").toString())
     }
 
     def delete() {
