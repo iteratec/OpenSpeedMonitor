@@ -184,20 +184,14 @@ class JobController {
     }
 
     def delete() {
-
         Job job = Job.get(params.id)
 
-        //TODO: get the following to work
-
-        /*
         Promise p = task {
 			jobService.deleteJob(job)
         }
         p.onComplete {
             log.info("Deletion of Job ${job} completed.")
         }
-        */
-
         redirect(controller: "batchActivity", action: "list")
     }
 

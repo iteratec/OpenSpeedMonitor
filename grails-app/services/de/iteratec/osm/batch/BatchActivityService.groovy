@@ -28,7 +28,7 @@ class BatchActivityService {
                     progress: 0,
                     progressWithinStage: "",
                     stage: "",
-                    status: Status.active,
+                    status: Status.ACTIVE,
                     startDate: new Date(),
                     successfulActions: 0,
             ).save(failOnError: true, flush: true)
@@ -70,7 +70,9 @@ class BatchActivityService {
                 log.error("$key not allowed for ${activity.class}")
             }
         }
-        activity.save(flush: true)
+        BatchActivity.withTransaction {
+            activity.save(flush: true)
+        }
     }
 
 }

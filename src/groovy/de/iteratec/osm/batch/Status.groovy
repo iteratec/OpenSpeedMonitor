@@ -1,8 +1,9 @@
 package de.iteratec.osm.batch
 
 /**
- * Created by benjamin on 02.03.15.
- * @author
+ * Representation of the current status from a BatchActivity
+ *
+ * @author bwo
  */
 enum Status {
         ACTIVE, INACTIVE, DONE, CANCELLED
