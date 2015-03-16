@@ -182,11 +182,13 @@ class JobController {
         Job job1 = Job.get(id)
         def query = JobResult.where {job == job1}
         Date minDate = JobResult.createCriteria().get {
+            eq("job",job1)
             projections {
                 min "date"
             }
         }
         Date maxDate = JobResult.createCriteria().get {
+            eq("job",job1)
             projections {
                 max "date"
             }
