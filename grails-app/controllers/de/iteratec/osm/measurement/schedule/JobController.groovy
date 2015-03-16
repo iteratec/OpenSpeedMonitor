@@ -179,23 +179,26 @@ class JobController {
      * @return
      */
     def createDeleteConfirmationText(int id){
+        int before = System.nanoTime()/1000000000.0
         Job job1 = Job.get(id)
         def query = JobResult.where {job == job1}
-        Date minDate = JobResult.createCriteria().get {
+        List<Date> dateList = JobResult.createCriteria().get {
             eq("job",job1)
             projections {
                 min "date"
-            }
-        }
-        Date maxDate = JobResult.createCriteria().get {
-            eq("job",job1)
-            projections {
                 max "date"
             }
+        }
+        Date minDate
+        Date maxDate
+        if(dateList.size()>1){
+            minDate = dateList[0]
+            maxDate = dateList[1]
         }
         int count = query.count()
         String first = minDate ? "First Result: ${minDate.format('dd.MM.yy')} ":""
         String last = maxDate ? "Last Result: ${maxDate.format('dd.MM.yy')} " :""
+        println System.nanoTime()/1000000000.0-before
         render(new JsonBuilder("$first$last"+ "Result amount: ${count}").toString())
     }
 
