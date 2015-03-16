@@ -19,6 +19,8 @@ package de.iteratec.osm.report.chart
 
 import groovy.transform.EqualsAndHashCode
 
+import java.lang.annotation.Annotation
+
 
 /**
  * <p>
@@ -40,8 +42,8 @@ import groovy.transform.EqualsAndHashCode
  * @author mze
  * @since IT-78
  */
-@EqualsAndHashCode(includeFields=true)
-public final class OsmChartPoint {
+@EqualsAndHashCode
+class OsmChartPoint{
 
 	/**
 	 * <p>
@@ -54,7 +56,7 @@ public final class OsmChartPoint {
 	 * hover info dialog to inform the user about values background
 	 * </p>
 	 */
-	public final int countOfAggregatedResults
+	int countOfAggregatedResults
 
 	/**
 	 * <p>
@@ -67,7 +69,7 @@ public final class OsmChartPoint {
 	 * 
 	 * @see #countOfAggregatedResults
 	 */
-	public final double measuredValue
+	double measuredValue
 
 	/**
 	 * <p>
@@ -83,7 +85,7 @@ public final class OsmChartPoint {
 	 * 
 	 * @see #hasAnSourceURL()
 	 */
-	public final URL sourceURL
+	URL sourceURL
 
 	/**
 	 * <p>
@@ -99,54 +101,12 @@ public final class OsmChartPoint {
 	 * @see #measuredValue
 	 * @see Date#getTime()
 	 */
-	public final long time
+	long time
 	
 	/**
 	 * Measuring machine name (can contain ip adress) 
 	 */
-	public final String testingAgent
-
-	/**
-	 * <p>
-	 * Creates a new Highchart point.
-	 * </p>
-	 *
-	 * @param time
-	 *            The time the value was measured (milliseconds since Epoch); a
-	 *            value >= 0 - for sure there is no web-page-test-measuring
-	 *            before the 1th January 1970 ;).
-	 * @param measuredValue
-	 *            The measured value.
-	 * @param countOfAggregatedResults
-	 *            The count of aggregated values to receive the
-	 *            {@code measuredValue}. A value >= 0.
-	 * @param sourceURL
-	 *            The source {@link URL} if available, <code>null</code> else.
-	 * @throws IllegalArgumentException
-	 *             if {@code time} is less than 0 <em>or</em>
-	 *             {@code countOfAggregatedResults} is less than 0.
-	 */
-	public OsmChartPoint(final long time, final double measuredValue,
-						 final int countOfAggregatedResults, final URL sourceURL, final String testAgent)
-			throws IllegalArgumentException {
-		super()
-
-		if (time < 0) {
-			throw new IllegalArgumentException(
-					"The time could not be less than 0.")
-		}
-
-		if (countOfAggregatedResults < 0) {
-			throw new IllegalArgumentException(
-					"The count of aggregated results could not be less than 0.")
-		}
-
-		this.time = time
-		this.measuredValue = measuredValue
-		this.countOfAggregatedResults = countOfAggregatedResults
-		this.sourceURL = sourceURL
-		this.testingAgent = testAgent
-	}
+	String testingAgent
 
 	/**
 	 * <p>
@@ -165,13 +125,8 @@ public final class OsmChartPoint {
 		return this.sourceURL != null
 	}
 
-    public boolean equals(Object o){
-        OsmChartPoint osmChartPoint = (OsmChartPoint) o
-        if (this.time == osmChartPoint.time
-                && this.measuredValue == osmChartPoint.measuredValue
-                && this.countOfAggregatedResults == osmChartPoint.countOfAggregatedResults
-                && this.sourceURL == osmChartPoint.sourceURL
-                && this.testingAgent == osmChartPoint.testingAgent)
+    public boolean isValid(){
+        if(this.time > 0 && this.countOfAggregatedResults > 0)
             return true
         return false
     }
