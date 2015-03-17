@@ -17,6 +17,10 @@
 
 package de.iteratec.osm.persistence
 
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.Status
 import de.iteratec.osm.report.chart.MeasuredValue
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.HttpArchive
@@ -26,6 +30,8 @@ import grails.gorm.DetachedCriteria
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.dao.EventResultDaoService
+import org.quartz.core.QuartzScheduler
+
 //import org.springframework.transaction.TransactionDefinition
 import org.springframework.transaction.support.DefaultTransactionDefinition
 
@@ -36,6 +42,7 @@ class DbCleanupService {
 
     static transactional = false
 
+    BatchActivityService batchActivityService
 	EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService
 
@@ -97,83 +104,115 @@ class DbCleanupService {
 	}
 
     /**
-     * Deletes all {@link EventResult}s {@link JobResult}s {@link HttpArchive}s {@link MeasuredValue}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
+     * Deletes all {@link EventResult}s {@link JobResult}s {@link HttpArchive}s before date toDeleteBefore.
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
     void deleteResultsDataBefore(Date toDeleteBefore){
-        log.info "Deleting all results-data before: ${toDeleteBefore}"
+        log.info "beginn with deleteResultsDataBefore"
 
-        //TODO: batching does not persist in database
         // use gorm-batching
         def dc = new DetachedCriteria(JobResult).build {
             lt 'date', toDeleteBefore
         }
         int count = dc.count()
 
-        //batch size -> hibernate doc recommends 10..50
-        int batchSize = 50
-        0.step(count, batchSize) {
-            JobResult.withNewTransaction {
-                dc.list(max: batchSize).each { JobResult jobResult ->
-                    try {
-                        log.info("try to delete JobResult with dependened objects... delete JobResult: {$jobResult.id}")
+        //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
+        if(count > 0 && !batchActivityService.runningBatch(this.class, 1)) {
+            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 1, Activity.DELETE, "Nightly cleanup of JobResults with dependents objects" )
+            //batch size -> hibernate doc recommends 10..50
+            int batchSize = 50
+            0.step(count, batchSize) { int offset ->
+                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(count, offset)])
+                JobResult.withNewTransaction {
+                    dc.list(max: batchSize).each { JobResult jobResult ->
+                        try {
+                            HttpArchive.findAllByJobResult(jobResult)*.delete()
 
-                        HttpArchive.findAllByJobResult(jobResult)*.delete()
+                            jobResult.getEventResults().each { EventResult eventResult ->
+                                eventResult.delete()
+                            }
 
-                        jobResult.getEventResults().each {EventResult eventResult ->
-                            eventResult.delete()
+                            jobResult.delete()
+                        } catch (Exception e) {
                         }
-
-                        jobResult.delete()
-                    } catch (Exception e) {
-                        log.error("JobResult could not deleted ${e}" )
                     }
                 }
+                //clear hibernate session first-level cache
+                JobResult.withSession { session -> session.clear() }
             }
-            //clear hibernate session first-level cache
-            JobResult.withSession { session -> session.clear() }
+            batchActivityService.updateStatus(batchActivity, [ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
         }
 
-        dc = new DetachedCriteria(MeasuredValue).build {
+        log.info "end with deleteResultsDataBefore"
+    }
+
+
+    /**
+     * Deletes all {@link MeasuredValue}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
+     * @param toDeleteBefore	All results-data before this date get deleted.
+     */
+    void deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(Date toDeleteBefore){
+        log.info "beginn with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
+
+        def measuredValueDetachedCriteria = new DetachedCriteria(MeasuredValue).build {
             lt 'started', toDeleteBefore
         }
-        count = dc.count()
+        int measuredValueCount = measuredValueDetachedCriteria.count()
 
-        batchSize = 50
-        0.step(count, batchSize) {
-            MeasuredValue.withNewTransaction {
-                dc.list(max: batchSize).each { MeasuredValue measuredValue ->
-                    try {
-                        def innerDc = new DetachedCriteria(MeasuredValueUpdateEvent).build {
-                            eq 'measuredValueId', measuredValue.id
+        def measuredValueUpdateEventDetachedCriteria = new DetachedCriteria(MeasuredValueUpdateEvent).build {
+            'in'('measuredValueId', measuredValueDetachedCriteria.list()*.id )
+        }
+        int measuredValueUpdateEventsCount = measuredValueDetachedCriteria.count()
+
+        log.info "MeasuredValueUpdateEvent - Count : ${measuredValueUpdateEventsCount}"
+
+//        def measuredValueUpdateEvents = MeasuredValueUpdateEvent.withCriteria {
+//            'in'('measuredValueId', measuredValueDetachedCriteria.list()*.id )
+//        }
+//        int measuredValueUpdateEventsCount = measuredValueUpdateEvents.size()
+
+        int globalCount = measuredValueCount + measuredValueUpdateEventsCount
+
+        //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
+        if(measuredValueCount > 0 && !batchActivityService.runningBatch(this.class, 2)) {
+            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of MeasuredValues and MeasuredValueUpdateEvents" )
+            //batch size -> hibernate doc recommends 10..50
+            int batchSize = 50
+
+            //First clean MeasuredValueUpdateEvents
+            0.step(measuredValueUpdateEventsCount, batchSize){ int offset ->
+                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete MeasuredValueUpdateEvents'])
+                MeasuredValueUpdateEvent.withNewTransaction {
+                    measuredValueUpdateEventDetachedCriteria.list(max: batchSize).each{ MeasuredValueUpdateEvent measuredValueUpdateEvent ->
+                        try {
+                            measuredValueUpdateEvent.delete()
                         }
-                        int innerCount = innerDc.count()
-
-                        0.step(innerCount, batchSize){ innerOffset ->
-                            MeasuredValueUpdateEvent.withNewTransaction {
-                                innerDc.list(offset:  innerOffset, max: batchSize).each { MeasuredValueUpdateEvent measuredValueUpdateEvent ->
-                                    try{
-                                        log.info("try to delete MeasuredValueUpdateEvent {$measuredValueUpdateEvent.id}")
-                                        measuredValueUpdateEvent.delete()
-                                    }catch (Exception e){
-                                        log.error("MeasuredValueUpdateEvent could not deleted ${e}")
-                                    }
-                                }
-                            }
-                            MeasuredValueUpdateEvent.withSession { session -> session.clear() }
+                        catch(Exception e){
                         }
-
-                        log.info("try to delete MeasuredValue {$measuredValue.id}")
-                        measuredValue.delete()
-                    } catch (Exception e) {
-                        log.error("MeasuredValue could not deleted ${e}")
                     }
                 }
+                //clear hibernate session first-level cache
+                MeasuredValueUpdateEvent.withSession { session -> session.clear() }
             }
-            MeasuredValue.withSession { session -> session.clear() }
+
+            //After then clean MeasuredValues
+            0.step(measuredValueCount, batchSize) { int offset ->
+                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
+                MeasuredValue.withNewTransaction {
+                    measuredValueDetachedCriteria.list(max: batchSize).each { MeasuredValue measuredValue ->
+                        try {
+                            measuredValue.delete()
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+                //clear hibernate session first-level cache
+                MeasuredValue.withSession { session -> session.clear() }
+            }
+            batchActivityService.updateStatus(batchActivity, [ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
         }
 
-        log.info "... DONE"
+        log.info "end with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
     }
 }
 

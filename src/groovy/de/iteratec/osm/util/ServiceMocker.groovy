@@ -18,6 +18,10 @@
 package de.iteratec.osm.util
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
@@ -25,12 +29,15 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.persistence.DbCleanupService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.*
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
+
+import java.text.DecimalFormat
 
 /**
  * <p>
@@ -62,6 +69,53 @@ class ServiceMocker {
 	Closure getClosureToExecute(serviceClassToMock, nameOfMethodToMock){
 		//TODO: should deliver the closure to be executed if the method nameOfMethodToMock of service serviceClassToMock is called in unit-tests 
 	}
+
+    /**
+     * Mocks methods of {@link BatchActivityService}.
+     * @param serviceToMockIn
+     *      Grails-Service with the service to mock as instance-variable.
+     */
+    void mockBatchActivityService(serviceToMockIn){
+        def batchActivityService = mockFor(BatchActivityService, true)
+        HashMap<Long, Class> containingIds = new HashMap<>()
+
+        batchActivityService.demand.getActiveBatchActivity(1..10000) {
+            Class c,long idWithinDomain, Activity activity,String name ->
+                containingIds.put(idWithinDomain, c)
+                return new BatchActivity(
+                        activity: activity,
+                        domain: c.toString(),
+                        idWithinDomain: idWithinDomain,
+                        name: name,
+                        failures: 0,
+                        lastFailureMessage: "",
+                        progress: 0,
+                        progressWithinStage: "",
+                        stage: "",
+                        status: Status.ACTIVE,
+                        startDate: new Date(),
+                        successfulActions: 0,
+                ).save(failOnError: true)
+        }
+
+        batchActivityService.demand.runningBatch(1..10000) {
+            Class c,long idWithinDomain ->
+                return containingIds.containsKey(idWithinDomain) ? (containingIds.get(idWithinDomain) == c ? true : false) : false
+        }
+
+        batchActivityService.demand.updateStatus(1..1000){
+            BatchActivity activity,Map<String,Object> map ->
+            log.info "BatchActivity status updated"
+        }
+
+        batchActivityService.demand.calculateProgress(1..1000){
+            int count, int actual ->
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(100.0/count*actual) + " %";
+        }
+
+        serviceToMockIn.batchActivityService = batchActivityService.createMock()
+    }
 	
 	/**
 	 * Mocks methods of {@link MeasuredValueUpdateEventDaoService}.

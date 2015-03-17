@@ -17,12 +17,14 @@
 
 package de.iteratec.osm.persistence
 
+import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.MeasuredValue
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.ServiceMocker
 import org.joda.time.DateTime
 
 import static org.hamcrest.Matchers.*
@@ -35,12 +37,13 @@ import org.junit.*
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestFor(DbCleanupService)
-@Mock([JobResult, EventResult, HttpArchive, MeasuredValue, MeasuredValueUpdateEvent])
+@Mock([JobResult, EventResult, HttpArchive, MeasuredValue, MeasuredValueUpdateEvent, BatchActivity])
 class DbCleanupServiceSpec {
 
     static transactional = false
 
     DbCleanupService serviceUnderTest
+    ServiceMocker mocker
 
     DateTime executionDateBeforeCleanUpDate = new DateTime(2014,2,9,0,0,0)
     DateTime executionDateAfterCleanUpDate = new DateTime()
@@ -48,6 +51,8 @@ class DbCleanupServiceSpec {
     @Before
     void setUp() {
         serviceUnderTest = service
+        mocker = ServiceMocker.create()
+        mocker.mockBatchActivityService(serviceUnderTest)
     }
 
     @Test
@@ -81,6 +86,7 @@ class DbCleanupServiceSpec {
 
         //delete all {@link JobResult}s, {@link EventResult}s, {@link HttpArchive}s, {@link MeasuredValue}s, {@link MeasuredValueUpdateEvent}s older then one year (12 months)
         serviceUnderTest.deleteResultsDataBefore(new DateTime().minusMonths(12).toDate())
+        serviceUnderTest.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(new DateTime().minusMonths(12).toDate())
 
         //after DbCleanupJob execution
         assertThat(HttpArchive.list().size(), is(1))
