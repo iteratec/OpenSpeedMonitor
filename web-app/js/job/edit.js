@@ -135,7 +135,7 @@ function domainDeleteConfirmation(message,id){
         data: {id:id},
         async:   false,
         success: function(result) {
-            confirmMessage = message + "<br>" + result.toString();
+            confirmMessage = message + "<br>" + result;
         },
         error: function(result) {
             confirmMessage = message;

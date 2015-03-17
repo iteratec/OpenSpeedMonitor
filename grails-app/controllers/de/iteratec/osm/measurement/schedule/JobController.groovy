@@ -179,7 +179,6 @@ class JobController {
      * @return
      */
     def createDeleteConfirmationText(int id){
-        int before = System.nanoTime()/1000000000.0
         Job job1 = Job.get(id)
         def query = JobResult.where {job == job1}
         List<Date> dateList = JobResult.createCriteria().get {
@@ -196,10 +195,10 @@ class JobController {
             maxDate = dateList[1]
         }
         int count = query.count()
-        String first = minDate ? "First Result: ${minDate.format('dd.MM.yy')} ":""
-        String last = maxDate ? "Last Result: ${maxDate.format('dd.MM.yy')} " :""
-        println System.nanoTime()/1000000000.0-before
-        render(new JsonBuilder("$first$last"+ "Result amount: ${count}").toString())
+
+        String first = minDate ? "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.firstResult", default: "Date of first result")}: ${minDate.format('dd.MM.yy')} <br>":""
+        String last = maxDate ? "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.lastResult", default: "Date of last result")}: ${maxDate.format('dd.MM.yy')} <br>" :""
+        render("$first$last"+ "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.resultAmount", default: "Amount of results")}: ${count}")
     }
 
     def delete() {
