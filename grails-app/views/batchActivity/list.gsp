@@ -10,6 +10,11 @@
 </head>
 
 <body>
+<h3><g:message code="de.iteratec.osm.batch.batchactivity.list.heading" default="Batch Activities"/></h3>
+
+<p>
+    <g:message code="de.iteratec.osm.batch.batchactivity.list.description" default="A list of all larger activities and their current status."/>
+</p>
 
 <section id="list-batchActivity" class="first">
     <div id="tabelle">
