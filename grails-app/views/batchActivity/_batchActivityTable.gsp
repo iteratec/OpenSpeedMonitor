@@ -56,5 +56,5 @@
     </tbody>
 </table>
 <div class="pagination">
-    <g:paginate total="${batchActivityCount}"/>
+    <bs:paginate total="${batchActivityCount}"/>
 </div>
