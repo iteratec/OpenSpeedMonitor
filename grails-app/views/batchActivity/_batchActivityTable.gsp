@@ -55,6 +55,3 @@
     </g:each>
     </tbody>
 </table>
-<div class="pagination">
-    <bs:paginate total="${batchActivityCount}"/>
-</div>

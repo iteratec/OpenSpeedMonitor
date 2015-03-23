@@ -25,6 +25,9 @@
         %{--</div>--}%
     </div>
 </section>
+<div class="pagination">
+    <bs:paginate total="${batchActivityCount}"/>
+</div>
 <r:script>
 		$(document).ready(
 			updateIfNecessary('${createLink(action: 'updateTable', absolute: true)}',
