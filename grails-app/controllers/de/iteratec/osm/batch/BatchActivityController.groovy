@@ -24,10 +24,11 @@ package de.iteratec.osm.batch
 class BatchActivityController {
 
     BatchActivityService batchActivityService
-//    static Date last = new Date()
 
     def list(){
-        [batchActivities:BatchActivity.list(sort: "startDate", order: "desc")]
+        params.order = "desc"
+        params.sort = "startDate"
+        [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
     }
 
     def index(){
