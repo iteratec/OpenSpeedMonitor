@@ -27,7 +27,7 @@ class BatchActivityController {
 //    static Date last = new Date()
 
     def list(){
-        [batchActivities:BatchActivity.list()]
+        [batchActivities:BatchActivity.list(sort: "startDate", order: "desc")]
     }
 
     def index(){
