@@ -25,7 +25,7 @@ $.fn.fixedHeader = function (options) {
  if (options){ $.extend(config, options); }
 
  return this.each( function() {
-  var o = $(this);
+  var o = $(this);console.log(o);
 
   var $win = $(window)
     , $head = $('thead.header', o)
@@ -56,6 +56,7 @@ $.fn.fixedHeader = function (options) {
   })
 
   $head.clone().removeClass('header').addClass('header-copy header-fixed').css({'position': 'fixed', 'top': config['topOffset']}).appendTo(o);
+//  o.find('thead.header-copy').width($head.width());
   o.find('thead.header-copy').width($head.width());
 
   o.find('thead.header > tr > th').each(function (i, h) {

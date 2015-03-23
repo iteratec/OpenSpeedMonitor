@@ -220,11 +220,22 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 			url : listJobsLink,
 			success: function(result) {
 				$('#jobtable tbody').empty();
-				$('#jobtable tbody').html(result);
+				$('#jobtable tbody').replaceWith(result);
 				initTable(nextJobExecutionLink);
 				// to prevent flickering:
 				JobStatusUpdater.repeatFn(false);
 				spinner.stop();
+				
+				var o = $('#jobtable');
+				var $win = $(window)
+		    , $head = $('thead.header', o)
+		    , isFixed = 0;
+			  o.find('thead.header-copy').width($head.width());
+			  o.find('thead.header > tr > th').each(function (i, h) {
+			    var w = $(h).width();
+			    o.find('thead.header-copy> tr > th:eq('+i+')').width(w)
+			  });
+			  
 			},
 			error: function(result) {
 				console.log(result);
