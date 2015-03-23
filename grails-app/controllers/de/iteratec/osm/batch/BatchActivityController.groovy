@@ -28,11 +28,12 @@ class BatchActivityController {
     def list(){
         params.order = "desc"
         params.sort = "startDate"
+        println params
         [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
     }
 
     def index(){
-        redirect(action: 'list')
+        redirect(action: 'list',params: [max:10])
     }
 
     def edit(){
