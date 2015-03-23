@@ -34,9 +34,9 @@
             <td><g:link action="show"
                         id="${batchActivityInstance.id}">${fieldValue(bean: batchActivityInstance, field: "name")}</g:link></td>
 
-            <td>${fieldValue(bean: batchActivityInstance, field: "activity")}</td>
+            <td>${message(code: batchActivityInstance.activity.getI18nCode(),default: batchActivityInstance.activity)}</td>
 
-            <td>${fieldValue(bean: batchActivityInstance, field: "status")}</td>
+            <td>${message(code: batchActivityInstance.status.getI18nCode(),default: batchActivityInstance.status)}</td>
 
             <td>${fieldValue(bean: batchActivityInstance, field: "progress")}</td>
 

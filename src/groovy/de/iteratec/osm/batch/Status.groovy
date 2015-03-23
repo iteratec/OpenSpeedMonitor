@@ -7,4 +7,8 @@ package de.iteratec.osm.batch
  */
 enum Status {
         ACTIVE, INACTIVE, DONE, CANCELLED
+
+    String getI18nCode(){
+        return "de.iteratec.osm.batch.status."+this
+    }
 }
