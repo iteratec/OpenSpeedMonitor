@@ -28,7 +28,6 @@ class BatchActivityController {
     def list(){
         params.order = "desc"
         params.sort = "startDate"
-        println params
         [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
     }
 
@@ -55,7 +54,10 @@ class BatchActivityController {
      * @return new Content from BatchActivityTable
      */
     def updateTable(){
-        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list()])
+        params.order = "desc"
+        params.sort = "startDate"
+        params.max = 10
+        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()])
     }
 
     def checkForUpdate(){
