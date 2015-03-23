@@ -24,14 +24,15 @@ package de.iteratec.osm.batch
 class BatchActivityController {
 
     BatchActivityService batchActivityService
-//    static Date last = new Date()
 
     def list(){
-        [batchActivities:BatchActivity.list()]
+        params.order = "desc"
+        params.sort = "startDate"
+        [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
     }
 
     def index(){
-        redirect(action: 'list')
+        redirect(action: 'list',params: [max:10])
     }
 
     def edit(){
@@ -53,7 +54,10 @@ class BatchActivityController {
      * @return new Content from BatchActivityTable
      */
     def updateTable(){
-        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list()])
+        params.order = "desc"
+        params.sort = "startDate"
+        params.max = 10
+        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()])
     }
 
     def checkForUpdate(){

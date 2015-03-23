@@ -210,7 +210,7 @@ class JobController {
         p.onComplete {
             log.info("Deletion of Job ${job} completed.")
         }
-        redirect(controller: "batchActivity", action: "list")
+        redirect(controller: "batchActivity", action: "list", params: [max:10])
     }
 
 
