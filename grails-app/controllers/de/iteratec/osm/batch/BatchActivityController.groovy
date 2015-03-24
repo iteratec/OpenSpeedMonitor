@@ -28,8 +28,8 @@ class BatchActivityController {
     BatchActivityService batchActivityService
 
     def list(){
-        params.order = "desc"
-        params.sort = "startDate"
+        params.order = params.order?:"desc"
+        params.sort = params.sort?:"startDate"
         [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
     }
 
