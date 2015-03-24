@@ -18,11 +18,7 @@
 
 <section id="list-batchActivity" class="first">
     <div id="tabelle">
-
         <g:render template="batchActivityTable" model="${['batchActivities': batchActivities,'batchActivityCount':batchActivityCount]}"/>
-        %{--<div class="pagination">--}%
-            %{--<bs:paginate total="${batchActivities.size()}"/>--}%
-        %{--</div>--}%
     </div>
 </section>
 <div class="pagination">
@@ -31,7 +27,8 @@
 <r:script>
 		$(document).ready(
 			updateIfNecessary('${createLink(action: 'updateTable', absolute: true)}',
-			'${createLink(action: 'checkForUpdate', absolute: true)}'
+			'${createLink(action: 'checkForUpdate', absolute: true)}',
+			'${createLink(action: 'getUpdate', absolute: true)}'
 			)
 		);
 </r:script>

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.batch
 
+import grails.converters.JSON
+
 /**
  * BatchActivityController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
@@ -58,6 +60,14 @@ class BatchActivityController {
         params.sort = "startDate"
         params.max = 10
         render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()])
+    }
+    /**
+     *
+     * @param id id of the batchactivity to collect
+     * @return batchactivity row of the given id
+     */
+    def getUpdate(int id){
+        render(view: '_batchActivityRow', model:[batchActivityInstance: BatchActivity.get(id) ])
     }
 
     def checkForUpdate(){
