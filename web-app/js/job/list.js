@@ -285,7 +285,9 @@ function doOnDomReady(
 	
 	var filterValueJobname = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
 	var filterValueJobgroup = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
-	var filterValueLocation = getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
+  var filterValueLocation = getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
+  var filterValueSkript = getFromLocalStorage('de.iteratec.osm.job.list.filters.skript');
+  var filterValueBrowser = getFromLocalStorage('de.iteratec.osm.job.list.filters.browser');
 	
 	var filterValueCheckedJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs'));
 	var filterValueInactiveJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
@@ -294,7 +296,9 @@ function doOnDomReady(
 	
 	if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
 	if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);
-	if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
+  if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
+  if(filterValueSkript != null) $('#filterBySkript').val(filterValueSkript);
+  if(filterValueBrowser != null) $('#filterByBrowser').val(filterValueBrowser);
 	
 	if(filterValueCheckedJobs != null) $('#filterCheckedJobs').prop("checked",filterValueCheckedJobs);
 	if(filterValueInactiveJobs != null) $('#filterInactiveJobs').prop("checked",filterValueInactiveJobs);

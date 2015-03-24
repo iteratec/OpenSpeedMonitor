@@ -25,7 +25,7 @@ $.fn.fixedHeader = function (options) {
  if (options){ $.extend(config, options); }
 
  return this.each( function() {
-  var o = $(this);console.log(o);
+  var o = $(this);
 
   var $win = $(window)
     , $head = $('thead.header', o)
