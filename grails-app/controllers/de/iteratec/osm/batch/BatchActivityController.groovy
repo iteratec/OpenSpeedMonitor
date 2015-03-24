@@ -63,11 +63,12 @@ class BatchActivityController {
     }
     /**
      *
-     * @param id id of the batchactivity to collect
-     * @return batchactivity row of the given id
+     * @param id id of the BatchActivity to collect
+     * @param evenOdd even or odd to get the right row highlighting
+     * @return BatchActivity row of the given id
      */
-    def getUpdate(int id){
-        render(view: '_batchActivityRow', model:[batchActivityInstance: BatchActivity.get(id) ])
+    def getUpdate(int id, String evenOdd){
+        render(view: '_batchActivityRow', model:[batchActivityInstance: BatchActivity.get(id), evenOdd:evenOdd])
     }
 
     def checkForUpdate(){

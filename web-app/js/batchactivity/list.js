@@ -41,13 +41,14 @@ function updateIfNecessary(updateTableUrl, checkUrl,rowUpdateUrl) {
 /**
  * Replaces all rows with the given id with a new version
  * @param ids row ids to update
+ * @param rowUpdateUrl url to get a row update
  */
 function replaceRows(ids,rowUpdateUrl) {
     for (var i in ids) {
         jQuery.ajax({
             type: 'GET',
             url: rowUpdateUrl,
-            data: {id: ids[i]},
+            data: {id: ids[i][0],evenOdd:ids[i][1]},
             async: false,
             success: function (content) {
                 replaceRow(ids[i], content);
@@ -80,7 +81,7 @@ function replaceRow(id, content) {
 function collectActiveIds() {
     var ids = [];
     $("[status='ACTIVE']").each(function (index, element) {
-        ids.push($(element).attr("id").replace("batchActivity_", ""));
+        ids.push([$(element).attr("id").replace("batchActivity_", ""),$(element).attr("class")]);
     });
     return ids;
 }

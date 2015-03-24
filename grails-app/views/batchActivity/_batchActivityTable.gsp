@@ -29,7 +29,7 @@
     </thead>
     <tbody>
     <g:each in="${batchActivities}" status="i" var="batchActivityInstance">
-            <g:render template="batchActivityRow" model="${['batchActivityInstance': batchActivityInstance]}"/>
+            <g:render template="batchActivityRow" model="${['batchActivityInstance': batchActivityInstance,evenOdd:"${(i % 2) == 0 ? 'odd' : 'even'}"]}"/>
     </g:each>
     </tbody>
 </table>

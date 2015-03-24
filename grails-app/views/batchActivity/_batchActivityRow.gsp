@@ -1,5 +1,5 @@
 <%@ page import="de.iteratec.osm.batch.BatchActivity" %>
-<tr id=batchActivity_${batchActivityInstance.id} status=${batchActivityInstance.status}>
+<tr class=${evenOdd} id=batchActivity_${batchActivityInstance.id} status=${batchActivityInstance.status}>
     <td><g:link action="show"
                 id="${batchActivityInstance.id}">${fieldValue(bean: batchActivityInstance, field: "name")}</g:link></td>
 
