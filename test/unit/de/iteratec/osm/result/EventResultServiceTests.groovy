@@ -648,90 +648,31 @@ class EventResultServiceTests {
 		// - the first within range, measured at 08.08.2013 - 14:02:14:
 		Date measuringDateOfWithinDateRange1 = new Date(1375963334000L)
 		
-		JobResult jobResultWithinDateRange1 = new JobResult(
-			jobGroupName: 'CSI Lhotse',
-			locationLocation: 'agent1.example.com',
-			locationBrowser: 'FF-w0',
-			date: measuringDateOfWithinDateRange1,
-			/*Not of interest but required by constraint: */
-			testId: 1,
-			httpStatusCode: 200,
-			description: 'test',
-			jobConfigLabel: 'testjob',
-			jobConfigRuns: 1,
-			job: theJobWichIsNotOfInterestHere
-			)
-		
-		EventResult eventResultWithinDateRange1_1_relevant = new EventResult(measuredEvent : theEventToLookFor, cachedView : CachedView.UNCACHED, medianValue: true, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		EventResult eventResultWithinDateRange1_2_notRelevant_notMedian = new EventResult(measuredEvent : theEventToLookFor, cachedView : CachedView.UNCACHED, medianValue: false, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		EventResult eventResultWithinDateRange1_3_notRelevant_notUnchached = new EventResult(measuredEvent : theEventToLookFor, cachedView : CachedView.CACHED, medianValue: true, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		EventResult eventResultWithinDateRange1_3_notRelevant_differentEvent = new EventResult(measuredEvent : anotherEventNotOfInterest, cachedView : CachedView.UNCACHED, medianValue: true, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		
-		jobResultWithinDateRange1.save(failOnError:true);
+		JobResult jobResultWithinDateRange1 = createJobResult(measuringDateOfWithinDateRange1,theJobWichIsNotOfInterestHere)
+		EventResult eventResultWithinDateRange1_1_relevant =createEventResult(theEventToLookFor,CachedView.UNCACHED,true, jobResultWithinDateRange1, measuringDateOfWithinDateRange1);
+		//Create not relevant EventResults
+		EventResult eventResultWithinDateRange1_2_notRelevant_notMedian = createEventResult(theEventToLookFor, CachedView.UNCACHED,false,jobResultWithinDateRange1, measuringDateOfWithinDateRange1);
+		EventResult eventResultWithinDateRange1_3_notRelevant_notUnchached = createEventResult(theEventToLookFor,CachedView.CACHED,true,jobResultWithinDateRange1,measuringDateOfWithinDateRange1);
+		EventResult eventResultWithinDateRange1_3_notRelevant_differentEvent =createEventResult(anotherEventNotOfInterest,CachedView.UNCACHED,true, jobResultWithinDateRange1,measuringDateOfWithinDateRange1);
+
 
 		// - the second within range, measured at 08.08.2013 - 14:14:44:
 		Date measuringDateOfWithinDateRange2 = new Date(1375964084000L)
-		
-		JobResult jobResultWithinDateRange2 = new JobResult(
-				jobGroupName: 'CSI Lhotse',
-				locationLocation: 'agent1.example.com',
-				locationBrowser: 'FF-w0',
-				date: measuringDateOfWithinDateRange2,
-				/*Not of interest but required by constraint: */
-				testId: 1,
-				httpStatusCode: 200,
-				description: 'test',
-				jobConfigLabel: 'testjob',
-				jobConfigRuns: 1,
-				job: theJobWichIsNotOfInterestHere
-				)
-		
-		EventResult eventResultWithinDateRange2_relevant = new EventResult(measuredEvent : theEventToLookFor, cachedView : CachedView.UNCACHED, medianValue: true, jobResult: jobResultWithinDateRange2, jobResultDate: measuringDateOfWithinDateRange2, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		
-		jobResultWithinDateRange2.save(failOnError:true);
+		JobResult jobResultWithinDateRange2 = createJobResult(measuringDateOfWithinDateRange2,theJobWichIsNotOfInterestHere)
+		EventResult eventResultWithinDateRange2_relevant = createEventResult(theEventToLookFor,CachedView.UNCACHED,true,jobResultWithinDateRange2, measuringDateOfWithinDateRange2);
+
 
 		// - before the range, measured at 08.08.2013 - 13:59:59.999:
 		Date measuringDateOfBeforeDateRange = new Date(1375963199999L)
-		
-		JobResult jobResultBeforeDateRange = new JobResult(
-				jobGroupName: 'CSI Lhotse',
-				locationLocation: 'agent1.example.com',
-				locationBrowser: 'FF-w0',
-				date: measuringDateOfBeforeDateRange,
-				/*Not of interest but required by constraints: */
-				testId: '1',
-				httpStatusCode: 200,
-				description: 'test',
-				jobConfigLabel: 'testjob',
-				jobConfigRuns: 1,
-				job: theJobWichIsNotOfInterestHere
-				)
-		
-		EventResult eventResultBeforeDateRange_wouldBeRelevantIfWasWithin = new EventResult(measuredEvent : theEventToLookFor, cachedView : CachedView.UNCACHED, medianValue: true, jobResult: jobResultBeforeDateRange, jobResultDate: measuringDateOfBeforeDateRange, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		
-		jobResultBeforeDateRange.save(failOnError:true);
+		JobResult jobResultBeforeDateRange = createJobResult(measuringDateOfBeforeDateRange,theJobWichIsNotOfInterestHere)
+		EventResult eventResultBeforeDateRange_wouldBeRelevantIfWasWithin = createEventResult(theEventToLookFor,CachedView.UNCACHED,true,jobResultBeforeDateRange, measuringDateOfBeforeDateRange);
+
 
 		// - after the range, measured at 08.08.2013 - 15:00:00:
 		Date measuringDateOfAfterDateRange = new Date(1375966800000L)
+		JobResult jobResultAfterDateRange = createJobResult(measuringDateOfAfterDateRange,theJobWichIsNotOfInterestHere)
+		EventResult eventResultAfterDateRange_wouldBeRelevantIfWasWithin = createEventResult(theEventToLookFor,CachedView.UNCACHED,true,jobResultAfterDateRange, measuringDateOfAfterDateRange);
 		
-		JobResult jobResultAfterDateRange = new JobResult(
-				jobGroupName: 'CSI Lhotse',
-				locationLocation: 'agent1.example.com',
-				locationBrowser: 'FF-w0',
-				date: measuringDateOfAfterDateRange,
-				/*Not of interest but required by constraint: */
-				testId: 1,
-				httpStatusCode: 200,
-				description: 'test',
-				jobConfigLabel: 'testjob',
-				jobConfigRuns: 1,
-				job: theJobWichIsNotOfInterestHere
-				)
-		
-		EventResult eventResultAfterDateRange_wouldBeRelevantIfWasWithin = new EventResult(measuredEvent : theEventToLookFor, cachedView : CachedView.UNCACHED, medianValue: true, jobResult: jobResultAfterDateRange, jobResultDate: measuringDateOfAfterDateRange, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
-		
-		jobResultAfterDateRange.save(failOnError:true);
-
 		// Run the test:
 		Collection<EventResult> result = serviceUnderTest.findByMeasuredEventBetweenDate(jobGroupCsiLhotse, theEventToLookFor, location, fromDate, toDate);
 
@@ -740,5 +681,40 @@ class EventResultServiceTests {
 		assertEquals(2, result.size());
 		assertEquals(1, result.count({ it.ident() == eventResultWithinDateRange1_1_relevant.ident() }))
 		assertEquals(1, result.count({ it.ident() == eventResultWithinDateRange2_relevant.ident() }))
+	}
+	
+	/**
+	 * Creates an EventResult
+	 * @param theEventToLookFor
+	 * @param cachedView
+	 * @param medianValue
+	 * @param jobResultWithinDateRange1
+	 * @param measuringDateOfWithinDateRange1
+	 * @return
+	 */
+	private EventResult createEventResult(MeasuredEvent theEventToLookFor,CachedView cachedView,Boolean medianValue, JobResult jobResultWithinDateRange1, Date measuringDateOfWithinDateRange1){
+		new EventResult(measuredEvent : theEventToLookFor, cachedView : cachedView, medianValue: medianValue, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
+	}
+
+	/**
+	 * Creates a JobResult
+	 * @param date
+	 * @param job
+	 * @return
+	 */
+	private JobResult createJobResult(Date date, Job job){
+		new JobResult(
+				jobGroupName: 'CSI Lhotse',
+				locationLocation: 'agent1.example.com',
+				locationBrowser: 'FF-w0',
+				date: date,
+				/*Not of interest but required by constraint: */
+				testId: 1,
+				httpStatusCode: 200,
+				description: 'test',
+				jobConfigLabel: 'testjob',
+				jobConfigRuns: 1,
+				job: job
+		).save(failOnError: true)
 	}
 }
