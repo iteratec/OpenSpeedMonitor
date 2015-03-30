@@ -62,19 +62,17 @@ class DbCleanupServiceSpec {
         JobResult jobResultWithBeforeCleanupDate = new JobResult(testId: 'test1', date: executionDateBeforeCleanUpDate.toDate()).save(validate: false)
         JobResult jobResultWithAfterCleanupDate = new JobResult(testId: 'test2', date: executionDateAfterCleanUpDate.toDate()).save(validate: false)
 
-        EventResult eventResult1 = new EventResult(jobResultDate: jobResultWithBeforeCleanupDate.date).save(validate: false)
-        jobResultWithBeforeCleanupDate.addToEventResults(eventResult1).save(validate: false)
-        HttpArchive httpArchive1 = new HttpArchive(jobResult: jobResultWithBeforeCleanupDate).save(validate: false)
+        new EventResult(jobResult: jobResultWithBeforeCleanupDate, jobResultDate: jobResultWithBeforeCleanupDate.date).save(validate: false)
+        new HttpArchive(jobResult: jobResultWithBeforeCleanupDate).save(validate: false)
 
-        EventResult eventResult2 = new EventResult(jobResultDate: jobResultWithAfterCleanupDate.date).save(validate: false)
-        jobResultWithAfterCleanupDate.addToEventResults(eventResult2).save(validate: false)
-        HttpArchive httpArchive2 = new HttpArchive(jobResult: jobResultWithAfterCleanupDate).save(validate: false)
+        new EventResult(jobResult: jobResultWithAfterCleanupDate, jobResultDate: jobResultWithAfterCleanupDate.date).save(validate: false)
+        new HttpArchive(jobResult: jobResultWithAfterCleanupDate).save(validate: false)
 
         MeasuredValue measuredValueWithBeforeCleanupDate = new MeasuredValue(started: executionDateBeforeCleanUpDate.toDate()).save(validate: false)
-        MeasuredValueUpdateEvent measuredValueUpdateEvent1 = new MeasuredValueUpdateEvent(measuredValueId: measuredValueWithBeforeCleanupDate.id).save(validate: false)
+        new MeasuredValueUpdateEvent(measuredValueId: measuredValueWithBeforeCleanupDate.id).save(validate: false)
 
         MeasuredValue measuredValueWithAfterCleanupDate = new MeasuredValue(started: executionDateAfterCleanUpDate.toDate()).save(validate: false)
-        MeasuredValueUpdateEvent measuredValueUpdateEvent2 = new MeasuredValueUpdateEvent(measuredValueId: measuredValueWithAfterCleanupDate.id).save(validate: false)
+        new MeasuredValueUpdateEvent(measuredValueId: measuredValueWithAfterCleanupDate.id).save(validate: false)
 
         // before DbCleanupJob execution
         assertThat(JobResult.list().size(), is(2))
