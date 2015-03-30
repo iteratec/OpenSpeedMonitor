@@ -61,7 +61,7 @@ class JobResult {
 	 * </p>
 	 */
 	//Collection<EventResult> eventResults = []
-	static hasMany = EventResult
+//	static hasMany = EventResult
 
     static hasOne = HttpArchive
 

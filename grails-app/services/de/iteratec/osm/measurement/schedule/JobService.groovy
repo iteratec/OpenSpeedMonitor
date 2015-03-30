@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.result.EventResult
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import de.iteratec.osm.batch.Activity
@@ -123,8 +124,8 @@ class JobService {
                             List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
                             batchDelete(httpArchives, batchSize)
 //                            FIXME with IT-456 there will be no cascading delete from JobResult to EventResult and the following lines should be activated
-//                            List<EventResult> eventResults = jobResult.getEventResults()
-//                            batchDelete(eventResults,batchSize)
+                            List<EventResult> eventResults = jobResult.getEventResults()
+                            batchDelete(eventResults,batchSize)
                             jobResult.delete()
                             batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
                         } catch (Exception e) {
