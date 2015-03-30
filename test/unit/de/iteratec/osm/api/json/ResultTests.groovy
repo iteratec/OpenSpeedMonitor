@@ -112,12 +112,7 @@ class ResultTests {
 		event.testedPage = testedPage;
 		event.name = 'ADS for article 5';
 
-		EventResult eventResult = new EventResult() {
-					@Override
-					public Long getId() {
-						return 1;
-					}
-				};
+		EventResult eventResult = new EventResult();
 		eventResult.measuredEvent = event;
 		eventResult.customerSatisfactionInPercent = 1.5112d;
 		
@@ -125,10 +120,20 @@ class ResultTests {
 		job.location = new Location();
 		job.location.wptServer = new WebPageTestServer();
 		job.location.wptServer.baseUrl = "";
-		
-		JobResult jobResult = new JobResult();
-		eventResult.jobResult = jobResult;
-		jobResult.job = job;
+
+		//since we aare not saving any job we need to make sure that every JobResult has its own id
+		JobResult jobResult = new JobResult(){
+			@Override
+			public Long getId() {
+				return 1;
+			}
+		};
+		eventResult.jobResult = new JobResult(){
+			@Override
+			public Long getId() {
+				return 2;
+			}
+		};
 		jobResult.locationLocation = 'agent01';
 		jobResult.locationUniqueIdentifierForServer = 'agent01:IE';
 		jobResult.locationBrowser = 'Firefox7';
