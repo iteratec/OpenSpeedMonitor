@@ -92,7 +92,7 @@ function doOnDomReady(nextExecutionLink) {
             //$('#execution-schedule').val(execScheduleWithSeconds);
             //alert(data);
             $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, '(derzeit nicht aktiv)') + ' '
+                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
@@ -157,7 +157,7 @@ function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLi
 
             $('#execution-schedule').val(execScheduleWithSeconds);
             $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, '(derzeit nicht aktiv)') + ' '
+                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
