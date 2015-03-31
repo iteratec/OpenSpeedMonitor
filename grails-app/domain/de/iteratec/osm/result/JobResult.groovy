@@ -17,9 +17,6 @@
 
 package de.iteratec.osm.result
 
-import grails.gorm.DetachedCriteria
-import org.apache.tools.ant.taskdefs.condition.Http
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -48,20 +45,6 @@ class JobResult {
 
 	Job job
 	static belongsTo = [job : Job]
-
-	/**
-	 * <p>
-	 * All {@link EventResult}s assigned to to this job-result; 
-	 * never <code>null</code>.
-	 * </p>
-	 * 
-	 * <p>
-	 * An event-result should never be assigned to more than 
-	 * one job-results.
-	 * </p>
-	 */
-	//Collection<EventResult> eventResults = []
-//	static hasMany = EventResult
 
     static hasOne = HttpArchive
 
