@@ -128,7 +128,7 @@ class ConfigService {
         if (inMemoryConfigService == null) {
             throw new IllegalStateException("measurementsGenerallyEnabled couldn\'t be read from Configuration!")
         }else{
-            inMemoryConfigService.activateMeasurementsGenerallyEnabled(true)
+            inMemoryConfigService.activateMeasurementsGenerallyEnabled()
         }
     }
 	
