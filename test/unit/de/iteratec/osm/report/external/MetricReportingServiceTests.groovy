@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.report.external.MetricReportingService
 
 import static org.junit.Assert.assertEquals
@@ -86,6 +87,7 @@ class MetricReportingServiceTests {
     void setUp() {
 		serviceUnderTest = service 
 		serviceUnderTest.configService = new ConfigService()
+		serviceUnderTest.configService.inMemoryConfigService = new InMemoryConfigService()
 		createTestDataCommonToAllTests()
     }
 	
@@ -96,7 +98,8 @@ class MetricReportingServiceTests {
 		new AggregatorType(name: AggregatorType.MEASURED_EVENT).save(validate: false)
 		new AggregatorType(name: AggregatorType.PAGE).save(validate: false)
 		new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
-		new OsmConfiguration(measurementsGenerallyEnabled: true).save(failOnError: true)
+		serviceUnderTest.configService.inMemoryConfigService.activateMeasurementsGenerallyEnabled()
+		new OsmConfiguration().save(failOnError: true)
 	}
 
     void tearDown() {

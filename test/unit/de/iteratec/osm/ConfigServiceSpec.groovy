@@ -38,6 +38,7 @@ class ConfigServiceSpec {
 	@Before
 	void setUp(){
 		serviceUnderTest = service
+		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
 	}
 
     void testFailingGettingDetailDataStorageTime() {
