@@ -92,7 +92,8 @@
 							<g:each var="jobResult" in="${job.value}">
 								<tr data-statuscode="${jobResult.httpStatusCode}">
 								<td>
-									<a href="../job/edit/${jobResult.job.id}">${jobResult.getSatusCodeMessage()}</a>
+                  <a href="${jobResult.wptServerBaseurl}result/${jobResult.testId}/">${jobResult.getSatusCodeMessage()}</a>
+                  <%-- <a href="../job/edit/${jobResult.job.id}">${jobResult.getSatusCodeMessage()}</a> --%>
 								 </td>
 								 <td>
 									<g:render template="../job/timeago" model="${[date: jobResult.date]}" />
