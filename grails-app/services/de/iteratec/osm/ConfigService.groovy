@@ -79,7 +79,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
 	 */
 	boolean areMeasurementsGenerallyEnabled(){
-		return inMemoryConfigService.getMeasurementsGenerallyEnabled()
+		return inMemoryConfigService.areMeasurementsGenerallyEnabled()
 	}
 
 	/**
