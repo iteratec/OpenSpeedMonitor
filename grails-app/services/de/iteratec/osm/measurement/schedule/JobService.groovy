@@ -116,14 +116,12 @@ class JobService {
         Job.withSession { session ->
             0.step(count, batchSize) { offset ->
                 Job.withTransaction {
-                    int max = offset + batchSize
                     batchActivityService.updateStatus(activity, ["progress": batchActivityService.calculateProgress(count,offset), "stage": "Delete JobResults"])
                     dc.list(offset: 0, max: batchSize).eachWithIndex { JobResult jobResult, int index ->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
                             List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
                             batchDelete(httpArchives, batchSize)
-//                            FIXME with IT-456 there will be no cascading delete from JobResult to EventResult and the following lines should be activated
                             List<EventResult> eventResults = jobResult.getEventResults()
                             batchDelete(eventResults,batchSize)
                             jobResult.delete()
