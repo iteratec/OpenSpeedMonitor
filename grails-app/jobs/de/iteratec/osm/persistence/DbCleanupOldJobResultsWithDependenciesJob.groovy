@@ -17,9 +17,9 @@ class DbCleanupOldJobResultsWithDependenciesJob {
     }
 
     def execute() {
-//        if(configService.getMaxDataStorageTimeInMonths() > 0){
-//            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-//            dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
-//        }
+        if(configService.isDatabaseCleanupEnabled() && configService.areMeasurementsGenerallyEnabled()){
+            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
+            dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
+        }
     }
 }

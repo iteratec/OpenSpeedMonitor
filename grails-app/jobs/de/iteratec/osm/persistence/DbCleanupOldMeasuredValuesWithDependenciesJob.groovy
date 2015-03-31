@@ -17,9 +17,9 @@ class DbCleanupOldMeasuredValuesWithDependenciesJob {
     }
 
     def execute() {
-//        if(configService.getMaxDataStorageTimeInMonths() > 0) {
-//            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-//            dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore)
-//        }
+        if(configService.isDatabaseCleanupEnabled() > 0 && configService.areMeasurementsGenerallyEnabled()) {
+            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
+            dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore)
+        }
     }
 }

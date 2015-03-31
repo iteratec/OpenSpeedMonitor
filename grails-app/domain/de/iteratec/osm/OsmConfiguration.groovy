@@ -26,10 +26,9 @@ class OsmConfiguration {
     static final Integer DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES = 60
     static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
     static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
-    static final Boolean DEFAULT_MEASUREMENTS_GENERALLY_ENABLED = false
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
-    static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 0
+
 
     /* Default (injected) attributes of GORM */
     Long	id
@@ -47,14 +46,11 @@ class OsmConfiguration {
     Integer minDocCompleteTimeInMillisecs = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
     /** {@link EventResult}s with a docCompleteTimeInMillisecs greater than this won't be factored in csi-{@link MeasuredValue} */
     Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
-    /** If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. */
-    Boolean measurementsGenerallyEnabled = DEFAULT_MEASUREMENTS_GENERALLY_ENABLED
     /** Initial height of charts when opening dashboards. */
     Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
     /** Main url under test within this osm instance. Got shown in chart title of csi dashboard. */
     String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
-    /** Maximum Number of months osm keeps results in database   */
-    Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
+
 
     static mapping = {
     }
@@ -64,9 +60,7 @@ class OsmConfiguration {
         defaultMaxDownloadTimeInMinutes(defaultValue: DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES, min: -2147483648, max: 2147483647)
         minDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS, min: -2147483648, max: 2147483647)
         maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS, min: -2147483648, max: 2147483647)
-        measurementsGenerallyEnabled(defaultValue: DEFAULT_MEASUREMENTS_GENERALLY_ENABLED)
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS, min: -2147483648, max: 2147483647)
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST, maxSize: 255)
-        maxDataStorageTimeInMonths(defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS)
     }
 }

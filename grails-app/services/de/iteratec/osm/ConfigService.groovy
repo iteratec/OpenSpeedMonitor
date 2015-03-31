@@ -24,7 +24,9 @@ package de.iteratec.osm
 class ConfigService {
 
 	def grailsApplication
-	
+
+	InMemoryConfigService inMemoryConfigService
+
     static transactional = true
 
 	/**
@@ -77,7 +79,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
 	 */
 	boolean areMeasurementsGenerallyEnabled(){
-		return (Boolean)retrieveConfigValue('measurementsGenerallyEnabled')
+		return inMemoryConfigService.getMeasurementsGenerallyEnabled()
 	}
 
 	/**
@@ -105,8 +107,17 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
      */
     Integer getMaxDataStorageTimeInMonths(){
-        return (Integer)retrieveConfigValue('maxDataStorageTimeInMonths')
+        return inMemoryConfigService.getMaxDataStorageTimeInMonths()
     }
+
+	/**
+	 * Get status of databaseCleanupEnabled
+	 * If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldMeasuredValuesWithDependenciesJob})
+	 * @return Whether the nightly database cleanup is enabled or not
+	 */
+	Boolean isDatabaseCleanupEnabled(){
+		return inMemoryConfigService.isDatabaseCleanupEnabled()
+	}
 
     /**
      * Activates measurements generally.
@@ -114,11 +125,10 @@ class ConfigService {
      */
     void activateMeasurementsGenerally(){
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
-        if (osmConfigs.size() != 1 || osmConfigs[0].measurementsGenerallyEnabled == null) {
+        if (inMemoryConfigService == null) {
             throw new IllegalStateException("measurementsGenerallyEnabled couldn\'t be read from Configuration!")
         }else{
-            osmConfigs[0].measurementsGenerallyEnabled = true
-            osmConfigs[0].save(failOnError: true)
+            inMemoryConfigService.activateMeasurementsGenerallyEnabled(true)
         }
     }
 	
