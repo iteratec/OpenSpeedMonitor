@@ -34,7 +34,7 @@ import org.junit.*
 class ConfigServiceSpec {
 	
 	ConfigService serviceUnderTest
-	
+
 	@Before
 	void setUp(){
 		serviceUnderTest = service
@@ -94,7 +94,7 @@ class ConfigServiceSpec {
 		Boolean defaultMeasurementActivation = false
 		//test executions and assertions
 		assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(defaultMeasurementActivation))
-		conf.measurementsGenerallyEnabled = true
+		serviceUnderTest.activateMeasurementsGenerally()
 		assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(true))
 	}
 	
@@ -108,7 +108,7 @@ class ConfigServiceSpec {
 
     void testActivatingMeasurements(){
         //test-specific data
-        OsmConfiguration conf = new OsmConfiguration(measurementsGenerallyEnabled: false).save(failOnError: true)
+        OsmConfiguration conf = new OsmConfiguration().save(failOnError: true)
         assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(false))
         //test execution
         serviceUnderTest.activateMeasurementsGenerally()
