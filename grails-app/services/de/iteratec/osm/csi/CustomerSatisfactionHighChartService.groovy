@@ -126,9 +126,12 @@ class CustomerSatisfactionHighChartService {
 		List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
 		List<Page> pages = queryParams.pageIds.collectNested { Page.get(it) };
 		List<MeasuredValue> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
+        log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
 		
 		resultMap = convertToHighchartGraphList(csiValues)
-		
+        log.debug("Number of ChartGraphs made from MeasuredValues: ${resultMap.size()}")
+        log.debug("Number of points in each ChartGraph made from MeasuredValues: ${resultMap*.points.size()}")
+
 		return resultMap
 	}
 	

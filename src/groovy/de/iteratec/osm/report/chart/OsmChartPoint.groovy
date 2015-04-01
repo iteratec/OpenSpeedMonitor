@@ -19,8 +19,6 @@ package de.iteratec.osm.report.chart
 
 import groovy.transform.EqualsAndHashCode
 
-import java.lang.annotation.Annotation
-
 
 /**
  * <p>
@@ -47,8 +45,7 @@ class OsmChartPoint{
 
 	/**
 	 * <p>
-	 * The count of aggregated values to receive {@link #measuredValue}. This
-	 * value is always >= 0.
+	 * The count of aggregated values to receive {@link #measuredValue}. 
 	 * </p>
 	 * 
 	 * <p>
@@ -64,7 +61,7 @@ class OsmChartPoint{
 	 * </p>
 	 * 
 	 * <p>
-	 * This value is intended to be the y-coordinate of a Highchart graph.
+	 * This value is intended to be the y-coordinate of a Highchart graph. OsmChartPoints without this value are invalid.
 	 * </p>
 	 * 
 	 * @see #countOfAggregatedResults
@@ -90,8 +87,7 @@ class OsmChartPoint{
 	/**
 	 * <p>
 	 * The time this value was measured or an aggregated value takes place (gets
-	 * relevant) represented as milliseconds since Epoch. This value is always
-	 * greater or equal 0.
+	 * relevant) represented as milliseconds since Epoch. Only OsmChartPoints with time greater or equal 0 are valid.
 	 * </p>
 	 * 
 	 * <p>
@@ -125,9 +121,11 @@ class OsmChartPoint{
 		return this.sourceURL != null
 	}
 
+	/**
+	 * Only points with a {@link #time} greater 0 and a {@link #measuredValue} not null are valid. 
+	 * @return <code>true</code> if {@link #time} is greater than 0 and {@link #measuredValue} is not null.
+	 */
     public boolean isValid(){
-        if(this.time > 0 && this.countOfAggregatedResults > 0)
-            return true
-        return false
+        return (this.time > 0 && this.measuredValue != null)
     }
 }
