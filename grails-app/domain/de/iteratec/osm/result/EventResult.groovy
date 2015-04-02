@@ -140,7 +140,8 @@ class EventResult implements CsiValue {
 	Date jobResultDate
 	Long jobResultJobConfigId
 
-	static belongsTo = JobResult
+	//static belongsTo = JobResult
+	static belongsTo = [jobResult: JobResult]
 
 	static constraints = {
 		id()

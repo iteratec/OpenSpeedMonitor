@@ -31,8 +31,8 @@
 
 .input-medium-height30 {
 	.input-medium;
-	height:30px !important;
-	padding:0px 6px !important;
+	height:24px !important;
+	padding:2px 6px !important;
 }
 .content-box {
 	box-sizing:content-box;
@@ -53,11 +53,6 @@
     margin-right: 5px;
 }
 
-select {
-    width: auto !important;
-}
-
-select,
 textarea,
 input[type="text"],
 input[type="password"],
@@ -75,7 +70,14 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
  // height: 25px !important;
-  height: 25px;
+  height: 24px;
+  padding: 2px 6px !important;
+  line-height: 24px !important;
+}
+
+select {
+  width: auto !important;
+  height: 30px;
   padding: 4px 6px !important;
   line-height: 20px !important;
 }
@@ -89,8 +91,8 @@ input[type="color"],
 }
 
 .input-append .add-on, .input-prepend .add-on {
-    height: 25px !important;
-    line-height: 25px !important;
+    height: 20px !important;
+    line-height: 20px !important;
 }
 .btn {
     line-height: 25px !important;
@@ -108,7 +110,17 @@ select[multiple], select[size] {
 a.dropdown-toggle {
     position: relative;
 }
+
 i.clickable-icon {
   cursor: pointer;
   .text-info
+}
+
+textarea {
+  height: auto;
+}
+
+input.ui-autocomplete-input {
+  height: 20px !important;
+  padding: 2px 6px !important;
 }

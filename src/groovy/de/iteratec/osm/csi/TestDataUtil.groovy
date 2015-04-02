@@ -179,10 +179,10 @@ class TestDataUtil {
 			OsmConfiguration.class,
 			MeasuredValue.class,
 			HourOfDay.class,
+			EventResult.class,
 			JobResult.class,
 			WaterfallEntry.class,
 			WebPerformanceWaterfall.class,
-			EventResult.class,
 			Job.class,
 			Script.class,
 			JobGroup.class,
@@ -989,13 +989,13 @@ class TestDataUtil {
 				wptStatus:200,
 				docCompleteTimeInMillisecs: docCompleteTimeInMillisecs,
 				customerSatisfactionInPercent: customerSatisfactionInPercent,
+				jobResult: jobResult,
 				jobResultDate: jobResult.date,
 				jobResultJobConfigId: jobResult.job.ident(),
 				measuredEvent: event,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
 				).save(failOnError: true)
 
-		jobResult.eventResults.add(eventResult);
 		jobResult.save(failOnError: true)
 	}
 	
@@ -1034,6 +1034,7 @@ class TestDataUtil {
 				wptStatus:200,
 				docCompleteTimeInMillisecs: docCompleteTimeInMillisecs,
 				customerSatisfactionInPercent: customerSatisfactionInPercent,
+				jobResult: jobResult,
 				jobResultDate: jobResult.date,
 				jobResultJobConfigId: jobResult.job.ident(),
 				measuredEvent: event,
@@ -1041,22 +1042,8 @@ class TestDataUtil {
 				tag: resultTag
 				).save(failOnError: true)
 
-		jobResult.eventResults.add(eventResult);
 		jobResult.save(failOnError: true)
 		
-	}
-	
-	public static Map<Long, JobResult> generateMapToFindJobResultByEventResultId(List<JobResult> jobResults){
-		Map<Long, JobResult> resultMap = null
-		if(!jobResults.isEmpty()){
-			resultMap = new HashMap<Long, JobResult>()
-			jobResults.each{JobResult jobResult ->
-				jobResult.eventResults.each{EventResult eventResult ->
-					resultMap[eventResult.ident()] = jobResult
-				}
-			}
-		}
-		return resultMap
 	}
 
 	/**

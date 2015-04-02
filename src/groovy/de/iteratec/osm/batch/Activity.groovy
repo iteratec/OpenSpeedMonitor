@@ -5,4 +5,8 @@ package de.iteratec.osm.batch
  */
 enum Activity {
         DELETE, UPDATE, CREATE
+
+    String getI18nCode(){
+        return "de.iteratec.osm.batch.activity."+this
+    }
 }

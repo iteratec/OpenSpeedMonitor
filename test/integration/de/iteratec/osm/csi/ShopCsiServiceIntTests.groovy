@@ -17,22 +17,34 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupType
+import de.iteratec.osm.measurement.script.Script
+
 import static org.junit.Assert.*
+
+import java.util.Date;
+
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Before
+
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.api.ShopCsiService
 import de.iteratec.osm.api.SystemCSI
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.schedule.Job
 
 /**
  *
@@ -44,6 +56,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 	ShopCsiService shopCsiService
 	DateTime START = new DateTime(2014,1,1,0,0, DateTimeZone.UTC)
 	DateTime END = new DateTime(2014,12,31,0,0, DateTimeZone.UTC)
+	int groups = 0
 
 	@Before
     void setUp() {
@@ -128,12 +141,24 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
     }
 	
 	void createEventResult(MeasuredEvent event, String tag, double value){
+		//data is needed to create a JobResult
+		JobGroup group = TestDataUtil.createJobGroup("Group${groups}",JobGroupType.CSI_AGGREGATION)
+		Script script = TestDataUtil.createScript("label${groups}","description","navigationScript",true)
+		WebPageTestServer webPageTestServer = TestDataUtil.createWebPageTestServer("label","1",true,"http://www.url.de")
+		Browser browser = TestDataUtil.createBrowser("browser${groups}",1)
+		Location location = TestDataUtil.createLocation(webPageTestServer,"id",browser,true)
+		Job job = TestDataUtil.createJob("Label${groups++}",script, location,group,"descirpiton",1,false,20)
+
+		JobResult expectedResult = new JobResult(jobGroupName: "Group", jobConfigLabel:"label", jobConfigRuns: 1, httpStatusCode: 200, job:job,description: "description",date: new Date(), testId: "TestJob").save(validate: false);
+		// TODO: Create a dummy data for expectedResult to pass it to EventResult
+		
 		new EventResult(
 			measuredEvent: event,
 			wptStatus: 200,
 			medianValue: true,
 			numberOfWptRun: 1,
 			cachedView: CachedView.UNCACHED,
+			jobResult: expectedResult,
 			jobResultDate: START.plusDays(1).toDate(),
 			jobResultJobConfigId: 1,
 			tag: tag,

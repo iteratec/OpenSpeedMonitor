@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.GraphitePathName
 import de.iteratec.osm.report.external.GraphiteSocket
@@ -79,7 +80,9 @@ class QuartzControlledGrailsReportsTests {
 		serviceUnderTest = service
 		serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService() 
 		serviceUnderTest.configService = new ConfigService()
-		new OsmConfiguration(measurementsGenerallyEnabled: true).save(failOnError: true)
+		serviceUnderTest.configService.inMemoryConfigService = new InMemoryConfigService()
+		serviceUnderTest.configService.inMemoryConfigService.activateMeasurementsGenerallyEnabled()
+		new OsmConfiguration().save(failOnError: true)
 	}
 
 	@After

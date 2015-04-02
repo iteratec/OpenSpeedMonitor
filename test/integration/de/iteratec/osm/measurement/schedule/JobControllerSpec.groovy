@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.*
 class JobControllerSpec extends IntTestWithDBCleanup {
 
     JobController controllerUnderTest
+    //Will be used to assign different names for the test data
     private int jobIdCount = 0
 
     DateTime executionDateBeforeCleanUpDate = new DateTime()
@@ -40,7 +41,6 @@ class JobControllerSpec extends IntTestWithDBCleanup {
 
     @Test
     void delete() {
-        controllerUnderTest.params.id = deleteJob.id.toString()
         List<JobResult> jobResults = JobResult.findAllByJob(deleteJob)
         List<HttpArchive> httpArchives =  []
         List<EventResult> eventResults = []
@@ -54,8 +54,8 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         assert jobResults.size() == 1
         assert eventResults.size() == 1
         assert httpArchives.size() == 1
-
-        controllerUnderTest.delete()
+        //The Controller will use a promise to run the deletion within another thread, so we just check if the service will delete the job
+        controllerUnderTest.jobService.deleteJob(deleteJob)
 
         List<Job> allJobs = Job.list()
         List<JobResult> allJobResults = JobResult.list()
@@ -75,6 +75,11 @@ class JobControllerSpec extends IntTestWithDBCleanup {
 
     }
 
+    /**
+     * Creates 11 Jobs, with all needed Objects(WebPageTestServer, JobGroup, Browser, Location, Page, Script).
+     * 1 Job Result will will be assigned to deleteJob, this job will also be mapped with 1 JobResult
+     * There will be also another JobResult, with is mapped to another Job
+     */
     private void createData() {
         WebPageTestServer server = createWebPageTestServer("server - wpt server", "server - wpt server", true, "http://iteratec.de")
         JobGroup group = createJobGroup("Testgroup", JobGroupType.CSI_AGGREGATION)
@@ -82,7 +87,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         Location ffAgent1 = createLocation(server, "1", browser, true)
         Page homepage = createPages(["homepage"]).get(0)
 
-        Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
+        Script script = Script.createDefaultScript('Unnamed').save(flush: true, failOnError: true)
 
         deleteJob = createJob("BV${jobIdCount} - Step 01", script, ffAgent1, group, "This is job ${jobIdCount++}...", 5, false, 10)
         for (i in 1..9) {
@@ -93,23 +98,18 @@ class JobControllerSpec extends IntTestWithDBCleanup {
 
         JobResult jobResultWithAfterCleanupDate = createJobResult(createJob("BV${jobIdCount} - Step 01", script, ffAgent1, group, "This is job ${jobIdCount++}...", 5, false, 10))
 
-        MeasuredEvent measuredEvent = createMeasuredEvent('Test event', homepage).save(failOnError: true)
+        MeasuredEvent measuredEvent = createMeasuredEvent('Test event', homepage).save(flush: true, failOnError: true)
 
         String eventResultTag = "$group.id;$measuredEvent.id;$homepage.id;$browser.id;$ffAgent1.id";
 
-        EventResult eventResult1 = createEventResult(jobResultWithBeforeCleanupDate, eventResultTag)
-        jobResultWithBeforeCleanupDate.addToEventResults(eventResult1)
-        jobResultWithBeforeCleanupDate.save(failOnError: true)
-
+        createEventResult(jobResultWithBeforeCleanupDate, eventResultTag)
         createHttpArchive(jobResultWithBeforeCleanupDate)
-        EventResult eventResult2 = createEventResult(jobResultWithAfterCleanupDate, eventResultTag)
-        jobResultWithAfterCleanupDate.addToEventResults(eventResult2)
-        jobResultWithAfterCleanupDate.save(failOnError: true)
 
+        createEventResult(jobResultWithAfterCleanupDate, eventResultTag)
         createHttpArchive(jobResultWithAfterCleanupDate)
     }
 
-       private JobResult createJobResult(Job job) {
+    private JobResult createJobResult(Job job) {
         new JobResult(
                 job: job,
                 date: executionDateBeforeCleanUpDate.toDate(),
@@ -122,7 +122,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
                 httpStatusCode: 200,
-        ).save(failOnError: true)
+        ).save(flush: true,failOnError: true)
     }
 
     private static EventResult createEventResult(JobResult jobResult, eventResultTag) {
@@ -152,7 +152,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 measuredEvent: null,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 tag: eventResultTag
-        ).save(failOnError: true)
+        ).save(flush: true,failOnError: true)
     }
 
 }

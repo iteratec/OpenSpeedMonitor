@@ -29,29 +29,7 @@
     </thead>
     <tbody>
     <g:each in="${batchActivities}" status="i" var="batchActivityInstance">
-        <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-
-            <td><g:link action="show"
-                        id="${batchActivityInstance.id}">${fieldValue(bean: batchActivityInstance, field: "name")}</g:link></td>
-
-            <td>${fieldValue(bean: batchActivityInstance, field: "activity")}</td>
-
-            <td>${fieldValue(bean: batchActivityInstance, field: "status")}</td>
-
-            <td>${fieldValue(bean: batchActivityInstance, field: "progress")}</td>
-
-            <td>${fieldValue(bean: batchActivityInstance, field: "lastFailureMessage")}</td>
-
-            <td><g:formatDate type="datetime" date="${batchActivityInstance.startDate}" style="LONG"
-                              timeStyle="SHORT"/></td>
-
-            <td><g:formatDate type="datetime" date="${batchActivityInstance.lastUpdated}" style="LONG"
-                              timeStyle="SHORT"/></td>
-
-            <td><g:formatDate type="datetime" date="${batchActivityInstance.endDate}" style="LONG"
-                              timeStyle="SHORT"/></td>
-
-        </tr>
+            <g:render template="batchActivityRow" model="${['batchActivityInstance': batchActivityInstance,evenOdd:"${(i % 2) == 0 ? 'odd' : 'even'}"]}"/>
     </g:each>
     </tbody>
 </table>

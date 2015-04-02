@@ -24,6 +24,7 @@ import java.text.DecimalFormatSymbols
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.measurement.schedule.Job
 
 /**
  * <p>
@@ -123,9 +124,9 @@ public final class Result {
 			JobResult jobResult,
 			EventResult eventResultOfJobResult) {
 		
-		if( jobResult.getEventResults().count( {it.id == eventResultOfJobResult.id} ) < 1 )
+		if(jobResult.id != eventResultOfJobResult.jobResult.id)
 		{
-			throw new IllegalArgumentException('The job result does not contain the specified event result. This is illegal.');
+			throw new IllegalArgumentException('The specified event result does not belong to the specified job result. This is illegal.');
 		}
 			
 		this.csiValue = API_DECIMAL_FORMAT.format( (double)

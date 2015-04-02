@@ -5,7 +5,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="kickstart" />
+	<meta name="layout" content="kickstart_osm" />
 	<g:set var="entityName" value="${message(code: 'batchActivity.label', default: 'BatchActivity')}" />
 	<title><g:message code="default.show.label" args="[entityName]" /></title>
 </head>
@@ -41,7 +41,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="batchActivity.activity.label" default="Activity" /></td>
 				
-				<td valign="top" class="value">${batchActivityInstance?.activity?.encodeAsHTML()}</td>
+				<td valign="top" class="value"><g:message code="${batchActivityInstance?.activity?.i18nCode}" default="Activity" /></td>
 				
 			</tr>
 		
@@ -55,7 +55,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="batchActivity.status.label" default="Status" /></td>
 				
-				<td valign="top" class="value">${batchActivityInstance?.status?.encodeAsHTML()}</td>
+				<td valign="top" class="value"><g:message code="${batchActivityInstance?.status?.i18nCode}" default="Status" /></td>
 				
 			</tr>
 		

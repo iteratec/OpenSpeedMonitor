@@ -46,7 +46,7 @@ class WebPageTestServer {
         lastUpdated()
         active()
         description(nullable: true, widget: 'textarea', maxSize: 255)
-        baseUrl(blank: false, url: true, maxSize: 255)
+        baseUrl(blank: false, url: ["localhost(:(\\d{1,5}))?"], maxSize: 255)
         contactPersonName(maxSize: 200, nullable: true)
         contactPersonEmail(email: true, nullable: true, maxSize: 255)
     }

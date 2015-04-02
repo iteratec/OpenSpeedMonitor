@@ -1,5 +1,7 @@
 package de.iteratec.osm.batch
 
+import java.text.DecimalFormat
+
 /**
  * Created by benjamin on 04.03.15.
  */
@@ -26,8 +28,8 @@ class BatchActivityService {
                     failures: 0,
                     lastFailureMessage: "",
                     progress: 0,
-                    progressWithinStage: "",
-                    stage: "",
+                    progressWithinStage: "0",
+                    stage: "0",
                     status: Status.ACTIVE,
                     startDate: new Date(),
                     successfulActions: 0,
@@ -73,6 +75,18 @@ class BatchActivityService {
         BatchActivity.withTransaction {
             activity.save(flush: true)
         }
+    }
+
+
+    /**
+     * Creates a String representation for BatchActivity progress
+     * @param count Maximum amount of Activities
+     * @param actual activities which are already done
+     * @return formatted string
+     */
+    public String calculateProgress(int count, int actual){
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(100.0/count*actual) + " %";
     }
 
 }

@@ -17,8 +17,12 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.test.MockUtils
+import grails.test.mixin.TestFor
+
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertNotEquals
 import static org.junit.Assert.assertThat
 
@@ -35,42 +39,34 @@ import static org.junit.Assert.assertTrue
  * @since IT-78
  */
 public class OsmChartPointTests {
-	
-	private static final String TEST_AGENT = 'myAgent - 192.168.1.1'
 
-	private static final long TIME = 1378976834000L
+	private static String TEST_AGENT = 'myAgent - 192.168.1.1'
 
-	private static final double VALUE = 42d
+	private static long TIME = 1378976834000L
 
-	private static final int COUNT_OF_AGGREGATED_RESULTS = 4
+	private static double VALUE = 42d
 
-	private static final URL URL = new URL("https://www.google.de/search?q=42")
+	private static int COUNT_OF_AGGREGATED_RESULTS = 4
+
+	private static URL URL = new URL("https://www.google.de/search?q=42")
 
 	@Test
 	public void testEqualsAndHashCode() throws Throwable {
 
-        OsmChartPoint out = new OsmChartPoint(
-                TIME, VALUE, COUNT_OF_AGGREGATED_RESULTS, URL, TEST_AGENT)
+        OsmChartPoint out = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: URL, testingAgent: TEST_AGENT)
 
-        OsmChartPoint equalsToOut = new OsmChartPoint(
-                TIME, VALUE, COUNT_OF_AGGREGATED_RESULTS, URL, TEST_AGENT)
+        OsmChartPoint equalsToOut = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: URL, testingAgent: TEST_AGENT)
 
-        OsmChartPoint differentValue = new OsmChartPoint(
-                TIME, 23d, COUNT_OF_AGGREGATED_RESULTS, URL, TEST_AGENT)
+        OsmChartPoint differentValue = new OsmChartPoint(time: TIME, measuredValue: 23d, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: URL, testingAgent: TEST_AGENT)
 
-        OsmChartPoint differentCountOfAggregatedResults = new OsmChartPoint(
-                TIME, VALUE, 3, URL, TEST_AGENT)
+        OsmChartPoint differentCountOfAggregatedResults = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: 3, sourceURL: URL, testingAgent: TEST_AGENT)
 
-        OsmChartPoint differentTime = new OsmChartPoint(
-                1378976835000L, VALUE, COUNT_OF_AGGREGATED_RESULTS, URL, TEST_AGENT)
+        OsmChartPoint differentTime = new OsmChartPoint(time: 1378976835000L, measuredValue: VALUE, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: URL, testingAgent: TEST_AGENT)
 
-        OsmChartPoint differentURL = new OsmChartPoint(
-                TIME, VALUE, COUNT_OF_AGGREGATED_RESULTS, new URL("https://www.example.com/42"), TEST_AGENT)
+        OsmChartPoint differentURL = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: new URL("https://www.example.com/42"), testingAgent: TEST_AGENT)
 
-        OsmChartPoint differentTestAgent = new OsmChartPoint(
-                TIME, VALUE, COUNT_OF_AGGREGATED_RESULTS, URL, 'myAgent - 192.168.1.2')
+        OsmChartPoint differentTestAgent = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: URL, testingAgent: 'myAgent - 192.168.1.2')
 
-//        assertTrue(out.equals(equalsToOut))
 		assertThat(out, equalTo(equalsToOut))
 		assertThat(out.hashCode(), equalTo(equalsToOut.hashCode()))
 
@@ -83,8 +79,7 @@ public class OsmChartPointTests {
 
 	@Test
 	public void testHighchartPoin_noSourceURLt() throws Throwable {
-		final OsmChartPoint out = new OsmChartPoint(TIME, VALUE, COUNT_OF_AGGREGATED_RESULTS,
-				null, TEST_AGENT)
+		final OsmChartPoint out = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: COUNT_OF_AGGREGATED_RESULTS, sourceURL: null, testingAgent: TEST_AGENT)
 
 		assertThat(out.time, is(TIME))
 		assertThat(out.measuredValue, closeTo(VALUE, 0.0d))
@@ -95,8 +90,7 @@ public class OsmChartPointTests {
 
 	@Test
 	public void testHighchartPoint() throws Throwable {
-		final OsmChartPoint out = new OsmChartPoint(TIME, VALUE, 3,
-				URL, TEST_AGENT)
+		final OsmChartPoint out = new OsmChartPoint(time: TIME, measuredValue: VALUE, countOfAggregatedResults: 3, sourceURL: URL, testingAgent: TEST_AGENT)
 
 		assertThat(out.time, is(TIME))
 		assertThat(out.measuredValue, closeTo(VALUE, 0.0d))
@@ -105,8 +99,9 @@ public class OsmChartPointTests {
 		assertThat(out.sourceURL, is(URL))
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void testHighchartPoint_InvalidTime() throws Throwable {
-		new OsmChartPoint(-1L, VALUE, 3, URL, TEST_AGENT)
+		OsmChartPoint out = new OsmChartPoint(time: -1L, measuredValue: VALUE, countOfAggregatedResults: 3, sourceURL: URL, testingAgent: TEST_AGENT)
+        assertFalse(out.isValid())
 	}
 }

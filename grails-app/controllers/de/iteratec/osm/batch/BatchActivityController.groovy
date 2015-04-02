@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.batch
 
+import grails.converters.JSON
+
 /**
  * BatchActivityController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
@@ -24,14 +26,15 @@ package de.iteratec.osm.batch
 class BatchActivityController {
 
     BatchActivityService batchActivityService
-//    static Date last = new Date()
 
     def list(){
-        [batchActivities:BatchActivity.list()]
+        params.order = params.order?:"desc"
+        params.sort = params.sort?:"startDate"
+        [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
     }
 
     def index(){
-        redirect(action: 'list')
+        redirect(action: 'list',params: [max:10])
     }
 
     def edit(){
@@ -53,7 +56,19 @@ class BatchActivityController {
      * @return new Content from BatchActivityTable
      */
     def updateTable(){
-        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list()])
+        params.order = "desc"
+        params.sort = "startDate"
+        params.max = 10
+        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()])
+    }
+    /**
+     *
+     * @param id id of the BatchActivity to collect
+     * @param evenOdd even or odd to get the right row highlighting
+     * @return BatchActivity row of the given id
+     */
+    def getUpdate(int id, String evenOdd){
+        render(view: '_batchActivityRow', model:[batchActivityInstance: BatchActivity.get(id), evenOdd:evenOdd])
     }
 
     def checkForUpdate(){

@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.batch
+package de.iteratec.osm
 
 
 
@@ -23,12 +23,12 @@ import grails.test.mixin.*
 import org.junit.*
 
 /**
- * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
+ * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(BatchActivity)
-class BatchActivitySpec {
+@TestFor(InMemoryConfigService)
+class InMemoryConfigServiceSpec {
 
     void testSomething() {
-       fail "Implement me"
+        fail "Implement me"
     }
 }

@@ -40,13 +40,12 @@ import groovy.transform.EqualsAndHashCode
  * @author mze
  * @since IT-78
  */
-@EqualsAndHashCode(includeFields=true)
-public final class OsmChartPoint {
+@EqualsAndHashCode
+class OsmChartPoint{
 
 	/**
 	 * <p>
-	 * The count of aggregated values to receive {@link #measuredValue}. This
-	 * value is always >= 0.
+	 * The count of aggregated values to receive {@link #measuredValue}. 
 	 * </p>
 	 * 
 	 * <p>
@@ -54,7 +53,7 @@ public final class OsmChartPoint {
 	 * hover info dialog to inform the user about values background
 	 * </p>
 	 */
-	public final int countOfAggregatedResults
+	int countOfAggregatedResults
 
 	/**
 	 * <p>
@@ -62,12 +61,12 @@ public final class OsmChartPoint {
 	 * </p>
 	 * 
 	 * <p>
-	 * This value is intended to be the y-coordinate of a Highchart graph.
+	 * This value is intended to be the y-coordinate of a Highchart graph. OsmChartPoints without this value are invalid.
 	 * </p>
 	 * 
 	 * @see #countOfAggregatedResults
 	 */
-	public final double measuredValue
+	double measuredValue
 
 	/**
 	 * <p>
@@ -83,13 +82,12 @@ public final class OsmChartPoint {
 	 * 
 	 * @see #hasAnSourceURL()
 	 */
-	public final URL sourceURL
+	URL sourceURL
 
 	/**
 	 * <p>
 	 * The time this value was measured or an aggregated value takes place (gets
-	 * relevant) represented as milliseconds since Epoch. This value is always
-	 * greater or equal 0.
+	 * relevant) represented as milliseconds since Epoch. Only OsmChartPoints with time greater or equal 0 are valid.
 	 * </p>
 	 * 
 	 * <p>
@@ -99,54 +97,12 @@ public final class OsmChartPoint {
 	 * @see #measuredValue
 	 * @see Date#getTime()
 	 */
-	public final long time
+	long time
 	
 	/**
 	 * Measuring machine name (can contain ip adress) 
 	 */
-	public final String testingAgent
-
-	/**
-	 * <p>
-	 * Creates a new Highchart point.
-	 * </p>
-	 *
-	 * @param time
-	 *            The time the value was measured (milliseconds since Epoch); a
-	 *            value >= 0 - for sure there is no web-page-test-measuring
-	 *            before the 1th January 1970 ;).
-	 * @param measuredValue
-	 *            The measured value.
-	 * @param countOfAggregatedResults
-	 *            The count of aggregated values to receive the
-	 *            {@code measuredValue}. A value >= 0.
-	 * @param sourceURL
-	 *            The source {@link URL} if available, <code>null</code> else.
-	 * @throws IllegalArgumentException
-	 *             if {@code time} is less than 0 <em>or</em>
-	 *             {@code countOfAggregatedResults} is less than 0.
-	 */
-	public OsmChartPoint(final long time, final double measuredValue,
-						 final int countOfAggregatedResults, final URL sourceURL, final String testAgent)
-			throws IllegalArgumentException {
-		super()
-
-		if (time < 0) {
-			throw new IllegalArgumentException(
-					"The time could not be less than 0.")
-		}
-
-		if (countOfAggregatedResults < 0) {
-			throw new IllegalArgumentException(
-					"The count of aggregated results could not be less than 0.")
-		}
-
-		this.time = time
-		this.measuredValue = measuredValue
-		this.countOfAggregatedResults = countOfAggregatedResults
-		this.sourceURL = sourceURL
-		this.testingAgent = testAgent
-	}
+	String testingAgent
 
 	/**
 	 * <p>
@@ -165,14 +121,11 @@ public final class OsmChartPoint {
 		return this.sourceURL != null
 	}
 
-    public boolean equals(Object o){
-        OsmChartPoint osmChartPoint = (OsmChartPoint) o
-        if (this.time == osmChartPoint.time
-                && this.measuredValue == osmChartPoint.measuredValue
-                && this.countOfAggregatedResults == osmChartPoint.countOfAggregatedResults
-                && this.sourceURL == osmChartPoint.sourceURL
-                && this.testingAgent == osmChartPoint.testingAgent)
-            return true
-        return false
+	/**
+	 * Only points with a {@link #time} greater 0 and a {@link #measuredValue} not null are valid. 
+	 * @return <code>true</code> if {@link #time} is greater than 0 and {@link #measuredValue} is not null.
+	 */
+    public boolean isValid(){
+        return (this.time > 0 && this.measuredValue != null)
     }
 }

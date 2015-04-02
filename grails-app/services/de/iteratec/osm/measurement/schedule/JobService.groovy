@@ -17,8 +17,8 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.result.EventResult
 import grails.gorm.DetachedCriteria
-import grails.plugin.jodatime.binding.StructuredDateTimeEditor
 import grails.transaction.Transactional
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
@@ -116,16 +116,14 @@ class JobService {
         Job.withSession { session ->
             0.step(count, batchSize) { offset ->
                 Job.withTransaction {
-                    int max = offset + batchSize
-                    batchActivityService.updateStatus(activity, ["progress": calculateProgress(count,offset), "stage": "Delete JobResults"])
+                    batchActivityService.updateStatus(activity, ["progress": batchActivityService.calculateProgress(count,offset), "stage": "Delete JobResults"])
                     dc.list(offset: 0, max: batchSize).eachWithIndex { JobResult jobResult, int index ->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
                             List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
                             batchDelete(httpArchives, batchSize)
-//                            FIXME with IT-456 there will be no cascading delete from JobResult to EventResult and the following lines should be activated
-//                            List<EventResult> eventResults = jobResult.getEventResults()
-//                            batchDelete(eventResults,batchSize)
+                            List<EventResult> eventResults = jobResult.getEventResults()
+                            batchDelete(eventResults,batchSize)
                             jobResult.delete()
                             batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
                         } catch (Exception e) {
@@ -149,16 +147,6 @@ class JobService {
         }
     }
 
-    /**
-     * Creates a String representation for BatchActivity progress
-     * @param count Maximum amount of Activities
-     * @param actual activities which are already done
-     * @return formatted string
-     */
-    private String calculateProgress(int count, int actual){
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(100.0/count*actual) + " %";
-    }
     /**
      * Deletes a List of objects with a new Transaction and will delete up to batchSize objects with one transaction
      * @param objects Objects to be deleted

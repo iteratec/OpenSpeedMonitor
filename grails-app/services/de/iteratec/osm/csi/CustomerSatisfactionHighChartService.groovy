@@ -126,9 +126,12 @@ class CustomerSatisfactionHighChartService {
 		List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
 		List<Page> pages = queryParams.pageIds.collectNested { Page.get(it) };
 		List<MeasuredValue> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
+        log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
 		
 		resultMap = convertToHighchartGraphList(csiValues)
-		
+        log.debug("Number of ChartGraphs made from MeasuredValues: ${resultMap.size()}")
+        log.debug("Number of points in each ChartGraph made from MeasuredValues: ${resultMap*.points.size()}")
+
 		return resultMap
 	}
 	
@@ -198,7 +201,10 @@ class CustomerSatisfactionHighChartService {
 				double value = valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
 				
 				URL linkForPoint = getLinkFor(eachCsiVal)
-				points.add(new OsmChartPoint(curTimestamp, value, eachCsiVal.countResultIds(), linkForPoint, null))
+
+                OsmChartPoint chartPoint = new OsmChartPoint(time: curTimestamp, measuredValue: value, countOfAggregatedResults: eachCsiVal.countResultIds(), sourceURL: linkForPoint, testingAgent: null)
+                if(chartPoint.isValid())
+				    points.add(chartPoint)
 			}
 		}
 
@@ -369,13 +375,15 @@ class CustomerSatisfactionHighChartService {
 		CsTargetGraph actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
 		
 		if (actualTargetGraph) {
-			OsmChartPoint fromPoint = new OsmChartPoint(getHighchartCompatibleTimestampFrom(fromDate.toDate()), (double) actualTargetGraph.getPercentOfDate(fromDate), 1, null, null);
-			OsmChartPoint toPoint = new OsmChartPoint(getHighchartCompatibleTimestampFrom(toDate.toDate()), (double) actualTargetGraph.getPercentOfDate(toDate), 1, null, null);
+			OsmChartPoint fromPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(fromDate.toDate()), measuredValue: (double) actualTargetGraph.getPercentOfDate(fromDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
+			OsmChartPoint toPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(toDate.toDate()), measuredValue: (double) actualTargetGraph.getPercentOfDate(toDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
 			
 			OsmChartGraph graph=new OsmChartGraph();
 			graph.setLabel(actualTargetGraph.label);
-			graph.getPoints().add(fromPoint);
-			graph.getPoints().add(toPoint);
+            if(fromPoint.isValid())
+			    graph.getPoints().add(fromPoint);
+            if(toPoint.isValid())
+			    graph.getPoints().add(toPoint);
 			
 			result.add(graph);
 		}

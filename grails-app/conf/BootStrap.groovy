@@ -15,6 +15,9 @@
 * limitations under the License.
 */
 
+
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.Status
 import grails.util.Environment
 
 import org.joda.time.DateTime
@@ -84,6 +87,7 @@ class BootStrap {
 		initCsiData()
 		initMeasurementInfrastructure()
 		initJobScheduling()
+		cancelActiveBatchActivity()
 		
 		log.info "initApplicationData() OSM ends"
 	}
@@ -95,10 +99,8 @@ class BootStrap {
 		
 		if (configs.size() != 1) {
 			deleteAllInvalidAndCreateNewOsmConfig(configs)
-		} else {
-			disableMeasurementsIfTheyAreGenerallyEnabled(configs[0])
 		}
-		
+
 		log.info "initConfig() OSM ends"
 	}
 	void deleteAllInvalidAndCreateNewOsmConfig(List<OsmConfiguration> configs){
@@ -110,12 +112,6 @@ class BootStrap {
 			defaultMaxDownloadTimeInMinutes: 60,
 			minDocCompleteTimeInMillisecs: 250,
 			maxDocCompleteTimeInMillisecs: 180000).save(failOnError: true)
-	}
-	void disableMeasurementsIfTheyAreGenerallyEnabled(OsmConfiguration validConfig){
-		if (validConfig.measurementsGenerallyEnabled) {
-			validConfig.measurementsGenerallyEnabled = false
-			validConfig.save(failOnError: true)
-		}
 	}
 	void initJobScheduling(){
 		log.info "initJobScheduling() OSM starts"
@@ -390,6 +386,15 @@ class BootStrap {
 		log.info "registerProxyListener OSM ends"
 		proxyService.addListener(locationAndResultPersisterService)
 		log.info "registerProxyListener OSM ends"
+	}
+
+	void cancelActiveBatchActivity(){
+		BatchActivity.findAllByStatus(Status.ACTIVE).each { BatchActivity batchActivity ->
+			BatchActivity.withTransaction {
+				batchActivity.status = Status.CANCELLED
+				batchActivity.save(faildOnError: true)
+			}
+		}
 	}
 	
 }

@@ -1,23 +1,24 @@
 /* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
+ * OpenSpeedMonitor (OSM)
+ * Copyright 2014 iteratec GmbH
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); 
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * 	http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ * See the License for the specific language governing permissions and 
+ * limitations under the License.
+ */
 
 package de.iteratec.osm.result
 
 import java.sql.SQLException
+import java.util.List;
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup;
@@ -53,6 +54,7 @@ class JobResultService {
 	 * 		-> this indicated a Bug in the persistence process!
 	 * 
 	 */
+	/* Should not be needed anymore cause since Feb-2015 you can directly navigate from EventResult to JobResult
 	public JobResult findJobResultByEventResult(EventResult eventResult) {
 		// Note: Grails uses the grails.gorm.CriteriaBuilder in test-mode,
 		// but the HibernateCriteriaBuilder in productive mode!?
@@ -74,7 +76,8 @@ class JobResultService {
 
 		return results.get(0);
 	}
-
+	*/
+	
 	/**
 	 * <p>
 	 * Finds the {@link JobResult} with the specified database id if existing.
@@ -89,7 +92,7 @@ class JobResultService {
 	{
 		return JobResult.get(databaseId);
 	}
-	
+
 	/**
 	 * 
 	 * @param mvQueryParams
@@ -113,7 +116,7 @@ class JobResultService {
 				if(!mvQueryParams.jobGroupIds.isEmpty()) {
 					'in'('jobGroupName',  JobGroup.where { 'in'('id', mvQueryParams.getJobGroupIds()) }.findAll()*.name)
 				}
-				
+
 				if(!mvQueryParams.measuredEventIds.isEmpty()) {
 					eventResults{
 						measuredEvent {
@@ -121,7 +124,7 @@ class JobResultService {
 						}
 					}
 				}
-				
+
 				if(!mvQueryParams.pageIds.isEmpty()) {
 					eventResults{
 						measuredEvent {
@@ -135,13 +138,13 @@ class JobResultService {
 				ge('date', fromDate)
 				le('date', toDate)
 			}
-			
+
 			order('date', 'desc')
 		};
 
 		return jobResults
 	}
-	
+
 	/**
 	 * Returns all successful JobResults belonging to the specified Job 
 	 */

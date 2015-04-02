@@ -92,7 +92,7 @@ function doOnDomReady(nextExecutionLink) {
             //$('#execution-schedule').val(execScheduleWithSeconds);
             //alert(data);
             $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, '(derzeit nicht aktiv)') + ' '
+                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
@@ -135,7 +135,7 @@ function domainDeleteConfirmation(message,id){
         data: {id:id},
         async:   false,
         success: function(result) {
-            confirmMessage = message + "\n" + result.toString();
+            confirmMessage = message + "<br>" + result;
         },
         error: function(result) {
             confirmMessage = message;
@@ -157,7 +157,7 @@ function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLi
 
             $('#execution-schedule').val(execScheduleWithSeconds);
             $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, '(derzeit nicht aktiv)') + ' '
+                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(

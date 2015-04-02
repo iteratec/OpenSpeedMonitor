@@ -222,7 +222,7 @@ class HighchartPointDetailsController {
 				continue;
 			}
 			
-			JobResult jobResult = jobResultService.findJobResultByEventResult(eventResult);
+			JobResult jobResult = eventResult.jobResult;
 			eventResultListing.addRow(new EventResultListingRow(jobResult, eventResult));
 			
 			immeditaelyLoadedResultsCount++;
@@ -411,7 +411,7 @@ class HighchartPointDetailsController {
 				break;
 			}
 			
-			JobResult correspondingJobResult = jobResultService.findJobResultByEventResult(eachEventResult);
+			JobResult correspondingJobResult = eachEventResult.jobResult;
 			eventResultListing.addRow(new EventResultListingRow(correspondingJobResult, eachEventResult))
 			
 			immeditaelyLoadedResultsCount++;
@@ -487,7 +487,7 @@ class HighchartPointDetailsController {
 			render(status: 400, message: "Bad Request");
 			return null;
 		}
-		JobResult jobResult = jobResultService.findJobResultByEventResult(resultToShow)
+		JobResult jobResult = resultToShow.jobResult
 		if (!jobResult) {
 			render(status: 400, message: "Bad Request");
 			return null;

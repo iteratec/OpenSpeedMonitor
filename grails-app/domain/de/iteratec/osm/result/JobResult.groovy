@@ -17,9 +17,6 @@
 
 package de.iteratec.osm.result
 
-import grails.gorm.DetachedCriteria
-import org.apache.tools.ant.taskdefs.condition.Http
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -48,20 +45,6 @@ class JobResult {
 
 	Job job
 	static belongsTo = [job : Job]
-
-	/**
-	 * <p>
-	 * All {@link EventResult}s assigned to to this job-result; 
-	 * never <code>null</code>.
-	 * </p>
-	 * 
-	 * <p>
-	 * An event-result should never be assigned to more than 
-	 * one job-results.
-	 * </p>
-	 */
-    Collection<EventResult> eventResults = []
-	static hasMany = [eventResults: EventResult]
 
     static hasOne = HttpArchive
 
@@ -172,7 +155,7 @@ class JobResult {
 		date (index: 'date_idx')
 		testId (index: 'testId_and_jobConfigLabel_idx')
 		jobConfigLabel (index: 'testId_and_jobConfigLabel_idx')
-		eventResults(column: "job_result_id", joinTable: false)
+		//eventResults(column: "job_result_id", joinTable: false)
 		wptStatus(type: 'text')
 	}
 	String toString(){
@@ -195,6 +178,26 @@ class JobResult {
 	public EventResult findEventResult(MeasuredEvent event, CachedView view, Integer run) {
 		Collection<EventResult> results = this.getEventResults();
 		return results.find{it.measuredEvent == event && it.cachedView == view && it.numberOfWptRun == run}
+	}
+	/**
+	 * Returns a list of Event results connected to this job result
+	 *
+	 * @return list<EventResult>
+	 *
+	 */
+	public List<EventResult> getEventResults(){
+		// Note: Grails uses the grails.gorm.CriteriaBuilder in test-mode,
+		// but the HibernateCriteriaBuilder in productive mode!?
+		// -> different types! Why ever... so we use def-declaration here.
+		def criteria = EventResult.createCriteria()
+
+		List results = criteria.list {
+			jobResult {
+				eq("id", this.id)
+			}
+		}
+
+		return results;
 	}
 	/**
 	 * Returns the median {@link EventResult} of the uncached view for one {@link MeasuredEvent}.

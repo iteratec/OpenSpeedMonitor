@@ -14,6 +14,12 @@
 			</li>
 			<sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
 				<li class="">
+					<a href="${createLink(controller: 'batchActivity')}">
+						<i class="icon-tasks"></i>
+						<g:message code="de.iteratec.osm.batch.batchactivity.list.heading"/>
+					</a>
+				</li>
+				<li class="">
 					<a href="${createLink(uri: '/systeminfo')}">
 						<i class="icon-info-sign"></i>
 						<g:message code="default.systeminfo.label"/>

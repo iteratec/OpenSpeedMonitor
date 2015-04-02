@@ -172,15 +172,33 @@ class JobController {
 			render(view: 'list', model: getListModel(!job.active) << ['massExecutionResults': massExecutionResults])
 		}
 	}
-	
+    
+    /**
+     * Creates a text to represent which data will be gone if the job with the given id will be deleted
+     * @param id Job id
+     * @return
+     */
     def createDeleteConfirmationText(int id){
-        Job job = Job.get(id)
-        List<JobResult> results = JobResult.findAllByJob(job)
-        JobResult firstDate = results.min{it.date}
-        JobResult lastDate = results.max{it.date}
-        String first = firstDate ? "First Result: ${firstDate.date.format('dd.MM.yy')} ":""
-        String last = lastDate ? "Last Result: ${lastDate.date.format('dd.MM.yy')} " :""
-        render(new JsonBuilder("$first$last"+ "Result amount: ${results.size()}").toString())
+        Job job1 = Job.get(id)
+        def query = JobResult.where {job == job1}
+        List<Date> dateList = JobResult.createCriteria().get {
+            eq("job",job1)
+            projections {
+                min "date"
+                max "date"
+            }
+        }
+        Date minDate
+        Date maxDate
+        if(dateList.size()>1){
+            minDate = dateList[0]
+            maxDate = dateList[1]
+        }
+        int count = query.count()
+
+        String first = minDate ? "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.firstResult", default: "Date of first result")}: ${minDate.format('dd.MM.yy')} <br>":""
+        String last = maxDate ? "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.lastResult", default: "Date of last result")}: ${maxDate.format('dd.MM.yy')} <br>" :""
+        render("$first$last"+ "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.resultAmount", default: "Amount of results")}: ${count}")
     }
 
     def delete() {
@@ -192,7 +210,7 @@ class JobController {
         p.onComplete {
             log.info("Deletion of Job ${job} completed.")
         }
-        redirect(controller: "batchActivity", action: "list")
+        redirect(controller: "batchActivity", action: "list", params: [max:10])
     }
 
 

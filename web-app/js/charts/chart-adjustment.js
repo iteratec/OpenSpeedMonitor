@@ -135,7 +135,7 @@ function HighchartExporter(args) {
         var dataConverted = canvas.toDataURL("image/png");
         if(dataConverted.indexOf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA") > -1) {
           removeObjectFromDom("#canvas_everything_merged");
-          HighchartExporter(args);console.log('1');
+          HighchartExporter(args);
         } else {
           downloadCanvas(canvas, "png");
           removeObjectFromDom("#canvas_everything_merged");

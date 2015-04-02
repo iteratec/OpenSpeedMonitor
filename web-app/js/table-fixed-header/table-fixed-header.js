@@ -56,6 +56,7 @@ $.fn.fixedHeader = function (options) {
   })
 
   $head.clone().removeClass('header').addClass('header-copy header-fixed').css({'position': 'fixed', 'top': config['topOffset']}).appendTo(o);
+//  o.find('thead.header-copy').width($head.width());
   o.find('thead.header-copy').width($head.width());
 
   o.find('thead.header > tr > th').each(function (i, h) {

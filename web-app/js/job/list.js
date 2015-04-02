@@ -220,11 +220,22 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 			url : listJobsLink,
 			success: function(result) {
 				$('#jobtable tbody').empty();
-				$('#jobtable tbody').html(result);
+				$('#jobtable tbody').replaceWith(result);
 				initTable(nextJobExecutionLink);
 				// to prevent flickering:
 				JobStatusUpdater.repeatFn(false);
 				spinner.stop();
+				
+				var o = $('#jobtable');
+				var $win = $(window)
+		    , $head = $('thead.header', o)
+		    , isFixed = 0;
+			  o.find('thead.header-copy').width($head.width());
+			  o.find('thead.header > tr > th').each(function (i, h) {
+			    var w = $(h).width();
+			    o.find('thead.header-copy> tr > th:eq('+i+')').width(w)
+			  });
+			  
 			},
 			error: function(result) {
 				console.log(result);
@@ -274,7 +285,9 @@ function doOnDomReady(
 	
 	var filterValueJobname = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
 	var filterValueJobgroup = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
-	var filterValueLocation = getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
+  var filterValueLocation = getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
+  var filterValueSkript = getFromLocalStorage('de.iteratec.osm.job.list.filters.skript');
+  var filterValueBrowser = getFromLocalStorage('de.iteratec.osm.job.list.filters.browser');
 	
 	var filterValueCheckedJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs'));
 	var filterValueInactiveJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
@@ -283,7 +296,9 @@ function doOnDomReady(
 	
 	if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
 	if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);
-	if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
+  if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
+  if(filterValueSkript != null) $('#filterBySkript').val(filterValueSkript);
+  if(filterValueBrowser != null) $('#filterByBrowser').val(filterValueBrowser);
 	
 	if(filterValueCheckedJobs != null) $('#filterCheckedJobs').prop("checked",filterValueCheckedJobs);
 	if(filterValueInactiveJobs != null) $('#filterInactiveJobs').prop("checked",filterValueInactiveJobs);

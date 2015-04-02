@@ -16,13 +16,18 @@
 */
 
 function getPrettyCron(cronExpression) {
-	return prettyCron.toString(cronExpression.substr(cronExpression.indexOf(' ') + 1));
+  if (cronExpression == "0 ") {
+    return "";
+  } else {
+    return prettyCron.toString(cronExpression.substr(cronExpression.indexOf(' ') + 1));
+  }
 }
 
 function updatePrettyCrons() {
 	$.each($('abbr.cronExpression'), function(index, elem) {
 		var cronExpression = elem.innerHTML;
     $(elem).attr('title', getPrettyCron(cronExpression));
+    $(elem).html(cronExpression.substr(cronExpression.indexOf(' ') + 1));
 	});
 }
 

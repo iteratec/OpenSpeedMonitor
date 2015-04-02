@@ -401,6 +401,7 @@ class LocationAndResultPersisterService implements iListener{
 		result.loadTimeInMillisecs=viewTag.loadTime.toInteger()
 		result.startRenderInMillisecs=viewTag.render.toInteger()
 		result.lastStatusUpdate=new Date()
+		result.jobResult=jobRun
 		result.jobResultDate=jobRun.date
 		result.jobResultJobConfigId=jobRun.job.ident()
 		JobGroup csiGroup = jobRun.job.jobGroup?:JobGroup.findByName(JobGroup.UNDEFINED_CSI)
@@ -445,7 +446,6 @@ class LocationAndResultPersisterService implements iListener{
 		}
         result.testAgent=jobRun.testAgent
 
-		jobRun.eventResults.add(result)
 		// FIXME: 2014-01-27-nku
 		//The following line is necessary in unit-tests since Grails version 2.3, but isn't in production. Should be removed if this bug s fixed in grails.  
 		result.save(failOnError: true)

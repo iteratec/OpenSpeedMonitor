@@ -79,16 +79,17 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 	@Before
 	void setUp() {
 
-		//no clue why the criteria in the following service-method doesn't work in this integration test :-(
+		/*/no clue why the criteria in the following service-method doesn't work in this integration test :-(
 		JobResultService.metaClass.findJobResultByEventResult = { EventResult eventResult ->
 			JobResult jobResultToReturn
-			JobResult.list().each { jobResult ->
-				if (jobResult.eventResults*.ident().contains(eventResult.ident())) {
+			JobResult.list().each {jobResult ->
+				if(jobResult.getEventResults()*.ident().contains(eventResult.ident())) {
 					jobResultToReturn = jobResult
 				}
 			}
 			return jobResultToReturn
 		}
+		//*/
 
 		Page page = new Page(name: 'HP', weight: 0.8).save(failOnError: true, flush: true)
 		new MeasuredEvent(name: 'event', testedPage: page).save(failOnError: true, flush: true)
@@ -182,12 +183,12 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 //						numberOfWptRun: 1,
 //						cachedView: CachedView.UNCACHED,
 //						speedIndex: 1,
+//						jobResult: jobResult,
 //						jobResultDate: aTuesday.toDate(),
 //						jobResultJobConfigId: 1,
 //						measuredEvent: MeasuredEvent.findByName('event'),
 //				).save(failOnError: true, flush: true)
 //
-//				jobResult.eventResults.add(eventResult)
 //				jobResult.save(failOnError: true, flush: true)
 //
 //				//log.error "marking daily mv's with result nr. $index : startOfDay=$startOfDay result-date=$eventResult.jobResultDate"
