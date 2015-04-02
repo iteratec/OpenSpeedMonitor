@@ -27,7 +27,10 @@ function updatePrettyCrons() {
 	$.each($('abbr.cronExpression'), function(index, elem) {
 		var cronExpression = elem.innerHTML;
     $(elem).attr('title', getPrettyCron(cronExpression));
-    $(elem).html(cronExpression.substr(cronExpression.indexOf(' ') + 1));
+    if(!$(elem).attr('data-seconds-cutted') ) {
+      $(elem).attr('data-seconds-cutted', 'true');
+      $(elem).html(cronExpression.substr(cronExpression.indexOf(' ') + 1));
+    }
 	});
 }
 
