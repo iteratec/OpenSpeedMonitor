@@ -4,14 +4,14 @@ This is the standard dialog that initiates the delete action.
 
 <!-- Modal dialog -->
 <r:require modules="spin"/>
-<div id="DeleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel" aria-hidden="true" onshow="changeText();">
+<div id="DeleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel" aria-hidden="true" onshow=changeText("${controllerLink}");>
 <div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>
 		<h3 id="DeleteModalLabel"><g:message code="default.button.delete.confirm.title" default="Delete Item"/></h3>
 	</div>
 	<div class="modal-body">
 		<p><g:message code="default.button.delete.confirm.message" args="[entityName]" default="Do you really want to delete this item?"/></p>
-        <div id = "spinner-position"></div>
+        <div id="spinner-position"></div>
 	</div>
 	<div class="modal-footer">
 		<g:form>
@@ -25,7 +25,7 @@ This is the standard dialog that initiates the delete action.
 </div>
 
 <script>
-    function changeText(){
+    function changeText(link){
         setTimeout(function(){
             var opts = {
                 lines: 10, // The number of lines to draw
@@ -46,8 +46,8 @@ This is the standard dialog that initiates the delete action.
                 left: '50%' // Left position relative to parent in px
             };
             var spinner = new Spinner(opts).spin(document.getElementById('spinner-position'));
-            var text = domainDeleteConfirmation('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}',${item ? item.id : params.id});
-            spinner.stop()
+            var text = domainDeleteConfirmation('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}',${item ? item.id : params.id}, link);
+            spinner.stop();
             $('#DeleteModal').find('p').html(text);
         },1);
     }
