@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.InMemoryConfigService
+
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertNull
@@ -66,7 +68,7 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 
 	@Before
 	void setUp() {
-		
+
 		// mocks common for all tests
 		
 		jobProcessingService.proxyService = [ runtest: { WebPageTestServer wptserver, Map params ->
@@ -99,7 +101,10 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 		jobProcessingService.proxyService.httpRequestService = new HttpRequestServiceMock()
 		
 		//test data common for all tests
-		
+
+
+		jobProcessingService.inMemoryConfigService = new InMemoryConfigService()
+		jobProcessingService.inMemoryConfigService.activateMeasurementsGenerally()
 		TestDataUtil.createOsmConfig()
 
 		WebPageTestServer wptServer = new WebPageTestServer(

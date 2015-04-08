@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.InMemoryConfigService
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
@@ -46,6 +47,7 @@ class MvUpdateEventCleanupService {
 	ShopMeasuredValueService shopMeasuredValueService
 	MeasuredValueTagService measuredValueTagService
 	ConfigService configService
+	InMemoryConfigService inMemoryConfigService
 
 	/**
 	 * <p>
@@ -67,7 +69,7 @@ class MvUpdateEventCleanupService {
 	 */
 	void closeMeasuredValuesExpiredForAtLeast(int minutes){
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No measured value update events are closed cause measurements are generally disabled.")
 			return
 		}

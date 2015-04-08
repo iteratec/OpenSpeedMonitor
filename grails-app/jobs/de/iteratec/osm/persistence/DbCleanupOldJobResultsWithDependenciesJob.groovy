@@ -1,25 +1,32 @@
 package de.iteratec.osm.persistence
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import org.joda.time.DateTime
+import org.quartz.JobExecutionException
 
 
 class DbCleanupOldJobResultsWithDependenciesJob {
 
     DbCleanupService dbCleanupService
     ConfigService configService
+    InMemoryConfigService inMemoryConfigService
 
     static triggers = {
         /**
          * Each Day at 3:00 am.
          */
-        cron(name: 'DailyOldJobResultsWithDependenciesCleanup', cronExpression: '0 0 3 ? * *')
+        cron(name: 'DailyOldJobResultsWithDependenciesCleanup', cronExpression: '0 01 15 ? * *')
     }
 
     def execute() {
-        if(configService.isDatabaseCleanupEnabled() && configService.areMeasurementsGenerallyEnabled()){
-            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-            dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
+        try{
+            if(inMemoryConfigService.isDatabaseCleanupEnabled()){
+                Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
+                dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
+            }
+        }catch (JobExecutionException e){
+            log.error(e.toString())
         }
     }
 }

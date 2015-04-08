@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.InMemoryConfigService
 import grails.async.Promise
 
 import static grails.async.Promises.*
@@ -51,6 +52,7 @@ class JobController {
 	def messageSource
 	PerformanceLoggingService performanceLoggingService
 	ConfigService configService
+	InMemoryConfigService inMemoryConfigService
 	
 	private String getJobI18n() {
 		return message(code: 'de.iteratec.isj.job', default: 'Job')
@@ -92,7 +94,7 @@ class JobController {
 			jobsWithTags: jobService.listJobsWithTags(), 
 			onlyActiveJobs: onlyActiveJobs, 
 			filters: params.filters, 
-			measurementsEnabled: configService.areMeasurementsGenerallyEnabled(),
+			measurementsEnabled: inMemoryConfigService.areMeasurementsGenerallyEnabled(),
 			lastNMinutesToShowSuccessfulResultsInJoblist: LAST_N_MINUTES_TO_SHOW_SUCCESSFUL_RESULTS_IN_JOBLIST,
 			lastNHoursToShowFailedResultsInJoblist: LAST_N_HOURS_TO_SHOW_FAILED_RESULTS_IN_JOBLIST,
 			lastNHoursToShowPendingOrRunnngResultsInJoblist: LAST_N_HOURS_TO_SHOW_PENDING_OR_RUNNNG_RESULTS_IN_JOBLIST]
@@ -363,7 +365,7 @@ class JobController {
 	}
 
     def activateMeasurementsGenerally(){
-        configService.activateMeasurementsGenerally()
+        inMemoryConfigService.activateMeasurementsGenerally()
         redirect(action: 'list')
     }
 	

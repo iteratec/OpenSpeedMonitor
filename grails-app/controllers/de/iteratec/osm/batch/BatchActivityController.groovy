@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.batch
 
+import de.iteratec.osm.InMemoryConfigService
 import grails.converters.JSON
 
 /**
@@ -26,11 +27,12 @@ import grails.converters.JSON
 class BatchActivityController {
 
     BatchActivityService batchActivityService
+    InMemoryConfigService inMemoryConfigService
 
     def list(){
         params.order = params.order?:"desc"
         params.sort = params.sort?:"startDate"
-        [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count()]
+        [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count(), dbCleanupEnabled:inMemoryConfigService.isDatabaseCleanupEnabled()]
     }
 
     def index(){
@@ -77,5 +79,15 @@ class BatchActivityController {
         } else{
             render("false")
         }
+    }
+
+    def activateDatabaseCleanup(){
+        inMemoryConfigService.activateDatabaseCleanup()
+        redirect(action: 'list', max: 10)
+    }
+
+    def deactivateDatabaseCleanup(){
+        inMemoryConfigService.deactivateDatabaseCleanup()
+        redirect(action: 'list', max: 10)
     }
 }

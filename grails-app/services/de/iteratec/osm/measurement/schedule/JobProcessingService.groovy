@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
@@ -71,6 +72,7 @@ class JobProcessingService {
 	ProxyService proxyService
 	def quartzScheduler
 	ConfigService configService
+	InMemoryConfigService inMemoryConfigService
     PerformanceLoggingService performanceLoggingService
 	
 	/**
@@ -287,7 +289,7 @@ class JobProcessingService {
 	 */
 	public boolean launchJobRun(Job job) {
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
 			return false
 		}

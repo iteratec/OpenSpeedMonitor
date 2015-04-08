@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -35,6 +36,8 @@ class JobControllerSpec extends IntTestWithDBCleanup {
     @Before
     void setup() {
         controllerUnderTest = new JobController()
+        controllerUnderTest.inMemoryConfigService = new InMemoryConfigService()
+        controllerUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
         createOsmConfig()
         createData()
     }

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.InMemoryConfigService
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 
@@ -65,6 +66,7 @@ class MetricReportingService {
 	PageMeasuredValueService pageMeasuredValueService
 	ShopMeasuredValueService shopMeasuredValueService
 	ConfigService configService
+	InMemoryConfigService inMemoryConfigService
 
 	/**
 	 * Reports each measurand of incoming result for that a {@link GraphitePath} is configured.  
@@ -172,7 +174,7 @@ class MetricReportingService {
 	 */
 	public void reportEventCSIValuesOfLastHour(DateTime reportingTimeStamp) {
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
 		}
@@ -212,7 +214,7 @@ class MetricReportingService {
 	 */
 	public void reportPageCSIValuesOfLastDay(DateTime reportingTimeStamp) {
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No page csi values of last day are reported cause measurements are generally disabled.")
 			return
 		}
@@ -236,7 +238,7 @@ class MetricReportingService {
 	 */
 	public void reportPageCSIValuesOfLastWeek(DateTime reportingTimeStamp) {
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No page csi values of last week are reported cause measurements are generally disabled.")
 			return
 		}
@@ -280,7 +282,7 @@ class MetricReportingService {
 	 */
 	public void reportShopCSIValuesOfLastDay(DateTime reportingTimeStamp) {
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No shop csi values of last day are reported cause measurements are generally disabled.")
 			return
 		}
@@ -303,7 +305,7 @@ class MetricReportingService {
 	 */
 	public void reportShopCSIValuesOfLastWeek(DateTime reportingTimeStamp) {
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No shop csi values of last week are reported cause measurements are generally disabled.")
 			return
 		}
