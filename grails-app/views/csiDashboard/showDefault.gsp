@@ -23,7 +23,7 @@
 	<div class="row">
 		<div class="span12">
 			<div>
-				<h3><g:message code="de.iteratec.isocsi.csi.heading" default="Kundenzufriedenheit (CS)"/></h3>
+				<h3><g:message code="de.iteratec.isocsi.csi.heading" default="Kundenzufriedenheit (CSI)"/></h3>
 				
 				<p>
 				    <g:message code="de.iteratec.isocsi.csi.static.measuring.description.short" default="Den dargestellten CSI-Wochenwerten liegen jeweils die Webpagetest-Rohdaten der vorangegangenen Woche zugrunde."/>
@@ -84,11 +84,9 @@
 					xAxisMin: fromTimestampForHighChart,
 					xAxisMax: toTimestampForHighChart,
 					markerEnabled: markerShouldBeEnabled,
-					dataLabelsActivated: 'true',
+					dataLabelsActivated: labelShouldBeEnabled,
 					yAxisScalable: 'false',
 					optimizeForExport: 'true',
-					yAxisMin: '60',
-					yAxisMax: '105',
 					openDataPointLinksInNewWindow: 'false']"/>
 		</div>
 		</div>

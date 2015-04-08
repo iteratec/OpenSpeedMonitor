@@ -55,10 +55,14 @@
 							</div>
 						</g:if>
 							<!-- Show data-markers -->
-							<div class ="row">
-								<div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Punkte anzeigen"/></div>
-								<div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
-							</div>
+              <div class ="row">
+                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/></div>
+                <div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
+              </div>
+              <div class ="row">
+                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/></div>
+                <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}" /></div>
+              </div>
 					</g:if>
 					<g:else>
 					<!-- rickshaw -->
@@ -76,10 +80,14 @@
 								<button class="btn" id="dia-change-yaxis" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.apply.name"/></button>
 							</div>
 						</div>
-						<div class ="row">
-								<div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Punkte anzeigen"/></div>
-								<div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
-							</div>
+            <div class ="row">
+                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/></div>
+                <div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
+              </div>
+            <div class ="row">
+                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/></div>
+                <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}" /></div>
+              </div>
 					</g:else>
 				</div>
 			</div>

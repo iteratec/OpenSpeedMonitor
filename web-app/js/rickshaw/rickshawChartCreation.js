@@ -28,9 +28,15 @@ function RickshawGraphBuilder(args) {
   this.yAxes = [];
   this.slider;
   this.legend;
-
+  this.dataLabelsActivated = false;
+  this.dataLabelsHaveBeenAdded = false;
+  
   this.initialize = function(args) {
-    self.divId = args.divId
+    if ((args.hasOwnProperty("dataLabelsActivated")) && (args.dataLabelsActivated == true)) { //display dataLabels
+      this.dataLabelsActivated = true;
+    }
+
+    self.divId = args.divId;
     args.series = self.composeSeries(args.data);
     
     self.htmlProvider = new HtmlProvider(args);
@@ -47,14 +53,64 @@ function RickshawGraphBuilder(args) {
     self.graph.onUpdate(self.update);
     self.graph.render();
     self.updateTitle(args.title);
+    self.addDataLabels();
+    
     new ChartAdjuster(args);
     new ChartExporter(args);
+  }
+
+  this.addDataLabels = function() {
+    if (this.dataLabelsActivated && !this.dataLabelsHaveBeenAdded) {
+      $(".pointMarker").each(function( index ) {
+        var percentage = 0;
+        var currentMarkerColor = self.rgb2hex($( this ).css("border-top-color"));
+        self.graph.series.forEach(function(series) {
+          if(currentMarkerColor === series.color) {
+            //get args.series.ROW.data.INDEX.y * 100 rounded
+            if ( !/undef/i.test(typeof series.data[index])) {
+//              percentage =  Math.round((series.data[index].y)*100)/100;
+              percentage =  parseFloat(series.data[index].y).toFixed(2);
+            }
+            //end loop
+            return false;
+          }
+        });
+        if (percentage > 0) {
+          var totalHeight = $( this ).parent().height();
+          var distanceTop = $( this ).css("top").replace(/[^-\d\.]/g, '') ;
+          //calculate data, round to 2 digits
+  //        var percentage = Math.round((100 - ((distanceTop * 100) / totalHeight))*100)/100;
+          //display data
+          $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;'>"+percentage+"</div>" );
+        }
+      });
+    }
+    this.dataLabelsHaveBeenAdded = true;
+  }
+  
+  this.rgb2hex = function (rgb){
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" +
+     ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
+   }
+
+  this.updateDataLabels = function() {
+    //remove labels
+    $(".dataLabel").each(function( index ) {
+      $(this).remove();
+    });
+    //re-add labels
+    this.dataLabelsHaveBeenAdded = false;
+    self.addDataLabels();
   }
 
   this.update = function() {
     self.xAxis.updateXAxis();
     self.removeGrid();
     self.updateYAxes();
+    self.updateDataLabels();
   }
 
   this.updateBorders = function(args) {
@@ -155,6 +211,16 @@ function RickshawGraphBuilder(args) {
       $("#rickshaw_chart > .pointMarker").remove();
     }
   }
+  
+  this.updateDrawPointLabels = function(drawPointLabels){
+    $(".dataLabel").each(function( index ) {
+      $(this).remove();
+    });
+    this.dataLabelsHaveBeenAdded = false;
+    if (drawPointLabels) {
+      self.addDataLabels();
+    }
+  }
 
   this.initializeGraph = function(args) {
     self.graph = new Rickshaw.Graph({
@@ -165,7 +231,8 @@ function RickshawGraphBuilder(args) {
       interpolation : 'linear',
       series : args.series,
       NUMBER_OF_YAXIS_TICKS : args.NUMBER_OF_YAXIS_TICKS,
-      drawPointMarkers : args.drawPointMarkers
+      drawPointMarkers : args.drawPointMarkers,
+      drawPointLabels : args.drawPointLabels
     });
   }
   
@@ -208,6 +275,7 @@ function RickshawGraphBuilder(args) {
 
   this.initializeYAxes = function(args) {
     var measurandGroups = args.graph.measurandGroupsManager.measurandGroups;
+    
     for (var i = 0; i < measurandGroups.length; i++) {
 
       var id_prefix, orientation;
@@ -593,7 +661,6 @@ function YValueFormatter() {
 
   this.getFormatterForSpecificMeasurandGroup = function(measurandGroup) {
     var result;
-
     if (measurandGroup.name == "LOAD_TIMES") {
       result = self.getFormatterForLoadTimes(measurandGroup);
     } else if (measurandGroup.name == "REQUEST_COUNTS") {
@@ -811,7 +878,9 @@ function ChartAdjuster(args) {
     self.addFunctionalityCustomizeTitle();
     self.createYAxisAdjuster(args);
     self.replaceDataMarkerCheckbox();
+    self.replaceDataLabelsCheckbox();
     self.addFunctionalityShowDataMarker();
+    self.addFunctionalityShowDataLabels();
   }
   
   this.addFunctionalityAdjustingChartSize = function() {
@@ -929,7 +998,7 @@ function ChartAdjuster(args) {
           }
         });
   }
-  
+
   this.replaceDataMarkerCheckbox = function() {
     var checkbox = $("#to-enable-marker").parent().parent();
     var parentContainer = checkbox.parent();
@@ -937,10 +1006,24 @@ function ChartAdjuster(args) {
     parentContainer.append(checkbox);
   }
   
+  this.replaceDataLabelsCheckbox = function() {
+    var checkbox = $("#to-enable-label").parent().parent();
+    var parentContainer = checkbox.parent();
+    checkbox.detach();
+    parentContainer.append(checkbox);
+  }
+
   this.addFunctionalityShowDataMarker = function() {
     $('#to-enable-marker').bind('change', function(){
       var toEnableMarkers = $(this).is(':checked');
       rickshawGraphBuilder.updateDrawPointMarkers(toEnableMarkers);
+    });
+  }
+  
+  this.addFunctionalityShowDataLabels = function() {
+    $('#to-enable-label').bind('change', function(){
+      var toEnableLabels = $(this).is(':checked');
+      rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
     });
   }
   
@@ -978,6 +1061,15 @@ function ChartExporter(args) {
       self.modifyStylesForRendering();
       deferrerCollection.push($.Deferred());
       self.renderSvgElementOnNewCanvasWithDelay($('.x_axis_d3'), 'canvas_x_axis_d3', deferrerCollection[deferrerCollection.length - 1]);
+
+      var dataLabelCount = 0;
+      $('.dataLabel').each(function() {
+        deferrerCollection.push($.Deferred());
+        var newCanvasId = 'canvas_dataLabel_' + dataLabelCount.toString() + '';
+        self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
+        dataLabelCount++;
+      });
+      
       var rightLabelCount = 0;
       $('.rickshaw_y-axis_right_label').each(function() {
         deferrerCollection.push($.Deferred());
@@ -985,6 +1077,7 @@ function ChartExporter(args) {
         self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
         rightLabelCount++;
       });
+      
       deferrerCollection.push($.Deferred());
       self.renderDomElementOnNewCanvasWithDelay(document.querySelector(".rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
 
@@ -1019,6 +1112,13 @@ function ChartExporter(args) {
   
         self.modifyStylesAfterRendering();
         self.mergeLabelCanvases($(".rickshaw_y-axis_left_label"), "#canvas_y-axis_left_label", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+
+        var dataLabelCount = 0;
+        $('.dataLabel').each(function() {
+          var newCanvasId = '#canvas_dataLabel_' + dataLabelCount.toString() + '';
+          self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+          dataLabelCount++;
+        });
         
         var rightLabelCount = 0;
         $('.rickshaw_y-axis_right_label').each(function() {
@@ -1030,7 +1130,6 @@ function ChartExporter(args) {
         //convert to image
         try {
           downloadCanvas(canvas, "png");
-//          removeObjectFromDom("#canvas_everything_merged");
         } 
         catch(err) {} // handle IE        
       });

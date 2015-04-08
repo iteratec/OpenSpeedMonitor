@@ -24,7 +24,7 @@ class RickshawHtmlCreater {
      * to place its components. Additional a javascript function
      * will be called, which is responsible to draw the rickshaw graph.
      */
-    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, String heightOfChart, List<OsmChartAxis> yAxesLabels, String title, boolean markerEnabled ->
+    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, List<OsmChartAxis> yAxesLabels, String title, boolean markerEnabled ->
 
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
@@ -63,6 +63,7 @@ class RickshawHtmlCreater {
 					title: "${title}",
 					data : ${data},
 					heightOfChart :  ${height},
+                    dataLabelsActivated : ${dataLabelsActivated},
 					NUMBER_OF_YAXIS_TICKS : 5,
 					drawPointMarkers: ${markerEnabled}
 				};

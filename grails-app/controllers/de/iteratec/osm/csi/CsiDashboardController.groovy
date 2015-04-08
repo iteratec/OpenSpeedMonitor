@@ -18,6 +18,22 @@
 package de.iteratec.osm.csi
 
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
+import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import de.iteratec.osm.result.EventResultService
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.*
 import grails.validation.Validateable
 
 import java.text.NumberFormat
@@ -37,23 +53,6 @@ import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
-
-import de.iteratec.osm.csi.weighting.WeightFactor
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.p13n.CookieBasedSettingsService
-import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.*
 
 //TODO: implement some tests for this controller
 
@@ -359,6 +358,7 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
         modelToRender.put('markerShouldBeEnabled', true)
+        modelToRender.put('labelShouldBeEnabled', false)
     }
 
     /**
@@ -403,6 +403,7 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
         modelToRender.put('markerShouldBeEnabled', false)
+        modelToRender.put('labelShouldBeEnabled', false)
     }
 
     /**
@@ -470,6 +471,7 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
         modelToRender.put('markerShouldBeEnabled', true)
+        modelToRender.put('labelShouldBeEnabled', false)
     }
 
     /**
@@ -541,6 +543,7 @@ class CsiDashboardController {
         modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
         modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
         modelToRender.put('markerShouldBeEnabled', true)
+        modelToRender.put('labelShouldBeEnabled', true)
         modelToRender.put('debug', params.debug?true:false)
         modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
         return modelToRender

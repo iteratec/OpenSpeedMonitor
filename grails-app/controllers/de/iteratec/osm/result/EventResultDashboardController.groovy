@@ -188,6 +188,7 @@ class EventResultDashboardController {
 
         modelToRender.put("highChartLabels", labelToDataMap);
         modelToRender.put("markerShouldBeEnabled", false);
+        modelToRender.put("labelShouldBeEnabled", false);
 
         //add / remove 5 Minutes
         modelToRender.put('fromTimestampForHighChart', (timeFrame.getStart().toDate().getTime() - 300000))

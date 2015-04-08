@@ -159,7 +159,7 @@
 							xAxisMin: fromTimestampForHighChart,
 							xAxisMax: toTimestampForHighChart,
 							markerEnabled: markerShouldBeEnabled,
-							dataLabelsActivated: 'false',
+							dataLabelsActivated: labelShouldBeEnabled,
 							yAxisScalable: 'false',
 							optimizeForExport: 'false',
 							openDataPointLinksInNewWindow: openDataPointLinksInNewWindow]" />

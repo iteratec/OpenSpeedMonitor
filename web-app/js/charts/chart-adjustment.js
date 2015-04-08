@@ -50,31 +50,54 @@ function HighchartAdjuster() {
 		}
 		$("#collapseAdjustment").collapse('hide');
 		//register events
-		$('#to-enable-marker').bind('change', function(){
-			var toEnableMarkers = $(this).is(':checked');
-			var countAllDatapoints = 0;
-			jQuery.each(
-					chart.series, 
-					function (i, series) { 
-						countAllDatapoints+=series.data.length;
-					});
-			if (toEnableMarkers && countAllDatapoints > 10000) {
-				window.alert("Too many datapoints to show and label them!");
-				$(this).prop('checked', false);
-			} else {
-				jQuery.each(
-						chart.series, 
-						function (i, series) { 
-							series.update(
-									{
-										marker:{enabled: toEnableMarkers},
-										dataLabels: {enabled: toEnableMarkers}
-									}
-							)
-						}
-				);
-			}
-		});
+    $('#to-enable-marker').bind('change', function(){
+      var toEnableMarkers = $(this).is(':checked');
+      var countAllDatapoints = 0;
+      jQuery.each(
+          chart.series, 
+          function (i, series) { 
+            countAllDatapoints+=series.data.length;
+          });
+      if (toEnableMarkers && countAllDatapoints > 10000) {
+        window.alert("Too many datapoints to show and label them!");
+        $(this).prop('checked', false);
+      } else {
+        jQuery.each(
+            chart.series, 
+            function (i, series) { 
+              series.update(
+                  {
+                    marker:{enabled: toEnableMarkers}
+                  }
+              )
+            }
+        );
+      }
+    });
+    $('#to-enable-label').bind('change', function(){
+      var toEnableLabels = $(this).is(':checked');
+      var countAllDatapoints = 0;
+      jQuery.each(
+          chart.series, 
+          function (i, series) { 
+            countAllDatapoints+=series.data.length;
+          });
+      if (toEnableLabels && countAllDatapoints > 10000) {
+        window.alert("Too many datapoints to show and label them!");
+        $(this).prop('checked', false);
+      } else {
+        jQuery.each(
+            chart.series, 
+            function (i, series) { 
+              series.update(
+                  {
+                    dataLabels: {enabled: toEnableLabels}
+                  }
+              )
+            }
+        );
+      }
+    });
     $('#dia-change-chartsize').bind('click', function(){
       var diaWidth = $('#dia-width').val()
       var diaHeight = $('#dia-height').val()

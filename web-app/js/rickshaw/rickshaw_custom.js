@@ -401,7 +401,6 @@ Rickshaw.Graph = function(args) {
 	var self = this;
 
 	this.initialize = function(args) {
-
 		if (!args.element) throw "Rickshaw.Graph needs a reference to an element";
 		if (args.element.nodeType !== 1) throw "Rickshaw.Graph element was defined but not an HTML element";
 
@@ -932,10 +931,12 @@ function MeasurandGroup(args) {
 		if (min == undefined || max == undefined) {
 			result = undefined;
 		} else {
+		  if ((this.name === "PERCENTAGES") && (max < 110)) {
+		    max = 110;
+		  }
 			result.min = min;
 			result.max = max;
 		}
-		
 		return result;
 	}
 	
