@@ -16,17 +16,13 @@ class DbCleanupOldMeasuredValuesWithDependenciesJob {
         /**
          * Each Day at 3:00 am.
          */
-        cron(name: 'DailyOldMeasuredValuesWithDependenciesCleanup', cronExpression: '0 01 15 ? * *')
+        cron(name: 'DailyOldMeasuredValuesWithDependenciesCleanup', cronExpression: '0 0 3 ? * *')
     }
 
     def execute() {
-        try{
-            if(inMemoryConfigService.isDatabaseCleanupEnabled()) {
-                Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-                dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore)
-            }
-        }catch (JobExecutionException e){
-            log.error(e.toString())
+        if(inMemoryConfigService.isDatabaseCleanupEnabled()) {
+            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
+            dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore)
         }
     }
 }
