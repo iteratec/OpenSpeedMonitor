@@ -814,6 +814,7 @@ class CsiDashboardController {
          * Please use {@link #getSelectedTimeFrame()}.
          */
         String  fromHour
+        String  fromMinute
 
         /**
          * The selected end hour of date.
@@ -821,6 +822,7 @@ class CsiDashboardController {
          * Please use {@link #getSelectedTimeFrame()}.
          */
         String toHour
+        String toMinute
 
         /**
          * The name of the {@link AggregatorType}.
@@ -1027,8 +1029,24 @@ class CsiDashboardController {
             Boolean manualTimeframe = this.selectedTimeFrameInterval == 0
             if (manualTimeframe && fromHour && toHour) {
 
-                DateTime firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
-                DateTime firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
+                DateTime firstDayWithFromHourAsDaytime
+                DateTime firstDayWithToHourAsDaytime
+
+                if (fromMinute != null) {
+                    firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":" + fromMinute.padRight(2, '0'))
+                } else if (fromHour.indexOf(":") > -1) {
+                    firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
+                } else {
+                    firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":00")
+                }
+
+                if (toMinute != null) {
+                    firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":" + toMinute.padRight(2, '0'))
+                } else if (toHour.indexOf(":") > -1) {
+                    firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
+                } else {
+                    firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":00")
+                }
 
                 start = new DateTime(this.from.getTime())
                         .withTime(
