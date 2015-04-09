@@ -337,7 +337,7 @@ class OsmChartTagLibTests {
 				var args = {
 					divId: "${divId}",
 					title: "Antwortzeit WPT-Monitore",
-					data : [ { measurandGroup: "LOAD_TIMES",   yAxisLabel: "Load Times", name: "job1",  data: [  { x: 1373631796, y: 0.0015, url: "https://www.example.com/now" }, { x: 1373635396, y: 0.0030, url: "undefined" }, { x: 1373638996, y: 0.0023, url: "https://www.example.com/twoHoursAfterNow" } ] },  { measurandGroup: "PERCENTAGES",   yAxisLabel: "Percentages", name: "job2",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
+					data : [ { measurandGroup: "LOAD_TIMES",   yAxisLabel: "Load Times", name: "job1",  data: [  { x: 1373631796, y: 0.0015, url: "https://www.example.com/now" }, { x: 1373635396, y: 0.003, url: "undefined" }, { x: 1373638996, y: 0.0023, url: "https://www.example.com/twoHoursAfterNow" } ] },  { measurandGroup: "PERCENTAGES",   yAxisLabel: "Percentages", name: "job2",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
 					heightOfChart :  600,
                     dataLabelsActivated : false,
 					NUMBER_OF_YAXIS_TICKS : 5,
