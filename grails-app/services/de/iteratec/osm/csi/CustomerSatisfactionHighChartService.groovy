@@ -223,10 +223,10 @@ class CustomerSatisfactionHighChartService {
 	 * Creates an URL for a link for the {@link MeasuredValue} (MV) csiValue (to be used in diagrams). The URL links to the underlying data of csiValue:
 	 * <ul>
 	 * <li>If csiValue is a <b>weekly shop-MV: </b>Link to diagram-sight of daily shop-MV's of the respective week and shop/system.</li>
-	 * <li>If csiValue is a <b>daily shop-MV: </b></li>Link to diagram-sight of hourly measured step-MV's of the respective day and shop/system.
-	 * <li>If csiValue is a <b>weekly page-MV: </b></li>Link to diagram-sight of daily page-MV's of the respective week, shop/system and page.
-	 * <li>If csiValue is a <b>daily page-MV: </b></li>Link to diagram-sight of hourly measured step-MV's of the respective day, shop/system and page.
-	 * <li>If csiValue is a <b>hourly measured step-MV: </b></li>Link to a list of the raw-data-results of the respective hour, shop/system, page and step.
+	 * <li>If csiValue is a <b>daily shop-MV: </b>Link to diagram-sight of hourly measured step-MV's of the respective day and shop/system.</li>
+	 * <li>If csiValue is a <b>weekly page-MV: </b>Link to diagram-sight of daily page-MV's of the respective week, shop/system and page.</li>
+	 * <li>If csiValue is a <b>daily page-MV: </b>Link to diagram-sight of hourly measured step-MV's of the respective day, shop/system and page.</li>
+	 * <li>If csiValue is a <b>hourly measured step-MV: </b>Link to a list of the raw-data-results of the respective hour, shop/system, page and step.</li>
 	 * </ul>
 	 * @param csiValue
 	 * @return
