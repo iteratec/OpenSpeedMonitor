@@ -72,7 +72,7 @@
 					</div>
 					<div class="span6">
 						<g:render template="/dateSelection/startAndEnddateSelection" 
-											model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from, 'fromHour':fromHour, 'to':to, 'toHour':toHour]}"/>
+											model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from, 'fromHour':fromHour, 'to':to, 'toHour':toHour, 'includeInterval':includeInterval]}"/>
 					</div>
 				</div>
 				<div class="row">

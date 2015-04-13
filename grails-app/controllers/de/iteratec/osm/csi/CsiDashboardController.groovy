@@ -942,6 +942,11 @@ class CsiDashboardController {
         Boolean setToHour
 
         /**
+         * Whether or not current and not yet finished intervals should be loaded and displayed
+         */
+        Boolean includeInterval
+
+        /**
          * Constraints needs to fit.
          */
         static constraints = {
@@ -1139,6 +1144,7 @@ class CsiDashboardController {
             viewModelToCopyTo.put('debug', this.debug?:false)
             viewModelToCopyTo.put('setFromHour', this.setFromHour)
             viewModelToCopyTo.put('setToHour', this.setToHour)
+            viewModelToCopyTo.put('includeInterval', this.includeInterval)
         }
 
         /**
