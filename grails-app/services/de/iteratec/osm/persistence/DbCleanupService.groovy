@@ -108,7 +108,7 @@ class DbCleanupService {
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
     void deleteResultsDataBefore(Date toDeleteBefore){
-        log.info "beginn with deleteResultsDataBefore"
+        log.info "begin with deleteResultsDataBefore"
 
         // use gorm-batching
         def dc = new DetachedCriteria(JobResult).build {
@@ -152,7 +152,7 @@ class DbCleanupService {
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
     void deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(Date toDeleteBefore){
-        log.info "beginn with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
+        log.info "begin with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
 
         def measuredValueDetachedCriteria = new DetachedCriteria(MeasuredValue).build {
             lt 'started', toDeleteBefore
@@ -178,6 +178,7 @@ class DbCleanupService {
             BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of MeasuredValues and MeasuredValueUpdateEvents" )
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
+            log.debug('Starting deletion of MeasuredValueUpdateEvents and MeasuredValues')
 
             //First clean MeasuredValueUpdateEvents
             0.step(measuredValueUpdateEventsCount, batchSize){ int offset ->
@@ -195,6 +196,8 @@ class DbCleanupService {
                 MeasuredValueUpdateEvent.withSession { session -> session.clear() }
             }
 
+            log.debug('Deletion of MeasuredValueUpdateEvents finished')
+
             //After then clean MeasuredValues
             0.step(measuredValueCount, batchSize) { int offset ->
 //                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
@@ -210,6 +213,7 @@ class DbCleanupService {
                 MeasuredValue.withSession { session -> session.clear() }
             }
             batchActivityService.updateStatus(batchActivity, [ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
+            log.debug('Deletion of MeasuredValues finished')
         }
 
         log.info "end with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
