@@ -402,8 +402,9 @@ environments {
                 )
 
                 /**
-                 * Standard-appender for openSpeedMonitor-app. One Logging-level for the whole application.
-                 *	Nothing else is logged.
+                 * Standard-appender for openSpeedMonitor-app.
+                 * Log-level ERROR as threshold.
+                 * Per log4j configuration all would be logged.
                  */
                 appender new DailyRollingFileAppender(
                         name: 'osmAppender',
@@ -413,15 +414,16 @@ environments {
                     threshold: org.apache.log4j.Level.ERROR
                         )
                 /**
-                 * Detail-appender for openSpeedMonitor-app. Logging-level can be set for every package separately at runtime.
-                 * Grails-core packages get logged, too.
+                 * Detail-appender for OpenSpeedMonitor-app.
+                 * Log-level DEBUG as threshold.
+                 * Per log4j configuration all would be logged.
                  */
                 RollingFileAppender rollingFileAppender = new RollingFileAppender(
                         name: 'osmAppenderDetails',
                         fileName: "${logFolder}${appName}Details.log",
                         layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         maxFileSize: '20MB',
-                        maxBackupIndex: 5,
+                        maxBackupIndex: 20,
                         threshold: org.apache.log4j.Level.DEBUG
                 )
                 appender rollingFileAppender
