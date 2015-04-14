@@ -51,7 +51,9 @@ function replaceRows(ids,rowUpdateUrl) {
             data: {id: ids[i][0],evenOdd:ids[i][1]},
             async: false,
             success: function (content) {
-                replaceRow(ids[i], content);
+                //remove unnecessary html tags
+                content = content.replace("<html>","").replace("<body>","").replace("</html>","").replace("</body>","");
+                replaceRow(ids[i],content);
             },
             error: function (content) {
             }
