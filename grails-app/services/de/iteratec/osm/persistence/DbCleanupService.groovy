@@ -158,12 +158,12 @@ class DbCleanupService {
             lt 'started', toDeleteBefore
         }
         int measuredValueCount = measuredValueDetachedCriteria.count()
+        log.info "MeasuredValue - Count : ${measuredValueCount}"
 
         def measuredValueUpdateEventDetachedCriteria = new DetachedCriteria(MeasuredValueUpdateEvent).build {
             'in'('measuredValueId', measuredValueDetachedCriteria.list()*.id )
         }
         int measuredValueUpdateEventsCount = measuredValueDetachedCriteria.count()
-
         log.info "MeasuredValueUpdateEvent - Count : ${measuredValueUpdateEventsCount}"
 
 //        def measuredValueUpdateEvents = MeasuredValueUpdateEvent.withCriteria {
@@ -199,19 +199,19 @@ class DbCleanupService {
             log.debug('Deletion of MeasuredValueUpdateEvents finished')
 
             //After then clean MeasuredValues
-            0.step(measuredValueCount, batchSize) { int offset ->
-//                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
-                MeasuredValue.withNewTransaction {
-                    measuredValueDetachedCriteria.list(max: batchSize).each { MeasuredValue measuredValue ->
-                        try {
-                            measuredValue.delete()
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-                //clear hibernate session first-level cache
-                MeasuredValue.withSession { session -> session.clear() }
-            }
+//            0.step(measuredValueCount, batchSize) { int offset ->
+////                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
+//                MeasuredValue.withNewTransaction {
+//                    measuredValueDetachedCriteria.list(max: batchSize).each { MeasuredValue measuredValue ->
+//                        try {
+//                            measuredValue.delete()
+//                        } catch (Exception e) {
+//                        }
+//                    }
+//                }
+//                //clear hibernate session first-level cache
+//                MeasuredValue.withSession { session -> session.clear() }
+//            }
             batchActivityService.updateStatus(batchActivity, [ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
             log.debug('Deletion of MeasuredValues finished')
         }
