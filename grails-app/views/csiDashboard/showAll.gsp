@@ -73,6 +73,15 @@
 					<div class="span6">
 						<g:render template="/dateSelection/startAndEnddateSelection" 
 											model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from, 'fromHour':fromHour, 'to':to, 'toHour':toHour, 'includeInterval':includeInterval]}"/>
+
+						<fieldset id="includeInterval">
+						  <div class="span2">
+						    <label class="checkbox inline">
+						      <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
+						      &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label" default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen" />
+						    </label>
+						  </div>
+						</fieldset>
 					</div>
 				</div>
 				<div class="row">

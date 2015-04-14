@@ -75,12 +75,3 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 </fieldset>
 <input type="hidden" name="to" value="${to}" id="to">
 <input type="hidden" name="toHour" value="${toHour}" id="toHour">
-
-<fieldset id="includeInterval">
-	<div class="span2">
-	  <label class="checkbox inline">
-	    <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
-	    &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label" default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen" />
-	  </label>
-	</div>
-</fieldset>

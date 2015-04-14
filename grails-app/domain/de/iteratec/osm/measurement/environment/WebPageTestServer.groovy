@@ -51,12 +51,8 @@ class WebPageTestServer {
         contactPersonEmail(email: true, nullable: true, maxSize: 255)
     }
 
-    public void setBaseUrl(n) {
-        if (!(n.endsWith('/'))) {
-            baseUrl = n + "/"
-        } else {
-            baseUrl = n
-        }
+    public String getBaseUrl() {
+        return baseUrl.endsWith('/') ? baseUrl : "${baseUrl}/"
     }
 
     static mapping = {
