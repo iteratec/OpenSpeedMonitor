@@ -110,7 +110,9 @@ class TabularResultPresentationController {
                     {
                         continue;
                     }
-                    eventResultsListing.addRow(new EventResultListingRow(jobResultService.findJobResultByEventResult(eachEventResult), eachEventResult));
+                    JobResult correspondingJobResult = eachEventResult.jobResult;
+                    eventResultsListing.addRow(new EventResultListingRow(correspondingJobResult, eachEventResult))
+//                    formerly: eventResultsListing.addRow(new EventResultListingRow(jobResultService.findJobResultByEventResult(eachEventResult), eachEventResult));
                 }
 
                 modelToRender.put('showEventResultsListing', true);
