@@ -60,7 +60,7 @@ class CsiDashboardControllerTests {
 
 	CsiDashboardController controllerUnderTest
 
-	// Mocks:
+	// Mocks:  
 	AggregatorTypeDaoService aggregatorTypeDaoServiceMock
 	JobGroupDaoService jobGroupDaoServiceMock
 	PageDaoService pageDaoServiceMock
@@ -1111,7 +1111,7 @@ class CsiDashboardControllerTests {
 		out.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(17, dataUnderTest.size());
+		assertEquals(18, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPage', [1L, 5L]);
@@ -1165,7 +1165,7 @@ class CsiDashboardControllerTests {
 		out.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(17, dataUnderTest.size());
+		assertEquals(18, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPage', [1L, 5L]);
@@ -1220,7 +1220,7 @@ class CsiDashboardControllerTests {
 		out.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(17, dataUnderTest.size());
+		assertEquals(18, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPage', [1L, 5L]);

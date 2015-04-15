@@ -1067,9 +1067,31 @@ class CsiDashboardController {
                         )
 
             }else{
-
-                end = new DateTime()
-                start = end.minusSeconds(this.selectedTimeFrameInterval)
+//                if(includeInterval) {
+                    end = new DateTime()
+                    start = end.minusSeconds(this.selectedTimeFrameInterval)
+//                } else {
+//                    end = new DateTime()
+//                    start = end.minusSeconds(this.selectedTimeFrameInterval)
+//
+//                    switch (this.selectedTimeFrameInterval) {
+//                        case 3600: // last hour
+//                            break
+//                        case 43200: // last 12 hours
+//                            break
+//                        case 86400: // last day
+//                            break
+//                        case 259200: // last 3 days
+//                            break
+//                        case 604800: // last week
+//                            break
+//                        case 1209600: // last 2 weeks
+//                            break
+//                        case 2419200: // last 4 weeks
+//                            break
+//                    }
+//
+//                }
 
             }
 
