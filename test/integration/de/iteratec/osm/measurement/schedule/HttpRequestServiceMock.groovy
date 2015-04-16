@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -28,7 +28,7 @@ class HttpRequestServiceMock extends HttpRequestService {
 	public static final String redirectUserUrl = "http://dev.server01.wpt.iteratec.de/result/${testId}/"
 
 	private int fetchResultCallCount = 0;
-	
+
 	// called from ProxyService.fetchResult() to retrieve har
 	Object getWptServerHttpGetResponse(WebPageTestServer wptserver, String path, Map query, ContentType contentType, Map headers) {
 		return [data: null]
@@ -42,7 +42,7 @@ class HttpRequestServiceMock extends HttpRequestService {
 		switch(statusCode) {
 			case 100: statusText = 'Test Pending'; break;
 			case 101: statusText = 'Test Running'; break;
-			case 200: statusText = 'Ok'; break;	
+			case 200: statusText = 'Ok'; break;
 		}
 		String xmlHeader = """\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -51,9 +51,9 @@ class HttpRequestServiceMock extends HttpRequestService {
 <statusCode>${statusCode}</statusCode>
 <statusText>${statusText}</statusText>
 		"""
-		
+
 		String xmlFooter = '</response>'
-		
+
 		String resultData = """\
 <data>
 <testId>140214_5W_3</testId>

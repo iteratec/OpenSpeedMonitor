@@ -21,7 +21,7 @@ import grails.util.Environment
 
 import org.grails.databinding.BindUsing
 import org.grails.taggable.Taggable
-import org.quartz.CronExpression
+import org.quartz.CronExpression 
 
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.measurement.script.Script

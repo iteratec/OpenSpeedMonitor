@@ -149,7 +149,7 @@ function toggleCronInstructions(){
     cronInstructions.style.display=="none" ?
         cronInstructions.style.display="inline" : cronInstructions.style.display="none";
 }
-function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLink) {console.log("rkrkrk");
+function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLink) {
     jQuery.ajax({
         type: 'POST',
         data: 'value=' + execScheduleWithSeconds,
