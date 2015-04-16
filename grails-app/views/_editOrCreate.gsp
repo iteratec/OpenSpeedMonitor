@@ -21,6 +21,9 @@
     }
     </style>
     <script>
+		    function getExecutionScheduleSetButInactiveLabel() {
+	       return '${message(code:'job.executionScheduleSetButInactive.label')}';
+			  }
         function promptForDuplicateName() {
             var newName = prompt('${message(code: 'de.iteratec.actions.duplicate.prompt')}', $('input#label').val() + ' ${message(code: 'de.iteratec.actions.duplicate.copy')}');
             if (newName != null && newName != '') {
