@@ -56,23 +56,22 @@ jQuery.fn.visibilityToggle = function() {
 };
 
 function doOnDomReady(nextExecutionLink) {
-	$('#connectivityProfile').append($('<option></option>').val('null').text('Custom'));
-	if ($('#customConnectivityProfile').val() == 'true') {
-		$('#connectivityProfile option:last-child').attr('selected', 'selected');
-	}
     initializeSelects();
     $("[rel=tooltip]").tooltip({ html: true });
     $("[rel=popover]").popover();
   	
 	$('#active').change(function () {
-		$('[name="executionSchedule"]').keyup();
+		$('[name="execution-schedule-shown"]').keyup();
 	});
 
-	$('#connectivityProfile').change(function() {
-		var custom = $('#connectivityProfile :selected').text() == 'Custom';
-		$('#connectivityProfileDetails').toggle(custom);
-		$('#customConnectivityProfile').val(custom);
+	$(document).on('change', '#connectivityProfile', function () {
+    if($(this).val() === 'null') {
+      $('#connectivityProfileDetails').toggle(true);
+    } else {
+      $('#connectivityProfileDetails').toggle(false);
+    }
 	});
+	
 	$('#connectivityProfile').change();
 	
 	$('#maxDownloadTimeInMinutes a').click(function() {
