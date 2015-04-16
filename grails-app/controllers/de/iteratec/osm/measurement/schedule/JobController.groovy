@@ -100,11 +100,12 @@ class JobController {
 			lastNHoursToShowPendingOrRunnngResultsInJoblist: LAST_N_HOURS_TO_SHOW_PENDING_OR_RUNNNG_RESULTS_IN_JOBLIST]
 		if (forceShowAllJobs)
 			model << ['filters': ['filterInactiveJobs': true]] 
-		if (!request.xhr){
-			return model
-		}
-		else{
-			render(template: 'jobTable', model: model)
+		if (request.xhr){
+//            render(template: 'jobTable', model: model)
+            String templateAsPlainText = g.render(template: 'jobTable', model: model)
+            sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
+		}else{
+            return model
 		}
 	}
 	
