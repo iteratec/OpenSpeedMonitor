@@ -44,7 +44,7 @@ function updateBatchActivityTable(updateTableUrl) {
 }
 
 /**
- * Replaces all rows with the given id with a new version
+ * Updates all rows with the given ids
  * @param ids row ids to update
  * @param rowUpdateUrl url to get a row update
  */
@@ -75,9 +75,8 @@ function isPageOne() {
     return content == "1";
 }
 /**
- * replaces a single row with the given id with the content
- * @param id
- * @param content
+ * Updates a single row with the given rowObject
+ * @param rowObject([activity,endDate,htmlId,lastFailureMessage,lastUpdated,progress,startDate,status])
  */
 function updateRow(rowObject) {
     console.log("will be activated: " + JSON.stringify(rowObject));
