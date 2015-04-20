@@ -82,9 +82,8 @@ class BatchActivityController {
 
     /**
      *
-     * @param id id of the BatchActivity to collect
-     * @param evenOdd even or odd to get the right row highlighting
-     * @return BatchActivity row of the given id
+     * @param activeIds ids of all BatchActivities to collect
+     * @return JSON of all requested BatchActivities, ids without a matching BatchActivity will be ignored
      */
     def getUpdate(){
         def updates = []
@@ -92,19 +91,20 @@ class BatchActivityController {
         ids.addAll(params.activeIds);
         ids.each{activeId ->
             BatchActivity batchActivity = BatchActivity.get(new Long(activeId))
-            updates.add(
-                    new BatchActivityRow (
-                            htmlId: "batchActivity_${activeId}",
-                            activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
-                            status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
-                            progress: batchActivity.progress,
-                            lastFailureMessage: batchActivity.lastFailureMessage,
-                            startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
-                            lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
-                            endDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate))
-                    )
-            )
-
+            if(batchActivity){
+                updates.add(
+                        new BatchActivityRow (
+                                htmlId: "batchActivity_${activeId}",
+                                activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
+                                status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
+                                progress: batchActivity.progress,
+                                lastFailureMessage: batchActivity.lastFailureMessage,
+                                startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
+                                lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
+                                endDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate))
+                        )
+                )
+            }
         }
         render updates as JSON
 
