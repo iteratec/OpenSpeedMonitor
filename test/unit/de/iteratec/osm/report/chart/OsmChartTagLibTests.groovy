@@ -208,6 +208,7 @@ class OsmChartTagLibTests {
 			</div>
 
 			<div id="rickshaw_addons">
+                <div id="rickshaw_timeline"></div>
 				<div id="rickshaw_slider"></div>
 				<div id="rickshaw_legend"></div>
 			</div>
@@ -224,7 +225,8 @@ class OsmChartTagLibTests {
 					heightOfChart :  400,
                     dataLabelsActivated : false,
 					NUMBER_OF_YAXIS_TICKS : 5,
-					drawPointMarkers: true
+					drawPointMarkers: true,
+                    annotations : null
 				};
 				rickshawGraphBuilder = new RickshawGraphBuilder(args);
 			});
@@ -325,6 +327,7 @@ class OsmChartTagLibTests {
 			</div>
 
 			<div id="rickshaw_addons">
+                <div id="rickshaw_timeline"></div>
 				<div id="rickshaw_slider"></div>
 				<div id="rickshaw_legend"></div>
 			</div>
@@ -341,7 +344,8 @@ class OsmChartTagLibTests {
 					heightOfChart :  600,
                     dataLabelsActivated : false,
 					NUMBER_OF_YAXIS_TICKS : 5,
-					drawPointMarkers: false
+					drawPointMarkers: false,
+                    annotations : null
 				};
 				rickshawGraphBuilder = new RickshawGraphBuilder(args);
 			});
