@@ -6,9 +6,18 @@ package de.iteratec.osm.batch
  * @author bwo
  */
 enum Status {
-        ACTIVE, INACTIVE, DONE, CANCELLED
+    ACTIVE ('de.iteratec.osm.batch.status.ACTIVE'),
+    INACTIVE ('de.iteratec.osm.batch.status.INACTIVE'),
+    DONE ('de.iteratec.osm.batch.status.DONE'),
+    CANCELLED ('de.iteratec.osm.batch.status.CANCELLED')
 
-    String getI18nCode(){
-        return "de.iteratec.osm.batch.status."+this
+    private final String i18nCode
+
+    Status(String i18nCode){
+        this.i18nCode = i18nCode
+    }
+
+    public String getI18nCode(){
+        return this.i18nCode
     }
 }

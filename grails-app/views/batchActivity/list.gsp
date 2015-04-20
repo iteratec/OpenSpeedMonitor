@@ -53,9 +53,10 @@
 
 <r:script>
 		$(document).ready(
-			updateIfNecessary('${createLink(action: 'updateTable', absolute: true)}',
-			'${createLink(action: 'checkForUpdate', absolute: true)}',
-			'${createLink(action: 'getUpdate', absolute: true)}'
+			updateIfNecessary(
+			    '${createLink(action: 'updateTable', absolute: true)}',
+			    '${createLink(action: 'checkForUpdate', absolute: true)}',
+			    '${createLink(action: 'getUpdate', absolute: true)}'
 			)
 		);
 </r:script>

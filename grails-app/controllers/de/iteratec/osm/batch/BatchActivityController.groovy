@@ -18,7 +18,13 @@
 package de.iteratec.osm.batch
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.api.json.BatchActivityRow
+import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.springframework.http.HttpStatus
 
 /**
  * BatchActivityController
@@ -26,8 +32,11 @@ import grails.converters.JSON
  */
 class BatchActivityController {
 
+    public final static DateTimeFormatter DATE_FORMAT_BATCH_ACTIVITIES = DateTimeFormat.forPattern("dd.MMM.yyyy hh:mm")
+
     BatchActivityService batchActivityService
     InMemoryConfigService inMemoryConfigService
+    I18nService i18nService
 
     def list(){
         params.order = params.order?:"desc"
@@ -58,19 +67,46 @@ class BatchActivityController {
      * @return new Content from BatchActivityTable
      */
     def updateTable(){
+
         params.order = "desc"
         params.sort = "startDate"
         params.max = 10
-        render(view: '_batchActivityTable',model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()])
+
+        String templateAsPlainText = g.render(
+                template: 'batchActivityTable',
+                model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()]
+        )
+        sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
+
     }
+
     /**
      *
      * @param id id of the BatchActivity to collect
      * @param evenOdd even or odd to get the right row highlighting
      * @return BatchActivity row of the given id
      */
-    def getUpdate(int id, String evenOdd){
-        render(view: '_batchActivityRow', model:[batchActivityInstance: BatchActivity.get(id), evenOdd:evenOdd])
+    def getUpdate(){
+        def updates = []
+        params.activeIds.each{activeId ->
+
+            BatchActivity batchActivity = BatchActivity.get(new Long(activeId))
+            updates.add(
+                    new BatchActivityRow (
+                            htmlId: "batchActivity_${activeId}",
+                            activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
+                            status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
+                            progress: batchActivity.progress,
+                            lastFailureMessage: batchActivity.lastFailureMessage,
+                            startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
+                            lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
+                            endDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate))
+                    )
+            )
+
+        }
+        render updates as JSON
+
     }
 
     def checkForUpdate(){
@@ -89,5 +125,17 @@ class BatchActivityController {
     def deactivateDatabaseCleanup(){
         inMemoryConfigService.deactivateDatabaseCleanup()
         redirect(action: 'list', max: 10)
+    }
+
+    private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, HttpStatus httpStatus, String message) {
+
+        response.setContentType('text/plain;charset=UTF-8')
+        response.status=httpStatus.value()
+
+        Writer textOut = new OutputStreamWriter(response.getOutputStream())
+        textOut.write(message)
+        textOut.flush()
+        response.getOutputStream().flush()
+
     }
 }
