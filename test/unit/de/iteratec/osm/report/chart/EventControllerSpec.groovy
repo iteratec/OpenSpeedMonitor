@@ -28,4 +28,7 @@ import org.junit.*
 @TestFor(EventController)
 class EventControllerSpec {
 
+    void testSomething() {
+       assertTrue(true)
+    }
 }
