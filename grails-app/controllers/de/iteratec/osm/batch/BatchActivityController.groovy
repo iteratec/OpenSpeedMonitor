@@ -104,6 +104,8 @@ class BatchActivityController {
                                 endDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate))
                         )
                 )
+            } else{
+                log.error("Couldn't find a matching BatchActivty with id: $activeId")
             }
         }
         render updates as JSON
