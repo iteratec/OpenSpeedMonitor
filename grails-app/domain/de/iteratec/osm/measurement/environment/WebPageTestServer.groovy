@@ -52,7 +52,11 @@ class WebPageTestServer {
     }
 
     public String getBaseUrl() {
-        return baseUrl.endsWith('/') ? baseUrl : "${baseUrl}/"
+        if (baseUrl) {
+            return baseUrl.endsWith('/') ? "${baseUrl}" : "${baseUrl}/"
+        } else {
+            return ""
+        }
     }
 
     static mapping = {
