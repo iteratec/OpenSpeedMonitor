@@ -46,6 +46,7 @@ class OsmChartTagLib {
 		Boolean optimizeForExport = attrs['optimizeForExport']!=null ? Boolean.valueOf(attrs['optimizeForExport']) : false
 		Boolean openDatapointLinksInNewWindow = attrs['openDataPointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDataPointLinksInNewWindow'])  : true
 		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
+        List annotations = attrs["annotations"]
 
 		ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
 		log.debug("chartLibToUse while processing osm chart tgalib=${chartLibToUse}")
@@ -65,7 +66,7 @@ class OsmChartTagLib {
 			highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
 
 			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, markerEnabled)
+			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, markerEnabled, annotations)
 		}else {
 			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
 					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
@@ -97,6 +98,7 @@ class OsmChartTagLib {
 		Boolean openDatapointLinksInNewWindow = attrs['openDatapointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDatapointLinksInNewWindow'])  : true
 		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
 		List<OsmChartAxis> yAxesLabels = attrs['highChartLabels']
+        List annotations = attrs["annotations"]
 
 		if (title == null) {
 			title = "";
@@ -115,7 +117,7 @@ class OsmChartTagLib {
 		{
 			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
 			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, markerEnabled)
+			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, markerEnabled, annotations)
 		} else {
 			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
 					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")

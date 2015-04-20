@@ -87,7 +87,8 @@
 					dataLabelsActivated: labelShouldBeEnabled,
 					yAxisScalable: 'false',
 					optimizeForExport: 'true',
-					openDataPointLinksInNewWindow: 'false']"/>
+					openDataPointLinksInNewWindow: 'false',
+          annotations: annotations]"/>
 		</div>
 		</div>
 		<%-- table --%>

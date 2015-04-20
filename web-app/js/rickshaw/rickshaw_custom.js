@@ -1649,7 +1649,6 @@ Rickshaw.Graph.Annotate = function(args) {
 
 	var graph = this.graph = args.graph;
 	this.elements = { timeline: args.element };
-	
 	var self = this;
 
 	this.data = {};

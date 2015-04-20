@@ -32,6 +32,7 @@ function RickshawGraphBuilder(args) {
   this.dataLabelsHaveBeenAdded = false;
   
   this.initialize = function(args) {
+    
     if ((args.hasOwnProperty("dataLabelsActivated")) && (args.dataLabelsActivated == true)) { //display dataLabels
       this.dataLabelsActivated = true;
     }
@@ -49,6 +50,9 @@ function RickshawGraphBuilder(args) {
     self.initializeYAxes(args);
     self.initializeHoverDetail();
     self.initializeLegend();
+    if (args.hasOwnProperty("annotations")) { //display annotations
+      self.initializeAnnotator(args.annotations);
+    }
     self.initializeSlider();
     self.graph.onUpdate(self.update);
     self.graph.render();
@@ -252,6 +256,18 @@ function RickshawGraphBuilder(args) {
                 "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
                 "</table>";
     };
+  }
+
+  this.initializeAnnotator = function(args) {
+    var annotator = new Rickshaw.Graph.Annotate( {
+      graph: self.graph,
+      element: document.getElementById('rickshaw_timeline')
+    } );
+//    args = [{x: 1414846610, text: "rk1"}, {x: 1414846400, text: "rk2"}];
+    for (index = 0; index < args.length; ++index) {
+      annotator.add(args[index].x, args[index].text);
+    }
+    annotator.update();
   }
   
   this.initializeLegend = function() {

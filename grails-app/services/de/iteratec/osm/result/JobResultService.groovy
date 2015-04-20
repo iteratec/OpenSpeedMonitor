@@ -91,58 +91,6 @@ class JobResultService {
 	}
 
 	/**
-	 *
-	 * @param mvQueryParams
-	 * @param fromDate
-	 * @param toDate
-	 * @return
-	 */
-	public Collection<JobResult> findJobResultsByQueryParams(MvQueryParams mvQueryParams, Date fromDate, Date toDate) {
-
-		def jobResultCriteria = JobResult.createCriteria();
-		def jobResults = jobResultCriteria{
-			and {
-				if(!mvQueryParams.locationIds.isEmpty()) {
-					'in'('locationLocation', Location.where { 'in'('id', mvQueryParams.getLocationIds())}.findAll()*.location)
-				}
-
-				if(!mvQueryParams.browserIds.isEmpty()) {
-					'in'('locationBrowser', Browser.where { 'in'('id', mvQueryParams.getBrowserIds())}.findAll()*.name)
-				}
-
-				if(!mvQueryParams.jobGroupIds.isEmpty()) {
-					'in'('jobGroupName',  JobGroup.where { 'in'('id', mvQueryParams.getJobGroupIds()) }.findAll()*.name)
-				}
-
-				if(!mvQueryParams.measuredEventIds.isEmpty()) {
-					eventResults{
-						measuredEvent {
-							'in'('id', mvQueryParams.getMeasuredEventIds())
-						}
-					}
-				}
-
-				if(!mvQueryParams.pageIds.isEmpty()) {
-					eventResults{
-						measuredEvent {
-							testedPage {
-								'in'('id', mvQueryParams.getPageIds())
-							}
-						}
-					}
-				}
-
-				ge('date', fromDate)
-				le('date', toDate)
-			}
-
-			order('date', 'desc')
-		};
-
-		return jobResults
-	}
-
-	/**
 	 * Returns all successful JobResults belonging to the specified Job
 	 */
 	public Collection<JobResult> findSuccessfulJobResultsByJob(Job _job, Date fromDate, Date toDate) {
