@@ -80,11 +80,20 @@ function isPageOne() {
  * @param content
  */
 function updateRow(rowObject) {
-    console.log("will be activated: " + JSON.stringify(rowObject))
+    console.log("will be activated: " + JSON.stringify(rowObject));
     var idxFieldActivity = 1;
     var idxFieldStatus = 2;
-    //TODO: update all fields
-    $("tr#" + rowObject.htmlId + " td")[idxFieldActivity].innerText=rowObject.activity;
+    var idxFieldProgress = 3;
+    var idxFieldLastFailureMessage = 4;
+    var idxFieldLastUpdated = 6;
+    var idxFieldEndDate = 7;
+
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldActivity+")").html(rowObject.activity);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldStatus+")").html(rowObject.status);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldProgress+")").html(rowObject.progress);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastFailureMessage+")").html(rowObject.lastFailureMessage);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastUpdated+")").html(rowObject.lastUpdated);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldEndDate+")").html(rowObject.endDate);
 }
 /**
  * Returns an array with all row ids where status = active

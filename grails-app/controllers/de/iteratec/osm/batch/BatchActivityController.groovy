@@ -32,7 +32,7 @@ import org.springframework.http.HttpStatus
  */
 class BatchActivityController {
 
-    public final static DateTimeFormatter DATE_FORMAT_BATCH_ACTIVITIES = DateTimeFormat.forPattern("dd.MMM.yyyy hh:mm")
+    public final static DateTimeFormatter DATE_FORMAT_BATCH_ACTIVITIES = DateTimeFormat.forPattern("dd. MMMMM. yyyy hh:mm")
 
     BatchActivityService batchActivityService
     InMemoryConfigService inMemoryConfigService
@@ -88,8 +88,9 @@ class BatchActivityController {
      */
     def getUpdate(){
         def updates = []
-        params.activeIds.each{activeId ->
-
+        def ids = []
+        ids.addAll(params.activeIds);
+        ids.each{activeId ->
             BatchActivity batchActivity = BatchActivity.get(new Long(activeId))
             updates.add(
                     new BatchActivityRow (
