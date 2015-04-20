@@ -264,10 +264,12 @@ function RickshawGraphBuilder(args) {
       element: document.getElementById('rickshaw_timeline')
     } );
 //    args = [{x: 1414846610, text: "rk1"}, {x: 1414846400, text: "rk2"}];
-    for (index = 0; index < args.length; ++index) {
-      annotator.add(args[index].x, args[index].text);
+    if (args) {
+      for (index = 0; index < args.length; ++index) {
+        annotator.add(args[index].x, args[index].text);
+      }
+      annotator.update();
     }
-    annotator.update();
   }
   
   this.initializeLegend = function() {
