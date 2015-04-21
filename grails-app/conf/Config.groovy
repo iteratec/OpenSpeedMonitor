@@ -27,6 +27,10 @@ import org.apache.log4j.RollingFileAppender
  * 	config files can be ConfigSlurper scripts, Java properties files, or classes
  * 	in the classpath in ConfigSlurper format
  */
+
+//grails.databinding.dateFormats = [
+//    'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
+
 if (System.properties["osm_config_location"]) {
 	log.info('system property for external configuration found')
     grails.config.locations = ["file:" + System.properties["osm_config_location"]]

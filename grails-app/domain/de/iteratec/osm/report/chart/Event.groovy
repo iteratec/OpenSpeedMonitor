@@ -17,9 +17,10 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.measurement.schedule.JobGroup;
+import de.iteratec.osm.measurement.schedule.JobGroup
 
-import java.util.Date;
+//import java.text.SimpleDateFormat
+
 
 /**
  * Event
@@ -28,31 +29,30 @@ import java.util.Date;
 class Event {
 
     Date date
+    String fromHour
     String shortName
     String htmlDescription
     Boolean globallyVisible = false
 
     /**
-     * The {@link JobGroup} this job is assigned to <em>or</em>
+     * The {@link JobGroup} this event is assigned to
      */
-    static hasMany = [jobGroup: JobGroup] //(1:n Beziehung zur JobGroup unidirektional one-to-many).)
+    static hasMany = [jobGroup: JobGroup]
 
     static mapping = {
         globallyVisible(defaultValue: false)
     }
 
+//    def beforeValidate() {
+//        def formatter = new SimpleDateFormat("dd.MM.yyyy")
+//        date = (Date)formatter.parse(params.date)
+//    }
+
 	static constraints = {
-        date()
+        date(nullable: false)
+        fromHour()
         shortName(unique:true, maxSize: 255)
         htmlDescription(maxSize: 255, nullable: true)
         globallyVisible()
     }
-
-	/*
-	 * Methods of the Domain Class
-	 */
-//	@Override	// Override toString for a nicer / more descriptive UI
-//	public String toString() {
-//		return "${name}";
-//	}
 }
