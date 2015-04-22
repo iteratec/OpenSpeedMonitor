@@ -61,38 +61,48 @@
 					   <dl>
 					   <dt>page</dt>
 						<dd>
-							The name of a page. If specified on results belonging to this page are returned.
+							The name of a page. If specified only results belonging to this page are returned.
 							<br/>
 							You can obtain a list of all pages by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allPages</code>.
 							As result a JSON list of page names is returned.
 						</dd>
 						<dt>step</dt>
 						<dd>
-							The name of a (measured) step. If specified on results belonging to this step are returned.
+							The name of a (measured) step. If specified only results belonging to this step are returned.
 							<br/>
 							You can obtain a list of all steps by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSteps</code>.
 							As result a JSON list of step names is returned.
 						</dd>
 						<dt>browser</dt>
 						<dd>
-							The name of a browser. If specified on results belonging to this browser are returned.
+							The name of a browser. If specified only results belonging to this browser are returned.
 							<br/>
 							You can obtain a list of all browsers by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allBrowsers</code>.
 							As result a JSON list of browser names is returned.
 						</dd>
 						<dt>location</dt>
 						<dd>
-							The location-address of a location. If specified on results belonging to this location are returned.
+							The location-address of a location. If specified only results belonging to this location are returned.
 							<br/>
 							You can obtain a list of all location-addresses by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allLocations</code>.
 							As result a JSON list of location-addresses is returned.
 						</dd>
+					   	<dt>cachedView</dt>
+					   	<dd>
+						   	The cached view. If specified only results of this cached view are returned.
+						   	<br/>
+						   	Only one of the following two values are allowed:
+							<ul>
+								<li><em>UNCACHED</em> - WebPagetest's <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/quick-start-quide#TOC-High-level-Metrics:">First view</a></li>
+								<li><em>CACHED</em> - WebPagetest's <a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/quick-start-quide#TOC-High-level-Metrics:">Repeat view</a></li>
+							</ul>
+					   </dd>
 					   </dl>
 
 					<p>
 					An example with all parameters:<br>
 					<code><abbr title="[application path]/rest">[REST-base-path]</abbr>/live/resultsbetween/20140101T000000Z/20140101T230000Z?
-						<br>browser=IE&page=WK&location=Hetzner01-IE&step=IE8_BV1_Step06_Warenkorb - hetzner</code>
+						<br>browser=IE&page=WK&location=Hetzner01-IE&step=IE8_BV1_Step06_Warenkorb - hetzner&cachedView=UNCACHED</code>
 					</p>
 
 					<h3>Potential outcomes of a request</h3>

@@ -60,7 +60,7 @@ class ResultTests {
 	}
 
 	@Test
-	public void testResult() {
+	public void testResultWithCustomerSatisfaction() {
 		// Create some data
 		Page testedPage = new Page();
 		testedPage.name = 'ADS';
@@ -89,7 +89,7 @@ class ResultTests {
 		jobResult.job = job 
 
 		// Run the test
-		Result out = new Result(jobResult, eventResult);
+		Result out = new Result(eventResult);
 
 		// Verify results
 		assertEquals('1,51', out.csiValue);
@@ -101,9 +101,8 @@ class ResultTests {
 		assertEquals("${WPT_SERVER_BASE_URL}export.php?test=${TEST_ID}".toString(), out.httpArchiveUrl)
 	}
 
-	@Test(expected=IllegalArgumentException)
-	public void testResult_EventResultNotPartOfJobResult()
-	{
+	@Test
+	public void testResultWithoutCustomerSatisfaction() {
 		// Create some data
 		Page testedPage = new Page();
 		testedPage.name = 'ADS';
@@ -112,34 +111,35 @@ class ResultTests {
 		event.testedPage = testedPage;
 		event.name = 'ADS for article 5';
 
-		EventResult eventResult = new EventResult();
-		eventResult.measuredEvent = event;
-		eventResult.customerSatisfactionInPercent = 1.5112d;
-		
-		Job job = new Job();
-		job.location = new Location();
-		job.location.wptServer = new WebPageTestServer();
-		job.location.wptServer.baseUrl = "";
-
-		//since we aare not saving any job we need to make sure that every JobResult has its own id
-		JobResult jobResult = new JobResult(){
+		EventResult eventResult = new EventResult() {
 			@Override
 			public Long getId() {
 				return 1;
 			}
 		};
-		eventResult.jobResult = new JobResult(){
-			@Override
-			public Long getId() {
-				return 2;
-			}
-		};
+		eventResult.measuredEvent = event;
+
+		JobResult jobResult = new JobResult();
+		eventResult.jobResult = jobResult;
 		jobResult.locationLocation = 'agent01';
 		jobResult.locationUniqueIdentifierForServer = 'agent01:IE';
 		jobResult.locationBrowser = 'Firefox7';
+		jobResult.testId = TEST_ID
+		WebPageTestServer wptServer = new WebPageTestServer(baseUrl: WPT_SERVER_BASE_URL)
+		Job job =new Job(location: new Location(wptServer: wptServer))
+		jobResult.job = job
 
-		// Run the test (should throw java.lang.IllegalArgumentException)
-		new Result(jobResult, eventResult);
+		// Run the test
+		Result out = new Result(eventResult);
+
+		// Verify results
+		assertEquals('not calculated', out.csiValue);
+		assertEquals('ADS', out.page);
+		assertEquals('ADS for article 5', out.step);
+		assertEquals('Firefox7', out.browser);
+		assertEquals('agent01:IE', out.location);
+		assertEquals("${WPT_SERVER_BASE_URL}result/${TEST_ID}".toString(), out.detailUrl)
+		assertEquals("${WPT_SERVER_BASE_URL}export.php?test=${TEST_ID}".toString(), out.httpArchiveUrl)
 	}
 
 }
