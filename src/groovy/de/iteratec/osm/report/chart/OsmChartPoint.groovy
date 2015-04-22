@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import groovy.transform.EqualsAndHashCode
+import org.joda.time.DateTime
 
 
 /**
@@ -128,4 +129,8 @@ class OsmChartPoint{
     public boolean isValid(){
         return (this.time > 0 && this.measuredValue != null)
     }
+
+	public String toString(){
+		return "${new DateTime(time)} | ${measuredValue}"
+	}
 }

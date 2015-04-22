@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -33,13 +32,9 @@ import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.*
-import grails.validation.Validateable
-
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.regex.Pattern
-
+import de.iteratec.osm.util.ControllerUtils
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.TreeMapOfTreeMaps
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -47,12 +42,16 @@ import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import org.springframework.beans.propertyeditors.CustomDateEditor
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
+
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+
+import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 
 //TODO: implement some tests for this controller
 
@@ -194,7 +193,7 @@ class CsiDashboardController {
      * 	       not <code>null</code> and never
      *         {@linkplain Map#isEmpty() empty}.
      */
-    Map<String, Object> showAll(ShowAllCommand cmd) {
+    Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
@@ -242,7 +241,7 @@ class CsiDashboardController {
                             fixTimeFrame( cmd.getSelectedTimeFrame(), selectedAggregationIntervallInMintues ),
                             selectedAggregationIntervallInMintues,
                             cmd.selectedFolder.size(),
-                            cmd.selectedPage.size(),
+                            cmd.selectedPages.size(),
                             countOfSelectedBrowser)
                 }
 
@@ -262,7 +261,7 @@ class CsiDashboardController {
      * <p>
      * Fills the specified map with approximate data based on {@linkplain
      * MeasuredValue measured values} correspond to the selection in
-     * specified {@linkplain ShowAllCommand command object}.
+     * specified {@linkplain CsiDashboardShowAllCommand command object}.
      * </p>
      *
      * @param modelToRender
@@ -275,7 +274,7 @@ class CsiDashboardController {
      *         the graphs in {@link modelToRender} else, if set to
      *         <code>false</code> not.
      */
-    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, ShowAllCommand cmd, boolean withTargetGraph)
+    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph)
     {
         // TODO Test this: Structure and data...
 
@@ -283,6 +282,7 @@ class CsiDashboardController {
         requiresArgumentNotNull('cmd', cmd)
 
         Interval timeFrame = cmd.getSelectedTimeFrame()
+        log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         Set<JobGroup> csiGroups = jobGroupDaoService.findCSIGroups()
         Set<Long> csiGroupIds = csiGroups
@@ -451,12 +451,18 @@ class CsiDashboardController {
         if(moveGraphsByOneWeek==true) {
             moveDataPointsOneWeekForward(graphs)
             resetFromDate=resetFromDate.plusWeeks(1)
+            resetToDate=resetToDate.plusWeeks(1)
         }
 
         Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
-        Integer rightOffsetToGuaranteeExportButtonRemainsClickable = oneDayOffset * 4
         DateTime resetFromDateWithOffsetChange = resetFromDate.minusMinutes(oneDayOffset)
-        DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffsetToGuaranteeExportButtonRemainsClickable)
+        Integer rightOffset
+        if (cookieBasedSettingsService.getChartingLibraryToUse() == ChartingLibrary.HIGHCHARTS){
+            rightOffset = oneDayOffset * 4
+        }else {
+            rightOffset = oneDayOffset
+        }
+        DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
 
         if( withTargetGraph )
         {
@@ -521,11 +527,11 @@ class CsiDashboardController {
      */
     Map<String, Object> showDefault() {
 
-        DateTime toDate = new DateTime() // now
-        DateTime fromDate = toDate.minusMonths(3)
+        DateTime nowMinusOneInterval = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
+        DateTime fromDate = nowMinusOneInterval.minusMonths(3)
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-        Interval timeFrame = new Interval(fromDate, toDate)
+        Interval timeFrame = new Interval(fromDate, nowMinusOneInterval)
 
         MvQueryParams queryParams = new MvQueryParams()
 
@@ -539,9 +545,9 @@ class CsiDashboardController {
         modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put('weekStart', MONDAY_WEEKSTART)
         modelToRender.put('from', fromDate)
-        modelToRender.put('to', toDate)
+        modelToRender.put('to', nowMinusOneInterval)
         modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
-        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
+        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(nowMinusOneInterval.toDate()))
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', true)
         modelToRender.put('debug', params.debug?true:false)
@@ -603,7 +609,7 @@ class CsiDashboardController {
 
     /**
      * <p>
-     * Creates a CSV based on the selection passed as {@link ShowAllCommand}.
+     * Creates a CSV based on the selection passed as {@link CsiDashboardShowAllCommand}.
      * </p>
      *
      * @param cmd
@@ -612,7 +618,7 @@ class CsiDashboardController {
      * @return nothing, immediately renders a CSV to response' output stream.
      * @see <a href="http://tools.ietf.org/html/rfc4180">http://tools.ietf.org/html/rfc4180</a>
      */
-    public Map<String, Object> csiValuesCsv(ShowAllCommand cmd) {
+    public Map<String, Object> csiValuesCsv(CsiDashboardShowAllCommand cmd) {
 
         Map<String, Object> modelToRender = new HashMap<String, Object>()
 
@@ -758,462 +764,7 @@ class CsiDashboardController {
 
     /**
      * <p>
-     * Command of {@link CsiDashboardController#showAll(ShowAllCommand)} and
-     * {@link CsiDashboardController#csiValuesCsv(ShowAllCommand)}.
-     * </p>
-     *
-     * <p>
-     * None of the properties will be <code>null</code> for a valid instance.
-     * Some collections might be empty depending on the {@link #aggrGroup}
-     * used.
-     * </p>
-     *
-     * <p>
-     * <em>DEV-Note:</em> This command uses auto-binding for type {@link Date}.
-     * To make this possible, you need a custom {@link PropertyEditor}.
-     * See class {@link CustomDateEditorRegistrar} for details. If try an
-     * auto-binding in a unit-test you need to register the class
-     * CustomDateEditorRegistrar with a code-block like:
-     * <pre>
-     * defineBeans {
-     *     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-     * }
-     * </pre>
-     * in the set-up of your test. For productive use you need to add
-     * <pre>
-     * beans = {
-     *     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-     * }
-     * </pre>
-     * to the config file {@code grails-app/conf/spring/resources.groovy}
-     * </p>
-     *
-     * @author mze
-     * @since IT-74
-     */
-    @Validateable
-    public static class ShowAllCommand {
-
-        /**
-         * The selected start date (inclusive).
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        Date from
-
-        /**
-         * The selected end date (inclusive).
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        Date to
-
-        /**
-         * The selected start hour of date.
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        String  fromHour
-        String  fromMinute
-
-        /**
-         * The selected end hour of date.
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        String toHour
-        String toMinute
-
-        /**
-         * The name of the {@link AggregatorType}.
-         *
-         * @see AggregatorType#getName()
-         * @see AggregatorType#MEASURED_STEP
-         * @see AggregatorType#PAGE
-         * @see AggregatorType#PAGE_AND_BROWSER
-         * @see AggregatorType#SHOP
-         */
-        String aggrGroup
-
-        /**
-         * The database IDs of the selected {@linkplain JobGroup CSI groups}
-         * which are the systems measured for a CSI value
-         *
-         */
-        Collection<Long> selectedFolder = []
-
-        /**
-         * The database IDs of the selected {@linkplain Page pages}
-         * which results to be shown.
-         *
-         * TODO rename to selectedPages
-         */
-        Collection<Long> selectedPage = []
-
-        /**
-         * The database IDs of the selected {@linkplain MeasuredEvent
-         * measured events} which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllMeasuredEvents} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedMeasuredEventIds = []
-
-        /**
-         * User enforced the selection of all measured events.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedMeasuredEventIds} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedMeasuredEventIds} should be ignored.
-         */
-        Boolean selectedAllMeasuredEvents
-
-        /**
-         * The database IDs of the selected {@linkplain Browser
-         * browsers} which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllBrowsers} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedBrowsers = []
-
-        /**
-         * User enforced the selection of all browsers.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedBrowsers} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedBrowsers} should be ignored.
-         */
-        Boolean selectedAllBrowsers
-
-        /**
-         * The database IDs of the selected {@linkplain Location
-         * locations} which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllLocations} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedLocations = []
-
-        /**
-         * User enforced the selection of all locations.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedLocations} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedLocations} should be ignored.
-         */
-        Boolean selectedAllLocations
-
-        /**
-         * If the user has been warned about a potentially long processing
-         * time, did he overwrite the waring and really want to perform
-         * the request?
-         *
-         * A value of <code>true</code> indicates that overwrite, everything
-         * should be done as requested, <code>false</code> indicates that
-         * the user hasn't been warned before, so there is no overwrite.
-         */
-        Boolean overwriteWarningAboutLongProcessingTime
-
-        /**
-         * Flag for manual debugging.
-         * Used for debugging highcharts-export-server, e.g.
-         */
-        Boolean debug
-
-        /**
-         * A predefined time frame.
-         */
-        int selectedTimeFrameInterval = 259200
-
-        /**
-         * Whether or not the time of the start-date should be selected manually.
-         */
-        Boolean setFromHour
-        /**
-         * Whether or not the time of the start-date should be selected manually.
-         */
-        Boolean setToHour
-
-        /**
-         * Whether or not current and not yet finished intervals should be loaded and displayed
-         */
-        Boolean includeInterval
-
-        /**
-         * Constraints needs to fit.
-         */
-        static constraints = {
-            from(nullable: true, validator: {Date currentFrom, ShowAllCommand cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentFrom == null) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.from.nullWithManualSelection']
-            })
-            to(nullable:true, validator: { Date currentTo, ShowAllCommand cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentTo == null) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.nullWithManualSelection']
-                else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.beforeFromDate']
-            })
-            fromHour(nullable: true, validator: {String currentFromHour, ShowAllCommand cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentFromHour == null) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
-            })
-            toHour(nullable: true, validator: {String currentToHour, ShowAllCommand cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentToHour == null) {
-                    return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.nullWithManualSelection']
-                }
-                else if(manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
-                    DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
-                    DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                    if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
-                }
-            })
-            aggrGroup(nullable:false, inList: [AggregatorType.MEASURED_EVENT, AggregatorType.PAGE, AggregatorType.SHOP, CsiDashboardController.DAILY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_SHOP])
-            selectedFolder(nullable: false, validator: { Collection currentCollection, ShowAllCommand cmd ->
-                if (currentCollection.isEmpty()) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
-            })
-
-            // selectedPage is only allowed to be empty if aggrGroup is AggregatorType.SHOP
-            selectedPage(nullable: false, validator: { Collection currentCollection, ShowAllCommand cmd ->
-                if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty())) ||
-                ( (AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)) && (!currentCollection.isEmpty())) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
-            })
-            // selectedMeasuredEventIds is only allowed to be empty if aggrGroup is NOT AggregatorType.MEASURED_EVENT or selectedAllMeasuredEvents evaluates to true
-            selectedMeasuredEventIds(nullable:false, validator: { Collection currentCollection, ShowAllCommand cmd ->
-                if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)) ||
-                AggregatorType.PAGE.equals(cmd.aggrGroup)  || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
-            })
-
-            // selectedBrowsers is only allowed to be empty if aggrGroup is NOT AggregatorType.MEASURED_EVENT or selectedAllBrowsers evaluates to true
-            selectedBrowsers(nullable:false, validator: { Collection currentCollection, ShowAllCommand cmd ->
-                if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)) ||
-                AggregatorType.PAGE.equals(cmd.aggrGroup)  || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
-            })
-
-            // selectedLocations is only allowed to be empty if aggrGroup is NOT AggregatorType.MEASURED_EVENT or selectedAllLocations evaluates to true
-            selectedLocations(nullable:false, validator: { Collection currentCollection, ShowAllCommand cmd ->
-                if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)) ||
-                AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
-            })
-            overwriteWarningAboutLongProcessingTime(nullable:true)
-        }
-
-        static transients = ['selectedTimeFrame']
-
-        /**
-         * <p>
-         * Returns the selected time frame as {@link Interval}.
-         * That is the interval from {@link #from} / {@link #fromHour} to {@link #to} / {@link #toHour} if {@link #selectedTimeFrameInterval} is 0 (that means manual).
-         * If {@link #selectedTimeFrameInterval} is greater 0 the returned time frame is now minus {@link #selectedTimeFrameInterval} minutes to now.
-         * </p>
-         *
-         * @return not <code>null</code>.
-         * @throws IllegalStateException
-         *         if called on an invalid instance.
-         */
-        public Interval getSelectedTimeFrame() throws IllegalStateException
-        {
-            if( !this.validate() )
-            {
-                throw new IllegalStateException('A time frame is not available from an invalid command.')
-            }
-
-            DateTime start
-            DateTime end
-
-            Boolean manualTimeframe = this.selectedTimeFrameInterval == 0
-            if (manualTimeframe && fromHour && toHour) {
-
-                DateTime firstDayWithFromHourAsDaytime
-                DateTime firstDayWithToHourAsDaytime
-
-                if (fromMinute != null) {
-                    firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":" + fromMinute.padRight(2, '0'))
-                } else if (fromHour.indexOf(":") > -1) {
-                    firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
-                } else {
-                    firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":00")
-                }
-
-                if (toMinute != null) {
-                    firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":" + toMinute.padRight(2, '0'))
-                } else if (toHour.indexOf(":") > -1) {
-                    firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
-                } else {
-                    firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":00")
-                }
-
-                start = new DateTime(this.from.getTime())
-                        .withTime(
-                        firstDayWithFromHourAsDaytime.getHourOfDay(),
-                        firstDayWithFromHourAsDaytime.getMinuteOfHour(),
-                        0, 0
-                        )
-                end = new DateTime(this.to.getTime())
-                        .withTime(
-                        firstDayWithToHourAsDaytime.getHourOfDay(),
-                        firstDayWithToHourAsDaytime.getMinuteOfHour(),
-                        59, 999
-                        )
-
-            }else{
-//                if(includeInterval) {
-                    end = new DateTime()
-                    start = end.minusSeconds(this.selectedTimeFrameInterval)
-//                } else {
-//                    end = new DateTime()
-//                    start = end.minusSeconds(this.selectedTimeFrameInterval)
-//
-//                    switch (this.selectedTimeFrameInterval) {
-//                        case 3600: // last hour
-//                            break
-//                        case 43200: // last 12 hours
-//                            break
-//                        case 86400: // last day
-//                            break
-//                        case 259200: // last 3 days
-//                            break
-//                        case 604800: // last week
-//                            break
-//                        case 1209600: // last 2 weeks
-//                            break
-//                        case 2419200: // last 4 weeks
-//                            break
-//                    }
-//
-//                }
-
-            }
-
-            return new Interval(start, end)
-        }
-
-        /**
-         * Returns a {@link DateTime} of the first day in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-         * @param timeWithOrWithoutMeridian
-         * 		The format can be with or without meridian (e.g. "04:45", "16:12" without or "02:00 AM", "11:23 PM" with meridian)
-         * @return A {@link DateTime} of the first day in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-         * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
-         */
-        public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException{
-
-            Pattern regexWithMeridian = ~/\d{1,2}:\d\d [AP]M/
-            Pattern regexWithoutMeridian = ~/\d{1,2}:\d\d/
-            String dateFormatString
-
-            if(timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
-            else if(timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
-            else throw new IllegalStateException("Wrong format of time: ${timeWithOrWithoutMeridian}")
-
-            DateTimeFormatter fmt = DateTimeFormat.forPattern(dateFormatString)
-            return fmt.parseDateTime("01.01.1970 ${timeWithOrWithoutMeridian}")
-
-        }
-
-        /**
-         * <p>
-         * Copies all request data to the specified map. This operation does
-         * not care about the validation status of this instance.
-         * For missing values the defaults are inserted.
-         * </p>
-         *
-         * @param viewModelToCopyTo
-         *         The {@link Map} the request data contained in this command
-         *         object should be copied to. The map must be modifiable.
-         *         Previously contained data will be overwritten.
-         *         The argument might not be <code>null</code>.
-         */
-        public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
-        {
-            viewModelToCopyTo.put('selectedTimeFrameInterval', this.selectedTimeFrameInterval)
-
-            viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
-            viewModelToCopyTo.put('selectedPage', this.selectedPage)
-
-            viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
-            viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
-
-            viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers as boolean ? 'on' : ''))
-            viewModelToCopyTo.put('selectedBrowsers', this.selectedBrowsers)
-
-            viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
-            viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
-
-            CustomDateEditor dateEditor = CustomDateEditorRegistrar.createCustomDateEditor()
-
-            dateEditor.setValue(this.from)
-            viewModelToCopyTo.put('from', dateEditor.getAsText())
-            if(!this.fromHour.is(null)) {
-                viewModelToCopyTo.put('fromHour',this.fromHour)
-            }
-
-            dateEditor.setValue(this.to)
-            viewModelToCopyTo.put('to', dateEditor.getAsText())
-            if (!this.toHour.is(null)){
-                viewModelToCopyTo.put('toHour', this.toHour)
-            }
-            viewModelToCopyTo.put('aggrGroup', this.aggrGroup ?: AggregatorType.MEASURED_EVENT)
-            viewModelToCopyTo.put('debug', this.debug?:false)
-            viewModelToCopyTo.put('setFromHour', this.setFromHour)
-            viewModelToCopyTo.put('setToHour', this.setToHour)
-            viewModelToCopyTo.put('includeInterval', this.includeInterval)
-        }
-
-        /**
-         * <p>
-         * Creates {@link MvQueryParams} based on this command. This command
-         * need to be valid for this operation to be successful.
-         * </p>
-         *
-         * @return not <code>null</code>.
-         * @throws IllegalStateException
-         *         if called on an invalid instance.
-         */
-        public MvQueryParams createMvQueryParams() throws IllegalStateException
-        {
-            if( !this.validate() )
-            {
-                throw new IllegalStateException('Query params are not available from an invalid command.')
-            }
-
-            MvQueryParams result = new MvQueryParams()
-
-            result.jobGroupIds.addAll(this.selectedFolder)
-
-            if( !this.selectedAllMeasuredEvents )
-            {
-                result.measuredEventIds.addAll(this.selectedMeasuredEventIds)
-            }
-
-            result.pageIds.addAll(this.selectedPage)
-
-            if( !this.selectedAllBrowsers )
-            {
-                result.browserIds.addAll(this.selectedBrowsers)
-            }
-
-            if( !this.selectedAllLocations )
-            {
-                result.locationIds.addAll(this.selectedLocations)
-            }
-
-            return result
-        }
-    }
-
-    /**
-     * <p>
-     * Constructs the static view data of the {@link #showAll(ShowAllCommand)}
+     * Constructs the static view data of the {@link #showAll(CsiDashboardShowAllCommand)}
      * view as {@link Map}.
      * </p>
      *
@@ -1342,7 +893,7 @@ class CsiDashboardController {
         response.outputStream << builder.toString()
     }
     def weights() {
-        log.info("params=$params")
+        CsiDashboardController.log.info("params=$params")
         //		List<String> params.errorMessagesCsi instanceof String?[params.errorMessagesCsi]:params.errorMessagesCsi
         [browsers:browserDaoService.findAll(),
             pages: pageDaoService.findAll(),
@@ -1356,7 +907,7 @@ class CsiDashboardController {
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER, csv.getInputStream())
         }
-        log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
+        CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
         redirect(action: 'weights',
         params: [errorMessagesCsi: errorMessagesCsiValidation]	)
     }
@@ -1453,7 +1004,7 @@ class CsiDashboardController {
         try {
             csvAsString = tryToFormatForTable(csiValueMap, includeCsTargetGraphs)
         } catch (Exception e) {
-            log.error('An error occurred while creating csv-representation of measurement-data', e)
+            CsiDashboardController.log.error('An error occurred while creating csv-representation of measurement-data', e)
             flash.tableDataError = i18nService.msg('de.iteratec.ism.measurement.conversion.errormessage', 'Bei der Umwandlung der Messdaten f&uuml;r die tabellarischen Darstellung ist ein Fehler aufgetreten!')
         }
         return csvAsString

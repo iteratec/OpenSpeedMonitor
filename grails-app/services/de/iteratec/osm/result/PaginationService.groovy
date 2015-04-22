@@ -141,7 +141,7 @@ class PaginationService {
 						'to': fmtDate.format(cmd.getTo()),
 						'toHour': cmd.getToHour(),
 						'selectedFolder': cmd.getSelectedFolder(),
-						'selectedPage': cmd.getSelectedPage(),
+						'selectedPages': cmd.getSelectedPage(),
 						'selectedBrowsers': cmd.getSelectedBrowsers(),
                         'selectedAllBrowsers' : cmd.getSelectedAllBrowsers(),
 						'_selectedAllBrowsers': cmd.getSelectedAllBrowsers(),

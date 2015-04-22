@@ -115,7 +115,7 @@ class EventResultDashboardControllerTests {
 
 		assertFalse(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -133,7 +133,7 @@ class EventResultDashboardControllerTests {
 
 		assertFalse(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -157,7 +157,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '13:00'
 		params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -175,7 +175,7 @@ class EventResultDashboardControllerTests {
 		// Verification:
 		assertTrue(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -188,9 +188,9 @@ class EventResultDashboardControllerTests {
 		assertEquals(1, out.selectedFolder.size())
 		assertTrue(out.selectedFolder.contains(1L))
 
-		assertEquals(2, out.selectedPage.size())
-		assertTrue(out.selectedPage.contains(1L))
-		assertTrue(out.selectedPage.contains(5L))
+		assertEquals(2, out.selectedPages.size())
+		assertTrue(out.selectedPages.contains(1L))
+		assertTrue(out.selectedPages.contains(5L))
 
 		assertFalse(out.selectedAllMeasuredEvents as boolean)
 		assertEquals(3, out.selectedMeasuredEventIds.size())
@@ -243,7 +243,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '13:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -271,7 +271,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '11:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -299,7 +299,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '12:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -330,7 +330,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '18:00'
 		params.aggrGroup = AggregatorType.PAGE.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -348,7 +348,7 @@ class EventResultDashboardControllerTests {
 		// Verification:
 		assertTrue(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -361,9 +361,9 @@ class EventResultDashboardControllerTests {
 		assertEquals(1, out.selectedFolder.size())
 		assertTrue(out.selectedFolder.contains(1L))
 
-		assertEquals(2, out.selectedPage.size())
-		assertTrue(out.selectedPage.contains(1L))
-		assertTrue(out.selectedPage.contains(5L))
+		assertEquals(2, out.selectedPages.size())
+		assertTrue(out.selectedPages.contains(1L))
+		assertTrue(out.selectedPages.contains(5L))
 
 		assertFalse(out.selectedAllMeasuredEvents as boolean)
 		assertEquals(3, out.selectedMeasuredEventIds.size())
@@ -412,7 +412,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '13:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', 'NOT-A-NUMBER']
+		params.selectedPages = ['1', 'NOT-A-NUMBER']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = 'UGLY'
@@ -425,12 +425,12 @@ class EventResultDashboardControllerTests {
 		// Verification:
 		assertFalse(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
 
-		assertTrue("Invalid data -> no elements in Collection", out.selectedPage.isEmpty())
+		assertTrue("Invalid data -> no elements in Collection", out.selectedPages.isEmpty())
 		assertTrue("Invalid data -> no elements in Collection", out.selectedLocations.isEmpty())
 	}
 
@@ -447,7 +447,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '18:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = []
+		params.selectedPages = []
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -474,7 +474,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '18:00'
 				params.aggrGroup = AggregatorType.PAGE.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = []
+		params.selectedPages = []
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -501,7 +501,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '18:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = []
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -528,7 +528,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '18:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = []
 		params.selectedLocations = '17'
@@ -555,7 +555,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '18:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '1'
 		params.selectedLocations = []
@@ -751,7 +751,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = "13:00"
 				out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
 		out.selectedBrowsers = [2L]
 		out.selectedLocations = [17L]
@@ -774,7 +774,7 @@ class EventResultDashboardControllerTests {
 		assertEquals(26, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPage', [1L, 5L]);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
@@ -805,7 +805,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = null // Missing!
 				out.aggrGroup = null // Missing!
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
 		out.selectedBrowsers = [2L]
 		out.selectedLocations = [17L]
@@ -825,7 +825,7 @@ class EventResultDashboardControllerTests {
 		assertEquals(24, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPage', [1L, 5L]);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
@@ -855,7 +855,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = "13:00"
 				out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedAllMeasuredEvents = 'on'
 		out.selectedMeasuredEventIds = []
 		out.selectedBrowsers = [2L]
@@ -878,7 +878,7 @@ class EventResultDashboardControllerTests {
 		assertEquals(26, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPage', [1L, 5L]);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', true);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', []);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
@@ -911,7 +911,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = "13:00"
 		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
 		out.selectedBrowsers = [2L]
 		out.selectedLocations = [17L]
@@ -952,7 +952,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = "13:00"
 		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedAllMeasuredEvents = 'on';
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
 		out.selectedBrowsers = [2L]
@@ -993,7 +993,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = "13:00"
 		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
 		out.selectedAllBrowsers = true;
 		out.selectedBrowsers = [2L]
@@ -1034,7 +1034,7 @@ class EventResultDashboardControllerTests {
 		out.toHour = "13:00"
 		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
-		out.selectedPage = [1L, 5L]
+		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
 		out.selectedBrowsers = [2L]
 		out.selectedAllLocations = true;

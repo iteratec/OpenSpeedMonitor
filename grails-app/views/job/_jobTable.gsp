@@ -1,4 +1,3 @@
-<%@ page import="de.iteratec.osm.measurement.environment.Browser"%>
 <tbody>
 	<g:each var="job" in="${jobs}">
 		<g:set var="tags" value="${jobsWithTags.findAll { it.jobId == job.id }.collect { it.tag }}" />
@@ -32,7 +31,7 @@
 			</td>
 			<td class="jobgroup">${job.jobGroup.name}</td>
 			<td class="location">${job.location.removeBrowser(job.location.uniqueIdentifierForServer ?: job.location.location)}</td>
-			<td class="browser">${job.location.browser.name != Browser.UNDEFINED ? job.location.browser.name : ''}</td>
+			<td class="browser">${job.location.browser.name != de.iteratec.osm.measurement.environment.Browser.UNDEFINED ? job.location.browser.name : ''}</td>
 			<td><g:render template="timeago"
 					model="${['date': job.lastRun, 
 					  		'defaultmessage': message(code: 'job.lastRun.label.never', default: 'Noch nie'),

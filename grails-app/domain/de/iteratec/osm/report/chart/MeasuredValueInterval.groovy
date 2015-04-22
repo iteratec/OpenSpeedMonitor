@@ -45,4 +45,8 @@ class MeasuredValueInterval {
 	static mapping = {
 		cache usage: 'nonstrict-read-write'
 	}
+
+	public String toString(){
+		return name
+	}
 }

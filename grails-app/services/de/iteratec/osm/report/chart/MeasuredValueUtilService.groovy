@@ -226,7 +226,7 @@ class MeasuredValueUtilService {
 				this.resetToStartOfActualInterval(
 						timeFrameToFix.getStart(), 
 						intervalRangeInMinutes),
-				this.resetToEndOfActualInterval(
+				this.resetToStartOfActualInterval(
 						timeFrameToFix.getEnd(), 
 						intervalRangeInMinutes)
 		);
@@ -274,7 +274,7 @@ class MeasuredValueUtilService {
 		}else if (intervalInMinutes == MeasuredValueInterval.WEEKLY) {
 			return toSubtractFrom.minusWeeks(1)
 		}else{
-			throw new IllegalArgumentException("Unnknown interval: ${interval}")
+			throw new IllegalArgumentException("Unknown interval: ${intervalInMinutes}")
 		}
 	}
 	
@@ -302,4 +302,18 @@ class MeasuredValueUtilService {
 	public DateTime getNowInUtc(){
 		return new DateTime(DateTimeZone.UTC)
 	}
+
+    /**
+     * Checks, whether given DateTime dateTime is within actual interval of size {@link #interval} in minutes.
+     * @param dateTime
+     *          Any DateTime which should get checked.
+     * @param interval
+     *          Interval in minutes.
+     * @return Whether or not the given DateTime dateTime is within actual interval of size {@link #interval} in minutes.
+     */
+    Boolean isInActualInterval(DateTime dateTime, Integer interval) {
+        DateTime startOfActualInterval = resetToStartOfActualInterval(new DateTime(), interval)
+        DateTime startOfIntervalOfGivenDateTime = resetToStartOfActualInterval(dateTime, interval)
+        return startOfActualInterval.isEqual(startOfIntervalOfGivenDateTime)
+    }
 }

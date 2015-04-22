@@ -274,7 +274,7 @@ class CustomerSatisfactionHighChartService {
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
 				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
-				paramsToSend['selectedPage'] = Page.list()*.ident()
+				paramsToSend['selectedPages'] = Page.list()*.ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}
 
@@ -283,12 +283,12 @@ class CustomerSatisfactionHighChartService {
 			if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
 				paramsToSend['aggrGroup'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
-				paramsToSend['selectedPage'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+				paramsToSend['selectedPages'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
 				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
-				paramsToSend['selectedPage'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+				paramsToSend['selectedPages'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}
 

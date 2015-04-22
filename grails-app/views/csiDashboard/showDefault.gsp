@@ -29,7 +29,6 @@
 				    <g:message code="de.iteratec.isocsi.csi.static.measuring.description.short" default="Den dargestellten CSI-Wochenwerten liegen jeweils die Webpagetest-Rohdaten der vorangegangenen Woche zugrunde."/>
 				</p>
 				
-				<g:link action="showAll"><g:message code="de.iteratec.isocsi.csiDashboard"/></g:link>
 				<form method="get" action ="">
 					<div style="clear:both;"></div>
 					<p>

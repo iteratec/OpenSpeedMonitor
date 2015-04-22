@@ -133,7 +133,7 @@ class EventResultDashboardController {
 
                     int countOfSelectedAggregators = cmd.selectedAggrGroupValuesCached.size() + cmd.selectedAggrGroupValuesUnCached.size();
 
-                    warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(cmd.getSelectedTimeFrame(), cmd.getSelectedInterval(), countOfSelectedAggregators, cmd.selectedFolder.size(), countOfSelectedBrowser, cmd.selectedPage.size());
+                    warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(cmd.getSelectedTimeFrame(), cmd.getSelectedInterval(), countOfSelectedAggregators, cmd.selectedFolder.size(), countOfSelectedBrowser, cmd.selectedPages.size());
 
                 }
 
@@ -514,10 +514,8 @@ class EventResultDashboardController {
         /**
          * The database IDs of the selected {@linkplain Page pages}
          * which results to be shown.
-         *
-         * TODO rename to selectedPages
          */
-        Collection<Long> selectedPage = []
+        Collection<Long> selectedPages = []
 
         /**
          * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
@@ -684,7 +682,7 @@ class EventResultDashboardController {
             selectedFolder(nullable: false, validator: { Collection currentCollection, ShowAllCommand cmd ->
                 if (currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
             })
-            selectedPage(nullable: false, validator: { Collection currentCollection, ShowAllCommand cmd ->
+            selectedPages(nullable: false, validator: { Collection currentCollection, ShowAllCommand cmd ->
                 if (currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
             })
             selectedBrowsers(nullable: false, validator: { Collection currentCollection, ShowAllCommand cmd ->
@@ -794,7 +792,7 @@ class EventResultDashboardController {
             viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: MeasuredValueInterval.RAW)
 
             viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
-            viewModelToCopyTo.put('selectedPage', this.selectedPage)
+            viewModelToCopyTo.put('selectedPages', this.selectedPages)
 
             viewModelToCopyTo.put('selectedAllMeasuredEvents', this.selectedAllMeasuredEvents)
             viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
@@ -859,7 +857,7 @@ class EventResultDashboardController {
                 result.measuredEventIds.addAll(this.selectedMeasuredEventIds);
             }
 
-            result.pageIds.addAll(this.selectedPage);
+            result.pageIds.addAll(this.selectedPages);
 
             if (!this.selectedAllBrowsers) {
                 result.browserIds.addAll(this.selectedBrowsers);
