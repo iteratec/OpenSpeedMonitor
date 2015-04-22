@@ -37,7 +37,10 @@ grails.project.fork = [
 ]
 // in intellij a grails bug inhibits test runs in forked mode, so we disabled it
 // see http://codedevstuff.blogspot.de/2014/03/run-forked-tests-in-grails-on-intellij.html
-grails.project.fork.test = false
+grails.project.fork = [
+		test: false,
+		run: false
+]
 
 //grails.project.dependency.resolver = "maven" // or ivy
 
