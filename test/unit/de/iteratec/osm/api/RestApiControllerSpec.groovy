@@ -17,20 +17,15 @@
 
 package de.iteratec.osm.api
 
-import de.iteratec.osm.api.RestApiController
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobService
-import spock.lang.Specification
-
-import static org.junit.Assert.*
-
-import grails.test.mixin.*
-import org.junit.*
-import de.iteratec.osm.api.RestApiController.ResultsRequestCommand
 import de.iteratec.osm.filters.SecureApiFunctionsFilters
+import de.iteratec.osm.measurement.schedule.Job
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import spock.lang.Specification
+import de.iteratec.osm.api.ResultsRequestCommand
 
 /**
- * Test-suite of {@link RestApiConfigController}.
+ * Test-suite of {@link RestApiController}.
  * 
  * @author mze
  * @since IT-81
