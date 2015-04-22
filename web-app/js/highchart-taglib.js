@@ -474,15 +474,13 @@ function createChartForExport(
 		plotOptions: plotOptions,
 		exporting: {
 			scale: 1,
-			sourceWidth: 900,
-			sourceHeight: 500,
+			sourceWidth: 1418,
+			sourceHeight: 557,
 			url: exportUrl
 		},
 		
 		series: data
 	});
-	window.chart.exporting.sourceHeight
-	
 }
 
 function createChartWithFixYAxis(
