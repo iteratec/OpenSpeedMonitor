@@ -85,7 +85,7 @@ function RickshawGraphBuilder(args) {
           //calculate data, round to 2 digits
   //        var percentage = Math.round((100 - ((distanceTop * 100) / totalHeight))*100)/100;
           //display data
-          $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;'>"+percentage+"</div>" );
+          $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;font-size: 13pt;font-weight: bold;color: #b3b3b3;cursor: default;fill: #b3b3b3;'>"+percentage+"</div>" );
         }
       });
     }
@@ -131,12 +131,17 @@ function RickshawGraphBuilder(args) {
     var widthOfChartSvg = $(rickshawGraphBuilder.graph.element).width();
 
     // set height of html components
+    console.log("rk1");
+    console.log(args.width);
+    console.log(args.width-91);
+    console.log("rk2");
+    
     $("#rickshaw_chart_title").width(args.width);
     $(".rickshaw_y-axis_left").height(args.height);
     $(".rickshaw_y-axis_right").height(args.height);
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
-    $("#rickshaw_addons").width(args.width);
+    $("#rickshaw_addons").width(args.width-91);
     $("#rickshaw_slider").width(args.width);
     $("#rickshaw_range_slider_preview_container").width(args.width);
     $("#rickshaw_graph x_axis_d3").width(args.width);
@@ -935,8 +940,8 @@ function ChartAdjuster(args) {
               });
             }
             //center legend
-            var leftDistance = Math.floor(((diaWidth - $("#rickshaw_legend").outerWidth()) / 2) - 60);
-            document.getElementById('rickshaw_legend').style.cssText = "margin-left:" + leftDistance + "px !important";
+//            var leftDistance = Math.floor(((diaWidth - $("#rickshaw_legend").outerWidth()) / 2) - 60);
+//            document.getElementById('rickshaw_legend').style.cssText = "margin-left:" + leftDistance + "px !important";
 //            $(".rickshaw_legend").css({
 //              "margin-left" : "" + leftDistance + "px"
 //            });
