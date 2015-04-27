@@ -231,7 +231,11 @@ class MetricReportingService {
 		if (log.infoEnabled) log.info("Start reporting PageCSIValuesOfLastDay for timestamp: ${reportingTimeStamp}");
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		reportPageCSIValues(MeasuredValueInterval.DAILY, reportingTimeStamp)
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		reportPageCSIValues(MeasuredValueInterval.DAILY, reportingTimeStamp, activity)
+		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
+
+
 	}
 
 	/**
@@ -254,13 +258,18 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		reportPageCSIValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp)
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		reportPageCSIValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
+		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
 
-	private void reportPageCSIValues(Integer intervalInMinutes, DateTime reportingTimeStamp) {
+	private void reportPageCSIValues(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivity activity) {
 		if(log.debugEnabled) log.debug("reporting page csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
 
-		jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}.each {JobGroup eachJobGroup ->
+		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
+		int size = groups.size()
+		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
+			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index)])
 
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
 				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
@@ -297,8 +306,9 @@ class MetricReportingService {
 		}
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
-
-		reportShopCSIMeasuredValues(MeasuredValueInterval.DAILY, reportingTimeStamp)
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		reportShopCSIMeasuredValues(MeasuredValueInterval.DAILY, reportingTimeStamp,activity)
+		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
 
 	/**
@@ -321,14 +331,18 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		reportShopCSIMeasuredValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp)
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		reportShopCSIMeasuredValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
+		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
+
 	}
 
-	private void reportShopCSIMeasuredValues(Integer intervalInMinutes, DateTime reportingTimeStamp) {
+	private void reportShopCSIMeasuredValues(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivity activity) {
 		if(log.debugEnabled) log.debug("reporting shop csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
-
-		jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}.each {JobGroup eachJobGroup ->
-
+		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
+		int size = groups.size()
+		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
+			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index)])
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
 				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
 				intervalInMinutes)
