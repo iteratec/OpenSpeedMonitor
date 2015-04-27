@@ -16,20 +16,21 @@
 */
 
 function getPrettyCron(cronExpression) {
-  if (cronExpression == "0 ") {
+  if (cronExpression == "") {
     return "";
   } else {
-    return prettyCron.toString(cronExpression.substr(cronExpression.indexOf(' ') + 1));
+    return prettyCron.toString(cronExpression);
   }
 }
 
 function updatePrettyCrons() {
 	$.each($('abbr.cronExpression'), function(index, elem) {
-		var cronExpression = elem.innerHTML;
-    $(elem).attr('title', getPrettyCron(cronExpression));
     if(!$(elem).attr('data-seconds-cutted') ) {
       $(elem).attr('data-seconds-cutted', 'true');
-      $(elem).html(cronExpression.substr(cronExpression.indexOf(' ') + 1));
+      var cronExpression = elem.innerHTML;
+      var cronExpressionNoSeconds = cronExpression.indexOf(' ') + 1);
+      $(elem).attr('title', getPrettyCron(cronExpressionNoSeconds);
+      $(elem).html(cronExpression.substr(cronExpressionNoSeconds);
     }
 	});
 }
