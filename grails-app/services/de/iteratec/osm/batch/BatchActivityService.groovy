@@ -53,15 +53,15 @@ class BatchActivityService {
      *
      * @param BatchActivity BatchActivity to update
      * @param map with following possible entries:
-     *      "errors": Integer,
-     *      "failures": Integer,
-     *      "lastFailureMessage": String,
-     *      "progress": Integer,
-     *      "progressWithinStage": String,
-     *      "stage": String,
-     *      "status": Status,
-     *      "successfulActions": Integer,
-     *      "endDate": Date
+     *      <li>"errors": Integer,</li>
+     *      <li>"failures": Integer,</li>
+     *      <li>"lastFailureMessage": String,</li>
+     *      <li>"progress": String,</li>
+     *      <li>"progressWithinStage": String,</li>
+     *      <li>"stage": String,</li>
+     *      <li>"status": Status,</li>
+     *      <li>"successfulActions": Integer,</li>
+     *      <li>"endDate": Date</li>
      */
     public void updateStatus(BatchActivity activity,Map<String,Object> map){
         def allowed = ["errors","failures","lastFailureMessage","progress","progressWithinStage","stage","status","successfulActions","endDate"]
