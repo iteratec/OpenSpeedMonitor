@@ -207,7 +207,7 @@ class MetricReportingService {
 			if(log.debugEnabled) log.debug("MeasuredValues to report for last hour: ${mvs}")
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
 		}
-		batchActivityService.updateStatus(activity,["status":Status.DONE])
+		batchActivityService.updateStatus(activity, ["stage": "", "endDate": new Date(), "status": Status.DONE])
 	}
 
 	/**
