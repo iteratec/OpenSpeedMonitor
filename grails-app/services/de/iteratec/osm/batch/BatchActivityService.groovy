@@ -86,6 +86,7 @@ class BatchActivityService {
      */
     public String calculateProgress(int count, int actual){
         DecimalFormat df = new DecimalFormat("#.##");
+        if (count == 0) return df.format(0)+" %"
         return df.format(100.0/count*actual) + " %";
     }
 

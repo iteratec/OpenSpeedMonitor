@@ -18,6 +18,10 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import grails.test.GrailsMock
 
 import static org.junit.Assert.assertEquals
 
@@ -55,7 +59,7 @@ import de.iteratec.osm.util.I18nService
  */
 @TestFor(MetricReportingService)
 @TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, AggregatorType, JobGroup, GraphiteServer, GraphitePath, MeasuredValueInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration])
+@Mock([EventResult, AggregatorType,JobGroup, BatchActivity, GraphiteServer, GraphitePath, MeasuredValueInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration])
 class MetricReportingServiceTests {
 	MetricReportingService serviceUnderTest
 	static final double DELTA = 1e-15
@@ -79,9 +83,10 @@ class MetricReportingServiceTests {
 	static final String MEASURAND_DOCREADYTIME_NAME = 'docReadyTime'
 
     void setUp() {
-		serviceUnderTest = service 
+		serviceUnderTest = service
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
+		serviceUnderTest.batchActivityService = new BatchActivityService()
 		createTestDataCommonToAllTests()
     }
 	

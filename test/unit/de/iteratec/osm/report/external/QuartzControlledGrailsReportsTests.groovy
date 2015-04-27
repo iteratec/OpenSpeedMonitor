@@ -18,6 +18,8 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -46,7 +48,7 @@ import org.junit.Test
 
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)
-@Mock([MeasuredValueInterval, OsmConfiguration])
+@Mock([MeasuredValueInterval, OsmConfiguration, BatchActivity])
 class QuartzControlledGrailsReportsTests {
 	
 	static final String jobGroupWithServersName = 'csiGroupWithServers'
@@ -76,6 +78,7 @@ class QuartzControlledGrailsReportsTests {
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
 		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
+		serviceUnderTest.batchActivityService = new BatchActivityService()
 		new OsmConfiguration().save(failOnError: true)
 	}
 
