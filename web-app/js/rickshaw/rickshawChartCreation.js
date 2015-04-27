@@ -131,11 +131,6 @@ function RickshawGraphBuilder(args) {
     var widthOfChartSvg = $(rickshawGraphBuilder.graph.element).width();
 
     // set height of html components
-    console.log("rk1");
-    console.log(args.width);
-    console.log(args.width-91);
-    console.log("rk2");
-    
     $("#rickshaw_chart_title").width(args.width);
     $(".rickshaw_y-axis_left").height(args.height);
     $(".rickshaw_y-axis_right").height(args.height);
