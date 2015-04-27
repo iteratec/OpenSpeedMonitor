@@ -18,6 +18,10 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.Status
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 
@@ -67,6 +71,7 @@ class MetricReportingService {
 	ShopMeasuredValueService shopMeasuredValueService
 	ConfigService configService
 	InMemoryConfigService inMemoryConfigService
+	BatchActivityService batchActivityService
 
 	/**
 	 * Reports each measurand of incoming result for that a {@link GraphitePath} is configured.  
@@ -89,7 +94,7 @@ class MetricReportingService {
 		JobGroup jobGroup = measuredValueTagService.findJobGroupOfHourlyEventTag(result.tag)
 		Collection<GraphiteServer> servers = jobGroup.graphiteServers
 		if (servers.size()<1) {
-			return null
+			return
 		}
 
 		MeasuredEvent event = measuredValueTagService.findMeasuredEventOfHourlyEventTag(result.tag);
@@ -178,14 +183,17 @@ class MetricReportingService {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
 		}
-
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, new Date().getTime(), Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		if(log.debugEnabled) log.debug('reporting csi-values of last hour')
+		batchActivityService.updateStatus(activity,["stage":"Collecting JobGroups"])
 		Collection<JobGroup> csiGroupsWithGraphiteServers = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		if(log.debugEnabled) log.debug("csi-groups to report: ${csiGroupsWithGraphiteServers}")
-		csiGroupsWithGraphiteServers.each {JobGroup eachJobGroup ->
-
+		int size = csiGroupsWithGraphiteServers.size()
+		batchActivityService.updateStatus(activity,["stage":"Collecting JobGroups"])
+		csiGroupsWithGraphiteServers.eachWithIndex {JobGroup eachJobGroup, int index ->
+			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(index, size)])
 			MvQueryParams queryParams = new MvQueryParams()
 			queryParams.jobGroupIds.add(eachJobGroup.getId())
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
@@ -199,6 +207,7 @@ class MetricReportingService {
 			if(log.debugEnabled) log.debug("MeasuredValues to report for last hour: ${mvs}")
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
 		}
+		batchActivityService.updateStatus(activity,["status":Status.DONE])
 	}
 
 	/**
