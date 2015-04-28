@@ -19,6 +19,8 @@ package de.iteratec.osm.report.chart
 
 import org.springframework.dao.DataIntegrityViolationException
 
+import java.text.SimpleDateFormat
+
 /**
  * EventController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
@@ -41,7 +43,15 @@ class EventController {
     }
 
     def save() {
+        //Convert english date format to german, for passing validation
+        def gerFormatter = new SimpleDateFormat("dd.MM.yyyy")
+        def engFormatter = new SimpleDateFormat("yyyy-MM-dd")
+
+        if(params['date'].toString().contains("-"))
+            params['date'] = gerFormatter.format(engFormatter.parse(params['date']))
+
         def eventInstance = new Event(params)
+
         if (!eventInstance.save(flush: true)) {
             render(view: "create", model: [eventInstance: eventInstance])
             return

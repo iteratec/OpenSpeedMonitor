@@ -20,6 +20,7 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 import org.grails.databinding.BindUsing
+import org.grails.databinding.BindingFormat
 
 /**
  * Event
@@ -27,7 +28,6 @@ import org.grails.databinding.BindUsing
  */
 class Event {
 
-    @BindUsing({ obj, source -> source['date'] })
     Date date
     String fromHour
     String shortName
@@ -43,9 +43,9 @@ class Event {
         date(type: 'date')
         globallyVisible(defaultValue: false)
     }
-//
+
 //    def beforeValidate() {
-//        log.error(date)
+//        log.info(date)
 //        def formatter = new SimpleDateFormat("dd.MM.yyyy")
 //        date = (Date)formatter.parse(date)
 //    }
