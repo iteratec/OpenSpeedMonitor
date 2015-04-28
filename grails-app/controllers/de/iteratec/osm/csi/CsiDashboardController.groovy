@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
+import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -35,6 +37,10 @@ import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
+
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -47,11 +53,6 @@ import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
-
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-
-import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 
 //TODO: implement some tests for this controller
 
@@ -408,6 +409,68 @@ class CsiDashboardController {
 
     /**
      * <p>
+     * Fills the annotations with values.
+     * </p>
+     *
+     * @param modelToRender
+     *         The map to be filled. Previously added entries are overridden.
+     *         This map should not be <code>null</code>.
+     * @param timeFrame
+     *         The time-frame for that data should be calculated,
+     *         not <code>null</code>.
+     */
+    private void fillWithAnnotations(
+            Map<String, Object> modelToRender,
+            Interval timeFrame)
+    {
+//        MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+//        Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
+//
+//        DateTime resetFromDate = fixedTimeFrame.getStart()
+//        DateTime resetToDate = fixedTimeFrame.getEnd()
+
+//        List<Event> annotationContent = customerSatisfactionHighChartService.getAnnotationContentForHighChartMap(
+//                fixedTimeFrame, interval)
+
+//        List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedShopMeasuredValuesAsHighChartMap(
+//                fixedTimeFrame, interval, measuredValuesQueryParams)
+//
+//        Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
+//        DateTime resetFromDateWithOffsetChange = resetFromDate.minusMinutes(oneDayOffset)
+//        Integer rightOffset
+//        if (cookieBasedSettingsService.getChartingLibraryToUse() == ChartingLibrary.HIGHCHARTS){
+//            rightOffset = oneDayOffset * 4
+//        }else {
+//            rightOffset = oneDayOffset
+//        }
+//        DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
+//
+//        if( withTargetGraph )
+//        {
+//            graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
+//                    resetFromDateWithOffsetChange.minusDays(1), resetToDateWithOffsetChange.plusDays(1)))
+//        }
+//
+//        boolean includeCsTargetGraphs = true
+//        modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
+//        modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
+//        modelToRender.put('wptCustomerSatisfactionValues', graphs)
+//        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        ArrayList<String> annotations = new ArrayList<String>()
+//        DateTime annotationTime =  new DateTime(DateTime.parse("2015-03-16T07:22:05Z"))
+//        annotations.add([x: (annotationTime.getMillis() / 1000), text: "rk1"])
+
+        annotations.add("{x: 1426490525, text: '16.05.2015, 08:22:05CET<br/><span style=\"color:red\">rk2</span>'}")
+        annotations.add("{x: 1426460525, text: '15.05.2015, 22:02:05CET<br/><span style=\"color:green\">rk3</span>'}")
+//        annotationTime =  new DateTime(DateTime.parse("2015-03-17T07:22:05Z"))
+//        annotations.add([x: annotationTime, text: "rk2"])
+        modelToRender.put('annotations', annotations)
+
+    }
+
+    /**
+     * <p>
      * Fills the view-model-map with shop values. Calling this method
      * should not be mixed with other operations than weekly shop depended
      * ones.
@@ -541,6 +604,7 @@ class CsiDashboardController {
         queryParams.jobGroupIds.addAll(csiGroupIds)
 
         fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
+        fillWithAnnotations(modelToRender, timeFrame)
 
         modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put('weekStart', MONDAY_WEEKSTART)
@@ -552,6 +616,7 @@ class CsiDashboardController {
         modelToRender.put('labelShouldBeEnabled', true)
         modelToRender.put('debug', params.debug?true:false)
         modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
+
         return modelToRender
     }
 

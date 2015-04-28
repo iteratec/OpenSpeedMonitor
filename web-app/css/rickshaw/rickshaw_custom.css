@@ -43,10 +43,17 @@
 .disabledYAxis {
 	opacity: 0.3;
 }
+
+#rickshaw_timeline {
+  margin-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 60px;
+  width: 1104px;
+}
 #rickshaw_addons {
-	margin-top: 10px;
-	padding-bottom: 10px;
-	margin-left: 60px;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 60px;
   width: 1104px;
 }
 .rickshaw_chart_title {

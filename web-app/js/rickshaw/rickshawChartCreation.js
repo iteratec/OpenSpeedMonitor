@@ -136,7 +136,8 @@ function RickshawGraphBuilder(args) {
     $(".rickshaw_y-axis_right").height(args.height);
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
-    $("#rickshaw_addons").width(args.width-91);
+    $("#rickshaw_addons").width(args.width-60);
+    $("#rickshaw_timeline").width(args.width-60);
     $("#rickshaw_slider").width(args.width);
     $("#rickshaw_range_slider_preview_container").width(args.width);
     $("#rickshaw_graph x_axis_d3").width(args.width);
@@ -263,9 +264,8 @@ function RickshawGraphBuilder(args) {
       graph: self.graph,
       element: document.getElementById('rickshaw_timeline')
     } );
-//    args = [{x: 1414846610, text: "rk1"}, {x: 1414846400, text: "rk2"}];
     if (args) {
-      for (index = 0; index < args.length; ++index) {
+      for (index = 0; index < args.length; ++index) {console.log(args[index].x);console.log(args[index].text);
         annotator.add(args[index].x, args[index].text);
       }
       annotator.update();
@@ -843,7 +843,7 @@ function HtmlProvider(args) {
     var numberOfRightYAxes = self.numberOfMeasurandGroups - 1;
     var totalWidthOfRightYAxes = numberOfRightYAxes * widthOfRightYAxis;
     var widthOfGraph = totalAvailableWidth - widthOfLeftYAxis
-        - totalWidthOfRightYAxes - 6;
+        - totalWidthOfRightYAxes;
 
     // container which contains all right y-axes
     $("#rickshaw_y-axes_right").css({
@@ -867,6 +867,10 @@ function HtmlProvider(args) {
 
     // container which contains x-axis, slider and legend
     $("#rickshaw_addons").css({
+      "margin-left" : widthOfLeftYAxis + "px",
+      "width" : widthOfGraph + "px"
+    });
+    $("#rickshaw_timeline").css({
       "margin-left" : widthOfLeftYAxis + "px",
       "width" : widthOfGraph + "px"
     });

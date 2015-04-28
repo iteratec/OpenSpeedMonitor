@@ -134,33 +134,55 @@ class CustomerSatisfactionHighChartService {
 		return resultMap
 	}
 
-	/**
-	 * <p>
-	 * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
-	 * </p>
-	 *
-	 * @param timeFrame
-	 *         The time frame for which {@link MeasuredValue}s should be found. Both
-	 *         borders are included in search. This argument may not be
-	 *         <code>null</code>.
-	 * @param queryParams
-	 *         The {@linkplain MvQueryParams filter} to select relevant
-	 *         measured values, not <code>null</code>.
-	 * @return not <code>null</code>.
-	 * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
-	 */
-	List<OsmChartGraph> getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
-		List<OsmChartGraph> resultList = []
+    /**
+     * <p>
+     * Gets annotations as a list with {@link Event}s.
+     * </p>
+     *
+     * @param timeFrame
+     *         The time frame for which annotations should be found. Both
+     *         borders are included in search. This argument may not be
+     *         <code>null</code>.
+     * @return not <code>null</code>.
+     */
+//    List<Event> getAnnotationContentForHighChartMap(Interval timeFrame, MeasuredValueInterval interval) {
+//        List<Event> resultList = []
+//
+//        Date fromDate = timeFrame.getStart().toDate();
+//        Date toDate = timeFrame.getEnd().toDate();
+//
+//        resultList = shopMeasuredValueService.getAnnotationContent(fromDate, toDate, interval)
+//
+//        return resultList;
+//    }
 
-		Date fromDate = timeFrame.getStart().toDate();
-		Date toDate = timeFrame.getEnd().toDate();
-		List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
-		List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
+    /**
+     * <p>
+     * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
+     * </p>
+     *
+     * @param timeFrame
+     *         The time frame for which {@link MeasuredValue}s should be found. Both
+     *         borders are included in search. This argument may not be
+     *         <code>null</code>.
+     * @param queryParams
+     *         The {@linkplain MvQueryParams filter} to select relevant
+     *         measured values, not <code>null</code>.
+     * @return not <code>null</code>.
+     * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
+     */
+    List<OsmChartGraph> getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
+        List<OsmChartGraph> resultList = []
 
-		resultList = convertToHighchartGraphList(csiValues)
+        Date fromDate = timeFrame.getStart().toDate();
+        Date toDate = timeFrame.getEnd().toDate();
+        List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
+        List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
 
-		return resultList;
-	}
+        resultList = convertToHighchartGraphList(csiValues)
+
+        return resultList;
+    }
 
 	/**
 	 * <p>
