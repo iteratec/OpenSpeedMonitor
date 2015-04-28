@@ -207,8 +207,8 @@ class OsmChartTagLibTests {
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
+            <div id="rickshaw_timeline"></div>
 			<div id="rickshaw_addons">
-                <div id="rickshaw_timeline"></div>
 				<div id="rickshaw_slider"></div>
 				<div id="rickshaw_legend"></div>
 			</div>
@@ -326,8 +326,8 @@ class OsmChartTagLibTests {
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
+            <div id="rickshaw_timeline"></div>
 			<div id="rickshaw_addons">
-                <div id="rickshaw_timeline"></div>
 				<div id="rickshaw_slider"></div>
 				<div id="rickshaw_legend"></div>
 			</div>
