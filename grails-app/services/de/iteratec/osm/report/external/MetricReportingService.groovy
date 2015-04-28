@@ -178,7 +178,6 @@ class MetricReportingService {
 	 * @since IT-199
 	 */
 	public void reportEventCSIValuesOfLastHour(DateTime reportingTimeStamp) {
-		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
@@ -193,7 +192,7 @@ class MetricReportingService {
 		int size = csiGroupsWithGraphiteServers.size()
 		batchActivityService.updateStatus(activity,["stage":"Collecting JobGroups"])
 		csiGroupsWithGraphiteServers.eachWithIndex {JobGroup eachJobGroup, int index ->
-			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(index, size)])
+			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size, index+1)])
 			MvQueryParams queryParams = new MvQueryParams()
 			queryParams.jobGroupIds.add(eachJobGroup.getId())
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
@@ -206,6 +205,7 @@ class MetricReportingService {
 
 			if(log.debugEnabled) log.debug("MeasuredValues to report for last hour: ${mvs}")
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 		batchActivityService.updateStatus(activity, ["stage": "", "endDate": new Date(), "status": Status.DONE])
 	}
@@ -269,7 +269,7 @@ class MetricReportingService {
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
-			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index)])
+			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index+1)])
 
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
 				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
@@ -284,6 +284,7 @@ class MetricReportingService {
 
 			if(log.debugEnabled) log.debug("reporting ${pmvsWithData.size()} page csi-values with intervalInMinutes ${intervalInMinutes} for JobGroup: ${eachJobGroup}");
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.PAGE, pmvsWithData)
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
 
@@ -342,7 +343,7 @@ class MetricReportingService {
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
-			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index)])
+			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index+1)])
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
 				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
 				intervalInMinutes)
@@ -355,6 +356,7 @@ class MetricReportingService {
 			}
 
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.SHOP, smvsWithData)
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
 
