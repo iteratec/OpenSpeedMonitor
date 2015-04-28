@@ -182,7 +182,7 @@ class MetricReportingService {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
 		}
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, new Date().getTime(), Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		if(log.debugEnabled) log.debug('reporting csi-values of last hour')
@@ -231,7 +231,7 @@ class MetricReportingService {
 		if (log.infoEnabled) log.info("Start reporting PageCSIValuesOfLastDay for timestamp: ${reportingTimeStamp}");
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day page CSI Values: ${reportingTimeStamp}")
 		reportPageCSIValues(MeasuredValueInterval.DAILY, reportingTimeStamp, activity)
 		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 
@@ -258,7 +258,7 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week page CSI Values: ${reportingTimeStamp}")
 		reportPageCSIValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
 		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
@@ -307,7 +307,7 @@ class MetricReportingService {
 		}
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day shop CSI Values: ${reportingTimeStamp}")
 		reportShopCSIMeasuredValues(MeasuredValueInterval.DAILY, reportingTimeStamp,activity)
 		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
@@ -332,7 +332,7 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.UPDATE,"Report last hour CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week shop CSI Values: ${reportingTimeStamp}")
 		reportShopCSIMeasuredValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
 		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 

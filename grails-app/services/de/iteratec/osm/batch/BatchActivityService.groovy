@@ -12,7 +12,7 @@ class BatchActivityService {
     /**
      * Creates a new BatchActivity
      * @param c Class of the affected Domain
-     * @param idWithinDomain affected object id
+     * @param idWithinDomain affected object id, will be used to identify already existing activities
      * @param activity running Activity
      * @param name a readable name to display
      * @return

@@ -87,7 +87,7 @@ class MvUpdateEventCleanupService {
 		
 	}
 	void closeAndCalculateIfNecessary(List<MeasuredValue> mvsOpenAndExpired){
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, new Date().getTime(), Activity.UPDATE, "Close and Calculate MeasuredValues")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate MeasuredValues")
 		List<MeasuredValueUpdateEvent> allUpdateEvents = MeasuredValueUpdateEvent.list()
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${allUpdateEvents.size()} update events in db before cleanup.")
 		List<MeasuredValueUpdateEvent> updateEventsToBeDeleted = measuredValueDaoService.getUpdateEvents(mvsOpenAndExpired*.ident())
