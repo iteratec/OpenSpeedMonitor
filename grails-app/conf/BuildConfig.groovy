@@ -65,7 +65,7 @@ grails.project.dependency.resolution = {
         flatDir name:'local jars', dirs:'./lib/'
 
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
-        //mavenRepo "http://repo.grails.org/grails/plugins/"
+        mavenRepo "http://repo.grails.org/grails/plugins/"
         //mavenRepo "http://snapshots.repository.codehaus.org"
         //mavenRepo "http://repository.codehaus.org"
         //mavenRepo "http://download.java.net/maven/2/"
@@ -145,6 +145,7 @@ grails.project.dependency.resolution = {
 		}
 
 		compile(':codenarc:0.22')
+		compile(':markdown:1.1.1')
 	}
 
 	codenarc {

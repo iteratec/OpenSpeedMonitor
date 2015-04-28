@@ -16,6 +16,7 @@
 */
 
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import grails.util.Environment
@@ -111,7 +112,8 @@ class BootStrap {
 			detailDataStorageTimeInWeeks: 12,
 			defaultMaxDownloadTimeInMinutes: 60,
 			minDocCompleteTimeInMillisecs: 250,
-			maxDocCompleteTimeInMillisecs: 180000).save(failOnError: true)
+			maxDocCompleteTimeInMillisecs: 180000,
+			maxDataStorageTimeInMonths: 13).save(failOnError: true)
 	}
 	void initJobScheduling(){
 		log.info "initJobScheduling() OSM starts"

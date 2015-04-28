@@ -29,6 +29,8 @@ class EventController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+    def markdownService
+
     def index() {
         redirect(action: "list", params: params)
     }
@@ -49,6 +51,7 @@ class EventController {
 
         if(params['date'].toString().contains("-"))
             params['date'] = gerFormatter.format(engFormatter.parse(params['date']))
+
 
         def eventInstance = new Event(params)
 

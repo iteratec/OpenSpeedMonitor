@@ -34,7 +34,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="event.htmlDescription.label" default="Html Description" /></td>
 				
-				<td valign="top" class="value">${fieldValue(bean: eventInstance, field: "htmlDescription")}</td>
+				<td valign="top" class="value"><markdown:renderHtml text="${fieldValue(bean: eventInstance, field: "htmlDescription")}"/></td>
 				
 			</tr>
 		
