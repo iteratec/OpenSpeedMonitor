@@ -24,16 +24,17 @@ function getPrettyCron(cronExpression) {
 }
 
 function updatePrettyCrons() {
-	$.each($('abbr.cronExpression'), function(index, elem) {
-    if(!$(elem).attr('data-seconds-cutted') ) {
-      $(elem).attr('data-seconds-cutted', 'true');
+  $.each($('abbr.cronExpression'), function(index, elem) {
+     if(!$(elem).attr('data-seconds-cutted') ) {
+       $(elem).attr('data-seconds-cutted', 'true');
       var cronExpression = elem.innerHTML;
-      var cronExpressionNoSeconds = cronExpression.indexOf(' ') + 1);
-      $(elem).attr('title', getPrettyCron(cronExpressionNoSeconds);
-      $(elem).html(cronExpression.substr(cronExpressionNoSeconds);
-    }
-	});
+      var cronExpressionNoSeconds = cronExpression.substr(cronExpression.indexOf(' ') + 1);
+      $(elem).attr('title', getPrettyCron(cronExpressionNoSeconds));
+      $(elem).html(cronExpressionNoSeconds);
+     }
+  });
 }
+
 
 $(document).ready(function() {
 	updatePrettyCrons();
