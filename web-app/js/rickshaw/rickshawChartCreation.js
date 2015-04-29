@@ -140,8 +140,8 @@ function RickshawGraphBuilder(args) {
     $("#rickshaw_timeline").width(args.width-60);
     $("#rickshaw_slider").width(args.width);
     $("#rickshaw_range_slider_preview_container").width(args.width);
-    $("#rickshaw_graph x_axis_d3").width(args.width);
     $("#rickshaw_x-axis").width(args.width);
+    $(".x_axis_d3").attr("width", args.width);
     $(".graph").width(eval(parseInt(args.width) + 25));
 
     self.graph.configure({
@@ -265,7 +265,7 @@ function RickshawGraphBuilder(args) {
       element: document.getElementById('rickshaw_timeline')
     } );
     if (args) {
-      for (index = 0; index < args.length; ++index) {console.log(args[index].x);console.log(args[index].text);
+      for (index = 0; index < args.length; ++index) {
         annotator.add(args[index].x, args[index].text);
       }
       annotator.update();
@@ -1057,7 +1057,13 @@ function ChartExporter(args) {
   
   this.initialize = function(args) {
     d3.select("#dia-save-chart-as-png").on("click", function(){
+
       deferrerCollection = new Array();
+      
+      //resize
+      deferrerCollection.push($.Deferred());
+      self.resizeGraphTo(1418, 557, deferrerCollection[deferrerCollection.length - 1]);
+
       self.assignAllRelevantCssToStyleAttributes();
       
       var yAxisCount = 0;
@@ -1067,7 +1073,7 @@ function ChartExporter(args) {
         self.renderSvgElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
         yAxisCount++;
       });
-  
+
       var titleContent = $('#rickshaw_chart_title').html().trim();
       if (titleContent != "") {
         deferrerCollection.push($.Deferred());
@@ -1105,7 +1111,7 @@ function ChartExporter(args) {
 
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var retVal = prepareNewBlankCanvas(".graph");
+        var retVal = prepareNewBlankCanvas(".graph", 146);
         var canvas = retVal.canvas;
         var ctx = retVal.ctx;
         
@@ -1117,7 +1123,7 @@ function ChartExporter(args) {
   
         self.mergeCanvases("#rickshaw_graphic_svg", "#canvas_graphic_svg", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
         self.mergeCanvases(".x_axis_d3", "#canvas_x_axis_d3", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
-        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+146), graphOffsetLeft);
         
         var yAxisCount = 0;
         $('.y_axis').each(function() {
@@ -1247,10 +1253,24 @@ function ChartExporter(args) {
     });
   }
 
+
+  this.resizeGraphTo = function(width, height, deferrer) {
+    rickshawGraphBuilder.updateSize({
+      width : width,
+      height : height
+    });
+    $("#rickshaw_legend, ul").css({
+      "-moz-column-count" : 2 + "",
+      "-webkit-column-count" : 2 + "",
+      "column-count" : 2 + ""
+    });
+    deferrer.resolve();
+  }
+  
   this.renderSvgElementOnNewCanvasWithDelay = function(svgElement, newCanvasId, deferrer) {
     var html2 = svgElement.clone().wrapAll("<div/>").parent().html();
     html2 = html2.replace(/<svg (.*?)>/, '<svg xmlns="http://www.w3.org/2000/svg" $1>');
-    html2 = html2.replace(/top: -20px/, 'top: 0');
+    html2 = html2.replace(/top: -[\d]+\.?[\d]*px/, 'top: 0');
     
     if(!!navigator.userAgent.match(/Trident/)){
       html2 = html2.replace(/ xmlns=\"http:\/\/www.w3.org\/2000\/svg\"/, '');

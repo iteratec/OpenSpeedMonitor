@@ -19,9 +19,6 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
 
-import org.grails.databinding.BindUsing
-import org.grails.databinding.BindingFormat
-
 /**
  * Event
  * A domain class describes the data object and it's mapping to the database

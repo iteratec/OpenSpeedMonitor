@@ -448,7 +448,7 @@
 .rickshaw_legend .label {
 	margin: 0;
 	white-space: nowrap;
-	display: inline;
+	display: block;
 	font-size: inherit;
 	background-color: transparent;
 	color: inherit;
@@ -456,6 +456,7 @@
 	line-height: normal;
 	padding: 0px;
 	text-shadow: none;
+	text-align: left !important;
 }
 
 .rickshaw_legend .action:hover {
