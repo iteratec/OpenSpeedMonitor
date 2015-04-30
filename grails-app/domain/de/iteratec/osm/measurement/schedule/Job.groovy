@@ -17,15 +17,14 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.isj.quartzjobs.*
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.script.Script
 import grails.util.Environment
 
 import org.grails.databinding.BindUsing
 import org.grails.taggable.Taggable
-import org.quartz.CronExpression 
-
-import de.iteratec.isj.quartzjobs.*
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.environment.Location
+import org.quartz.CronExpression
 
 /**
  * <p>
@@ -200,8 +199,7 @@ class Job implements Taggable {
 
         // if an executionSchedule is set, make sure that it is a valid Cron expression
         executionSchedule(nullable: true, validator: {
-            if (it != null && !CronExpression.isValidExpression(it)) {
-                def rk = 1 // I guess this delays execution - at least with this command here, the validation works and any errors are output in frontend correctly
+            if ((it != null) && (!(CronExpression.isValidExpression(it)))) {
                 return ['executionScheduleInvalid']
             }
         })
