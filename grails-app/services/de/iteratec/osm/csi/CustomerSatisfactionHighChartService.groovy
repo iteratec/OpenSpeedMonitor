@@ -136,28 +136,6 @@ class CustomerSatisfactionHighChartService {
 
     /**
      * <p>
-     * Gets annotations as a list with {@link Event}s.
-     * </p>
-     *
-     * @param timeFrame
-     *         The time frame for which annotations should be found. Both
-     *         borders are included in search. This argument may not be
-     *         <code>null</code>.
-     * @return not <code>null</code>.
-     */
-//    List<Event> getAnnotationContentForHighChartMap(Interval timeFrame, MeasuredValueInterval interval) {
-//        List<Event> resultList = []
-//
-//        Date fromDate = timeFrame.getStart().toDate();
-//        Date toDate = timeFrame.getEnd().toDate();
-//
-//        resultList = shopMeasuredValueService.getAnnotationContent(fromDate, toDate, interval)
-//
-//        return resultList;
-//    }
-
-    /**
-     * <p>
      * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
      * </p>
      *

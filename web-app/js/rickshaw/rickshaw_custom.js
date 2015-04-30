@@ -972,7 +972,7 @@ function MeasurandGroup(args) {
 			var tick = lowestYValue + i * valuePerTick;
 			tickValues.push(tick.toFixed(decimals));
 		}
-
+		
 		return tickValues;
 	}
 
@@ -1797,7 +1797,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 			offsets.push( { value: tickValue, unit: unit } );
 		}
-
+		
 		return offsets;
 	};
 
@@ -1900,7 +1900,7 @@ Rickshaw.Graph.Axis.X = function(args) {
 		if (this._renderWidth !== undefined && this.graph.width !== this._renderWidth) this.setSize({ auto: true });
 
 		var axis = d3.svg.axis().scale(this.graph.x).orient(this.orientation);
-		
+
 		axis.tickFormat( self.tickFormat || function(x) { return x } );
 		
 		if (this.tickValues) axis.tickValues(this.tickValues);

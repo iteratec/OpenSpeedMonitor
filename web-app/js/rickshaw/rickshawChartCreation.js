@@ -496,7 +496,7 @@ function XAxis(args) {
     while (date < maxDate) {
       // increase date by one year
       date = new Date(date.getTime());
-      date.setYear(date.getYear() + 1);
+      date.setYear(date.getFullYear() + 1);
 
       if (date < maxDate) {
         years.push(date.getTime() / 1000);
@@ -527,15 +527,16 @@ function XAxis(args) {
   this.getDaysInRange = function(minDate, maxDate) {
     var days = [];
     var date = new Date(minDate.getTime());
+    var maxDateAsTime = new Date(maxDate.getTime());
     date.setMilliseconds(0);
     date.setSeconds(0);
     date.setMinutes(0);
     date.setHours(0);
 
-    while (date < maxDate) {
+    while (date < maxDateAsTime) {
       date = new Date(date.getTime());
       self.increaseDay(date);
-      if (date < maxDate) {
+      if (date < maxDateAsTime) {
         days.push(date.getTime() / 1000);
       }
     }
@@ -622,7 +623,7 @@ function XAxis(args) {
 
   this.increaseMonth = function(date) {
     if (date.getMonth() == 11) {
-      date.setYear(date.getYear() + 1);
+      date.setYear(date.getFullYear() + 1);
       date.setMonth(0);
     } else {
       date.setMonth(date.getMonth() + 1);
@@ -641,7 +642,7 @@ function XAxis(args) {
     }
 
     if (month == 2) {
-      if (date.getYear() % 4 == 0) {
+      if (date.getFullYear() % 4 == 0) {
         increase(date, 27);
       } else {
         increase(date, 28);
