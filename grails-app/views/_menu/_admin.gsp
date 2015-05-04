@@ -34,7 +34,7 @@
 					<ul class="dropdown-menu scrollable">
 						<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.logicalPropertyName } }">
               <g:if test="${c.logicalPropertyName != 'home'}">
-	              <g:if test="${['AdminManageController', 'BrowserController', 'BrowserAliasController', 'CsTargetGraphController', 'CsTargetValueController', 'EventController', 'GraphitePathController', 'GraphiteServerController', 'JobGroupController', 'LocationController', 'MeasuredEventController', 'OsmConfigurationController', 'PageController', 'WebPageTestServerController'].contains(c?.fullName?.substring(c?.fullName?.lastIndexOf('.')+1))}">
+	              <g:if test="${['AdminManageController', 'ApiKeyController', 'BrowserController', 'BrowserAliasController', 'CsTargetGraphController', 'CsTargetValueController', 'EventController', 'GraphitePathController', 'GraphiteServerController', 'JobGroupController', 'LocationController', 'MeasuredEventController', 'OsmConfigurationController', 'PageController', 'WebPageTestServerController'].contains(c?.fullName?.substring(c?.fullName?.lastIndexOf('.')+1))}">
 									<li class="controller"><g:link controller="${c.logicalPropertyName}">${c?.fullName?.substring(c?.fullName?.lastIndexOf('.')+1)}</g:link></li>
 	              </g:if>
               </g:if>
