@@ -588,28 +588,8 @@ Rickshaw.Graph = function(args) {
 		} );
 
 		var stackedData;
-// RK performance optimized
-//		if (!this.renderer.unstack) {
-//
-//			this._validateStackable();
-//
-//			var layout = d3.layout.stack();
-//			layout.offset( self.offset );
-//			stackedData = layout(data);
-//		}
-	// RK performance optimized
 
 		stackedData = stackedData || data;
-
-	// RK performance optimized
-//		if (this.renderer.unstack) {
-//			stackedData.forEach( function(seriesData) {
-//				seriesData.forEach( function(d) {
-//					d.y0 = d.y0 === undefined ? 0 : d.y0;
-//				} );
-//			} );
-//		}
-	  // RK performance optimized
 
 		this.stackData.hooks.after.forEach( function(entry) {
 			stackedData = entry.f.apply(self, [data]);
@@ -624,23 +604,6 @@ Rickshaw.Graph = function(args) {
 		this.stackedData = stackedData;
 		
 		return stackedData;
-	};
-
-	this._validateStackable = function() {
-
-		var series = this.series;
-		var pointsCount;
-
-		series.forEach( function(s) {
-
-			pointsCount = pointsCount || s.data.length;
-
-			if (pointsCount && s.data.length != pointsCount) {
-				throw "stacked series cannot have differing numbers of points: " +
-					pointsCount + " vs " + s.data.length + "; see Rickshaw.Series.fill()";
-			}
-
-		}, this );
 	};
 
 	this.stackData.hooks = { data: [], after: [] };
@@ -3126,13 +3089,6 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
 			
-//			 RK modify performance
-//			parent.onUpdate(function() {
-//  			  graph.render();
-//  			  self.render();
-//			});
-//    RK modify performance
-
 			parent.onConfigure(function(args) { 
 				// don't propagate height
 				delete args.height;
@@ -3405,7 +3361,7 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 				}
 				graph.window.xMin = windowAfterDrag[0];
 				graph.window.xMax = windowAfterDrag[1];
-//				graph.update();
+				graph.update();
 				self.render();
 			});
 		}
@@ -3440,9 +3396,6 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 		}
 
 		function onMouseup(datum, index) {
-		  self.graphs.forEach(function(graph) {
-		    graph.update();
-	    });
 			d3.select(document).on("mousemove.rickshaw_range_slider_preview", null);
 			d3.select(document).on("mouseup.rickshaw_range_slider_preview", null);
 			d3.select(document).on("touchmove.rickshaw_range_slider_preview", null);
@@ -3514,18 +3467,10 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
 	domain: function(data) {
 		// Requires that at least one series contains some data
-//  RK improve performance
-	  //neu start
     var stackedData = data || this.graph.stackedData;
     if(( typeof stackedData === 'undefined' ) || (!stackedData)) {
       stackedData = this.graph.stackData();
     }
-    //neu ende
-    //alt start
-//    var stackedData = data || this.graph.stackedData || this.graph.stackData();
-    //alt ende
-// RK optimize performance end
-
 		var xMin = +Infinity;
 		var xMax = -Infinity;
 
