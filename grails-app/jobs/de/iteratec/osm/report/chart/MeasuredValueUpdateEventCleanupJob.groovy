@@ -25,7 +25,7 @@ class MeasuredValueUpdateEventCleanupJob {
 	MvUpdateEventCleanupService mvUpdateEventCleanupService
 	
     static triggers = {
-		/** Each Day at 5:00 am. */
+		/** Each Day at 5:30 am. */
 		cron(name: 'dailyUpdateEventCleanup', cronExpression: '0 30 5 ? * *')
     }
     def execute() {
