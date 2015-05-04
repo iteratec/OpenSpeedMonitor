@@ -1061,11 +1061,15 @@ function ChartExporter(args) {
 
       deferrerCollection = new Array();
       
-      //resize
-      deferrerCollection.push($.Deferred());
-      self.resizeGraphTo(1418, 557, deferrerCollection[deferrerCollection.length - 1]);
-
-      self.assignAllRelevantCssToStyleAttributes();
+      if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+        //resize
+        deferrerCollection.push($.Deferred());
+        var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'));
+        var previousHeight=parseFloat($('#rickshaw_yAxis_0').css('height'));
+        self.resizeGraphTo(1418, 557, deferrerCollection[deferrerCollection.length - 1]);
+      }
+      
+    self.assignAllRelevantCssToStyleAttributes();
       
       var yAxisCount = 0;
       $('.y_axis').each(function() {
@@ -1159,6 +1163,10 @@ function ChartExporter(args) {
         //convert to image
         try {
           downloadCanvas(canvas, "png");
+          if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+            deferrerCollection.push($.Deferred());
+            self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
+          }
         } 
         catch(err) {} // handle IE        
       });
