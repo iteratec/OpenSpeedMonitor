@@ -219,6 +219,7 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 			type : 'POST',
 			url : listJobsLink,
 			success: function(result) {
+			  //result = result.replace("<html>","").replace("<body>","").replace("</html>","").replace("</body>","");
 				$('#jobtable tbody').empty();
 				$('#jobtable tbody').replaceWith(result);
 				initTable(nextJobExecutionLink);

@@ -1,13 +1,16 @@
 package de.iteratec.osm.persistence
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import org.joda.time.DateTime
+import org.quartz.JobExecutionException
 
 
 class DbCleanupOldJobResultsWithDependenciesJob {
 
     DbCleanupService dbCleanupService
     ConfigService configService
+    InMemoryConfigService inMemoryConfigService
 
     static triggers = {
         /**
@@ -17,7 +20,7 @@ class DbCleanupOldJobResultsWithDependenciesJob {
     }
 
     def execute() {
-        if(configService.isDatabaseCleanupEnabled() && configService.areMeasurementsGenerallyEnabled()){
+        if(inMemoryConfigService.isDatabaseCleanupEnabled()){
             Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
             dbCleanupService.deleteResultsDataBefore(toDeleteResultsBefore)
         }

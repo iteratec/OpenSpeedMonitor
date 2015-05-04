@@ -140,7 +140,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime endDate = new DateTime(2013, 9, 19, 15, 55, 00);
 		
 		DateTime expectedFixedStartDate = new DateTime(2013, 6, 14, 0, 0, 0, 0);
-		DateTime expectedFixedEndDate = new DateTime(2013, 9, 20, 0, 0, 0, 0);
+		DateTime expectedFixedEndDate = new DateTime(2013, 9, 13, 0, 0, 0, 0);
 		
 		Interval timeFrame = new Interval(startDate, endDate);
 		
@@ -221,4 +221,28 @@ class MeasuredValueUtilServiceTests {
 	void testCountIntervals(){
 		DateTime tenDaysBeforeEndOfSummertime = new DateTime(2013, 10, 17, 0, 0, 0);
 	}
+
+    @Test
+    void testIsInActualInterval() {
+
+        //test specific data
+        Integer hourly = MeasuredValueInterval.HOURLY
+        Integer daily = MeasuredValueInterval.DAILY
+        Integer weekly = MeasuredValueInterval.WEEKLY
+        DateTime now = new DateTime()
+
+        //assertions
+        assertTrue(serviceUnderTest.isInActualInterval(now, hourly))
+        assertFalse(serviceUnderTest.isInActualInterval(now.minusMinutes(hourly + 1), hourly))
+        assertFalse(serviceUnderTest.isInActualInterval(now.minusMinutes(daily), hourly))
+        assertFalse(serviceUnderTest.isInActualInterval(now.minusMinutes(weekly), hourly))
+
+        assertTrue(serviceUnderTest.isInActualInterval(now, daily))
+        assertFalse(serviceUnderTest.isInActualInterval(now.minusMinutes(daily + 1), daily))
+        assertFalse(serviceUnderTest.isInActualInterval(now.minusMinutes(weekly), daily))
+
+        assertTrue(serviceUnderTest.isInActualInterval(now, weekly))
+        assertFalse(serviceUnderTest.isInActualInterval(now.minusMinutes(weekly + 1), weekly))
+
+    }
 }

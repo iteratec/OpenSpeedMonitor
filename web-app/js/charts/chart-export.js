@@ -11,7 +11,8 @@
     return ("osm_" + curAreaName + "_" + datetime + "." + fileType + "");
   }
 
-  function prepareNewBlankCanvas(modelCanvasId) {
+  function prepareNewBlankCanvas(modelCanvasId, reduceHeightBy) {
+    if (typeof(reduceHeightBy)==='undefined') reduceHeightBy = 10;
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'canvas_everything_merged');
     canvas.setAttribute('style', "display:none");
@@ -22,7 +23,7 @@
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   
     ctx.canvas.width  = $( modelCanvasId ).first().width();
-    ctx.canvas.height = $( modelCanvasId ).first().height();
+    ctx.canvas.height = $( modelCanvasId ).first().height() - reduceHeightBy;
     ctx.globalCompositeOperation = "destination-under";
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);

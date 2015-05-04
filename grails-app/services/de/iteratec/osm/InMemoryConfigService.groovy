@@ -29,15 +29,10 @@ class InMemoryConfigService {
 
     static final Boolean DEFAULT_MEASUREMENTS_GENERALLY_ENABLED = false
 
-    static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
-
     static final Boolean DEFAULT_DATABASE_CLEANUP_ENABLED = false
 
     /** If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. */
     Boolean measurementsGenerallyEnabled = DEFAULT_MEASUREMENTS_GENERALLY_ENABLED
-
-    /** Maximum Number of months osm keeps results in database   */
-    Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
 
     /** If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldMeasuredValuesWithDependenciesJob}) */
     Boolean databaseCleanupEnabled = DEFAULT_DATABASE_CLEANUP_ENABLED
@@ -54,14 +49,17 @@ class InMemoryConfigService {
     /**
      * Sets measurementsGenerallyEnabled to true
      */
-    void activateMeasurementsGenerallyEnabled(){
+    /**
+     * Activates measurements generally.
+     */
+    void activateMeasurementsGenerally(){
         measurementsGenerallyEnabled = true
     }
 
     /**
      * Sets measurementsGenerallyEnabled to false
      */
-    void deactivateMeasurementsGenerallyEnabled(){
+    void deactivateMeasurementsGenerally(){
         measurementsGenerallyEnabled = false
     }
 
@@ -75,32 +73,16 @@ class InMemoryConfigService {
     }
 
     /**
-     * Sets databaseCleanupEnabled to true
+     * Activates databaseCleanup
      */
-    void activateDatabaseCleanupEnabled(){
+    void activateDatabaseCleanup(){
         databaseCleanupEnabled = true
     }
 
     /**
-     * Sets databaseCleanupEnabled to false
+     * Deactivates databaseCleanup
      */
-    void deactivateDatabaseCleanupEnabled(){
+    void deactivateDatabaseCleanup(){
         databaseCleanupEnabled = false
-    }
-
-    /**
-     * Gets the maximum number of months osm keeps results in database
-     * @return The number in months wich osm keeps results in database
-     */
-    Integer getMaxDataStorageTimeInMonths(){
-        return maxDataStorageTimeInMonths
-    }
-
-    /**
-     * Sets the maximum number of months wich osm keeps results in database
-     * @param number in months
-     */
-    void setMaxDataStorageTimeInMonths(Integer months){
-        maxDataStorageTimeInMonths = months
     }
 }

@@ -12,7 +12,7 @@ class BatchActivityService {
     /**
      * Creates a new BatchActivity
      * @param c Class of the affected Domain
-     * @param idWithinDomain affected object id
+     * @param idWithinDomain affected object id, will be used to identify already existing activities
      * @param activity running Activity
      * @param name a readable name to display
      * @return
@@ -53,15 +53,15 @@ class BatchActivityService {
      *
      * @param BatchActivity BatchActivity to update
      * @param map with following possible entries:
-     *      "errors": Integer,
-     *      "failures": Integer,
-     *      "lastFailureMessage": String,
-     *      "progress": Integer,
-     *      "progressWithinStage": String,
-     *      "stage": String,
-     *      "status": Status,
-     *      "successfulActions": Integer,
-     *      "endDate": Date
+     *      <li>"errors": Integer,</li>
+     *      <li>"failures": Integer,</li>
+     *      <li>"lastFailureMessage": String,</li>
+     *      <li>"progress": String,</li>
+     *      <li>"progressWithinStage": String,</li>
+     *      <li>"stage": String,</li>
+     *      <li>"status": Status,</li>
+     *      <li>"successfulActions": Integer,</li>
+     *      <li>"endDate": Date</li>
      */
     public void updateStatus(BatchActivity activity,Map<String,Object> map){
         def allowed = ["errors","failures","lastFailureMessage","progress","progressWithinStage","stage","status","successfulActions","endDate"]
@@ -86,6 +86,7 @@ class BatchActivityService {
      */
     public String calculateProgress(int count, int actual){
         DecimalFormat df = new DecimalFormat("#.##");
+        if (count == 0) return df.format(0)+" %"
         return df.format(100.0/count*actual) + " %";
     }
 

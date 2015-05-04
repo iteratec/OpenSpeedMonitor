@@ -148,11 +148,16 @@ modules = {
 
         resource url: 'js/csidashboard/showAll.js'
     }
+    'event' {
+        dependsOn 'osm-dashboard-datetime'
+
+        resource url: 'js/event/createEdit.js'
+    }
     'eventresult' {
         dependsOn 'osm-dashboard-datetime'
 
-		resource url: 'js/eventresult/listResult.js'
-	}
+        resource url: 'js/eventresult/listResult.js'
+    }
     'batchactivity'{
         resource '/js/batchactivity/list.js'
     }

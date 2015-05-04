@@ -27,6 +27,10 @@ import org.apache.log4j.RollingFileAppender
  * 	config files can be ConfigSlurper scripts, Java properties files, or classes
  * 	in the classpath in ConfigSlurper format
  */
+
+grails.databinding.dateFormats = [
+    'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
+
 if (System.properties["osm_config_location"]) {
 	log.info('system property for external configuration found')
     grails.config.locations = ["file:" + System.properties["osm_config_location"]]
@@ -113,42 +117,30 @@ grails.plugins.springsecurity.authority.className = 'de.iteratec.osm.security.Ro
 grails.plugins.springsecurity.securityConfigType = "InterceptUrlMap"
 
 grails.plugins.springsecurity.interceptUrlMap = [
-    '/static/**'                : ["permitAll"],
-    '/static/*'                	: ["permitAll"],
-    '/css/**'                   : ["permitAll"],
-    '/js/**'                    : ["permitAll"],
-    '/images/**'                : ["permitAll"],
-    '/less/**'                  : ["permitAll"],
-    '/'                  		: ["permitAll"],
-    '/proxy/**'                 : ["permitAll"],
-    '/wptProxy/**'              : ["permitAll"],
-    '/csiDashboard/index'       : ["permitAll"],
-    '/csiDashboard/showAll'     : ["permitAll"],
-    '/csiDashboard/csiValuesCsv': ["permitAll"],
-    '/csiDashboard/showDefault' : ["permitAll"],
-    '/csiDashboard/weights'     : ["permitAll"],
-    '/csiDashboard/downloadBrowserWeights'  : ["permitAll"],
-    '/csiDashboard/downloadPageWeights'     : ["permitAll"],
-    '/csiDashboard/downloadHourOfDayWeights': ["permitAll"],
-    '/eventResultDashboard/**'  : ["permitAll"],
-    '/eventResult/**'           : ["permitAll"],
-    '/highchartPointDetails/**' : ["permitAll"],
-    '/restApi/getResults/**'    : ["permitAll"],
-    '/rest/*/resultsbetween/**' : ["permitAll"], // URL mapping for /restApi/getResults
-    '/restApi/allSystems'       : ["permitAll"],
-    '/rest/allSystems'          : ["permitAll"], // URL mapping for /restApi/allSystems
-    '/restApi/allBrowsers'       : ["permitAll"],
-    '/rest/allBrowsers'          : ["permitAll"], // URL mapping for /restApi/allBrowser
-    '/restApi/allPages'         : ["permitAll"],
-    '/rest/allPages'            : ["permitAll"], // URL mapping for /restApi/allPages
-    '/restApi/allLocations'     : ["permitAll"],
-    '/rest/allLocations'        : ["permitAll"], // URL mapping for /restApi/allLocations
-    '/restApi/allSteps'         : ["permitAll"],
-    '/rest/allSteps'            : ["permitAll"], // URL mapping for /restApi/allSteps
-    '/restApi/index/**'         : ["permitAll"],
-    '/restApi/man/**'           : ["permitAll"],
-    '/rest/man/**'              : ["permitAll"], // URL mapping for /restApi/ documentations
-    '/rest/*/csi/**' : ["permitAll"], // URL mapping for /restApi/getResults
+//////////////////////////////////////////////////////////////////
+//free for all (even guests not logged in)
+//////////////////////////////////////////////////////////////////
+    '/static/**'                                : ["permitAll"],
+    '/static/*'                	                : ["permitAll"],
+    '/css/**'                                   : ["permitAll"],
+    '/js/**'                                    : ["permitAll"],
+    '/images/**'                                : ["permitAll"],
+    '/less/**'                                  : ["permitAll"],
+    '/'                  		                : ["permitAll"],
+    '/proxy/**'                                 : ["permitAll"],
+    '/wptProxy/**'                              : ["permitAll"],
+    '/csiDashboard/index'                       : ["permitAll"],
+    '/csiDashboard/showAll'                     : ["permitAll"],
+    '/csiDashboard/csiValuesCsv'                : ["permitAll"],
+    '/csiDashboard/showDefault'                 : ["permitAll"],
+    '/csiDashboard/weights'                     : ["permitAll"],
+    '/csiDashboard/downloadBrowserWeights'      : ["permitAll"],
+    '/csiDashboard/downloadPageWeights'         : ["permitAll"],
+    '/csiDashboard/downloadHourOfDayWeights'    : ["permitAll"],
+    '/eventResultDashboard/**'                  : ["permitAll"],
+    '/eventResult/**'                           : ["permitAll"],
+    '/highchartPointDetails/**'                 : ["permitAll"],
+    '/rest/**'                                  : ["permitAll"],
 	'/login/**'                 				: ["permitAll"],
 	'/logout/**'                				: ["permitAll"],
 	'/job/list'                					: ["permitAll"],
@@ -159,8 +151,14 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/connectivityProfile/list'                	: ["permitAll"],
 	'/about'                					: ["permitAll"],
 	'/cookie/**'								: ["permitAll"],
+//////////////////////////////////////////////////////////////////
+//SUPER_ADMIN only
+//////////////////////////////////////////////////////////////////
 	'/console/**'                				: ['ROLE_SUPER_ADMIN'],
 	'/apiKey/**'								: ['ROLE_SUPER_ADMIN'],
+//////////////////////////////////////////////////////////////////
+//ADMIN or SUPER_ADMIN log in
+//////////////////////////////////////////////////////////////////
 	'/**'                       				: ['ROLE_ADMIN','ROLE_SUPER_ADMIN']
 ]
 
@@ -402,8 +400,9 @@ environments {
                 )
 
                 /**
-                 * Standard-appender for openSpeedMonitor-app. One Logging-level for the whole application.
-                 *	Nothing else is logged.
+                 * Standard-appender for openSpeedMonitor-app.
+                 * Log-level ERROR as threshold.
+                 * Per log4j configuration all would be logged.
                  */
                 appender new DailyRollingFileAppender(
                         name: 'osmAppender',
@@ -413,15 +412,16 @@ environments {
                     threshold: org.apache.log4j.Level.ERROR
                         )
                 /**
-                 * Detail-appender for openSpeedMonitor-app. Logging-level can be set for every package separately at runtime.
-                 * Grails-core packages get logged, too.
+                 * Detail-appender for OpenSpeedMonitor-app.
+                 * Log-level DEBUG as threshold.
+                 * Per log4j configuration all would be logged.
                  */
                 RollingFileAppender rollingFileAppender = new RollingFileAppender(
                         name: 'osmAppenderDetails',
                         fileName: "${logFolder}${appName}Details.log",
                         layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         maxFileSize: '20MB',
-                        maxBackupIndex: 5,
+                        maxBackupIndex: 20,
                         threshold: org.apache.log4j.Level.DEBUG
                 )
                 appender rollingFileAppender

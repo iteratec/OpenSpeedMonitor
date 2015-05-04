@@ -401,7 +401,6 @@ Rickshaw.Graph = function(args) {
 	var self = this;
 
 	this.initialize = function(args) {
-
 		if (!args.element) throw "Rickshaw.Graph needs a reference to an element";
 		if (args.element.nodeType !== 1) throw "Rickshaw.Graph element was defined but not an HTML element";
 
@@ -543,7 +542,6 @@ Rickshaw.Graph = function(args) {
 		args.series = self.series;
 		args.slice = self._slice;
 		this.measurandGroupsManager.updateMeasurandGroupsAndRelatedSeries(args);
-		
 		var stackedData = this.stackData();
 		this.discoverRange();
 		this.renderer.render();
@@ -591,24 +589,7 @@ Rickshaw.Graph = function(args) {
 
 		var stackedData;
 
-		if (!this.renderer.unstack) {
-
-			this._validateStackable();
-
-			var layout = d3.layout.stack();
-			layout.offset( self.offset );
-			stackedData = layout(data);
-		}
-
 		stackedData = stackedData || data;
-
-		if (this.renderer.unstack) {
-			stackedData.forEach( function(seriesData) {
-				seriesData.forEach( function(d) {
-					d.y0 = d.y0 === undefined ? 0 : d.y0;
-				} );
-			} );
-		}
 
 		this.stackData.hooks.after.forEach( function(entry) {
 			stackedData = entry.f.apply(self, [data]);
@@ -623,23 +604,6 @@ Rickshaw.Graph = function(args) {
 		this.stackedData = stackedData;
 		
 		return stackedData;
-	};
-
-	this._validateStackable = function() {
-
-		var series = this.series;
-		var pointsCount;
-
-		series.forEach( function(s) {
-
-			pointsCount = pointsCount || s.data.length;
-
-			if (pointsCount && s.data.length != pointsCount) {
-				throw "stacked series cannot have differing numbers of points: " +
-					pointsCount + " vs " + s.data.length + "; see Rickshaw.Series.fill()";
-			}
-
-		}, this );
 	};
 
 	this.stackData.hooks = { data: [], after: [] };
@@ -932,10 +896,12 @@ function MeasurandGroup(args) {
 		if (min == undefined || max == undefined) {
 			result = undefined;
 		} else {
+		  if ((this.name === "PERCENTAGES") && (max < 110)) {
+		    max = 110;
+		  }
 			result.min = min;
 			result.max = max;
 		}
-		
 		return result;
 	}
 	
@@ -969,7 +935,7 @@ function MeasurandGroup(args) {
 			var tick = lowestYValue + i * valuePerTick;
 			tickValues.push(tick.toFixed(decimals));
 		}
-
+		
 		return tickValues;
 	}
 
@@ -1648,7 +1614,6 @@ Rickshaw.Graph.Annotate = function(args) {
 
 	var graph = this.graph = args.graph;
 	this.elements = { timeline: args.element };
-	
 	var self = this;
 
 	this.data = {};
@@ -1795,7 +1760,7 @@ Rickshaw.Graph.Axis.Time = function(args) {
 
 			offsets.push( { value: tickValue, unit: unit } );
 		}
-
+		
 		return offsets;
 	};
 
@@ -1898,7 +1863,7 @@ Rickshaw.Graph.Axis.X = function(args) {
 		if (this._renderWidth !== undefined && this.graph.width !== this._renderWidth) this.setSize({ auto: true });
 
 		var axis = d3.svg.axis().scale(this.graph.x).orient(this.orientation);
-		
+
 		axis.tickFormat( self.tickFormat || function(x) { return x } );
 		
 		if (this.tickValues) axis.tickValues(this.tickValues);
@@ -2722,7 +2687,6 @@ Rickshaw.Graph.Legend = Rickshaw.Class.create( {
 
 		this.list = document.createElement('ul');
 		this.element.appendChild(this.list);
-		
 		this.render();
 
 		// we could bind this.render.bind(this) here
@@ -3072,7 +3036,6 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 	},
 
 	render: function() {
-	
 		var self = this;
 
 		this.svg = d3.select(this.element)
@@ -3126,10 +3089,6 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
 			
-			parent.onUpdate(function() {
-  			  graph.render(); self.render();
-			});
-
 			parent.onConfigure(function(args) { 
 				// don't propagate height
 				delete args.height;
@@ -3137,7 +3096,6 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 				graph.configure(args);
 				graph.render();
 			});
-
 			graph.render();
 		};
 		var graphContainer = d3.select(this.element)
@@ -3403,8 +3361,8 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 				}
 				graph.window.xMin = windowAfterDrag[0];
 				graph.window.xMax = windowAfterDrag[1];
-				
 				graph.update();
+				self.render();
 			});
 		}
 
@@ -3509,8 +3467,10 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 
 	domain: function(data) {
 		// Requires that at least one series contains some data
-		var stackedData = data || this.graph.stackedData || this.graph.stackData();
-
+    var stackedData = data || this.graph.stackedData;
+    if(( typeof stackedData === 'undefined' ) || (!stackedData)) {
+      stackedData = this.graph.stackData();
+    }
 		var xMin = +Infinity;
 		var xMax = -Infinity;
 
@@ -3532,8 +3492,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
 	},
 
 	render: function(args) {
-
-		args = args || {};
+	  args = args || {};
 
 		var graph = this.graph;
 		var series = args.series || graph.series;
@@ -4148,7 +4107,6 @@ Rickshaw.Graph.Renderer.Multi = Rickshaw.Class.create( Rickshaw.Graph.Renderer, 
 				.filter( function(series) { return !series.disabled } );
 
 			series.active = function() { return series };
-
 			group.renderer.render({ series: series, vis: group.vis });
 			series.forEach(function(s) { s.stack = s._stack || s.stack || s.data; });
 		});

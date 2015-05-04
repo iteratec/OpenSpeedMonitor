@@ -56,23 +56,22 @@ jQuery.fn.visibilityToggle = function() {
 };
 
 function doOnDomReady(nextExecutionLink) {
-	$('#connectivityProfile').append($('<option></option>').val('null').text('Custom'));
-	if ($('#customConnectivityProfile').val() == 'true') {
-		$('#connectivityProfile option:last-child').attr('selected', 'selected');
-	}
     initializeSelects();
     $("[rel=tooltip]").tooltip({ html: true });
     $("[rel=popover]").popover();
   	
 	$('#active').change(function () {
-		$('[name="executionSchedule"]').keyup();
+		$('[name="execution-schedule-shown"]').keyup();
 	});
 
-	$('#connectivityProfile').change(function() {
-		var custom = $('#connectivityProfile :selected').text() == 'Custom';
-		$('#connectivityProfileDetails').toggle(custom);
-		$('#customConnectivityProfile').val(custom);
+	$(document).on('change', '#connectivityProfile', function () {
+    if($(this).val() === 'null') {
+      $('#connectivityProfileDetails').toggle(true);
+    } else {
+      $('#connectivityProfileDetails').toggle(false);
+    }
 	});
+	
 	$('#connectivityProfile').change();
 	
 	$('#maxDownloadTimeInMinutes a').click(function() {
@@ -124,23 +123,24 @@ function fixChoosen() {
          $parent.css("overflow", "");
    });
 }
-function domainDeleteConfirmation(message,id){
-    //TODO link to controller action has to be absolute (defined in gsp)
-    //(see therefor job/edit.gsp or http://blogs.bytecode.com.au/glen/2011/07/04/using-grails-links-from-javascript-a-micropattern.html)
-    var link = "http://localhost:8080/OpenSpeedMonitor/job/createDeleteConfirmationText";
+function domainDeleteConfirmation(message,id,link){
     var confirmMessage = "";
-    jQuery.ajax({
-        type : 'GET',
-        url : link,
-        data: {id:id},
-        async:   false,
-        success: function(result) {
-            confirmMessage = message + "<br>" + result;
-        },
-        error: function(result) {
-            confirmMessage = message;
-    }});
-    return confirmMessage;
+    if(link != null || link == ""){
+        jQuery.ajax({
+            type : 'GET',
+            url : link,
+            data: {id:id},
+            async:   false,
+            success: function(result) {
+                confirmMessage = message + "<br>" + result;
+            },
+            error: function(result) {
+                confirmMessage = message;
+            }});
+        return confirmMessage;
+    } else{
+        return message;
+    }
 
 }
 function toggleCronInstructions(){

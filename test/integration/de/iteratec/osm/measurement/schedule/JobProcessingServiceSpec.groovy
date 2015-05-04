@@ -1,21 +1,23 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
 package de.iteratec.osm.measurement.schedule
+
+import de.iteratec.osm.InMemoryConfigService
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
@@ -44,7 +46,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
  * Integration test for JobProcessingService
- * 
+ *
  * @author dri
  */
 @TestMixin(IntegrationTestMixin)
@@ -53,7 +55,7 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 	QueueAndJobStatusService queueAndJobStatusService
 
 	final static String UNNAMED_JOB_LABEL = 'Unnamed Job'
-	/** 
+	/**
 	 * Cron strings designed for Quartz jobs to never be executed before integration test ends
 	 */
 	private final static String CRON_STRING_1 = '* * */12 * * ?'
@@ -66,9 +68,9 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 
 	@Before
 	void setUp() {
-		
+
 		// mocks common for all tests
-		
+
 		jobProcessingService.proxyService = [ runtest: { WebPageTestServer wptserver, Map params ->
 			if (params.f == 'xml') {
 				String xml = """\
@@ -97,9 +99,12 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 			}
 		} ] as ProxyService
 		jobProcessingService.proxyService.httpRequestService = new HttpRequestServiceMock()
-		
+
 		//test data common for all tests
-		
+
+
+		jobProcessingService.inMemoryConfigService = new InMemoryConfigService()
+		jobProcessingService.inMemoryConfigService.activateMeasurementsGenerally()
 		TestDataUtil.createOsmConfig()
 
 		WebPageTestServer wptServer = new WebPageTestServer(
@@ -199,15 +204,15 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 	void testLaunchJobAndPoll() {
 		//test specific data /////////////////////////////////////////////////////////////
 		Job job = createJob(true, EVERY_15_SECONDS)
-		
+
 		//test execution /////////////////////////////////////////////////////////////
 		//launchJobRun returns false, because it fails and catch the exception
 		jobProcessingService.launchJobRun(job)
 		// manual first execution cause quartz scheduling doesn't seem to work trustable in tests
 		jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
-		
+
 		//assertions /////////////////////////////////////////////////////////////
-		
+
 		// ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
 		TriggerKey subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
 
@@ -234,18 +239,18 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 		// test execution
 		Job job = createJob(false)
 		String redirectUrl = jobProcessingService.launchJobRunInteractive(job)
-		
+
 		// assertions
 		assertNotNull(redirectUrl)
 		assertEquals(HttpRequestServiceMock.redirectUserUrl, redirectUrl)
 	}
-	
+
 	/**
 	 * This test creates several JobResults with different status codes and checks whether
 	 * JobProcessingService.getRunningAndRecentlyFinishedJobs() filters these results correctly.
 	 * Only results that are no errors or the most recent one should be retained.
 	 */
-	
+
 	void testStatusOfRepeatedJobExecution() {
 		Map testData = [
 			[100]: [100],
@@ -263,12 +268,12 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 			[200, 400, 100]: [200, 100],
 			[400, 100, 200]: [100, 200],
 			[400, 200, 100]: [200, 100]]
-		
+
 		// test setup
 		Job job = createJob(false)
 		Date now = new Date()
 		Date oldestDate = now - 5
-		
+
 		testData.each { List inputStatusCodes, List expectedStatusCodes ->
 			// test setup
 			inputStatusCodes.reverse().eachWithIndex { int httpStatusCode, int i ->
@@ -285,7 +290,7 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 			expectedStatusCodes.eachWithIndex { int statusCode, int i ->
 				assertEquals(statusCode, recentRuns[i]['status'])
 			}
-			
+
 			// cleanup
 			JobResult.list()*.delete(flush: true, failOnError: true)
 		}

@@ -207,6 +207,7 @@ class OsmChartTagLibTests {
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
+            <div id="rickshaw_timeline"></div>
 			<div id="rickshaw_addons">
 				<div id="rickshaw_slider"></div>
 				<div id="rickshaw_legend"></div>
@@ -220,10 +221,12 @@ class OsmChartTagLibTests {
 				var args = {
 					divId: "${divId}",
 					title: "Antwortzeit WPT-Monitore",
-					data : [ { measurandGroup: "NO_MEASURAND",   yAxisLabel: "Antwortzeit [ms]", name: "job1",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
+					data : [ { measurandGroup: "PERCENTAGES",   yAxisLabel: "Antwortzeit [ms]", name: "job1",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
 					heightOfChart :  400,
+                    dataLabelsActivated : false,
 					NUMBER_OF_YAXIS_TICKS : 5,
-					drawPointMarkers: true
+					drawPointMarkers: true,
+                    annotations : null
 				};
 				rickshawGraphBuilder = new RickshawGraphBuilder(args);
 			});
@@ -323,6 +326,7 @@ class OsmChartTagLibTests {
 				<div id="rickshaw_x-axis"></div>
 			</div>
 
+            <div id="rickshaw_timeline"></div>
 			<div id="rickshaw_addons">
 				<div id="rickshaw_slider"></div>
 				<div id="rickshaw_legend"></div>
@@ -338,8 +342,10 @@ class OsmChartTagLibTests {
 					title: "Antwortzeit WPT-Monitore",
 					data : [ { measurandGroup: "LOAD_TIMES",   yAxisLabel: "Load Times", name: "job1",  data: [  { x: 1373631796, y: 0.0015, url: "https://www.example.com/now" }, { x: 1373635396, y: 0.003, url: "undefined" }, { x: 1373638996, y: 0.0023, url: "https://www.example.com/twoHoursAfterNow" } ] },  { measurandGroup: "PERCENTAGES",   yAxisLabel: "Percentages", name: "job2",  data: [  { x: 1373631796, y: 1.5, url: "https://www.example.com/now" }, { x: 1373635396, y: 3.0, url: "undefined" }, { x: 1373638996, y: 2.3, url: "https://www.example.com/twoHoursAfterNow" } ] } ],
 					heightOfChart :  600,
+                    dataLabelsActivated : false,
 					NUMBER_OF_YAXIS_TICKS : 5,
-					drawPointMarkers: false
+					drawPointMarkers: false,
+                    annotations : null
 				};
 				rickshawGraphBuilder = new RickshawGraphBuilder(args);
 			});

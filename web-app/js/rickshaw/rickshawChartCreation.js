@@ -28,9 +28,16 @@ function RickshawGraphBuilder(args) {
   this.yAxes = [];
   this.slider;
   this.legend;
-
+  this.dataLabelsActivated = false;
+  this.dataLabelsHaveBeenAdded = false;
+  
   this.initialize = function(args) {
-    self.divId = args.divId
+    
+    if ((args.hasOwnProperty("dataLabelsActivated")) && (args.dataLabelsActivated == true)) { //display dataLabels
+      this.dataLabelsActivated = true;
+    }
+
+    self.divId = args.divId;
     args.series = self.composeSeries(args.data);
     
     self.htmlProvider = new HtmlProvider(args);
@@ -43,18 +50,71 @@ function RickshawGraphBuilder(args) {
     self.initializeYAxes(args);
     self.initializeHoverDetail();
     self.initializeLegend();
+    if (args.hasOwnProperty("annotations")) { //display annotations
+      self.initializeAnnotator(args.annotations);
+    }
     self.initializeSlider();
     self.graph.onUpdate(self.update);
     self.graph.render();
     self.updateTitle(args.title);
+    self.addDataLabels();
+    
     new ChartAdjuster(args);
     new ChartExporter(args);
+  }
+
+  this.addDataLabels = function() {
+    if (this.dataLabelsActivated && !this.dataLabelsHaveBeenAdded) {
+      $(".pointMarker").each(function( index ) {
+        var percentage = 0;
+        var currentMarkerColor = self.rgb2hex($( this ).css("border-top-color"));
+        self.graph.series.forEach(function(series) {
+          if(currentMarkerColor === series.color) {
+            //get args.series.ROW.data.INDEX.y * 100 rounded
+            if ( !/undef/i.test(typeof series.data[index])) {
+//              percentage =  Math.round((series.data[index].y)*100)/100;
+              percentage =  parseFloat(series.data[index].y).toFixed(2);
+            }
+            //end loop
+            return false;
+          }
+        });
+        if (percentage > 0) {
+          var totalHeight = $( this ).parent().height();
+          var distanceTop = $( this ).css("top").replace(/[^-\d\.]/g, '') ;
+          //calculate data, round to 2 digits
+  //        var percentage = Math.round((100 - ((distanceTop * 100) / totalHeight))*100)/100;
+          //display data
+          $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;font-size: 13pt;font-weight: bold;color: #b3b3b3;cursor: default;fill: #b3b3b3;'>"+percentage+"</div>" );
+        }
+      });
+    }
+    this.dataLabelsHaveBeenAdded = true;
+  }
+  
+  this.rgb2hex = function (rgb){
+    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+    return "#" +
+     ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
+   }
+
+  this.updateDataLabels = function() {
+    //remove labels
+    $(".dataLabel").each(function( index ) {
+      $(this).remove();
+    });
+    //re-add labels
+    this.dataLabelsHaveBeenAdded = false;
+    self.addDataLabels();
   }
 
   this.update = function() {
     self.xAxis.updateXAxis();
     self.removeGrid();
     self.updateYAxes();
+    self.updateDataLabels();
   }
 
   this.updateBorders = function(args) {
@@ -76,11 +136,12 @@ function RickshawGraphBuilder(args) {
     $(".rickshaw_y-axis_right").height(args.height);
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
-    $("#rickshaw_addons").width(args.width);
+    $("#rickshaw_addons").width(args.width-60);
+    $("#rickshaw_timeline").width(args.width-60);
     $("#rickshaw_slider").width(args.width);
     $("#rickshaw_range_slider_preview_container").width(args.width);
-    $("#rickshaw_graph x_axis_d3").width(args.width);
     $("#rickshaw_x-axis").width(args.width);
+    $(".x_axis_d3").attr("width", args.width);
     $(".graph").width(eval(parseInt(args.width) + 25));
 
     self.graph.configure({
@@ -155,6 +216,16 @@ function RickshawGraphBuilder(args) {
       $("#rickshaw_chart > .pointMarker").remove();
     }
   }
+  
+  this.updateDrawPointLabels = function(drawPointLabels){
+    $(".dataLabel").each(function( index ) {
+      $(this).remove();
+    });
+    this.dataLabelsHaveBeenAdded = false;
+    if (drawPointLabels) {
+      self.addDataLabels();
+    }
+  }
 
   this.initializeGraph = function(args) {
     self.graph = new Rickshaw.Graph({
@@ -165,7 +236,8 @@ function RickshawGraphBuilder(args) {
       interpolation : 'linear',
       series : args.series,
       NUMBER_OF_YAXIS_TICKS : args.NUMBER_OF_YAXIS_TICKS,
-      drawPointMarkers : args.drawPointMarkers
+      drawPointMarkers : args.drawPointMarkers,
+      drawPointLabels : args.drawPointLabels
     });
   }
   
@@ -185,6 +257,19 @@ function RickshawGraphBuilder(args) {
                 "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
                 "</table>";
     };
+  }
+
+  this.initializeAnnotator = function(args) {
+    var annotator = new Rickshaw.Graph.Annotate( {
+      graph: self.graph,
+      element: document.getElementById('rickshaw_timeline')
+    } );
+    if (args) {
+      for (index = 0; index < args.length; ++index) {
+        annotator.add(args[index].x, args[index].text);
+      }
+      annotator.update();
+    }
   }
   
   this.initializeLegend = function() {
@@ -208,6 +293,7 @@ function RickshawGraphBuilder(args) {
 
   this.initializeYAxes = function(args) {
     var measurandGroups = args.graph.measurandGroupsManager.measurandGroups;
+    
     for (var i = 0; i < measurandGroups.length; i++) {
 
       var id_prefix, orientation;
@@ -410,7 +496,7 @@ function XAxis(args) {
     while (date < maxDate) {
       // increase date by one year
       date = new Date(date.getTime());
-      date.setYear(date.getYear() + 1);
+      date.setYear(date.getFullYear() + 1);
 
       if (date < maxDate) {
         years.push(date.getTime() / 1000);
@@ -441,15 +527,16 @@ function XAxis(args) {
   this.getDaysInRange = function(minDate, maxDate) {
     var days = [];
     var date = new Date(minDate.getTime());
+    var maxDateAsTime = new Date(maxDate.getTime());
     date.setMilliseconds(0);
     date.setSeconds(0);
     date.setMinutes(0);
     date.setHours(0);
 
-    while (date < maxDate) {
+    while (date < maxDateAsTime) {
       date = new Date(date.getTime());
       self.increaseDay(date);
-      if (date < maxDate) {
+      if (date < maxDateAsTime) {
         days.push(date.getTime() / 1000);
       }
     }
@@ -536,7 +623,7 @@ function XAxis(args) {
 
   this.increaseMonth = function(date) {
     if (date.getMonth() == 11) {
-      date.setYear(date.getYear() + 1);
+      date.setYear(date.getFullYear() + 1);
       date.setMonth(0);
     } else {
       date.setMonth(date.getMonth() + 1);
@@ -555,7 +642,7 @@ function XAxis(args) {
     }
 
     if (month == 2) {
-      if (date.getYear() % 4 == 0) {
+      if (date.getFullYear() % 4 == 0) {
         increase(date, 27);
       } else {
         increase(date, 28);
@@ -593,7 +680,6 @@ function YValueFormatter() {
 
   this.getFormatterForSpecificMeasurandGroup = function(measurandGroup) {
     var result;
-
     if (measurandGroup.name == "LOAD_TIMES") {
       result = self.getFormatterForLoadTimes(measurandGroup);
     } else if (measurandGroup.name == "REQUEST_COUNTS") {
@@ -758,7 +844,7 @@ function HtmlProvider(args) {
     var numberOfRightYAxes = self.numberOfMeasurandGroups - 1;
     var totalWidthOfRightYAxes = numberOfRightYAxes * widthOfRightYAxis;
     var widthOfGraph = totalAvailableWidth - widthOfLeftYAxis
-        - totalWidthOfRightYAxes - 6;
+        - totalWidthOfRightYAxes;
 
     // container which contains all right y-axes
     $("#rickshaw_y-axes_right").css({
@@ -782,6 +868,10 @@ function HtmlProvider(args) {
 
     // container which contains x-axis, slider and legend
     $("#rickshaw_addons").css({
+      "margin-left" : widthOfLeftYAxis + "px",
+      "width" : widthOfGraph + "px"
+    });
+    $("#rickshaw_timeline").css({
       "margin-left" : widthOfLeftYAxis + "px",
       "width" : widthOfGraph + "px"
     });
@@ -811,7 +901,9 @@ function ChartAdjuster(args) {
     self.addFunctionalityCustomizeTitle();
     self.createYAxisAdjuster(args);
     self.replaceDataMarkerCheckbox();
+    self.replaceDataLabelsCheckbox();
     self.addFunctionalityShowDataMarker();
+    self.addFunctionalityShowDataLabels();
   }
   
   this.addFunctionalityAdjustingChartSize = function() {
@@ -848,8 +940,8 @@ function ChartAdjuster(args) {
               });
             }
             //center legend
-            var leftDistance = Math.floor(((diaWidth - $("#rickshaw_legend").outerWidth()) / 2) - 60);
-            document.getElementById('rickshaw_legend').style.cssText = "margin-left:" + leftDistance + "px !important";
+//            var leftDistance = Math.floor(((diaWidth - $("#rickshaw_legend").outerWidth()) / 2) - 60);
+//            document.getElementById('rickshaw_legend').style.cssText = "margin-left:" + leftDistance + "px !important";
 //            $(".rickshaw_legend").css({
 //              "margin-left" : "" + leftDistance + "px"
 //            });
@@ -929,7 +1021,7 @@ function ChartAdjuster(args) {
           }
         });
   }
-  
+
   this.replaceDataMarkerCheckbox = function() {
     var checkbox = $("#to-enable-marker").parent().parent();
     var parentContainer = checkbox.parent();
@@ -937,10 +1029,24 @@ function ChartAdjuster(args) {
     parentContainer.append(checkbox);
   }
   
+  this.replaceDataLabelsCheckbox = function() {
+    var checkbox = $("#to-enable-label").parent().parent();
+    var parentContainer = checkbox.parent();
+    checkbox.detach();
+    parentContainer.append(checkbox);
+  }
+
   this.addFunctionalityShowDataMarker = function() {
     $('#to-enable-marker').bind('change', function(){
       var toEnableMarkers = $(this).is(':checked');
       rickshawGraphBuilder.updateDrawPointMarkers(toEnableMarkers);
+    });
+  }
+  
+  this.addFunctionalityShowDataLabels = function() {
+    $('#to-enable-label').bind('change', function(){
+      var toEnableLabels = $(this).is(':checked');
+      rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
     });
   }
   
@@ -952,8 +1058,18 @@ function ChartExporter(args) {
   
   this.initialize = function(args) {
     d3.select("#dia-save-chart-as-png").on("click", function(){
+
       deferrerCollection = new Array();
-      self.assignAllRelevantCssToStyleAttributes();
+      
+      if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+        //resize
+        deferrerCollection.push($.Deferred());
+        var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'));
+        var previousHeight=parseFloat($('#rickshaw_yAxis_0').css('height'));
+        self.resizeGraphTo(1418, 557, deferrerCollection[deferrerCollection.length - 1]);
+      }
+      
+    self.assignAllRelevantCssToStyleAttributes();
       
       var yAxisCount = 0;
       $('.y_axis').each(function() {
@@ -962,7 +1078,7 @@ function ChartExporter(args) {
         self.renderSvgElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
         yAxisCount++;
       });
-  
+
       var titleContent = $('#rickshaw_chart_title').html().trim();
       if (titleContent != "") {
         deferrerCollection.push($.Deferred());
@@ -978,6 +1094,15 @@ function ChartExporter(args) {
       self.modifyStylesForRendering();
       deferrerCollection.push($.Deferred());
       self.renderSvgElementOnNewCanvasWithDelay($('.x_axis_d3'), 'canvas_x_axis_d3', deferrerCollection[deferrerCollection.length - 1]);
+
+      var dataLabelCount = 0;
+      $('.dataLabel').each(function() {
+        deferrerCollection.push($.Deferred());
+        var newCanvasId = 'canvas_dataLabel_' + dataLabelCount.toString() + '';
+        self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
+        dataLabelCount++;
+      });
+      
       var rightLabelCount = 0;
       $('.rickshaw_y-axis_right_label').each(function() {
         deferrerCollection.push($.Deferred());
@@ -985,12 +1110,13 @@ function ChartExporter(args) {
         self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
         rightLabelCount++;
       });
+      
       deferrerCollection.push($.Deferred());
       self.renderDomElementOnNewCanvasWithDelay(document.querySelector(".rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
 
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var retVal = prepareNewBlankCanvas(".graph");
+        var retVal = prepareNewBlankCanvas(".graph", 146);
         var canvas = retVal.canvas;
         var ctx = retVal.ctx;
         
@@ -1002,7 +1128,7 @@ function ChartExporter(args) {
   
         self.mergeCanvases("#rickshaw_graphic_svg", "#canvas_graphic_svg", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
         self.mergeCanvases(".x_axis_d3", "#canvas_x_axis_d3", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
-        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+146), graphOffsetLeft);
         
         var yAxisCount = 0;
         $('.y_axis').each(function() {
@@ -1019,6 +1145,13 @@ function ChartExporter(args) {
   
         self.modifyStylesAfterRendering();
         self.mergeLabelCanvases($(".rickshaw_y-axis_left_label"), "#canvas_y-axis_left_label", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+
+        var dataLabelCount = 0;
+        $('.dataLabel').each(function() {
+          var newCanvasId = '#canvas_dataLabel_' + dataLabelCount.toString() + '';
+          self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+          dataLabelCount++;
+        });
         
         var rightLabelCount = 0;
         $('.rickshaw_y-axis_right_label').each(function() {
@@ -1030,7 +1163,10 @@ function ChartExporter(args) {
         //convert to image
         try {
           downloadCanvas(canvas, "png");
-//          removeObjectFromDom("#canvas_everything_merged");
+          if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+            deferrerCollection.push($.Deferred());
+            self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
+          }
         } 
         catch(err) {} // handle IE        
       });
@@ -1126,10 +1262,24 @@ function ChartExporter(args) {
     });
   }
 
+
+  this.resizeGraphTo = function(width, height, deferrer) {
+    rickshawGraphBuilder.updateSize({
+      width : width,
+      height : height
+    });
+    $("#rickshaw_legend, ul").css({
+      "-moz-column-count" : 2 + "",
+      "-webkit-column-count" : 2 + "",
+      "column-count" : 2 + ""
+    });
+    deferrer.resolve();
+  }
+  
   this.renderSvgElementOnNewCanvasWithDelay = function(svgElement, newCanvasId, deferrer) {
     var html2 = svgElement.clone().wrapAll("<div/>").parent().html();
     html2 = html2.replace(/<svg (.*?)>/, '<svg xmlns="http://www.w3.org/2000/svg" $1>');
-    html2 = html2.replace(/top: -20px/, 'top: 0');
+    html2 = html2.replace(/top: -[\d]+\.?[\d]*px/, 'top: 0');
     
     if(!!navigator.userAgent.match(/Trident/)){
       html2 = html2.replace(/ xmlns=\"http:\/\/www.w3.org\/2000\/svg\"/, '');

@@ -302,4 +302,8 @@ class MeasuredValue implements CsiValue {
     public List<MeasuredValueUpdateEvent> getMeasuredValueUpdateEvents() {
         return MeasuredValueUpdateEvent.findAllByMeasuredValueId(this.ident())
     }
+
+    public String toString(){
+        return "${aggregator} | ${interval} | ${started} | ${value}"
+    }
 }

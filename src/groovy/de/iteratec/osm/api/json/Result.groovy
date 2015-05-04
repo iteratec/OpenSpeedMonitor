@@ -24,7 +24,6 @@ import java.text.DecimalFormatSymbols
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.measurement.schedule.Job
 
 /**
  * <p>
@@ -120,37 +119,29 @@ public final class Result {
 	 */
 	public final String httpArchiveUrl
 	
-	public Result(
-			JobResult jobResult,
-			EventResult eventResultOfJobResult) {
+	public Result(EventResult eventResult) {
+		this.csiValue = eventResult.customerSatisfactionInPercent != null ?
+				API_DECIMAL_FORMAT.format( (double)eventResult.customerSatisfactionInPercent ) :
+				"not calculated"
+		this.browser = eventResult.jobResult.locationBrowser;
+		this.location = eventResult.jobResult.locationUniqueIdentifierForServer;
 		
-		if(jobResult.id != eventResultOfJobResult.jobResult.id)
-		{
-			throw new IllegalArgumentException('The specified event result does not belong to the specified job result. This is illegal.');
-		}
-			
-		this.csiValue = API_DECIMAL_FORMAT.format( (double)
-				eventResultOfJobResult.customerSatisfactionInPercent);
-			
-		this.browser = jobResult.locationBrowser; 
-		this.location = jobResult.locationUniqueIdentifierForServer;
-		
-		MeasuredEvent event = eventResultOfJobResult.getMeasuredEvent();
+		MeasuredEvent event = eventResult.getMeasuredEvent();
 		this.page = event.getTestedPage().getName();
 		this.step = event.getName();
-		String baseUrlWithTrailingSlash = jobResult.job.location.wptServer.baseUrl.endsWith('/') ? jobResult.job.location.wptServer.baseUrl : jobResult.job.location.wptServer.baseUrl + '/'  
-		String testId = jobResult.testId
+		String baseUrlWithTrailingSlash = eventResult.jobResult.job.location.wptServer.baseUrl
+		String testId = eventResult.jobResult.testId
 		if (baseUrlWithTrailingSlash && testId) {
-			this.detailUrl = "${baseUrlWithTrailingSlash}result/${jobResult.testId}"
-			this.httpArchiveUrl = "${baseUrlWithTrailingSlash}export.php?test=${jobResult.testId}"
+			this.detailUrl = "${baseUrlWithTrailingSlash}result/${eventResult.jobResult.testId}"
+			this.httpArchiveUrl = "${baseUrlWithTrailingSlash}export.php?test=${eventResult.jobResult.testId}"
 		}else{
 			this.detailUrl = ''
 			this.httpArchiveUrl = ''
 		}
-		this.executionTime = jobResult.date
-		this.docCompleteTimeInMillisecs = eventResultOfJobResult.docCompleteTimeInMillisecs
-		this.numberOfWptRun = eventResultOfJobResult.numberOfWptRun
-		this.cachedView = eventResultOfJobResult.cachedView.toString()
+		this.executionTime = eventResult.jobResult.date
+		this.docCompleteTimeInMillisecs = eventResult.docCompleteTimeInMillisecs
+		this.numberOfWptRun = eventResult.numberOfWptRun
+		this.cachedView = eventResult.cachedView.toString()
 	}
 			
 	@Override

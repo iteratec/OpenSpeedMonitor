@@ -2,9 +2,9 @@
 /*################### self created html elements ###################*/
 
 #rickshaw_main{
-	width: 100%;
 	position: relative;
 	top: 20px;
+	width: 1110px;
 }
 .rickshaw_y-axis_left {
 	width: 60px;
@@ -22,6 +22,7 @@
 	background-color: white;
   margin-left: auto;
   margin-right: auto;
+  width: 1135px;
 }
 .rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label {
 	position: absolute;
@@ -42,9 +43,18 @@
 .disabledYAxis {
 	opacity: 0.3;
 }
+
+#rickshaw_timeline {
+  margin-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 60px;
+  width: 1104px;
+}
 #rickshaw_addons {
-	margin-top: 10px;
-	padding-bottom: 10px;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 60px;
+  width: 1104px;
 }
 .rickshaw_chart_title {
 	text-align: center;	
@@ -53,17 +63,18 @@
 }
 .rickshaw_legend {
 	display: table !important;
-    margin-top: 10px !important;
-    margin-left: -25px !important;
+  margin-top: 10px !important;
+  text-align: center;
+  width: 100%;
 }
 .rickshaw_legend .action {
 	opacity: 0.4 !important;
 }
 .rickshaw_legend ul {
-	width: 100%;
 	column-count: 2;
 	-webkit-column-count: 2;
 	-moz-column-count: 2;	
+	display: inline-block;
 }
 .action{
 	float: left;
@@ -397,6 +408,9 @@
 		rgba(0, 0, 0, 0.8), -1px 0px 0 rgba(0, 0, 0, 0.8), -1px -1px 0
 		rgba(0, 0, 0, 0.8);
 }
+#rickshaw_slider {
+  margin-left: -10px;	
+}
 
 .rickshaw_legend {
 	font-family: Arial;
@@ -405,7 +419,6 @@
 	background: #e5e5e5;
 	display: inline-block;
 	padding: 12px 5px;
-	margin: 5px;
 	border-radius: 2px;
 	position: relative;
 }
@@ -435,7 +448,7 @@
 .rickshaw_legend .label {
 	margin: 0;
 	white-space: nowrap;
-	display: inline;
+	display: block;
 	font-size: inherit;
 	background-color: transparent;
 	color: inherit;
@@ -443,6 +456,7 @@
 	line-height: normal;
 	padding: 0px;
 	text-shadow: none;
+	text-align: left !important;
 }
 
 .rickshaw_legend .action:hover {

@@ -18,7 +18,10 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.report.external.MetricReportingService
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import grails.test.GrailsMock
 
 import static org.junit.Assert.assertEquals
 
@@ -27,8 +30,6 @@ import grails.test.mixin.support.*
 
 import org.joda.time.DateTime
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.report.external.GraphitePath
-import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.JobGroupType;
@@ -39,9 +40,6 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValue
 import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.external.GraphiteComunicationFailureException
-import de.iteratec.osm.report.external.GraphitePathName
-import de.iteratec.osm.report.external.GraphiteSocket
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.csi.EventMeasuredValueService
 import de.iteratec.osm.csi.PageMeasuredValueService
@@ -61,7 +59,7 @@ import de.iteratec.osm.util.I18nService
  */
 @TestFor(MetricReportingService)
 @TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, AggregatorType, JobGroup, GraphiteServer, GraphitePath, MeasuredValueInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration])
+@Mock([EventResult, AggregatorType,JobGroup, BatchActivity, GraphiteServer, GraphitePath, MeasuredValueInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration])
 class MetricReportingServiceTests {
 	MetricReportingService serviceUnderTest
 	static final double DELTA = 1e-15
@@ -85,9 +83,10 @@ class MetricReportingServiceTests {
 	static final String MEASURAND_DOCREADYTIME_NAME = 'docReadyTime'
 
     void setUp() {
-		serviceUnderTest = service 
+		serviceUnderTest = service
 		serviceUnderTest.configService = new ConfigService()
-		serviceUnderTest.configService.inMemoryConfigService = new InMemoryConfigService()
+		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
+		serviceUnderTest.batchActivityService = new BatchActivityService()
 		createTestDataCommonToAllTests()
     }
 	
@@ -98,7 +97,7 @@ class MetricReportingServiceTests {
 		new AggregatorType(name: AggregatorType.MEASURED_EVENT).save(validate: false)
 		new AggregatorType(name: AggregatorType.PAGE).save(validate: false)
 		new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
-		serviceUnderTest.configService.inMemoryConfigService.activateMeasurementsGenerallyEnabled()
+		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
 		new OsmConfiguration().save(failOnError: true)
 	}
 

@@ -71,17 +71,6 @@ class ConfigService {
 		return (Integer)retrieveConfigValue('maxDocCompleteTimeInMillisecs')
 	}
 	
-	/** 
-	 * Gets measurementsGenerallyEnabled from osm-configuration.
-	 * If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. 
-	 * @return Whether the performance measurement is generally enabled or not.
-     * @see OsmConfiguration
-     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
-	 */
-	boolean areMeasurementsGenerallyEnabled(){
-		return inMemoryConfigService.areMeasurementsGenerallyEnabled()
-	}
-
 	/**
 	 * Gets initial height of charts when opening dashboards from osm-configuration.
 	 * @see OsmConfiguration
@@ -107,7 +96,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
      */
     Integer getMaxDataStorageTimeInMonths(){
-        return inMemoryConfigService.getMaxDataStorageTimeInMonths()
+		return (Integer)retrieveConfigValue('maxDataStorageTimeInMonths')
     }
 
 	/**
@@ -119,19 +108,6 @@ class ConfigService {
 		return inMemoryConfigService.isDatabaseCleanupEnabled()
 	}
 
-    /**
-     * Activates measurements generally.
-     * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
-     */
-    void activateMeasurementsGenerally(){
-        List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
-        if (inMemoryConfigService == null) {
-            throw new IllegalStateException("measurementsGenerallyEnabled couldn\'t be read from Configuration!")
-        }else{
-            inMemoryConfigService.activateMeasurementsGenerallyEnabled()
-        }
-    }
-	
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
 		if (osmConfigs.size() != 1 || osmConfigs[0]."${name}" == null) {

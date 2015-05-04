@@ -1211,7 +1211,6 @@ class TestDataUtil {
 				defaultMaxDownloadTimeInMinutes: 60,
 				minDocCompleteTimeInMillisecs: 250,
 				maxDocCompleteTimeInMillisecs: 180000,
-				measurementsGenerallyEnabled: true, 
 				initialChartHeightInPixels: 400,
                 maxDataStorageTimeInMonths: 12
 				).save(failOnError: true)

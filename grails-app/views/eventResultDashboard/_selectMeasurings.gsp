@@ -6,7 +6,7 @@ GSP-Template Mappings:
 * selectedFolder List<JobGroup>: all selected folders from past call
 
 * pages List<Page>: all Pages for selection
-* selectedPage List<Page>: all selected pages from past call
+* selectedPages List<Page>: all selected pages from past call
 
 * measuredEvents List<MeasuredEvent>: see other
 * selectedMeasuredEventIds List<MeasuredEvent>: see other
@@ -36,9 +36,9 @@ GSP-Template Mappings:
 	<div id="page-filter" class="span4 iteratec-grid-border-left">
 		<label for="pageSelectHtmlId"><g:message
 				code="de.iteratec.isr.wptrd.labels.filterPage" default="Pages:" /></label>
-		<g:select id="pageSelectHtmlId" class="iteratec-element-select" name="selectedPage"
+		<g:select id="pageSelectHtmlId" class="iteratec-element-select" name="selectedPages"
 			from="${pages}" optionKey="id" optionValue="name" multiple="true"
-			value="${selectedPage}" />
+			value="${selectedPages}" />
 	</div>
 	<div id="browser-filter" class="span3 iteratec-grid-border-left">
 		<label for="selectedBrowsersHtmlId"><g:message

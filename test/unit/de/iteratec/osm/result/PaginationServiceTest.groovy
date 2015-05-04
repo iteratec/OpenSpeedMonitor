@@ -128,7 +128,7 @@ class PaginationServiceTest {
 		
 		// Simulate GrailsLinkGenerator
 		LinkGenerator grailsLinkGeneratorMock = Mockito.mock(LinkGenerator.class);
-		Mockito.when(grailsLinkGeneratorMock.link(Mockito.any(Map.class))).thenReturn("http://example.com/eventResult/listResults?selectedTimeFrameInterval=0&_setFromHour=&setFromHour=on&from=08.08.2014&fromHour=4%3A00&_setToHour=&setToHour=on&to=08.08.2014&toHour=6%3A00&selectedFolder=2&selectedPage=1&selectedBrowsers=3&_selectedAllBrowsers=&_selectedAllMeasuredEvents=&selectedAllMeasuredEvents=on&_selectedAllLocations=&selectedAllLocations=on&_action_listResults=Show");
+		Mockito.when(grailsLinkGeneratorMock.link(Mockito.any(Map.class))).thenReturn("http://example.com/eventResult/listResults?selectedTimeFrameInterval=0&_setFromHour=&setFromHour=on&from=08.08.2014&fromHour=4%3A00&_setToHour=&setToHour=on&to=08.08.2014&toHour=6%3A00&selectedFolder=2&selectedPages=1&selectedBrowsers=3&_selectedAllBrowsers=&_selectedAllMeasuredEvents=&selectedAllMeasuredEvents=on&_selectedAllLocations=&selectedAllLocations=on&_action_listResults=Show");
 		
 		// Inject relevant services
 		serviceUnderTest.grailsLinkGenerator = grailsLinkGeneratorMock;
@@ -147,7 +147,7 @@ class PaginationServiceTest {
 		assertEquals("08.08.2014", queryParams.get("to").get(0))
 		assertEquals(cmd.getToHour(), queryParams.get("toHour").get(0))
 		assertEquals(cmd.getSelectedFolder().toString(), queryParams.get("selectedFolder").toString())
-		assertEquals(cmd.getSelectedPage().toString(), queryParams.get("selectedPage").toString())
+		assertEquals(cmd.getSelectedPage().toString(), queryParams.get("selectedPages").toString())
 		assertEquals(cmd.getSelectedBrowsers().toString(), queryParams.get("selectedBrowsers").toString())
 		assertEquals("[]" ,queryParams.get("_selectedAllBrowsers").toString())
 		assertEquals("[]" ,queryParams.get("_selectedAllMeasuredEvents").toString())

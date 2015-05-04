@@ -1,37 +1,25 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.util.PerformanceLoggingService
-
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
-import groovy.util.slurpersupport.GPathResult
-import groovyx.net.http.RESTClient
-
-import org.apache.http.HttpHost
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-
 import co.freeside.betamax.Betamax
 import co.freeside.betamax.Recorder
 import de.iteratec.osm.OsmConfiguration
@@ -45,6 +33,16 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.PerformanceLoggingService
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import groovy.util.slurpersupport.GPathResult
+import groovyx.net.http.RESTClient
+
+import org.apache.http.HttpHost
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 
 /**
  * Unit tests in this class test fetching of results from wptservers. In that they use wptservers getLocations.php function to
@@ -113,11 +111,11 @@ class FetchResultsFromWptserverTests {
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-	
+
 	@Test
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo')
 	void testFetchResult_Result_wptserver2_13_multistep7_1Run_3Events_JustFirstView_WithoutVideo() {
-		
+
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
@@ -134,11 +132,11 @@ class FetchResultsFromWptserverTests {
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-	
+
 	@Test
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo')
 	void testFetchResult_Result_wptserver2_13_multistep7_1Run_3Events_JustFirstView_WithVideo() {
-		
+
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
@@ -155,11 +153,11 @@ class FetchResultsFromWptserverTests {
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-	
+
 	@Test
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.15-singlestep_1Run_WithoutVideo')
 	void testFetchResult_Result_wptserver2_15_singlestep_1Run_WithoutVideo() {
-		
+
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
@@ -176,11 +174,11 @@ class FetchResultsFromWptserverTests {
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-	
+
 	@Test
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.15_singlestep_1Run_WithVideo')
 	void testFetchResult_Result_wptserver2_15_singlestep_1Run_WithVideo() {
-		
+
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener

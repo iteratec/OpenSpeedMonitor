@@ -18,6 +18,7 @@
 package de.iteratec.osm.util
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService

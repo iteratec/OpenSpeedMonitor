@@ -1,3 +1,4 @@
+<g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <ul class="nav pull-right">
 	<li class="dropdown dropdown-btn">
 <sec:ifNotLoggedIn>
@@ -5,7 +6,7 @@
 		<a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#" tabindex="-1">
 			<!-- TODO: integrate Springsource Security etc. and show User's name ... -->
     		<i class="icon-user"></i>
-    		<g:message code="security.signin.label"/><b class="caret"></b>
+    		<g:message code="security.signin.label" locale="${lang}"/><b class="caret"></b>
 		</a>
 
 		<ul class="dropdown-menu" role="menu">
@@ -15,7 +16,7 @@
 					<input style="margin-bottom: 15px;" type="password" placeholder="Password" id="password" name="password">
 					<input style="float: left; margin-right: 10px;" type="checkbox" name="remember-me" id="remember-me" value="1">
 					<label class="string optional" for="user_remember_me"> Remember me</label> -->
-					<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="${g.message(code:'security.signin.label')}">
+					<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="${g.message([code:'security.signin.label', locale:lang])}">
 				</g:form>
 			</li>
 		</ul>
@@ -30,7 +31,7 @@
 						<ul class="dropdown-menu" role="menu">
 							<li class="form-container">
 								<g:form controller="logout" action="index" method="POST" accept-charset="UTF-8">
-									<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="${g.message(code:'security.signout.label')}">
+									<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="${g.message([code:'security.signout.label', locale:lang])}">
 								</g:form>
 							</li>
 		</ul>

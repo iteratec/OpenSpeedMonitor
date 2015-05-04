@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
@@ -34,11 +35,11 @@ import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 class JobExecutionException extends Exception{
 	public String htmlResult
-	
+
 	public JobExecutionException(String message) {
 		super(message)
 	}
-	
+
 	public JobExecutionException(String message, String htmlResult) {
 		super(message)
 		this.htmlResult = htmlResult
@@ -61,18 +62,19 @@ enum TriggerGroup {
 
 /**
  * This service provides functionality for launching Jobs and for scheduling management.
- * 
+ *
  * @author dri
  */
 class JobProcessingService {
-	
+
 	static transactional = false
-	
+
 	ProxyService proxyService
 	def quartzScheduler
 	ConfigService configService
+	InMemoryConfigService inMemoryConfigService
     PerformanceLoggingService performanceLoggingService
-	
+
 	/**
 	 * Time to wait during Job processing before each check if results are available
 	 */
@@ -86,11 +88,11 @@ class JobProcessingService {
 	public void setPollDelaySeconds(int pollDelaySeconds) {
 		this.pollDelaySeconds = pollDelaySeconds
 	}
-	
+
 	/**
 	 * Maps the properties of a Job to the parameters expected by
-	 * the REST API available at https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis 
-	 * 
+	 * the REST API available at https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis
+	 *
 	 * @return A map of parameters suitable for POSTing a valid request to runtest.php
 	 */
 	private def fillRequestParameters(Job job) {
@@ -111,7 +113,7 @@ class JobProcessingService {
 			continuousVideo: job.continuousVideo,
 			keepua: job.keepua
 			]
-		
+
 		// specify connectivity
 		if (!job.customConnectivityProfile && !job.connectivityProfile) {
 			parameters.location += ".Native"
@@ -129,7 +131,7 @@ class JobProcessingService {
 				parameters.plr = job.connectivityProfile.packetLoss
 			}
 		}
-		 
+
 		if (job.script) {
 			parameters.script = job.script.getParsedNavigationScript(job)
 			if (job.provideAuthenticateInformation) {
@@ -137,18 +139,18 @@ class JobProcessingService {
 				parameters.password = job.authPassword
 			}
 		}
-		
+
 		// convert all boolean parameters to 0 or 1
 		parameters = parameters.each {
-			if (it.value instanceof Boolean && it.value != null) 
-				it.value = it.value ? 1 : 0 
+			if (it.value instanceof Boolean && it.value != null)
+				it.value = it.value ? 1 : 0
 		}
 		return parameters
 	}
-	
+
 	/**
 	 * Builds an ID string from the ID of the given Job and the supplied testId.
-	 * This ID is used to identify those Quartz triggers that are created when a 
+	 * This ID is used to identify those Quartz triggers that are created when a
 	 * Job is started and fire every pollDelaySeconds seconds to poll for a result.
 	 */
 	private String getSubtriggerId(Job job, String testId) {
@@ -156,7 +158,7 @@ class JobProcessingService {
 	}
 
 	/**
-	 * Saves a JobResult with the given parameters and no date to indicate that the 
+	 * Saves a JobResult with the given parameters and no date to indicate that the
 	 * specified Job/test is running and that this is not the result of a finished
 	 * test execution.
 	 */
@@ -164,7 +166,7 @@ class JobProcessingService {
 
 		// If no testId was provided some error occurred and needs to be logged
 		JobResult result
-		if (testId) { 
+		if (testId) {
 			result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
 		}
 
@@ -244,10 +246,10 @@ class JobProcessingService {
 			throw new JobExecutionException("No testId was provided")
 		}
 		params.userUrl = response.data.userUrl.text()
-		
+
 		return params
 	}
-	
+
 	/**
 	 * Build the trigger designed to poll WPTServer for new results every pollDelaySeconds (dubbed subtrigger)
 	 * until endDate.
@@ -262,11 +264,11 @@ class JobProcessingService {
 				// If application / scheduler is down for some time and becomes available again
 				// polling will be continued until maxDownloadTimeInMinutes has been reached:
 				.withMisfireHandlingInstructionNextWithRemainingCount())
-		if (endDate)	
+		if (endDate)
 			subTrigger = subTrigger.endAt(endDate);
 		return subTrigger.build()
 	}
-	
+
 	/**
 	 * Build the trigger to handle a job run timeout. Runs once at timeoutDate.
 	 */
@@ -279,25 +281,25 @@ class JobProcessingService {
 			.startAt(timeoutDate)
 		return timeoutTrigger.build()
 	}
-	
+
 	/**
 	 * If measurements are generally enabled: Launches the given Job and creates a Quartz trigger to poll for new results every x seconds.
 	 * If they are not enabled nothing happens.
 	 * @return whether the job was launched successfully
 	 */
 	public boolean launchJobRun(Job job) {
-		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("Job run of Job ${job} is skipped cause measurements are generally disabled.")
 			return false
 		}
-		
+
 		Map params = [ testId: '' ]
 		int statusCode
 		try {
 			def parameters = fillRequestParameters(job);
 			parameters.f = 'xml';
-				
+
 			WebPageTestServer wptserver = job.location.wptServer
 			if (!wptserver) {
 				throw new JobExecutionException("Missing wptServer in job ${job.label}");
@@ -312,9 +314,9 @@ class JobProcessingService {
 				throw new JobExecutionException("ProxyService.runtest() returned status code ${statusCode}");
 			}
 			log.info("Jobrun successfully launched: wptserver=${wptserver}, sent params=${parameters}")
-			
+
 			params = parseXmlResponse(result.data.text, wptserver)
-			
+
 			use (TimeCategory) {
 				Map jobDataMap = [jobId: job.id, testId: params.testId]
 				Date endDate = new Date() + job.maxDownloadTimeInMinutes.minutes
@@ -329,7 +331,7 @@ class JobProcessingService {
                 log.debug("Building timeout trigger for job ${job.label} and test-id ${params.testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
 				CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(job, params.testId, timeoutDate), jobDataMap)
 			}
-			
+
 			return true
 		} catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now.")
@@ -340,14 +342,14 @@ class JobProcessingService {
 
 	/**
 	 * Launch Job interactively
-	 * 
+	 *
 	 * @return If successful, a URL to the WPT Server Results Page is returned
 	 * @throws JobExecutionException If the job could not be submitted successfully, a JobExecutionException is thrown
 	 * 	 and its htmlResult contains the HTML response from the WPT Server indicating why test execution failed.
 	 */
 	public String launchJobRunInteractive(Job job) throws JobExecutionException {
 		def parameters = fillRequestParameters(job);
-		
+
 		WebPageTestServer wptserver = job.location.wptServer
 		HttpResponseDecorator result = proxyService.runtest(wptserver, parameters);
 		if (result.getStatus() == 302) {
@@ -359,8 +361,8 @@ class JobProcessingService {
 
 	/**
 	 * Updates the status of a currently running job.
-	 * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun() 
-	 * every pollDelaySeconds seconds is removed 
+	 * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun()
+	 * every pollDelaySeconds seconds is removed
 	 */
 	public int pollJobRun(Job job, String testId, String wptStatus = null) {
 		int statusCode = 400
@@ -400,13 +402,13 @@ class JobProcessingService {
 			proxyService.cancelTest(job.location.wptServer, [test: testId])
 		}
 	}
-	
+
 	/**
 	 * Cancel a running Job. If the job is pending and has not been executed yet, the WPT server will
 	 * also terminate it. Otherwise it will be left running on the server but polling is stopped.
 	 */
 	public void cancelJobRun(Job job, String testId) {
-//		if (quartzScheduler.getTrigger(new TriggerKey(getSubtriggerId(job, testId)), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())) 
+//		if (quartzScheduler.getTrigger(new TriggerKey(getSubtriggerId(job, testId)), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value()))
 		log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId}")
 		CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
 		CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value())
@@ -421,7 +423,7 @@ class JobProcessingService {
 			log.info("Canceling respective test on wptserver... DONE")
 		}
 	}
-	
+
 	/**
 	 * Schedules a Quartz trigger to launch the given Job at the time(s) determined by its execution schedule Cron expression.
 	 */

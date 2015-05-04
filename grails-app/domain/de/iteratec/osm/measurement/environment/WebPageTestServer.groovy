@@ -51,6 +51,14 @@ class WebPageTestServer {
         contactPersonEmail(email: true, nullable: true, maxSize: 255)
     }
 
+    public String getBaseUrl() {
+        if (baseUrl) {
+            return baseUrl.endsWith('/') ? "${baseUrl}" : "${baseUrl}/"
+        } else {
+            return ""
+        }
+    }
+
     static mapping = {
         //locations cascade: "all-delete-orphan"
     }

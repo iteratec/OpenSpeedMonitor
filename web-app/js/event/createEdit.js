@@ -15,20 +15,10 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm
-
-
-
-import grails.test.mixin.*
-import org.junit.*
-
 /**
- * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
+ * Called on jquerys DOM-ready.
+ * Initializes DOM-nodes and registers events. 
  */
-@TestFor(InMemoryConfigService)
-class InMemoryConfigServiceSpec {
-
-    void testSomething() {
-        fail "Implement me"
-    }
+function doOnDomReady(){		
+	initTimepicker(false);	
 }

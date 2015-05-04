@@ -72,7 +72,16 @@
 					</div>
 					<div class="span6">
 						<g:render template="/dateSelection/startAndEnddateSelection" 
-											model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from, 'fromHour':fromHour, 'to':to, 'toHour':toHour]}"/>
+											model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from, 'fromHour':fromHour, 'to':to, 'toHour':toHour, 'includeInterval':includeInterval]}"/>
+
+						<fieldset id="includeInterval">
+						  <div class="span3">
+						    <label class="checkbox inline">
+						      <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
+						      &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label" default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen" />
+						    </label>
+						  </div>
+						</fieldset>
 					</div>
 				</div>
 				<div class="row">
@@ -83,7 +92,7 @@
 					</div>
 				</div>
 				<g:render template="/eventResultDashboard/selectMeasurings" 
-				        model="['locationsOfBrowsers':locationsOfBrowsers, 'eventsOfPages':eventsOfPages,'folders':folders,'selectedFolder':selectedFolder, 'pages':pages,'selectedPage':selectedPage,'measuredEvents':measuredEvents,'selectedAllMeasuredEvents':selectedAllMeasuredEvents,'selectedMeasuredEvents':selectedMeasuredEvents,'browsers':browsers,'selectedBrowsers':selectedBrowsers,'selectedAllBrowsers':selectedAllBrowsers,'locations':locations,'selectedLocations':selectedLocations,'selectedAllLocations':selectedAllLocations]"/>
+				        model="['locationsOfBrowsers':locationsOfBrowsers, 'eventsOfPages':eventsOfPages,'folders':folders,'selectedFolder':selectedFolder, 'pages':pages,'selectedPages':selectedPages,'measuredEvents':measuredEvents,'selectedAllMeasuredEvents':selectedAllMeasuredEvents,'selectedMeasuredEvents':selectedMeasuredEvents,'browsers':browsers,'selectedBrowsers':selectedBrowsers,'selectedAllBrowsers':selectedAllBrowsers,'locations':locations,'selectedLocations':selectedLocations,'selectedAllLocations':selectedAllLocations]"/>
 			
 				<div style="clear:both;"></div>
 				<p>
@@ -159,10 +168,11 @@
 							xAxisMin: fromTimestampForHighChart,
 							xAxisMax: toTimestampForHighChart,
 							markerEnabled: markerShouldBeEnabled,
-							dataLabelsActivated: 'false',
+							dataLabelsActivated: labelShouldBeEnabled,
 							yAxisScalable: 'false',
 							optimizeForExport: 'false',
-							openDataPointLinksInNewWindow: openDataPointLinksInNewWindow]" />
+							openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+              annotations: annotations]" />
 				</div>
 			</div>
 			<%-- table --%>

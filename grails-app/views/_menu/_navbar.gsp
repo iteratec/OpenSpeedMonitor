@@ -1,3 +1,4 @@
+<g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <div id="Navbar" class="navbar navbar-fixed-top navbar-inverse">
 	<div class="navbar-inner">
 		<div class="container">
@@ -9,7 +10,7 @@
 			</a>
 
 			<a class="brand" href="${createLink(uri: '/')}">
-        <img class="logo" src="${resource(dir:'images',file:'OpenSpeedMonitor-onblack-monitorWritingLight_250pxHeight.gif')}" alt="${meta(name:'app.name')}" />
+        <img class="logo" src="${resource(dir:'images',file:'OpenSpeedMonitor-onblack-monitorWritingLight_39pxHeight.gif')}" alt="${meta(name:'app.name')}" />
 			</a>
 
        		<div class="nav-collapse">
@@ -27,25 +28,25 @@
 					<g:render template="/_menu/user"/><!-- NOTE: the renderDialog for the "Register" modal dialog MUST be placed outside the NavBar (at least for Bootstrap 2.1.1): see bottom of main.gsp -->
 					<ul class="nav">
 						<li class="dropdown">
-							<a class="dropdown-toggle" data-toggle="dropdown" href="#"><g:message code="navbar.browse" default="Browse" /> <b class="caret"></b></a>
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#"><g:message code="navbar.browse" default="Browse" locale="${lang}"/> <b class="caret"></b></a>
 							<ul class="dropdown-menu">
 
 								<li class="controller">
-									<g:link controller="job" action="list" title="${g.message([code:'de.iteratec.isr.managementDashboard'])}">
+									<g:link controller="job" action="list" title="${g.message([code:'de.iteratec.isr.managementDashboard', locale:lang])}">
 										<i class="icon-calendar"></i>
-										<g:message code="de.iteratec.isr.managementDashboard" />
+										<g:message code="de.iteratec.isr.managementDashboard" locale="${lang}"/>
 									</g:link>
 								</li>
 								<li class="controller">
-									<g:link controller="eventResultDashboard" action="showAll" title="${g.message([code:'eventResultDashboard.description'])}">
+									<g:link controller="eventResultDashboard" action="showAll" title="${g.message([code:'eventResultDashboard.description', locale:lang])}">
 										<i class="icon-signal"></i>
-										<g:message code="eventResultDashboard.label" />
+										<g:message code="eventResultDashboard.label" locale="${lang}"/>
 									</g:link>
 								</li>
 								<li class="controller">
-									<g:link controller="csiDashboard" action="showAll" title="${g.message([code:'csiDashboard.description'])}">
+									<g:link controller="csiDashboard" action="showAll" title="${g.message([code:'csiDashboard.description', locale:lang])}">
 										<i class="icon-signal"></i>
-										<g:message code="csiDashboard.label" />
+										<g:message code="csiDashboard.label" locale="${lang}"/>
 									</g:link>
 								</li>
 			                    

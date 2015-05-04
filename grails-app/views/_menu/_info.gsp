@@ -1,9 +1,10 @@
+<g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <ul class="nav pull-right">
 	<li class="dropdown dropdown-btn">
 		
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
     		<i class="icon-info-sign"></i>
-			<g:message code="default.info.label"/> <b class="caret"></b>
+			<g:message code="default.info.label" locale="${lang}"/> <b class="caret"></b>
 		</a>
 
 <ul class="dropdown-menu">
@@ -12,20 +13,20 @@
 		<li class="">
 			<a href="${createLink(uri: '/rest/man')}" target="_blank">
 				<i class="icon-info-sign"></i>
-				<g:message code="de.iteratec.osm.api.manual.label"/>
+				<g:message code="de.iteratec.osm.api.manual.label" locale="${lang}"/>
 			</a>
 		</li>
 		<li class="">
 			<a href="${createLink(uri: '/about')}" target="_blank">
 				<i class="icon-info-sign"></i>
-				<g:message code="de.iteratec.osm.about.label"/>
+				<g:message code="de.iteratec.osm.about.label" locale="${lang}"/>
 			</a>
 		</li>
 
 		<li class="">
 			<a href="mailto:wpt@iteratec.de">
 				<i class="icon-envelope"></i>
-				<g:message code="de.iteratec.osm.contact.label"/>
+				<g:message code="de.iteratec.osm.contact.label" locale="${lang}"/>
 			</a>
 		</li>
 	<%--			<li class="divider"></li>--%>

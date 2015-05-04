@@ -110,7 +110,9 @@ class TabularResultPresentationController {
                     {
                         continue;
                     }
-                    eventResultsListing.addRow(new EventResultListingRow(jobResultService.findJobResultByEventResult(eachEventResult), eachEventResult));
+                    JobResult correspondingJobResult = eachEventResult.jobResult;
+                    eventResultsListing.addRow(new EventResultListingRow(correspondingJobResult, eachEventResult))
+//                    formerly: eventResultsListing.addRow(new EventResultListingRow(jobResultService.findJobResultByEventResult(eachEventResult), eachEventResult));
                 }
 
                 modelToRender.put('showEventResultsListing', true);
@@ -504,7 +506,7 @@ class TabularResultPresentationController {
         static constraints = {
             selectedFolder(nullable:false, minSize:1)
 
-            // selectedPage is not allowed to be empty
+            // selectedPages is not allowed to be empty
             selectedPage(nullable:false, minSize:1)
 
             // selectedMeasuredEventIds is only allowed to be empty if selectedAllMeasuredEvents is true
@@ -540,7 +542,7 @@ class TabularResultPresentationController {
         public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
         {
             viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
-            viewModelToCopyTo.put('selectedPage', this.selectedPage)
+            viewModelToCopyTo.put('selectedPages', this.selectedPage)
 
             viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
             viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)

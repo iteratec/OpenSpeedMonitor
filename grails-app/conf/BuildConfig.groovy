@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -37,7 +37,10 @@ grails.project.fork = [
 ]
 // in intellij a grails bug inhibits test runs in forked mode, so we disabled it
 // see http://codedevstuff.blogspot.de/2014/03/run-forked-tests-in-grails-on-intellij.html
-grails.project.fork.test = false
+grails.project.fork = [
+		test: false,
+		run: false
+]
 
 //grails.project.dependency.resolver = "maven" // or ivy
 
@@ -62,7 +65,7 @@ grails.project.dependency.resolution = {
         flatDir name:'local jars', dirs:'./lib/'
 
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
-        //mavenRepo "http://repo.grails.org/grails/plugins/"
+        mavenRepo "http://repo.grails.org/grails/plugins/"
         //mavenRepo "http://snapshots.repository.codehaus.org"
         //mavenRepo "http://repository.codehaus.org"
         //mavenRepo "http://download.java.net/maven/2/"
@@ -72,7 +75,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 		runtime(
-			'mysql:mysql-connector-java:5.1.26', 
+			'mysql:mysql-connector-java:5.1.26',
 			'net.sf.supercsv:super-csv:2.1.0'
 		)
 		compile (
@@ -83,12 +86,12 @@ grails.project.dependency.resolution = {
 			'net.sf.supercsv:super-csv:2.1.0'
 		)
 		 test (
-			'org.mockito:mockito-all:1.9.5', 
+			'org.mockito:mockito-all:1.9.5',
 			'org.hamcrest:hamcrest-all:1.3',
 			'co.freeside:betamax:1.1.2'
 		)
     }
-	
+
 	plugins {
 		//runtime//////////////////////////////////////////////////////////////////
 		runtime (
@@ -117,7 +120,7 @@ grails.project.dependency.resolution = {
 		build( ":kickstart-with-bootstrap:0.9.6"){
 			excludes "resources", "scaffolding"
 		}
-		//compile//////////////////////////////////////////////////////////////////
+        //compile//////////////////////////////////////////////////////////////////
 		compile (
 			":joda-time:1.4",
 			':scaffolding:2.0.2',
@@ -142,6 +145,7 @@ grails.project.dependency.resolution = {
 		}
 
 		compile(':codenarc:0.22')
+		compile(':markdown:1.1.1')
 	}
 
 	codenarc {
@@ -157,5 +161,5 @@ grails.project.dependency.resolution = {
 		}
 	}
 
-    
+
 }

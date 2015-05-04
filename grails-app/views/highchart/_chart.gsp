@@ -13,20 +13,23 @@
 		yAxisMax="${yAxisMax}" lineWidthGlobal="${lineWidthGlobal}"
 		optimizeForExport="${optimizeForExport}"
 		openDataPointLinksInNewWindow="${openDataPointLinksInNewWindow}"
-		exportUrl="${exportUrl}" />
+		exportUrl="${exportUrl}"
+    annotations="${annotations}"/>
 </g:if>
 <g:else>
 	<iteratec:multipleAxisChart data="${eventResultValues}" title="${chartTitle}"
 		lineType="${selectedCharttypeForHighchart}" measurementUnit="s"
 		lineWidthGlobal="2" xAxisMin="${fromTimestampForHighChart}"
 		xAxisMax="${toTimestampForHighChart}"
-		markerEnabled="${markerShouldBeEnabled}" dataLabelsActivated="false"
+		markerEnabled="${markerShouldBeEnabled}"
+		dataLabelsActivated="${labelShouldBeEnabled}"
 		yAxisScalable="false" optimizeForExport="false"
 		highChartLabels="${highChartLabels}"
 		highChartsTurboThreshold="${highChartsTurboThreshold}"
 		exportUrl="${exportUrl}"
 		heightOfChart="${initialChartHeight}"
-		width="${initialChartWidth}"/>
+		width="${initialChartWidth}"
+		annotations="${annotations}"/>
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />

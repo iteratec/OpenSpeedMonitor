@@ -52,11 +52,6 @@
 			<g:createLink absolute="true" ... />
 			--%>
 			</g:else>
-			<p>
-				<g:message code="de.iteratec.osm.gui.job.list.description" default="" />
-				<a href="#" id="updateHints" class="icon-question-sign icon-large" rel="popover"
-				data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"></a>
-			</p>
 			<div class="row noIdent">
 				<h5><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern"/></h5>
 				<input class="span2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
@@ -107,22 +102,26 @@
 					code="job.filter.filterInactiveJobs" /></label> 
 			</div>
 		</div>
-		<div class="controlribbon">
-			<g:message code="de.iteratec.isj.job.selected"
-				default="Markierte Jobs" />
-
-			<g:actionSubmit action="activate" class="btn btn-default"
-				value="${ message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren') }" />
-			<g:actionSubmit action="deactivate" class="btn btn-default"
-				value="${ message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren') }" />
-			<g:actionSubmit class="btn btn-info" action="execute"
-				value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}" />
-		</div>
-		<div class="controlribbon">
-			<a
-				href="<g:createLink action="create" />" class="btn btn-primary">
-				<i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
-			</a>
+		<div class="controlribbon" style="border: 1px solid green width: 100%;">
+      <i class="icon-arrow-down"></i>
+      <g:message code="de.iteratec.isj.job.selected"
+        default="Markierte Jobs" />:&nbsp;
+      <g:actionSubmit action="activate" class="btn btn-default"
+        value="${ message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren') }" />
+      <g:actionSubmit action="deactivate" class="btn btn-default"
+        value="${ message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren') }" />
+      <g:actionSubmit class="btn btn-info" action="execute"
+        value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}" />
+      <span style="margin-left:100px;">  
+	      <a
+	        href="<g:createLink action="create" />" class="btn btn-primary">
+	        <i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+	      </a>  
+      </span>  
+      <span style="float:right;margin-top: 12px;">        
+        <a href="#" id="updateHints" class="icon-question-sign icon-large clickable-icon" rel="popover"
+        data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true" style="text-decoration:none;color: #3a87ad;"></a>
+      </span>
 		</div>
 		
 		

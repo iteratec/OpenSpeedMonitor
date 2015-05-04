@@ -17,6 +17,11 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.Status
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
@@ -46,6 +51,8 @@ class MvUpdateEventCleanupService {
 	ShopMeasuredValueService shopMeasuredValueService
 	MeasuredValueTagService measuredValueTagService
 	ConfigService configService
+	InMemoryConfigService inMemoryConfigService
+	BatchActivityService batchActivityService
 
 	/**
 	 * <p>
@@ -67,7 +74,7 @@ class MvUpdateEventCleanupService {
 	 */
 	void closeMeasuredValuesExpiredForAtLeast(int minutes){
 		
-		if ( ! configService.areMeasurementsGenerallyEnabled() ) {
+		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No measured value update events are closed cause measurements are generally disabled.")
 			return
 		}
@@ -80,7 +87,7 @@ class MvUpdateEventCleanupService {
 		
 	}
 	void closeAndCalculateIfNecessary(List<MeasuredValue> mvsOpenAndExpired){
-		
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate MeasuredValues")
 		List<MeasuredValueUpdateEvent> allUpdateEvents = MeasuredValueUpdateEvent.list()
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${allUpdateEvents.size()} update events in db before cleanup.")
 		List<MeasuredValueUpdateEvent> updateEventsToBeDeleted = measuredValueDaoService.getUpdateEvents(mvsOpenAndExpired*.ident())
@@ -88,73 +95,94 @@ class MvUpdateEventCleanupService {
 		
 		List<MeasuredValue> justToClose = []
 		List<MeasuredValue> toCalculateAndClose = []
-		mvsOpenAndExpired.each{MeasuredValue mvOpenAndExpired ->
+		//Variables for BatchActivity calculations
+		int size = mvsOpenAndExpired.size()
+		int overallSize = size * 3
+
+		batchActivityService.updateStatus(activity,["stage":"Split into justClose and calculateAndClose"])
+		mvsOpenAndExpired.eachWithIndex{MeasuredValue mvOpenAndExpired, int index ->
+			batchActivityService.updateStatus(activity,["progressWithinStage":batchActivityService.calculateProgress(size,index+1), "progress":batchActivityService.calculateProgress(overallSize,index)])
 			if(mvOpenAndExpired.hasToBeCalculatedAccordingEvents(updateEventsToBeDeleted)){
 				toCalculateAndClose.add(mvOpenAndExpired)
 			}else{
 				justToClose.add(mvOpenAndExpired)
 			}
 		}
-		
+		batchActivityService.updateStatus(activity,["stage":"Closing all already calculated MeasuredValues"])
 		try{
 			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${justToClose.size()} already calculated MeasuredValues should get closed now.")
-			justToClose.each {MeasuredValue toClose ->
+			justToClose.eachWithIndex {MeasuredValue toClose, int index ->
+				batchActivityService.updateStatus(activity,["progressWithinStage":batchActivityService.calculateProgress(size,index+1), "progress":batchActivityService.calculateProgress(overallSize,index)])
 				MeasuredValue.withTransaction{TransactionStatus status ->
 					closeMv(toClose)
 					status.flush()
 				}
+				batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 			}
 		}catch (Exception e){
-			log.error("An error occurred while closing MeasuredValues who are  calculated already.", e)
+			def message = "An error occurred while closing MeasuredValues who are  calculated already."
+			log.error(message, e)
+			batchActivityService.updateStatus(activity,["lastFailureMessage":message,"failures":++activity.getFailures()])
 		}
 		
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${toCalculateAndClose.size()} open and expired MeasuredValues should get calculated now.")
-		if(toCalculateAndClose.size() > 0) closeAndCalculate(toCalculateAndClose)
-		
+		if(toCalculateAndClose.size() > 0) closeAndCalculate(toCalculateAndClose, activity, overallSize)
+		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
 		allUpdateEvents = MeasuredValueUpdateEvent.list()
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${allUpdateEvents.size()} update events in db after cleanup.")
 	}
-	void closeAndCalculate(List<MeasuredValue> mvsToCalculateAndClose){
+	void closeAndCalculate(List<MeasuredValue> mvsToCalculateAndClose, BatchActivity activity, int overallSize){
 		
 		try{
 			List<MeasuredValue> pageMvsToCalculate = mvsToCalculateAndClose.findAll{ it.aggregator.name.equals(AggregatorType.PAGE) }
 			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${pageMvsToCalculate.size()} open and expired page MeasuredValues should get calculated now.")
-			if(pageMvsToCalculate.size() > 0) calculateAndClosePageMvs(pageMvsToCalculate)
+			if(pageMvsToCalculate.size() > 0) calculateAndClosePageMvs(pageMvsToCalculate, activity, overallSize)
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		} catch(Exception e){
-			log.error("An error occurred while calculation and closing page MeasuredValues.", e)
+			def message = "An error occurred while calculation and closing page MeasuredValues."
+			log.error(message, e)
+			batchActivityService.updateStatus(activity,["lastFailureMessage":message,"failures":++activity.getFailures()])
 		}
 		
 		try{
 			List<MeasuredValue> shopMvsToCalculate = mvsToCalculateAndClose.findAll{ it.aggregator.name.equals(AggregatorType.SHOP) }
 			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${shopMvsToCalculate.size()} open and expired shop MeasuredValues should get calculated now.")
-			if(shopMvsToCalculate) calculateAndCloseShopMvs(shopMvsToCalculate)
+			if(shopMvsToCalculate) calculateAndCloseShopMvs(shopMvsToCalculate, activity, overallSize)
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		} catch(Exception e){
-			log.error("An error occurred while calculation and closing shop MeasuredValues.", e)
+			def message = "An error occurred while calculation and closing shop MeasuredValues."
+			log.error(message, e)
+			batchActivityService.updateStatus(activity,["lastFailureMessage":message,"failures":++activity.getFailures()])
 		}
 		
 	}
 	
-	void calculateAndClosePageMvs(List<MeasuredValue> pageMvsToCalculateAndClose){
-		
+	void calculateAndClosePageMvs(List<MeasuredValue> pageMvsToCalculateAndClose, BatchActivity activity, int overallSize){
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: Creating caching container for calculating page MeasuredValues ...")
 		CachingContainerFactory ccFactory = new CachingContainerFactory(pageMvsToCalculateAndClose)
 		log.info("... DONE creating caching container")
-		
-		pageMvsToCalculateAndClose.each {MeasuredValue dpmvToCalcAndClose ->
+		int size = pageMvsToCalculateAndClose.size()
+		batchActivityService.updateStatus(activity,["stage":"Calculate and Close Page MV"])
+		pageMvsToCalculateAndClose.eachWithIndex{MeasuredValue dpmvToCalcAndClose, int index ->
+			batchActivityService.updateStatus(activity,["progressWithinStage":batchActivityService.calculateProgress(size,index+1), "progress":batchActivityService.calculateProgress(overallSize,index)])
 			MeasuredValue.withTransaction {TransactionStatus status ->
 				pageMeasuredValueService.calcMv(dpmvToCalcAndClose, ccFactory.createContainerFor(dpmvToCalcAndClose))
 				closeMv(dpmvToCalcAndClose)
 				status.flush()
 			}
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
-	void calculateAndCloseShopMvs(List<MeasuredValue> shopMvsToCalculate){
-		shopMvsToCalculate.each {MeasuredValue smvToCalcAndClose ->
+	void calculateAndCloseShopMvs(List<MeasuredValue> shopMvsToCalculate, BatchActivity activity, int overallSize){
+		int size = shopMvsToCalculate.size()
+		shopMvsToCalculate.eachWithIndex {MeasuredValue smvToCalcAndClose, int index ->
+			batchActivityService.updateStatus(activity,["progressWithinStage":batchActivityService.calculateProgress(size,index+1), "progress":batchActivityService.calculateProgress(overallSize,index)])
 			MeasuredValue.withTransaction {TransactionStatus status ->
 				shopMeasuredValueService.calcMv(smvToCalcAndClose)
 				closeMv(smvToCalcAndClose)
 				status.flush()
 			}
+			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
 	

@@ -1,23 +1,37 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
 package de.iteratec.osm.csi
 
 import static de.iteratec.osm.util.Constants.*
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.OsmChartGraph
+import de.iteratec.osm.report.chart.OsmChartPoint
+import de.iteratec.osm.result.EventResultDashboardService
+import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.MvQueryParams
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -26,27 +40,12 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.OsmChartPoint
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.result.EventResultDashboardService
-import de.iteratec.osm.result.JobResultService
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-
 
 /**
  * @todo TODO mze-2013-09-12: Suggest to move to a generic HighchartFactoryService.
  */
 class CustomerSatisfactionHighChartService {
-	
+
 	static final String HIGHCHART_GRAPH_LABEL_NOT_ASSIGNABLE = "de.iteratec.isocsi.highchart.graph.lable.notassignable"
 	/**
 	 * The {@link DateTimeFormat} used for date-GET-params in created links.
@@ -68,17 +67,17 @@ class CustomerSatisfactionHighChartService {
 	EventResultDashboardService eventResultDashboardService
 	CsTargetGraphDaoService csTargetGraphDaoService
 	MeasuredValueUtilService measuredValueUtilService
-	
+
 	/**
 	 * The Grails engine to generate links.
 	 *
 	 * @see http://mrhaki.blogspot.ca/2012/01/grails-goodness-generate-links-outside.html
 	 */
 	LinkGenerator grailsLinkGenerator
-	
+
 	Map<String, String> hourlyEventTagToGraphLabelMap = [:]
 	def weeklyPageTagToGraphLabelMap = [:]
-	
+
 	/**
 	 * Get hourly Customer Satisfaction {@ JobMeasuredValue}s as a List of{@link OsmChartGraph}s in format for highcharts-taglib.
 	 * see {@link CustomerSatisfactionHighChartService#convertToHighChartMap}
@@ -90,26 +89,26 @@ class CustomerSatisfactionHighChartService {
 	 */
 	List<OsmChartGraph> getCalculatedHourlyEventMeasuredValuesAsHighChartMap(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
 		List<OsmChartGraph> resultList = []
-	
+
 		List<MeasuredValue> csiValues = eventMeasuredValueService.getHourylMeasuredValues(fromDate, toDate, mvQueryParams)
-		
+
 		resultList = convertToHighchartGraphList(csiValues)
-		
+
 		return resultList
 	}
-	
+
 	/**
 	 * <p>
 	 * Gets page CSI {@link MeasuredValue}s as a List of{@link OsmChartGraph}s in the highcharts
 	 * taglib format.
 	 * </p>
-	 * 
+	 *
 	 * @param timeFrame
-	 *         The time frame for which {@link MeasuredValue}s should be found. Both 
-	 *         borders are included in search. This argument may not be 
+	 *         The time frame for which {@link MeasuredValue}s should be found. Both
+	 *         borders are included in search. This argument may not be
 	 *         <code>null</code>.
 	 * @param queryParams
-	 *         The {@linkplain MvQueryParams filter} to select relevant 
+	 *         The {@linkplain MvQueryParams filter} to select relevant
 	 *         measured values, not <code>null</code>.
 	 * @param mvInterval
 	 * 		   The {@link MeasuredValueInterval} to be calculated, not <code>null</code>
@@ -118,71 +117,71 @@ class CustomerSatisfactionHighChartService {
 	 */
 	List<OsmChartGraph> getCalculatedPageMeasuredValuesAsHighChartMap(Interval timeFrame, MvQueryParams queryParams, MeasuredValueInterval mvInterval) {
 		List<OsmChartGraph> resultMap = []
-	
+
 		"Customer satisfaction index (CSI)"
-		
+
 		Date fromDate = timeFrame.getStart().toDate();
 		Date toDate = timeFrame.getEnd().toDate();
 		List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
 		List<Page> pages = queryParams.pageIds.collectNested { Page.get(it) };
 		List<MeasuredValue> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
         log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
-		
+
 		resultMap = convertToHighchartGraphList(csiValues)
         log.debug("Number of ChartGraphs made from MeasuredValues: ${resultMap.size()}")
         log.debug("Number of points in each ChartGraph made from MeasuredValues: ${resultMap*.points.size()}")
 
 		return resultMap
 	}
-	
-	/**
-	 * <p>
-	 * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
-	 * </p>
-	 * 
-	 * @param timeFrame
-	 *         The time frame for which {@link MeasuredValue}s should be found. Both 
-	 *         borders are included in search. This argument may not be 
-	 *         <code>null</code>.
-	 * @param queryParams
-	 *         The {@linkplain MvQueryParams filter} to select relevant 
-	 *         measured values, not <code>null</code>.
-	 * @return not <code>null</code>.
-	 * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
-	 */
-	List<OsmChartGraph> getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
-		List<OsmChartGraph> resultList = []
-	
-		Date fromDate = timeFrame.getStart().toDate();
-		Date toDate = timeFrame.getEnd().toDate();
-		List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
-		List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
-		
-		resultList = convertToHighchartGraphList(csiValues)
-		
-		return resultList;
-	}
-	
+
+    /**
+     * <p>
+     * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
+     * </p>
+     *
+     * @param timeFrame
+     *         The time frame for which {@link MeasuredValue}s should be found. Both
+     *         borders are included in search. This argument may not be
+     *         <code>null</code>.
+     * @param queryParams
+     *         The {@linkplain MvQueryParams filter} to select relevant
+     *         measured values, not <code>null</code>.
+     * @return not <code>null</code>.
+     * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
+     */
+    List<OsmChartGraph> getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
+        List<OsmChartGraph> resultList = []
+
+        Date fromDate = timeFrame.getStart().toDate();
+        Date toDate = timeFrame.getEnd().toDate();
+        List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
+        List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
+
+        resultList = convertToHighchartGraphList(csiValues)
+
+        return resultList;
+    }
+
 	/**
 	 * <p>
 	 * Creates {@link OsmChartGraph}s from the specified
 	 * {@link Collection} of {@link MeasuredValue}s.
 	 * </p>
-	 * 
-	 * @param csiValues 
-	 *         The values from which the graph is to be calculated, 
+	 *
+	 * @param csiValues
+	 *         The values from which the graph is to be calculated,
 	 *         not <code>null</code>.
-	 * @return A list of graphs sorted ascending by {@link 
+	 * @return A list of graphs sorted ascending by {@link
 	 *         OsmChartGraph#getLabel()}; never <code>null</code>.
 	 */
 	private List<OsmChartGraph> convertToHighchartGraphList(Collection<MeasuredValue> csiValues) {
 		// Cache of already added graphs by tag
 		Map<String, OsmChartGraph> tagToGraph=new HashMap<String, OsmChartGraph>();
-		
+
 		List<OsmChartGraph> result=new ArrayList<OsmChartGraph>();
-		
+
 		for( MeasuredValue eachCsiVal : csiValues) {
-			
+
 			if (eachCsiVal.value) {
 				if(!tagToGraph.containsKey(eachCsiVal.getTag())) {
 					OsmChartGraph graph=new OsmChartGraph();
@@ -190,16 +189,16 @@ class CustomerSatisfactionHighChartService {
 					tagToGraph.put(eachCsiVal.getTag(), graph);
 					result.add(graph);
 				}
-				
+
 				List<OsmChartPoint> points = tagToGraph.get(eachCsiVal.getTag()).getPoints();
 				Long curTimestamp = getHighchartCompatibleTimestampFrom(eachCsiVal.started)
-				
+
 				/*
 				 * round to 2 decimal places
 				 */
 				BigDecimal valueForRounding = new BigDecimal(eachCsiVal.value * 100)
 				double value = valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
-				
+
 				URL linkForPoint = getLinkFor(eachCsiVal)
 
                 OsmChartPoint chartPoint = new OsmChartPoint(time: curTimestamp, measuredValue: value, countOfAggregatedResults: eachCsiVal.countResultIds(), sourceURL: linkForPoint, testingAgent: null)
@@ -213,21 +212,21 @@ class CustomerSatisfactionHighChartService {
 		{
 			graph.getPoints().sort(true, { it.time });
 		}
-		
+
 		// Sort all graphs
 		result.sort(true, { it.label });
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Creates an URL for a link for the {@link MeasuredValue} (MV) csiValue (to be used in diagrams). The URL links to the underlying data of csiValue:
 	 * <ul>
 	 * <li>If csiValue is a <b>weekly shop-MV: </b>Link to diagram-sight of daily shop-MV's of the respective week and shop/system.</li>
-	 * <li>If csiValue is a <b>daily shop-MV: </b></li>Link to diagram-sight of hourly measured step-MV's of the respective day and shop/system.
-	 * <li>If csiValue is a <b>weekly page-MV: </b></li>Link to diagram-sight of daily page-MV's of the respective week, shop/system and page.
-	 * <li>If csiValue is a <b>daily page-MV: </b></li>Link to diagram-sight of hourly measured step-MV's of the respective day, shop/system and page.
-	 * <li>If csiValue is a <b>hourly measured step-MV: </b></li>Link to a list of the raw-data-results of the respective hour, shop/system, page and step.
+	 * <li>If csiValue is a <b>daily shop-MV: </b>Link to diagram-sight of hourly measured step-MV's of the respective day and shop/system.</li>
+	 * <li>If csiValue is a <b>weekly page-MV: </b>Link to diagram-sight of daily page-MV's of the respective week, shop/system and page.</li>
+	 * <li>If csiValue is a <b>daily page-MV: </b>Link to diagram-sight of hourly measured step-MV's of the respective day, shop/system and page.</li>
+	 * <li>If csiValue is a <b>hourly measured step-MV: </b>Link to a list of the raw-data-results of the respective hour, shop/system, page and step.</li>
 	 * </ul>
 	 * @param csiValue
 	 * @return
@@ -235,7 +234,7 @@ class CustomerSatisfactionHighChartService {
 	 */
 	private URL getLinkFor(MeasuredValue csiValue){
 		URL linkForPoint
-		
+
 		if (csiValue.aggregator.name.equals(AggregatorType.PAGE) || csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
 			def paramsToSend = getParamsForLink(csiValue)
 			String testsDetailURLAsString = grailsLinkGenerator.link([
@@ -250,7 +249,7 @@ class CustomerSatisfactionHighChartService {
 		}
 		return linkForPoint
 	}
-	
+
 	private Map getParamsForLink(MeasuredValue csiValue){
 		DateTime startOfInterval = new DateTime(csiValue.started)
 		DateTime endOfInterval = measuredValueUtilService.addOneInterval(startOfInterval, csiValue.interval.intervalInMinutes)
@@ -264,31 +263,35 @@ class CustomerSatisfactionHighChartService {
 			'selectedAllBrowsers': 'on',
 			'selectedAllLocations': 'on',
 			'selectedAllMeasuredEvents': 'on',
-			'_action_showAll': 'Show'
+            '_action_showAll': 'Show'
 		]
 		if (csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
-			
+
 			if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
 				paramsToSend['aggrGroup'] = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
+                paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
 				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
-				paramsToSend['selectedPage'] = Page.list()*.ident()
+				paramsToSend['selectedPages'] = Page.list()*.ident()
+                paramsToSend['selectedTimeFrameInterval'] = "0"
 			}
-			
+
 		}else if (csiValue.aggregator.name.equals(AggregatorType.PAGE)) {
-		
+
 			if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
 				paramsToSend['aggrGroup'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
-				paramsToSend['selectedPage'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+				paramsToSend['selectedPages'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+                paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
 				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
-				paramsToSend['selectedPage'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+				paramsToSend['selectedPages'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+                paramsToSend['selectedTimeFrameInterval'] = "0"
 			}
-			
+
 		}
 		return paramsToSend
 	}
@@ -296,7 +299,7 @@ class CustomerSatisfactionHighChartService {
 	/**
 	 * Get label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMap}
 	 * for given {@link MeasuredValue} and {@link AggregatorType}
-	 * 
+	 *
 	 * @param mv
 	 * @param aggregator
 	 * @return Label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMap}
@@ -306,14 +309,14 @@ class CustomerSatisfactionHighChartService {
 		switch (mv.aggregator.name) {
 			case AggregatorType.MEASURED_EVENT:
 				if (!hourlyEventTagToGraphLabelMap.containsKey(mv.tag)) {
-					
+
 					JobGroup group = measuredValueTagService.findJobGroupOfHourlyEventTag(mv.tag)
 					Page page = measuredValueTagService.findPageOfHourlyEventTag(mv.tag)
 					MeasuredEvent event = measuredValueTagService.findMeasuredEventOfHourlyEventTag(mv.tag)
 					Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(mv.tag)
 					Location location = measuredValueTagService.findLocationOfHourlyEventTag(mv.tag)
 
-					//Removed Browser and Page See IT-153					
+					//Removed Browser and Page See IT-153
 					String label= (group?group.name:labelForValuesNotAssignable) + HIGHCHART_LEGEND_DELIMITTER;
 //					label+= (page?page.name:labelForValuesNotAssignable) + UNIQUE_STRING_DELIMITTER;
 					label+= (event?event.name:labelForValuesNotAssignable) + HIGHCHART_LEGEND_DELIMITTER;
@@ -321,9 +324,9 @@ class CustomerSatisfactionHighChartService {
 					label+= location?
 						(location.uniqueIdentifierForServer==null?location.location:location.uniqueIdentifierForServer):
 						labelForValuesNotAssignable;
-					
+
 					hourlyEventTagToGraphLabelMap.put(mv.tag, label)
-						
+
 				}
 				return hourlyEventTagToGraphLabelMap[mv.tag]
 			break
@@ -345,12 +348,12 @@ class CustomerSatisfactionHighChartService {
 			break
 		}
 	}
-	
+
 	/**
 	 * <p>
 	 * Creates a Highchart-map containing the cs-relevant {@link CsTargetGraph}-points as stored in database.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * The result hast the following format:
 	 * <pre>
@@ -361,36 +364,36 @@ class CustomerSatisfactionHighChartService {
 	 * ]
 	 * </pre>
 	 * </p>
-	 * 
-	 * @param fromDate 
+	 *
+	 * @param fromDate
 	 *         The relevant time frames start date, inclusive, not <code>null</code>.
 	 * @param toDate
 	 *         The relevant time frames end date, inclusive, not <code>null</code>.
 	 * @return A List of {@link OsmChartGraph} as described above, never <code>null</code>.
 	 */
 	List<OsmChartGraph> getCsRelevantStaticGraphsAsResultMapForChart(DateTime fromDate, DateTime toDate){
-		
+
 		List<OsmChartGraph> result=Collections.checkedList(new ArrayList<OsmChartGraph>(), OsmChartGraph.class);
-		
+
 		CsTargetGraph actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
-		
+
 		if (actualTargetGraph) {
 			OsmChartPoint fromPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(fromDate.toDate()), measuredValue: (double) actualTargetGraph.getPercentOfDate(fromDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
 			OsmChartPoint toPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(toDate.toDate()), measuredValue: (double) actualTargetGraph.getPercentOfDate(toDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-			
+
 			OsmChartGraph graph=new OsmChartGraph();
 			graph.setLabel(actualTargetGraph.label);
             if(fromPoint.isValid())
 			    graph.getPoints().add(fromPoint);
             if(toPoint.isValid())
 			    graph.getPoints().add(toPoint);
-			
+
 			result.add(graph);
 		}
-		
+
 		return result
 	}
-	
+
 	private Long getHighchartCompatibleTimestampFrom(Date date){
 		return new DateTime(date, DateTimeZone.forID('MET')).getMillis()
 	}

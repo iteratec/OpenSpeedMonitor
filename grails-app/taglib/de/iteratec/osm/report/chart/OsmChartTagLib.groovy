@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -19,8 +19,6 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
-import de.iteratec.osm.util.Constants
-import de.iteratec.osm.util.OsmCookieService;
 
 class OsmChartTagLib {
 
@@ -48,7 +46,8 @@ class OsmChartTagLib {
 		Boolean optimizeForExport = attrs['optimizeForExport']!=null ? Boolean.valueOf(attrs['optimizeForExport']) : false
 		Boolean openDatapointLinksInNewWindow = attrs['openDataPointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDataPointLinksInNewWindow'])  : true
 		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
-		
+        List annotations = attrs["annotations"]
+
 		ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
 		log.debug("chartLibToUse while processing osm chart tgalib=${chartLibToUse}")
 
@@ -61,13 +60,13 @@ class OsmChartTagLib {
 		{
 			String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
 			data.each {
-				it.measurandGroup = MeasurandGroup.NO_MEASURAND
+				it.measurandGroup = MeasurandGroup.PERCENTAGES
 			}
 			List<OsmChartAxis> highChartLabels = new LinkedList<OsmChartAxis>();
-			highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.NO_MEASURAND, "",1, OsmChartAxis.LEFT_CHART_SIDE))
-			
+			highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
+
 			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, heightOfChart, highChartLabels, title, markerEnabled)
+			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, markerEnabled, annotations)
 		}else {
 			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
 					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
@@ -99,7 +98,8 @@ class OsmChartTagLib {
 		Boolean openDatapointLinksInNewWindow = attrs['openDatapointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDatapointLinksInNewWindow'])  : true
 		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
 		List<OsmChartAxis> yAxesLabels = attrs['highChartLabels']
-		
+        List annotations = attrs["annotations"]
+
 		if (title == null) {
 			title = "";
 		}
@@ -117,7 +117,7 @@ class OsmChartTagLib {
 		{
 			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
 			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, heightOfChart, yAxesLabels, title, markerEnabled)
+			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, markerEnabled, annotations)
 		} else {
 			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
 					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")

@@ -19,6 +19,7 @@ package de.iteratec.osm
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.util.ServiceMocker
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
@@ -34,11 +35,12 @@ import org.junit.*
 class ConfigServiceSpec {
 	
 	ConfigService serviceUnderTest
+	InMemoryConfigService inMemoryConfigService
 
 	@Before
 	void setUp(){
 		serviceUnderTest = service
-		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
+		inMemoryConfigService = new InMemoryConfigService()
 	}
 
     void testFailingGettingDetailDataStorageTime() {
@@ -94,9 +96,9 @@ class ConfigServiceSpec {
 		OsmConfiguration conf = new OsmConfiguration().save(failOnError: true) //config with default values
 		Boolean defaultMeasurementActivation = false
 		//test executions and assertions
-		assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(defaultMeasurementActivation))
-		serviceUnderTest.activateMeasurementsGenerally()
-		assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(true))
+		assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(defaultMeasurementActivation))
+		inMemoryConfigService.activateMeasurementsGenerally()
+		assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(true))
 	}
 	
 	void testSuccessfulGettingInitialChartHeight() {
@@ -110,14 +112,14 @@ class ConfigServiceSpec {
     void testActivatingMeasurements(){
         //test-specific data
         OsmConfiguration conf = new OsmConfiguration().save(failOnError: true)
-        assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(false))
+        assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(false))
         //test execution
-        serviceUnderTest.activateMeasurementsGenerally()
+		inMemoryConfigService.activateMeasurementsGenerally()
         // assertions
-        assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(true))
+        assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(true))
         //test execution
-        serviceUnderTest.activateMeasurementsGenerally()
+		inMemoryConfigService.activateMeasurementsGenerally()
         // assertions
-        assertThat(serviceUnderTest.areMeasurementsGenerallyEnabled(), is(true))
+        assertThat(inMemoryConfigService.areMeasurementsGenerallyEnabled(), is(true))
     }
 }

@@ -128,7 +128,7 @@ class JobService {
                             batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
                         } catch (Exception e) {
                             log.error("Couldn't delete JobResult ${e}")
-                            batchActivityService.updateStatus(activity, ["failures": ++activity.getFailures(), "lastFailureMessage": "Couldn't delete JobResult: ${jobResult.id} - ${e}"])
+                            batchActivityService.updateStatus(activity, ["failures": ++activity.getFailures(), "lastFailureMessage": "Couldn't delete JobResult: ${jobResult.id}"])
                         }
                     }
                     session.flush()

@@ -43,7 +43,7 @@ class BatchActivity {
 
     static constraints = {
         domain()
-        idWithinDomain()
+        idWithinDomain(nullable:true)
         name()
         activity()
         startDate()

@@ -18,9 +18,8 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.report.external.GraphiteComunicationFailureException
-import de.iteratec.osm.report.external.GraphitePathName
-import de.iteratec.osm.report.external.GraphiteSocket
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -33,9 +32,6 @@ import de.iteratec.osm.csi.ShopMeasuredValueService
 import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.report.external.GraphitePath
-import de.iteratec.osm.report.external.GraphiteServer
-import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.MvQueryParams
@@ -52,7 +48,7 @@ import org.junit.Test
 
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)
-@Mock([MeasuredValueInterval, OsmConfiguration])
+@Mock([MeasuredValueInterval, OsmConfiguration, BatchActivity])
 class QuartzControlledGrailsReportsTests {
 	
 	static final String jobGroupWithServersName = 'csiGroupWithServers'
@@ -80,8 +76,9 @@ class QuartzControlledGrailsReportsTests {
 		serviceUnderTest = service
 		serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService() 
 		serviceUnderTest.configService = new ConfigService()
-		serviceUnderTest.configService.inMemoryConfigService = new InMemoryConfigService()
-		serviceUnderTest.configService.inMemoryConfigService.activateMeasurementsGenerallyEnabled()
+		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
+		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
+		serviceUnderTest.batchActivityService = new BatchActivityService()
 		new OsmConfiguration().save(failOnError: true)
 	}
 
