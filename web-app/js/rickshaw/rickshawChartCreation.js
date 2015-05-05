@@ -927,13 +927,13 @@ function ChartAdjuster(args) {
               height : $('#dia-height').val()
             });
             if (parseInt(diaWidth) < 1070) {
-              $("#rickshaw_legend, ul").css({
+              $("#rickshaw_legend > ul").css({
                 "-moz-column-count" : 1 + "",
                 "-webkit-column-count" : 1 + "",
                 "column-count" : 1 + ""
               });
             } else {
-              $("#rickshaw_legend, ul").css({
+              $("#rickshaw_legend > ul").css({
                 "-moz-column-count" : 2 + "",
                 "-webkit-column-count" : 2 + "",
                 "column-count" : 2 + ""
@@ -1164,6 +1164,7 @@ function ChartExporter(args) {
         try {
           downloadCanvas(canvas, "png");
           if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
           }
@@ -1268,11 +1269,20 @@ function ChartExporter(args) {
       width : width,
       height : height
     });
-    $("#rickshaw_legend, ul").css({
-      "-moz-column-count" : 2 + "",
-      "-webkit-column-count" : 2 + "",
-      "column-count" : 2 + ""
-    });
+
+    if (parseInt(width) < 1070) {
+      $("#rickshaw_legend > ul").css({
+        "-moz-column-count" : 1 + "",
+        "-webkit-column-count" : 1 + "",
+        "column-count" : 1 + ""
+      });
+    } else {
+      $("#rickshaw_legend > ul").css({
+        "-moz-column-count" : 2 + "",
+        "-webkit-column-count" : 2 + "",
+        "column-count" : 2 + ""
+      });
+    }
     deferrer.resolve();
   }
   
