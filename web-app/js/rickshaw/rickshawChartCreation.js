@@ -1066,7 +1066,7 @@ function ChartExporter(args) {
         deferrerCollection.push($.Deferred());
         var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'));
         var previousHeight=parseFloat($('#rickshaw_yAxis_0').css('height'));
-        self.resizeGraphTo(1418, 557, deferrerCollection[deferrerCollection.length - 1]);
+        self.resizeGraphTo(1418, 572, deferrerCollection[deferrerCollection.length - 1]);
       }
       
     self.assignAllRelevantCssToStyleAttributes();
@@ -1116,7 +1116,7 @@ function ChartExporter(args) {
 
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var retVal = prepareNewBlankCanvas(".graph", 146);
+        var retVal = prepareNewBlankCanvas(".graph", 131);
         var canvas = retVal.canvas;
         var ctx = retVal.ctx;
         
@@ -1128,7 +1128,7 @@ function ChartExporter(args) {
   
         self.mergeCanvases("#rickshaw_graphic_svg", "#canvas_graphic_svg", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
         self.mergeCanvases(".x_axis_d3", "#canvas_x_axis_d3", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
-        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+146), graphOffsetLeft);
+        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+131), graphOffsetLeft);
         
         var yAxisCount = 0;
         $('.y_axis').each(function() {
