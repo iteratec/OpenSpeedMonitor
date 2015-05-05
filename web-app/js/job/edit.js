@@ -95,7 +95,7 @@ function doOnDomReady(nextExecutionLink) {
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(cronExpression) : ''
+                data ? getPrettyCron(cronExpression.substr(cronExpression.indexOf(' ') + 1)) : ''
             );
 
         },
