@@ -19,19 +19,8 @@
 		
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="event.date.label" default="Date" /></td>
-<<<<<<< HEAD
-				<td valign="top" class="value"><g:formatDate format="dd.MM.yyyy" date="${eventInstance?.date}"/> ${eventInstance.fromHour}</td>
-				
-			</tr>
-		
-			<tr class="prop">
-				<td valign="top" class="name"><g:message code="event.shortName.label" default="Short Name" /></td>
-				
-				<td valign="top" class="value">${fieldValue(bean: eventInstance, field: "shortName")}</td>
-=======
 				
 				<td valign="top" class="value"><g:formatDate date="${eventInstance?.date}" formatName="default.date.format.short" /></td>
->>>>>>> MODIFIED display of date and time of event, MODIFIED prettycron display parameters
 				
 			</tr>
     
