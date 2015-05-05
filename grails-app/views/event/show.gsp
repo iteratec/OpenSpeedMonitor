@@ -19,8 +19,7 @@
 		
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="event.date.label" default="Date" /></td>
-				
-				<td valign="top" class="value"><g:formatDate date="${eventInstance?.date}" /></td>
+				<td valign="top" class="value"><g:formatDate format="dd.MM.yyyy" date="${eventInstance?.date}"/> ${eventInstance.fromHour}</td>
 				
 			</tr>
 		
