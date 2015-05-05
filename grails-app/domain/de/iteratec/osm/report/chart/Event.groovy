@@ -25,19 +25,23 @@ import de.iteratec.osm.measurement.schedule.JobGroup
  */
 class Event {
 
-    Date date
-    String fromHour
-    String shortName
-    String htmlDescription
+    Date date = new Date()
+    String fromHour = Calendar.getInstance().getTime().format('HH:mm')
+    String shortName = ""
+    String htmlDescription = ""
     Boolean globallyVisible = false
 
     /**
      * The {@link JobGroup} this event is assigned to
      */
+    Collection<JobGroup> jobGroup
     static hasMany = [jobGroup: JobGroup]
 
     static mapping = {
-        date(type: 'date')
+        date(type: 'date', defaultValue: new Date())
+        fromHour(defaultValue: Calendar.getInstance().getTime().format('HH:mm'))
+        shortName(defaultValue: "")
+        htmlDescription(defaultValue: "")
         globallyVisible(defaultValue: false)
     }
 

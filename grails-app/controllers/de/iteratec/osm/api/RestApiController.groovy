@@ -32,6 +32,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
@@ -43,14 +44,15 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
+
+import javax.persistence.NoResultException
+
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import org.quartz.CronExpression
-
-import javax.persistence.NoResultException
 
 /**
  * RestApiController
@@ -500,34 +502,95 @@ class RestApiController {
 				params.pretty && params.pretty == 'true'
 		)
 	}
-	/**
-	 * Updates execution schedule of Job with submitted id. Schedule must ba a valid quartz schedule.
-	 * This function can't be called without a valid apiKey as parameter.
-	 * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
-	 * @see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
-	 */
-	public Map<String, Object> securedViaApiKeySetExecutionSchedule(){
 
-		if( !params.validApiKey.allowedForJobSetExecutionSchedule ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
+    /**
+     * Updates execution schedule of Job with submitted id. Schedule must be a valid quartz schedule.
+     * This function can't be called without a valid apiKey as parameter.
+     * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+     * @see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
+     */
+    public Map<String, Object> securedViaApiKeySetExecutionSchedule(){
 
-		Job job = Job.get(params.id)
-		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+        if( !params.validApiKey.allowedForJobSetExecutionSchedule ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
 
-		def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
-		String schedule = jsonSlurper.executionSchedule
-		if( schedule == null ) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
+        Job job = Job.get(params.id)
+        if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
 
-		if( !CronExpression.isValidExpression(schedule) )
-			sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
-			"(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
+        def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
+        String schedule = jsonSlurper.executionSchedule
+        if( schedule == null ) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
 
-		jobService.updateExecutionSchedule(job, schedule)
+        if( !CronExpression.isValidExpression(schedule) )
+            sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
+            "(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
 
-		sendObjectAsJSON(
-			job.refresh(),
-			params.pretty && params.pretty == 'true'
-		)
-	}
+        jobService.updateExecutionSchedule(job, schedule)
+
+        sendObjectAsJSON(
+            job.refresh(),
+            params.pretty && params.pretty == 'true'
+        )
+    }
+
+    /**
+     * Creates Event with supplied parameters.
+     * This function can't be called without a valid apiKey as parameter.
+     * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+     */
+    public Map<String, Object> securedViaApiKeyCreateEvent(){
+        if( !params.validApiKey.allowedForCreateEvent ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to create events.")
+
+        if(( params.shortName == null ) || (params.shortName.trim() == "")) sendSimpleResponseAsStream(response, 400, 'Parameter shortName must be set and contain content.')
+
+        int jobGroupCount = 0
+
+        for(value in params.jobGroup){
+            jobGroupCount++
+            if(value.trim() == "") sendSimpleResponseAsStream(response, 400, 'The ' + jobGroupCount + '. jobGroup parameter is empty, however any and all jobGroup parameters must contain content.')
+            if(JobGroup.findByName(URLDecoder.decode(value)) == null) sendSimpleResponseAsStream(response, 400, 'The ' + jobGroupCount + '. jobGroup parameter ("'+value+'") is not recognized.')
+        }
+        if( jobGroupCount == 0 ) sendSimpleResponseAsStream(response, 400, 'Parameter jobGroup must be set and contain content at least once.')
+
+
+        Event event = new Event()
+        event.shortName = params.shortName
+        if(( params.date != null ) && (params.date.trim() != "")) event.date = params.date
+        if(( params.fromHour != null ) && (params.fromHour.trim() != "")) event.fromHour = params.fromHour
+        if(( params.htmlDescription != null ) && (params.htmlDescription.trim() != "")) event.htmlDescription = URLDecoder.decode(params.htmlDescription)
+        if(( params.globallyVisible != null ) && (params.globallyVisible.trim() != "")) event.globallyVisible = params.globallyVisible
+
+//        event.jobGroup = new JobGroup()
+        for(value in params.jobGroup){
+            JobGroup currentJobGroup = JobGroup.findByName(URLDecoder.decode(value))
+            event.addToJobGroup(currentJobGroup)
+        }
+
+        log.error("rk1");
+        log.error(event);
+        log.error(event.date);
+        log.error(event.fromHour);
+        log.error(event.shortName);
+        log.error(event.htmlDescription);
+        log.error(event.globallyVisible);
+        log.error(event.jobGroup);
+        log.error("rk2");
+
+        if (!event.save(flush: true)) {
+            String errorMessages = ""
+            b.errors.each {
+                errorMessages += it + " "
+            }
+            sendSimpleResponseAsStream(response, 500, errorMessages)
+        }
+        sendSimpleResponseAsStream(response, 200, "OK")
+
+//        jobService.updateExecutionSchedule(job, schedule)
+//
+//        sendObjectAsJSON(
+//            job.refresh(),
+//            params.pretty && params.pretty == 'true'
+//        )
+    }
 
 
 	/**

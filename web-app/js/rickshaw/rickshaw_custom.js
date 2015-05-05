@@ -588,8 +588,24 @@ Rickshaw.Graph = function(args) {
 		} );
 
 		var stackedData;
-
+	  if (!this.renderer.unstack) {
+	
+	    this._validateStackable();
+	
+	    var layout = d3.layout.stack();
+	    layout.offset( self.offset );
+	    stackedData = layout(data);
+	  }
+		 
 		stackedData = stackedData || data;
+		 
+	  if (this.renderer.unstack) {
+	    stackedData.forEach( function(seriesData) {
+	      seriesData.forEach( function(d) {
+	        d.y0 = d.y0 === undefined ? 0 : d.y0;
+	      } );
+	    } );
+	  }
 
 		this.stackData.hooks.after.forEach( function(entry) {
 			stackedData = entry.f.apply(self, [data]);
@@ -605,7 +621,22 @@ Rickshaw.Graph = function(args) {
 		
 		return stackedData;
 	};
-
+	
+	this._validateStackable = function() {	
+    var series = this.series;
+    var pointsCount;
+    
+    series.forEach( function(s) {    
+      pointsCount = pointsCount || s.data.length;
+      
+      if (pointsCount && s.data.length != pointsCount) {
+        throw "stacked series cannot have differing numbers of points: " +
+        pointsCount + " vs " + s.data.length + "; see Rickshaw.Series.fill()";
+    }
+    
+    }, this );
+	};
+	  
 	this.stackData.hooks = { data: [], after: [] };
 
 	this._slice = function(d) {
@@ -3062,32 +3093,17 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			});
 			
 			var graph;
-
-			// // copy series
-			// var series = [];
-			// parent.series.forEach(function(eachSeries) {
-			// 	var entry = {};
-			// 	entry.color = eachSeries.color;
-			// 	entry.data = eachSeries.data.slice(0);
-			// 	entry.label = eachSeries.label;
-			// 	entry.measurandGroup = eachSeries.measurandGroup;
-			// 	entry.name = eachSeries.name;
-			// 	entry.path = eachSeries.path;
-			// 	entry.stroke = eachSeries.stroke;
-			// 	entry.disable= eachSeries.disable;
-			// 	entry.enable= eachSeries.enable;
-			// 	entry.scale= eachSeries.scale;
-			// 	entry.yFormatter= eachSeries.yFormatter;
-			// 	series.push(entry);
-			// });
-			// series.active = function() {return graph.series;};
-			// graphArgs.series = series;
 			
 			graphArgs.stack = false; // if true, slider preview can not be drawn
 			graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
 
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
+			
+	    parent.onUpdate(function() {
+	     graph.render();
+	     self.render();
+	    });
 			
 			parent.onConfigure(function(args) { 
 				// don't propagate height
@@ -3471,6 +3487,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
     if(( typeof stackedData === 'undefined' ) || (!stackedData)) {
       stackedData = this.graph.stackData();
     }
+	  
 		var xMin = +Infinity;
 		var xMax = -Infinity;
 
