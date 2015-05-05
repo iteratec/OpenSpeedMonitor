@@ -122,7 +122,7 @@ class DbCleanupService {
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
             0.step(count, batchSize) { int offset ->
-                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(count, offset)])
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(count, offset)])
                 JobResult.withNewTransaction {
                     dc.list(max: batchSize).each { JobResult jobResult ->
                         try {
@@ -140,7 +140,7 @@ class DbCleanupService {
                 //clear hibernate session first-level cache
                 JobResult.withSession { session -> session.clear() }
             }
-            batchActivityService.updateStatus(batchActivity, [ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
+            batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
         }
 
         log.info "end with deleteResultsDataBefore"
@@ -177,7 +177,7 @@ class DbCleanupService {
 
             //First clean MeasuredValueUpdateEvents
             0.step(measuredValueUpdateEventsCount, batchSize){ int offset ->
-                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete MeasuredValueUpdateEvents'])
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete MeasuredValueUpdateEvents'])
                 MeasuredValueUpdateEvent.withNewTransaction {
                     measuredValueUpdateEventDetachedCriteria.list(max: batchSize).each{ MeasuredValueUpdateEvent measuredValueUpdateEvent ->
                         try {
@@ -195,7 +195,7 @@ class DbCleanupService {
 
             //After then clean MeasuredValues
             0.step(measuredValueCount, batchSize) { int offset ->
-                batchActivityService.updateStatus(batchActivity, ['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
                 MeasuredValue.withNewTransaction {
                     measuredValueDetachedCriteria.list(max: batchSize).each { MeasuredValue measuredValue ->
                         try {
@@ -207,7 +207,7 @@ class DbCleanupService {
                 //clear hibernate session first-level cache
                 MeasuredValue.withSession { session -> session.clear() }
             }
-            batchActivityService.updateStatus(batchActivity, [ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
+            batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
             log.debug('Deletion of MeasuredValues finished')
         }
 
