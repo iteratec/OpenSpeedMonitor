@@ -138,8 +138,8 @@ function RickshawGraphBuilder(args) {
     $("#rickshaw_chart").height(args.height);
     $("#rickshaw_addons").width(args.width-60);
     $("#rickshaw_timeline").width(args.width-60);
-    $("#rickshaw_slider").width(args.width);
-    $("#rickshaw_range_slider_preview_container").width(args.width);
+    $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
+    $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
     $("#rickshaw_x-axis").width(args.width);
     $(".x_axis_d3").attr("width", args.width);
     $(".graph").width(eval(parseInt(args.width) + 25));
@@ -883,7 +883,7 @@ function HtmlProvider(args) {
 
     // place the slider below the chart
     $("#rickshaw_slider").css({
-      "width" : widthOfGraph + "px"
+      "width" : eval(parseInt(widthOfGraph) + 10) + "px"
     });
   }
   this.initialize(args);

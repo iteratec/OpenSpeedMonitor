@@ -3074,7 +3074,7 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			.data([null]);
 
 		this.previewHeight = this.config.height - (this.config.frameTopThickness * 2);
-		this.previewWidth = this.config.width - (this.config.frameHandleThickness * 2);
+		this.previewWidth = this.config.width - (this.config.frameHandleThickness * 2) + 10;
 
 		this.currentFrame = [0, this.previewWidth];
 
@@ -3159,7 +3159,7 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			.append("svg")
 			.classed("rickshaw_range_slider_preview", true)
 			.style("height", this.config.height + "px")
-			.style("width", this.config.width + "px")
+			.style("width", eval(parseInt(this.config.width) + 10) + "px")
 			.style("position", "absolute")
 			.style("top", 0);
 
