@@ -53,7 +53,7 @@ class Event {
 
 	static constraints = {
         date(nullable: false)
-        fromHour()
+        fromHour(nullable: false)
         shortName(unique:true, maxSize: 255)
         htmlDescription(maxSize: 255, nullable: true)
         globallyVisible()

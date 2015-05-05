@@ -161,7 +161,7 @@ function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLi
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(execScheduleWithSeconds) : ''
+                data ? getPrettyCron(execScheduleWithSeconds.substr(execScheduleWithSeconds.indexOf(' ') + 1)) : ''
             );
 
         },
