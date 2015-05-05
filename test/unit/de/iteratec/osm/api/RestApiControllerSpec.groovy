@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -22,11 +22,10 @@ import de.iteratec.osm.measurement.schedule.Job
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-import de.iteratec.osm.api.ResultsRequestCommand
 
 /**
  * Test-suite of {@link RestApiController}.
- * 
+ *
  * @author mze
  * @since IT-81
  */
@@ -48,7 +47,7 @@ class RestApiControllerSpec extends Specification {
 
 		then:
 		response.status == 400
-		response.contentAsString.equals("This api function requires an ApiKey with respected permission. You " +
+		response.contentAsString.equals("This api function requires an apiKey with respected permission. You " +
 				"have to submit this key as param 'apiKey'.")
 	}
 	void "test securing action method - should fail cause submitted apiKey doesn't exist"() {
@@ -60,7 +59,7 @@ class RestApiControllerSpec extends Specification {
 
 		then:
 		response.status == 404
-		response.contentAsString.equals("The submitted ApiKey doesn't exist.")
+		response.contentAsString.equals("The submitted apiKey doesn't exist.")
 	}
 	void "test securing action method - should fail cause submitted apiKey is invalid"() {
 		setup:
@@ -75,6 +74,6 @@ class RestApiControllerSpec extends Specification {
 
 		then:
 		response.status == 403
-		response.contentAsString.equals("The submitted ApiKey is invalid.")
+		response.contentAsString.equals("The submitted apiKey is invalid.")
 	}
 }
