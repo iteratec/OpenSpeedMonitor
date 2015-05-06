@@ -527,11 +527,16 @@ class CsiDashboardController {
      */
     Map<String, Object> showDefault() {
 
-        DateTime nowMinusOneInterval = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
-        DateTime fromDate = nowMinusOneInterval.minusMonths(3)
+        DateTime toDate
+        if(params.includeInterval){
+            toDate = new DateTime()
+        }else{
+            toDate = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
+        }
+        DateTime fromDate = toDate.minusMonths(3)
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-        Interval timeFrame = new Interval(fromDate, nowMinusOneInterval)
+        Interval timeFrame = new Interval(fromDate, toDate)
 
         MvQueryParams queryParams = new MvQueryParams()
 
@@ -545,9 +550,9 @@ class CsiDashboardController {
         modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put('weekStart', MONDAY_WEEKSTART)
         modelToRender.put('from', fromDate)
-        modelToRender.put('to', nowMinusOneInterval)
+        modelToRender.put('to', toDate)
         modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
-        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(nowMinusOneInterval.toDate()))
+        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', true)
         modelToRender.put('debug', params.debug?true:false)

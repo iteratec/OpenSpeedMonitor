@@ -48,6 +48,9 @@
 								optionValue="name" 
 								value="${folders.collect({it.id})}"
 								multiple="true" />
+						<g:link action="showDefault" params="[includeInterval: true]" class="btn btn-primary" style="margin-top: 16px;">
+							<g:message code="csiDashboard.include-actual-interval.label" default="inclusive actual week"/>
+						</g:link>
 						<g:actionSubmit value="CSV" action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;" />
 					</p>
 				</form>
