@@ -33,9 +33,9 @@
 		<g:each in="${eventInstanceList}" status="i" var="eventInstance">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			
-				<td><g:link action="show" id="${eventInstance.id}"><g:formatDate date="${eventInstance?.date}" formatName="default.date.format.short" /></g:link></td>
+				<td><g:link action="show" id="${eventInstance.id}"><g:formatDate date="${eventInstance?.eventDate}" formatName="default.date.format.short" /></g:link></td>
 			
-        <td>${fieldValue(bean: eventInstance, field: "fromHour")}</td>
+        <td>${fieldValue(bean: eventInstance, field: "eventTime")}</td>
         
         <td>${fieldValue(bean: eventInstance, field: "shortName")}</td>
 			

@@ -17,9 +17,9 @@
 
 package de.iteratec.osm.report.chart
 
-import org.springframework.dao.DataIntegrityViolationException
-
 import java.text.SimpleDateFormat
+
+import org.springframework.dao.DataIntegrityViolationException
 
 /**
  * EventController
@@ -49,8 +49,8 @@ class EventController {
         def gerFormatter = new SimpleDateFormat("dd.MM.yyyy")
         def engFormatter = new SimpleDateFormat("yyyy-MM-dd")
 
-        if(params['date'].toString().contains("-"))
-            params['date'] = gerFormatter.format(engFormatter.parse(params['date']))
+        if(params['eventDate'].toString().contains("-"))
+            params['eventDate'] = gerFormatter.format(engFormatter.parse(params['eventDate']))
 
 
         def eventInstance = new Event(params)

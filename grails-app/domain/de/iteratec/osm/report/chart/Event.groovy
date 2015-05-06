@@ -25,8 +25,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
  */
 class Event {
 
-    Date date = new Date()
-    String fromHour = Calendar.getInstance().getTime().format('HH:mm')
+    Date eventDate = new Date()
+    String eventTime = Calendar.getInstance().getTime().format('HH:mm')
     String shortName = ""
     String htmlDescription = ""
     Boolean globallyVisible = false
@@ -38,8 +38,8 @@ class Event {
     static hasMany = [jobGroup: JobGroup]
 
     static mapping = {
-        date(type: 'date', defaultValue: new Date())
-        fromHour(defaultValue: Calendar.getInstance().getTime().format('HH:mm'))
+        eventDate(type: 'date', defaultValue: new Date())
+        eventTime(defaultValue: Calendar.getInstance().getTime().format('HH:mm'))
         shortName(defaultValue: "")
         htmlDescription(defaultValue: "")
         globallyVisible(defaultValue: false)
@@ -52,8 +52,8 @@ class Event {
 //    }
 
 	static constraints = {
-        date(nullable: false)
-        fromHour(nullable: false)
+        eventDate(nullable: false)
+        eventTime(nullable: false)
         shortName(unique:true, maxSize: 255)
         htmlDescription(maxSize: 255, nullable: true)
         globallyVisible()

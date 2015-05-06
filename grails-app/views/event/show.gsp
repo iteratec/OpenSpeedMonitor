@@ -20,14 +20,14 @@
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="event.date.label" default="Date" /></td>
 				
-				<td valign="top" class="value"><g:formatDate date="${eventInstance?.date}" formatName="default.date.format.short" /></td>
+				<td valign="top" class="value"><g:formatDate date="${eventInstance?.eventDate}" formatName="default.date.format.short" /></td>
 				
 			</tr>
     
       <tr class="prop">
         <td valign="top" class="name"><g:message code="event.time.label" default="Time" /></td>
         
-        <td valign="top" class="value">${fieldValue(bean: eventInstance, field: "fromHour")}</td>
+        <td valign="top" class="value">${fieldValue(bean: eventInstance, field: "eventTime")}</td>
         
       </tr>
     

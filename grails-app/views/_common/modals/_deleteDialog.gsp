@@ -23,7 +23,6 @@ This is the standard dialog that initiates the delete action.
 		
 	</div>
 </div>
-
 <script>
     function changeText(link){
         setTimeout(function(){

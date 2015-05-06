@@ -551,29 +551,17 @@ class RestApiController {
         }
         if( jobGroupCount == 0 ) sendSimpleResponseAsStream(response, 400, 'Parameter jobGroup must be set and contain content at least once.')
 
-
         Event event = new Event()
         event.shortName = params.shortName
-        if(( params.date != null ) && (params.date.trim() != "")) event.date = params.date
-        if(( params.fromHour != null ) && (params.fromHour.trim() != "")) event.fromHour = params.fromHour
+        if(( params.eventDate != null ) && (params.eventDate.trim() != "")) event.eventDate = params.eventDate
+        if(( params.eventTime != null ) && (params.eventTime.trim() != "")) event.eventTime = params.eventTime
         if(( params.htmlDescription != null ) && (params.htmlDescription.trim() != "")) event.htmlDescription = URLDecoder.decode(params.htmlDescription)
         if(( params.globallyVisible != null ) && (params.globallyVisible.trim() != "")) event.globallyVisible = params.globallyVisible
 
-//        event.jobGroup = new JobGroup()
-        for(value in params.jobGroup){
+        for(value in params.system){
             JobGroup currentJobGroup = JobGroup.findByName(URLDecoder.decode(value))
             event.addToJobGroup(currentJobGroup)
         }
-
-        log.error("rk1");
-        log.error(event);
-        log.error(event.date);
-        log.error(event.fromHour);
-        log.error(event.shortName);
-        log.error(event.htmlDescription);
-        log.error(event.globallyVisible);
-        log.error(event.jobGroup);
-        log.error("rk2");
 
         if (!event.save(flush: true)) {
             String errorMessages = ""
@@ -583,13 +571,6 @@ class RestApiController {
             sendSimpleResponseAsStream(response, 500, errorMessages)
         }
         sendSimpleResponseAsStream(response, 200, "OK")
-
-//        jobService.updateExecutionSchedule(job, schedule)
-//
-//        sendObjectAsJSON(
-//            job.refresh(),
-//            params.pretty && params.pretty == 'true'
-//        )
     }
 
 

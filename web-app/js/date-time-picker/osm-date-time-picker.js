@@ -127,6 +127,11 @@ var initTimepicker = function(whetherToShowMeridian) {
 	var setFromHourFromQueryParam = $.getUrlVar('setFromHour');
 	var setToHourFromQueryParam = $.getUrlVar('setToHour');
 
+	if(window.location.href.indexOf("event/edit") > -1) {
+	  fromHourFromQueryParams = $('#eventTime').val();
+	  setFromHourFromQueryParam = $('#eventTime').val();
+	}
+	
 	if(fromHourFromQueryParams != null) setFromHour(fromHourFromQueryParams);
 	else if(lastFromHourSelection != null) setFromHour(lastFromHourSelection);
 
