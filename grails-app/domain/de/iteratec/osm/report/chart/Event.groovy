@@ -41,11 +41,10 @@ class Event {
         globallyVisible(defaultValue: false)
     }
 
-//    def beforeValidate() {
-//        log.info(date)
-//        def formatter = new SimpleDateFormat("dd.MM.yyyy")
-//        date = (Date)formatter.parse(date)
-//    }
+    def beforeValidate() {
+        shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
+        htmlDescription = htmlDescription.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
+    }
 
 	static constraints = {
         eventDate()
