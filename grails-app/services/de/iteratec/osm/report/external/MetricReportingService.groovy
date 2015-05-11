@@ -182,7 +182,23 @@ class MetricReportingService {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
 		}
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
+//		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
+		//To temporarily disable the activity for this progress we create an activity which will not be observed and saved
+		BatchActivity activity = new BatchActivity(
+				activity: Activity.UPDATE,
+				domain: this.class.toString(),
+				idWithinDomain: 0,
+				name: "Report last hour CSI Values: ${reportingTimeStamp}",
+				failures: 0,
+				lastFailureMessage: "",
+				progress: 0,
+				progressWithinStage: "0",
+				stage: "0",
+				status: Status.ACTIVE,
+				startDate: new Date(),
+				successfulActions: 0,
+		)
+
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		if(log.debugEnabled) log.debug('reporting csi-values of last hour')
