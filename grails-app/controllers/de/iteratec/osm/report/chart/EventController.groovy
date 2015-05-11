@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import org.springframework.web.servlet.support.RequestContextUtils
+
 import java.text.SimpleDateFormat
 
 import org.springframework.dao.DataIntegrityViolationException
@@ -45,16 +47,9 @@ class EventController {
     }
 
     def save() {
-        //Convert english date format to german, for passing validation
-        def gerFormatter = new SimpleDateFormat("dd.MM.yyyy")
-        def engFormatter = new SimpleDateFormat("yyyy-MM-dd")
-
-        if(params['eventDate'].toString().contains("-"))
-            params['eventDate'] = gerFormatter.format(engFormatter.parse(params['eventDate']))
-
-
+        combineDateAndTime(params)
         def eventInstance = new Event(params)
-
+        println eventInstance.eventDate
         if (!eventInstance.save(flush: true)) {
             render(view: "create", model: [eventInstance: eventInstance])
             return
@@ -104,7 +99,7 @@ class EventController {
                 return
             }
         }
-
+        combineDateAndTime(params)
         eventInstance.properties = params
 
         if (!eventInstance.save(flush: true)) {
@@ -133,5 +128,26 @@ class EventController {
 			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
             redirect(action: "show", id: params.id)
         }
+    }
+
+    /**
+     * Combine time and date within the param list, where time ist 'time' and date is 'eventDate'
+     * @param params
+     */
+    private void combineDateAndTime(def params){
+        //Convert english date format to german, for passing validation
+        //The gsp passes the time and the date separately so we need to combine these two
+        params['eventDate'] = params['eventDate']+" "+params['time']
+        def formatter
+        params.remove('time')
+        def locale = RequestContextUtils.getLocale(request)
+        switch (locale){
+            case Locale.GERMANY:
+                formatter =  "dd.MM.yyyy HH:mm"
+                break;
+            default:
+                formatter = "yyyy-MM-dd HH:mm"
+        }
+        params['eventDate'] = Date.parse(formatter,params['eventDate'] as String)
     }
 }

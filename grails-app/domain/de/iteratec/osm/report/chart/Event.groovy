@@ -37,7 +37,7 @@ class Event {
     static hasMany = [jobGroup: JobGroup]
 
     static mapping = {
-        eventDate(type: 'date', defaultValue: new Date())
+        eventDate()
         globallyVisible(defaultValue: false)
     }
 
