@@ -20,15 +20,14 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 /**
- * Event
- * A domain class describes the data object and it's mapping to the database
+ * Represents an arbitrary event to be shown in dashboard diagramms as verticals with info text as hover info.
+ * Could be deployments of measured web application for example.
  */
 class Event {
 
     Date eventDate = new Date()
-    String eventTime = Calendar.getInstance().getTime().format('HH:mm')
-    String shortName = ""
-    String htmlDescription = ""
+    String shortName
+    String htmlDescription
     Boolean globallyVisible = false
 
     /**
@@ -39,9 +38,6 @@ class Event {
 
     static mapping = {
         eventDate(type: 'date', defaultValue: new Date())
-        eventTime(defaultValue: Calendar.getInstance().getTime().format('HH:mm'))
-        shortName(defaultValue: "")
-        htmlDescription(defaultValue: "")
         globallyVisible(defaultValue: false)
     }
 
@@ -52,9 +48,8 @@ class Event {
 //    }
 
 	static constraints = {
-        eventDate(nullable: false)
-        eventTime(nullable: false)
-        shortName(unique:true, maxSize: 255)
+        eventDate()
+        shortName(maxSize: 255)
         htmlDescription(maxSize: 255, nullable: true)
         globallyVisible()
     }
