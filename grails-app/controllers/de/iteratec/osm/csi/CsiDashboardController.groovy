@@ -313,6 +313,7 @@ class CsiDashboardController {
                 fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
                 break
         }
+        fillWithAnnotations(modelToRender, timeFrame)
     }
 
     /**
@@ -434,10 +435,10 @@ class CsiDashboardController {
         ArrayList<String> annotations = new ArrayList<String>()
 
         annotationContent.eachWithIndex { item, index ->
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            Date date = dateFormat.parse("$item.eventDate $item.eventTime");
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
+            Date date = dateFormat.parse("$item.eventDate");
             long unixTime = (long)date.getTime()/1000;
-            annotations.add("{x: '$unixTime', text: '$item.eventDate $item.eventTime<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
+            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
         }
         modelToRender.put('annotations', annotations)
 
@@ -583,7 +584,7 @@ class CsiDashboardController {
         queryParams.jobGroupIds.addAll(csiGroupIds)
 
         fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
-        fillWithAnnotations(modelToRender, timeFrame)
+//        fillWithAnnotations(modelToRender, timeFrame)
 
         modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put('weekStart', MONDAY_WEEKSTART)
