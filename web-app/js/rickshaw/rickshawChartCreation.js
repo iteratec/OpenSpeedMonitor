@@ -64,7 +64,11 @@ function RickshawGraphBuilder(args) {
   }
 
   this.addDataLabels = function() {
-    if (this.dataLabelsActivated && !this.dataLabelsHaveBeenAdded) {
+    if (($('#to-enable-label').is(':checked')) && (!this.dataLabelsHaveBeenAdded)) {
+      if($(".pointMarker").length < 1) {
+        //activate pointMarker
+        $("#to-enable-marker").click();
+      }
       $(".pointMarker").each(function( index ) {
         var percentage = 0;
         var currentMarkerColor = self.rgb2hex($( this ).css("border-top-color"));
@@ -88,8 +92,8 @@ function RickshawGraphBuilder(args) {
           $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;font-size: 13pt;font-weight: bold;color: #b3b3b3;cursor: default;fill: #b3b3b3;'>"+percentage+"</div>" );
         }
       });
+      this.dataLabelsHaveBeenAdded = true;
     }
-    this.dataLabelsHaveBeenAdded = true;
   }
   
   this.rgb2hex = function (rgb){
@@ -1043,10 +1047,15 @@ function ChartAdjuster(args) {
     });
   }
   
-  this.addFunctionalityShowDataLabels = function() {
+  this.addFunctionalityShowDataLabels = function() {    
     $('#to-enable-label').bind('change', function(){
       var toEnableLabels = $(this).is(':checked');
-      rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
+      if (toEnableLabels && $(rickshawGraphBuilder.graph.series[0].data).length > 10000) {
+        window.alert("Too many datapoints to show and label them!");
+        $(this).prop('checked', false);
+      } else {
+        rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
+      }
     });
   }
   

@@ -430,14 +430,14 @@ class CsiDashboardController {
         Date resetFromDate = fixedTimeFrame.getStart().toDate()
         Date resetToDate = fixedTimeFrame.getEnd().toDate()
 
-        List<Event> annotationContent = Event.findAllByDateBetween(resetFromDate, resetToDate)
+        List<Event> annotationContent = Event.findAllByEventDateBetween(resetFromDate, resetToDate)
         ArrayList<String> annotations = new ArrayList<String>()
 
         annotationContent.eachWithIndex { item, index ->
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            Date date = dateFormat.parse("$item.date $item.fromHour");
+            Date date = dateFormat.parse("$item.eventDate $item.eventTime");
             long unixTime = (long)date.getTime()/1000;
-            annotations.add("{x: '$unixTime', text: '$item.date $item.fromHour<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
+            annotations.add("{x: '$unixTime', text: '$item.eventDate $item.eventTime<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
         }
         modelToRender.put('annotations', annotations)
 
