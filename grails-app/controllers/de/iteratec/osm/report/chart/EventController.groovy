@@ -17,11 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
-import org.springframework.web.servlet.support.RequestContextUtils
-
-import java.text.SimpleDateFormat
-
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
  * EventController

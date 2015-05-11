@@ -94,5 +94,4 @@ $.extend({
  */
 function domainDeleteConfirmation(message,id,link){
     return message;
-
 }
