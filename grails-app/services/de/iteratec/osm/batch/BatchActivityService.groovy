@@ -31,9 +31,10 @@ class BatchActivityService implements Observer {
      * @param idWithinDomain affected object id, will be used to identify already existing activities
      * @param activity running Activity
      * @param name a readable name to display
+     * @param observe if true(default) the created activity will be observed and saved
      * @return
      */
-    public BatchActivity getActiveBatchActivity(Class c, long idWithinDomain, Activity activity, String name) {
+    public BatchActivity getActiveBatchActivity(Class c, long idWithinDomain, Activity activity, String name, boolean observe = true) {
         BatchActivity batchActivity
         BatchActivity.withTransaction {
             batchActivity = new BatchActivity(
@@ -48,9 +49,11 @@ class BatchActivityService implements Observer {
                     stage: "0",
                     status: Status.ACTIVE,
                     startDate: new Date(),
-                    successfulActions: 0,
-            ).save(failOnError: true, flush: true)
-            batchActivity.addObserver(this)
+                    successfulActions: 0)
+            if(observe){
+                batchActivity.save(failOnError: true, flush: true)
+                batchActivity.addObserver(this)
+            }
         }
         return batchActivity
     }

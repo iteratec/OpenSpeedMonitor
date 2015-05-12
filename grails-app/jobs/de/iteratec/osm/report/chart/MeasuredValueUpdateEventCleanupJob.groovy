@@ -23,12 +23,13 @@ import de.iteratec.osm.csi.MvUpdateEventCleanupService;
 class MeasuredValueUpdateEventCleanupJob {
 	
 	MvUpdateEventCleanupService mvUpdateEventCleanupService
+    boolean createBatchActivity = true
 	
     static triggers = {
 		/** Each Day at 5:30 am. */
 		cron(name: 'dailyUpdateEventCleanup', cronExpression: '0 30 5 ? * *')
     }
     def execute() {
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300, createBatchActivity)
     }
 }

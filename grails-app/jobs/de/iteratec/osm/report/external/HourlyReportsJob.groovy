@@ -32,6 +32,7 @@ import de.iteratec.osm.report.external.MetricReportingService
 class HourlyReportsJob {
 	
 	MetricReportingService metricReportingService
+	boolean createBatchActivity = false
 	
 	static triggers = {
 		/** Twenty minutes after each full hour. */
@@ -42,6 +43,6 @@ class HourlyReportsJob {
 
     def execute() {
 		DateTime now = new DateTime();
-		metricReportingService.reportEventCSIValuesOfLastHour(now)
+		metricReportingService.reportEventCSIValuesOfLastHour(now, createBatchActivity)
     }
 }

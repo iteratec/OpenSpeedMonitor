@@ -177,27 +177,12 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-199
 	 */
-	public void reportEventCSIValuesOfLastHour(DateTime reportingTimeStamp) {
+	public void reportEventCSIValuesOfLastHour(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
 		}
-//		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
-		//To temporarily disable the activity for this progress we create an activity which will not be observed and saved
-		BatchActivity activity = new BatchActivity(
-				activity: Activity.UPDATE,
-				domain: this.class.toString(),
-				idWithinDomain: 0,
-				name: "Report last hour CSI Values: ${reportingTimeStamp}",
-				failures: 0,
-				lastFailureMessage: "",
-				progress: 0,
-				progressWithinStage: "0",
-				stage: "0",
-				status: Status.ACTIVE,
-				startDate: new Date(),
-				successfulActions: 0,
-		)
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}", createBatchActivity)
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
@@ -237,7 +222,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-201
 	 */
-	public void reportPageCSIValuesOfLastDay(DateTime reportingTimeStamp) {
+	public void reportPageCSIValuesOfLastDay(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No page csi values of last day are reported cause measurements are generally disabled.")
@@ -247,7 +232,7 @@ class MetricReportingService {
 		if (log.infoEnabled) log.info("Start reporting PageCSIValuesOfLastDay for timestamp: ${reportingTimeStamp}");
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day page CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day page CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportPageCSIValues(MeasuredValueInterval.DAILY, reportingTimeStamp, activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 
@@ -265,7 +250,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-205
 	 */
-	public void reportPageCSIValuesOfLastWeek(DateTime reportingTimeStamp) {
+	public void reportPageCSIValuesOfLastWeek(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No page csi values of last week are reported cause measurements are generally disabled.")
@@ -274,7 +259,7 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week page CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week page CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportPageCSIValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
@@ -315,7 +300,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-203
 	 */
-	public void reportShopCSIValuesOfLastDay(DateTime reportingTimeStamp) {
+	public void reportShopCSIValuesOfLastDay(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No shop csi values of last day are reported cause measurements are generally disabled.")
@@ -323,7 +308,7 @@ class MetricReportingService {
 		}
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day shop CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day shop CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportShopCSIMeasuredValues(MeasuredValueInterval.DAILY, reportingTimeStamp,activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
@@ -339,7 +324,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-205
 	 */
-	public void reportShopCSIValuesOfLastWeek(DateTime reportingTimeStamp) {
+	public void reportShopCSIValuesOfLastWeek(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No shop csi values of last week are reported cause measurements are generally disabled.")
@@ -348,7 +333,7 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week shop CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week shop CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportShopCSIMeasuredValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
 		activity.updateStatus( ["stage": "","endDate": new Date(), "status": Status.DONE])
 

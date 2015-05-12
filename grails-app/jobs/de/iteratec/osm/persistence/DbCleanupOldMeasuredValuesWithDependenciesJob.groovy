@@ -12,6 +12,8 @@ class DbCleanupOldMeasuredValuesWithDependenciesJob {
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
 
+    boolean createBatchActivity = true
+
     static triggers = {
         /**
          * Each Day at 3:00 am.
@@ -22,7 +24,7 @@ class DbCleanupOldMeasuredValuesWithDependenciesJob {
     def execute() {
         if(inMemoryConfigService.isDatabaseCleanupEnabled()) {
             Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-            dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore)
+            dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore, createBatchActivity)
         }
     }
 }

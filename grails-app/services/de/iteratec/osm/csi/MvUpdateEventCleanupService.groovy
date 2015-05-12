@@ -72,7 +72,7 @@ class MvUpdateEventCleanupService {
 	 * 					<li>A WEEKLY-MeasuredValue with <code>started=2014-07-04 00:00:00</code> and an expiration-time of 300 minutes expires at "2014-07-11 05:00:00"</li>
 	 * 					</ul>
 	 */
-	void closeMeasuredValuesExpiredForAtLeast(int minutes){
+	void closeMeasuredValuesExpiredForAtLeast(int minutes, boolean createBatchActivity = true){
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No measured value update events are closed cause measurements are generally disabled.")
@@ -82,12 +82,12 @@ class MvUpdateEventCleanupService {
 		List<MeasuredValue> mvsOpenAndExpired = measuredValueDaoService.getOpenMeasuredValuesWhosIntervalExpiredForAtLeast(minutes)
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${mvsOpenAndExpired.size()} MeasuredValues identified as open and expired.")
 		if(mvsOpenAndExpired.size() > 0){
-			closeAndCalculateIfNecessary(mvsOpenAndExpired)
+			closeAndCalculateIfNecessary(mvsOpenAndExpired,createBatchActivity)
 		}
 		
 	}
-	void closeAndCalculateIfNecessary(List<MeasuredValue> mvsOpenAndExpired){
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate MeasuredValues")
+	void closeAndCalculateIfNecessary(List<MeasuredValue> mvsOpenAndExpired, boolean createBatchActivity){
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate MeasuredValues", createBatchActivity)
 		List<MeasuredValueUpdateEvent> allUpdateEvents = MeasuredValueUpdateEvent.list()
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${allUpdateEvents.size()} update events in db before cleanup.")
 		List<MeasuredValueUpdateEvent> updateEventsToBeDeleted = measuredValueDaoService.getUpdateEvents(mvsOpenAndExpired*.ident())
