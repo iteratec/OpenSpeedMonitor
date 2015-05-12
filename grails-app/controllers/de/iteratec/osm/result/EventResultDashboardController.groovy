@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.Event
+import de.iteratec.osm.report.chart.EventService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
@@ -35,6 +36,7 @@ import de.iteratec.osm.report.chart.OsmChartAxis
 import de.iteratec.osm.report.chart.OsmChartGraph
 import de.iteratec.osm.report.chart.OsmChartPoint
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.CustomDateEditorRegistrar
 import de.iteratec.osm.util.I18nService
@@ -73,6 +75,7 @@ class EventResultDashboardController {
     PageService pageService
     I18nService i18nService
     CookieBasedSettingsService cookieBasedSettingsService
+    EventService eventService
 
     /**
      * The Grails engine to generate links.
@@ -217,21 +220,7 @@ class EventResultDashboardController {
             Map<String, Object> modelToRender,
             Interval timeFrame)
     {
-        MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-
-        Date resetFromDate = timeFrame.getStart().toDate()
-        Date resetToDate = timeFrame.getEnd().toDate()
-
-        List<Event> annotationContent = Event.findAllByEventDateBetween(resetFromDate, resetToDate)
-        ArrayList<String> annotations = new ArrayList<String>()
-
-        annotationContent.eachWithIndex { item, index ->
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
-            Date date = dateFormat.parse("$item.eventDate");
-            long unixTime = (long)date.getTime()/1000;
-            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
-        }
-        modelToRender.put('annotations', annotations)
+        AnnotationUtil.fillWithAnnotations(modelToRender,timeFrame, eventService)
 
     }
 

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.util.AnnotationUtil
+
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import de.iteratec.osm.csi.weighting.WeightFactor
@@ -78,6 +80,7 @@ class CsiDashboardController {
     CsiHelperService csiHelperService
     MeasuredValueUtilService measuredValueUtilService
     CookieBasedSettingsService cookieBasedSettingsService
+    EventService eventService
 
     /**
      * The Grails engine to generate links.
@@ -427,21 +430,7 @@ class CsiDashboardController {
     {
         MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
-
-        Date resetFromDate = fixedTimeFrame.getStart().toDate()
-        Date resetToDate = fixedTimeFrame.getEnd().toDate()
-
-        List<Event> annotationContent = Event.findAllByEventDateBetween(resetFromDate, resetToDate)
-        ArrayList<String> annotations = new ArrayList<String>()
-
-        annotationContent.eachWithIndex { item, index ->
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
-            Date date = dateFormat.parse("$item.eventDate");
-            long unixTime = (long)date.getTime()/1000;
-            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
-        }
-        modelToRender.put('annotations', annotations)
-
+        AnnotationUtil.fillWithAnnotations(modelToRender,fixedTimeFrame, eventService)
     }
 
     /**

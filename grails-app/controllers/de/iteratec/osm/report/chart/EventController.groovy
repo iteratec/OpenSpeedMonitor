@@ -29,6 +29,7 @@ class EventController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def markdownService
+    EventService eventService
 
     def index() {
         redirect(action: "list", params: params)
@@ -45,14 +46,16 @@ class EventController {
 
     def save() {
         combineDateAndTime(params)
-        def eventInstance = new Event(params)
-        if (!eventInstance.save(flush: true)) {
-            render(view: "create", model: [eventInstance: eventInstance])
-            return
+        eventService.saveEvent(params){
+            action.success={ Event eventInstance->
+                flash.message = message(code: 'default.created.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
+                redirect(action: "show", id: eventInstance.id)
+            }
+            action.failure={Event eventInstance->
+                render(view: "create", model: [eventInstance: eventInstance])
+            }
         }
 
-		flash.message = message(code: 'default.created.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
-        redirect(action: "show", id: eventInstance.id)
     }
 
     def show() {
@@ -62,7 +65,6 @@ class EventController {
             redirect(action: "list")
             return
         }
-
         [eventInstance: eventInstance]
     }
 
@@ -84,50 +86,40 @@ class EventController {
             redirect(action: "list")
             return
         }
-
-        if (params.version) {
-            def version = params.version.toLong()
-            if (eventInstance.version > version) {
-                eventInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'event.label', default: 'Event')] as Object[],
-                          "Another user has updated this Event while you were editing")
+        combineDateAndTime(params)
+        eventService.updateEvent(eventInstance, params.clone()){
+            action.success = {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
+                redirect(action: "show", id: eventInstance.id)
+            }
+            action.failure = {
                 render(view: "edit", model: [eventInstance: eventInstance])
-                return
             }
         }
-        combineDateAndTime(params)
-        eventInstance.properties = params
-
-        if (!eventInstance.save(flush: true)) {
-            render(view: "edit", model: [eventInstance: eventInstance])
-            return
-        }
-
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
-        redirect(action: "show", id: eventInstance.id)
     }
 
     def delete() {
         def eventInstance = Event.get(params.id)
         if (!eventInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
             redirect(action: "list")
             return
         }
 
-        try {
-            eventInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
-            redirect(action: "show", id: params.id)
+        eventService.deleteEvent(eventInstance){
+            action.success = {
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+                redirect(action: "list")
+            }
+            action.failure = {exception->
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+                redirect(action: "show", id: params.id)
+            }
         }
     }
 
     /**
-     * Combine time and date within the param list, where time ist 'time' and date is 'eventDate'
+     * Combines time and date within the param list, where time ist 'time' and date is 'eventDate'
      * @param params
      */
     private void combineDateAndTime(def params){

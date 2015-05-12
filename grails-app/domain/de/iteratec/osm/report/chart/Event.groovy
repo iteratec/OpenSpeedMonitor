@@ -43,7 +43,7 @@ class Event {
 
     def beforeValidate() {
         shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
-        htmlDescription = htmlDescription.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
+        htmlDescription = htmlDescription?.replaceAll(/<!--.*?-->/, '')?.replaceAll(/<.*?>/, '')
     }
 
 	static constraints = {
