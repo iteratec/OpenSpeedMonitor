@@ -89,6 +89,7 @@ class BootStrap {
 		initMeasurementInfrastructure()
 		initJobScheduling()
 		cancelActiveBatchActivity()
+        fixGrailsBugs()
 		
 		log.info "initApplicationData() OSM ends"
 	}
@@ -398,5 +399,11 @@ class BootStrap {
 			}
 		}
 	}
+
+    void fixGrailsBugs(){
+        // without this it's not safe to test on JSONObject instances in a groovy way
+        // see https://jira.grails.org/browse/GRAILS-7739
+        JSONObject.NULL.metaClass.asBoolean = {-> false}
+    }
 	
 }

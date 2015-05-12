@@ -78,25 +78,5 @@ class SecuredRestApiSpec extends Specification {
 		response.status == 403
 		response.contentAsString.equals("The submitted apiKey is invalid.")
 	}
-	void "test creation of event"(){
-		setup:
-		String existingValidAndAllowed = 'keyvalue'
-		new ApiKey(secretKey: existingValidAndAllowed, valid: true, allowedForCreateEvent: true).save(failOnError: true)
 
-		when:
-		params.validApiKey = 'my-valid-key'
-		params.shortName = 'my-event'
-		params.system = ['JobGroup1', 'JobGroup1']
-		params.eventDate = new DateTime(2015,5,8,0,0,0, DateTimeZone.UTC)
-		params.eventTime = '11:00'
-		params.htmlDescription = 'description'
-		params.globallyVisible = false
-		withFilters(action:"securedViaApiKeyCreateEvent") {
-			controllerUnderTest.securedViaApiKeyCreateEvent()
-		}
-
-		then:
-		response.text == '{"book":"Great"}'
-		response.json.book == 'Great'
-	}
 }

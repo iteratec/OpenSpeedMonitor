@@ -25,7 +25,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
  */
 class Event {
 
-    Date eventDate = new Date()
+    Date eventDate
     String shortName
     String htmlDescription
     Boolean globallyVisible = false
@@ -33,11 +33,10 @@ class Event {
     /**
      * The {@link JobGroup} this event is assigned to
      */
-    Collection<JobGroup> jobGroup
-    static hasMany = [jobGroup: JobGroup]
+    Collection<JobGroup> jobGroups
+    static hasMany = [jobGroups: JobGroup]
 
     static mapping = {
-        eventDate()
         globallyVisible(defaultValue: false)
     }
 

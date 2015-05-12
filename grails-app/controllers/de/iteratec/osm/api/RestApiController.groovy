@@ -32,18 +32,20 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.report.chart.Event
+import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
+import org.joda.time.format.DateTimeFormat
 
 import javax.persistence.NoResultException
 
@@ -74,6 +76,7 @@ class RestApiController {
 	JobLinkService jobLinkService
 	EventResultDaoService eventResultDaoService
 	PerformanceLoggingService performanceLoggingService
+    EventDaoService eventDaoService
 
 	/**
 	 * <p>
@@ -537,40 +540,25 @@ class RestApiController {
      * This function can't be called without a valid apiKey as parameter.
      * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
      */
-    public Map<String, Object> securedViaApiKeyCreateEvent(){
-        if( !params.validApiKey.allowedForCreateEvent ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to create events.")
+    public Map<String, Object> securedViaApiKeyCreateEvent(CreateEventCommand cmd){
 
-        if(( params.shortName == null ) || (params.shortName.trim() == "")) sendSimpleResponseAsStream(response, 400, 'Parameter shortName must be set and contain content.')
-
-        int jobGroupCount = 0
-
-        for(value in params.jobGroup){
-            jobGroupCount++
-            if(value.trim() == "") sendSimpleResponseAsStream(response, 400, 'The ' + jobGroupCount + '. jobGroup parameter is empty, however any and all jobGroup parameters must contain content.')
-            if(JobGroup.findByName(URLDecoder.decode(value)) == null) sendSimpleResponseAsStream(response, 400, 'The ' + jobGroupCount + '. jobGroup parameter ("'+value+'") is not recognized.')
-        }
-        if( jobGroupCount == 0 ) sendSimpleResponseAsStream(response, 400, 'Parameter jobGroup must be set and contain content at least once.')
-
-        Event event = new Event()
-        event.shortName = params.shortName
-        if(( params.eventDate != null ) && (params.eventDate.trim() != "")) event.eventDate = params.eventDate
-        if(( params.eventTime != null ) && (params.eventTime.trim() != "")) event.eventTime = params.eventTime
-        if(( params.htmlDescription != null ) && (params.htmlDescription.trim() != "")) event.htmlDescription = URLDecoder.decode(params.htmlDescription)
-        if(( params.globallyVisible != null ) && (params.globallyVisible.trim() != "")) event.globallyVisible = params.globallyVisible
-
-        for(value in params.system){
-            JobGroup currentJobGroup = JobGroup.findByName(URLDecoder.decode(value))
-            event.addToJobGroup(currentJobGroup)
-        }
-
-        if (!event.save(flush: true)) {
-            String errorMessages = ""
-            b.errors.each {
-                errorMessages += it + " "
+        if(cmd.hasErrors()){
+            StringWriter sw = new StringWriter()
+            cmd.errors.getFieldErrors().each {fieldError->
+                sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
-            sendSimpleResponseAsStream(response, 500, errorMessages)
+            sendSimpleResponseAsStream(response, 400, sw.toString())
+        }else{
+            JSON.use('deep'){
+                render eventDaoService.createEvent(
+                        cmd.shortName,
+                        cmd.getEventTimeStampAsDateTime(),
+                        cmd.htmlDescription?:'',
+                        cmd.globallyVisible ?: false,
+                        cmd.getJobGroups()) as JSON
+            }
         }
-        sendSimpleResponseAsStream(response, 200, "OK")
+
     }
 
 
@@ -860,4 +848,60 @@ public class ResultsRequestCommand {
 	public Collection<CachedView> getCachedViewsToReturn(){
 			return cachedView == null? [CachedView.UNCACHED, CachedView.CACHED] : [cachedView]
 	}
+}
+
+/**
+ * Created by nkuhn on 08.05.15.
+ */
+@Validateable
+class CreateEventCommand {
+	String apiKey
+	String shortName
+	List<String> system = [].withLazyDefault { new String() }
+	String eventTimestamp
+	String htmlDescription
+	Boolean globallyVisible
+
+    static transients = {['eventTimeStampAsDateTime', 'jobGroups']}
+
+	/**
+	 * Constraints needs to fit.
+	 */
+	static constraints = {
+        apiKey(validator: {String currentKey, CreateEventCommand cmd ->
+            ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
+            if(!validApiKey.allowedForCreateEvent) return ["The submitted ApiKey doesn't have the permission to create events."]
+            else return true
+        })
+        shortName(nullable: false, blank: false)
+        system(validator: { List<String> currentSystems, CreateEventCommand cmd ->
+            if (currentSystems.size()==0) return ["You have to submit at least one system (technically: job group) for the event."]
+            int invalidJobGroups = 0
+            currentSystems.each {String system ->
+                if (!JobGroup.findByName(system)) invalidJobGroups++
+            }
+            if(invalidJobGroups > 0) return ["At least one of the submitted systems doesn't exist."]
+            else return true
+        })
+        eventTimestamp(nullable: true, validator: {String currentTimestamp, CreateEventCommand cmd ->
+            if(currentTimestamp != null){
+                try{
+                    RestApiController.API_DATE_FORMAT.parseDateTime(currentTimestamp)
+                }catch(Exception e){
+                    return ["The date has the wrong format. Has to be in format ISO 8601. The 1st January 2014, 11 PM (UTC) in that format: 20140101T230000Z."]
+                }
+            }
+            return true
+        })
+        htmlDescription(nullable: true)
+        globallyVisible(nullable: true)
+	}
+
+    public DateTime getEventTimeStampAsDateTime(){
+        return eventTimestamp != null ? RestApiController.API_DATE_FORMAT.parseDateTime(eventTimestamp) : new DateTime();
+    }
+    public List<JobGroup> getJobGroups(){
+        return system.collect {JobGroup.findByName(it)}
+    }
+
 }

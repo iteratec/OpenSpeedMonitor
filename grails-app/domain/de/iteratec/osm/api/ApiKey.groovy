@@ -33,15 +33,20 @@ class ApiKey {
     Boolean allowedForCreateEvent = false
 
     static mapping = {
+		valid(defaultValue: true)
+		allowedForJobActivation(defaultValue: false)
+		allowedForJobDeactivation(defaultValue: false)
+		allowedForJobSetExecutionSchedule(defaultValue: false)
+		allowedForCreateEvent(defaultValue: false)
     }
 
 	static constraints = {
 		secretKey(nullable: false, blank: false)
-		valid(nullable: false, defaultValue: true)
-		allowedForJobActivation(nullable: false, defaultValue: false)
-		allowedForJobDeactivation(nullable: false, defaultValue: false)
-        allowedForJobSetExecutionSchedule(nullable: false, defaultValue: false)
-        allowedForCreateEvent(nullable: false, defaultValue: false)
+		valid(nullable: false)
+		allowedForJobActivation(nullable: false)
+		allowedForJobDeactivation(nullable: false)
+        allowedForJobSetExecutionSchedule(nullable: false)
+        allowedForCreateEvent(nullable: false)
     }
 
 }
