@@ -71,7 +71,7 @@ function RickshawGraphBuilder(args) {
       }
       $(".pointMarker").each(function( index ) {
         var percentage = 0;
-        var currentMarkerColor = self.rgb2hex($( this ).css("border-top-color"));
+        var currentMarkerColor = rgb2hex($( this ).css("border-top-color"));
         self.graph.series.forEach(function(series) {
           if(currentMarkerColor === series.color) {
             //get args.series.ROW.data.INDEX.y * 100 rounded
@@ -95,14 +95,6 @@ function RickshawGraphBuilder(args) {
       this.dataLabelsHaveBeenAdded = true;
     }
   }
-  
-  this.rgb2hex = function (rgb){
-    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    return "#" +
-     ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
-   }
 
   this.updateDataLabels = function() {
     //remove labels
@@ -1062,6 +1054,16 @@ function ChartAdjuster(args) {
   this.initialize(args);
 }
 
+  
+function rgb2hex(rgb){
+  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  return "#" +
+   ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+   ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+   ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
+}
+
+
 function ChartExporter(args) {
   var self = this;
   
@@ -1088,6 +1090,14 @@ function ChartExporter(args) {
         yAxisCount++;
       });
 
+      var pointMarkerCount = 0;      
+      $('.pointMarker').each(function() {
+        var newCanvasId = 'canvas_pointMarker_' + pointMarkerCount.toString() + '';
+        deferrerCollection.push($.Deferred());
+        self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
+        pointMarkerCount++;
+      });
+      
       if(window.location.href.indexOf("csiDashboard/showDefault") < 0) {
         var titleContent = $('#rickshaw_chart_title').html().trim();
         if (titleContent != "") {
@@ -1124,14 +1134,14 @@ function ChartExporter(args) {
       
       deferrerCollection.push($.Deferred());
       self.renderDomElementOnNewCanvasWithDelay(document.querySelector(".rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
-
+      
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var reduceHeightBy = 131;
+        var reduceHeightBy = 126; // slider isn't included in export, thus height is lower
         var moveOffsetUpwardsBy = 0;
         if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
-          reduceHeightBy = 196;
-          moveOffsetUpwardsBy = 65;
+          reduceHeightBy = 196; // for this diagramm, title isn't included in export, thus height is lower
+          moveOffsetUpwardsBy = 65; // for this diagramm, title isn't included in export, thus all elements are closer to the top
         }
         
         var retVal = prepareNewBlankCanvas(".graph", reduceHeightBy);
@@ -1146,8 +1156,8 @@ function ChartExporter(args) {
   
         self.mergeCanvases("#rickshaw_graphic_svg", "#canvas_graphic_svg", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
         self.mergeCanvases(".x_axis_d3", "#canvas_x_axis_d3", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
-        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+131+moveOffsetUpwardsBy), graphOffsetLeft);
-        
+        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+reduceHeightBy), graphOffsetLeft);
+
         var yAxisCount = 0;
         $('.y_axis').each(function() {
           var newCanvasId = '#canvas_y_axis_' + yAxisCount.toString() + '';
@@ -1155,6 +1165,29 @@ function ChartExporter(args) {
           yAxisCount++;
         });
         
+        var pointMarkerCount = 0;
+
+        marklineLabel = "";
+        
+        var marklineLabel = $( "span.label:contains('Ziel-Kundenzufriedenheit')" );
+        if ( !(marklineLabel.length) ) {
+          marklineLabel = $( "span.label:contains('Target-CSI')" );
+        }
+        var marklineColor = "";
+        if (marklineLabel.length) {
+          marklineColor = marklineLabel.prev().css("background-color");
+        }        
+        
+        $('.pointMarker').each(function() {
+          var newCanvasId = '#canvas_pointMarker_' + pointMarkerCount.toString() + '';
+          if((marklineColor != "") && (marklineColor == $( this ).css("background-color"))) {
+            removeObjectFromDom(newCanvasId);
+          } else {
+            self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
+          }          
+          pointMarkerCount++;
+        });
+
         var titleNode = document.getElementById("canvas_chart_title");
         var canvasExist = titleNode != null;
         if(canvasExist) {
@@ -1317,7 +1350,7 @@ function ChartExporter(args) {
     
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', newCanvasId);
-    canvas.setAttribute('style', "display:none");
+//    canvas.setAttribute('style', "display:none");
     canvas.width = 3000;
     canvas.height = 5000;
     document.body.appendChild(canvas);
