@@ -27,7 +27,7 @@ class Event {
 
     Date eventDate
     String shortName
-    String htmlDescription
+    String description
     Boolean globallyVisible = false
 
     /**
@@ -41,14 +41,14 @@ class Event {
     }
 
     def beforeValidate() {
-        shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
-        htmlDescription = htmlDescription?.replaceAll(/<!--.*?-->/, '')?.replaceAll(/<.*?>/, '')
+        if(shortName != null) shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
+        if(description != null) description = description?.replaceAll(/<!--.*?-->/, '')?.replaceAll(/<.*?>/, '')
     }
 
 	static constraints = {
         eventDate()
         shortName(maxSize: 255)
-        htmlDescription(maxSize: 255, nullable: true)
+        description(maxSize: 255, nullable: true)
         globallyVisible()
     }
 }

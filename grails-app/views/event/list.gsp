@@ -42,7 +42,7 @@
 
                 <td>${fieldValue(bean: eventInstance, field: "shortName")}</td>
 
-                <td>${fieldValue(bean: eventInstance, field: "htmlDescription")}</td>
+                <td>${fieldValue(bean: eventInstance, field: "description")}</td>
 
                 <td><g:formatBoolean boolean="${eventInstance.globallyVisible}"/></td>
 

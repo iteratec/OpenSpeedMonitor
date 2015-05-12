@@ -38,11 +38,11 @@ class EventCreationViaRestApiSpec extends Specification {
         //mocks common for all tests
         EventDaoService eventDaoService = new EventDaoService()
         eventDaoService.metaClass.createEvent = {
-            String shortName, DateTime eventTimestamp, String htmlDescription, Boolean globallyVisible->
+            String shortName, DateTime eventTimestamp, String description, Boolean globallyVisible->
                 return new Event(
                         shortName: shortName,
                         eventDate: eventTimestamp.toDate(),
-                        htmlDescription: htmlDescription,
+                        description: description,
                         globallyVisible: globallyVisible)
         }
         controllerUnderTest.eventDaoService = eventDaoService
@@ -65,7 +65,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 shortName: shortName,
                 system: [group1.name, group2.name],
                 eventTimestamp: '20140101T110000Z',
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -97,7 +97,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 shortName: shortName,
                 system: [group1.name, group2.name],
                 eventTimestamp: '20140101T110000Z',
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -128,7 +128,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 shortName: shortName,
                 system: [group1.name, group2.name],
                 eventTimestamp: '20140101T110000Z',
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -160,7 +160,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 apiKey: apiKeyAllowed,
                 shortName: shortName,
                 eventTimestamp: '20140101T110000Z',
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -191,7 +191,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 shortName: shortName,
                 eventTimestamp: '20140101T110000Z',
                 system: [group1.name, 'NO_JOBGROUP_WITH_THIS_NAME_EXISTS'],
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -224,7 +224,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 shortName: shortName,
                 eventTimestamp: '2014-01-01 11:00',
                 system: [group1.name, group2.name],
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -258,7 +258,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 shortName: shortName,
                 system: [group1.name, group2.name],
                 eventTimestamp: '20140101T110000Z',
-                htmlDescription: description,
+                description: description,
                 globallyVisible: globalVisibility
         )
         cmd.validate()
@@ -272,7 +272,7 @@ class EventCreationViaRestApiSpec extends Specification {
         persistedEvents.size() == 1
         Event persistedEvent = persistedEvents[0]
         persistedEvent.shortName == shortName
-        persistedEvent.htmlDescription == description
+        persistedEvent.description == description
         persistedEvent.eventDate == expectedDate.toDate()
         persistedEvent.globallyVisible == globalVisibility
         List<JobGroup> associatedJobGroups = persistedEvent.jobGroups
@@ -282,7 +282,7 @@ class EventCreationViaRestApiSpec extends Specification {
         //test json representation
         response.json.class == 'de.iteratec.osm.report.chart.Event'
         response.json.shortName == shortName
-        response.json.htmlDescription == description
+        response.json.description == description
         new DateTime(response.json.eventDate) == expectedDate
         response.json.globallyVisible == globalVisibility
         response.json.jobGroups.size() == 2
@@ -313,7 +313,7 @@ class EventCreationViaRestApiSpec extends Specification {
         persistedEvents.size() == 1
         Event persistedEvent = persistedEvents[0]
         persistedEvent.shortName == shortName
-        persistedEvent.htmlDescription == null
+        persistedEvent.description == null
         new Duration(new DateTime(persistedEvent.eventDate), new DateTime()).standardMinutes < 5
         persistedEvent.globallyVisible == expectedGlobalVisibility
         List<JobGroup> associatedJobGroups = persistedEvent.jobGroups
@@ -323,7 +323,7 @@ class EventCreationViaRestApiSpec extends Specification {
         //test json representation
         response.json.class == 'de.iteratec.osm.report.chart.Event'
         response.json.shortName == shortName
-        response.json.htmlDescription.equals(null)
+        response.json.description.equals(null)
         new Duration(new DateTime(response.json.eventDate), new DateTime()).standardMinutes < 5
         response.json.globallyVisible == expectedGlobalVisibility
         response.json.jobGroups.size() == 2

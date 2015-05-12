@@ -49,7 +49,7 @@ class EventDaoService {
         Event event = new Event(
             shortName: shortName,
             eventDate: eventTimestamp != null ? eventTimestamp.toDate() : eventTimestamp,
-            htmlDescription: htmlDescription,
+            description: htmlDescription,
             globallyVisible: globallyVisible
         )
         jobGroups.each {group->

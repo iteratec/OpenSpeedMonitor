@@ -135,7 +135,7 @@ class RestApiController {
 	 * @since IT-81
 	 */
 	public Map<String, Object> man() {
-		return [protectedFunctionHint:'This method is protected. You need a valid api key, ask your osm administrator for one.']
+		return [protectedFunctionHint:'THIS METHOD IS PROTECTED: You need a valid api key, ask your osm administrator for one.']
 	}
 
 	/**
@@ -549,14 +549,12 @@ class RestApiController {
             }
             sendSimpleResponseAsStream(response, 400, sw.toString())
         }else{
-            JSON.use('deep'){
-                render eventDaoService.createEvent(
-                        cmd.shortName,
-                        cmd.getEventTimeStampAsDateTime(),
-                        cmd.htmlDescription?:'',
-                        cmd.globallyVisible ?: false,
-                        cmd.getJobGroups()) as JSON
-            }
+            render eventDaoService.createEvent(
+                    cmd.shortName,
+                    cmd.getEventTimeStampAsDateTime(),
+                    cmd.description?:'',
+                    cmd.globallyVisible ?: false,
+                    cmd.getJobGroups()) as JSON
         }
 
     }
@@ -859,7 +857,7 @@ class CreateEventCommand {
 	String shortName
 	List<String> system = [].withLazyDefault { new String() }
 	String eventTimestamp
-	String htmlDescription
+	String description
 	Boolean globallyVisible
 
     static transients = {['eventTimeStampAsDateTime', 'jobGroups']}
@@ -893,7 +891,7 @@ class CreateEventCommand {
             }
             return true
         })
-        htmlDescription(nullable: true)
+        description(nullable: true)
         globallyVisible(nullable: true)
 	}
 

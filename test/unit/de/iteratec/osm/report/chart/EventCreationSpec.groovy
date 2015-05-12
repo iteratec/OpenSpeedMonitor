@@ -70,7 +70,7 @@ class EventCreationSpec extends Specification{
         persistedEvents.size() == 1
         Event persistedEvent = persistedEvents[0]
         persistedEvent.shortName == shortname
-        persistedEvent.htmlDescription == description
+        persistedEvent.description == description
         new DateTime(persistedEvent.eventDate) == datetime
         persistedEvent.globallyVisible == globalVisibility
         List<JobGroup> associatedJobGroups = persistedEvent.jobGroups
@@ -101,7 +101,7 @@ class EventCreationSpec extends Specification{
         persistedEvents.size() == 1
         Event persistedEvent = persistedEvents[0]
         persistedEvent.shortName == shortname
-        persistedEvent.htmlDescription == description
+        persistedEvent.description == description
         new DateTime(persistedEvent.eventDate) == datetime
         persistedEvent.globallyVisible == globalVisibility
         List<JobGroup> associatedJobGroups = persistedEvent.jobGroups

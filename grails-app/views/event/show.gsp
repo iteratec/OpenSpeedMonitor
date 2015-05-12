@@ -44,7 +44,7 @@
                                                      default="Html Description"/></td>
 
             <td valign="top" class="value"><markdown:renderHtml
-                    text="${fieldValue(bean: eventInstance, field: "htmlDescription")}"/></td>
+                    text="${fieldValue(bean: eventInstance, field: "description")}"/></td>
 
         </tr>
 
