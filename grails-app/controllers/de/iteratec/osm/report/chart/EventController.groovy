@@ -46,7 +46,6 @@ class EventController {
     def save() {
         combineDateAndTime(params)
         def eventInstance = new Event(params)
-        println eventInstance.eventDate
         if (!eventInstance.save(flush: true)) {
             render(view: "create", model: [eventInstance: eventInstance])
             return
@@ -140,6 +139,7 @@ class EventController {
         def locale = RequestContextUtils.getLocale(request)
         switch (locale){
             case Locale.GERMANY:
+            case Locale.GERMAN:
                 formatter =  "dd.MM.yyyy HH:mm"
                 break;
             default:
