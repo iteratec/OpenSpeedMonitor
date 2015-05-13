@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report.chart
 
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
@@ -85,6 +84,9 @@ class EventController {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
             redirect(action: "list")
             return
+        }
+        if (!(params?.jobGroups)) {
+            eventInstance.jobGroups.clear()
         }
         combineDateAndTime(params)
         eventService.updateEvent(eventInstance, params.clone()){

@@ -57,7 +57,7 @@
     <label for="jobGroups" class="control-label"><g:message code="event.jobGroup.label" default="Job Group"/></label>
 
     <div class="controls">
-        <g:select name="jobGroup" from="${de.iteratec.osm.measurement.schedule.JobGroup.list()}" multiple="multiple"
+        <g:select name="jobGroups" from="${de.iteratec.osm.measurement.schedule.JobGroup.list()}" multiple="multiple"
                   optionKey="id" size="5" value="${eventInstance?.jobGroups*.id}" class="many-to-many"/>
     </div>
 </div>
