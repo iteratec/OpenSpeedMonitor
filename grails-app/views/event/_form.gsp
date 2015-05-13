@@ -17,7 +17,10 @@
     <div class="controls">
         <div class="input-append bootstrap-timepicker" }>
             <input id="fromHourTimepicker" name="time" type="text" class="input-small content-box"
-                   value="${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}">
+                   value="<g:if test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
+                   ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
+                   </g:if>
+                   <g:else>00:00</g:else>">
             <span class="add-on"><i class="icon-time"></i></span>
         </div>
     </div>
@@ -31,13 +34,13 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'htmlDescription', 'error')} ">
-    <label for="htmlDescription" class="control-label"><g:message code="event.htmlDescription.label"
+<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'description', 'error')} ">
+    <label for="description" class="control-label"><g:message code="event.description.label"
                                                                   default="Html Description"/></label>
 
     <div class="controls">
-        <g:textArea name="htmlDescription" cols="40" rows="5" maxlength="255"
-                    value="${eventInstance?.htmlDescription}"/>
+        <g:textArea name="description" cols="40" rows="5" maxlength="255"
+                    value="${eventInstance?.description}"/>
     </div>
 </div>
 
@@ -50,11 +53,11 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'jobGroup', 'error')} ">
-    <label for="jobGroup" class="control-label"><g:message code="event.jobGroup.label" default="Job Group"/></label>
+<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'jobGroups', 'error')} ">
+    <label for="jobGroups" class="control-label"><g:message code="event.jobGroup.label" default="Job Group"/></label>
 
     <div class="controls">
         <g:select name="jobGroup" from="${de.iteratec.osm.measurement.schedule.JobGroup.list()}" multiple="multiple"
-                  optionKey="id" size="5" value="${eventInstance?.jobGroup*.id}" class="many-to-many"/>
+                  optionKey="id" size="5" value="${eventInstance?.jobGroups*.id}" class="many-to-many"/>
     </div>
 </div>

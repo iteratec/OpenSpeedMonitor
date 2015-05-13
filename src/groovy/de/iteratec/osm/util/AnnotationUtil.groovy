@@ -2,11 +2,11 @@ package de.iteratec.osm.util
 
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventService
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import org.joda.time.Interval
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
+
+import org.joda.time.Interval
 
 class AnnotationUtil {
     /**
@@ -35,7 +35,7 @@ class AnnotationUtil {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
             Date date = dateFormat.parse("$item.eventDate");
             long unixTime = (long)date.getTime()/1000;
-            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
+            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$item.description'}")
         }
         modelToRender.put('annotations', annotations)
 

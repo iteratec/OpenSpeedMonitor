@@ -40,8 +40,8 @@
         </tr>
 
         <tr class="prop">
-            <td valign="top" class="name"><g:message code="event.htmlDescription.label"
-                                                     default="Html Description"/></td>
+            <td valign="top" class="name"><g:message code="event.description.label"
+                                                     default="Description"/></td>
 
             <td valign="top" class="value"><markdown:renderHtml
                     text="${fieldValue(bean: eventInstance, field: "description")}"/></td>
@@ -61,8 +61,8 @@
 
             <td valign="top" style="text-align: left;" class="value">
                 <ul>
-                    <g:each in="${eventInstance.jobGroup}" var="j">
-                        <li><g:link controller="jobGroup" action="show" id="${j.id}">${j?.encodeAsHTML()}</g:link></li>
+                    <g:each in="${eventInstance.jobGroups}" var="j">
+                        <li><g:link controller="jobGroups" action="show" id="${j.id}">${j?.encodeAsHTML()}</g:link></li>
                     </g:each>
                 </ul>
             </td>

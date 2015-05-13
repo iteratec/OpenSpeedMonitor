@@ -27,7 +27,7 @@
 					
 						<g:sortableColumn property="shortName" title="${message(code: 'event.shortName.label', default: 'Short Name')}" />
 					
-						<g:sortableColumn property="htmlDescription" title="${message(code: 'event.htmlDescription.label', default: 'Html Description')}" />
+						<g:sortableColumn property="description" title="${message(code: 'event.description.label', default: 'Description')}" />
 					
 						<g:sortableColumn property="globallyVisible" title="${message(code: 'event.globallyVisible.label', default: 'Globally Visible')}" />
 					
@@ -41,7 +41,7 @@
 					
 						<td>${fieldValue(bean: eventInstance, field: "shortName")}</td>
 					
-						<td>${fieldValue(bean: eventInstance, field: "htmlDescription")}</td>
+						<td>${fieldValue(bean: eventInstance, field: "description")}</td>
 					
 						<td><g:formatBoolean boolean="${eventInstance.globallyVisible}" /></td>
 					
