@@ -301,8 +301,6 @@ class JobController {
 		model['cronstring'] = params.value
 		if (!params.noprepend)
 			model['prepend'] = message(code: 'job.nextRun.label')
-        log.error(params)
-        log.error(model)
 		render(template: 'timeago', model: model)
 	}
 

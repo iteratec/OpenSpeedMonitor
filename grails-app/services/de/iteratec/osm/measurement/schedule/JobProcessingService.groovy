@@ -349,9 +349,9 @@ class JobProcessingService {
 	 */
 	public String launchJobRunInteractive(Job job) throws JobExecutionException {
 		def parameters = fillRequestParameters(job);
-
 		WebPageTestServer wptserver = job.location.wptServer
 		HttpResponseDecorator result = proxyService.runtest(wptserver, parameters);
+
 		if (result.getStatus() == 302) {
 			return result.getHeaders().getAt('Location').getValue()
 		} else {
