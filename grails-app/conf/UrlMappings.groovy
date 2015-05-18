@@ -166,6 +166,16 @@ class UrlMappings {
             controller = "RestApi"
             action = [POST: "securedViaApiKeyCreateEvent"]
         }
+        "/rest/config/activateMeasurementsGenerally" {
+            controller = "RestApi"
+            action = [PUT: "securedViaApiKeySetMeasurementActivation"]
+            activationToSet = true
+        }
+        "/rest/config/deactivateMeasurementsGenerally" {
+            controller = "RestApi"
+            action = [PUT: "securedViaApiKeySetMeasurementActivation"]
+            activationToSet = false
+        }
 
 	}
 }

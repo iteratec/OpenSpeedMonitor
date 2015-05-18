@@ -31,6 +31,7 @@ class ApiKey {
 	Boolean allowedForJobDeactivation = false
     Boolean allowedForJobSetExecutionSchedule = false
     Boolean allowedForCreateEvent = false
+    Boolean allowedForMeasurementActivation = false
 
     static mapping = {
 		valid(defaultValue: true)
@@ -38,6 +39,7 @@ class ApiKey {
 		allowedForJobDeactivation(defaultValue: false)
 		allowedForJobSetExecutionSchedule(defaultValue: false)
 		allowedForCreateEvent(defaultValue: false)
+        allowedForMeasurementActivation(defaultValue: false)
     }
 
 	static constraints = {
@@ -47,6 +49,7 @@ class ApiKey {
 		allowedForJobDeactivation(nullable: false)
         allowedForJobSetExecutionSchedule(nullable: false)
         allowedForCreateEvent(nullable: false)
+        allowedForMeasurementActivation(nullable: false)
     }
 
 }

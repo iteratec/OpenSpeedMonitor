@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.api.json.JSONLocationBox
 import de.iteratec.osm.api.json.JSONNameBox
 import de.iteratec.osm.api.json.Result
@@ -77,6 +79,7 @@ class RestApiController {
 	EventResultDaoService eventResultDaoService
 	PerformanceLoggingService performanceLoggingService
     EventDaoService eventDaoService
+    InMemoryConfigService inMemoryConfigService
 
 	/**
 	 * <p>
@@ -540,7 +543,7 @@ class RestApiController {
      * This function can't be called without a valid apiKey as parameter.
      * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
      */
-    public Map<String, Object> securedViaApiKeyCreateEvent(CreateEventCommand cmd){
+    public void securedViaApiKeyCreateEvent(CreateEventCommand cmd){
 
         if(cmd.hasErrors()){
             StringWriter sw = new StringWriter()
@@ -559,6 +562,23 @@ class RestApiController {
 
     }
 
+    /**
+     * <p>
+     *     Activates or deactivates measurements generally respective param activationToSet.
+     * </p>
+     * @param cmd Binds parameters of requests.
+     */
+    public void securedViaApiKeySetMeasurementActivation(MeasurementActivationCommand cmd){
+        if(cmd.hasErrors()){
+            StringWriter sw = new StringWriter()
+            cmd.errors.getFieldErrors().each {fieldError->
+                sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
+            }
+            sendSimpleResponseAsStream(response, 400, sw.toString())
+        }else{
+            inMemoryConfigService.setActiveStatusOfMeasurementsGenerally(cmd.activationToSet)
+        }
+    }
 
 	/**
 	 * <p>
@@ -849,6 +869,7 @@ public class ResultsRequestCommand {
 }
 
 /**
+ * Parameters of rest api function /rest/event/create.
  * Created by nkuhn on 08.05.15.
  */
 @Validateable
@@ -900,6 +921,28 @@ class CreateEventCommand {
     }
     public List<JobGroup> getJobGroups(){
         return system.collect {JobGroup.findByName(it)}
+    }
+
+}
+
+/**
+ * Parameters of rest api functions /rest/config/activateMeasurementsGenerally and
+ * /rest/config/deactivateMeasurementsGenerally.
+ * Created by nkuhn on 08.05.15.
+ */
+@Validateable
+class MeasurementActivationCommand {
+
+    String apiKey
+    Boolean activationToSet
+
+    static constraints = {
+        activationToSet(nullable: false)
+        apiKey(validator: {String currentKey, MeasurementActivationCommand cmd ->
+            ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
+            if(!validApiKey.allowedForMeasurementActivation) return ["The submitted ApiKey doesn't have the permission to (de)activate measurements generally."]
+            else return true
+        })
     }
 
 }
