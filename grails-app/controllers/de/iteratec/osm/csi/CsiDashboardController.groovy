@@ -567,7 +567,7 @@ class CsiDashboardController {
 
         MvQueryParams queryParams = new MvQueryParams()
 
-        List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['live', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
+        List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['otto.de_Desktop', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
         Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll{namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)}
         Set<Long> csiGroupIds = csiGroupsToShow.collect({it.id})
         queryParams.jobGroupIds.addAll(csiGroupIds)
