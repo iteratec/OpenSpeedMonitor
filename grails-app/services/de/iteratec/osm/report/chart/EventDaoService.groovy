@@ -42,7 +42,7 @@ class EventDaoService {
             DateTime eventTimestamp,
             String description,
             Boolean globallyVisible,
-            List<JobGroup> jobGroups) {
+            Collection<JobGroup> jobGroups) {
 
         Event event = new Event(
             shortName: shortName,

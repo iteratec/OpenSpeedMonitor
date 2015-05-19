@@ -35,7 +35,11 @@ class GraphiteServer {
      * {@link GraphitePath}s, for which results should be sent for this server.
      */
     Collection<GraphitePath> graphitePaths = []
-    static hasMany = [graphitePaths:GraphitePath]
+    /**
+     * {@link GraphiteEventSourcePath}s, to create Events.
+     */
+    Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
+    static hasMany = [graphitePaths:GraphitePath, graphiteEventSourcePaths:GraphiteEventSourcePath]
     static transients = ['serverInetAddress']
 
     public InetAddress getServerInetAddress() {
