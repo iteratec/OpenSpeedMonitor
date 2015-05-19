@@ -21,7 +21,7 @@ import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.MvUpdateEventCleanupService;
 
 /**
- * This job calculates and closes aggregated csi values and deletes associated update events.
+ * This job calculates and closes aggregated csi values and deletes associated update events each night.
  * @author nkuhn
  */
 class MeasuredValueUpdateEventCleanupJob {
