@@ -132,7 +132,7 @@ function RickshawGraphBuilder(args) {
     $(".rickshaw_y-axis_right").height(args.height);
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
-    $("#rickshaw_addons").width(args.width-60);
+    $("#rickshaw_addons").width(args.width-70);
     $("#rickshaw_timeline").width(args.width-60);
     $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
     $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
@@ -865,7 +865,7 @@ function HtmlProvider(args) {
     // container which contains x-axis, slider and legend
     $("#rickshaw_addons").css({
       "margin-left" : widthOfLeftYAxis + "px",
-      "width" : widthOfGraph + "px"
+      "width" : eval(parseInt(widthOfGraph) - 10) + "px"
     });
     $("#rickshaw_timeline").css({
       "margin-left" : widthOfLeftYAxis + "px",
