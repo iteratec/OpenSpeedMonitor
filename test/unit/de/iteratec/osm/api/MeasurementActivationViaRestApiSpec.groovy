@@ -48,7 +48,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
 
         then:
         response.status == 200
-        response.text == ""
+        response.text == "Set measurements activation to: true"
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == true
     }
 
@@ -66,7 +66,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
 
         then:
         response.status == 200
-        response.text == ""
+        response.text == "Set measurements activation to: false"
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == false
     }
 

@@ -412,7 +412,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '13:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPages = ['1', 'NOT-A-NUMBER']
+		params.selectedPages = ['NOT-A-NUMBER']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = 'UGLY'

@@ -590,7 +590,7 @@ class CsiDashboardControllerTests {
 		params.toHour = '13:00'
 				params.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		params.selectedFolder = '1'
-		params.selectedPages = ['1', 'NOT-A-NUMBER']
+		params.selectedPages = ['NOT-A-NUMBER']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = 'UGLY'

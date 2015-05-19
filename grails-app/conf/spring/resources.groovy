@@ -25,11 +25,13 @@ import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.util.CustomDateEditorRegistrar
 import de.iteratec.osm.util.CustomDoubleRegistrar
+import de.iteratec.osm.util.DateValueConverter
+import de.iteratec.osm.util.DoubleValueConverter
 
 // Place your Spring DSL code here
 beans = {
-    customPropertyEditorRegistrar(CustomDoubleRegistrar)
-    customPropertyEditorRegistrar(CustomDateEditorRegistrar)
+    doubleValueConverter(DoubleValueConverter)
+    dateValueConverter(DateValueConverter)
     aggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
     jobGroupDaoService(DefaultJobGroupDaoService)
     pageDaoService(DefaultPageDaoService)

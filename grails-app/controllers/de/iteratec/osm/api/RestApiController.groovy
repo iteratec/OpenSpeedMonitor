@@ -126,7 +126,7 @@ class RestApiController {
 	 * @return Nothing, redirects immediately.
 	 */
 	Map<String, Object> index() {
-		redirectWith303('getResultsDocumentation')
+		redirectWith303('man')
 	}
 
 	/**
@@ -279,9 +279,6 @@ class RestApiController {
 	 */
 	public Map<String, Object> getResults(ResultsRequestCommand cmd) {
 
-		//FIXME: REMOVE IF Databinder is changed to new version
-		fixCommand(cmd);
-
 		DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
 		DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
 		if( endDateTimeInclusive.isBefore(startDateTimeInclusive) ) sendSimpleResponseAsStream(response, 400, 'End of requested time-frame may not be earlier that its requested start.')
@@ -320,9 +317,6 @@ class RestApiController {
 	}
 
 	public Map<String, Object> getSystemCsi(ResultsRequestCommand cmd) {
-
-		//FIXME: REMOVE IF Databinder is changed to new version
-		fixCommand(cmd);
 
 		DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
 		DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
@@ -543,7 +537,7 @@ class RestApiController {
      * This function can't be called without a valid apiKey as parameter.
      * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
      */
-    public void securedViaApiKeyCreateEvent(CreateEventCommand cmd){
+    public Map<String, Object> securedViaApiKeyCreateEvent(CreateEventCommand cmd){
 
         if(cmd.hasErrors()){
             StringWriter sw = new StringWriter()
@@ -568,7 +562,7 @@ class RestApiController {
      * </p>
      * @param cmd Binds parameters of requests.
      */
-    public void securedViaApiKeySetMeasurementActivation(MeasurementActivationCommand cmd){
+    public Map<String, Object> securedViaApiKeySetMeasurementActivation(MeasurementActivationCommand cmd){
         if(cmd.hasErrors()){
             StringWriter sw = new StringWriter()
             cmd.errors.getFieldErrors().each {fieldError->
@@ -577,6 +571,7 @@ class RestApiController {
             sendSimpleResponseAsStream(response, 400, sw.toString())
         }else{
             inMemoryConfigService.setActiveStatusOfMeasurementsGenerally(cmd.activationToSet)
+            sendSimpleResponseAsStream(response, 200, "Set measurements activation to: ${cmd.activationToSet}")
         }
     }
 
@@ -624,23 +619,6 @@ class RestApiController {
 		response.getOutputStream().flush()
 
 		render ''
-	}
-
-
-	/**
-	 * Fix to support Databinding of URLMapping Variables to CommandObjects,
-	 * can be removed if the new Databinder is used.
-	 *
-	 * @author rhe
-	 * @since IT-188
-	 * @see IT-230
-	 */
-	private void fixCommand(ResultsRequestCommand cmd) {
-
-		cmd.timestampFrom=params.timestampFrom;
-		cmd.timestampTo=params.timestampTo;
-		cmd.system=params.system;
-
 	}
 
 }
