@@ -34,7 +34,8 @@ import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
+import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -73,7 +74,10 @@ class CsiDashboardControllerTests {
 	public void setUp()
 	{
 		// Because spring resources not loaded in unit tests, declare them locally:
-		defineBeans { customPropertyEditorRegistrar(CustomDateEditorRegistrar) }
+		defineBeans {
+            doubleValueConverter(DoubleValueConverter)
+            dateValueConverter(DateValueConverter)
+        }
 
 		// Enable constraint tests:
 		mockForConstraintsTests(CsiDashboardShowAllCommand.class);
@@ -1072,10 +1076,12 @@ class CsiDashboardControllerTests {
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap()
 	{
 		// form = '18.08.2013'
-		command.from = new Date(1376776800000L)
+        Date expectedDate = new Date(1376776800000L)
+        command.from = expectedDate
 		command.fromHour = '12:00'
 		// to = '19.08.2013'
-		command.to = new Date(1376863200000L)
+        Date expectedToDate = new Date(1376863200000L)
+        command.to = expectedToDate
 		command.toHour = '13:00'
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
@@ -1107,10 +1113,10 @@ class CsiDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', '');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroup', AggregatorType.MEASURED_EVENT.toString());
@@ -1127,10 +1133,12 @@ class CsiDashboardControllerTests {
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap_defaultsForMissingValues()
 	{
 		// form = '18.08.2013'
-		command.from = new Date(1376776800000L)
+        Date expectedDate = new Date(1376776800000L)
+        command.from = expectedDate
 		command.fromHour = '12:00'
 		// to = '19.08.2013'
-		command.to = new Date(1376863200000L)
+        Date expectedToDate = new Date(1376863200000L)
+        command.to = expectedToDate
 		command.toHour = '18:00'
 		command.aggrGroup = null // Missing! -> Default should be set
 		command.selectedFolder = [1L]
@@ -1158,9 +1166,9 @@ class CsiDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', '');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '18:00');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroup', AggregatorType.MEASURED_EVENT.toString());
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
@@ -1177,10 +1185,12 @@ class CsiDashboardControllerTests {
 	{
 		// Create and fill a command:
 		// form = '18.08.2013'
-		command.from = new Date(1376776800000L)
+        Date expectedFromDate = new Date(1376776800000L)
+        command.from = expectedFromDate
 		command.fromHour = "12:00"
 		// to = '19.08.2013'
-		command.to = new Date(1376863200000L)
+        Date expectedToDate = new Date(1376863200000L)
+        command.to = expectedToDate
 		command.toHour = "13:00"
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
@@ -1213,10 +1223,10 @@ class CsiDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', '');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroup', AggregatorType.MEASURED_EVENT.toString());

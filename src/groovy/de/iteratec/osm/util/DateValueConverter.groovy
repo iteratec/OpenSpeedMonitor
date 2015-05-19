@@ -25,4 +25,7 @@ class DateValueConverter implements ValueConverter{
     Class<?> getTargetType() {
         Date.class
     }
+    public static getConverter(){
+        return new DateValueConverter()
+    }
 }

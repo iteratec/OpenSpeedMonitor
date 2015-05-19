@@ -32,7 +32,7 @@ import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.validation.Validateable
 
@@ -360,16 +360,14 @@ class TabularResultPresentationController {
          */
         public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
         {
-            CustomDateEditor dateEditor = CustomDateEditorRegistrar.createCustomDateEditor();
+            DateValueConverter converter = DateValueConverter.getConverter()
 
-            dateEditor.setValue(this.from)
-            viewModelToCopyTo.put('from', dateEditor.getAsText())
+            viewModelToCopyTo.put('from', converter.convert(this.from))
             if(!this.fromHour.is(null)) {
                 viewModelToCopyTo.put('fromHour',this.fromHour)
             }
 
-            dateEditor.setValue(this.to)
-            viewModelToCopyTo.put('to', dateEditor.getAsText())
+            viewModelToCopyTo.put('to', converter.convert(this.to))
             if (!this.toHour.is(null)){
                 viewModelToCopyTo.put('toHour', this.toHour)
             }
@@ -399,26 +397,6 @@ class TabularResultPresentationController {
      *
      * <p>
      * None of the properties will be <code>null</code> for a valid instance.
-     * </p>
-     *
-     * <p>
-     * <em>DEV-Note:</em> This command uses auto-binding for type {@link Date}.
-     * To make this possible, you need a custom {@link PropertyEditor}.
-     * See class {@link CustomDateEditorRegistrar} for details. If try an
-     * auto-binding in a unit-test you need to register the class
-     * CustomDateEditorRegistrar with a code-block like:
-     * <pre>
-     * defineBeans {
-     *     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-     * }
-     * </pre>
-     * in the set-up of your test. For productive use you need to add
-     * <pre>
-     * beans = {
-     *     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-     * }
-     * </pre>
-     * to the config file {@code grails-app/conf/spring/resources.groovy}
      * </p>
      *
      * @author mze
