@@ -23,8 +23,6 @@ import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
-import de.iteratec.osm.util.CustomDateEditorRegistrar
-import de.iteratec.osm.util.CustomDoubleRegistrar
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
 
