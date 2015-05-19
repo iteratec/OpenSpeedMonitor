@@ -26,6 +26,7 @@ package de.iteratec.osm.api
 class ApiKey {
 
 	String secretKey
+    String description
 	Boolean valid = true
 	Boolean allowedForJobActivation = false
 	Boolean allowedForJobDeactivation = false
@@ -44,6 +45,7 @@ class ApiKey {
 
 	static constraints = {
 		secretKey(nullable: false, blank: false)
+        description(nullable: true)
 		valid(nullable: false)
 		allowedForJobActivation(nullable: false)
 		allowedForJobDeactivation(nullable: false)
