@@ -20,6 +20,10 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.MvUpdateEventCleanupService;
 
+/**
+ * This job calculates and closes aggregated csi values and deletes associated update events.
+ * @author nkuhn
+ */
 class MeasuredValueUpdateEventCleanupJob {
 	
 	MvUpdateEventCleanupService mvUpdateEventCleanupService
