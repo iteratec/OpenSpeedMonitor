@@ -101,7 +101,8 @@ class BatchActivityController {
                                 lastFailureMessage: batchActivity.lastFailureMessage,
                                 startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
                                 lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
-                                endDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate))
+                                endDate: (batchActivity.endDate)? DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate)):"",
+                                statusEN: batchActivity.status.toString()
                         )
                 )
             } else{

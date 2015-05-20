@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.api.json.JSONLocationBox
 import de.iteratec.osm.api.json.JSONNameBox
 import de.iteratec.osm.api.json.Result
@@ -32,25 +34,29 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
+import org.joda.time.format.DateTimeFormat
+
+import javax.persistence.NoResultException
+
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import org.quartz.CronExpression
-
-import javax.persistence.NoResultException
 
 /**
  * RestApiController
@@ -72,6 +78,8 @@ class RestApiController {
 	JobLinkService jobLinkService
 	EventResultDaoService eventResultDaoService
 	PerformanceLoggingService performanceLoggingService
+    EventDaoService eventDaoService
+    InMemoryConfigService inMemoryConfigService
 
 	/**
 	 * <p>
@@ -118,7 +126,7 @@ class RestApiController {
 	 * @return Nothing, redirects immediately.
 	 */
 	Map<String, Object> index() {
-		redirectWith303('getResultsDocumentation')
+		redirectWith303('man')
 	}
 
 	/**
@@ -130,7 +138,7 @@ class RestApiController {
 	 * @since IT-81
 	 */
 	public Map<String, Object> man() {
-		return [protectedFunctionHint:'This method is protected. You need a valid api key, ask your osm administrator for one.']
+		return [protectedFunctionHint:'THIS METHOD IS PROTECTED: You need a valid api key, ask your osm administrator for one.']
 	}
 
 	/**
@@ -271,9 +279,6 @@ class RestApiController {
 	 */
 	public Map<String, Object> getResults(ResultsRequestCommand cmd) {
 
-		//FIXME: REMOVE IF Databinder is changed to new version
-		fixCommand(cmd);
-
 		DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
 		DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
 		if( endDateTimeInclusive.isBefore(startDateTimeInclusive) ) sendSimpleResponseAsStream(response, 400, 'End of requested time-frame may not be earlier that its requested start.')
@@ -312,9 +317,6 @@ class RestApiController {
 	}
 
 	public Map<String, Object> getSystemCsi(ResultsRequestCommand cmd) {
-
-		//FIXME: REMOVE IF Databinder is changed to new version
-		fixCommand(cmd);
 
 		DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
 		DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
@@ -500,35 +502,78 @@ class RestApiController {
 				params.pretty && params.pretty == 'true'
 		)
 	}
-	/**
-	 * Updates execution schedule of Job with submitted id. Schedule must ba a valid quartz schedule.
-	 * This function can't be called without a valid apiKey as parameter.
-	 * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
-	 * @see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
-	 */
-	public Map<String, Object> securedViaApiKeySetExecutionSchedule(){
 
-		if( !params.validApiKey.allowedForJobSetExecutionSchedule ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
+    /**
+     * Updates execution schedule of Job with submitted id. Schedule must be a valid quartz schedule.
+     * This function can't be called without a valid apiKey as parameter.
+     * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+     * @see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger
+     */
+    public Map<String, Object> securedViaApiKeySetExecutionSchedule(){
 
-		Job job = Job.get(params.id)
-		if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+        if( !params.validApiKey.allowedForJobSetExecutionSchedule ) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
 
-		def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
-		String schedule = jsonSlurper.executionSchedule
-		if( schedule == null ) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
+        Job job = Job.get(params.id)
+        if( job == null ) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
 
-		if( !CronExpression.isValidExpression(schedule) )
-			sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
-			"(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
+        def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
+        String schedule = jsonSlurper.executionSchedule
+        if( schedule == null ) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
 
-		jobService.updateExecutionSchedule(job, schedule)
+        if( !CronExpression.isValidExpression(schedule) )
+            sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
+            "(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
 
-		sendObjectAsJSON(
-			job.refresh(),
-			params.pretty && params.pretty == 'true'
-		)
-	}
+        jobService.updateExecutionSchedule(job, schedule)
 
+        sendObjectAsJSON(
+            job.refresh(),
+            params.pretty && params.pretty == 'true'
+        )
+    }
+
+    /**
+     * Creates Event with supplied parameters.
+     * This function can't be called without a valid apiKey as parameter.
+     * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+     */
+    public Map<String, Object> securedViaApiKeyCreateEvent(CreateEventCommand cmd){
+
+        if(cmd.hasErrors()){
+            StringWriter sw = new StringWriter()
+            cmd.errors.getFieldErrors().each {fieldError->
+                sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
+            }
+            sendSimpleResponseAsStream(response, 400, sw.toString())
+        }else{
+            render eventDaoService.createEvent(
+                    cmd.shortName,
+                    cmd.getEventTimeStampAsDateTime(),
+                    cmd.description?:'',
+                    cmd.globallyVisible ?: false,
+                    cmd.getJobGroups()) as JSON
+        }
+
+    }
+
+    /**
+     * <p>
+     *     Activates or deactivates measurements generally respective param activationToSet.
+     * </p>
+     * @param cmd Binds parameters of requests.
+     */
+    public Map<String, Object> securedViaApiKeySetMeasurementActivation(MeasurementActivationCommand cmd){
+        if(cmd.hasErrors()){
+            StringWriter sw = new StringWriter()
+            cmd.errors.getFieldErrors().each {fieldError->
+                sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
+            }
+            sendSimpleResponseAsStream(response, 400, sw.toString())
+        }else{
+            inMemoryConfigService.setActiveStatusOfMeasurementsGenerally(cmd.activationToSet)
+            sendSimpleResponseAsStream(response, 200, "Set measurements activation to: ${cmd.activationToSet}")
+        }
+    }
 
 	/**
 	 * <p>
@@ -574,23 +619,6 @@ class RestApiController {
 		response.getOutputStream().flush()
 
 		render ''
-	}
-
-
-	/**
-	 * Fix to support Databinding of URLMapping Variables to CommandObjects,
-	 * can be removed if the new Databinder is used.
-	 *
-	 * @author rhe
-	 * @since IT-188
-	 * @see IT-230
-	 */
-	private void fixCommand(ResultsRequestCommand cmd) {
-
-		cmd.timestampFrom=params.timestampFrom;
-		cmd.timestampTo=params.timestampTo;
-		cmd.system=params.system;
-
 	}
 
 }
@@ -816,4 +844,83 @@ public class ResultsRequestCommand {
 	public Collection<CachedView> getCachedViewsToReturn(){
 			return cachedView == null? [CachedView.UNCACHED, CachedView.CACHED] : [cachedView]
 	}
+}
+
+/**
+ * Parameters of rest api function /rest/event/create.
+ * Created by nkuhn on 08.05.15.
+ */
+@Validateable
+class CreateEventCommand {
+	String apiKey
+	String shortName
+	List<String> system = [].withLazyDefault { new String() }
+	String eventTimestamp
+	String description
+	Boolean globallyVisible
+
+    static transients = {['eventTimeStampAsDateTime', 'jobGroups']}
+
+	/**
+	 * Constraints needs to fit.
+	 */
+	static constraints = {
+        apiKey(validator: {String currentKey, CreateEventCommand cmd ->
+            ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
+            if(!validApiKey.allowedForCreateEvent) return ["The submitted ApiKey doesn't have the permission to create events."]
+            else return true
+        })
+        shortName(nullable: false, blank: false)
+        system(validator: { List<String> currentSystems, CreateEventCommand cmd ->
+            if (currentSystems.size()==0) return ["You have to submit at least one system (technically: job group) for the event."]
+            int invalidJobGroups = 0
+            currentSystems.each {String system ->
+                if (!JobGroup.findByName(system)) invalidJobGroups++
+            }
+            if(invalidJobGroups > 0) return ["At least one of the submitted systems doesn't exist."]
+            else return true
+        })
+        eventTimestamp(nullable: true, validator: {String currentTimestamp, CreateEventCommand cmd ->
+            if(currentTimestamp != null){
+                try{
+                    RestApiController.API_DATE_FORMAT.parseDateTime(currentTimestamp)
+                }catch(Exception e){
+                    return ["The date has the wrong format. Has to be in format ISO 8601. The 1st January 2014, 11 PM (UTC) in that format: 20140101T230000Z."]
+                }
+            }
+            return true
+        })
+        description(nullable: true)
+        globallyVisible(nullable: true)
+	}
+
+    public DateTime getEventTimeStampAsDateTime(){
+        return eventTimestamp != null ? RestApiController.API_DATE_FORMAT.parseDateTime(eventTimestamp) : new DateTime();
+    }
+    public List<JobGroup> getJobGroups(){
+        return system.collect {JobGroup.findByName(it)}
+    }
+
+}
+
+/**
+ * Parameters of rest api functions /rest/config/activateMeasurementsGenerally and
+ * /rest/config/deactivateMeasurementsGenerally.
+ * Created by nkuhn on 08.05.15.
+ */
+@Validateable
+class MeasurementActivationCommand {
+
+    String apiKey
+    Boolean activationToSet
+
+    static constraints = {
+        activationToSet(nullable: false)
+        apiKey(validator: {String currentKey, MeasurementActivationCommand cmd ->
+            ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
+            if(!validApiKey.allowedForMeasurementActivation) return ["The submitted ApiKey doesn't have the permission to (de)activate measurements generally."]
+            else return true
+        })
+    }
+
 }

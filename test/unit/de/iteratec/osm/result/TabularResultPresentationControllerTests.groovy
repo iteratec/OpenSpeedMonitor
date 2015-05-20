@@ -23,7 +23,8 @@ import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
+import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -55,7 +56,10 @@ class TabularResultPresentationControllerTests {
 	public void setUp()
 	{
 		// Because spring resources not loaded in unit tests, declare them locally:
-		defineBeans { customPropertyEditorRegistrar(CustomDateEditorRegistrar) }
+		defineBeans {
+            doubleValueConverter(DoubleValueConverter)
+            dateValueConverter(DateValueConverter)
+        }
 
 		// Enable constraint tests:
 		mockForConstraintsTests(ListResultsCommand.class);

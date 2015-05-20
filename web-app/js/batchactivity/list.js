@@ -93,6 +93,7 @@ function updateRow(rowObject) {
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastFailureMessage+")").html(rowObject.lastFailureMessage);
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastUpdated+")").html(rowObject.lastUpdated);
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldEndDate+")").html(rowObject.endDate);
+    $("tr#" + rowObject.htmlId).attr("status", rowObject.statusEN)
 }
 /**
  * Returns an array with all row ids where status = active

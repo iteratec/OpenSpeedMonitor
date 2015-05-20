@@ -95,7 +95,7 @@ function doOnDomReady(nextExecutionLink) {
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(cronExpression) : ''
+                data ? getPrettyCron(cronExpression.substr(cronExpression.indexOf(' ') + 1)) : ''
             );
 
         },
@@ -161,7 +161,7 @@ function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLi
             );
             FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
             $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(execScheduleWithSeconds) : ''
+                data ? getPrettyCron(execScheduleWithSeconds.substr(execScheduleWithSeconds.indexOf(' ') + 1)) : ''
             );
 
         },

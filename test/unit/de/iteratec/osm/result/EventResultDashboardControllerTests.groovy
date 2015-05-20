@@ -32,7 +32,8 @@ import de.iteratec.osm.report.chart.ChartingLibrary
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultDashboardController.ShowAllCommand
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
+import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -70,7 +71,10 @@ class EventResultDashboardControllerTests {
 	public void setUp()
 	{
 		// Because spring resources not loaded in unit tests, declare them locally:
-		defineBeans { customPropertyEditorRegistrar(CustomDateEditorRegistrar) }
+		defineBeans {
+            doubleValueConverter(DoubleValueConverter)
+            dateValueConverter(DateValueConverter)
+        }
 
 		// Enable constraint tests:
 		mockForConstraintsTests(ShowAllCommand.class);
@@ -412,7 +416,7 @@ class EventResultDashboardControllerTests {
 		params.toHour = '13:00'
 				params.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		params.selectedFolder = '1'
-		params.selectedPages = ['1', 'NOT-A-NUMBER']
+		params.selectedPages = ['NOT-A-NUMBER']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = 'UGLY'
@@ -745,11 +749,13 @@ class EventResultDashboardControllerTests {
 		// Create and fill a command:
 		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
+        Date expectedFromDate = new Date(1376776800000L)
+        out.from = expectedFromDate
 		out.fromHour = "12:00"
-				out.to = new Date(1376863200000L)
+        Date expectedToDate = new Date(1376863200000L)
+        out.to = expectedToDate
 		out.toHour = "13:00"
-				out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+        out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
 		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
@@ -782,10 +788,10 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
 	}
@@ -799,11 +805,13 @@ class EventResultDashboardControllerTests {
 		// Create and fill a command:
 		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
+        Date expectedFromDate = new Date(1376776800000L)
+        out.from = expectedFromDate
 		out.fromHour = null // Missing!
-				out.to = new Date(1376863200000L)
+        Date expectedToDate = new Date(1376863200000L)
+        out.to = expectedToDate
 		out.toHour = null // Missing!
-				out.aggrGroup = null // Missing!
+        out.aggrGroup = null // Missing!
 		out.selectedFolder = [1L]
 		out.selectedPages = [1L, 5L]
 		out.selectedMeasuredEventIds = [7L, 8L, 9L]
@@ -833,9 +841,9 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
 	}
 
@@ -848,10 +856,12 @@ class EventResultDashboardControllerTests {
 		// Create and fill a command:
 		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
+        Date expectedFromDate = new Date(1376776800000L)
+        out.from = expectedFromDate
 		out.fromHour = "12:00"
 				// to = '19.08.2013'
-		out.to = new Date(1376863200000L)
+        Date expectedToDate = new Date(1376863200000L)
+        out.to = expectedToDate
 		out.toHour = "13:00"
 				out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
 		out.selectedFolder = [1L]
@@ -886,10 +896,10 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', "12:00");
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', "13:00");
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
 	}

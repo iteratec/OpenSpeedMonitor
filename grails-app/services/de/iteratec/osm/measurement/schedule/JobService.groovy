@@ -94,7 +94,7 @@ class JobService {
 		job.executionSchedule = executionSchedule
 		job.save(failOnError: true)
 	}
-	
+
     /**
      * Deletes a Job with all JobResults, HttpArchives and EventResults
      *
@@ -116,7 +116,7 @@ class JobService {
         Job.withSession { session ->
             0.step(count, batchSize) { offset ->
                 Job.withTransaction {
-                    batchActivityService.updateStatus(activity, ["progress": batchActivityService.calculateProgress(count,offset), "stage": "Delete JobResults"])
+                    activity.updateStatus(["progress": batchActivityService.calculateProgress(count,offset), "stage": "Delete JobResults"])
                     dc.list(offset: 0, max: batchSize).eachWithIndex { JobResult jobResult, int index ->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
@@ -125,17 +125,17 @@ class JobService {
                             List<EventResult> eventResults = jobResult.getEventResults()
                             batchDelete(eventResults,batchSize)
                             jobResult.delete()
-                            batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
+                            activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
                         } catch (Exception e) {
                             log.error("Couldn't delete JobResult ${e}")
-                            batchActivityService.updateStatus(activity, ["failures": ++activity.getFailures(), "lastFailureMessage": "Couldn't delete JobResult: ${jobResult.id}"])
+                            activity.updateStatus(["failures": ++activity.getFailures(), "lastFailureMessage": "Couldn't delete JobResult: ${jobResult.id}"])
                         }
                     }
                     session.flush()
                     session.clear()
                 }
             }
-            batchActivityService.updateStatus(activity, ["stage": "Delete Job"])
+            activity.updateStatus(["stage": "Delete Job"])
             Job.withTransaction {
                 try {
                     job.delete(flush: true)
@@ -143,7 +143,7 @@ class JobService {
                     e.printStackTrace()
                 }
             }
-            batchActivityService.updateStatus(activity, ["stage": "", "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
+            activity.updateStatus(["stage": "", "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
         }
     }
 

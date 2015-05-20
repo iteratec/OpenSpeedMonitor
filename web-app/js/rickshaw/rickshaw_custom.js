@@ -588,8 +588,24 @@ Rickshaw.Graph = function(args) {
 		} );
 
 		var stackedData;
-
+	  if (!this.renderer.unstack) {
+	
+	    this._validateStackable();
+	
+	    var layout = d3.layout.stack();
+	    layout.offset( self.offset );
+	    stackedData = layout(data);
+	  }
+		 
 		stackedData = stackedData || data;
+		 
+	  if (this.renderer.unstack) {
+	    stackedData.forEach( function(seriesData) {
+	      seriesData.forEach( function(d) {
+	        d.y0 = d.y0 === undefined ? 0 : d.y0;
+	      } );
+	    } );
+	  }
 
 		this.stackData.hooks.after.forEach( function(entry) {
 			stackedData = entry.f.apply(self, [data]);
@@ -605,7 +621,22 @@ Rickshaw.Graph = function(args) {
 		
 		return stackedData;
 	};
-
+	
+	this._validateStackable = function() {	
+    var series = this.series;
+    var pointsCount;
+    
+    series.forEach( function(s) {    
+      pointsCount = pointsCount || s.data.length;
+      
+      if (pointsCount && s.data.length != pointsCount) {
+        throw "stacked series cannot have differing numbers of points: " +
+        pointsCount + " vs " + s.data.length + "; see Rickshaw.Series.fill()";
+    }
+    
+    }, this );
+	};
+	  
 	this.stackData.hooks = { data: [], after: [] };
 
 	this._slice = function(d) {
@@ -3028,7 +3059,7 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 				if (this.svg) {
 					var svgHeight = height + this.config.frameHandleThickness * 2;
 					var svgWidth = width + this.config.frameHandleThickness * 2;
-					this.svg.style("width", svgWidth + "px");
+					this.svg.style("width", eval(svgWidth+20) + "px");
 					this.svg.style("height", svgHeight + "px");
 				}
 			}, this);
@@ -3043,7 +3074,7 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			.data([null]);
 
 		this.previewHeight = this.config.height - (this.config.frameTopThickness * 2);
-		this.previewWidth = this.config.width - (this.config.frameHandleThickness * 2);
+		this.previewWidth = this.config.width - (this.config.frameHandleThickness * 2) + 20;
 
 		this.currentFrame = [0, this.previewWidth];
 
@@ -3062,32 +3093,17 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			});
 			
 			var graph;
-
-			// // copy series
-			// var series = [];
-			// parent.series.forEach(function(eachSeries) {
-			// 	var entry = {};
-			// 	entry.color = eachSeries.color;
-			// 	entry.data = eachSeries.data.slice(0);
-			// 	entry.label = eachSeries.label;
-			// 	entry.measurandGroup = eachSeries.measurandGroup;
-			// 	entry.name = eachSeries.name;
-			// 	entry.path = eachSeries.path;
-			// 	entry.stroke = eachSeries.stroke;
-			// 	entry.disable= eachSeries.disable;
-			// 	entry.enable= eachSeries.enable;
-			// 	entry.scale= eachSeries.scale;
-			// 	entry.yFormatter= eachSeries.yFormatter;
-			// 	series.push(entry);
-			// });
-			// series.active = function() {return graph.series;};
-			// graphArgs.series = series;
 			
 			graphArgs.stack = false; // if true, slider preview can not be drawn
 			graphArgs.NUMBER_OF_YAXIS_TICKS = parent.NUMBER_OF_YAXIS_TICKS;
 
 			graph = new Rickshaw.Graph(graphArgs);
 			self.previews.push(graph);
+			
+	    parent.onUpdate(function() {
+	     graph.render();
+	     self.render();
+	    });
 			
 			parent.onConfigure(function(args) { 
 				// don't propagate height
@@ -3143,7 +3159,7 @@ Rickshaw.Graph.RangeSlider.Preview = Rickshaw.Class.create({
 			.append("svg")
 			.classed("rickshaw_range_slider_preview", true)
 			.style("height", this.config.height + "px")
-			.style("width", this.config.width + "px")
+			.style("width", eval(parseInt(this.config.width) + 20) + "px")
 			.style("position", "absolute")
 			.style("top", 0);
 
@@ -3471,6 +3487,7 @@ Rickshaw.Graph.Renderer = Rickshaw.Class.create( {
     if(( typeof stackedData === 'undefined' ) || (!stackedData)) {
       stackedData = this.graph.stackData();
     }
+	  
 		var xMin = +Infinity;
 		var xMax = -Infinity;
 

@@ -20,38 +20,35 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 /**
- * Event
- * A domain class describes the data object and it's mapping to the database
+ * Represents an arbitrary event to be shown in dashboard diagramms as verticals with info text as hover info.
+ * Could be deployments of measured web application for example.
  */
 class Event {
 
-    Date date
-    String fromHour
+    Date eventDate
     String shortName
-    String htmlDescription
+    String description
     Boolean globallyVisible = false
 
     /**
      * The {@link JobGroup} this event is assigned to
      */
-    static hasMany = [jobGroup: JobGroup]
+    Collection<JobGroup> jobGroups
+    static hasMany = [jobGroups: JobGroup]
 
     static mapping = {
-        date(type: 'date')
         globallyVisible(defaultValue: false)
     }
 
-//    def beforeValidate() {
-//        log.info(date)
-//        def formatter = new SimpleDateFormat("dd.MM.yyyy")
-//        date = (Date)formatter.parse(date)
-//    }
+    def beforeValidate() {
+        if(shortName != null) shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
+        if(description != null) description = description?.replaceAll(/<!--.*?-->/, '')?.replaceAll(/<.*?>/, '')
+    }
 
 	static constraints = {
-        date(nullable: false)
-        fromHour()
-        shortName(unique:true, maxSize: 255)
-        htmlDescription(maxSize: 255, nullable: true)
+        eventDate()
+        shortName(maxSize: 255)
+        description(maxSize: 255, nullable: true)
         globallyVisible()
     }
 }

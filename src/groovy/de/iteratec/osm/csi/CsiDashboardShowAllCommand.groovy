@@ -4,7 +4,7 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
 import grails.validation.Validateable
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -24,26 +24,6 @@ import java.util.regex.Pattern
  * None of the properties will be <code>null</code> for a valid instance.
  * Some collections might be empty depending on the {@link #aggrGroup}
  * used.
- * </p>
- *
- * <p>
- * <em>DEV-Note:</em> This command uses auto-binding for type {@link Date}.
- * To make this possible, you need a custom {@link PropertyEditor}.
- * See class {@link de.iteratec.osm.util.CustomDateEditorRegistrar} for details. If try an
- * auto-binding in a unit-test you need to register the class
- * CustomDateEditorRegistrar with a code-block like:
- * <pre>
- * defineBeans {
- *     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
- * }
- * </pre>
- * in the set-up of your test. For productive use you need to add
- * <pre>
- * beans = {
- *     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
- * }
- * </pre>
- * to the config file {@code grails-app/conf/spring/resources.groovy}
  * </p>
  *
  * @author mze
@@ -393,16 +373,12 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
-        CustomDateEditor dateEditor = CustomDateEditorRegistrar.createCustomDateEditor()
-
-        dateEditor.setValue(this.from)
-        viewModelToCopyTo.put('from', dateEditor.getAsText())
+        viewModelToCopyTo.put('from', this.from)
         if(!this.fromHour.is(null)) {
             viewModelToCopyTo.put('fromHour',this.fromHour)
         }
 
-        dateEditor.setValue(this.to)
-        viewModelToCopyTo.put('to', dateEditor.getAsText())
+        viewModelToCopyTo.put('to', this.to)
         if (!this.toHour.is(null)){
             viewModelToCopyTo.put('toHour', this.toHour)
         }

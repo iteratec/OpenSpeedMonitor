@@ -64,10 +64,14 @@ function RickshawGraphBuilder(args) {
   }
 
   this.addDataLabels = function() {
-    if (this.dataLabelsActivated && !this.dataLabelsHaveBeenAdded) {
+    if (($('#to-enable-label').is(':checked')) && (!this.dataLabelsHaveBeenAdded)) {
+      if($(".pointMarker").length < 1) {
+        //activate pointMarker
+        $("#to-enable-marker").click();
+      }
       $(".pointMarker").each(function( index ) {
         var percentage = 0;
-        var currentMarkerColor = self.rgb2hex($( this ).css("border-top-color"));
+        var currentMarkerColor = rgb2hex($( this ).css("border-top-color"));
         self.graph.series.forEach(function(series) {
           if(currentMarkerColor === series.color) {
             //get args.series.ROW.data.INDEX.y * 100 rounded
@@ -88,17 +92,9 @@ function RickshawGraphBuilder(args) {
           $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;font-size: 13pt;font-weight: bold;color: #b3b3b3;cursor: default;fill: #b3b3b3;'>"+percentage+"</div>" );
         }
       });
+      this.dataLabelsHaveBeenAdded = true;
     }
-    this.dataLabelsHaveBeenAdded = true;
   }
-  
-  this.rgb2hex = function (rgb){
-    rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-    return "#" +
-     ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-     ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-     ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
-   }
 
   this.updateDataLabels = function() {
     //remove labels
@@ -136,10 +132,10 @@ function RickshawGraphBuilder(args) {
     $(".rickshaw_y-axis_right").height(args.height);
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
-    $("#rickshaw_addons").width(args.width-60);
+    $("#rickshaw_addons").width(args.width-70);
     $("#rickshaw_timeline").width(args.width-60);
-    $("#rickshaw_slider").width(args.width);
-    $("#rickshaw_range_slider_preview_container").width(args.width);
+    $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
+    $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
     $("#rickshaw_x-axis").width(args.width);
     $(".x_axis_d3").attr("width", args.width);
     $(".graph").width(eval(parseInt(args.width) + 25));
@@ -869,7 +865,7 @@ function HtmlProvider(args) {
     // container which contains x-axis, slider and legend
     $("#rickshaw_addons").css({
       "margin-left" : widthOfLeftYAxis + "px",
-      "width" : widthOfGraph + "px"
+      "width" : eval(parseInt(widthOfGraph) - 10) + "px"
     });
     $("#rickshaw_timeline").css({
       "margin-left" : widthOfLeftYAxis + "px",
@@ -883,7 +879,7 @@ function HtmlProvider(args) {
 
     // place the slider below the chart
     $("#rickshaw_slider").css({
-      "width" : widthOfGraph + "px"
+      "width" : eval(parseInt(widthOfGraph) + 10) + "px"
     });
   }
   this.initialize(args);
@@ -927,13 +923,13 @@ function ChartAdjuster(args) {
               height : $('#dia-height').val()
             });
             if (parseInt(diaWidth) < 1070) {
-              $("#rickshaw_legend, ul").css({
+              $("#rickshaw_legend > ul").css({
                 "-moz-column-count" : 1 + "",
                 "-webkit-column-count" : 1 + "",
                 "column-count" : 1 + ""
               });
             } else {
-              $("#rickshaw_legend, ul").css({
+              $("#rickshaw_legend > ul").css({
                 "-moz-column-count" : 2 + "",
                 "-webkit-column-count" : 2 + "",
                 "column-count" : 2 + ""
@@ -1043,15 +1039,30 @@ function ChartAdjuster(args) {
     });
   }
   
-  this.addFunctionalityShowDataLabels = function() {
+  this.addFunctionalityShowDataLabels = function() {    
     $('#to-enable-label').bind('change', function(){
       var toEnableLabels = $(this).is(':checked');
-      rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
+      if (toEnableLabels && $(rickshawGraphBuilder.graph.series[0].data).length > 10000) {
+        window.alert("Too many datapoints to show and label them!");
+        $(this).prop('checked', false);
+      } else {
+        rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
+      }
     });
   }
   
   this.initialize(args);
 }
+
+  
+function rgb2hex(rgb){
+  rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+  return "#" +
+   ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+   ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+   ("0" + parseInt(rgb[3],10).toString(16)).slice(-2);
+}
+
 
 function ChartExporter(args) {
   var self = this;
@@ -1066,7 +1077,7 @@ function ChartExporter(args) {
         deferrerCollection.push($.Deferred());
         var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'));
         var previousHeight=parseFloat($('#rickshaw_yAxis_0').css('height'));
-        self.resizeGraphTo(1418, 557, deferrerCollection[deferrerCollection.length - 1]);
+        self.resizeGraphTo(1393, 467, deferrerCollection[deferrerCollection.length - 1]);
       }
       
     self.assignAllRelevantCssToStyleAttributes();
@@ -1079,10 +1090,20 @@ function ChartExporter(args) {
         yAxisCount++;
       });
 
-      var titleContent = $('#rickshaw_chart_title').html().trim();
-      if (titleContent != "") {
+      var pointMarkerCount = 0;      
+      $('.pointMarker').each(function() {
+        var newCanvasId = 'canvas_pointMarker_' + pointMarkerCount.toString() + '';
         deferrerCollection.push($.Deferred());
-        self.renderDomElementOnNewCanvasWithDelay(document.querySelector("#rickshaw_chart_title"), 'canvas_chart_title', deferrerCollection[deferrerCollection.length - 1]);
+        self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
+        pointMarkerCount++;
+      });
+      
+      if(window.location.href.indexOf("csiDashboard/showDefault") < 0) {
+        var titleContent = $('#rickshaw_chart_title').html().trim();
+        if (titleContent != "") {
+          deferrerCollection.push($.Deferred());
+          self.renderDomElementOnNewCanvasWithDelay(document.querySelector("#rickshaw_chart_title"), 'canvas_chart_title', deferrerCollection[deferrerCollection.length - 1]);
+        }
       }
   
       deferrerCollection.push($.Deferred());
@@ -1113,10 +1134,17 @@ function ChartExporter(args) {
       
       deferrerCollection.push($.Deferred());
       self.renderDomElementOnNewCanvasWithDelay(document.querySelector(".rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
-
+      
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var retVal = prepareNewBlankCanvas(".graph", 146);
+        var reduceHeightBy = 126; // slider isn't included in export, thus height is lower
+        var moveOffsetUpwardsBy = 0;
+        if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+          reduceHeightBy = 196; // for this diagramm, title isn't included in export, thus height is lower
+          moveOffsetUpwardsBy = 65; // for this diagramm, title isn't included in export, thus all elements are closer to the top
+        }
+        
+        var retVal = prepareNewBlankCanvas(".graph", reduceHeightBy);
         var canvas = retVal.canvas;
         var ctx = retVal.ctx;
         
@@ -1126,17 +1154,40 @@ function ChartExporter(args) {
         graphOffsetTop = graphRect.top - bodyRect.top;
         graphOffsetLeft = graphRect.left - bodyRect.left;
   
-        self.mergeCanvases("#rickshaw_graphic_svg", "#canvas_graphic_svg", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
-        self.mergeCanvases(".x_axis_d3", "#canvas_x_axis_d3", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
-        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+146), graphOffsetLeft);
-        
+        self.mergeCanvases("#rickshaw_graphic_svg", "#canvas_graphic_svg", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
+        self.mergeCanvases(".x_axis_d3", "#canvas_x_axis_d3", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
+        self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+reduceHeightBy), graphOffsetLeft);
+
         var yAxisCount = 0;
         $('.y_axis').each(function() {
           var newCanvasId = '#canvas_y_axis_' + yAxisCount.toString() + '';
-          self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+          self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           yAxisCount++;
         });
         
+        var pointMarkerCount = 0;
+
+        marklineLabel = "";
+        
+        var marklineLabel = $( "span.label:contains('Ziel-Kundenzufriedenheit')" );
+        if ( !(marklineLabel.length) ) {
+          marklineLabel = $( "span.label:contains('Target-CSI')" );
+        }
+        var marklineColor = "";
+        if (marklineLabel.length) {
+          marklineColor = marklineLabel.prev().css("background-color");
+        }        
+        
+        $('.pointMarker').each(function() {
+          var newCanvasId = '#canvas_pointMarker_' + pointMarkerCount.toString() + '';
+          if((marklineColor != "") && (marklineColor == $( this ).css("background-color"))) {
+            removeObjectFromDom(newCanvasId);
+          } else {
+            self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
+          }          
+          pointMarkerCount++;
+        });
+
         var titleNode = document.getElementById("canvas_chart_title");
         var canvasExist = titleNode != null;
         if(canvasExist) {
@@ -1144,19 +1195,19 @@ function ChartExporter(args) {
         }
   
         self.modifyStylesAfterRendering();
-        self.mergeLabelCanvases($(".rickshaw_y-axis_left_label"), "#canvas_y-axis_left_label", ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+        self.mergeLabelCanvases($(".rickshaw_y-axis_left_label"), "#canvas_y-axis_left_label", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
 
         var dataLabelCount = 0;
         $('.dataLabel').each(function() {
           var newCanvasId = '#canvas_dataLabel_' + dataLabelCount.toString() + '';
-          self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+          self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           dataLabelCount++;
         });
         
         var rightLabelCount = 0;
         $('.rickshaw_y-axis_right_label').each(function() {
           var newCanvasId = '#canvas_y-axis_right_label_' + rightLabelCount.toString() + '';
-          self.mergeLabelCanvases($( this ), newCanvasId, ctx, bodyRect, graphOffsetTop, graphOffsetLeft);
+          self.mergeLabelCanvases($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           rightLabelCount++;
         });
         
@@ -1164,6 +1215,7 @@ function ChartExporter(args) {
         try {
           downloadCanvas(canvas, "png");
           if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
           }
@@ -1268,11 +1320,20 @@ function ChartExporter(args) {
       width : width,
       height : height
     });
-    $("#rickshaw_legend, ul").css({
-      "-moz-column-count" : 2 + "",
-      "-webkit-column-count" : 2 + "",
-      "column-count" : 2 + ""
-    });
+
+    if (parseInt(width) < 1070) {
+      $("#rickshaw_legend > ul").css({
+        "-moz-column-count" : 1 + "",
+        "-webkit-column-count" : 1 + "",
+        "column-count" : 1 + ""
+      });
+    } else {
+      $("#rickshaw_legend > ul").css({
+        "-moz-column-count" : 2 + "",
+        "-webkit-column-count" : 2 + "",
+        "column-count" : 2 + ""
+      });
+    }
     deferrer.resolve();
   }
   
@@ -1289,7 +1350,7 @@ function ChartExporter(args) {
     
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', newCanvasId);
-    canvas.setAttribute('style', "display:none");
+//    canvas.setAttribute('style', "display:none");
     canvas.width = 3000;
     canvas.height = 5000;
     document.body.appendChild(canvas);

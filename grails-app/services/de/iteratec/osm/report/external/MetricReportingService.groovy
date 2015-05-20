@@ -177,22 +177,23 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-199
 	 */
-	public void reportEventCSIValuesOfLastHour(DateTime reportingTimeStamp) {
+	public void reportEventCSIValuesOfLastHour(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No event csi values are reported cause measurements are generally disabled.")
 			return
 		}
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Report last hour CSI Values: ${reportingTimeStamp}", createBatchActivity)
+
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		if(log.debugEnabled) log.debug('reporting csi-values of last hour')
-		batchActivityService.updateStatus(activity,["stage":"Collecting JobGroups"])
+		activity.updateStatus(["stage":"Collecting JobGroups"])
 		Collection<JobGroup> csiGroupsWithGraphiteServers = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		if(log.debugEnabled) log.debug("csi-groups to report: ${csiGroupsWithGraphiteServers}")
 		int size = csiGroupsWithGraphiteServers.size()
-		batchActivityService.updateStatus(activity,["stage":"Collecting JobGroups"])
+		activity.updateStatus(["stage":"Collecting JobGroups"])
 		csiGroupsWithGraphiteServers.eachWithIndex {JobGroup eachJobGroup, int index ->
-			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size, index+1)])
+			activity.updateStatus(["progress":batchActivityService.calculateProgress(size, index+1)])
 			MvQueryParams queryParams = new MvQueryParams()
 			queryParams.jobGroupIds.add(eachJobGroup.getId())
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
@@ -205,9 +206,9 @@ class MetricReportingService {
 
 			if(log.debugEnabled) log.debug("MeasuredValues to report for last hour: ${mvs}")
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
-			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
+			activity.updateStatus( ["successfulActions": ++activity.getSuccessfulActions()])
 		}
-		batchActivityService.updateStatus(activity, ["stage": "", "endDate": new Date(), "status": Status.DONE])
+		activity.updateStatus(["stage": "", "endDate": new Date(), "status": Status.DONE])
 	}
 
 	/**
@@ -221,7 +222,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-201
 	 */
-	public void reportPageCSIValuesOfLastDay(DateTime reportingTimeStamp) {
+	public void reportPageCSIValuesOfLastDay(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No page csi values of last day are reported cause measurements are generally disabled.")
@@ -231,9 +232,9 @@ class MetricReportingService {
 		if (log.infoEnabled) log.info("Start reporting PageCSIValuesOfLastDay for timestamp: ${reportingTimeStamp}");
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day page CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day page CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportPageCSIValues(MeasuredValueInterval.DAILY, reportingTimeStamp, activity)
-		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
+		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 
 
 	}
@@ -249,7 +250,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-205
 	 */
-	public void reportPageCSIValuesOfLastWeek(DateTime reportingTimeStamp) {
+	public void reportPageCSIValuesOfLastWeek(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No page csi values of last week are reported cause measurements are generally disabled.")
@@ -258,9 +259,9 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week page CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week page CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportPageCSIValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
-		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
+		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
 
 	private void reportPageCSIValues(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivity activity) {
@@ -269,7 +270,7 @@ class MetricReportingService {
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
-			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index+1)])
+			activity.updateStatus(["progress":batchActivityService.calculateProgress(size,index+1)])
 
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
 				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
@@ -284,7 +285,7 @@ class MetricReportingService {
 
 			if(log.debugEnabled) log.debug("reporting ${pmvsWithData.size()} page csi-values with intervalInMinutes ${intervalInMinutes} for JobGroup: ${eachJobGroup}");
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.PAGE, pmvsWithData)
-			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
+			activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
 
@@ -299,7 +300,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-203
 	 */
-	public void reportShopCSIValuesOfLastDay(DateTime reportingTimeStamp) {
+	public void reportShopCSIValuesOfLastDay(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No shop csi values of last day are reported cause measurements are generally disabled.")
@@ -307,9 +308,9 @@ class MetricReportingService {
 		}
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day shop CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day shop CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportShopCSIMeasuredValues(MeasuredValueInterval.DAILY, reportingTimeStamp,activity)
-		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
+		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
 
 	/**
@@ -323,7 +324,7 @@ class MetricReportingService {
 	 *         should be reported, not <code>null</code>.
 	 * @since IT-205
 	 */
-	public void reportShopCSIValuesOfLastWeek(DateTime reportingTimeStamp) {
+	public void reportShopCSIValuesOfLastWeek(DateTime reportingTimeStamp, boolean createBatchActivity = true) {
 		
 		if ( ! inMemoryConfigService.areMeasurementsGenerallyEnabled() ) {
 			log.info("No shop csi values of last week are reported cause measurements are generally disabled.")
@@ -332,9 +333,9 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
-		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week shop CSI Values: ${reportingTimeStamp}")
+		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week shop CSI Values: ${reportingTimeStamp}",createBatchActivity)
 		reportShopCSIMeasuredValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
-		batchActivityService.updateStatus(activity, ["stage": "","endDate": new Date(), "status": Status.DONE])
+		activity.updateStatus( ["stage": "","endDate": new Date(), "status": Status.DONE])
 
 	}
 
@@ -343,7 +344,7 @@ class MetricReportingService {
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
-			batchActivityService.updateStatus(activity,["progress":batchActivityService.calculateProgress(size,index+1)])
+			activity.updateStatus(["progress":batchActivityService.calculateProgress(size,index+1)])
 			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
 				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
 				intervalInMinutes)
@@ -356,7 +357,7 @@ class MetricReportingService {
 			}
 
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.SHOP, smvsWithData)
-			batchActivityService.updateStatus(activity, ["successfulActions": ++activity.getSuccessfulActions()])
+			activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
 

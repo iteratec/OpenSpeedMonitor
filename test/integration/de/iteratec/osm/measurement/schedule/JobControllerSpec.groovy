@@ -36,6 +36,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
     @Before
     void setup() {
         controllerUnderTest = new JobController()
+        controllerUnderTest.jobService.batchActivityService.timer.cancel()
         controllerUnderTest.inMemoryConfigService = new InMemoryConfigService()
         controllerUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
         createOsmConfig()

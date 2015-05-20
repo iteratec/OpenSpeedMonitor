@@ -81,7 +81,7 @@ class ServiceMocker {
         HashMap<Long, Class> containingIds = new HashMap<>()
 
         batchActivityService.demand.getActiveBatchActivity(1..10000) {
-            Class c,long idWithinDomain, Activity activity,String name ->
+            Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
                 containingIds.put(idWithinDomain, c)
                 return new BatchActivity(
                         activity: activity,

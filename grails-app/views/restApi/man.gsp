@@ -21,6 +21,9 @@
 					<li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
 					<li><a href="#job-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job deactivation</a></li>
 					<li><a href="#job-set-schedule">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Set execution schedule</a></li>
+                    <li><a href="#create-event">&raquo;&nbsp;<strong>POST</strong>&nbsp;Create event</a></li>
+                    <li><a href="#measurement-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement activation</a></li>
+                    <li><a href="#measurement-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement deactivation</a></li>
 				</ul>
 			</div>
 			<div class="span9 content">
@@ -39,6 +42,7 @@
 					<h2>GET Method:&nbsp;<span class="text-info">Results between</span></h2>
 
 					<h3>Request signature</h3>
+
 					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/[system]/resultsbetween/[timestampFrom]/[timestampTo]</code></p>
 					<p>
 						The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
@@ -61,35 +65,35 @@
 					   <dl>
 					   <dt>page</dt>
 						<dd>
-							The name of a page. If specified only results belonging to this page are returned.
+                            OPTIONAL<br>The name of a page. If specified only results belonging to this page are returned.
 							<br/>
 							You can obtain a list of all pages by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allPages</code>.
 							As result a JSON list of page names is returned.
 						</dd>
 						<dt>step</dt>
 						<dd>
-							The name of a (measured) step. If specified only results belonging to this step are returned.
+                            OPTIONAL<br>The name of a (measured) step. If specified only results belonging to this step are returned.
 							<br/>
 							You can obtain a list of all steps by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSteps</code>.
 							As result a JSON list of step names is returned.
 						</dd>
 						<dt>browser</dt>
 						<dd>
-							The name of a browser. If specified only results belonging to this browser are returned.
+                            OPTIONAL<br>The name of a browser. If specified only results belonging to this browser are returned.
 							<br/>
 							You can obtain a list of all browsers by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allBrowsers</code>.
 							As result a JSON list of browser names is returned.
 						</dd>
 						<dt>location</dt>
 						<dd>
-							The location-address of a location. If specified only results belonging to this location are returned.
+                            OPTIONAL<br>The location-address of a location. If specified only results belonging to this location are returned.
 							<br/>
 							You can obtain a list of all location-addresses by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allLocations</code>.
 							As result a JSON list of location-addresses is returned.
 						</dd>
 					   	<dt>cachedView</dt>
 					   	<dd>
-						   	The cached view. If specified only results of this cached view are returned.
+                            OPTIONAL<br>The cached view. If specified only results of this cached view are returned.
 						   	<br/>
 						   	Only one of the following two values are allowed:
 							<ul>
@@ -243,11 +247,11 @@
 					   <dl>
 						<dt>pageName</dt>
 						   <dd>
-							   The name of the page the doc complete time was measured for.
+                               MANDATORY<br>The name of the page the doc complete time was measured for.
 						   </dd>
 						   <dt>docCompleteTimeInMillisecs</dt>
 						   <dd>
-							   Doc complete time to translate to customer satisfaction.
+                               MANDATORY<br>Doc complete time to translate to customer satisfaction.
 						   </dd>
 						  </dl>
 
@@ -292,7 +296,7 @@
 					   <dl>
 						<dt>pageName</dt>
 						   <dd>
-							   The name of the page the customer frustration load times should be delivered for.
+                               MANDATORY<br>The name of the page the customer frustration load times should be delivered for.
 						   </dd>
 						  </dl>
 
@@ -395,7 +399,7 @@
 					<dl>
 						<dt>apiKey</dt>
 						<dd>
-							An api key for OpenSpeedMonitor. Provides permissions for api functions.
+                            MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
 						</dd>
 					</dl>
 
@@ -448,7 +452,7 @@
 					<dl>
 						<dt>apiKey</dt>
 						<dd>
-							An api key for OpenSpeedMonitor. Provides permissions for api functions.
+                            MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
 						</dd>
 					</dl>
 
@@ -509,7 +513,7 @@
 					<dl>
 						<dt>apiKey</dt>
 						<dd>
-							An api key for OpenSpeedMonitor. Provides permissions for api functions.
+                            MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
 						</dd>
 					</dl>
 
@@ -543,6 +547,201 @@
 					<hr>
 
 				</div>
+
+                <div id="create-event">
+
+                    <h2>Method:&nbsp;<span class="text-info">Create event</span></h2>
+
+                    <i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+
+                    <h3>Request signature</h3>
+                    <p>
+                        The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
+                        followed by <em>event/create</em>.
+                    </p>
+                    <p>
+                        Example URI to create a new event would be <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/event/create</code>
+                        Created events have a timestamp and are shown as vertical lines in diagrams of OpenSpeedMonitor dashboards.
+                    </p>
+                    <h4>Parameters</h4>
+                    <p>
+                        Attributes of event to be created must be sent as query arguments.
+                    </p>
+                    <dl>
+                        <dt>apiKey</dt>
+                        <dd>
+                            MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>shortName</dt>
+                        <dd>
+                            MANDATORY<br>Short name of event to be created. This is shown on hover popup of dasboards.
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>description</dt>
+                        <a name="create-event-param-system"></a>%{--Here cause of overlaying header of bootstrap layout--}%
+                        <dd>
+                            OPTIONAL<br>More detailed description of event to be created. This is shown on hover popup of dasboards.
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>system</dt>
+                        <dd>
+                            MANDATORY<br>Name of the measurement system the created event should be associated to. Can be more than one system.
+                            You can obtain a list of all systems by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSystems</code>.
+                            Created events are shown only in dashboard views for respective system (except events with global visibility, see following parameter).
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>globallyVisible</dt>
+                        <dd>
+                            OPTIONAL<br>Normally events are only shown in dashboard views for associated systems. Globally visible events are shown on all dashboards.
+                            Only the following values are allowed:
+                            <ul>
+                            <li><em>true</em><br>Created events are visible on all dashboard sights independent of chosen systems.</li>
+                            <li><em>false</em><br>Created events are only visible on dashboard sights of systems associated to event (see parameter <a href="#create-event-param-system">system</a>). This is the default.</li>
+                            </ul>
+                        </dd>
+                    </dl>
+                    <dl>
+                        <dt>eventTimestamp</dt>
+                        <dd>
+                            OPTIONAL<br>The timestamp the event occurred. If omitted the timestamp this api function is called is used as timestamp for the event.
+                        </dd>
+                    </dl>
+
+                    <h3>Potential outcomes of a request</h3>
+                    <dl>
+                        <dt>HTTP status 200 OK</dt>
+                        <dd>
+                            The request handled successfully, an event gets created and persisted. This event in JSON notation is
+                            returned.<br>Response example:
+                            <pre>
+{
+    "class": "de.iteratec.osm.report.chart.Event",
+    "description": "my-description",
+    "eventDate": "2015-05-12T13:31:03Z",
+    "globallyVisible": false,
+    "jobGroups":
+        [
+            {
+                "class": "JobGroup",
+                "id": 2
+            },
+            {
+                "class": "JobGroup",
+                "id": 7
+            }
+        ],
+    "shortName": "my-event"
+}</pre>
+                            <br />
+                            The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.
+                        </dd>
+                        <dt>HTTP status 400 Bad Request</dt>
+                        <dd>One of the mandatory parameters was omitted or the timestamp parameter had the wrong format. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                    </dl>
+
+                    <hr>
+
+                </div>
+
+                <div id="measurement-activation">
+
+                    <h2>PUT Method:&nbsp;<span class="text-info">Measurement activation</span></h2>
+
+                    <i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+                    <h3>Request signature</h3>
+                    <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/config/activateMeasurementsGenerally</code></p>
+                    <p>
+                        The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
+                        followed by <em>config/activateMeasurementsGenerally</em>.
+                    </p>
+                    <h4>Parameters</h4>
+                    <dl>
+                        <dt>apiKey</dt>
+                        <dd>
+                            MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
+                        </dd>
+                    </dl>
+
+                    <h3>Potential outcomes of a request</h3>
+                    <dl>
+                        <dt>HTTP status 200 OK</dt>
+                        <dd>
+                            The request handled successfully. The measurements got enabled generally, no matter whether they were enabled before or not.
+                        </dd>
+                        <dt>HTTP status 400 Bad Request</dt>
+                        <dd>This function requires an api key. You missed to submit one as parameter or the key doesn't have permission to activate measurements.
+                        An error message with details is attached as response.<br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                        <dt>HTTP status 404 Not Found</dt>
+                        <dd>Submitted api key doesn't exist. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                        <dt>HTTP status 403 Forbidden</dt>
+                        <dd>Submitted api key is generally invalid. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                    </dl>
+
+                    <hr>
+
+                </div>
+
+                <div id="measurement-deactivation">
+
+                    <h2>PUT Method:&nbsp;<span class="text-info">Measurement deactivation</span></h2>
+
+                    <i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+                    <h3>Request signature</h3>
+                    <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/config/deactivateMeasurementsGenerally</code></p>
+                    <p>
+                        The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
+                        followed by <em>config/deactivateMeasurementsGenerally</em>.
+                    </p>
+                    <h4>Parameters</h4>
+                    <dl>
+                        <dt>apiKey</dt>
+                        <dd>
+                            MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
+                        </dd>
+                    </dl>
+
+                    <h3>Potential outcomes of a request</h3>
+                    <dl>
+                        <dt>HTTP status 200 OK</dt>
+                        <dd>
+                            The request handled successfully. The measurements got disabled generally, no matter whether they were enabled before or not.
+                        </dd>
+                        <dt>HTTP status 400 Bad Request</dt>
+                        <dd>This function requires an api key. You missed to submit one as parameter or the key doesn't have permission to activate measurements.
+                            An error message with details is attached as response.<br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                        <dt>HTTP status 404 Not Found</dt>
+                        <dd>Submitted api key doesn't exist. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                        <dt>HTTP status 403 Forbidden</dt>
+                        <dd>Submitted api key is generally invalid. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                    </dl>
+
+                    <hr>
+
+                </div>
 
 			</div>
 

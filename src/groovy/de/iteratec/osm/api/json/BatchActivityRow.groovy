@@ -12,4 +12,5 @@ class BatchActivityRow {
     String startDate
     String lastUpdated
     String endDate
+    String statusEN
 }

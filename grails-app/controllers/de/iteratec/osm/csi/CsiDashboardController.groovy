@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.util.AnnotationUtil
+
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import de.iteratec.osm.csi.weighting.WeightFactor
@@ -78,6 +80,7 @@ class CsiDashboardController {
     CsiHelperService csiHelperService
     MeasuredValueUtilService measuredValueUtilService
     CookieBasedSettingsService cookieBasedSettingsService
+    EventService eventService
 
     /**
      * The Grails engine to generate links.
@@ -313,6 +316,7 @@ class CsiDashboardController {
                 fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
                 break
         }
+        fillWithAnnotations(modelToRender, timeFrame)
     }
 
     /**
@@ -426,21 +430,7 @@ class CsiDashboardController {
     {
         MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
-
-        Date resetFromDate = fixedTimeFrame.getStart().toDate()
-        Date resetToDate = fixedTimeFrame.getEnd().toDate()
-
-        List<Event> annotationContent = Event.findAllByDateBetween(resetFromDate, resetToDate)
-        ArrayList<String> annotations = new ArrayList<String>()
-
-        annotationContent.eachWithIndex { item, index ->
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm");
-            Date date = dateFormat.parse("$item.date $item.fromHour");
-            long unixTime = (long)date.getTime()/1000;
-            annotations.add("{x: '$unixTime', text: '$item.date $item.fromHour<br><strong>$item.shortName:</strong><br/>$item.htmlDescription'}")
-        }
-        modelToRender.put('annotations', annotations)
-
+        AnnotationUtil.fillWithAnnotations(modelToRender,fixedTimeFrame, eventService)
     }
 
     /**
@@ -564,28 +554,33 @@ class CsiDashboardController {
      */
     Map<String, Object> showDefault() {
 
-        DateTime nowMinusOneInterval = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
-        DateTime fromDate = nowMinusOneInterval.minusMonths(3)
+        DateTime toDate
+        if(params.includeInterval){
+            toDate = new DateTime()
+        }else{
+            toDate = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
+        }
+        DateTime fromDate = toDate.minusMonths(3)
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-        Interval timeFrame = new Interval(fromDate, nowMinusOneInterval)
+        Interval timeFrame = new Interval(fromDate, toDate)
 
         MvQueryParams queryParams = new MvQueryParams()
 
-        List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['live', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
+        List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['otto.de_Desktop', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
         Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll{namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)}
         Set<Long> csiGroupIds = csiGroupsToShow.collect({it.id})
         queryParams.jobGroupIds.addAll(csiGroupIds)
 
         fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
-        fillWithAnnotations(modelToRender, timeFrame)
+//        fillWithAnnotations(modelToRender, timeFrame)
 
         modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
         modelToRender.put('weekStart', MONDAY_WEEKSTART)
         modelToRender.put('from', fromDate)
-        modelToRender.put('to', nowMinusOneInterval)
+        modelToRender.put('to', toDate)
         modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
-        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(nowMinusOneInterval.toDate()))
+        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', true)
         modelToRender.put('debug', params.debug?true:false)

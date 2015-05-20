@@ -17,9 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
-import org.springframework.dao.DataIntegrityViolationException
-
-import java.text.SimpleDateFormat
+import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
  * EventController
@@ -30,6 +28,7 @@ class EventController {
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     def markdownService
+    EventService eventService
 
     def index() {
         redirect(action: "list", params: params)
@@ -45,23 +44,17 @@ class EventController {
     }
 
     def save() {
-        //Convert english date format to german, for passing validation
-        def gerFormatter = new SimpleDateFormat("dd.MM.yyyy")
-        def engFormatter = new SimpleDateFormat("yyyy-MM-dd")
-
-        if(params['date'].toString().contains("-"))
-            params['date'] = gerFormatter.format(engFormatter.parse(params['date']))
-
-
-        def eventInstance = new Event(params)
-
-        if (!eventInstance.save(flush: true)) {
-            render(view: "create", model: [eventInstance: eventInstance])
-            return
+        combineDateAndTime(params)
+        eventService.saveEvent(params){
+            action.success={ Event eventInstance->
+                flash.message = message(code: 'default.created.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
+                redirect(action: "show", id: eventInstance.id)
+            }
+            action.failure={Event eventInstance->
+                render(view: "create", model: [eventInstance: eventInstance])
+            }
         }
 
-		flash.message = message(code: 'default.created.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
-        redirect(action: "show", id: eventInstance.id)
     }
 
     def show() {
@@ -71,7 +64,6 @@ class EventController {
             redirect(action: "list")
             return
         }
-
         [eventInstance: eventInstance]
     }
 
@@ -93,45 +85,60 @@ class EventController {
             redirect(action: "list")
             return
         }
-
-        if (params.version) {
-            def version = params.version.toLong()
-            if (eventInstance.version > version) {
-                eventInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'event.label', default: 'Event')] as Object[],
-                          "Another user has updated this Event while you were editing")
+        if (!(params?.jobGroups)) {
+            eventInstance.jobGroups.clear()
+        }
+        combineDateAndTime(params)
+        eventService.updateEvent(eventInstance, params.clone()){
+            action.success = {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
+                redirect(action: "show", id: eventInstance.id)
+            }
+            action.failure = {
                 render(view: "edit", model: [eventInstance: eventInstance])
-                return
             }
         }
-
-        eventInstance.properties = params
-
-        if (!eventInstance.save(flush: true)) {
-            render(view: "edit", model: [eventInstance: eventInstance])
-            return
-        }
-
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
-        redirect(action: "show", id: eventInstance.id)
     }
 
     def delete() {
         def eventInstance = Event.get(params.id)
         if (!eventInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
             redirect(action: "list")
             return
         }
 
-        try {
-            eventInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
-            redirect(action: "list")
+        eventService.deleteEvent(eventInstance){
+            action.success = {
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+                redirect(action: "list")
+            }
+            action.failure = {exception->
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+                redirect(action: "show", id: params.id)
+            }
         }
-        catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
-            redirect(action: "show", id: params.id)
+    }
+
+    /**
+     * Combines time and date within the param list, where time ist 'time' and date is 'eventDate'
+     * @param params
+     */
+    private void combineDateAndTime(def params){
+        //Convert english date format to german, for passing validation
+        //The gsp passes the time and the date separately so we need to combine these two
+        params['eventDate'] = params['eventDate']+" "+params['time']
+        def formatter
+        params.remove('time')
+        def locale = RequestContextUtils.getLocale(request)
+        switch (locale){
+            case Locale.GERMANY:
+            case Locale.GERMAN:
+                formatter =  "dd.MM.yyyy HH:mm"
+                break;
+            default:
+                formatter = "yyyy-MM-dd HH:mm"
         }
+        params['eventDate'] = Date.parse(formatter,params['eventDate'] as String)
     }
 }

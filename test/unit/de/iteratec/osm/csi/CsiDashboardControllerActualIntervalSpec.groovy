@@ -20,7 +20,8 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
+import de.iteratec.osm.util.DoubleValueConverter
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
@@ -49,7 +50,10 @@ class CsiDashboardControllerActualIntervalSpec {
 
     void setUp() {
         // Because spring resources not loaded in unit tests, declare them locally:
-        defineBeans { customPropertyEditorRegistrar(CustomDateEditorRegistrar) }
+        defineBeans {
+            doubleValueConverter(DoubleValueConverter)
+            dateValueConverter(DateValueConverter)
+        }
 
         // Enable constraint tests:
         mockForConstraintsTests(CsiDashboardShowAllCommand.class);

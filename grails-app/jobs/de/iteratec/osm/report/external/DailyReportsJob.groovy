@@ -31,6 +31,7 @@ import de.iteratec.osm.report.external.MetricReportingService
 class DailyReportsJob {
 	
 	MetricReportingService metricReportingService
+	boolean createBatchActivity = true
 	
 	static triggers = {
 		/** Each Day at 0:20 am. */
@@ -41,7 +42,7 @@ class DailyReportsJob {
 
     def execute() {
 		DateTime now = new DateTime();
-		metricReportingService.reportPageCSIValuesOfLastDay(now)
-		metricReportingService.reportShopCSIValuesOfLastDay(now)
+		metricReportingService.reportPageCSIValuesOfLastDay(now, createBatchActivity)
+		metricReportingService.reportShopCSIValuesOfLastDay(now, createBatchActivity)
     }
 }

@@ -87,6 +87,7 @@ class MetricReportingServiceTests {
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
 		serviceUnderTest.batchActivityService = new BatchActivityService()
+		serviceUnderTest.batchActivityService.timer.cancel()//we don't need any updates for this test
 		createTestDataCommonToAllTests()
     }
 	

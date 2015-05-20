@@ -27,6 +27,8 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.Event
+import de.iteratec.osm.report.chart.EventService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
@@ -34,13 +36,16 @@ import de.iteratec.osm.report.chart.OsmChartAxis
 import de.iteratec.osm.report.chart.OsmChartGraph
 import de.iteratec.osm.report.chart.OsmChartPoint
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.CustomDateEditorRegistrar
+import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.validation.Validateable
 
+import java.text.DateFormat
 import java.text.NumberFormat
+import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
@@ -70,6 +75,7 @@ class EventResultDashboardController {
     PageService pageService
     I18nService i18nService
     CookieBasedSettingsService cookieBasedSettingsService
+    EventService eventService
 
     /**
      * The Grails engine to generate links.
@@ -195,6 +201,26 @@ class EventResultDashboardController {
         modelToRender.put('toTimestampForHighChart', (timeFrame.getEnd().toDate().getTime() + 300000))
 
         modelToRender.put("selectedCharttypeForHighchart", cmd.getSelectChartType());
+        fillWithAnnotations(modelToRender, timeFrame)
+    }
+
+    /**
+     * <p>
+     * Fills the annotations with values.
+     * </p>
+     *
+     * @param modelToRender
+     *         The map to be filled. Previously added entries are overridden.
+     *         This map should not be <code>null</code>.
+     * @param timeFrame
+     *         The time-frame for that data should be calculated,
+     *         not <code>null</code>.
+     */
+    private void fillWithAnnotations(
+            Map<String, Object> modelToRender,
+            Interval timeFrame)
+    {
+        AnnotationUtil.fillWithAnnotations(modelToRender,timeFrame, eventService)
 
     }
 
@@ -430,22 +456,6 @@ class EventResultDashboardController {
      * None of the properties will be <code>null</code> for a valid instance.
      * Some collections might be empty depending on the {@link #aggrGroup}
      * used.
-     * </p>
-     *
-     * <p>
-     * <em>DEV-Note:</em> This command uses auto-binding for type {@link Date}.
-     * To make this possible, you need a custom {@link PropertyEditor}.
-     * See class {@link CustomDateEditorRegistrar} for details. If try an
-     * auto-binding in a unit-test you need to register the class
-     * CustomDateEditorRegistrar with a code-block like:
-     * <pre>
-     * defineBeans {*     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-     *}* </pre>
-     * in the set-up of your test. For productive use you need to add
-     * <pre>
-     * beans = {*     customPropertyEditorRegistrar(CustomDateEditorRegistrar)
-     *}* </pre>
-     * to the config file {@code grails-app/conf/spring/resources.groovy}
      * </p>
      *
      * @author mze , rhe
@@ -803,16 +813,14 @@ class EventResultDashboardController {
             viewModelToCopyTo.put('selectedAllLocations', this.selectedAllLocations)
             viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
-            CustomDateEditor dateEditor = CustomDateEditorRegistrar.createCustomDateEditor();
+            DateValueConverter converter = DateValueConverter.getConverter()
 
-            dateEditor.setValue(this.from)
-            viewModelToCopyTo.put('from', dateEditor.getAsText())
+            viewModelToCopyTo.put('from', this.from)
             if (!this.fromHour.is(null)) {
                 viewModelToCopyTo.put('fromHour', this.fromHour)
             }
 
-            dateEditor.setValue(this.to)
-            viewModelToCopyTo.put('to', dateEditor.getAsText())
+            viewModelToCopyTo.put('to', this.to)
             if (!this.toHour.is(null)) {
                 viewModelToCopyTo.put('toHour', this.toHour)
             }

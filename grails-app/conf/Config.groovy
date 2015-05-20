@@ -44,9 +44,6 @@ if (System.properties["osm_config_location"]) {
 
 // config for all environments //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-grails.databinding.useSpringBinder=true //Added to run CustomDateEditor: http://grails.1312388.n4.nabble.com/backward-compatability-of-Grails-2-3-0-databinder-td4650325.html
-grails.databinding.convertEmptyStringsToNull = false
-
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -144,7 +141,8 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/login/**'                 				: ["permitAll"],
 	'/logout/**'                				: ["permitAll"],
 	'/job/list'                					: ["permitAll"],
-	'/job/getRunningAndRecentlyFinishedJobs'	: ["permitAll"],
+    '/job/getRunningAndRecentlyFinishedJobs'    : ["permitAll"],
+    '/job/nextExecution'                        : ["permitAll"],
 	'/script/list'                				: ["permitAll"],
 	'/queueStatus/list'                			: ["permitAll"],
 	'/queueStatus/refresh'                		: ["permitAll"],
