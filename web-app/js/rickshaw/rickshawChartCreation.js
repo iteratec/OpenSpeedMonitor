@@ -412,54 +412,128 @@ function XAxis(args) {
     var diffYears = Math.ceil(timeDiff / (1000 * 3600 * 24 * 30 * 12));
 
     var format, tickValues = [];
-
-    if (diffYears >= self.NUMBER_OF_TICKS) {
-      tickValues = self.getYearsInRange(minDate, maxDate);
-      format = function(n) {
-        var date = new Date(n * 1000);
-        var year = date.getFullYear();
-        var dateLabel = self.getDateISO(date);
-        return year + "_nl_" + dateLabel;
+    
+    var regexS = "[\\?&]selectedInterval=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var resultsSelectedInterval = regex.exec( window.location.href );
+    if(( resultsSelectedInterval != null ) && (resultsSelectedInterval[1] != -1)) {
+//    aggregate weekly (if applicable)
+      if (resultsSelectedInterval[1] == 10080) {//weekly
+        var dayName="Friday";
+        regexS = "[\\?&]dayForLabel=([^&#]*)";
+        regex = new RegExp( regexS );
+        var resultsDayForLabel = regex.exec( window.location.href );
+        if((resultsDayForLabel != null) && (DAYS.indexOf(resultsDayForLabel[1]) > -1)) {
+          dayName = resultsDayForLabel[1];
+        }
+        tickValues = self.getDaysInRange(minDate, maxDate);
+        var index = tickValues.length;
+        while (index--) {
+          var date = new Date(tickValues[index] * 1000);
+          var dayNameToCheck = DAYS[date.getDay()];
+          if(dayNameToCheck != dayName) { // purge days not meeting requirement
+            tickValues.splice(index, 1);
+          }
+        }
+        // re-add tickValues if list is empty
+        if (tickValues.length == 0) {
+          tickValues = self.getDaysInRange(minDate, maxDate);
+        }
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var dayName = DAYS[date.getDay()];
+          var dateLabel = self.getDateISO(date);
+          return dayName + "_nl_" + dateLabel;
+        }
       }
-    } else if (diffMonths >= self.NUMBER_OF_TICKS) {
-      tickValues = self.getMonthsInRange(minDate, maxDate);
-      format = function(n) {
-        var date = new Date(n * 1000);
-        var monthName = MONTHS[date.getMonth()];
-        var dateLabel = self.getDateISO(date);
-        return monthName + "_nl_" + dateLabel;
+//    aggregate daily (if applicable) of if aggregate is weekly and tickValues empty
+      if ((resultsSelectedInterval[1] == 1440) || ((resultsSelectedInterval[1] == 10080) && (tickValues.length == 0))) {// daily
+        tickValues = self.getDaysInRange(minDate, maxDate);
+        tickValues = self.getHoursInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
       }
-    } else if (diffDays >= self.NUMBER_OF_TICKS) {
-      tickValues = self.getDaysInRange(minDate, maxDate);
-      format = function(n) {
-        var date = new Date(n * 1000);
-        var dayName = DAYS[date.getDay()];
-        var dateLabel = self.getDateISO(date);
-        return dayName + "_nl_" + dateLabel;
+//    aggregate hourly (if applicable) of if aggregate is daily/weekly and tickValues empty
+      if ((resultsSelectedInterval[1] == 60) || (tickValues.length == 0)) {
+        tickValues = self.getHoursInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
       }
-    } else if (diffHours >= self.NUMBER_OF_TICKS) {
-      tickValues = self.getHoursInRange(minDate, maxDate);
-      format = function(n) {
-        var date = new Date(n * 1000);
-        var time = self.getTimeString(date);
-        var dateLabel = self.getDateISO(date);
-        return time + "_nl_" + dateLabel;
+      if (tickValues.length == 0) {
+        tickValues = self.getMinutesInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
       }
-    } else if (diffMinutes >= self.NUMBER_OF_TICKS) {
-      tickValues = self.getMinutesInRange(minDate, maxDate);
-      format = function(n) {
-        var date = new Date(n * 1000);
-        var time = self.getTimeString(date);
-        var dateLabel = self.getDateISO(date);
-        return time + "_nl_" + dateLabel;
+      if (tickValues.length == 0) {
+        tickValues = self.getDefaultTickValues(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
       }
     } else {
-      tickValues = self.getDefaultTickValues(minDate, maxDate);
-      format = function(n) {
-        var date = new Date(n * 1000);
-        var time = self.getTimeString(date);
-        var dateLabel = self.getDateISO(date);
-        return time + "_nl_" + dateLabel;
+      if (diffYears >= self.NUMBER_OF_TICKS) {
+        tickValues = self.getYearsInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var year = date.getFullYear();
+          var dateLabel = self.getDateISO(date);
+          return year + "_nl_" + dateLabel;
+        }
+      } else if (diffMonths >= self.NUMBER_OF_TICKS) {
+        tickValues = self.getMonthsInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var monthName = MONTHS[date.getMonth()];
+          var dateLabel = self.getDateISO(date);
+          return monthName + "_nl_" + dateLabel;
+        }
+      } else if (diffDays >= self.NUMBER_OF_TICKS) {
+        tickValues = self.getDaysInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var dayName = DAYS[date.getDay()];
+          var dateLabel = self.getDateISO(date);
+          return dayName + "_nl_" + dateLabel;
+        }
+      } else if (diffHours >= self.NUMBER_OF_TICKS) {
+        tickValues = self.getHoursInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
+      } else if (diffMinutes >= self.NUMBER_OF_TICKS) {
+        tickValues = self.getMinutesInRange(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
+      } else {
+        tickValues = self.getDefaultTickValues(minDate, maxDate);
+        format = function(n) {
+          var date = new Date(n * 1000);
+          var time = self.getTimeString(date);
+          var dateLabel = self.getDateISO(date);
+          return time + "_nl_" + dateLabel;
+        }
       }
     }
 
