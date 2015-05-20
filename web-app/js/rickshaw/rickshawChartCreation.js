@@ -396,8 +396,8 @@ function XAxis(args) {
   }
 
   this.setTickValueLabels = function() {
-    var DAYS = [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-        "Saturday", "Sunday " ];
+    var DAYS = [  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+        "Saturday" ];
     var MONTHS = [ "January", "February", "March", "April", "May", "June",
         "July", "August", "September", "October", "November",
         "December" ];
@@ -416,6 +416,9 @@ function XAxis(args) {
     var regexS = "[\\?&]selectedInterval=([^&#]*)";
     var regex = new RegExp( regexS );
     var resultsSelectedInterval = regex.exec( window.location.href );
+    
+    
+    
     if(( resultsSelectedInterval != null ) && (resultsSelectedInterval[1] != -1)) {
 //    aggregate weekly (if applicable)
       if (resultsSelectedInterval[1] == 10080) {//weekly
