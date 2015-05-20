@@ -1861,7 +1861,8 @@ Rickshaw.Graph.Axis.X = function(args) {
 				.attr('class', 'rickshaw_graph x_axis_d3');
 
 			this.element = this.vis[0][0];
-			this.element.style.position = 'relative';
+      this.element.style.position = 'relative';
+      this.element.style.left = '3px !important';
 
 			this.setSize({ width: args.width, height: args.height });
 
