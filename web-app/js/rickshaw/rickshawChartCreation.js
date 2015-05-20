@@ -411,13 +411,42 @@ function XAxis(args) {
     var diffMonths = Math.ceil(timeDiff / (1000 * 3600 * 24 * 30));
     var diffYears = Math.ceil(timeDiff / (1000 * 3600 * 24 * 30 * 12));
 
-    var format, tickValues = [];
+    var format, tickValues = [];    
     
     var regexS = "[\\?&]selectedInterval=([^&#]*)";
     var regex = new RegExp( regexS );
     var resultsSelectedInterval = regex.exec( window.location.href );
     
+    regexS = "[\\?&]aggrGroup=([^&#]*)";
+    regex = new RegExp( regexS );
+    var resultsAggrGroup = regex.exec( window.location.href );
     
+    // measuredEvent // hourly
+    // daily_page daily_shop // daily
+    // page shop // weekly
+    
+    if(resultsAggrGroup != null) {
+      switch(resultsAggrGroup[1]) {
+      case "measuredEvent":
+        resultsSelectedInterval = [];
+        resultsSelectedInterval[1] = 60;
+        break;
+      case "daily_page":
+      case "daily_shop":
+        resultsSelectedInterval = [];
+        resultsSelectedInterval[1] = 1440;
+        break;
+      case "page":
+      case "shop":
+        resultsSelectedInterval = [];
+        resultsSelectedInterval[1] = 10080;
+      }
+    }
+    
+    if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+      resultsSelectedInterval = [];
+      resultsSelectedInterval[1] = 10080;      
+    }
     
     if(( resultsSelectedInterval != null ) && (resultsSelectedInterval[1] != -1)) {
 //    aggregate weekly (if applicable)
