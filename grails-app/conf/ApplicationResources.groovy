@@ -74,6 +74,7 @@ modules = {
     'osm-dashboard-datetime-and-chart' {
         dependsOn 'osm-dashboard-datetime'
         dependsOn 'iteratec-chart'
+        dependsOn 'spin'
     }
     /**
      * For template grails-app/views/eventResultDashboard/_selectMeasurings

@@ -56,7 +56,7 @@ class JobController {
 		return message(code: 'de.iteratec.isj.job', default: 'Job')
 	}
 
-	void redirectIfNotFound(Job job, String id) {
+	void redirectIfNotFound(Job job, def id) {
 		def flashMessageArgs = [getJobI18n(), id]
 		if (!job) {
 			flash.message = message(code: 'default.not.found.message', args: flashMessageArgs)
