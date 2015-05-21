@@ -30,8 +30,8 @@ class ScriptController {
 	private String getScriptI18n() {
 		return message(code: 'de.iteratec.iss.script', default: 'Skript')
 	}
-	
-	void redirectIfNotFound(Script script, String id) {
+
+	void redirectIfNotFound(Script script, def id) {
 		def flashMessageArgs = [getScriptI18n(), id];
 		if (!script) {
 			flash.message = message(code: 'default.not.found.message', args: flashMessageArgs)
