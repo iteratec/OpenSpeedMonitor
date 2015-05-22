@@ -1209,7 +1209,7 @@ function ChartExporter(args) {
       var graphParent = origGraphElement.parentNode;
       origGraphElement.setAttribute('id', "originalGraph");
       
-      // diagramm kopieren und graph unsichtbar stellen
+      // diagramm kopieren
       var cln = origGraphElement.cloneNode(true);
       var spinner = new Spinner(opts).spin(cln);
       cln.setAttribute('id', "workingCopy");
@@ -1219,7 +1219,8 @@ function ChartExporter(args) {
       
       self.assignAllRelevantCssToStyleAttributes();
       
-      origGraphElement.setAttribute('style', "position:absolute;margin-top:1500px;");
+      origGraphElement.style.position=('absolute');
+      origGraphElement.style.marginTop=('1500px');
       // namen in der kopie eindeutig machen
       self.renameChildNodeIds(cln);
       deferrerCollection = new Array();
@@ -1371,7 +1372,8 @@ function ChartExporter(args) {
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
           }
-          origGraphElement.setAttribute('style', "position:initial;top:0px;left:0px;");
+          origGraphElement.style.position=('initial');
+          origGraphElement.style.marginTop=('0px');
           removeObjectFromDom('#workingCopy');
           removeObjectFromDom('#canvas_everything_merged');
           spinner.stop();
