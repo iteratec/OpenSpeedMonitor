@@ -1529,7 +1529,7 @@ function ChartExporter(args) {
     
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', newCanvasId);
-    canvas.setAttribute('style', "display:none");
+//    canvas.setAttribute('style', "display:none");
     canvas.width = 3000;
     canvas.height = 5000;
     document.body.appendChild(canvas);
@@ -1545,7 +1545,7 @@ function ChartExporter(args) {
   }
 
   this.mergeCanvases = function(originalElementId, sourceCanvasId, targetContext, bodyRect, graphOffsetTop, graphOffsetLeft) {
-    curElemRect = document.querySelector(originalElementId).getBoundingClientRect();
+    curElemRect = document.querySelector("#originalGraph " + originalElementId).getBoundingClientRect();
     curElemOffsetTop = curElemRect.top - bodyRect.top;
     curElemOffsetLeft = curElemRect.left - bodyRect.left;
     distanceTop = curElemOffsetTop - graphOffsetTop;
