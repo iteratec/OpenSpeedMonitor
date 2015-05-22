@@ -19,7 +19,13 @@
 	position: relative;
 }
 .graph {
-	background-color: white;
+  background-color: white;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1135px;
+}
+.graphDuplicate {
+  background-color: white;
   margin-left: auto;
   margin-right: auto;
   width: 1135px;
