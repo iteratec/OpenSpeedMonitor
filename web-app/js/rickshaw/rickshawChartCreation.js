@@ -1364,10 +1364,10 @@ function ChartExporter(args) {
           self.mergeLabelCanvases($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           rightLabelCount++;
         });
-        
         //convert to image
         try {
-          downloadCanvas(canvas, "png");
+        downloadCanvas(canvas, "jpeg");
+//        downloadCanvas(canvas, "png");
           if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
@@ -1380,7 +1380,7 @@ function ChartExporter(args) {
           document.documentElement.style.overflow = 'auto';  // firefox, chrome
           document.body.scroll = "yes"; // ie only
         } 
-        catch(err) {
+        catch(err) {          
           if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);

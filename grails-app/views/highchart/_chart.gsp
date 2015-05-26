@@ -33,5 +33,20 @@
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
+
+<script type="text/javascript">
+console.log("rk1");
+$(document).ready(function () {
+  console.log("rk2");
+  if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
+    console.log("rk3");
+  //if ($.browser.mozilla) {
+    $("#dia-save-chart-as-png").removeClass("btn-primary");
+    $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
+    $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
+    $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
+   }
+});
+</script>
   <button class="span btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.save.name"/></button>
 </div>
