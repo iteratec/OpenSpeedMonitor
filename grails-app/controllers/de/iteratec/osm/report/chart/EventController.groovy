@@ -44,7 +44,9 @@ class EventController {
     }
 
     def save() {
+        log.error(params)
         combineDateAndTime(params)
+        log.error(params)
         eventService.saveEvent(params){
             action.success={ Event eventInstance->
                 flash.message = message(code: 'default.created.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])

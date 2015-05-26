@@ -35,11 +35,8 @@
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
 
 <script type="text/javascript">
-console.log("rk1");
 $(document).ready(function () {
-  console.log("rk2");
-  if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0) {
-    console.log("rk3");
+  if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
   //if ($.browser.mozilla) {
     $("#dia-save-chart-as-png").removeClass("btn-primary");
     $("#dia-save-chart-as-png").addClass("btn-primary.disabled");

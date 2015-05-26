@@ -346,13 +346,14 @@
 	z-index: 50;
 }
 
-.rickshaw_annotation_timeline .annotation.active .content {
-	display: block;
+.rickshaw_annotation_timeline .annotation .content.active {
+  display: block;
+  z-index: 50;
 }
 
 .rickshaw_annotation_timeline .annotation:hover .content {
-	display: block;
-	z-index: 50;
+  display: block;
+  z-index: 50;
 }
 
 .rickshaw_graph .y_axis, .rickshaw_graph  .x_axis_d3 {
