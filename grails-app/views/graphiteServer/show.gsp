@@ -43,6 +43,19 @@
 				</td>
 				
 			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><g:message code="graphiteServer.graphiteEventSourcePaths.label" default="Graphite Event Source Paths" /></td>
+
+				<td valign="top" style="text-align: left;" class="value">
+					<ul>
+						<g:each in="${graphiteServerInstance.graphiteEventSourcePaths}" var="g">
+							<li><g:link controller="graphiteEventSourcePath" action="show" id="${g.id}">${g?.encodeAsHTML()}</g:link></li>
+						</g:each>
+					</ul>
+				</td>
+
+			</tr>
 		
 		</tbody>
 	</table>

@@ -23,3 +23,10 @@
 				</div>
 			</div>
 
+			<div class="control-group fieldcontain ${hasErrors(bean: graphiteServerInstance, field: 'graphiteEventSourcePaths', 'error')} ">
+				<label for="graphiteEventSourcePaths" class="control-label"><g:message code="graphiteServer.graphiteEventSourcePaths.label" default="Graphite Event Source Paths" /></label>
+				<div class="controls">
+					<g:select name="graphiteEventSourcePaths" from="${de.iteratec.osm.report.external.GraphiteEventSourcePath.list()}" multiple="multiple" optionKey="id" size="5" value="${graphiteServerInstance?.graphiteEventSourcePaths*.id}" class="many-to-many"/>
+				</div>
+			</div>
+
