@@ -31,7 +31,7 @@ class GraphiteServerController {
         redirect(action: "list", params: params)
     }
 
-    def list() { log.error("rklist")
+    def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
         [graphiteServerInstanceList: GraphiteServer.list(params), graphiteServerInstanceTotal: GraphiteServer.count()]
     }

@@ -1681,16 +1681,6 @@ Rickshaw.Graph.Annotate = function(args) {
 				element.classList.add('annotation');
 				this.elements.timeline.appendChild(element);
 
-//        element.addEventListener('mouseover', function(e) {
-//          annotation.boxes.forEach( function(box) {console.log("rk51");console.log(box.rangeElement);
-////            if ( box.rangeElement ) box.rangeElement.classList.toggle('active');
-//          });
-//        }, false);
-//        element.addEventListener('mouseout', function(e) {
-//          annotation.boxes.forEach( function(box) {console.log("rk53");console.log(box.rangeElement);
-//            if ( box.rangeElement ) box.rangeElement.classList.toggle('active');
-//          });
-//        }, false);
 				element.addEventListener('click', function(e) {
 					element.classList.toggle('active');
 					annotation.line.classList.toggle('active');
@@ -1712,18 +1702,18 @@ Rickshaw.Graph.Annotate = function(args) {
 					annotation.line = document.createElement('div');
 					annotation.line.classList.add('annotation_line');
 					self.graph.element.appendChild(annotation.line);
-					//rk
-          annotation.line.addEventListener('mouseover', function(e) {console.log("rk4");
-          annotation.boxes.forEach( function(box) {console.log("rk52");console.log(element);          
+
+          annotation.line.addEventListener('mouseover', function(e) {
+          annotation.boxes.forEach( function(box) {
             element.classList.toggle('active');
           });
         }, false);
-          annotation.line.addEventListener('mouseout', function(e) {console.log("rk5");
-          annotation.boxes.forEach( function(box) {console.log("rk53");console.log(element);        
+          annotation.line.addEventListener('mouseout', function(e) {
+          annotation.boxes.forEach( function(box) {
             element.classList.toggle('active');
           });
         }, false);
-//rk
+
 					if ( box.end ) {
 						box.rangeElement = document.createElement('div');
 						box.rangeElement.classList.add('annotation_range');

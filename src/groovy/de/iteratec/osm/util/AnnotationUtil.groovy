@@ -23,12 +23,14 @@ class AnnotationUtil {
      */
     public static void fillWithAnnotations(
             Map<String, Object> modelToRender,
-            Interval timeFrame, EventService eventService)
+            Interval timeFrame,
+            Collection<Long> selectedFolder,
+            EventService eventService)
     {
         Date resetFromDate = timeFrame.getStart().toDate()
         Date resetToDate = timeFrame.getEnd().toDate()
 
-        List<Event> annotationContent = eventService.findAllEventsBetweenDate(resetFromDate, resetToDate)
+        List<Event> annotationContent = eventService.retrieveEventsByDateRangeAndVisibilityAndJobGroup(resetFromDate, resetToDate, selectedFolder)
         ArrayList<String> annotations = new ArrayList<String>()
 
         annotationContent.eachWithIndex { item, index ->
