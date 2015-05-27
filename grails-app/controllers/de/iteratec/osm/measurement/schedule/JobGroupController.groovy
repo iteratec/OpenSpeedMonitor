@@ -26,7 +26,6 @@ class JobGroupController {
     static scaffold = true
 
     def update() {
-        log.error("rkrkrk");
         def jobGroupInstance = JobGroup.get(params.id)
         if (!jobGroupInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
