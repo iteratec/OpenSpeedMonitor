@@ -17,63 +17,16 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import org.springframework.dao.DataIntegrityViolationException
 
 /**
  * JobGroupController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
  */
 class JobGroupController {
-
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
-    def index() {
-        redirect(action: "list", params: params)
-    }
-
-    def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [jobGroupInstanceList: JobGroup.list(params), jobGroupInstanceTotal: JobGroup.count()]
-    }
-
-    def create() {
-        [jobGroupInstance: new JobGroup(params)]
-    }
-
-    def save() {
-        def jobGroupInstance = new JobGroup(params)
-        if (!jobGroupInstance.save(flush: true)) {
-            render(view: "create", model: [jobGroupInstance: jobGroupInstance])
-            return
-        }
-
-		flash.message = message(code: 'default.created.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroupInstance.id])
-        redirect(action: "show", id: jobGroupInstance.id)
-    }
-
-    def show() {
-        def jobGroupInstance = JobGroup.get(params.id)
-        if (!jobGroupInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        [jobGroupInstance: jobGroupInstance]
-    }
-
-    def edit() {
-        def jobGroupInstance = JobGroup.get(params.id)
-        if (!jobGroupInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        [jobGroupInstance: jobGroupInstance]
-    }
+    static scaffold = true
 
     def update() {
+        log.error("rkrkrk");
         def jobGroupInstance = JobGroup.get(params.id)
         if (!jobGroupInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
@@ -103,24 +56,5 @@ class JobGroupController {
 
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroupInstance.id])
         redirect(action: "show", id: jobGroupInstance.id)
-    }
-
-    def delete() {
-        def jobGroupInstance = JobGroup.get(params.id)
-        if (!jobGroupInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            jobGroupInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "show", id: params.id)
-        }
     }
 }
