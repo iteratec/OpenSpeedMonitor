@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -97,11 +98,17 @@ class EventService {
     }
 
     List retrieveEventsByDateRangeAndVisibilityAndJobGroup(Date resetFromDate, Date resetToDate, Collection<Long> selectedFolder){
-        def query = Event.where {
-            (eventDate >= resetFromDate && eventDate <= resetToDate) && ((globallyVisible == true) || ((globallyVisible == false) && (jobGroups.id in selectedFolder)))
+        List result = Event.createCriteria().list {
+            createAlias('jobGroups', 'jg', CriteriaSpecification.LEFT_JOIN)
+            and {
+                between('eventDate', resetFromDate, resetToDate)
+                or {
+                    eq('globallyVisible', true)
+                    inList('jg.id', selectedFolder)
+                }
+            }
         }
-        def results = query.list()
-        return results;
+        return result;
     }
 
     /**

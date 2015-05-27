@@ -25,6 +25,4 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 	
 	initTimepicker(false);
 	
-	initChosenSelects(noResultsTextForChosenSelects);
-	
 }

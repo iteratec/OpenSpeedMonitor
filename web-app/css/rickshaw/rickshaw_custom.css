@@ -488,12 +488,11 @@
 	margin: 0;
 	padding: 0;
 	cursor: pointer;
-	/*margin: 2px;*/
 }
 
 .rickshaw_legend li {
-	padding: 0 0 0 2px;
-	min-width: 80px;
+	padding: 0 0 0 0px;
+	min-width: 483px;
 	white-space: nowrap;
 }
 
