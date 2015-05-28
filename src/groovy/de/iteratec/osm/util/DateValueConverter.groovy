@@ -21,7 +21,6 @@ class DateValueConverter implements ValueConverter{
         if (value) {
             String strDate = SIMPLE_DATE_FORMAT.format(value);
             Date parsedDate = SIMPLE_DATE_FORMAT.parse(strDate);
-//        return SIMPLE_DATE_FORMAT.parse(value)
             return parsedDate
         } else {
             return null;

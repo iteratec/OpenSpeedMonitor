@@ -1337,8 +1337,8 @@ class TestDataUtil {
 	 * @param measuredValueId
 	 * @param cause
 	 */
-	public static void createUpdateEvent(Long measuredValueId, MeasuredValueUpdateEvent.UpdateCause cause){
-		new MeasuredValueUpdateEvent(
+	public static MeasuredValueUpdateEvent createUpdateEvent(Long measuredValueId, MeasuredValueUpdateEvent.UpdateCause cause){
+		return new MeasuredValueUpdateEvent(
 			dateOfUpdate: new Date(),
 			measuredValueId: measuredValueId,
 			updateCause: cause

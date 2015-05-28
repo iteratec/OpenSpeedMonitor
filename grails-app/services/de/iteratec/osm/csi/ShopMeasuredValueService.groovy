@@ -230,7 +230,7 @@ class ShopMeasuredValueService {
 	 * 		The {@link MeasuredValue} to be calculated.
 	 * @return The calculated {@link MeasuredValue}.
 	 */
-	private MeasuredValue calcMv(MeasuredValue toBeCalculated) {
+	MeasuredValue calcMv(MeasuredValue toBeCalculated) {
 		
 		Contract.requiresArgumentNotNull("toBeCalculated", toBeCalculated);
 		

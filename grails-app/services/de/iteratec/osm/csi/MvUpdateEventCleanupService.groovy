@@ -22,17 +22,12 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
-import org.joda.time.DateTime
-import org.springframework.transaction.TransactionStatus
-
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.MeasuredValueDaoService
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.MeasuredValueTagService
+import org.springframework.transaction.TransactionStatus
 
 /**
  * Contains the logic to ...
@@ -50,7 +45,6 @@ class MvUpdateEventCleanupService {
 	PageMeasuredValueService pageMeasuredValueService
 	ShopMeasuredValueService shopMeasuredValueService
 	MeasuredValueTagService measuredValueTagService
-	ConfigService configService
 	InMemoryConfigService inMemoryConfigService
 	BatchActivityService batchActivityService
 
@@ -88,8 +82,7 @@ class MvUpdateEventCleanupService {
 	}
 	void closeAndCalculateIfNecessary(List<MeasuredValue> mvsOpenAndExpired, boolean createBatchActivity){
 		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate MeasuredValues", createBatchActivity)
-		List<MeasuredValueUpdateEvent> allUpdateEvents = MeasuredValueUpdateEvent.list()
-		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${allUpdateEvents.size()} update events in db before cleanup.")
+		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${MeasuredValueUpdateEvent.count()} update events in db before cleanup.")
 		List<MeasuredValueUpdateEvent> updateEventsToBeDeleted = measuredValueDaoService.getUpdateEvents(mvsOpenAndExpired*.ident())
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${updateEventsToBeDeleted.size()} update events should get deleted.")
 		
@@ -105,13 +98,18 @@ class MvUpdateEventCleanupService {
 				justToClose.add(mvOpenAndExpired)
 			}
 		}
-		activity.updateStatus(["stage":"Closing all already calculated MeasuredValues","progress":batchActivityService.calculateProgress(100,(100*(1/3)) as Integer) ])
+        List<MeasuredValueUpdateEvent> ueToBeDeletedOfMvToBeCalculated = updateEventsToBeDeleted.findAll{eventToBeDeleted -> toCalculateAndClose*.ident().contains(eventToBeDeleted.measuredValueId)}
+        log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${ueToBeDeletedOfMvToBeCalculated.size()} update events of mv to be calculated should get deleted.")
+        List<MeasuredValueUpdateEvent> ueToBeDeletedOfMvJustToClose = updateEventsToBeDeleted.findAll{eventToBeDeleted -> justToClose*.ident().contains(eventToBeDeleted.measuredValueId)}
+        log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${ueToBeDeletedOfMvJustToClose.size()} update events of mv just to close should get deleted.")
+
+        activity.updateStatus(["stage":"Closing all already calculated MeasuredValues","progress":batchActivityService.calculateProgress(100,(100*(1/3)) as Integer) ])
 		try{
 			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${justToClose.size()} already calculated MeasuredValues should get closed now.")
 			justToClose.eachWithIndex {MeasuredValue toClose, int index ->
 				activity.updateStatus(["progressWithinStage":batchActivityService.calculateProgress(justToClose.size(),index+1)])
 				MeasuredValue.withTransaction{TransactionStatus status ->
-					closeMv(toClose)
+					closeMv(toClose, ueToBeDeletedOfMvJustToClose)
 					status.flush()
 				}
 				activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
@@ -123,18 +121,20 @@ class MvUpdateEventCleanupService {
 		}
 		activity.updateStatus(["progress":batchActivityService.calculateProgress(100,(100*(2/3)) as Integer) ])
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${toCalculateAndClose.size()} open and expired MeasuredValues should get calculated now.")
-		if(toCalculateAndClose.size() > 0) closeAndCalculate(toCalculateAndClose, activity)
+		if(toCalculateAndClose.size() > 0) closeAndCalculate(toCalculateAndClose, ueToBeDeletedOfMvToBeCalculated, activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE, "progress":batchActivityService.calculateProgress(100,100)])
-		allUpdateEvents = MeasuredValueUpdateEvent.list()
-		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${allUpdateEvents.size()} update events in db after cleanup.")
+		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${MeasuredValueUpdateEvent.count()} update events in db after cleanup.")
 	}
-	void closeAndCalculate(List<MeasuredValue> mvsToCalculateAndClose, BatchActivity activity){
-		
+	void closeAndCalculate(List<MeasuredValue> mvsToCalculateAndClose, List<MeasuredValueUpdateEvent> updateEventsToBeDeleted, BatchActivity activity){
+
 		try{
+
 			List<MeasuredValue> pageMvsToCalculate = mvsToCalculateAndClose.findAll{ it.aggregator.name.equals(AggregatorType.PAGE) }
 			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${pageMvsToCalculate.size()} open and expired page MeasuredValues should get calculated now.")
-			if(pageMvsToCalculate.size() > 0) calculateAndClosePageMvs(pageMvsToCalculate, activity)
+			if(pageMvsToCalculate.size() > 0) calculateAndClosePageMvs(pageMvsToCalculate, updateEventsToBeDeleted, activity)
+
 			activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
+
 		} catch(Exception e){
 			def message = "An error occurred while calculation and closing page MeasuredValues."
 			log.error(message, e)
@@ -142,10 +142,13 @@ class MvUpdateEventCleanupService {
 		}
 		
 		try{
+
 			List<MeasuredValue> shopMvsToCalculate = mvsToCalculateAndClose.findAll{ it.aggregator.name.equals(AggregatorType.SHOP) }
 			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${shopMvsToCalculate.size()} open and expired shop MeasuredValues should get calculated now.")
-			if(shopMvsToCalculate) calculateAndCloseShopMvs(shopMvsToCalculate, activity)
+			if(shopMvsToCalculate) calculateAndCloseShopMvs(shopMvsToCalculate, updateEventsToBeDeleted, activity)
+
 			activity.updateStatus( ["successfulActions": ++activity.getSuccessfulActions()])
+
 		} catch(Exception e){
 			def message = "An error occurred while calculation and closing shop MeasuredValues."
 			log.error(message, e)
@@ -154,29 +157,37 @@ class MvUpdateEventCleanupService {
 		
 	}
 	
-	void calculateAndClosePageMvs(List<MeasuredValue> pageMvsToCalculateAndClose, BatchActivity activity){
+	void calculateAndClosePageMvs(List<MeasuredValue> pageMvsToCalculateAndClose, List<MeasuredValueUpdateEvent> updateEventsToBeDeleted, BatchActivity activity){
+
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: Creating caching container for calculating page MeasuredValues ...")
-		CachingContainerFactory ccFactory = new CachingContainerFactory(pageMvsToCalculateAndClose)
+		CachingContainerFactory ccFactory = new CachingContainerFactory(pageMvsToCalculateAndClose, measuredValueTagService, pageMeasuredValueService)
 		log.info("... DONE creating caching container")
+        List<MeasuredValueUpdateEvent> ueToBeDeletedOfPageMvs = updateEventsToBeDeleted.findAll{eventToBeDeleted -> pageMvsToCalculateAndClose*.ident().contains(eventToBeDeleted.measuredValueId)}
+        log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${ueToBeDeletedOfPageMvs.size()} update events of page mv to be calculated should get deleted.")
+
 		int size = pageMvsToCalculateAndClose.size()
 		activity.updateStatus(["stage":"Calculate and Close Page MV"])
 		pageMvsToCalculateAndClose.eachWithIndex{MeasuredValue dpmvToCalcAndClose, int index ->
 			activity.updateStatus(["progressWithinStage":batchActivityService.calculateProgress(size,index+1)])
 			MeasuredValue.withTransaction {TransactionStatus status ->
 				pageMeasuredValueService.calcMv(dpmvToCalcAndClose, ccFactory.createContainerFor(dpmvToCalcAndClose))
-				closeMv(dpmvToCalcAndClose)
+				closeMv(dpmvToCalcAndClose, ueToBeDeletedOfPageMvs)
 				status.flush()
 			}
 			activity.updateStatus( ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
-	void calculateAndCloseShopMvs(List<MeasuredValue> shopMvsToCalculate, BatchActivity activity){
+	void calculateAndCloseShopMvs(List<MeasuredValue> shopMvsToCalculate, List<MeasuredValueUpdateEvent> updateEventsToBeDeleted, BatchActivity activity){
+
+        List<MeasuredValueUpdateEvent> ueToBeDeletedOfShopMvs = updateEventsToBeDeleted.findAll{eventToBeDeleted -> shopMvsToCalculate*.ident().contains(eventToBeDeleted.measuredValueId)}
+        log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${ueToBeDeletedOfShopMvs.size()} update events of shop mv to be calculated should get deleted.")
+
 		int size = shopMvsToCalculate.size()
 		shopMvsToCalculate.eachWithIndex {MeasuredValue smvToCalcAndClose, int index ->
 			activity.updateStatus(["progressWithinStage":batchActivityService.calculateProgress(size,index+1)])
 			MeasuredValue.withTransaction {TransactionStatus status ->
 				shopMeasuredValueService.calcMv(smvToCalcAndClose)
-				closeMv(smvToCalcAndClose)
+				closeMv(smvToCalcAndClose, ueToBeDeletedOfShopMvs)
 				status.flush()
 			}
 			activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
@@ -187,126 +198,13 @@ class MvUpdateEventCleanupService {
 	 * Closes {@link MeasuredValue} toClose and deletes all associated {@link MeasuredValueUpdateEvent}s. 
 	 * @param toClose
 	 */
-	void closeMv(MeasuredValue toClose){
+	void closeMv(MeasuredValue toClose, List<MeasuredValueUpdateEvent> containAllEventsOfToClose){
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: The following MeasuredValue should get closed now: ${toClose}")
 		toClose.closedAndCalculated = true
 		toClose.save(failOnError: true)
-		List<MeasuredValueUpdateEvent> updateEventsToDelete = measuredValueDaoService.getUpdateEvents(toClose.ident())
+		List<MeasuredValueUpdateEvent> updateEventsToDelete = containAllEventsOfToClose.findAll{mvue-> mvue.measuredValueId == toClose.ident()}
 		log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${updateEventsToDelete.size()} MeasuredValueUpdateEvents should get deleted now.")
 		updateEventsToDelete*.delete(failOnError: true)
 	}
 	
-	/**
-	 * 
-	 * Delivers an instance of {@link MvCachingContainer} for every page {@link MeasuredValue} given when constructed the factory.
-	 * The caching container is necessary to calculate a {@link MeasuredValue} with the following service method: {@link PageMeasuredValueService#calcMv}
-	 * @author nkuhn
-	 * @see PageMeasuredValueService
-	 *
-	 */
-	class CachingContainerFactory{
-		
-		Map<String, JobGroup> jobGroupCache = [:]
-		Map<String, JobGroup> pageCache = [:]
-		
-		List<MeasuredValue> dailyPageMvsToCalculate
-		Map<String, List<JobGroup>> dailyJobGroupsByStartDate = [:].withDefault{ new ArrayList<JobGroup>() }
-		Map<String, List<Page>> dailyPagesByStartDate = [:].withDefault{ new ArrayList<Page>() }
-		Map<String, Map<String, List<MeasuredValue>>> dailyHemvMapByStartDate = [:]
-		
-		List<MeasuredValue> weeklyPageMvsToCalculate
-		Map<String, List<JobGroup>> weeklyJobGroupsByStartDate = [:].withDefault{ new ArrayList<JobGroup>() }
-		Map<String, List<Page>> weeklyPagesByStartDate = [:].withDefault{ new ArrayList<Page>() }
-		Map<String, Map<String, List<MeasuredValue>>> weeklyHemvMapByStartDate = [:]
-		
-		public CachingContainerFactory(List<MeasuredValue> pmvs){
-			if(pmvs.findAll{ !it.aggregator.name.equals(AggregatorType.PAGE) }.size() > 0) {
-				throw new IllegalArgumentException("Class CachingContainerFactory works just with page MeasuredValues!")
-			}
-			initialize(pmvs)
-		}
-		void initialize(List<MeasuredValue> pmvs){
-			dailyPageMvsToCalculate = pmvs.findAll{ it.interval.intervalInMinutes ==  MeasuredValueInterval.DAILY}
-			weeklyPageMvsToCalculate = pmvs.findAll{ it.interval.intervalInMinutes ==  MeasuredValueInterval.WEEKLY }
-			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${dailyPageMvsToCalculate.size()} daily page MeasuredValues in initialization of caching container factory.")
-			log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${weeklyPageMvsToCalculate.size()} weekly page MeasuredValues in initialization of caching container factory.")
-			
-			fillUniqueJobgroupAndPageListsPerStartdate()
-			prepareHemvMapsByStartdate()
-			
-		}
-		MvCachingContainer createContainerFor(MeasuredValue mv){
-			return new MvCachingContainer(
-				csiGroupToCalcMvFor: jobGroupCache[mv.tag],
-				pageToCalcMvFor: pageCache[mv.tag],
-				hmvsByCsiGroupPageCombination: this.getHemvMapOf(mv))
-		}
-		Map<String,List<MeasuredValue>> getHemvMapOf(MeasuredValue mv){
-			if(mv.interval.intervalInMinutes == MeasuredValueInterval.DAILY) return dailyHemvMapByStartDate[mv.started.toString()]
-			else if(mv.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) return weeklyHemvMapByStartDate[mv.started.toString()]
-			else throw new IllegalArgumentException("Page MeasuredValues can only have interval DAILY or WEEKLY! This MeasuredValue caused this Exception: ${mv}")
-		}
-		void fillUniqueJobgroupAndPageListsPerStartdate(){
-			dailyPageMvsToCalculate.each {dpmv ->
-				
-				JobGroup jobGroup = jobGroupCache[dpmv.tag]
-				List<JobGroup> allGroups = JobGroup.list()
-				if( jobGroup == null){
-					jobGroup = measuredValueTagService.findJobGroupOfWeeklyPageTag(dpmv.tag)
-					jobGroupCache[dpmv.tag] = jobGroup
-				}
-				dailyJobGroupsByStartDate[dpmv.started.toString()].add(jobGroup)
-				
-				Page page = pageCache[dpmv.tag]
-				if(page == null){
-					page = measuredValueTagService.findPageOfWeeklyPageTag(dpmv.tag)
-					pageCache[dpmv.tag] = page
-				}
-				dailyPagesByStartDate[dpmv.started.toString()].add(page)
-				
-			}
-			weeklyPageMvsToCalculate.each {wpmv ->
-				
-				JobGroup jobGroup = jobGroupCache[wpmv.tag]
-				if( jobGroup == null){
-					jobGroup = measuredValueTagService.findJobGroupOfWeeklyPageTag(wpmv.tag)
-					jobGroupCache[wpmv.tag] = jobGroup
-				}
-				weeklyJobGroupsByStartDate[wpmv.started.toString()].add(jobGroup)
-				
-				Page page = pageCache[wpmv.tag]
-				if(page == null){
-					page = measuredValueTagService.findPageOfWeeklyPageTag(wpmv.tag)
-					pageCache[wpmv.tag] = page
-				}
-				weeklyPagesByStartDate[wpmv.started.toString()].add(page)
-				
-			}
-		}
-		void prepareHemvMapsByStartdate(){
-			dailyPageMvsToCalculate*.started.unique().each{Date uniqueStartDate ->
-				
-				DateTime startForGettingHemv = new DateTime(uniqueStartDate)
-				String uniqueStartDateAsString = uniqueStartDate.toString()
-				
-				dailyHemvMapByStartDate[uniqueStartDateAsString] = pageMeasuredValueService.getHmvsByCsiGroupPageCombinationMap(
-					dailyJobGroupsByStartDate[uniqueStartDateAsString].unique(),
-					dailyPagesByStartDate[uniqueStartDateAsString].unique(),
-					startForGettingHemv,
-					startForGettingHemv.plusMinutes(MeasuredValueInterval.DAILY))
-			}
-			weeklyPageMvsToCalculate*.started.unique().each{Date uniqueStartDate ->
-				
-				DateTime startForGettingHemv = new DateTime(uniqueStartDate)
-				String uniqueStartDateAsString = uniqueStartDate.toString()
-				
-				weeklyHemvMapByStartDate[uniqueStartDateAsString] = pageMeasuredValueService.getHmvsByCsiGroupPageCombinationMap(
-					weeklyJobGroupsByStartDate[uniqueStartDateAsString].unique(),
-					weeklyPagesByStartDate[uniqueStartDateAsString].unique(),
-					startForGettingHemv,
-					startForGettingHemv.plusMinutes(MeasuredValueInterval.WEEKLY))
-			}
-		}
-	}
-
 }
