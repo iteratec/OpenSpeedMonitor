@@ -19,12 +19,10 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
-import de.iteratec.osm.util.DateValueConverter
-import de.iteratec.osm.util.DoubleValueConverter
+import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -55,12 +53,6 @@ class TabularResultPresentationControllerTests {
 	@Before
 	public void setUp()
 	{
-		// Because spring resources not loaded in unit tests, declare them locally:
-		defineBeans {
-            doubleValueConverter(DoubleValueConverter)
-            dateValueConverter(DateValueConverter)
-        }
-
 		// Enable constraint tests:
 		mockForConstraintsTests(ListResultsCommand.class);
 		
@@ -90,7 +82,7 @@ class TabularResultPresentationControllerTests {
 		
 		assertFalse(out.validate());
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -109,7 +101,7 @@ class TabularResultPresentationControllerTests {
 
 		assertFalse(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -132,7 +124,7 @@ class TabularResultPresentationControllerTests {
 
 		params.toHour = '13:00'
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -149,7 +141,7 @@ class TabularResultPresentationControllerTests {
 		// Verification:
 		assertTrue(out.validate())
 		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPage)
+		assertNotNull("Collections are never null", out.selectedPages)
 		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
 		assertNotNull("Collections are never null", out.selectedBrowsers)
 		assertNotNull("Collections are never null", out.selectedLocations)
@@ -161,9 +153,9 @@ class TabularResultPresentationControllerTests {
 		assertEquals(1, out.selectedFolder.size())
 		assertTrue(out.selectedFolder.contains(1L))
 
-		assertEquals(2, out.selectedPage.size())
-		assertTrue(out.selectedPage.contains(1L))
-		assertTrue(out.selectedPage.contains(5L))
+		assertEquals(2, out.selectedPages.size())
+		assertTrue(out.selectedPages.contains(1L))
+		assertTrue(out.selectedPages.contains(5L))
 
 		assertFalse(out.selectedAllMeasuredEvents as boolean)
 		assertEquals(3, out.selectedMeasuredEventIds.size())
@@ -216,7 +208,7 @@ class TabularResultPresentationControllerTests {
 		params.toHour = '13:00'
 		
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -248,7 +240,7 @@ class TabularResultPresentationControllerTests {
 		params.toHour = '11:00'
 		
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -280,7 +272,7 @@ class TabularResultPresentationControllerTests {
 		params.toHour = '12:00'
 		
 		params.selectedFolder = '1'
-		params.selectedPage = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
