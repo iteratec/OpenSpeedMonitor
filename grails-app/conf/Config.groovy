@@ -143,6 +143,7 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/job/list'                					: ["permitAll"],
     '/job/getRunningAndRecentlyFinishedJobs'    : ["permitAll"],
     '/job/nextExecution'                        : ["permitAll"],
+    '/job/getLastRun'                           : ["permitAll"],
 	'/script/list'                				: ["permitAll"],
 	'/queueStatus/list'                			: ["permitAll"],
 	'/queueStatus/refresh'                		: ["permitAll"],
