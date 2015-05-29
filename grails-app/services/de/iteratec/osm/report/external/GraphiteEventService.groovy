@@ -20,76 +20,122 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import groovy.json.JsonSlurper
+import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
 
 /**
  * GraphiteEventService
- * A service to fetch Events from GraphiteServers
+ * A service to fetch Events from GraphiteServers.
  */
 class GraphiteEventService {
 
     EventDaoService eventDaoService
     BatchActivityService batchActivityService
-    JsonSlurper slurper = new JsonSlurper()
+	HttpRequestService httpRequestService
+    MeasuredValueUtilService measuredValueUtilService
+
+    static final DateTimeFormatter GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT =  DateTimeFormat.forPattern("HH:mm_yyyyMMdd")
 
     static transactional = true
 
     /**
-     * Iterates over all existing GraphiteServer, if they got any GraphiteEventSourcePath,
-     * they will be used to fetch new Events
+     * Iterates over all existing GraphiteServers. If they got any GraphiteEventSourcePath,
+     * these will be used to fetch new Events from.
      * @param createBatchActivity defines if a BatchActivity should be created and updated
+     * @param lastNMinutes Defines oldest Events that get fetched from EventSources.
+     * @see de.iteratec.osm.report.external.GraphiteEventCollectorJob
      */
-    public void fetchGraphiteEvents(boolean createBatchActivity) {
-        def list = GraphiteServer.list()
-        int size = list.size()
+    public void fetchGraphiteEvents(boolean createBatchActivity, int lastNMinutes) {
+
+        DateTime until = measuredValueUtilService.getNowInUtc()
+        DateTime from = until.minusMinutes(lastNMinutes)
+        String untilFormatted = GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT.print(until)
+        String fromFormatted = GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT.print(from)
+
+        def graphiteServers = GraphiteServer.list()
+        int size = graphiteServers.size()
         BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.CREATE,"Fetch Graphite Events",createBatchActivity)
-        list.eachWithIndex {server,index ->
+
+        graphiteServers.eachWithIndex {server,index ->
             activity.updateStatus(["progress": batchActivityService.calculateProgress(size,index+1), "stage": "Delete JobResults"])
-            server.graphiteEventSourcePaths.each {
-                createEvents(it, server)
+            server.graphiteEventSourcePaths.each {eventSourcePath->
+                createEvents(eventSourcePath, server, fromFormatted, untilFormatted)
             }
         }
+
     }
     /**
      * Fetches the Events from the given GraphiteServer within the path.
      * @param eventSourcePath
      * @param server
+     * @param from
+     * @param until
      * @return List of fetched Events, they are already saved
      */
-    private List<Event> createEvents(GraphiteEventSourcePath eventSourcePath, GraphiteServer server){
+    private List<Event> createEvents(GraphiteEventSourcePath eventSourcePath, GraphiteServer server, String from, String until){
         def events = []
-        def json = getEventJSON(eventSourcePath.path, server)
+        def json = getEventJSON(eventSourcePath.targetMetricName, server, from, until)
         json.each{
             String shortName = it.target
             it.datapoints.each{point ->
                 long time = Long.parseLong(point[1] as String)
-                events << eventDaoService.createEvent(shortName,new DateTime(time),"",false,eventSourcePath.jobGroups)
+                events << eventDaoService.createEvent(
+                        "${eventSourcePath.staticPrefix}${shortName}",
+                        new DateTime(time),
+                        "Read from Graphite: ${shortName} [${eventSourcePath.targetMetricName}]",
+                        false,
+                        eventSourcePath.jobGroups)
             }
         }
         return events
     }
     /**
      * Calls the path from a GraphiteServer and converts it into a JSONObject
-     * @param path path within the server
+     * @param eventSourceMetricName Name of the metric to fetch.
      * @param server GraphiteServer
+     * @param from
+     * @param until
      * @return
      */
-    private Object getEventJSON(String path, GraphiteServer server){
-        def url = server.serverAdress + path
-        if(!url.startsWith("http")) url = "http://" +url
-        url = url.toURL()
-        return parseJSON(url.text)
+    private Object getEventJSON(String eventSourceMetricName, GraphiteServer server, String from, String until){
+
+        String webappUrl = createWebappUrlOf(server)
+        LinkedHashMap<String, String> queryParams = ['format': 'json', 'from': from, 'until': until, 'target': eventSourceMetricName]
+
+        return httpRequestService.getJsonResponse(webappUrl, server.webappPathToRenderingEngine, queryParams)
     }
 
-    /**
-     * Converts a String into a JSON Object
-     * @param text
-     * @return
-     */
-    private Object parseJSON(String text){
-        return slurper.parseText(text)
+    String createWebappUrlOf(GraphiteServer server){
+
+        try {
+            validateWebappDataOf(server)
+        } catch (IllegalArgumentException iae) {
+            log.error("No events could get retrieved from grahite server cause webapp isn't set correctly: $server")
+        }
+
+        return getWebappUrlOf(server)
+
     }
+
+    String getWebappUrlOf(GraphiteServer server) {
+        return server.webappProtocol.scheme + getUrlOfWebappInclTrailingSlash(server)
+    }
+
+    String getUrlOfWebappInclTrailingSlash(server){
+        return httpRequestService.addTrailingSlashIfMissing(
+                httpRequestService.removeLeadingSlashIfExisting(server.webappUrl)
+            )
+    }
+
+    void validateWebappDataOf(GraphiteServer server){
+        if (server.webappProtocol == null) throw new IllegalArgumentException("webappProtocol not set on graphite server: ${server}")
+        if (server.webappUrl == null) throw new IllegalArgumentException("webappUrl not set on graphite server: ${server}")
+        if (server.webappPathToRenderingEngine == null) throw new IllegalArgumentException("webappPathToRenderingEngine not set on graphite server: ${server}")
+    }
+
 }

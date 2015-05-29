@@ -17,66 +17,103 @@
 
 package de.iteratec.osm.report.external
 
+import co.freeside.betamax.Betamax
+import co.freeside.betamax.Recorder
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
+import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.json.JsonSlurper
+import groovyx.net.http.RESTClient
+import org.apache.http.HttpHost
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.junit.Rule
 import spock.lang.Specification
+
+import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
+import static org.hamcrest.Matchers.*
+import static org.hamcrest.MatcherAssert.*
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(GraphiteEventService)
-@Mock([GraphiteServer, BatchActivity, Event])
+@Mock([GraphiteServer, BatchActivity, Event, JobGroup, GraphiteEventSourcePath])
 class GraphiteEventServiceSpec extends Specification{
+
     GraphiteEventService serviceUnderTest
-    void "test parseJSON"() {
+    @Rule
+    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
+    public static final String jobGroupName = 'associated JobGroup'
+
+    void setup(){
+
+        serviceUnderTest = service
+
+        //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
+        serviceUnderTest.batchActivityService = new BatchActivityService()
+        serviceUnderTest.eventDaoService = new EventDaoService()
+        MeasuredValueUtilService mockedMeasuredValueUtilService = new MeasuredValueUtilService()
+        mockedMeasuredValueUtilService.metaClass.getNowInUtc = {-> new DateTime(2015, 5, 29, 5, 0, 0, DateTimeZone.UTC)}
+        serviceUnderTest.measuredValueUtilService = mockedMeasuredValueUtilService
+        mockHttpBuilderToUseBetamax()
+
+    }
+
+    @Betamax(tape = 'GraphiteEventServiceSpec_retrieve_events')
+    void "retrieve events from test graphite server"() {
         given:
-            serviceUnderTest = service
-            serviceUnderTest.batchActivityService = new BatchActivityService()
-            def amounts = [5,1]
-            int amountOfEventSourcePaths = amounts.sum() as Integer
-            createGraphiteServer(amounts)
-            serviceUnderTest.metaClass.getEventJSON = {String path, GraphiteServer server->amountOfEventSourcePaths--; return []}
+            createGraphiteServerWithSourcePaths()
         when:
-            serviceUnderTest.fetchGraphiteEvents(false)
+            serviceUnderTest.fetchGraphiteEvents(false, 1)
         then:
-        GraphiteServer.list().size() == amounts.size()
-            amountOfEventSourcePaths == 0
+        List<Event> allEvents = Event.list()
+        allEvents.size() == 6
+        assertThat(allEvents*.shortName, everyItem(is('from graphite|my-graph')))
+        assertThat(allEvents*.description, everyItem(is('Read from Graphite: my-graph [alias(drawAsInfinite(server.monitor02.*.load.load_fifteen),"my-graph")]')))
+        assertThat(allEvents*.globallyVisible, everyItem(is(false)))
+        assertThat(allEvents*.jobGroups*.name, everyItem(everyItem(is(jobGroupName))))
     }
 
-    void "test createdEvents"(){
-        given:
-            serviceUnderTest = service
-            serviceUnderTest.batchActivityService = new BatchActivityService()
-            serviceUnderTest.eventDaoService = new EventDaoService()
-            def amounts = [2,3]
-            int amountOfEventSourcePaths = amounts.sum() as Integer
-            createGraphiteServer(amounts)
-            serviceUnderTest.metaClass.getEventJSON = {String path, GraphiteServer server-> createJson()}
-        when:
-            serviceUnderTest.fetchGraphiteEvents(false)
-        then:
-            Event.list().size() == amountOfEventSourcePaths * 2
+    private void createGraphiteServerWithSourcePaths(){
+        GraphiteServer server = new GraphiteServer(
+            serverAdress: 'url.to.carbon',
+            port: 2003,
+            webappUrl: 'monitoring.hh.iteratec.de/',
+            webappProtocol: Protocol.HTTP,
+            webappPathToRenderingEngine: 'render'
+        )
+        JobGroup jobGroup = new JobGroup(
+                name: jobGroupName,
+                groupType: JobGroupType.CSI_AGGREGATION,
+                graphiteServers: [server],
+        )
+        GraphiteEventSourcePath eventSourcePath = new GraphiteEventSourcePath(
+            staticPrefix: 'from graphite|',
+            targetMetricName: 'alias(drawAsInfinite(server.monitor02.*.load.load_fifteen),"my-graph")'
+        )
+        eventSourcePath.addToJobGroups(jobGroup)
+        server.addToGraphiteEventSourcePaths(eventSourcePath)
+        server.save(failOnError: true)
+
     }
-    private void createGraphiteServer(List<Integer> amountsOfEventSourcePaths){
-        amountsOfEventSourcePaths.each {
-            new GraphiteServer(serverAdress: "",graphiteEventSourcePaths: createEventSourcePath(it),graphitePaths: []).save(flush: true)
+
+    private void mockHttpBuilderToUseBetamax(){
+        Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
+        HttpRequestService httpRequestService = new HttpRequestService()
+        httpRequestService.metaClass.getRestClient = {String url ->
+            RESTClient restClient = new RESTClient(url)
+            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))
+            return restClient
         }
+        serviceUnderTest.httpRequestService = httpRequestService
     }
 
-    private Object createJson(){
-        new JsonSlurper().parseText('[{"target": "Global-Resources", "datapoints": [[null, 1431324300], [null, 1431327300]]}]')
-    }
-
-    private List<GraphiteEventSourcePath> createEventSourcePath(int amount){
-        def list = []
-        (1..amount).each {
-                list << new GraphiteEventSourcePath(path: "")
-        }
-        return list
-    }
 }

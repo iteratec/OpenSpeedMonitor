@@ -21,25 +21,31 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 
 /**
  * GraphiteEventSourcePath
- * A domain class describes the data object and it's mapping to the database
+ * Defines a graphite source to fetch {@link Event}s from.
  */
 class GraphiteEventSourcePath {
 
-    String path;
+    /**
+     * Serves as prefix in osm dashboard representation of fetched {@link Event}s.
+     */
+    String staticPrefix
+    /**
+     * Graphite metric name. Used to request events from graphite's webapp.
+     */
+    String targetMetricName
 
-	static hasMany = [jobGroups:JobGroup]	// tells GORM to associate other domain objects for a 1-n or n-m mapping
+	static hasMany = [jobGroups:JobGroup]
 
     static mapping = {
     }
 
     static constraints = {
+        staticPrefix(nullable: true)
+        targetMetricName()
     }
 
-    /*
-     * Methods of the Domain Class
-     */
-	@Override	// Override toString for a nicer / more descriptive UI
+	@Override
 	public String toString() {
-		return "${path}";
+		return "staticPrefix=${staticPrefix}|targetMetricName=${targetMetricName}"
 	}
 }

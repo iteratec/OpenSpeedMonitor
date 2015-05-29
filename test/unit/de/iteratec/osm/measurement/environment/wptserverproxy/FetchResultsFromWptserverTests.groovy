@@ -68,7 +68,7 @@ class FetchResultsFromWptserverTests {
 		//mock HttpBuilder in HttpRequestService to use betamax-proxy
 		Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
 		HttpRequestService httpRequestService = new HttpRequestService()
-		httpRequestService.metaClass.getClient = {WebPageTestServer wptserver ->
+		httpRequestService.metaClass.getRestClientFrom = {WebPageTestServer wptserver ->
 			RESTClient restClient = new RESTClient(wptserver.baseUrl)
 			restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))
 			return restClient

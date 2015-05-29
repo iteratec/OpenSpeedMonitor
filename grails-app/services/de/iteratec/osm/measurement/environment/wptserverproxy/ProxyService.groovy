@@ -84,7 +84,7 @@ class ProxyService {
 //		urlEncodedQueryString=urlEncodedQueryString.substring(0, urlEncodedQueryString.size()-1)
 //		log.info("queryStringScript=$urlEncodedQueryString")
 			
-		return httpRequestService.getClient(wptserver).post(
+		return httpRequestService.getRestClientFrom(wptserver).post(
 			path: 'runtest.php',
 			query: params,
 //			queryString: urlEncodedQueryString,
@@ -95,7 +95,7 @@ class ProxyService {
 	}
 	
 	HttpResponseDecorator cancelTest(WebPageTestServer wptserver, Map params) {
-		return httpRequestService.getClient(wptserver).post(
+		return httpRequestService.getRestClientFrom(wptserver).post(
 			path: 'cancelTest.php',
 			query: params,
 			contentType: ContentType.TEXT

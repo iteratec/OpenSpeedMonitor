@@ -6,14 +6,14 @@ package de.iteratec.osm.report.external
 class GraphiteEventCollectorJob {
 
     GraphiteEventService graphiteEventService
-    boolean createBatchActivity = true
+    boolean createBatchActivity = false
 
     static triggers = {
-        /** Each Day at 0:35 am. */
-        cron(name: 'DailyGraphiteEventCollection', cronExpression: '0 35 0 ? * *')
+        /** Each Hour at Minute 30. */
+        cron(name: 'HourlyGraphiteEventCollection', cronExpression: '0 30 * ? * *')
     }
 
     def execute() {
-        //graphiteEventService.fetchGraphiteEvents(createBatchActivity)
+        graphiteEventService.fetchGraphiteEvents(createBatchActivity, 60)
     }
 }
