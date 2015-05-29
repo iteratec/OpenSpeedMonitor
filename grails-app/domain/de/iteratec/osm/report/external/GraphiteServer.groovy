@@ -90,6 +90,12 @@ class GraphiteServer {
 
     @Override
     public String toString(){
-        return "carbon: ${serverAdress}:${port} | webapp's rendering engine: ${webappProtocol.scheme}${webappUrl}${webappPathToRenderingEngine}"
+        StringBuilder sb = new StringBuilder()
+        sb.append("instance object: ${super.toString()}\n")
+        sb.append((serverAdress && port) ? "carbon: ${serverAdress}:${port}\n" : '')
+        sb.append((webappProtocol && webappUrl && webappPathToRenderingEngine) ?
+                "webapp's rendering engine: ${webappProtocol.scheme}${webappUrl}${webappPathToRenderingEngine}\n" :
+                '')
+        return sb.toString()
     }
 }
