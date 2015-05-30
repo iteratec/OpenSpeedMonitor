@@ -327,6 +327,7 @@
 	width: 160px;
 	display: none;
 	cursor: pointer;
+    word-wrap:break-word;
 }
 
 .rickshaw_annotation_timeline .annotation .content:before {
