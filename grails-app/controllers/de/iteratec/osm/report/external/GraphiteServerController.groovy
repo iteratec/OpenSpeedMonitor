@@ -23,6 +23,7 @@ package de.iteratec.osm.report.external
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
  */
 class GraphiteServerController {
+
     static scaffold = true
 
     def update() {
@@ -56,4 +57,5 @@ class GraphiteServerController {
 		flash.message = message(code: 'default.updated.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), graphiteServerInstance.id])
         redirect(action: "show", id: graphiteServerInstance.id)
     }
+
 }

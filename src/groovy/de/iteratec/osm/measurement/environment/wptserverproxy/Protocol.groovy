@@ -5,19 +5,20 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
  */
 enum Protocol{
     HTTP(80, 'http://'),
-    HTTPS(443, 'https://')
+    HTTPS(443, 'https://');
+
+    private final int defaultPort
+    private final String scheme
 
     Protocol(int defaultPort, String scheme){
         this.defaultPort = defaultPort
         this.scheme = scheme
     }
-    private int defaultPort
-    private String scheme
 
-    public int getDefaultPort(){
+    public int defaultPort(){
         return this.defaultPort
     }
-    public String getScheme(){
+    public String scheme(){
         return this.scheme
     }
 }

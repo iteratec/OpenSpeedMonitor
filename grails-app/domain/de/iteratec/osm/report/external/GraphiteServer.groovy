@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report.external
 
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 
 /**
@@ -94,7 +93,7 @@ class GraphiteServer {
         sb.append("instance object: ${super.toString()}\n")
         sb.append((serverAdress && port) ? "carbon: ${serverAdress}:${port}\n" : '')
         sb.append((webappProtocol && webappUrl && webappPathToRenderingEngine) ?
-                "webapp's rendering engine: ${webappProtocol.scheme}${webappUrl}${webappPathToRenderingEngine}\n" :
+                "webapp's rendering engine: ${webappProtocol.scheme()}${webappUrl}${webappPathToRenderingEngine}\n" :
                 '')
         return sb.toString()
     }

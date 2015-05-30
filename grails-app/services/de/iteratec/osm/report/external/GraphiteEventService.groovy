@@ -83,10 +83,10 @@ class GraphiteEventService {
         json.each{
             String shortName = it.target
             it.datapoints.each{point ->
-                long time = Long.parseLong(point[1] as String)
+                long unixTimeStamp = Long.parseLong(point[1] as String) * 1000L
                 events << eventDaoService.createEvent(
                         "${eventSourcePath.staticPrefix}${shortName}",
-                        new DateTime(time),
+                        new DateTime(unixTimeStamp),
                         "Read from Graphite: ${shortName} [${eventSourcePath.targetMetricName}]",
                         false,
                         eventSourcePath.jobGroups)
@@ -123,7 +123,7 @@ class GraphiteEventService {
     }
 
     String getWebappUrlOf(GraphiteServer server) {
-        return server.webappProtocol.scheme + getUrlOfWebappInclTrailingSlash(server)
+        return server.webappProtocol.scheme() + getUrlOfWebappInclTrailingSlash(server)
     }
 
     String getUrlOfWebappInclTrailingSlash(server){

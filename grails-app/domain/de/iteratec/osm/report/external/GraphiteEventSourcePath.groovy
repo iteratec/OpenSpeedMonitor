@@ -41,7 +41,7 @@ class GraphiteEventSourcePath {
 
     static constraints = {
         staticPrefix(nullable: true)
-        targetMetricName()
+        targetMetricName(maxSize: 255)
     }
 
 	@Override

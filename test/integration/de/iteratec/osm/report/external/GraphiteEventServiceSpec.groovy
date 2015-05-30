@@ -48,6 +48,8 @@ import static org.hamcrest.MatcherAssert.*
 @Mock([GraphiteServer, BatchActivity, Event, JobGroup, GraphiteEventSourcePath])
 class GraphiteEventServiceSpec extends Specification{
 
+    public static final DateTime untilDateTime = new DateTime(2015, 5, 29, 5, 0, 0)
+    public static final int minutesInPast = 1
     GraphiteEventService serviceUnderTest
     @Rule
     public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
@@ -61,7 +63,7 @@ class GraphiteEventServiceSpec extends Specification{
         serviceUnderTest.batchActivityService = new BatchActivityService()
         serviceUnderTest.eventDaoService = new EventDaoService()
         MeasuredValueUtilService mockedMeasuredValueUtilService = new MeasuredValueUtilService()
-        mockedMeasuredValueUtilService.metaClass.getNowInUtc = {-> new DateTime(2015, 5, 29, 5, 0, 0, DateTimeZone.UTC)}
+        mockedMeasuredValueUtilService.metaClass.getNowInUtc = {-> untilDateTime }
         serviceUnderTest.measuredValueUtilService = mockedMeasuredValueUtilService
         mockHttpBuilderToUseBetamax()
 
@@ -72,7 +74,7 @@ class GraphiteEventServiceSpec extends Specification{
         given:
             createGraphiteServerWithSourcePaths()
         when:
-            serviceUnderTest.fetchGraphiteEvents(false, 1)
+            serviceUnderTest.fetchGraphiteEvents(false, minutesInPast)
         then:
         List<Event> allEvents = Event.list()
         allEvents.size() == 6
