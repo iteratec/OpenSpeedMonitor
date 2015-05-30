@@ -82,7 +82,7 @@ class GraphiteEventService {
         def json = getEventJSON(eventSourcePath.targetMetricName, server, from, until)
         json.each{
             String shortName = it.target
-            it.datapoints.each{point ->
+            it.datapoints.findAll{it[0]}.each{point ->
                 long unixTimeStamp = Long.parseLong(point[1] as String) * 1000L
                 events << eventDaoService.createEvent(
                         "${eventSourcePath.staticPrefix}${shortName}",
