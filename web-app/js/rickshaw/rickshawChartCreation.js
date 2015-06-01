@@ -1291,10 +1291,10 @@ function ChartExporter(args) {
       
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var reduceHeightBy = 126; // slider isn't included in export, thus height is lower
+        var reduceHeightBy = 112; // slider isn't included in export, thus height is lower
         var moveOffsetUpwardsBy = 0;
         if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
-          reduceHeightBy = 196; // for this diagramm, title isn't included in export, thus height is lower
+          reduceHeightBy = 182; // for this diagramm, title isn't included in export, thus height is lower
           moveOffsetUpwardsBy = 65; // for this diagramm, title isn't included in export, thus all elements are closer to the top
         }
         
