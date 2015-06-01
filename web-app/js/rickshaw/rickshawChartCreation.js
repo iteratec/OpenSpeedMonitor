@@ -490,9 +490,9 @@ function XAxis(args) {
         tickValues = self.getDaysInRange(minDate, maxDate);
         format = function(n) {
           var date = new Date(n * 1000);
-          var time = self.getTimeString(date);
+          var dayName = DAYS[date.getDay()];
           var dateLabel = self.getDateISO(date);
-          return time + "_nl_" + dateLabel;
+          return dayName + "_nl_" + dateLabel;
         }
       }
 //    aggregate hourly (if applicable) or if aggregate is daily/weekly and tickValues empty
