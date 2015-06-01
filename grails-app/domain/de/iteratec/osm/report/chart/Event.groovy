@@ -42,6 +42,7 @@ class Event {
 
     static mapping = {
         globallyVisible(defaultValue: false)
+        description(type: 'text')
     }
 
     def beforeValidate() {
@@ -53,7 +54,7 @@ class Event {
 	static constraints = {
         eventDate()
         shortName(maxSize: 255)
-        description(maxSize: 255, nullable: true)
+        description(nullable: true, widget: 'textarea')
         globallyVisible()
     }
 }
