@@ -52,7 +52,7 @@ class BatchActivityService implements Observer {
                     successfulActions: 0)
             if(observe){
                 batchActivity.addObserver(this)
-                batchActivity.save(failOnError: true, flush: true)
+//                batchActivity.save(failOnError: true, flush: true)
             }
         }
         return batchActivity
@@ -92,7 +92,7 @@ class BatchActivityService implements Observer {
             activities.clear()
         }
         if(activityTemp.size()>0){
-            BatchActivity.withTransaction {
+            BatchActivity.withNewTransaction {
                 activityTemp*.save(flush: true)
             }
         }
