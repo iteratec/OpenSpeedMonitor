@@ -403,11 +403,21 @@ function XAxis(args) {
   }
 
   this.setTickValueLabels = function() {
-    var DAYS = [  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-        "Saturday" ];
-    var MONTHS = [ "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November",
-        "December" ];
+    var DAYS = [];
+    var MONTHS = [];
+    if (document.documentElement.lang == "de") {
+      DAYS = [  "Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag",
+          "Samstag" ];
+      MONTHS = [ "Januar", "Februar", "März", "April", "Mai", "Juni",
+          "Juli", "August", "September", "Oktober", "November",
+          "Dezember" ];
+    } else { 
+      DAYS = [  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+          "Saturday" ];
+      MONTHS = [ "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November",
+          "December" ];
+    }
     var xValuesRange = self.graph.renderer.domain().x;
     var minDate = new Date(xValuesRange[0] * 1000);
     var maxDate = new Date(xValuesRange[1] * 1000);
