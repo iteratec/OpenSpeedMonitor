@@ -40,12 +40,14 @@ class BatchActivityServiceSpec extends Specification {
             serviceUnderTest.timer.cancel()
 
         when:
-            serviceUnderTest.getActiveBatchActivity(Object.class, 1, Activity.DELETE, "Object test deletion")
+            BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 1, Activity.DELETE, "Object test deletion")
             serviceUnderTest.updateActivities()
 
         then:
-            BatchActivity.findByDomainAndIdWithinDomain(Object.class.toString(), 1).getStatus() == Status.ACTIVE
-            serviceUnderTest.runningBatch(Object.class, 1) == true
+        //The Activity should be persisted after it's first update, so at this point there should be no BatchActivity received
+            BatchActivity.list().size() == 0
+        //But it should exist
+            batchActivity != null
     }
 
     void "testBatchActivityProcess"() {
@@ -63,21 +65,21 @@ class BatchActivityServiceSpec extends Specification {
             batchActivity.stage.contains("firstStage")
             batchActivity.status == Status.ACTIVE
     }
-//    temporarily disabled
-//    void "testBatchActivityProcessAbortion"(){
-//        given:
-//            serviceUnderTest = service
-//            serviceUnderTest.timer.cancel()
-//
-//        when:
-//            BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 3, Activity.DELETE, "Object test deletion")
-//            batchActivity.updateStatus(['progress': serviceUnderTest.calculateProgress(100, 5), 'stage': "firstStage"])
-//            batchActivity.updateStatus(['status': Status.CANCELLED])
-//            serviceUnderTest.updateActivities()
-//        then:
-//            batchActivity.progress.contains("5 %")
-//            batchActivity.stage.contains("firstStage")
-//            batchActivity.status == Status.CANCELLED
-//            serviceUnderTest.runningBatch(Object.class, 3) == false
-//    }
+
+    void "testBatchActivityProcessAbortion"(){
+        given:
+            serviceUnderTest = service
+            serviceUnderTest.timer.cancel()
+
+        when:
+            BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 3, Activity.DELETE, "Object test deletion")
+            batchActivity.updateStatus(['progress': serviceUnderTest.calculateProgress(100, 5), 'stage': "firstStage"])
+            batchActivity.updateStatus(['status': Status.CANCELLED])
+            serviceUnderTest.updateActivities()
+        then:
+            batchActivity.progress.contains("5 %")
+            batchActivity.stage.contains("firstStage")
+            batchActivity.status == Status.CANCELLED
+            !serviceUnderTest.runningBatch(Object.class, 3)
+    }
 }
