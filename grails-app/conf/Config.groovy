@@ -22,15 +22,16 @@ import org.apache.log4j.RollingFileAppender
 */
 
 
+def appNameForLog4jConfig = appName
+
+grails.databinding.dateFormats = [
+    'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
+
 /*
  * locations to search for config files that get merged into the main config:
  * 	config files can be ConfigSlurper scripts, Java properties files, or classes
  * 	in the classpath in ConfigSlurper format
  */
-
-grails.databinding.dateFormats = [
-    'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
-
 if (System.properties["osm_config_location"]) {
 	log.info('system property for external configuration found')
     grails.config.locations = ["file:" + System.properties["osm_config_location"]]
@@ -275,7 +276,7 @@ environments {
                 appender new DailyRollingFileAppender(
                         name: 'osmAppender',
                         datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
-                        fileName: "logs/${appName}.log",
+                        fileName: "logs/${appNameForLog4jConfig}.log",
                         layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         threshold: org.apache.log4j.Level.ERROR
                 )
@@ -285,7 +286,7 @@ environments {
                  */
                  RollingFileAppender rollingFileAppender = new RollingFileAppender(
                      name: 'osmAppenderDetails',
-                     fileName: "logs/${appName}Details.log",
+                     fileName: "logs/${appNameForLog4jConfig}Details.log",
                      layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                      maxFileSize: '20MB',
                      maxBackupIndex: 5,
@@ -406,7 +407,7 @@ environments {
                 appender new DailyRollingFileAppender(
                         name: 'osmAppender',
                         datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
-                        fileName: "${logFolder}${appName}.log",
+                        fileName: "${logFolder}${appNameForLog4jConfig}.log",
 					layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                     threshold: org.apache.log4j.Level.ERROR
                         )
@@ -417,7 +418,7 @@ environments {
                  */
                 RollingFileAppender rollingFileAppender = new RollingFileAppender(
                         name: 'osmAppenderDetails',
-                        fileName: "${logFolder}${appName}Details.log",
+                        fileName: "${logFolder}${appNameForLog4jConfig}Details.log",
                         layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         maxFileSize: '20MB',
                         maxBackupIndex: 20,
