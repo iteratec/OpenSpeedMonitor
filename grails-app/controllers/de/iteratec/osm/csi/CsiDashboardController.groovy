@@ -197,11 +197,6 @@ class CsiDashboardController {
      *         {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
-
-        log.error("rk7")
-        log.error(cmd.publiclyVisible)
-        log.error(cmd.dashboardName)
-        log.error("rk8")
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 
@@ -696,33 +691,8 @@ class CsiDashboardController {
    public Map<String, Object> storeCustomDashboard(CsiDashboardShowAllCommand cmd) {
        log.error ("rk0")
        if( request.queryString && cmd.validate() )
-       { log.error ("rk1")
+       {
            def username = "rk"
-           log.error ("rk2")
-           log.error(cmd.from)
-           log.error(cmd.to)
-           log.error(cmd.fromHour)
-           log.error(cmd.fromMinute)
-           log.error(cmd.toHour)
-           log.error(cmd.toMinute)
-           log.error(cmd.aggrGroup)
-           log.error(cmd.selectedFolder)
-           log.error(cmd.selectedPages)
-           log.error(cmd.selectedMeasuredEventIds)
-           log.error(cmd.selectedAllMeasuredEvents)
-           log.error(cmd.selectedBrowsers)
-           log.error(cmd.selectedAllBrowsers)
-           log.error(cmd.selectedLocations)
-           log.error(cmd.selectedAllLocations)
-           log.error(cmd.overwriteWarningAboutLongProcessingTime)
-           log.error(cmd.debug)
-           log.error(cmd.selectedTimeFrameInterval)
-           log.error(cmd.setFromHour)
-           log.error(cmd.setToHour)
-           log.error(cmd.includeInterval)
-           log.error(cmd.publiclyVisible)
-           log.error(cmd.dashboardName)
-           log.error ("rk3")
            UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: cmd.from, toDate: cmd.to, fromHour: cmd.fromHour, fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute,
                aggrGroup: cmd.aggrGroup, selectedFolder: cmd.selectedFolder, selectedPages: cmd.selectedPages, selectedMeasuredEventIds: cmd.selectedMeasuredEventIds,
                selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: cmd.selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations,
@@ -730,13 +700,10 @@ class CsiDashboardController {
                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: cmd.publiclyVisible,
                dashboardName: cmd.dashboardName, username: username)
            //store object
-           log.error ("rk4")
-           log.error(newCustomDashboard.dashboardName)
-           log.error(newCustomDashboard.username)
            if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                redirectWith303('showAll', params)
                return
-           } else {log.error ("rk6")
+           } else {
                redirectWith303('showAll', params)
                return
            }
