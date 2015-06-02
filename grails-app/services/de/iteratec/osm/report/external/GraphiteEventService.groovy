@@ -57,6 +57,8 @@ class GraphiteEventService {
         String untilFormatted = GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT.print(until)
         String fromFormatted = GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT.print(from)
 
+        log.debug("Fetching of graphite events: Start -> from $fromFormatted to $untilFormatted.")
+
         def graphiteServers = GraphiteServer.list()
         int size = graphiteServers.size()
         BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.CREATE,"Fetch Graphite Events",createBatchActivity)
@@ -78,8 +80,10 @@ class GraphiteEventService {
      * @return List of fetched Events, they are already saved
      */
     private List<Event> createEvents(GraphiteEventSourcePath eventSourcePath, GraphiteServer server, String from, String until){
+        log.debug("Fetching of graphite events: Create events for graphite server: $server, eventSourcePath: $eventSourcePath, from: $from, until: $until.")
         def events = []
         def json = getEventJSON(eventSourcePath.targetMetricName, server, from, until)
+        log.debug("Fetching of graphite events: Fetched json from server: $json")
         json.each{
             String shortName = it.target
             it.datapoints.findAll{it[0]}.each{point ->
@@ -92,6 +96,7 @@ class GraphiteEventService {
                         eventSourcePath.jobGroups)
             }
         }
+        log.debug("${events.size()} events written: $events")
         return events
     }
     /**
