@@ -58,7 +58,7 @@ class Location {
 
     static constraints = {
         label(maxSize: 150)
-        uniqueIdentifierForServer(nullable: true, maxSize: 255, unique: 'wptServer')
+        uniqueIdentifierForServer(nullable: true, maxSize: 255, unique: ['wptServer', 'browser'])
         dateCreated()
         active()
         valid(range: 0 .. 1)
