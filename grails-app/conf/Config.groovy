@@ -151,6 +151,7 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/connectivityProfile/list'                	: ["permitAll"],
 	'/about'                					: ["permitAll"],
 	'/cookie/**'								: ["permitAll"],
+    '/csiDashboard/storeCustomDashboard'        : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////

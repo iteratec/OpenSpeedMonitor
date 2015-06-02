@@ -97,7 +97,11 @@
 				<div style="clear:both;"></div>
 				<p>
 					<g:actionSubmit id="chart-submit" value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll" class="btn btn-primary" style="margin-top: 16px;" />
-					<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;" />
+          <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;" />
+          <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+          <g:actionSubmit value="hiddenTriggerToStoreCustomDashboard" id="hiddenTriggerToStoreCustomDashboard" action="storeCustomDashboard" class="renderInvisible"/>
+          <input type="checkbox" id="publiclyVisible" name="publiclyVisible" class="renderInvisible"/>
+          <input type="text" class="renderInvisible" id="dashboardName" name="dashboardName">
 				</p>
 				<g:if test="${exceedsTimeframeBoundary}">
 					<g:if test="${selectedInterval.intervalInMinutes==60}">
@@ -207,6 +211,7 @@
 		</g:if>
 		</g:if>
 	</g:else>
+  <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 	<r:script>
 		$(document).ready(
 			doOnDomReady(

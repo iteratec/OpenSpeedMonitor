@@ -653,6 +653,13 @@ class EventResultDashboardController {
         Boolean setToHour
 
         /**
+         * transient parameters for storage of custom dashboard
+         */
+        Boolean publiclyVisible
+        String dashboardName
+        String username
+
+        /**
          * Constraints needs to fit.
          */
         static constraints = {
@@ -708,7 +715,7 @@ class EventResultDashboardController {
 
         }
 
-        static transients = ['selectedTimeFrame']
+        static transients = ['selectedTimeFrame', 'publiclyVisible', 'dashboardName']
 
         /**
          * <p>

@@ -228,12 +228,16 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="span2">
+						<div class="span12">
 							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll"
 								id="graphButtonHtmlId" class="btn btn-primary"
 								style="margin-top: 16px;" />
-							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
-								class="btn btn-primary" style="margin-top: 16px;" />
+              <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
+                class="btn btn-primary" style="margin-top: 16px;" />
+              <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+              <g:actionSubmit value="hiddenTriggerToStoreCustomDashboard" id="hiddenTriggerToStoreCustomDashboard" action="storeCustomDashboard" class="renderInvisible"/>
+             <input type="checkbox" id="publiclyVisible" name="publiclyVisible" class="renderInvisible"/>
+             <input type="text" class="renderInvisible" id="dashboardName" name="dashboardName">
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.
@@ -306,6 +310,7 @@
 		</g:if>
 	</g:else>
 	</div>
+	<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 	<r:script>
 		$(document).ready(doOnDomReady(
 			'${dateFormat}', 

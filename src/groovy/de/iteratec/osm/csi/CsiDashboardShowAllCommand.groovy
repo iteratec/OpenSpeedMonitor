@@ -4,15 +4,14 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.util.DateValueConverter
 import grails.validation.Validateable
+
+import java.util.regex.Pattern
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import org.springframework.beans.propertyeditors.CustomDateEditor
-
-import java.util.regex.Pattern
 
 /**
  * <p>
@@ -185,6 +184,11 @@ public class CsiDashboardShowAllCommand {
     Boolean includeInterval
 
     /**
+     * transient parameters for storage of custom dashboard
+     */
+    Boolean publiclyVisible
+    String dashboardName
+    /**
      * Constraints needs to fit.
      */
     static constraints = {
@@ -246,7 +250,7 @@ public class CsiDashboardShowAllCommand {
         overwriteWarningAboutLongProcessingTime(nullable:true)
     }
 
-    static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType']
+    static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType', 'publiclyVisible', 'dashboardName']
 
     /**
      * <p>
@@ -387,6 +391,8 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('includeInterval', this.includeInterval)
+        viewModelToCopyTo.put('publiclyVisible', this.publiclyVisible)
+        viewModelToCopyTo.put('dashboardName', this.dashboardName)
     }
 
     /**

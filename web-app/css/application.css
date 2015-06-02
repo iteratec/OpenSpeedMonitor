@@ -2,3 +2,8 @@
 	color: #b94a48;
 	font-weight: bold;
 }
+.renderInvisible {
+ visibility:hidden;
+ width:1px;
+ height:1px;
+}

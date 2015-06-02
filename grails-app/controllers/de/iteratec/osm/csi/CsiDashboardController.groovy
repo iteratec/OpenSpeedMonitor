@@ -27,6 +27,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.report.UserspecificDashboard
+import de.iteratec.osm.report.UserspecificDashboardDiagramType
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
@@ -53,7 +55,6 @@ import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
-
 //TODO: implement some tests for this controller
 
 /**
@@ -197,6 +198,10 @@ class CsiDashboardController {
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
 
+        log.error("rk7")
+        log.error(cmd.publiclyVisible)
+        log.error(cmd.dashboardName)
+        log.error("rk8")
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 
@@ -677,6 +682,69 @@ class CsiDashboardController {
         response.sendError(200, 'OK')
         return null
     }
+
+    /**
+     * <p>
+    * Stores the selection passed as {@link CsiDashboardShowAllCommand} as new custom dashboard. RKRKRK - WIP
+    * </p>
+    *
+    * @param cmd
+    *         The command with the users selections;
+    *         not <code>null</code>.
+    * @return nothing, immediately renders a CSV to response' output stream.
+    */
+   public Map<String, Object> storeCustomDashboard(CsiDashboardShowAllCommand cmd) {
+       log.error ("rk0")
+       if( request.queryString && cmd.validate() )
+       { log.error ("rk1")
+           def username = "rk"
+           log.error ("rk2")
+           log.error(cmd.from)
+           log.error(cmd.to)
+           log.error(cmd.fromHour)
+           log.error(cmd.fromMinute)
+           log.error(cmd.toHour)
+           log.error(cmd.toMinute)
+           log.error(cmd.aggrGroup)
+           log.error(cmd.selectedFolder)
+           log.error(cmd.selectedPages)
+           log.error(cmd.selectedMeasuredEventIds)
+           log.error(cmd.selectedAllMeasuredEvents)
+           log.error(cmd.selectedBrowsers)
+           log.error(cmd.selectedAllBrowsers)
+           log.error(cmd.selectedLocations)
+           log.error(cmd.selectedAllLocations)
+           log.error(cmd.overwriteWarningAboutLongProcessingTime)
+           log.error(cmd.debug)
+           log.error(cmd.selectedTimeFrameInterval)
+           log.error(cmd.setFromHour)
+           log.error(cmd.setToHour)
+           log.error(cmd.includeInterval)
+           log.error(cmd.publiclyVisible)
+           log.error(cmd.dashboardName)
+           log.error ("rk3")
+           UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: cmd.from, toDate: cmd.to, fromHour: cmd.fromHour, fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute,
+               aggrGroup: cmd.aggrGroup, selectedFolder: cmd.selectedFolder, selectedPages: cmd.selectedPages, selectedMeasuredEventIds: cmd.selectedMeasuredEventIds,
+               selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: cmd.selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations,
+               selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
+               selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: cmd.publiclyVisible,
+               dashboardName: cmd.dashboardName, username: username)
+           //store object
+           log.error ("rk4")
+           log.error(newCustomDashboard.dashboardName)
+           log.error(newCustomDashboard.username)
+           if (!newCustomDashboard.save(failOnError: true, flush: true)) {
+               redirectWith303('showAll', params)
+               return
+           } else {log.error ("rk6")
+               redirectWith303('showAll', params)
+               return
+           }
+       } else {
+           redirectWith303('showAll', params)
+           return
+       }
+   }
 
     /**
      * <p>
