@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report.external
 
-import org.springframework.dao.DataIntegrityViolationException
 
 /**
  * GraphiteServerController
@@ -25,53 +24,7 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class GraphiteServerController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
-
-    def index() {
-        redirect(action: "list", params: params)
-    }
-
-    def list() { log.error("rklist")
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [graphiteServerInstanceList: GraphiteServer.list(params), graphiteServerInstanceTotal: GraphiteServer.count()]
-    }
-
-    def create() {
-        [graphiteServerInstance: new GraphiteServer(params)]
-    }
-
-    def save() {
-        def graphiteServerInstance = new GraphiteServer(params)
-        if (!graphiteServerInstance.save(flush: true)) {
-            render(view: "create", model: [graphiteServerInstance: graphiteServerInstance])
-            return
-        }
-
-		flash.message = message(code: 'default.created.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), graphiteServerInstance.id])
-        redirect(action: "show", id: graphiteServerInstance.id)
-    }
-
-    def show() {
-        def graphiteServerInstance = GraphiteServer.get(params.id)
-        if (!graphiteServerInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        [graphiteServerInstance: graphiteServerInstance]
-    }
-
-    def edit() {
-        def graphiteServerInstance = GraphiteServer.get(params.id)
-        if (!graphiteServerInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        [graphiteServerInstance: graphiteServerInstance]
-    }
+    static scaffold = true
 
     def update() {
         def graphiteServerInstance = GraphiteServer.get(params.id)
@@ -105,22 +58,4 @@ class GraphiteServerController {
         redirect(action: "show", id: graphiteServerInstance.id)
     }
 
-    def delete() {
-        def graphiteServerInstance = GraphiteServer.get(params.id)
-        if (!graphiteServerInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            graphiteServerInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
 }

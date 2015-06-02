@@ -69,15 +69,21 @@ function RickshawGraphBuilder(args) {
         //activate pointMarker
         $("#to-enable-marker").click();
       }
+      var rememberLastRowColor = "";
+      var actualIndex = 0;
       $(".pointMarker").each(function( index ) {
         var percentage = 0;
         var currentMarkerColor = rgb2hex($( this ).css("border-top-color"));
+        if (currentMarkerColor != rememberLastRowColor) {
+          rememberLastRowColor = currentMarkerColor;
+          actualIndex = 0;
+        }
         self.graph.series.forEach(function(series) {
           if(currentMarkerColor === series.color) {
             //get args.series.ROW.data.INDEX.y * 100 rounded
-            if ( !/undef/i.test(typeof series.data[index])) {
+            if ( !/undef/i.test(typeof series.data[actualIndex])) {
 //              percentage =  Math.round((series.data[index].y)*100)/100;
-              percentage =  parseFloat(series.data[index].y).toFixed(2);
+              percentage =  parseFloat(series.data[actualIndex].y).toFixed(2);
             }
             //end loop
             return false;
@@ -91,6 +97,7 @@ function RickshawGraphBuilder(args) {
           //display data
           $( this ).parent().append( "<div class='dataLabel' style='top:"+(parseInt($(this).css('top'), 10)-5)+"px;left:"+(parseInt($(this).css('left'), 10)-9)+"px;height:100px;width:100px;font-size: 13pt;font-weight: bold;color: #b3b3b3;cursor: default;fill: #b3b3b3;'>"+percentage+"</div>" );
         }
+        actualIndex++;
       });
       this.dataLabelsHaveBeenAdded = true;
     }
@@ -396,11 +403,21 @@ function XAxis(args) {
   }
 
   this.setTickValueLabels = function() {
-    var DAYS = [  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-        "Saturday" ];
-    var MONTHS = [ "January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November",
-        "December" ];
+    var DAYS = [];
+    var MONTHS = [];
+    if (document.documentElement.lang == "de") {
+      DAYS = [  "Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag",
+          "Samstag" ];
+      MONTHS = [ "Januar", "Februar", "März", "April", "Mai", "Juni",
+          "Juli", "August", "September", "Oktober", "November",
+          "Dezember" ];
+    } else { 
+      DAYS = [  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+          "Saturday" ];
+      MONTHS = [ "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November",
+          "December" ];
+    }
     var xValuesRange = self.graph.renderer.domain().x;
     var minDate = new Date(xValuesRange[0] * 1000);
     var maxDate = new Date(xValuesRange[1] * 1000);
@@ -483,9 +500,9 @@ function XAxis(args) {
         tickValues = self.getDaysInRange(minDate, maxDate);
         format = function(n) {
           var date = new Date(n * 1000);
-          var time = self.getTimeString(date);
+          var dayName = DAYS[date.getDay()];
           var dateLabel = self.getDateISO(date);
-          return time + "_nl_" + dateLabel;
+          return dayName + "_nl_" + dateLabel;
         }
       }
 //    aggregate hourly (if applicable) or if aggregate is daily/weekly and tickValues empty
@@ -1175,6 +1192,10 @@ function ChartExporter(args) {
   this.initialize = function(args) {
     d3.select("#dia-save-chart-as-png").on("click", function(){
       
+      window.scrollTo(0, 0);
+      document.documentElement.style.overflow = 'hidden';  // firefox, chrome
+      document.body.scroll = "no"; // ie only
+      
       var opts = {
           lines: 15, // The number of lines to draw
           length: 20, // The length of each line
@@ -1194,30 +1215,47 @@ function ChartExporter(args) {
           left: '50%' // Left position relative to parent in px
       };
 
-      var spinner = new Spinner(opts).spin(document.getElementsByClassName('graph')[0]);
-
+      var origGraphElement = document.getElementsByClassName('graph')[0];
+      var graphParent = origGraphElement.parentNode;
+      origGraphElement.setAttribute('id', "originalGraph");
+      
+      // diagramm kopieren
+      var cln = origGraphElement.cloneNode(true);
+      var spinner = new Spinner(opts).spin(cln);
+      cln.setAttribute('id', "workingCopy");
+      cln.className = "graphDuplicate";
+      
+      graphParent.insertBefore(cln, graphParent.childNodes[0]);
+      
+      self.assignAllRelevantCssToStyleAttributes();
+      
+      origGraphElement.style.position=('absolute');
+      origGraphElement.style.marginTop=('1500px');
+      // namen in der kopie eindeutig machen
+      self.renameChildNodeIds(cln);
       deferrerCollection = new Array();
       
       if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
         //resize
         deferrerCollection.push($.Deferred());
-        var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'));
+        var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'))-25;
         var previousHeight=parseFloat($('#rickshaw_yAxis_0').css('height'));
         self.resizeGraphTo(1393, 467, deferrerCollection[deferrerCollection.length - 1]);
+        //reapply dataLabels
+        
       }
-      
-    self.assignAllRelevantCssToStyleAttributes();
+      self.assignAllRelevantCssToStyleAttributes();
       
       var yAxisCount = 0;
-      $('.y_axis').each(function() {
+      $('#originalGraph .y_axis').each(function() {
         var newCanvasId = 'canvas_y_axis_' + yAxisCount.toString() + '';
         deferrerCollection.push($.Deferred());
         self.renderSvgElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
         yAxisCount++;
       });
-
-      var pointMarkerCount = 0;      
-      $('.pointMarker').each(function() {
+      
+      var pointMarkerCount = 0;     
+      $('#originalGraph .pointMarker').each(function() {
         var newCanvasId = 'canvas_pointMarker_' + pointMarkerCount.toString() + '';
         deferrerCollection.push($.Deferred());
         self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
@@ -1236,14 +1274,14 @@ function ChartExporter(args) {
       self.renderDomElementOnNewCanvasWithDelay(document.querySelector("#rickshaw_legend"), 'canvas_legend', deferrerCollection[deferrerCollection.length - 1]);
       
       deferrerCollection.push($.Deferred());
-      self.renderSvgElementOnNewCanvasWithDelay($('#rickshaw_graphic_svg'), 'canvas_graphic_svg', deferrerCollection[deferrerCollection.length - 1]);
+      self.renderSvgElementOnNewCanvasWithDelay($('#originalGraph #rickshaw_graphic_svg:first'), 'canvas_graphic_svg', deferrerCollection[deferrerCollection.length - 1]);
       
       self.modifyStylesForRendering();
       deferrerCollection.push($.Deferred());
-      self.renderSvgElementOnNewCanvasWithDelay($('.x_axis_d3'), 'canvas_x_axis_d3', deferrerCollection[deferrerCollection.length - 1]);
-
+      self.renderSvgElementOnNewCanvasWithDelay($('#originalGraph .x_axis_d3'), 'canvas_x_axis_d3', deferrerCollection[deferrerCollection.length - 1]);
+      
       var dataLabelCount = 0;
-      $('.dataLabel').each(function() {
+      $('#originalGraph .dataLabel').each(function() {
         deferrerCollection.push($.Deferred());
         var newCanvasId = 'canvas_dataLabel_' + dataLabelCount.toString() + '';
         self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
@@ -1251,7 +1289,7 @@ function ChartExporter(args) {
       });
       
       var rightLabelCount = 0;
-      $('.rickshaw_y-axis_right_label').each(function() {
+      $('#originalGraph .rickshaw_y-axis_right_label').each(function() {
         deferrerCollection.push($.Deferred());
         var newCanvasId = 'canvas_y-axis_right_label_' + rightLabelCount.toString() + '';
         self.renderDomElementOnNewCanvasWithDelay($( this ), newCanvasId, deferrerCollection[deferrerCollection.length - 1]);
@@ -1259,14 +1297,14 @@ function ChartExporter(args) {
       });
       
       deferrerCollection.push($.Deferred());
-      self.renderDomElementOnNewCanvasWithDelay(document.querySelector(".rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
+      self.renderDomElementOnNewCanvasWithDelay($("#originalGraph .rickshaw_y-axis_left_label"), 'canvas_y-axis_left_label', deferrerCollection[deferrerCollection.length - 1]);
       
       $.when.apply($, deferrerCollection).then(function(){
         //merge all canvases into one
-        var reduceHeightBy = 126; // slider isn't included in export, thus height is lower
+        var reduceHeightBy = 112; // slider isn't included in export, thus height is lower
         var moveOffsetUpwardsBy = 0;
         if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
-          reduceHeightBy = 196; // for this diagramm, title isn't included in export, thus height is lower
+          reduceHeightBy = 182; // for this diagramm, title isn't included in export, thus height is lower
           moveOffsetUpwardsBy = 65; // for this diagramm, title isn't included in export, thus all elements are closer to the top
         }
         
@@ -1285,7 +1323,7 @@ function ChartExporter(args) {
         self.mergeCanvases("#rickshaw_legend", "#canvas_legend", ctx, bodyRect, (graphOffsetTop+reduceHeightBy), graphOffsetLeft);
 
         var yAxisCount = 0;
-        $('.y_axis').each(function() {
+        $('#originalGraph .y_axis').each(function() {
           var newCanvasId = '#canvas_y_axis_' + yAxisCount.toString() + '';
           self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           yAxisCount++;
@@ -1295,16 +1333,16 @@ function ChartExporter(args) {
 
         marklineLabel = "";
         
-        var marklineLabel = $( "span.label:contains('Ziel-Kundenzufriedenheit')" );
+        var marklineLabel = $( "#originalGraph span.label:contains('Ziel-Kundenzufriedenheit')" );
         if ( !(marklineLabel.length) ) {
-          marklineLabel = $( "span.label:contains('Target-CSI')" );
+          marklineLabel = $( "#originalGraph span.label:contains('Target-CSI')" );
         }
         var marklineColor = "";
         if (marklineLabel.length) {
           marklineColor = marklineLabel.prev().css("background-color");
         }        
         
-        $('.pointMarker').each(function() {
+        $('#originalGraph .pointMarker').each(function() {
           var newCanvasId = '#canvas_pointMarker_' + pointMarkerCount.toString() + '';
           if((marklineColor != "") && (marklineColor == $( this ).css("background-color"))) {
             removeObjectFromDom(newCanvasId);
@@ -1321,38 +1359,62 @@ function ChartExporter(args) {
         }
   
         self.modifyStylesAfterRendering();
-        self.mergeLabelCanvases($(".rickshaw_y-axis_left_label"), "#canvas_y-axis_left_label", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
+        self.mergeLabelCanvases($("#originalGraph .rickshaw_y-axis_left_label"), "#canvas_y-axis_left_label", ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
 
         var dataLabelCount = 0;
-        $('.dataLabel').each(function() {
+        $('#originalGraph .dataLabel').each(function() {
           var newCanvasId = '#canvas_dataLabel_' + dataLabelCount.toString() + '';
           self.mergeCanvasesFromSourceObject($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           dataLabelCount++;
         });
         
         var rightLabelCount = 0;
-        $('.rickshaw_y-axis_right_label').each(function() {
+        $('#originalGraph .rickshaw_y-axis_right_label').each(function() {
           var newCanvasId = '#canvas_y-axis_right_label_' + rightLabelCount.toString() + '';
           self.mergeLabelCanvases($( this ), newCanvasId, ctx, bodyRect, (graphOffsetTop+moveOffsetUpwardsBy), graphOffsetLeft);
           rightLabelCount++;
         });
-        
         //convert to image
         try {
-          downloadCanvas(canvas, "png");
+        downloadCanvas(canvas, "jpeg");
+//        downloadCanvas(canvas, "png");
           if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
-
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
           }
+          origGraphElement.style.position=('initial');
+          origGraphElement.style.marginTop=('0px');
+          removeObjectFromDom('#workingCopy');
+          removeObjectFromDom('#canvas_everything_merged');
           spinner.stop();
+          document.documentElement.style.overflow = 'auto';  // firefox, chrome
+          document.body.scroll = "yes"; // ie only
         } 
-        catch(err) {
+        catch(err) {          
+          if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+            deferrerCollection.push($.Deferred());
+            self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
+          }
+          origGraphElement.setAttribute('style', "position:initial;top:0px;left:0px;");
+          removeObjectFromDom('#workingCopy');
+          removeObjectFromDom('#canvas_everything_merged');
           spinner.stop();
-        } // handle IE        
+          document.documentElement.style.overflow = 'auto';  // firefox, chrome
+          document.body.scroll = "yes"; // ie only
+        } // handle IE
       });
     });
-  }  
+  }
+
+  this.renameChildNodeIds = function(node) {
+    for (var i = 0; i < node.childNodes.length; i++) {
+      var child = node.childNodes[i];
+      self.renameChildNodeIds(child);
+      if((typeof child.id !== 'undefined') && (child.id !== "")) {
+        child.id = "workingCopy_" + child.id;
+      }
+    }
+  }
   
   this.assignAllRelevantCssToStyleAttributes = function() {
     d3.selectAll("#rickshaw_y-axes_right").style({
@@ -1394,7 +1456,7 @@ function ChartExporter(args) {
      "fill": "none",
      "stroke": "none",
     });
-    d3.selectAll(".rickshaw_graph .y_ticks text, .rickshaw_graph .x_ticks_d3 text").style({
+    d3.selectAll(".rickshaw_graph .y_ticks text,  .rickshaw_graph .x_ticks_d3 text").style({
      "opacity": "0.5",
      "font-size": "9px",
      "pointer-events": "none",
@@ -1405,13 +1467,13 @@ function ChartExporter(args) {
   }
 
   this.modifyStylesForRendering = function() {
-    d3.selectAll("#rickshaw_x-axis").style({
+    d3.select("#originalGraph").selectAll("#rickshaw_x-axis").style({
       "margin-left": "0px",
       });
-    d3.selectAll(".x_axis_d3").style({
+    d3.select("#originalGraph").selectAll(".x_axis_d3").style({
       "left": "0px",
       });
-    d3.selectAll(".rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label").style({
+    d3.select("#originalGraph").selectAll(".rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label").style({
      "-moz-transform": "none", /* Firefox 3.6 Firefox 4 */
      "-webkit-transform": "none", /* Safari */
      "-o-transform": "none", /* Opera */
@@ -1421,7 +1483,7 @@ function ChartExporter(args) {
   }
 
   this.modifyStylesAfterRendering = function() {
-    d3.selectAll(".rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label").style({
+    d3.select("#originalGraph").selectAll(".rickshaw_y-axis_left_label, .rickshaw_y-axis_right_label").style({
       "-moz-transform": "rotate(-90deg)", /* Firefox 3.6 Firefox 4 */
       "-webkit-transform": "rotate(-90deg)", /* Safari */
       "-o-transform": "rotate(-90deg)", /* Opera */
@@ -1495,7 +1557,7 @@ function ChartExporter(args) {
   }
 
   this.mergeCanvases = function(originalElementId, sourceCanvasId, targetContext, bodyRect, graphOffsetTop, graphOffsetLeft) {
-    curElemRect = document.querySelector(originalElementId).getBoundingClientRect();
+    curElemRect = document.querySelector("#originalGraph " + originalElementId).getBoundingClientRect();
     curElemOffsetTop = curElemRect.top - bodyRect.top;
     curElemOffsetLeft = curElemRect.left - bodyRect.left;
     distanceTop = curElemOffsetTop - graphOffsetTop;

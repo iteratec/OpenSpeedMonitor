@@ -1,22 +1,23 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
 package de.iteratec.osm.report.chart
 
+import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -96,6 +97,19 @@ class EventService {
         Event.findAllByEventDateBetween(resetFromDate, resetToDate)
     }
 
+    List retrieveEventsByDateRangeAndVisibilityAndJobGroup(Date resetFromDate, Date resetToDate, Collection<Long> selectedFolder){
+        List result = Event.createCriteria().list {
+            createAlias('jobGroups', 'jg', CriteriaSpecification.LEFT_JOIN)
+            and {
+                between('eventDate', resetFromDate, resetToDate)
+                or {
+                    eq('globallyVisible', true)
+                    inList('jg.id', selectedFolder)
+                }
+            }
+        }
+        return result;
+    }
 
     /**
      * Creates a delegate object and applies it to the given closure. The map only contains a 'action' list

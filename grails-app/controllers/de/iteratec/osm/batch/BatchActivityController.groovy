@@ -88,27 +88,30 @@ class BatchActivityController {
     def getUpdate(){
         def updates = []
         def ids = []
-        ids.addAll(params.activeIds);
-        ids.each{activeId ->
-            BatchActivity batchActivity = BatchActivity.get(new Long(activeId))
-            if(batchActivity){
-                updates.add(
-                        new BatchActivityRow (
-                                htmlId: "batchActivity_${activeId}",
-                                activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
-                                status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
-                                progress: batchActivity.progress,
-                                lastFailureMessage: batchActivity.lastFailureMessage,
-                                startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
-                                lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
-                                endDate: (batchActivity.endDate)? DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate)):"",
-                                statusEN: batchActivity.status.toString()
-                        )
-                )
-            } else{
-                log.error("Couldn't find a matching BatchActivty with id: $activeId")
+        if(params?.activeIds){
+            ids.addAll(params.activeIds);
+            ids.each{activeId ->
+                BatchActivity batchActivity = BatchActivity.get(new Long(activeId as String))
+                if(batchActivity){
+                    updates.add(
+                            new BatchActivityRow (
+                                    htmlId: "batchActivity_${activeId}",
+                                    activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
+                                    status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
+                                    progress: batchActivity.progress,
+                                    lastFailureMessage: batchActivity.lastFailureMessage,
+                                    startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
+                                    lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
+                                    endDate: (batchActivity.endDate)? DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate)):"",
+                                    statusEN: batchActivity.status.toString()
+                            )
+                    )
+                } else{
+                    log.error("Couldn't find a matching BatchActivty with id: $activeId")
+                }
             }
         }
+
         render updates as JSON
 
     }

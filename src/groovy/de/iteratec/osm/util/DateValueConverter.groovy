@@ -1,10 +1,8 @@
 package de.iteratec.osm.util
 
-import org.grails.databinding.converters.ValueConverter
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-
 import java.text.SimpleDateFormat
+
+import org.grails.databinding.converters.ValueConverter
 
 /**
  * A String to Date converter for format {@code dd.MM.yyyy}.
@@ -20,7 +18,13 @@ class DateValueConverter implements ValueConverter{
         value instanceof String
     }
     def convert(value) {
-        return SIMPLE_DATE_FORMAT.parse(value)
+        if (value) {
+            String strDate = SIMPLE_DATE_FORMAT.format(value);
+            Date parsedDate = SIMPLE_DATE_FORMAT.parse(strDate);
+            return parsedDate
+        } else {
+            return null;
+        }
     }
     Class<?> getTargetType() {
         Date.class

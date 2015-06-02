@@ -31,7 +31,4 @@ class MvCachingContainer {
 	JobGroup csiGroupToCalcMvFor
 	Page pageToCalcMvFor
 	Map<String,List<MeasuredValue>> hmvsByCsiGroupPageCombination
-	String tagForMvToBeCalculated
-	Job jobToCreateHmvFor
-	List<EventResult> allResultsInPeriodToCalcMvsFor
 }

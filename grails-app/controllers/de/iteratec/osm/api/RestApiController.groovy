@@ -36,6 +36,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -47,6 +48,7 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
+import org.codehaus.groovy.grails.web.json.JSONArray
 import org.joda.time.format.DateTimeFormat
 
 import javax.persistence.NoResultException
@@ -214,11 +216,8 @@ class RestApiController {
 	 * @see Page
 	 */
 	public Map<String, Object> allLocations() {
-		Set<Location> locations = locationDaoService.findAll();
-		Collection<JSONNameBox> result = locations.collect({
-			new JSONLocationBox(it.location) });
-
-		return sendObjectAsJSON(result, params.pretty && params.pretty == 'true');
+		Collection<Location> locations = locationDaoService.findAll();
+        return sendObjectAsJSON(locations, params.pretty && params.pretty == 'true');
 	}
 
 	/**
@@ -309,7 +308,8 @@ class RestApiController {
 		List<Result> results = new LinkedList<Result>();
 
 		performanceLoggingService.logExecutionTime(LogLevel.INFO, 'assembling results for json', IndentationDepth.ONE) {
-			eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startTimeInclusive, endTimeInclusive, cmd.getCachedViewsToReturn(), queryParams).each{eachEventResult ->
+            Collection<EventResult> eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startTimeInclusive, endTimeInclusive, cmd.getCachedViewsToReturn(), queryParams)
+            eventResults.each{eachEventResult ->
 				results.add(new Result(eachEventResult));
 			}
 		}
@@ -825,12 +825,12 @@ public class ResultsRequestCommand {
 
 		if( location )
 		{
-			Location theLocation = locationDaoService.tryToFindByWPTLocation(location);
-			if( theLocation == null )
+			List<Location> locations = Location.findAllByUniqueIdentifierForServer(location)
+			if( locations.size() == 0 )
 			{
-				throw new NoResultException("Can not find location which queue named: " + location);
+				throw new NoResultException("Can not find location with unique identifier \"" + location + "\"");
 			}
-			result.locationIds.add(theLocation.getId());
+			result.locationIds.addAll(locations*.ident())
 		}
 
 		return result;

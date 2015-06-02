@@ -15,14 +15,16 @@
 * limitations under the License.
 */
 
+package de.iteratec.osm.report.external
+
+import org.springframework.dao.DataIntegrityViolationException
+
 /**
- * Called on jquerys DOM-ready.
- * Initializes DOM-nodes and registers events. 
+ * GraphiteEventSourcePathController
+ * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
  */
-function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
-	
-	initDatepicker(dateFormat, weekStart, 24*3);
-	
-	initTimepicker(false);
-	
+class GraphiteEventSourcePathController {
+
+    static scaffold = true
+
 }

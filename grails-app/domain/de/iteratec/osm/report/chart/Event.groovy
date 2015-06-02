@@ -20,7 +20,7 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 /**
- * Represents an arbitrary event to be shown in dashboard diagramms as verticals with info text as hover info.
+ * Represents an arbitrary event to be shown in dashboard diagrams as vertical lines with info text as hover info.
  * Could be deployments of measured web application for example.
  */
 class Event {
@@ -28,6 +28,10 @@ class Event {
     Date eventDate
     String shortName
     String description
+    /**
+     * If true this event is shown in all diagrams in dashboards of osm.
+     * If false this event is just shown in diagrams which contain data of associated {@link JobGroup}s.
+     */
     Boolean globallyVisible = false
 
     /**
@@ -38,9 +42,11 @@ class Event {
 
     static mapping = {
         globallyVisible(defaultValue: false)
+        description(type: 'text')
     }
 
     def beforeValidate() {
+        //remove all html tags, because we don't want arbitrary links to get injected into the gui of osm
         if(shortName != null) shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
         if(description != null) description = description?.replaceAll(/<!--.*?-->/, '')?.replaceAll(/<.*?>/, '')
     }
@@ -48,7 +54,7 @@ class Event {
 	static constraints = {
         eventDate()
         shortName(maxSize: 255)
-        description(maxSize: 255, nullable: true)
+        description(nullable: true, widget: 'textarea')
         globallyVisible()
     }
 }

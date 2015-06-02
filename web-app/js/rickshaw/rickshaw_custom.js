@@ -1680,22 +1680,17 @@ Rickshaw.Graph.Annotate = function(args) {
 				var element = annotation.element = document.createElement('div');
 				element.classList.add('annotation');
 				this.elements.timeline.appendChild(element);
+
 				element.addEventListener('click', function(e) {
 					element.classList.toggle('active');
 					annotation.line.classList.toggle('active');
-					annotation.boxes.forEach( function(box) {
-						if ( box.rangeElement ) box.rangeElement.classList.toggle('active');
-					});
-				}, false);
-					
+				}, false);					
 			}
 
 			annotation.element.style.left = left + 'px';
 			annotation.element.style.display = 'block';
 
 			annotation.boxes.forEach( function(box) {
-
-
 				var element = box.element;
 
 				if (!element) {
@@ -1707,6 +1702,17 @@ Rickshaw.Graph.Annotate = function(args) {
 					annotation.line = document.createElement('div');
 					annotation.line.classList.add('annotation_line');
 					self.graph.element.appendChild(annotation.line);
+
+          annotation.line.addEventListener('mouseover', function(e) {
+          annotation.boxes.forEach( function(box) {
+            element.classList.toggle('active');
+          });
+        }, false);
+          annotation.line.addEventListener('mouseout', function(e) {
+          annotation.boxes.forEach( function(box) {
+            element.classList.toggle('active');
+          });
+        }, false);
 
 					if ( box.end ) {
 						box.rangeElement = document.createElement('div');

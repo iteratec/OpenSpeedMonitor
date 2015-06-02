@@ -17,9 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.util.AnnotationUtil
-
-import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
@@ -36,11 +33,11 @@ import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 
-import java.text.DateFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
@@ -316,7 +313,7 @@ class CsiDashboardController {
                 fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
                 break
         }
-        fillWithAnnotations(modelToRender, timeFrame)
+        fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
     }
 
     /**
@@ -426,11 +423,12 @@ class CsiDashboardController {
      */
     private void fillWithAnnotations(
             Map<String, Object> modelToRender,
-            Interval timeFrame)
+            Interval timeFrame,
+            Collection<Long> selectedFolder)
     {
         MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
-        AnnotationUtil.fillWithAnnotations(modelToRender,fixedTimeFrame, eventService)
+        AnnotationUtil.fillWithAnnotations(modelToRender,fixedTimeFrame, selectedFolder, eventService)
     }
 
     /**

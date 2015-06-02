@@ -19,7 +19,13 @@
 	position: relative;
 }
 .graph {
-	background-color: white;
+  background-color: white;
+  margin-left: auto;
+  margin-right: auto;
+  width: 1135px;
+}
+.graphDuplicate {
+  background-color: white;
   margin-left: auto;
   margin-right: auto;
   width: 1135px;
@@ -49,6 +55,7 @@
   padding-bottom: 10px;
   margin-left: 60px;
   width: 1104px;
+  z-index: 1976;
 }
 #rickshaw_addons {
   margin-top: 10px;
@@ -267,11 +274,11 @@
 
 .rickshaw_annotation_timeline .annotation {
 	position: absolute;
-	height: 6px;
-	width: 6px;
-	margin-left: -2px;
-	top: -3px;
-	border-radius: 5px;
+	height: 12px;
+	width: 12px;
+	margin-left: -5px;
+	top: -6px;
+	border-radius: 7px;
 	background-color: rgba(0, 0, 0, 0.25);
 }
 
@@ -316,10 +323,11 @@
 	font-size: 12px;
 	padding: 6px 8px 8px;
 	top: 18px;
-	left: -11px;
+	left: -8px;
 	width: 160px;
 	display: none;
 	cursor: pointer;
+    word-wrap:break-word;
 }
 
 .rickshaw_annotation_timeline .annotation .content:before {
@@ -340,13 +348,14 @@
 	z-index: 50;
 }
 
-.rickshaw_annotation_timeline .annotation.active .content {
-	display: block;
+.rickshaw_annotation_timeline .annotation .content.active {
+  display: block;
+  z-index: 50;
 }
 
 .rickshaw_annotation_timeline .annotation:hover .content {
-	display: block;
-	z-index: 50;
+  display: block;
+  z-index: 50;
 }
 
 .rickshaw_graph .y_axis, .rickshaw_graph  .x_axis_d3 {
@@ -480,12 +489,11 @@
 	margin: 0;
 	padding: 0;
 	cursor: pointer;
-	/*margin: 2px;*/
 }
 
 .rickshaw_legend li {
-	padding: 0 0 0 2px;
-	min-width: 80px;
+	padding: 0 0 0 0px;
+	min-width: 483px;
 	white-space: nowrap;
 }
 

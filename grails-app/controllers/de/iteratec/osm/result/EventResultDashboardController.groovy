@@ -27,7 +27,6 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValueInterval
@@ -43,9 +42,7 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.validation.Validateable
 
-import java.text.DateFormat
 import java.text.NumberFormat
-import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
@@ -54,7 +51,6 @@ import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import org.springframework.beans.propertyeditors.CustomDateEditor
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -201,7 +197,7 @@ class EventResultDashboardController {
         modelToRender.put('toTimestampForHighChart', (timeFrame.getEnd().toDate().getTime() + 300000))
 
         modelToRender.put("selectedCharttypeForHighchart", cmd.getSelectChartType());
-        fillWithAnnotations(modelToRender, timeFrame)
+        fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
     }
 
     /**
@@ -218,9 +214,10 @@ class EventResultDashboardController {
      */
     private void fillWithAnnotations(
             Map<String, Object> modelToRender,
-            Interval timeFrame)
+            Interval timeFrame,
+            Collection<Long> selectedFolder)
     {
-        AnnotationUtil.fillWithAnnotations(modelToRender,timeFrame, eventService)
+        AnnotationUtil.fillWithAnnotations(modelToRender,timeFrame, selectedFolder, eventService)
 
     }
 

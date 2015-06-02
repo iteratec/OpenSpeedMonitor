@@ -17,25 +17,61 @@
 
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 
 /**
  * A graphite server to which measured data is to be sent to.
  * The data to send is configured in {@link #graphitePaths}.
+ * {@link de.iteratec.osm.report.chart.Event}s can be fetches fromm server via associated graphiteEventSourcePaths.
+ * @see GraphitePath
+ * @see GraphiteEventSourcePath
  */
 class GraphiteServer {
 
     /**
-     * Hostname of this GraphiteServer.
+     * Hostname of this GraphiteServer's carbon component.
+     * Graphite carbon component manages storage of metric data
+     * (see http://graphite.wikidot.com/high-level-diagram). So this adress is used to send data
+     * to graphite server.
      * @see InetAdress#getByName(String s)
+     * @see MetricReportingService
      */
-    String serverAdress;
-    int port;
+    String serverAdress
+    /**
+     * Port of this GraphiteServer's carbon component.
+     * Graphite carbon component manages storage of metric data
+     * (see http://graphite.wikidot.com/high-level-diagram). So this port is used to send data
+     * to graphite server.
+     * @see MetricReportingService
+     */
+    int port
+    /**
+     * Hostname of this GraphiteServer's webapp. This is used to read data from graphite server.
+     * (see http://graphite.wikidot.com/high-level-diagram)
+     * @see GraphiteEventService
+     */
+    String webappUrl
+    /**
+     * Port of this GraphiteServer's webapp. This is used to read data from graphite server.
+     * (see http://graphite.wikidot.com/high-level-diagram)
+     * @see GraphiteEventService
+     */
+    Protocol webappProtocol
+	/**
+	 * Path to rendering engine of GraphiteServer's webapp.
+	 */
+	String webappPathToRenderingEngine
+
 
     /**
      * {@link GraphitePath}s, for which results should be sent for this server.
      */
     Collection<GraphitePath> graphitePaths = []
-    static hasMany = [graphitePaths:GraphitePath]
+    /**
+     * {@link GraphiteEventSourcePath}s, to create Events.
+     */
+    Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
+    static hasMany = [graphitePaths:GraphitePath, graphiteEventSourcePaths:GraphiteEventSourcePath]
     static transients = ['serverInetAddress']
 
     public InetAddress getServerInetAddress() {
@@ -46,10 +82,19 @@ class GraphiteServer {
         serverAdress(unique: 'port', maxSize: 255)
         port(min: 0, max: 65535)
         graphitePaths()
+        webappUrl()
+		webappProtocol()
+        webappPathToRenderingEngine()
     }
 
     @Override
     public String toString(){
-        return "${getServerAdress()}:${port}"
+        StringBuilder sb = new StringBuilder()
+        sb.append("instance object: ${super.toString()}\n")
+        sb.append((serverAdress && port) ? "carbon: ${serverAdress}:${port}\n" : '')
+        sb.append((webappProtocol && webappUrl && webappPathToRenderingEngine) ?
+                "webapp's rendering engine: ${webappProtocol.scheme()}${webappUrl}${webappPathToRenderingEngine}\n" :
+                '')
+        return sb.toString()
     }
 }

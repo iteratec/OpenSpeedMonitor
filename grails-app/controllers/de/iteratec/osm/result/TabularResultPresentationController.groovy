@@ -32,18 +32,15 @@ import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.validation.Validateable
-
-import java.text.SimpleDateFormat
-import java.util.regex.Pattern
-
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
-import org.springframework.beans.propertyeditors.CustomDateEditor
+
+import java.text.SimpleDateFormat
+import java.util.regex.Pattern
 
 /**
  * <p>
@@ -360,14 +357,12 @@ class TabularResultPresentationController {
          */
         public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
         {
-            DateValueConverter converter = DateValueConverter.getConverter()
-
-            viewModelToCopyTo.put('from', converter.convert(this.from))
+            viewModelToCopyTo.put('from', this.from)
             if(!this.fromHour.is(null)) {
                 viewModelToCopyTo.put('fromHour',this.fromHour)
             }
 
-            viewModelToCopyTo.put('to', converter.convert(this.to))
+            viewModelToCopyTo.put('to', this.to)
             if (!this.toHour.is(null)){
                 viewModelToCopyTo.put('toHour', this.toHour)
             }
@@ -413,10 +408,8 @@ class TabularResultPresentationController {
         /**
          * The database IDs of the selected {@linkplain Page pages}
          * which results to be shown.
-         *
-         * TODO rename to selectedPages
          */
-        Collection<Long> selectedPage = []
+        Collection<Long> selectedPages = []
 
         /**
          * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
@@ -485,7 +478,7 @@ class TabularResultPresentationController {
             selectedFolder(nullable:false, minSize:1)
 
             // selectedPages is not allowed to be empty
-            selectedPage(nullable:false, minSize:1)
+            selectedPages(nullable:false, minSize:1)
 
             // selectedMeasuredEventIds is only allowed to be empty if selectedAllMeasuredEvents is true
             selectedMeasuredEventIds(nullable:false, validator: { Collection currentCollection, ListResultsCommand cmd ->
@@ -520,7 +513,7 @@ class TabularResultPresentationController {
         public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
         {
             viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
-            viewModelToCopyTo.put('selectedPages', this.selectedPage)
+            viewModelToCopyTo.put('selectedPages', this.selectedPages)
 
             viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
             viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
@@ -574,7 +567,7 @@ class TabularResultPresentationController {
                 result.measuredEventIds.addAll(this.selectedMeasuredEventIds);
             }
 
-            result.pageIds.addAll(this.selectedPage);
+            result.pageIds.addAll(this.selectedPages);
 
             if( !this.selectedAllBrowsers )
             {
