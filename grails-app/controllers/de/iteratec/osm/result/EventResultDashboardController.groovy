@@ -26,6 +26,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.report.UserspecificDashboard
+import de.iteratec.osm.report.UserspecificDashboardDiagramType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.EventService
 import de.iteratec.osm.report.chart.MeasurandGroup
@@ -72,6 +74,7 @@ class EventResultDashboardController {
     I18nService i18nService
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
+    def springSecurityService
 
     /**
      * The Grails engine to generate links.
@@ -154,6 +157,64 @@ class EventResultDashboardController {
         return modelToRender
     }
 
+
+    /**
+     * <p>
+    * Ajax service to confirm that dashboard name entered for saving custom dashboard was unique.
+    * </p>
+    *
+    * @param proposedDashboardName
+    *         The proposed Dashboard Name;
+    *         not <code>null</code>.
+    * @return nothing, immediately sends HTTP response codes to client.
+    */
+    def validateDashboardName(String proposedDashboardName) {
+        UserspecificDashboard newCustomDashboard = new UserspecificDashboard(dashboardName: proposedDashboardName)
+        if (!newCustomDashboard.validate()) {
+            response.sendError(302, 'dashboard by that name exists already')
+            return null
+        } else {
+            response.sendError(200, 'OK')
+            return null
+        }
+    }
+
+    /**
+     * <p>
+    * Stores the selection passed as {@link CsiDashboardShowAllCommand} as new custom dashboard.
+    * </p>
+    *
+    * @param cmd
+    *         The command with the users selections;
+    *         not <code>null</code>.
+    * @return nothing, immediately renders a CSV to response' output stream.
+    */
+   public Map<String, Object> storeCustomDashboard(ShowAllCommand cmd) {
+       if( request.queryString && cmd.validate() )
+       {
+           def username = springSecurityService.authentication.principal.getUsername()
+           UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.EVENT, fromDate: cmd.from, toDate: cmd.to, fromHour: cmd.fromHour,
+               toHour: cmd.toHour, aggrGroup: cmd.aggrGroup, selectedInterval: cmd.selectedInterval, selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, selectChartType: cmd.selectChartType,
+               selectedFolder: cmd.selectedFolder, selectedPages: cmd.selectedPages, selectedMeasuredEventIds: cmd.selectedMeasuredEventIds, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents,
+               selectedBrowsers: cmd.selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations, selectedAllLocations: cmd.selectedAllLocations,
+               selectedAggrGroupValuesCached: cmd.selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: cmd.selectedAggrGroupValuesUnCached, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
+               trimAboveLoadTimes: cmd.trimAboveLoadTimes, trimBelowRequestCounts: cmd.trimBelowRequestCounts, trimAboveRequestCounts: cmd.trimAboveRequestCounts,
+               trimBelowRequestSizes: cmd.trimBelowRequestSizes, trimAboveRequestSizes: cmd.trimAboveRequestSizes, overwriteWarningAboutLongProcessingTime: cmd.overwriteWarningAboutLongProcessingTime,
+               debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: cmd.publiclyVisible, dashboardName: cmd.dashboardName, username: username)
+           //store object
+           if (!newCustomDashboard.save(failOnError: true, flush: true)) {
+               redirectWith303('showAll', params)
+               return
+           } else {
+               params.saveOkay = URLEncoder.encode(cmd.dashboardName, "UTF-8")
+               redirectWith303('showAll', params)
+               return
+           }
+       } else {
+           redirectWith303('showAll', params)
+           return
+       }
+   }
 
     private void fillWithMeasuredValueData(Map<String, Object> modelToRender, ShowAllCommand cmd) {
         Interval timeFrame = cmd.getSelectedTimeFrame();

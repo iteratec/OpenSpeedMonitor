@@ -291,7 +291,7 @@ class UserspecificDashboard {
         setToHour(nullable: true)
         includeInterval(nullable: true)
         publiclyVisible(nullable: true)
-        dashboardName(nullable: true)
+        dashboardName(nullable: true, unique:true)
         selectedInterval(nullable: true)
         selectChartType(nullable: true)
         selectedAggrGroupValuesUnCached(nullable: true)

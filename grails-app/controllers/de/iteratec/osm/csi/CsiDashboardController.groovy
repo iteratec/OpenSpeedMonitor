@@ -79,7 +79,7 @@ class CsiDashboardController {
     MeasuredValueUtilService measuredValueUtilService
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
-
+    def springSecurityService
     /**
      * The Grails engine to generate links.
      *
@@ -680,7 +680,28 @@ class CsiDashboardController {
 
     /**
      * <p>
-    * Stores the selection passed as {@link CsiDashboardShowAllCommand} as new custom dashboard. RKRKRK - WIP
+    * Ajax service to confirm that dashboard name entered for saving custom dashboard was unique.
+    * </p>
+    *
+    * @param proposedDashboardName
+    *         The proposed Dashboard Name;
+    *         not <code>null</code>.
+    * @return nothing, immediately sends HTTP response codes to client.
+    */
+    def validateDashboardName(String proposedDashboardName) {
+        UserspecificDashboard newCustomDashboard = new UserspecificDashboard(dashboardName: proposedDashboardName)
+        if (!newCustomDashboard.validate()) {
+            response.sendError(302, 'dashboard by that name exists already')
+            return null
+        } else {
+            response.sendError(200, 'OK')
+            return null
+        }
+    }
+
+    /**
+     * <p>
+    * Stores the selection passed as {@link CsiDashboardShowAllCommand} as new custom dashboard.
     * </p>
     *
     * @param cmd
@@ -689,10 +710,9 @@ class CsiDashboardController {
     * @return nothing, immediately renders a CSV to response' output stream.
     */
    public Map<String, Object> storeCustomDashboard(CsiDashboardShowAllCommand cmd) {
-       log.error ("rk0")
        if( request.queryString && cmd.validate() )
        {
-           def username = "rk"
+           def username = springSecurityService.authentication.principal.getUsername()
            UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: cmd.from, toDate: cmd.to, fromHour: cmd.fromHour, fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute,
                aggrGroup: cmd.aggrGroup, selectedFolder: cmd.selectedFolder, selectedPages: cmd.selectedPages, selectedMeasuredEventIds: cmd.selectedMeasuredEventIds,
                selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: cmd.selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations,
@@ -704,6 +724,7 @@ class CsiDashboardController {
                redirectWith303('showAll', params)
                return
            } else {
+               params.saveOkay = URLEncoder.encode(cmd.dashboardName, "UTF-8")
                redirectWith303('showAll', params)
                return
            }

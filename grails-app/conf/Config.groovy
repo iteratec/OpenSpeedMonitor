@@ -152,6 +152,7 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/about'                					: ["permitAll"],
 	'/cookie/**'								: ["permitAll"],
     '/csiDashboard/storeCustomDashboard'        : ["permitAll"],
+    '/csiDashboard/validateDashboardName'       : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////

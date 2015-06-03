@@ -51,6 +51,18 @@
 	<div class="row">
 		<div class="span12">
 			<form method="get" action="">
+      <g:if test="${params.containsKey('saveOkay')}">
+        <div class="alert alert-success">
+          <g:message code="de.iteratec.ism.ui.labels.save.success" default="" args="${[URLDecoder.decode(params.saveOkay, "UTF-8")]}"/>
+        </div>
+        <r:script>
+        $(document).ready( function () {
+          var oldUrl = document.location.href;
+          var newUrl = oldUrl.replace(/(&saveOkay=).*?(&|$)/,'');
+          window.history.pushState('',document.title,newUrl);
+        });    
+        </r:script>
+      </g:if>
 			<g:if test="${warnAboutLongProcessingTime}">
 				<div class="alert">
 					<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title" /></strong>
