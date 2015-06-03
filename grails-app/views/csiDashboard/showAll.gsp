@@ -109,8 +109,8 @@
 				<p>
 					<g:actionSubmit id="chart-submit" value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll" class="btn btn-primary" style="margin-top: 16px;" />
           <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;" />
-          <sec:ifLoggedIn>rk1
-            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">rk2
+          <sec:ifLoggedIn>
+            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
              <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
              <g:actionSubmit value="hiddenTriggerToStoreCustomDashboard" id="hiddenTriggerToStoreCustomDashboard" action="storeCustomDashboard" class="renderInvisible"/>
              <input type="checkbox" id="publiclyVisible" name="publiclyVisible" class="renderInvisible"/>
