@@ -246,10 +246,14 @@
 								style="margin-top: 16px;" />
               <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
                 class="btn btn-primary" style="margin-top: 16px;" />
-              <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-              <g:actionSubmit value="hiddenTriggerToStoreCustomDashboard" id="hiddenTriggerToStoreCustomDashboard" action="storeCustomDashboard" class="renderInvisible"/>
-             <input type="checkbox" id="publiclyVisible" name="publiclyVisible" class="renderInvisible"/>
-             <input type="text" class="renderInvisible" id="dashboardName" name="dashboardName">
+              <sec:ifLoggedIn>
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+							   <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+                 <g:actionSubmit value="hiddenTriggerToStoreCustomDashboard" id="hiddenTriggerToStoreCustomDashboard" action="storeCustomDashboard" class="renderInvisible"/>
+		             <input type="checkbox" id="publiclyVisible" name="publiclyVisible" class="renderInvisible"/>
+		             <input type="text" class="renderInvisible" id="dashboardName" name="dashboardName">
+						    </sec:ifAnyGranted>
+							</sec:ifLoggedIn>
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.
