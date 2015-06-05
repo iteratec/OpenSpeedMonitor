@@ -184,11 +184,6 @@ public class CsiDashboardShowAllCommand {
     Boolean includeInterval
 
     /**
-     * transient parameters for storage of custom dashboard
-     */
-    Boolean publiclyVisible
-    String dashboardName
-    /**
      * Constraints needs to fit.
      */
     static constraints = {
@@ -250,7 +245,7 @@ public class CsiDashboardShowAllCommand {
         overwriteWarningAboutLongProcessingTime(nullable:true)
     }
 
-    static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType', 'publiclyVisible', 'dashboardName']
+    static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType']
 
     /**
      * <p>

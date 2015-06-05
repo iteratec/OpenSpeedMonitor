@@ -39,10 +39,12 @@ import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
+import grails.converters.JSON
 
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -701,38 +703,76 @@ class CsiDashboardController {
 
     /**
      * <p>
-    * Stores the selection passed as {@link CsiDashboardShowAllCommand} as new custom dashboard.
+    * Ajax service to validate and store custom dashboard settings.
     * </p>
     *
-    * @param cmd
-    *         The command with the users selections;
+    * @param values
+    *         The dashboard settings, JSON encoded;
     *         not <code>null</code>.
-    * @return nothing, immediately renders a CSV to response' output stream.
+    * @param dashboardName
+    *         The proposed Dashboard Name;
+    *         not <code>null</code>.
+    * @param publiclyVisible
+    *         boolean value indicating if the custom dashboard should be visible to everyone or just its creator;
+    *         not <code>null</code>.
+    * @return nothing, immediately sends HTTP response codes to client.
     */
-   public Map<String, Object> storeCustomDashboard(CsiDashboardShowAllCommand cmd) {
-       if( request.queryString && cmd.validate() )
-       {
+    def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible) {
+        JSONObject dashboardValues = JSON.parse(values)
+        Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
+        Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
+        Collection<Long> selectedFolder = []
+        Collection<Long> selectedPages = []
+        Collection<Long> selectedMeasuredEventIds = []
+        Collection<Long> selectedBrowsers = []
+        Collection<Long> selectedLocations = []
+        dashboardValues.each { id, data ->
+            switch (id) {
+                case ~/^selectedFolder$/:
+                    selectedFolder << Long.parseLong(data)
+                    break
+                case ~/^selectedPages$/:
+                    selectedPages << Long.parseLong(data)
+                    break
+                case ~/^selectedMeasuredEventIds$/:
+                    selectedMeasuredEventIds << Long.parseLong(data)
+                    break
+                case ~/^selectedBrowsers$/:
+                    selectedBrowsers << Long.parseLong(data)
+                    break
+                case ~/^selectedLocations$/:
+                    selectedLocations << Long.parseLong(data)
+                    break
+            }
+        }
+        def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
+            toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroup: dashboardValues.aggrGroup, selectedFolder: selectedFolder,
+            selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
+            selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
+            selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: dashboardValues.selectedTimeFrameInterval,
+            includeInterval: dashboardValues.includeInterval)
+
+        if (!cmd.validate()) {
+            //send errors
+            def errMsgList = cmd.errors.allErrors.collect{g.message([error : it])}
+            response.sendError(400, "rkrkrk" + errMsgList.toString() + "rkrkrk") // Apache Tomcat will output the response as part of (HTML) error page - 'rkrkrk' are the delimiters so the AJAX frontend can find the message
+            return null
+        } else {
            def username = springSecurityService.authentication.principal.getUsername()
-           UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: cmd.from, toDate: cmd.to, fromHour: cmd.fromHour, fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute,
-               aggrGroup: cmd.aggrGroup, selectedFolder: cmd.selectedFolder, selectedPages: cmd.selectedPages, selectedMeasuredEventIds: cmd.selectedMeasuredEventIds,
-               selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: cmd.selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations,
-               selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
-               selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: cmd.publiclyVisible,
-               dashboardName: cmd.dashboardName, username: username)
-           //store object
+            UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
+                fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute, aggrGroup: cmd.aggrGroup, selectedFolder: selectedFolder, selectedPages: selectedPages,
+                selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: selectedBrowsers,
+                selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
+                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, dashboardName: dashboardName, username: username)
            if (!newCustomDashboard.save(failOnError: true, flush: true)) {
-               redirectWith303('showAll', params)
-               return
+               response.sendError(500, 'save error')
+               return null
            } else {
-               params.saveOkay = URLEncoder.encode(cmd.dashboardName, "UTF-8")
-               redirectWith303('showAll', params)
-               return
+               response.sendError(200, 'OK')
+               return null
            }
-       } else {
-           redirectWith303('showAll', params)
-           return
-       }
-   }
+        }
+    }
 
     /**
      * <p>
