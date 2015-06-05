@@ -386,8 +386,6 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('includeInterval', this.includeInterval)
-        viewModelToCopyTo.put('publiclyVisible', this.publiclyVisible)
-        viewModelToCopyTo.put('dashboardName', this.dashboardName)
     }
 
     /**
