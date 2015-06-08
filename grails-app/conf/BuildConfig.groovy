@@ -131,7 +131,8 @@ grails.project.dependency.resolution = {
 			':jmx:0.9',
 			':taggable:1.0.1',
 			':lesscss-resources:1.3.1',
-			':cookie:1.0.1'
+			':cookie:1.0.1',
+            ':codenarc:0.22'
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"
@@ -144,8 +145,8 @@ grails.project.dependency.resolution = {
 			if (Environment.getCurrent() == Environment.PRODUCTION || Environment.getCurrent() == Environment.TEST) { export = false }
 		}
 
-		compile(':codenarc:0.22')
-		compile(':markdown:1.1.1')
+        //test//////////////////////////////////////////////////////////////////
+        test ":code-coverage:2.0.3-3"
 	}
 
 	codenarc {
@@ -160,6 +161,5 @@ grails.project.dependency.resolution = {
 	        }
 		}
 	}
-
 
 }
