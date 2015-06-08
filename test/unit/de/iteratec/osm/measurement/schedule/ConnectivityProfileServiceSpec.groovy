@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.schedule
 
 import grails.test.mixin.*
 import org.junit.*
+import org.springframework.context.i18n.LocaleContextHolder
 import spock.lang.Specification
 
 /**
@@ -33,6 +34,10 @@ class ConnectivityProfileServiceSpec extends Specification{
     void setup(){
         //eclipse doesn't know injected service object, so we help ;)
         serviceUnderTest = service
+        //mocks common to all tests
+        LocaleContextHolder.metaClass.static.getLocale = {
+            return Locale.GERMAN
+        }
     }
     void "get custom name for connectivity without packet loss"() {
         when:

@@ -17,7 +17,11 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import org.springframework.context.i18n.LocaleContextHolder
+
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+
 import static de.iteratec.osm.util.Constants.*
 
 /**
@@ -53,8 +57,7 @@ class ConnectivityProfileService {
     String getCustomConnectivityNameFor(Integer bwDown, Integer bwUp, Integer latency, Integer plr) {
 
         validateConnectivityAttributes(bwDown, bwUp, latency, plr)
-
-        DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN)
+        DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN, new DecimalFormatSymbols(LocaleContextHolder.locale))
         String plrPart = plr ? ", ${decimalFormat.format(plr)}% PLR" : ""
         return "Custom (${decimalFormat.format(bwDown)}/${decimalFormat.format(bwUp)} Kbps, ${decimalFormat.format(latency)}ms Latency${plrPart})"
 
