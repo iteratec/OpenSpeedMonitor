@@ -103,4 +103,48 @@ class ResultXmlProcessingSpec {
 		assertThat(resultXml.isMedian(3, CachedView.CACHED, 0), is(false))
 		assertThat(resultXml.isMedian(4, CachedView.CACHED, 0), is(false))
 	}
+    void testGetBwDown(){
+        //test specific data
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
+
+        //test execution and assertions
+        assertThat(resultXmlSinglestep.getBwDown(), is(6000))
+        assertThat(resultXmlMultistep.getBwDown(), is(6000))
+    }
+    void testGetBwUp(){
+        //test specific data
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
+
+        //test execution and assertions
+        assertThat(resultXmlSinglestep.getBwUp(), is(512))
+        assertThat(resultXmlMultistep.getBwUp(), is(512))
+    }
+    void testGetLatency(){
+        //test specific data
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
+
+        //test execution and assertions
+        assertThat(resultXmlSinglestep.getLatency(), is(50))
+        assertThat(resultXmlMultistep.getLatency(), is(50))
+    }
+    void testGetPlr(){
+        //test specific data
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
+
+        //test execution and assertions
+        assertThat(resultXmlSinglestep.getPacketLossRate(), is(0))
+        assertThat(resultXmlMultistep.getPacketLossRate(), is(0))
+    }
 }

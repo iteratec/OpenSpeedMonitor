@@ -215,7 +215,14 @@ class EventResultDashboardServiceTests {
 				runs: 1,
 				jobGroup: jobGroup,
 				maxDownloadTimeInMinutes: 60,
-				script: script).save(failOnError: true);
+				script: script,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
+        ).save(failOnError: true);
 
 		jobResult=new JobResult(
 				date: runDate.toDate(),

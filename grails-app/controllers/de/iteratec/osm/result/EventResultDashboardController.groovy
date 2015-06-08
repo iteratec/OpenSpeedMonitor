@@ -70,7 +70,7 @@ class EventResultDashboardController {
     PageDaoService pageDaoService
     BrowserDaoService browserDaoService
     LocationDaoService locationDaoService
-    EventResultService eventResultService
+    EventResultService eventResulshowatService
     MeasuredValueUtilService measuredValueUtilService
     EventResultDashboardService eventResultDashboardService
     PageService pageService

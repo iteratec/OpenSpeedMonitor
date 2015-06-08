@@ -336,7 +336,13 @@ class TestDataUtil {
 			description: description,
 			runs: runs,
 			active: active,
-            maxDownloadTimeInMinutes: maxDownloadTimeInMinutes
+            maxDownloadTimeInMinutes: maxDownloadTimeInMinutes,
+            customConnectivityProfile: true,
+            customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+            bandwidthDown: 6000,
+            bandwidthUp: 512,
+            latency: 50,
+            packetLoss: 0
 		).save(failOnError: true)
 	}
 	static createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation){

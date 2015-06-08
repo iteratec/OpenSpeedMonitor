@@ -47,10 +47,8 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 @Mock([EventResult, Job, JobResult, JobGroup, MeasuredValue, MeasuredEvent, WebPageTestServer,
 	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script])
 class ResultMeasuredValueServiceTests {
-	//ResultMeasuredValueService, JobResultService, MeasuredValueUtilService, BrowserDaoService, MeasuredValueTagService
 
 	ResultMeasuredValueService serviceUnderTest
-
 	BrowserDaoService browserDaoServiceMock
 	MeasuredValueUtilService measuredValueUtilServiceMock
 	MeasuredValueTagService measuredValueTagServiceMock
@@ -174,29 +172,41 @@ class ResultMeasuredValueServiceTests {
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
 		job1 = new Job(
-				id: 1,
-				active: false,
-				label: 'BV1 - Step 01',
-				description: 'This is job 01...',
-				location: ffAgent1,
-				frequencyInMin: 5,
-				runs: 1,
-				jobGroup: jobGroup,
-				script: script,
-				maxDownloadTimeInMinutes: 60	
-				).save(failOnError: true)
+            id: 1,
+            active: false,
+            label: 'BV1 - Step 01',
+            description: 'This is job 01...',
+            location: ffAgent1,
+            frequencyInMin: 5,
+            runs: 1,
+            jobGroup: jobGroup,
+            script: script,
+            maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: true,
+            customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+            bandwidthDown: 6000,
+            bandwidthUp: 512,
+            latency: 50,
+            packetLoss: 0
+        ).save(failOnError: true)
 
 		job2 = new Job(
-				active: false,
-				label: 'BV1 - Step 02',
-				description: 'This is job 02...',
-				location: ffAgent1,
-				frequencyInMin: 5,
-				runs: 1,
-				jobGroup: jobGroup,
-				script: script,
-				maxDownloadTimeInMinutes: 60	
-				).save(failOnError: true)
+            active: false,
+            label: 'BV1 - Step 02',
+            description: 'This is job 02...',
+            location: ffAgent1,
+            frequencyInMin: 5,
+            runs: 1,
+            jobGroup: jobGroup,
+            script: script,
+            maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: true,
+            customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+            bandwidthDown: 6000,
+            bandwidthUp: 512,
+            latency: 50,
+            packetLoss: 0
+        ).save(failOnError: true)
 
 		measuredEvent = new MeasuredEvent()
 		measuredEvent.setName('Test event')

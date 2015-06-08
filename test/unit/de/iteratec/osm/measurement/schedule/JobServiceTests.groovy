@@ -243,7 +243,13 @@ class JobServiceTests {
 				jobGroup: group,
 				script: script,
 				maxDownloadTimeInMinutes: 60,
-				executionSchedule: '0 0 */5 * * ? *'
+				executionSchedule: '0 0 */5 * * ? *',
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 		job2 = new Job(
 				active: false,
@@ -254,7 +260,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 		job3 = new Job(
 				active: false,
@@ -265,7 +277,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 		job4 = new Job(
 				active: false,
@@ -276,7 +294,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 
 		job5 = new Job(
@@ -288,7 +312,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 
 		job6 = new Job(
@@ -300,7 +330,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 		job7 = new Job(
 				active: false,
@@ -311,7 +347,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 
 		job8 = new Job(
@@ -323,7 +365,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 
 		job9 = new Job(
@@ -335,7 +383,13 @@ class JobServiceTests {
 				runs: 1,
 				jobGroup: nonCSIgroup,
 				script: script,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 		).save(failOnError: true)
 	}
 }

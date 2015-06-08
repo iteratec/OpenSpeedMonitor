@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.result.JobResultService
 import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
@@ -77,6 +78,7 @@ class LocationAndResultPersisterService implements iListener{
 	HarParserService harParserService
 	ConfigService configService
     PerformanceLoggingService performanceLoggingService
+    ConnectivityProfileService connectivityProfileService
 
 
     /**
@@ -131,7 +133,9 @@ class LocationAndResultPersisterService implements iListener{
 			
         Job jobConfig
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
-            jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
+            String jobLabel = resultXml.getLabel()
+            jobConfig = Job.findByLabel(jobLabel)
+            if (jobConfig == null) throw new RuntimeException("No measurement job could be found for label from result xml: ${jobLabel}")
         }
 
 		if (jobConfig != null) {
@@ -200,27 +204,6 @@ class LocationAndResultPersisterService implements iListener{
 				throw e;
 			}
 		}
-	}
-
-	protected Job persistNewJobConfig(WptResultXml resultXml, WebPageTestServer wptserverOfResult){
-		String jobConfLabel = resultXml.getLabel()
-		log.debug("persisting new Job ${jobConfLabel}")
-		Location location = getOrFetchLocation(wptserverOfResult, resultXml.getLocation());
-		JobGroup jobGroup = JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-		log.debug("Incoming Result for unknown Job.")	
-			
-		Job jobConfig = new Job(
-				location: location,
-				active: false,
-				label: jobConfLabel,
-				runs: resultXml.getRunCount(),
-				jobGroup: jobGroup,
-				script: Script.createDefaultScript(jobConfLabel).save(failOnError: true),
-				maxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes()
-				)
-		//new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
-		jobConfig.setDescription('')
-		return jobConfig
 	}
 
 	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){

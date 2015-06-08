@@ -91,13 +91,17 @@ class PersistScreenshotDependentWptMetricsSpec {
     }
 
     void createTestDataCommonForAllTests() {
-        TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI, JobGroupType.CSI_AGGREGATION)
+        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI, JobGroupType.CSI_AGGREGATION)
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
         Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
         Browser ie = TestDataUtil.createBrowser('IE', 1d)
-        TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-64bit-ssd:Firefox', ff, true)
-        TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
+        Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-64bit-ssd:Firefox', ff, true)
+        Location locationIe = TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
         List<Page> pages = TestDataUtil.createPages(['HP', 'SE'])
+
+        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+        TestDataUtil.createJob('FF_Otto_multistep', testScript, locationFirefox, jobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('IE_otto_hp_singlestep', testScript, locationIe, jobGroup, '', 1 , false, 60)
     }
 
     void createMocksCommonForAllTests() {

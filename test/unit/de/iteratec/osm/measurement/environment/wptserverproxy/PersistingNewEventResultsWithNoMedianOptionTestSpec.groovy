@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.csi.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -31,23 +32,18 @@ import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.PageService
+import de.iteratec.osm.result.*
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WaterfallEntry
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.util.PerformanceLoggingService
-import groovy.util.slurpersupport.GPathResult
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.util.slurpersupport.GPathResult
 import org.junit.Before
 import org.junit.Test
 
-import static org.junit.Assert.*
+import static org.junit.Assert.assertEquals
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -84,6 +80,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //creating test-data common to all tests
         createPages()
         createBrowsers()
+        createLocationsAndJobs()
         //mocks common for all tests
         mockMetricReportingService()
         mockHarParserService()
@@ -93,6 +90,12 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
     }
 
+    void createLocationsAndJobs(){
+        Location testLocation = TestDataUtil.createLocation(server, 'test-location', Browser.findByName('IE'), true)
+        if(Job.findByLabel('FF_Otto_multistep') == null) TestDataUtil.createJob('FF_Otto_multistep', Script.createDefaultScript('FF_Otto_multistep'), testLocation, undefinedJobGroup, '', 1 , false, 60)
+        if(Job.findByLabel('IE_otto_hp_singlestep') == null) TestDataUtil.createJob('IE_otto_hp_singlestep', Script.createDefaultScript('IE_otto_hp_singlestep'), testLocation, undefinedJobGroup, '', 1 , false, 60)
+    }
+
     @Test
     void testCreatedEventsAfterListeningToMultistepResultAndPersistNonMedian() {
         //create test-specific data
@@ -100,6 +103,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         GPathResult xmlResult = new XmlSlurper().parse(file)
         String har = new File('test/resources/HARs/singleResult.har').getText()
+        deleteResults()
+        setNonMedianPersistanceForJob('FF_Otto_multistep', true)
 
         //mocking of inner services
 
@@ -108,8 +113,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockPageService()
         mockJobService()
         mockMeasuredValueTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
-
 
         // Mock Location needed!
         mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
@@ -119,9 +122,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.listenToResult(xmlResult, har, server)
 
         //assertions
-
-        Collection<Job> jobs = Job.list()
-        assertEquals("Test persisted Jobs", 1, jobs.size())
 
         //check for job-runs
         Collection<JobResult> jobRuns = JobResult.list()
@@ -140,6 +140,12 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         assertEquals("Test expected size of all non median values", 12, EventResult.findAllByMedianValue(false).size())
     }
 
+    void setNonMedianPersistanceForJob(String jobLabel, boolean nonMedianPersistance) {
+        Job job = Job.findByLabel(jobLabel)
+        job.persistNonMedianResults = nonMedianPersistance
+        job.save(failOnError: true)
+    }
+
     @Test
     void testCreatedEventsAfterListeningToMultistepResultAndPersistOnlyMedian() {
         //create test-specific data
@@ -147,6 +153,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         GPathResult xmlResult = new XmlSlurper().parse(file)
         String har = new File('test/resources/HARs/singleResult.har').getText()
+        deleteResults()
+        setNonMedianPersistanceForJob('FF_Otto_multistep', false)
 
         //mocking of inner services
 
@@ -155,32 +163,14 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockPageService()
         mockJobService()
         mockMeasuredValueTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
 
         // Mock Location needed!
         mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
-
-        //create Job and disable persistNonMedianResults
-        Job job = new Job(
-                location: Location.findByUniqueIdentifierForServer(xmlResult.data.location.toString()),
-                active: false,
-                label: 'FF_Otto_multistep',
-                runs: 5,
-                jobGroup: undefinedJobGroup,
-                script: Script.createDefaultScript('FF_Otto_multistep').save(failOnError: true),
-                maxDownloadTimeInMinutes: 60,
-                persistNonMedianResults: false,
-                description: ''
-        )
-        job.save(failOnError: true, flush: true)
 
         //test execution
         serviceUnderTest.listenToResult(xmlResult, har, server)
 
         //assertions
-
-        Collection<Job> jobs = Job.list()
-        assertEquals("Test persisted Jobs", 1, jobs.size())
 
         //check for job-runs
         Collection<JobResult> jobRuns = JobResult.list()
@@ -206,6 +196,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         GPathResult xmlResult = new XmlSlurper().parse(file)
         String har = new File('test/resources/HARs/singleResult.har').getText()
+        deleteResults()
+        setNonMedianPersistanceForJob('IE_otto_hp_singlestep', true)
 
         //mocking of inner services
 
@@ -214,68 +206,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockPageService()
         mockJobService()
         mockMeasuredValueTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
-
-
-        // Mock Location needed!
-        mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
-
-        //create Job and disable persistNonMedianResults
-        Job job = new Job(
-                location: Location.findByUniqueIdentifierForServer(xmlResult.data.location.toString()),
-                active: false,
-                label: 'IE_otto_hp_singlestep',
-                runs: 5,
-                jobGroup: undefinedJobGroup,
-                script: Script.createDefaultScript('IE_otto_hp_singlestep').save(failOnError: true),
-                maxDownloadTimeInMinutes: 60,
-                persistNonMedianResults: false,
-                description: ''
-        )
-        job.save(failOnError: true, flush: true)
-
-        //test execution
-
-        serviceUnderTest.listenToResult(xmlResult, har, server)
-
-        //assertions
-
-        Collection<Job> jobs = Job.list()
-        assertEquals("Test persisted Jobs", 1, jobs.size())
-
-        //check for job-runs
-        Collection<JobResult> jobRuns = JobResult.list()
-        assertEquals("Test persisted JobResults", 1, jobRuns.size())
-
-        //check for steps
-        List<MeasuredEvent> steps = MeasuredEvent.list()
-        assertEquals("Test expected number of steps", 1, steps.size())
-
-        //check for results
-        List<EventResult> allResults = EventResult.list()
-        assertEquals("Test expected size of all results", 2, allResults.size())
-
-        assertEquals("Test expected size of all median values", 2, EventResult.findAllByMedianValue(true).size())
-
-        assertEquals("Test expected size of all non median values", 0, EventResult.findAllByMedianValue(false).size())
-    }
-
-    @Test
-    void testCreatedEventsAfterListeningToSinglestepResultAndPersistOnlyMedian() {
-        //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        GPathResult xmlResult = new XmlSlurper().parse(file)
-        String har = new File('test/resources/HARs/singleResult.har').getText()
-
-        //mocking of inner services
-
-        mockMeasuredValueUpdateService()
-        mockTimeToCsMappingService()
-        mockPageService()
-        mockJobService()
-        mockMeasuredValueTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
 
 
         // Mock Location needed!
@@ -286,9 +216,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.listenToResult(xmlResult, har, server)
 
         //assertions
-
-        Collection<Job> jobs = Job.list()
-        assertEquals("Test persisted Jobs", 1, jobs.size())
 
         //check for job-runs
         Collection<JobResult> jobRuns = JobResult.list()
@@ -307,12 +234,54 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         assertEquals("Test expected size of all non median values", 8, EventResult.findAllByMedianValue(false).size())
     }
 
-    private void deleteAllRelevantDomains(){
-        Location.findAll().each {it.delete(flush: true)}
-        Job.list()*.delete(flush: true)
+    @Test
+    void testCreatedEventsAfterListeningToSinglestepResultAndPersistOnlyMedian() {
+        //create test-specific data
+        String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
+        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        GPathResult xmlResult = new XmlSlurper().parse(file)
+        String har = new File('test/resources/HARs/singleResult.har').getText()
+        setNonMedianPersistanceForJob('IE_otto_hp_singlestep', false)
+        deleteResults()
+
+        //mocking of inner services
+
+        mockMeasuredValueUpdateService()
+        mockTimeToCsMappingService()
+        mockPageService()
+        mockJobService()
+        mockMeasuredValueTagService('notTheConcernOfThisTest')
+
+        // Mock Location needed!
+        mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
+
+        //test execution
+
+        serviceUnderTest.listenToResult(xmlResult, har, server)
+
+        //assertions
+
+        //check for job-runs
+        Collection<JobResult> jobRuns = JobResult.list()
+        assertEquals("Test persisted JobResults", 1, jobRuns.size())
+
+        //check for steps
+        List<MeasuredEvent> steps = MeasuredEvent.list()
+        assertEquals("Test expected number of steps", 1, steps.size())
+
+        //check for results
+        List<EventResult> allResults = EventResult.list()
+        assertEquals("Test expected size of all results", 2, allResults.size())
+
+        assertEquals("Test expected size of all median values", 2, EventResult.findAllByMedianValue(true).size())
+
+        assertEquals("Test expected size of all non median values", 0, EventResult.findAllByMedianValue(false).size())
+    }
+
+    private void deleteResults(){
+        EventResult.list()*.delete(flush: true)
         JobResult.list()*.delete(flush: true)
         MeasuredEvent.list()*.delete(flush: true)
-        EventResult.list()*.delete(flush: true)
     }
 
     // mocks ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
