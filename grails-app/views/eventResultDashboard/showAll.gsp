@@ -1,4 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
+<% def springSecurityService %>
+<%@ page import="de.iteratec.osm.report.UserspecificDashboard" %>
+<%
+    def userspecificDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificDashboard').newInstance()
+%>
 <html>
 <head>
 <meta name="layout" content="kickstart_osm" />
@@ -27,10 +32,6 @@
 
 	<%-- main menu --%>
 	<g:render template="/layouts/mainMenu"/>
-
-	<g:if test="${flash.message}">
-		<div class="message" role="status">${flash.message}</div>
-	</g:if>
 
 	<div class="row">
 		<div class="span12">
@@ -241,6 +242,12 @@
 							   <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
 						    </sec:ifAnyGranted>
 							</sec:ifLoggedIn>
+		          <g:if test="${params.id}">
+		            <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+		            <g:render template="/_common/modals/deleteCustomDashboard"/>
+		              
+		            </g:if>           
+		          </g:if> 
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.

@@ -43,13 +43,14 @@
                                      'CsTargetValueController',
                                      'EventController',
                                      'GraphitePathController',
-									 'GraphiteEventSourcePathController',
+                                     'GraphiteEventSourcePathController',
                                      'GraphiteServerController',
                                      'JobGroupController',
                                      'LocationController',
                                      'MeasuredEventController',
                                      'OsmConfigurationController',
                                      'PageController',
+                                     'UserspecificDashboardController',
                                      'WebPageTestServerController'].contains(c?.fullName?.substring(c?.fullName?.lastIndexOf('.')+1))}">
 									<li class="controller"><g:link controller="${c.logicalPropertyName}">${c?.fullName?.substring(c?.fullName?.lastIndexOf('.')+1)}</g:link></li>
 	                            </g:if>

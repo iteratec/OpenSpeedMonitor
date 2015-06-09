@@ -68,32 +68,37 @@
 			        200: function (response) {
 				        //formulardaten sammeln
 				        dashBoardParamsFormValues = {};
-								jQuery('#dashBoardParamsForm').serializeArray().map(function(item) {
-								    if ( dashBoardParamsFormValues[item.name] ) {
-								        if ( typeof(dashBoardParamsFormValues[item.name]) === "string" ) {
-								          dashBoardParamsFormValues[item.name] = [dashBoardParamsFormValues[item.name]];
-								        }
-								        dashBoardParamsFormValues[item.name].push(item.value);
-								    } else {
-								      dashBoardParamsFormValues[item.name] = item.value;
-								    }
-								});
 
-								var params = $('#dashBoardParamsForm').serializeArray();
-						    var dashBoardParamsFormValues = '{';
-						    for(var ix in params)
-						    {
-						        var row = params[ix];
-						        dashBoardParamsFormValues += '"' + row.name + '":"' + row.value + '",';
-						    }
-						    var end =dashBoardParamsFormValues.length - 1;
-						    dashBoardParamsFormValues = dashBoardParamsFormValues.substr(0, end);
-						    dashBoardParamsFormValues += '}';
+				        var arrayData, objectData;
+				        arrayData = $('#dashBoardParamsForm').serializeArray();
+				        objectData = {};
+
+				        $.each(arrayData, function() {
+				          var value;
+
+				          if (this.value != null) {
+				            value = this.value;
+				          } else {
+				            value = '';
+				          }
+
+				          if (objectData[this.name] != null) {
+				            if (!objectData[this.name].push) {
+				              objectData[this.name] = [objectData[this.name]];
+				            }
+
+				            objectData[this.name].push(value);
+				          } else {
+				            objectData[this.name] = value;
+				          }
+				        });
+				        json_data = JSON.stringify(objectData);
+
                 //ergebnis annehmen und erfolg oder fehler melden
 				        jQuery.ajax({
 				          type: 'POST', 
 				          url: '${createLink(action: 'validateAndSaveDashboardValues', absolute: true)}',
-				          data: { values: dashBoardParamsFormValues, dashboardName: document.getElementById("dashboardNameFromModal").value, publiclyVisible: document.getElementById("publiclyVisibleFromModal").checked },
+				          data: { values: json_data, dashboardName: document.getElementById("dashboardNameFromModal").value, publiclyVisible: document.getElementById("publiclyVisibleFromModal").checked },
 				          statusCode: {
 				              200: function (response) {
 					              window.scrollTo(0, 0);
@@ -105,7 +110,10 @@
                         $( "#saveDashboardErrorDiv" ).show();
                         var re = /(.*rkrkrk\[)(.*)(\]rkrkrk.*)/;
                         var newtext = response.responseText.replace(re, "$2");
-                        newtext = newtext.replace(",", "<br />"); 
+                        console.log(newtext);
+                        newtext = newtext.replace(/, /g, '<br />');
+                        newtext = newtext.replace(/&amp;/g, '&');
+                        console.log(newtext);
                         document.all.saveDashboardErrorDiv.innerHTML = newtext;
                         return false;
                       },

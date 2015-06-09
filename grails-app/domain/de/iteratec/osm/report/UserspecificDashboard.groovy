@@ -1,3 +1,5 @@
+
+
 /*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
@@ -17,6 +19,15 @@
 
 package de.iteratec.osm.report
 
+import java.text.SimpleDateFormat
+
+import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
+
+
+
+
+
+
 
 public enum UserspecificDashboardDiagramType {
     CSI,
@@ -28,8 +39,27 @@ public enum UserspecificDashboardDiagramType {
  * A domain class describes the data object and it's mapping to the database
  */
 class UserspecificDashboard {
+
+    def springSecurityService
+    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
+
     //display type
     UserspecificDashboardDiagramType diagramType
+
+    /**
+     * if dashboard is visible to all or just to admins and to user that created it
+     */
+    Boolean publiclyVisible
+
+    /**
+     * name of dashboard
+     */
+    String dashboardName
+
+    /**
+     * name of user that created it
+     */
     String username
 
     //from csi start
@@ -80,13 +110,13 @@ class UserspecificDashboard {
      * which are the systems measured for a CSI value
      *
      */
-    Collection<Long> selectedFolder = []
+    String selectedFolder = ""
 
     /**
      * The database IDs of the selected {@linkplain Page pages}
      * which results to be shown.
      */
-    Collection<Long> selectedPages = []
+    String selectedPages = ""
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
@@ -96,7 +126,7 @@ class UserspecificDashboard {
      * {@link #selectedAllMeasuredEvents} is evaluated to
      * <code>false</code>.
      */
-    Collection<Long> selectedMeasuredEventIds = []
+    String selectedMeasuredEventIds = ""
 
     /**
      * User enforced the selection of all measured events.
@@ -116,7 +146,7 @@ class UserspecificDashboard {
      * {@link #selectedAllBrowsers} is evaluated to
      * <code>false</code>.
      */
-    Collection<Long> selectedBrowsers = []
+    String selectedBrowsers = ""
 
     /**
      * User enforced the selection of all browsers.
@@ -136,7 +166,7 @@ class UserspecificDashboard {
      * {@link #selectedAllLocations} is evaluated to
      * <code>false</code>.
      */
-    Collection<Long> selectedLocations = []
+    String selectedLocations = ""
 
     /**
      * User enforced the selection of all locations.
@@ -185,14 +215,6 @@ class UserspecificDashboard {
     Boolean includeInterval
 
     /**
-     * transient parameters for storage of custom dashboard
-     */
-    Boolean publiclyVisible
-    String dashboardName
-    //from csi end
-
-    //from event start
-    /**
      * The time of the {@link MeasuredValueInterval}.
      */
     Integer selectedInterval
@@ -206,13 +228,13 @@ class UserspecificDashboard {
      * Database name of the selected {@link AggregatorType}, selected by the user.
      * Determines wich {@link CachedView#CACHED} results should be shown.
      */
-    Collection<String> selectedAggrGroupValuesCached = []
+    String selectedAggrGroupValuesCached = ""
 
     /**
      * Database name of the selected {@link AggregatorType}, selected by the user.
      * Determines wich {@link CachedView#UNCACHED} results should be shown.
      */
-    Collection<String> selectedAggrGroupValuesUnCached = []
+    String selectedAggrGroupValuesUnCached = ""
 
     /**
      * Lower bound for load-time-measurands. Values lower than this will be excluded from graphs.
@@ -244,6 +266,11 @@ class UserspecificDashboard {
      */
     Integer trimAboveRequestSizes
 
+    /**
+     * toggle formatting rickshaw export to wide screen format
+     */
+    Boolean wideScreenFreeze
+
     //from event end
 
 
@@ -265,6 +292,10 @@ class UserspecificDashboard {
 
     //csi
     static constraints = {
+        dashboardName(nullable: true, unique:true)
+        diagramType(nullable: true)
+        username(nullable: true)
+        publiclyVisible(nullable: true)
         fromDate(nullable: true)
         toDate(nullable:true)
         fromHour(nullable: true)
@@ -282,7 +313,6 @@ class UserspecificDashboard {
         selectedAllMeasuredEvents(nullable: true)
         selectedAllBrowsers(nullable: true)
         selectedAllLocations(nullable: true)
-        diagramType(nullable: true)
         fromMinute(nullable: true)
         toMinute(nullable: true)
         debug(nullable: true)
@@ -290,8 +320,6 @@ class UserspecificDashboard {
         setFromHour(nullable: true)
         setToHour(nullable: true)
         includeInterval(nullable: true)
-        publiclyVisible(nullable: true)
-        dashboardName(nullable: true, unique:true)
         selectedInterval(nullable: true)
         selectChartType(nullable: true)
         selectedAggrGroupValuesUnCached(nullable: true)
@@ -301,7 +329,117 @@ class UserspecificDashboard {
         trimAboveRequestCounts(nullable: true)
         trimBelowRequestSizes(nullable: true)
         trimAboveRequestSizes(nullable: true)
-        username(nullable: true)
+        wideScreenFreeze(nullable: true)
+    }
+
+    def isCurrentUserDashboardOwner(String dashboardId) {
+        if (SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN")) {
+            return true
+        } else {
+            // get owner name
+            UserspecificDashboard currentBoard = UserspecificDashboard.get(dashboardId)
+            String boardCreator = currentBoard.username
+            String currentUser = springSecurityService.authentication.principal.getUsername()
+            if (currentUser == boardCreator) {
+                return true
+            } else {
+                return false
+            }
+        }
+    }
+
+    def getListOfAvailableDashboards(String diagramType) {
+        List result = []
+        List fullList = []
+        if (diagramType == "EVENT") {
+            fullList = UserspecificDashboard.findAllByDiagramType(UserspecificDashboardDiagramType.EVENT)
+        } else {
+            fullList = UserspecificDashboard.findAllByDiagramType(UserspecificDashboardDiagramType.CSI)
+        }
+        String currentUser = springSecurityService.authentication.principal.getUsername()
+        for(board in fullList){
+            if ((board.publiclyVisible == 1) || (board.username == currentUser)) {
+                String link = ""
+                link += "showAll?"
+                link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
+                link += "&_setFromHour="
+                if (board.setFromHour != null) { link += "&setFromHour=on" }
+                link += "&from=" + SIMPLE_DATE_FORMAT.format(board.fromDate)
+                link += "&fromHour=" + board.fromHour.replace( ':', '%3A' )
+                link += "&_setToHour="
+                if (board.setToHour != null) { link += "&setToHour=on" }
+                link += "&to=" + SIMPLE_DATE_FORMAT.format(board.toDate)
+                link += "&toHour=" + board.toHour.replace( ':', '%3A' )
+                if ((board.selectedFolder != null) && (board.selectedFolder.size() > 0)) {
+                    for(item in board.selectedFolder.tokenize( ',' )){
+                        link += "&selectedFolder=" + item
+                    }
+                }
+                if ((board.selectedPages != null) && (board.selectedPages.size() > 0)) {
+                    for(item in board.selectedPages.tokenize( ',' )){
+                        link += "&selectedPages=" + item
+                    }
+                }
+                link += "&_selectedAllBrowsers="
+                if (board.selectedAllBrowsers != null) { link += "&selectedAllBrowsers=on" }
+                link += "&_selectedAllMeasuredEvents="
+                if (board.selectedAllMeasuredEvents != null) { link += "&selectedAllMeasuredEvents=on" }
+                link += "&_selectedAllLocations="
+                if (board.selectedAllLocations != null) { link += "&selectedAllLocations=on" }
+                if ((board.selectedMeasuredEventIds != null) && (board.selectedMeasuredEventIds.size() > 0)) {
+                    for(item in board.selectedMeasuredEventIds.tokenize( ',' )){
+                        link += "&selectedMeasuredEventIds=" + item
+                    }
+                }
+                if ((board.selectedBrowsers != null) && (board.selectedBrowsers.size() > 0)) {
+                    for(item in board.selectedBrowsers.tokenize( ',' )){
+                        link += "&selectedBrowsers=" + item
+                    }
+                }
+                if ((board.selectedLocations != null) && (board.selectedLocations.size() > 0)) {
+                    for(item in board.selectedLocations.tokenize( ',' )){
+                        link += "&selectedLocations=" + item
+                    }
+                }
+                link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
+                link += "&id=" + board.id
+                link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
+                if (board.wideScreenFreeze == 1) {
+                    link += "&wideScreenFreeze=on"
+                }
+                if (diagramType == "EVENT") {
+                    link += "&selectedInterval=" + board.selectedInterval
+
+                    if ((board.selectedAggrGroupValuesUnCached != null) && (board.selectedAggrGroupValuesUnCached.size() > 0)) {
+                        for(item in board.selectedAggrGroupValuesUnCached.tokenize( ',' )){
+                            link += "&selectedAggrGroupValuesUnCached=" + item
+                        }
+                    }
+                    if ((board.selectedAggrGroupValuesCached != null) && (board.selectedAggrGroupValuesCached.size() > 0)) {
+                        for(item in board.selectedAggrGroupValuesCached.tokenize( ',' )){
+                            link += "&selectedAggrGroupValuesCached=" + item
+                        }
+                    }
+                    link += "&trimBelowLoadTimes="
+                    if (board.trimBelowLoadTimes != null) { link += board.trimBelowLoadTimes }
+                    link += "&trimAboveLoadTimes="
+                    if (board.trimAboveLoadTimes != null) { link += board.trimAboveLoadTimes }
+                    link += "&trimBelowRequestCounts="
+                    if (board.trimBelowRequestCounts != null) { link += board.trimBelowRequestCounts }
+                    link += "&trimAboveRequestCounts="
+                    if (board.trimAboveRequestCounts != null) { link += board.trimAboveRequestCounts }
+                    link += "&trimBelowRequestSizes="
+                    if (board.trimBelowRequestSizes != null) { link += board.trimBelowRequestSizes }
+                    link += "&trimAboveRequestSizes="
+                    if (board.trimAboveRequestSizes != null) { link += board.trimAboveRequestSizes }
+                } else {
+                    link += "&aggrGroup=" + board.aggrGroup
+                    if (board.includeInterval != null) { link += "&includeInterval=on" }
+                }
+                result.add([dashboardName: board.dashboardName, link: link])
+            }
+        }
+        return result
     }
 
 	/*

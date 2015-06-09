@@ -52,6 +52,7 @@ import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
@@ -184,6 +185,32 @@ class CsiDashboardController {
      * @return Nothing, redirects immediately.
      */
     Map<String, Object> index() {
+        redirectWith303('showAll')
+    }
+
+    /**
+     * deletes custom Dashboard
+     *
+     * @return Nothing, redirects immediately.
+     */
+    Map<String, Object> delete() {
+
+        def userspecificDashboardInstance = UserspecificDashboard.get(params.id)
+        if (!userspecificDashboardInstance) {
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+            redirect(action: "list")
+            return
+        }
+
+        try {
+           userspecificDashboardInstance.delete(flush: true)
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+                redirect(action: "list")
+        } catch (DataIntegrityViolationException e) {
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+                redirect(action: "show", id: params.id)
+        }
+
         redirectWith303('showAll')
     }
 
@@ -726,23 +753,50 @@ class CsiDashboardController {
         Collection<Long> selectedMeasuredEventIds = []
         Collection<Long> selectedBrowsers = []
         Collection<Long> selectedLocations = []
+        String selectedFolderString = ""
+        String selectedPagesString = ""
+        String selectedMeasuredEventIdsString = ""
+        String selectedBrowsersString = ""
+        String selectedLocationsString = ""
         dashboardValues.each { id, data ->
+           def dataToAssign
+           if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
+               dataToAssign = data.join(',')
+               dataToAssign = dataToAssign.replace( '"', '' )
+           } else {
+               dataToAssign = data
+           }
             switch (id) {
-                case ~/^selectedFolder$/:
-                    selectedFolder << Long.parseLong(data)
-                    break
-                case ~/^selectedPages$/:
-                    selectedPages << Long.parseLong(data)
-                    break
-                case ~/^selectedMeasuredEventIds$/:
-                    selectedMeasuredEventIds << Long.parseLong(data)
-                    break
-                case ~/^selectedBrowsers$/:
-                    selectedBrowsers << Long.parseLong(data)
-                    break
-                case ~/^selectedLocations$/:
-                    selectedLocations << Long.parseLong(data)
-                    break
+                   case ~/^selectedFolder$/:
+                       selectedFolderString = dataToAssign
+                       data.each() {
+                           selectedFolder.push(it)
+                       }
+                       break
+                   case ~/^selectedPages$/:
+                       selectedPagesString = dataToAssign
+                       data.each() {
+                           selectedPages.push(it)
+                       }
+                       break
+                   case ~/^selectedMeasuredEventIds$/:
+                       selectedMeasuredEventIdsString = dataToAssign
+                       data.each() {
+                           selectedMeasuredEventIds.push(it)
+                       }
+                       break
+                   case ~/^selectedBrowsers$/:
+                       selectedBrowsersString = dataToAssign
+                       data.each() {
+                           selectedBrowsers.push(it)
+                       }
+                       break
+                   case ~/^selectedLocations$/:
+                       selectedLocationsString = dataToAssign
+                       data.each() {
+                           selectedLocations.push(it)
+                       }
+                       break
             }
         }
         def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
@@ -750,7 +804,7 @@ class CsiDashboardController {
             selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
             selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
             selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: dashboardValues.selectedTimeFrameInterval,
-            includeInterval: dashboardValues.includeInterval)
+            includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
 
         if (!cmd.validate()) {
             //send errors
@@ -760,10 +814,11 @@ class CsiDashboardController {
         } else {
            def username = springSecurityService.authentication.principal.getUsername()
             UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
-                fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute, aggrGroup: cmd.aggrGroup, selectedFolder: selectedFolder, selectedPages: selectedPages,
-                selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: selectedBrowsers,
-                selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
-                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, dashboardName: dashboardName, username: username)
+                fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute, aggrGroup: cmd.aggrGroup, selectedFolder: selectedFolderString, selectedPages: selectedPagesString,
+                selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: selectedBrowsersString,
+                selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
+                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, dashboardName: dashboardName, username: username,
+                setFromHour: cmd.setFromHour, setToHour: cmd.setToHour)
            if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                response.sendError(500, 'save error')
                return null

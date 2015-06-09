@@ -16,7 +16,6 @@
  */
 
 package de.iteratec.osm.result
-
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -56,10 +55,12 @@ import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
+
 
 class EventResultDashboardController {
 
@@ -107,6 +108,32 @@ class EventResultDashboardController {
     def intervals = ['not', 'hourly', 'daily', 'weekly']
 
     def index() {
+        redirect(action: 'showAll')
+    }
+
+    /**
+     * deletes custom Dashboard
+     *
+     * @return Nothing, redirects immediately.
+     */
+    Map<String, Object> delete() {
+
+        def userspecificDashboardInstance = UserspecificDashboard.get(params.id)
+        if (!userspecificDashboardInstance) {
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+            redirect(action: "showAll")
+            return
+        }
+
+        try {
+           userspecificDashboardInstance.delete(flush: true)
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+                redirect(action: "showAll")
+        } catch (DataIntegrityViolationException e) {
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+                redirect(action: "showAll")
+        }
+
         redirect(action: 'showAll')
     }
 
@@ -182,43 +209,6 @@ class EventResultDashboardController {
         }
     }
 
-    /**
-     * <p>
-    * Stores the selection passed as {@link CsiDashboardShowAllCommand} as new custom dashboard.
-    * </p>
-    *
-    * @param cmd
-    *         The command with the users selections;
-    *         not <code>null</code>.
-    * @return nothing, immediately renders a CSV to response' output stream.
-    */
-   public Map<String, Object> storeCustomDashboard(ShowAllCommand cmd) {
-       if( request.queryString && cmd.validate() )
-       {
-           def username = springSecurityService.authentication.principal.getUsername()
-           UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.EVENT, fromDate: cmd.from, toDate: cmd.to, fromHour: cmd.fromHour,
-               toHour: cmd.toHour, aggrGroup: cmd.aggrGroup, selectedInterval: cmd.selectedInterval, selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, selectChartType: cmd.selectChartType,
-               selectedFolder: cmd.selectedFolder, selectedPages: cmd.selectedPages, selectedMeasuredEventIds: cmd.selectedMeasuredEventIds, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents,
-               selectedBrowsers: cmd.selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations, selectedAllLocations: cmd.selectedAllLocations,
-               selectedAggrGroupValuesCached: cmd.selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: cmd.selectedAggrGroupValuesUnCached, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
-               trimAboveLoadTimes: cmd.trimAboveLoadTimes, trimBelowRequestCounts: cmd.trimBelowRequestCounts, trimAboveRequestCounts: cmd.trimAboveRequestCounts,
-               trimBelowRequestSizes: cmd.trimBelowRequestSizes, trimAboveRequestSizes: cmd.trimAboveRequestSizes, overwriteWarningAboutLongProcessingTime: cmd.overwriteWarningAboutLongProcessingTime,
-               debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: cmd.publiclyVisible, dashboardName: cmd.dashboardName, username: username)
-           //store object
-           if (!newCustomDashboard.save(failOnError: true, flush: true)) {
-               redirectWith303('showAll', params)
-               return
-           } else {
-               params.saveOkay = URLEncoder.encode(cmd.dashboardName, "UTF-8")
-               redirectWith303('showAll', params)
-               return
-           }
-       } else {
-           redirectWith303('showAll', params)
-           return
-       }
-   }
-
    /**
     * <p>
    * Ajax service to validate and store custom dashboard settings.
@@ -246,28 +236,63 @@ class EventResultDashboardController {
            Collection<Long> selectedLocations = []
            Collection<String> selectedAggrGroupValuesCached = []
            Collection<String> selectedAggrGroupValuesUnCached = []
+           String selectedFolderString = ""
+           String selectedPagesString = ""
+           String selectedMeasuredEventIdsString = ""
+           String selectedBrowsersString = ""
+           String selectedLocationsString = ""
+           String selectedAggrGroupValuesCachedString = ""
+           String selectedAggrGroupValuesUnCachedString = ""
            dashboardValues.each { id, data ->
+               def dataToAssign
+               if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
+                   dataToAssign = data.join(',')
+                   dataToAssign = dataToAssign.replace( '"', '' )
+               } else {
+                   dataToAssign = data
+               }
                switch (id) {
                    case ~/^selectedFolder$/:
-                       selectedFolder << Long.parseLong(data)
+                       selectedFolderString = dataToAssign
+                       data.each() {
+                           selectedFolder.push(it)
+                       }
                        break
                    case ~/^selectedPages$/:
-                       selectedPages << Long.parseLong(data)
+                       selectedPagesString = dataToAssign
+                       data.each() {
+                           selectedPages.push(it)
+                       }
                        break
                    case ~/^selectedMeasuredEventIds$/:
-                       selectedMeasuredEventIds << Long.parseLong(data)
+                       selectedMeasuredEventIdsString = dataToAssign
+                       data.each() {
+                           selectedMeasuredEventIds.push(it)
+                       }
                        break
                    case ~/^selectedBrowsers$/:
-                       selectedBrowsers << Long.parseLong(data)
+                       selectedBrowsersString = dataToAssign
+                       data.each() {
+                           selectedBrowsers.push(it)
+                       }
                        break
                    case ~/^selectedLocations$/:
-                       selectedLocations << Long.parseLong(data)
+                       selectedLocationsString = dataToAssign
+                       data.each() {
+                           selectedLocations.push(it)
+                       }
                        break
                    case ~/^selectedAggrGroupValuesCached$/:
-                       selectedAggrGroupValuesCached << data
+                       selectedAggrGroupValuesCachedString = dataToAssign
+                       data.each() {
+                           selectedAggrGroupValuesCached.push(it)
+                       }
                        break
                    case ~/^selectedAggrGroupValuesUnCached$/:
-                       selectedAggrGroupValuesUnCached << data
+                       selectedAggrGroupValuesUnCachedString = dataToAssign
+                       data.each() {
+                           selectedAggrGroupValuesUnCached.push(it)
+                       }
                        break
                }
            }
@@ -276,7 +301,6 @@ class EventResultDashboardController {
                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: dashboardValues.selectedAllLocations,
                selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
                overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
-
            if (dashboardValues.selectedInterval != null) { if (dashboardValues.selectedInterval != "") { cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()}}
            if (dashboardValues.selectedTimeFrameInterval != null) { if (dashboardValues.selectedTimeFrameInterval != "") { cmd.selectedTimeFrameInterval = dashboardValues.selectedTimeFrameInterval.toInteger()}}
            if (dashboardValues.selectChartType != null) { if (dashboardValues.selectChartType != "") { cmd.selectChartType = dashboardValues.selectChartType.toInteger()}}
@@ -295,9 +319,9 @@ class EventResultDashboardController {
           def username = springSecurityService.authentication.principal.getUsername()
            UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.EVENT, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
                toHour: cmd.toHour, aggrGroup: cmd.aggrGroup, selectedInterval: cmd.selectedInterval, selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, selectChartType: cmd.selectChartType,
-               selectedFolder: selectedFolder, selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents,
-               selectedBrowsers: selectedBrowsers, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: cmd.selectedLocations, selectedAllLocations: cmd.selectedAllLocations,
-               selectedAggrGroupValuesCached: cmd.selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: cmd.selectedAggrGroupValuesUnCached, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
+               selectedFolder: selectedFolderString, selectedPages: selectedPagesString, selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents,
+               selectedBrowsers: selectedBrowsersString, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations,
+               selectedAggrGroupValuesCached: selectedAggrGroupValuesCachedString, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCachedString, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
                trimAboveLoadTimes: cmd.trimAboveLoadTimes, trimBelowRequestCounts: cmd.trimBelowRequestCounts, trimAboveRequestCounts: cmd.trimAboveRequestCounts,
                trimBelowRequestSizes: cmd.trimBelowRequestSizes, trimAboveRequestSizes: cmd.trimAboveRequestSizes, overwriteWarningAboutLongProcessingTime: cmd.overwriteWarningAboutLongProcessingTime,
                debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: publiclyVisible, dashboardName: dashboardName, username: username)
