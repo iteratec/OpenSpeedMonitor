@@ -365,8 +365,10 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			runs: 1,
 			jobGroup: csiGroup1,
 			script: script,
-			maxDownloadTimeInMinutes: 60
-			).save(failOnError: true)
+			maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: false,
+            customConnectivityName: 'custom'
+        ).save(failOnError: true)
 		job2 = new Job(
 			active: false,
 			label: labelJobOfCsiGroup2,
@@ -376,8 +378,10 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			runs: 1,
 			jobGroup: csiGroup2,
 			script: script,
-			maxDownloadTimeInMinutes: 60
-			).save(failOnError: true)
+			maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: false,
+            customConnectivityName: 'custom'
+        ).save(failOnError: true)
 		//wptjobrun
 		new JobResult(
 			job: job1,

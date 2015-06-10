@@ -20,8 +20,10 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.csi.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
@@ -61,8 +63,6 @@ class PersistingNewEventResultsTests {
 	
 	Browser undefinedBrowser;
 	
-	String resultId = '130425_W1_f606bebc977a3b22c1a9205f70d07a00'
-	String resultId2 = '130425_W1_f606bebc977a3b22c1a9205f70d07a08'
 	/**
 	 * Map with expected values for assertions in test {@link #testListenToSuccessfullyMeasuredResults}.
 	 * 			Structure of the map:<br>
@@ -74,7 +74,7 @@ class PersistingNewEventResultsTests {
 	static final Map expectedAfterResultListening = [
 		'Result_NoMultistep_3Runs.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+			'expectedJobLabel': 'ie_step_testjob',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 3,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Thu, 25 Apr 2013 09:52:21 +0000')),
@@ -85,7 +85,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_Multistep_3Runs_6EventNames.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'http://www.example.de.de - Multiple steps with event names + dom elements',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 3,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Thu, 25 Apr 2013 09:52:21 +0000')),
@@ -96,7 +96,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_NoMultistep_1Run_NotCsiRelevantCauseDocTimeTooHighResponse.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'FF_BV1_Step01_Homepage - netlab',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 1,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Wed, 03 Apr 2013 11:46:22 +0000')),
@@ -107,7 +107,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_NoMultistep_1Run_JustFirstView.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'testjob',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 1,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Sat, 22 Jun 2013 20:33:35 +0000')),
@@ -118,7 +118,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_Multistep_1Run_2EventNamesWithPagePrefix_JustFirstView.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'testjob',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 1,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Wed, 30 Jan 2013 12:00:48 +0000')),
@@ -129,7 +129,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_Multistep_1Run_2EventNames_PagePrefix.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'FF_BV1_Multistep_2',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 1,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Wed, 11 Dec 2013 15:42:43 +0000')),
@@ -140,7 +140,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'IE_otto_hp_singlestep',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 1,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Tue, 25 Nov 2014 15:16:33 +0000')),
@@ -151,7 +151,7 @@ class PersistingNewEventResultsTests {
 		],
 		'Result_wptserver2.15_singlestep_1Run_WithVideo.xml':
 		['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'IE_otto_hp_singlestep',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 1,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Tue, 25 Nov 2014 15:38:38 +0000')),
@@ -168,30 +168,9 @@ class PersistingNewEventResultsTests {
 	void setUp() {
 		
 		serviceUnderTest = service
+
+        createTestDataCommonForAllTests()
 		
-		server1 = new WebPageTestServer(
-				label: "TestServer 1",
-				proxyIdentifier: "TestServer1",
-				baseUrl: "http://wptUnitTest.dev.hh.iteratec.local",
-				active: true
-		).save(failOnError: true, validate: false)
-		
-		server2 = new WebPageTestServer(
-				label: "TestServer 2",
-				proxyIdentifier: "TestServer2",
-				baseUrl: "http://wptUnitTest2.dev.hh.iteratec.local",
-				active: 1
-		).save(failOnError: true, validate: false)
-		
-		undefinedJobGroup=new JobGroup(
-			name: JobGroup.UNDEFINED_CSI,
-			groupType: JobGroupType.CSI_AGGREGATION
-			);
-		undefinedJobGroup.save(failOnError: true);
-		
-		//creating test-data common to all tests
-		createPages()
-		createBrowsers()
 		//mocks common for all tests
 		mockMetricReportingService()
 		mockHarParserService()
@@ -199,8 +178,9 @@ class PersistingNewEventResultsTests {
 		serviceUnderTest.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
 										   getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.connectivityProfileService = new ConnectivityProfileService()
 	}
-	
+
 	@After
 	void tearDown(){
 	}
@@ -235,6 +215,7 @@ class PersistingNewEventResultsTests {
 		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
 		//mocking of inner services
 	
@@ -244,10 +225,7 @@ class PersistingNewEventResultsTests {
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
-		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-				
+
 		//test execution
 		
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
@@ -310,6 +288,7 @@ class PersistingNewEventResultsTests {
 		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
 		//mocking of inner services
 	
@@ -319,10 +298,7 @@ class PersistingNewEventResultsTests {
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
-		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-				
+
 		//test execution
 		
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
@@ -386,6 +362,7 @@ class PersistingNewEventResultsTests {
 		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
 		//mocking of inner services
 	
@@ -395,10 +372,7 @@ class PersistingNewEventResultsTests {
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
-		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-				
+
 		//test execution
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
 		
@@ -422,6 +396,7 @@ class PersistingNewEventResultsTests {
 		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
 		//mocking of inner services
 	
@@ -431,10 +406,7 @@ class PersistingNewEventResultsTests {
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
-		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-		
+
 		//test execution
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
 		
@@ -486,6 +458,7 @@ class PersistingNewEventResultsTests {
 		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
 		//mocking of inner services
 	
@@ -495,10 +468,7 @@ class PersistingNewEventResultsTests {
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
-		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-		
+
 		//test execution
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
 		
@@ -570,7 +540,7 @@ class PersistingNewEventResultsTests {
 		//test execution and assertions
 		String k = 'Result_NoMultistep_Error_testCompletedButThereWereNoSuccessfulResults.xml'
 		Map v = ['expectedNumberOfLocations': 1,
-			'expectedNumberOfJobs': 1,
+            'expectedJobLabel': 'vb_agent1_IE8_BV1_Step05_Warenkorbbestaetigung',
 			'expectedNumberOfJobRuns': 1,
 			'expectedNumberOfRuns': 0,
 			'expectedResultExecutionDateTime':new DateTime(new Date('Wed, 30 Jan 2013 12:00:48 +0000')),
@@ -580,8 +550,9 @@ class PersistingNewEventResultsTests {
 		]
 
 		deleteAllRelevantDomains()
-		shouldFail() {			 listenToResultAndProofCreatedDomains(k, v) }
-		assertEquals(0, Job.count())
+		shouldFail() {
+            listenToResultAndProofCreatedDomains(k, v)
+        }
 		assertEquals(0, JobResult.count())
 	}
 	
@@ -609,10 +580,7 @@ class PersistingNewEventResultsTests {
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
 		
 		//assertions
-		List<Job> jobs=Job.findAll();
-		assertEquals(jobs.size(), 1);
-
-		Job job=jobs.get(0);
+		Job job = Job.findByLabel('testjob')
 		assertEquals(job.getLocation().getWptServer(), server1);
 	}
 	
@@ -624,6 +592,7 @@ class PersistingNewEventResultsTests {
 		File file = new File("test/resources/WptResultXmls/${testNameXML}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
 		//mocking of inner services
 	
@@ -634,18 +603,12 @@ class PersistingNewEventResultsTests {
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-		
 		//test execution
 		
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
 		
 		//assertions
-		List<Job> jobs=Job.findAll();
-		assertEquals(jobs.size(), 1);
-
-		Job job=jobs.get(0);
+		Job job = Job.findByLabel('testjob')
 		assertEquals(job.getLocation().getWptServer(), server1);
 	}
 	
@@ -656,8 +619,9 @@ class PersistingNewEventResultsTests {
 		String testNameXML="Result_NoMultistep_1Run_JustFirstView.xml";
 		File file = new File("test/resources/WptResultXmls/${testNameXML}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
-		
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server2);
 		
 		//XML-Result (TestID) reset:
 		String newTestId="130622_FA_1AX2"
@@ -671,10 +635,6 @@ class PersistingNewEventResultsTests {
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server2);
-		
 		//test execution
 		
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
@@ -686,10 +646,8 @@ class PersistingNewEventResultsTests {
 		System.out.println(xmlResult.data.testId);
 		
 		//assertions
-		List<Job> jobs=Job.findAll();
-		assertEquals(1, jobs.size());
 
-		Job job=jobs.get(0);	
+		Job job = Job.findByLabel('testjob')
 		assertEquals(server2, job.getLocation().getWptServer());	
 		
 		List<JobResult> jobResults=JobResult.findAll();
@@ -743,30 +701,23 @@ class PersistingNewEventResultsTests {
 	 * 			name of expected value n: expectedValueN]
 	 */
 	private void listenToResultAndProofCreatedDomains(String nameOfResultXmlFile, Map expectedValues){
+        //test specific data
 		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
 		GPathResult xmlResult = new XmlSlurper().parse(file)
 		String har = new File('test/resources/HARs/singleResult.har').getText()
+        createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
-		
-		// Mock Location needed!
-		mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server1);
-		
+        //test execution
 		serviceUnderTest.listenToResult(xmlResult, har, server1)
-
-		//check for locations
-		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfLocations - ", expectedValues['expectedNumberOfLocations'], Location.list().size())
-
-		//check for jobs
-		Collection<Job> jobs = Job.list()
-		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfJobs - ", expectedValues['expectedNumberOfJobs'], jobs.size())
 
 		//check for job-runs
 		Collection<JobResult> jobRuns = JobResult.list()
 		assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfJobRuns - ", expectedValues['expectedNumberOfJobRuns'], jobRuns.size())
 
 		//check dates of job and job_results
+        Job job = Job.findByLabel(expectedValues['expectedJobLabel'])
 		assertEquals("xml-result '${nameOfResultXmlFile}' expectedResultExecutionDateTime in job.lastRun - ", 
-			expectedValues['expectedResultExecutionDateTime'], new DateTime(jobs[0].lastRun))
+			expectedValues['expectedResultExecutionDateTime'], new DateTime(job.lastRun))
 		assertEquals("xml-result '${nameOfResultXmlFile}' expectedResultExecutionDateTime in jobResult.date - ", 
 			expectedValues['expectedResultExecutionDateTime'], new DateTime(jobRuns[0].date))
 		//TODO 2013-10-24: proof all CSI-relevant attributes of job_results
@@ -805,8 +756,8 @@ class PersistingNewEventResultsTests {
 	}
 	
 	private void deleteAllRelevantDomains(){
-		Location.findAll().each {it.delete(flush: true)}
-		Job.list()*.delete(flush: true)
+//		Location.findAll().each {it.delete(flush: true)}
+//		Job.list()*.delete(flush: true)
 		JobResult.list()*.delete(flush: true)
 		MeasuredEvent.list()*.delete(flush: true)
 		EventResult.list()*.delete(flush: true)
@@ -825,22 +776,25 @@ class PersistingNewEventResultsTests {
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
 	}
 
-	private void mockLocation(String locationIdentifier, Browser browser, WebPageTestServer server) {
-		new Location(
-					active: true,
-					valid: 1,
-					uniqueIdentifierForServer: locationIdentifier, // z.B. Agent1-wptdriver:Chrome
-					location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
-					label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
-					browser: browser,//z.B. Firefox
-					wptServer: server
-					).save(failOnError: true);
-	} 
+	private void createLocationIfNotExistent(String locationIdentifier, Browser browser, WebPageTestServer server) {
+        Location alreadyExistent = Location.findByWptServerAndUniqueIdentifierForServer(server, locationIdentifier)
+        if (!alreadyExistent) {
+            new Location(
+                    active: true,
+                    valid: 1,
+                    uniqueIdentifierForServer: locationIdentifier, // z.B. Agent1-wptdriver:Chrome
+                    location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
+                    label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
+                    browser: browser,//z.B. Firefox
+                    wptServer: server
+            ).save(failOnError: true);
+        }
+	}
 	
 	private void mockProxyService(String locationIdentifier){
 		def proxyService = mockFor(ProxyService, true)
 		proxyService.demand.fetchLocations(0..100) { WebPageTestServer server ->
-			mockLocation(locationIdentifier, undefinedBrowser, server);
+			createLocationIfNotExistent(locationIdentifier, undefinedBrowser, server);
 		}
 		serviceUnderTest.proxyService = proxyService.createMock()
 	}
@@ -981,7 +935,7 @@ class PersistingNewEventResultsTests {
 				.addToBrowserAliases(alias: "Chrome")
 				.save(failOnError: true)
 	}
-	private static createPages(){
+	private void createPages(){
 		['HP', 'MES', Page.UNDEFINED].each{pageName ->
 			Double weight = 0
 			switch(pageName){
@@ -997,4 +951,40 @@ class PersistingNewEventResultsTests {
 					weight: weight).save(failOnError: true)
 		}
 	}
+
+    void createTestDataCommonForAllTests(){
+        server1 = new WebPageTestServer(
+                label: "TestServer 1",
+                proxyIdentifier: "TestServer1",
+                baseUrl: "http://wptUnitTest.dev.hh.iteratec.local",
+                active: true
+        ).save(failOnError: true, validate: false)
+
+        server2 = new WebPageTestServer(
+                label: "TestServer 2",
+                proxyIdentifier: "TestServer2",
+                baseUrl: "http://wptUnitTest2.dev.hh.iteratec.local",
+                active: 1
+        ).save(failOnError: true, validate: false)
+
+        undefinedJobGroup=new JobGroup(
+                name: JobGroup.UNDEFINED_CSI,
+                groupType: JobGroupType.CSI_AGGREGATION
+        );
+        undefinedJobGroup.save(failOnError: true);
+
+        //creating test-data common to all tests
+        createPages()
+        createBrowsers()
+        Location testLocation = TestDataUtil.createLocation(server1, 'test-location', Browser.findByName('IE'), true)
+        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+        TestDataUtil.createJob('ie_step_testjob', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('http://www.example.de.de - Multiple steps with event names + dom elements', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('FF_BV1_Step01_Homepage - netlab', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('testjob', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('FF_BV1_Multistep_2', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('IE_otto_hp_singlestep', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('HP:::FF_BV1_Step01_Homepage - netlab', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob('example.de - Multiple steps with event names + dom elements', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+    }
 }

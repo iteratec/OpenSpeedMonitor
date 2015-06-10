@@ -1,4 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
+<% def springSecurityService %>
+<%@ page import="de.iteratec.osm.report.UserspecificDashboard" %>
+<%
+    def userspecificDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificDashboard').newInstance()
+%>
 <html>
 <head>
 <meta name="layout" content="kickstart_osm" />
@@ -28,10 +33,6 @@
 	<%-- main menu --%>
 	<g:render template="/layouts/mainMenu"/>
 
-	<g:if test="${flash.message}">
-		<div class="message" role="status">${flash.message}</div>
-	</g:if>
-
 	<div class="row">
 		<div class="span12">
 			<g:if test="${command}">
@@ -50,7 +51,9 @@
 	</div>
 	<div class="row">
 		<div class="span12">
-			<form method="get" action="">
+			<form method="get" action="" id="dashBoardParamsForm">
+      <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message code="de.iteratec.ism.ui.labels.save.success" default="Successfully saved these settings as custom dashboard." /></div>
+      <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
 			<g:if test="${warnAboutLongProcessingTime}">
 				<div class="alert">
 					<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title" /></strong>
@@ -228,12 +231,23 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="span2">
+						<div class="span12">
 							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll"
 								id="graphButtonHtmlId" class="btn btn-primary"
 								style="margin-top: 16px;" />
-							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
-								class="btn btn-primary" style="margin-top: 16px;" />
+              <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
+                class="btn btn-primary" style="margin-top: 16px;" />
+              <sec:ifLoggedIn>
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+							   <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+						    </sec:ifAnyGranted>
+							</sec:ifLoggedIn>
+		          <g:if test="${params.id}">
+		            <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+		            <g:render template="/_common/modals/deleteCustomDashboard"/>
+		              
+		            </g:if>           
+		          </g:if> 
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.
@@ -306,6 +320,7 @@
 		</g:if>
 	</g:else>
 	</div>
+	<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 	<r:script>
 		$(document).ready(doOnDomReady(
 			'${dateFormat}', 

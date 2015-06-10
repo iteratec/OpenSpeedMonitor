@@ -105,6 +105,11 @@ class Job implements Taggable {
     boolean customConnectivityProfile
 
     /**
+     * Name of the custom connectivity. Should only be non null value if {@link #customConnectivityProfile} is true.
+     */
+    String customConnectivityName
+
+    /**
      * Bandwidth to set for downlink.
      * @see https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis
      */
@@ -185,7 +190,20 @@ class Job implements Taggable {
         // If custom is set, no ConnectivityProfile may be specified and
         // bandwidthDown, bandwidthUp, latency and packetLoss may not  be null.
         connectivityProfile(nullable: true, validator: { profile, instance ->
-            return !instance.customConnectivityProfile || (instance.customConnectivityProfile && !profile && instance.bandwidthDown != null && instance.bandwidthUp != null && instance.latency != null && instance.packetLoss != null);
+
+            boolean notCustom = !instance.customConnectivityProfile
+            boolean allSetManually = !profile && instance.bandwidthDown != null && instance.bandwidthUp != null && instance.latency != null && instance.packetLoss != null
+
+            return notCustom || allSetManually;
+
+        })
+        customConnectivityName(nullable: true, validator: { connName, instance ->
+
+            boolean predefinedProfileIsSet = instance.connectivityProfile != null
+            boolean customConnNameIsSet = connName != null
+
+            return predefinedProfileIsSet || customConnNameIsSet
+
         })
         bandwidthDown(nullable: true, min: -2147483648, max: 2147483647)
         bandwidthUp(nullable: true, min: -2147483648, max: 2147483647)

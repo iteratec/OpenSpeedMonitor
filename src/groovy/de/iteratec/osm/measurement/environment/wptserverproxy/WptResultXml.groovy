@@ -59,6 +59,22 @@ class WptResultXml {
 		return responseNode.data.completed.isEmpty() ? new Date() : new Date(responseNode.data.completed.toString())
 	}
 
+    Integer getBwDown(){
+        return responseNode.data.bwDown.toInteger()
+    }
+
+    Integer getBwUp(){
+        return responseNode.data.bwUp.toInteger()
+    }
+
+    Integer getLatency(){
+        return responseNode.data.latency.toInteger()
+    }
+
+    Integer getPacketLossRate(){
+        return responseNode.data.plr.toInteger()
+    }
+
 	/**
 	 * Provides count of steps in this test. For results of wptservers before multistep 1 is returned for successful
 	 * results and 0 is returned for failed results.

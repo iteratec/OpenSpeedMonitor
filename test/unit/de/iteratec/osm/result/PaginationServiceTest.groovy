@@ -96,17 +96,23 @@ class PaginationServiceTest {
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		//lastRun: 07.08.2014 - 16:00
 		job = new Job(
-				active: false,
-				label: 'BV1 - Step 01',
-				description: 'This is job 01...',
-				lastRun: new Date(1407420000000L),
-				location: ffAgent,
-				frequencyInMin: 5,
-				runs: 1,
-				jobGroup: group,
-				script: script,
-				maxDownloadTimeInMinutes: 60
-				).save(failOnError: true)
+            active: false,
+            label: 'BV1 - Step 01',
+            description: 'This is job 01...',
+            lastRun: new Date(1407420000000L),
+            location: ffAgent,
+            frequencyInMin: 5,
+            runs: 1,
+            jobGroup: group,
+            script: script,
+            maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: true,
+            customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+            bandwidthDown: 6000,
+            bandwidthUp: 512,
+            latency: 50,
+            packetLoss: 0
+        ).save(failOnError: true)
 	}
 
 	@Test

@@ -24,6 +24,12 @@ package de.iteratec.osm.measurement.schedule
  * @author dri
  */
 class ConnectivityProfile {
+
+    public static final int BANDWIDTH_DOWN_MIN = 0
+    public static final int BANDWIDTH_UP_MIN = 0
+    public static final int LATENCY_MIN = 0
+    public static final int PLR_MIN = 0
+
     String name
     Integer bandwidthDown
     Integer bandwidthUp
@@ -32,6 +38,10 @@ class ConnectivityProfile {
 
     static constraints = {
         name(blank: false, maxSize: 255)
+        bandwidthDown(min: BANDWIDTH_DOWN_MIN)
+        bandwidthUp(min: BANDWIDTH_UP_MIN)
+        latency(min: LATENCY_MIN)
+        packetLoss(min: PLR_MIN)
     }
 
     public String toString() {
