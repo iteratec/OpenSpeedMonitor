@@ -27,6 +27,7 @@ import de.iteratec.osm.csi.TimeToCsMappingService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.Job
@@ -62,7 +63,13 @@ import org.quartz.CronExpression
 
 /**
  * RestApiController
- * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
+ * <p>
+ * Contains all the actions to handle requests of osm RESTful API.
+ * Note: If converted domain objects get returned as JSON representations some attributes get excluded
+ * in Bootstrap method excludePropertiesInJsonRepresentationsofDomainObjects (see link below).
+ * </p>
+ *
+ * @see BootStrap#excludePropertiesInJsonRepresentationsofDomainObjects
  */
 class RestApiController {
 
@@ -153,10 +160,7 @@ class RestApiController {
 	 */
 	public Map<String, Object> allSystems() {
 		Set<JobGroup> systems = jobGroupDaoService.findCSIGroups();
-		Collection<JSONNameBox> result = systems.collect({
-				new JSONNameBox(it.name) });
-
-		return sendObjectAsJSON(result, params.pretty && params.pretty == 'true');
+		return sendObjectAsJSON(systems, params.pretty && params.pretty == 'true');
 	}
 
 	/**
@@ -169,10 +173,7 @@ class RestApiController {
 	 */
 	public Map<String, Object> allSteps() {
 		Set<MeasuredEvent> events = measuredEventDaoService.findAll();
-		Collection<JSONNameBox> result = events.collect({
-			new JSONNameBox(it.name) });
-
-		return sendObjectAsJSON(result, params.pretty && params.pretty == 'true');
+		return sendObjectAsJSON(events, params.pretty && params.pretty == 'true');
 	}
 
 	/**
@@ -184,11 +185,8 @@ class RestApiController {
 	 * @see Browser
 	 */
 	public Map<String, Object> allBrowsers() {
-		Set<Browser> browser = browserDaoService.findAll();
-		Collection<JSONNameBox> result = browser.collect({
-			new JSONNameBox(it.name) });
-
-		return sendObjectAsJSON(result, params.pretty && params.pretty == 'true');
+		Set<Browser> browsers = browserDaoService.findAll();
+		return sendObjectAsJSON(browsers, params.pretty && params.pretty == 'true');
 	}
 
 	/**
@@ -201,10 +199,7 @@ class RestApiController {
 	 */
 	public Map<String, Object> allPages() {
 		Set<Page> pages = pageDaoService.findAll();
-		Collection<JSONNameBox> result = pages.collect({
-			new JSONNameBox(it.name) });
-
-		return sendObjectAsJSON(result, params.pretty && params.pretty == 'true');
+		return sendObjectAsJSON(pages, params.pretty && params.pretty == 'true');
 	}
 
 	/**
@@ -213,12 +208,12 @@ class RestApiController {
 	 * </p>
 	 *
 	 * @return Nothing, a JSON is sent before.
-	 * @see Page
+	 * @see Location
 	 */
 	public Map<String, Object> allLocations() {
-		Collection<Location> locations = locationDaoService.findAll();
+		Collection<Location> locations = locationDaoService.findAll()
         return sendObjectAsJSON(locations, params.pretty && params.pretty == 'true');
-	}
+    }
 
 	/**
 	 * The maximum duration of time-frame sent to {@link
