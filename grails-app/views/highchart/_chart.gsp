@@ -4,7 +4,7 @@
 %{--TODO merge the single- and multiple-axis-chart-function of highchart--}%
 <g:if test="${singleYAxis}">
 	<iteratec:singleYAxisChart data="${chartData}" yType="${yAxisLabel}"
-		title="${chartTitle}" width="${initialChartWidth}"
+		title="${chartTitle}" width="${initialChartWidth}" labelSummary="${labelSummary}"
 		heightOfChart="${initialChartHeight}" measurementUnit="${chartUnit}"
 		xAxisMin="${xAxisMin}" xAxisMax="${xAxisMax}"
 		markerEnabled="${markerEnabled}"
@@ -18,6 +18,7 @@
 </g:if>
 <g:else>
 	<iteratec:multipleAxisChart data="${eventResultValues}" title="${chartTitle}"
+		labelSummary="${labelSummary}"
 		lineType="${selectedCharttypeForHighchart}" measurementUnit="s"
 		lineWidthGlobal="2" xAxisMin="${fromTimestampForHighChart}"
 		xAxisMax="${toTimestampForHighChart}"

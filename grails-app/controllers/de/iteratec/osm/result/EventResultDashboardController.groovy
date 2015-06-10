@@ -182,6 +182,7 @@ class EventResultDashboardController {
                 timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, aggregators, queryParams);
         modelToRender.put("eventResultValues", graphCollection);
 
+        modelToRender.put("labelSummary", eventResultDashboardService.getLabelSummary());
 
         if (isHighchartGraphLimitReached(graphCollection)) {
             modelToRender.put("warnAboutExceededPointsPerGraphLimit", true);

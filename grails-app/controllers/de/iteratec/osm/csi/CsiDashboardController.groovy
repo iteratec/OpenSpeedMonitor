@@ -360,6 +360,8 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
+        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
+
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
     }
@@ -404,6 +406,8 @@ class CsiDashboardController {
         modelToRender.put('toTimestampForHighChart', resetToDate.toDate().getTime())
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
 
         modelToRender.put('markerShouldBeEnabled', false)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -500,6 +504,8 @@ class CsiDashboardController {
         modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)

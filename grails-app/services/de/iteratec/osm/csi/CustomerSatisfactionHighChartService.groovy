@@ -79,6 +79,66 @@ class CustomerSatisfactionHighChartService {
 	def weeklyPageTagToGraphLabelMap = [:]
 
 	/**
+	 * LabelSummary
+	 */
+	private String labelSummary;
+
+	private String getLabelSummary() {
+		return (labelSummary == null)? "" : labelSummary;
+	}
+
+	private void setLabelSummary(String labelSummary) {
+		this.labelSummary = labelSummary;
+	}
+
+	private void deleteLabelSummary() {
+		this.labelSummary = "";
+	}
+
+	private List<OsmChartGraph> summarizeGraphs(List<OsmChartGraph> graphs) {
+
+		def summarizedLabelParts = [];
+
+		if (graphs.size > 1) {
+
+			def graph = graphs.get(0);
+			def temp = graph.label.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim());
+
+			def labelParts = []
+
+			if(temp.size() >= 1)
+				labelParts.add([ key: 'Gruppe', value: temp[0] ]);
+			if(temp.size() >= 2)
+				labelParts.add([ key: 'Event', value: temp[1] ]);
+			if(temp.size() >= 3)
+				labelParts.add([ key: 'Location', value: temp[2] ]);
+
+			summarizedLabelParts = labelParts.findAll { part ->
+				graphs.every { it ->
+					it.label.contains(part.value.trim());
+				}
+			}
+
+			graphs.every { it ->
+				summarizedLabelParts.each { part ->
+					it.label = (it.label - part.value.trim()).replaceFirst("^[\\|\\s]+(?!\$)", "");
+				}
+			}
+
+			String summary = "";
+			summarizedLabelParts.each { part ->
+				String labelNewPart = "<b>" + part.key + "</b>: " + part.value;
+				summary == "" ? (summary = labelNewPart) : (summary += " | " + labelNewPart);
+			}
+			setLabelSummary(summary)
+		}else{
+			deleteLabelSummary();
+		}
+
+		return graphs;
+	}
+
+	/**
 	 * Get hourly Customer Satisfaction {@ JobMeasuredValue}s as a List of{@link OsmChartGraph}s in format for highcharts-taglib.
 	 * see {@link CustomerSatisfactionHighChartService#convertToHighChartMap}
 	 *
@@ -92,7 +152,7 @@ class CustomerSatisfactionHighChartService {
 
 		List<MeasuredValue> csiValues = eventMeasuredValueService.getHourylMeasuredValues(fromDate, toDate, mvQueryParams)
 
-		resultList = convertToHighchartGraphList(csiValues)
+		resultList = summarizeGraphs(convertToHighchartGraphList(csiValues));
 
 		return resultList
 	}
@@ -127,7 +187,7 @@ class CustomerSatisfactionHighChartService {
 		List<MeasuredValue> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
         log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
 
-		resultMap = convertToHighchartGraphList(csiValues)
+		resultMap = summarizeGraphs(convertToHighchartGraphList(csiValues));
         log.debug("Number of ChartGraphs made from MeasuredValues: ${resultMap.size()}")
         log.debug("Number of points in each ChartGraph made from MeasuredValues: ${resultMap*.points.size()}")
 
@@ -157,7 +217,7 @@ class CustomerSatisfactionHighChartService {
         List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
         List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
 
-        resultList = convertToHighchartGraphList(csiValues)
+        resultList = summarizeGraphs(convertToHighchartGraphList(csiValues))
 
         return resultList;
     }
