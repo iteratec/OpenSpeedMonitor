@@ -20,7 +20,16 @@
         </label>
       </div>
     </div>
+    <div class="control-group">
+      <div class="controls">
+        <label class="checkbox" for="wideScreenDiagramMontage">
+          <input type="checkbox" name="wideScreenDiagramMontage" id="wideScreenDiagramMontage" >
+          ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.wideScreenDiagramMontage.label', default: 'Diagrams exported from this dashboard will be optimized for widescreen display.')}
+        </label>
+      </div>
+    </div>
   </div>
+  
   <div class="modal-footer">
     <g:form>
       <button class="btn" data-dismiss="modal"><g:message code="default.button.cancel.label" default="Cancel"/></button>
@@ -98,7 +107,7 @@
 				        jQuery.ajax({
 				          type: 'POST', 
 				          url: '${createLink(action: 'validateAndSaveDashboardValues', absolute: true)}',
-				          data: { values: json_data, dashboardName: document.getElementById("dashboardNameFromModal").value, publiclyVisible: document.getElementById("publiclyVisibleFromModal").checked },
+				          data: { values: json_data, dashboardName: document.getElementById("dashboardNameFromModal").value, publiclyVisible: document.getElementById("publiclyVisibleFromModal").checked, wideScreenDiagramMontage: document.getElementById("wideScreenDiagramMontage").checked },
 				          statusCode: {
 				              200: function (response) {
 					              window.scrollTo(0, 0);
@@ -110,10 +119,8 @@
                         $( "#saveDashboardErrorDiv" ).show();
                         var re = /(.*rkrkrk\[)(.*)(\]rkrkrk.*)/;
                         var newtext = response.responseText.replace(re, "$2");
-                        console.log(newtext);
                         newtext = newtext.replace(/, /g, '<br />');
                         newtext = newtext.replace(/&amp;/g, '&');
-                        console.log(newtext);
                         document.all.saveDashboardErrorDiv.innerHTML = newtext;
                         return false;
                       },

@@ -744,7 +744,7 @@ class CsiDashboardController {
     *         not <code>null</code>.
     * @return nothing, immediately sends HTTP response codes to client.
     */
-    def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible) {
+    def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
         JSONObject dashboardValues = JSON.parse(values)
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
@@ -817,7 +817,7 @@ class CsiDashboardController {
                 fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute, aggrGroup: cmd.aggrGroup, selectedFolder: selectedFolderString, selectedPages: selectedPagesString,
                 selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: selectedBrowsersString,
                 selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
-                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, dashboardName: dashboardName, username: username,
+                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, wideScreenDiagramMontage: wideScreenDiagramMontage, dashboardName: dashboardName, username: username,
                 setFromHour: cmd.setFromHour, setToHour: cmd.setToHour)
            if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                response.sendError(500, 'save error')

@@ -133,8 +133,6 @@ class EventResultDashboardController {
                 flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
                 redirect(action: "showAll")
         }
-
-        redirect(action: 'showAll')
     }
 
     /**
@@ -225,7 +223,7 @@ class EventResultDashboardController {
    *         not <code>null</code>.
    * @return nothing, immediately sends HTTP response codes to client.
    */
-       def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible) {
+       def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
            JSONObject dashboardValues = JSON.parse(values)
            Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
            Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
@@ -324,7 +322,7 @@ class EventResultDashboardController {
                selectedAggrGroupValuesCached: selectedAggrGroupValuesCachedString, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCachedString, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
                trimAboveLoadTimes: cmd.trimAboveLoadTimes, trimBelowRequestCounts: cmd.trimBelowRequestCounts, trimAboveRequestCounts: cmd.trimAboveRequestCounts,
                trimBelowRequestSizes: cmd.trimBelowRequestSizes, trimAboveRequestSizes: cmd.trimAboveRequestSizes, overwriteWarningAboutLongProcessingTime: cmd.overwriteWarningAboutLongProcessingTime,
-               debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: publiclyVisible, dashboardName: dashboardName, username: username)
+               debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: publiclyVisible, wideScreenDiagramMontage: wideScreenDiagramMontage, dashboardName: dashboardName, username: username)
           if (!newCustomDashboard.save(failOnError: true, flush: true)) {
               response.sendError(500, 'save error')
               return null

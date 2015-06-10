@@ -269,7 +269,7 @@ class UserspecificDashboard {
     /**
      * toggle formatting rickshaw export to wide screen format
      */
-    Boolean wideScreenFreeze
+    Boolean wideScreenDiagramMontage
 
     //from event end
 
@@ -329,7 +329,7 @@ class UserspecificDashboard {
         trimAboveRequestCounts(nullable: true)
         trimBelowRequestSizes(nullable: true)
         trimAboveRequestSizes(nullable: true)
-        wideScreenFreeze(nullable: true)
+        wideScreenDiagramMontage(nullable: true)
     }
 
     def isCurrentUserDashboardOwner(String dashboardId) {
@@ -339,7 +339,10 @@ class UserspecificDashboard {
             // get owner name
             UserspecificDashboard currentBoard = UserspecificDashboard.get(dashboardId)
             String boardCreator = currentBoard.username
-            String currentUser = springSecurityService.authentication.principal.getUsername()
+            String currentUser = ""
+            if (springSecurityService.isLoggedIn()) {
+                currentUser = springSecurityService.authentication.principal.getUsername()
+            }
             if (currentUser == boardCreator) {
                 return true
             } else {
@@ -356,9 +359,12 @@ class UserspecificDashboard {
         } else {
             fullList = UserspecificDashboard.findAllByDiagramType(UserspecificDashboardDiagramType.CSI)
         }
-        String currentUser = springSecurityService.authentication.principal.getUsername()
+        String currentUser = ""
+        if (springSecurityService.isLoggedIn()) {
+            currentUser = springSecurityService.authentication.principal.getUsername()
+        }
         for(board in fullList){
-            if ((board.publiclyVisible == 1) || (board.username == currentUser)) {
+            if ((board.publiclyVisible == true) || (board.username == currentUser)) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
@@ -404,8 +410,8 @@ class UserspecificDashboard {
                 link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                if (board.wideScreenFreeze == 1) {
-                    link += "&wideScreenFreeze=on"
+                if (board.wideScreenDiagramMontage == true) {
+                    link += "&wideScreenDiagramMontage=on"
                 }
                 if (diagramType == "EVENT") {
                     link += "&selectedInterval=" + board.selectedInterval
