@@ -19,6 +19,8 @@
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
+import de.iteratec.osm.measurement.environment.BrowserAlias
+import de.iteratec.osm.measurement.environment.Location
 import grails.util.Environment
 
 import org.joda.time.DateTime
@@ -89,11 +91,12 @@ class BootStrap {
 		initMeasurementInfrastructure()
 		initJobScheduling()
 		cancelActiveBatchActivity()
+        excludePropertiesInJsonRepresentationsofDomainObjects()
         fixGrailsBugs()
-		
+
 		log.info "initApplicationData() OSM ends"
 	}
-	
+
 	void initConfig(){
 		log.info "initConfig() OSM starts"
 		
@@ -399,6 +402,28 @@ class BootStrap {
 			}
 		}
 	}
+
+    void excludePropertiesInJsonRepresentationsofDomainObjects(){
+
+        ArrayList<String> propertiesToExcludeFromAllDomains = ['class', 'dirty', 'dirtyPropertyNames', 'errors', 'properties']
+
+        grailsApplication.domainClasses*.clazz.each {domainClass ->
+            grails.converters.JSON.registerObjectMarshaller(domainClass) {
+
+                Map propertiesToRepresent = it.properties.findAll {k,v -> !propertiesToExcludeFromAllDomains.contains(k)}
+                propertiesToRepresent['id'] = it.ident()
+
+                removeDomainSpecificProperties(domainClass, propertiesToRepresent)
+
+                return propertiesToRepresent
+
+            }
+        }
+    }
+    void removeDomainSpecificProperties(Class domainClass, Map propertiesToRepresent){
+        if (domainClass == BrowserAlias) propertiesToRepresent.remove('browser')
+        else if (domainClass == JobGroup) propertiesToRepresent.remove('graphiteServers')
+    }
 
     void fixGrailsBugs(){
         // without this it's not safe to test on JSONObject instances in a groovy way

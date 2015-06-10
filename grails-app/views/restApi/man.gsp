@@ -68,28 +68,28 @@
                             OPTIONAL<br>The name of a page. If specified only results belonging to this page are returned.
 							<br/>
 							You can obtain a list of all pages by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allPages</code>.
-							As result a JSON list of page names is returned.
+							As result a JSON list of pages is returned.
 						</dd>
 						<dt>step</dt>
 						<dd>
                             OPTIONAL<br>The name of a (measured) step. If specified only results belonging to this step are returned.
 							<br/>
 							You can obtain a list of all steps by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSteps</code>.
-							As result a JSON list of step names is returned.
+							As result a JSON list of steps is returned.
 						</dd>
 						<dt>browser</dt>
 						<dd>
                             OPTIONAL<br>The name of a browser. If specified only results belonging to this browser are returned.
 							<br/>
 							You can obtain a list of all browsers by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allBrowsers</code>.
-							As result a JSON list of browser names is returned.
+							As result a JSON list of browsers is returned.
 						</dd>
 						<dt>location</dt>
 						<dd>
                             OPTIONAL<br>The location-address of a location. If specified only results belonging to this location are returned.
 							<br/>
 							You can obtain a list of all location-addresses by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allLocations</code>.
-							As result a JSON list of location-addresses is returned.
+							As result a JSON list of locations is returned.
 						</dd>
 					   	<dt>cachedView</dt>
 					   	<dd>
