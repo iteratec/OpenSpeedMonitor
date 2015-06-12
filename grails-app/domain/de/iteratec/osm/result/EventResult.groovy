@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.OsmConfigCacheService
@@ -140,6 +141,16 @@ class EventResult implements CsiValue {
 	Date jobResultDate
 	Long jobResultJobConfigId
 
+	/**
+	 * These values are to be used to distinguish results according to their connectivities
+	 *
+	 * @since IT-643
+	 */
+	ConnectivityProfile connectivityProfile;
+
+	// For reasons of performance is this just a string
+	String customConnectivityName;
+
 	//static belongsTo = JobResult
 	static belongsTo = [jobResult: JobResult]
 
@@ -179,6 +190,9 @@ class EventResult implements CsiValue {
 		webPerformanceWaterfall(nullable: true)
 
         testAgent(nullable: true)
+
+		connectivityProfile(nullable: true, validator: { connectivityProfileobj && !customConnectivityName })
+		customConnectivityName(nullable: true, validator: { customConnectivityName && !connectivityProfile  })
 	}
 
 	static mapping = {
