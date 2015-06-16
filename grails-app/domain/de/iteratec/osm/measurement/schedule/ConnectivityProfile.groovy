@@ -45,6 +45,6 @@ class ConnectivityProfile {
     }
 
     public String toString() {
-        return "$name: $bandwidthDown Kbps down, $bandwidthUp Kbps up, $latency ms first-hop RTT, $packetLoss% packet loss"
+        return "${name}: ${bandwidthDown}/${bandwidthUp} Kbps, ${latency}ms, ${packetLoss}% PLR"
     }
 }

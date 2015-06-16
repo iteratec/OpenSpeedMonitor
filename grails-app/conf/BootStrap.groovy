@@ -125,7 +125,7 @@ class BootStrap {
 		createConnectivityProfileIfMissing(6000, 512, 50, 'DSL 6.000', 0)
 		createConnectivityProfileIfMissing(384, 384, 140, 'UMTS', 0)
 		createConnectivityProfileIfMissing(3600, 1500, 40, 'UMTS - HSDPA', 0)
-		
+
 		jobProcessingService.scheduleAllActiveJobs()
 		
 		log.info "initJobScheduling() OSM ends"

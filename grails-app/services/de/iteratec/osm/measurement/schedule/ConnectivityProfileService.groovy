@@ -31,6 +31,8 @@ class ConnectivityProfileService {
 
     static transactional = false
 
+    static final String CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE = 'Native (No Traffic Shaping)'
+
     /**
      * Builds the default name for a custom connectivity defined by params bwDown, bwUp and latency.
      * Fourth param, Packet loss rate, is assumed to be zero.

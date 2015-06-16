@@ -28,9 +28,9 @@ function initializeSelects() {
 	  if ($('select#location').size() > 0) {
 		  $('select#location').chosen(chosenOptions);
 	  }		  
-	  if ($('select#connectivityProfile').size() > 0) {
-		  $('select#connectivityProfile').chosen(chosenOptions);
-	  }
+	  //if ($('select#connectivityProfile').size() > 0) {
+		//  $('select#connectivityProfile').chosen(chosenOptions);
+	  //}
 	  if ($('select#script').size() > 0) {
 		  chosenOptions.allow_single_deselect = true;
 		  $('select#script').chosen(chosenOptions);
@@ -55,7 +55,7 @@ jQuery.fn.visibilityToggle = function() {
     });
 };
 
-function doOnDomReady(nextExecutionLink) {
+function doOnDomReady(nextExecutionLink, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll) {
     initializeSelects();
     $("[rel=tooltip]").tooltip({ html: true });
     $("[rel=popover]").popover();
@@ -64,16 +64,9 @@ function doOnDomReady(nextExecutionLink) {
 		$('[name="execution-schedule-shown"]').keyup();
 	});
 
-	$(document).on('change', '#connectivityProfile', function () {
-    if($(this).val() === 'null') {
-      $('#connectivityProfileDetails').toggle(true);
-    } else {
-      $('#connectivityProfileDetails').toggle(false);
-    }
-	});
-	
+    prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll)
 	$('#connectivityProfile').change();
-	
+
 	$('#maxDownloadTimeInMinutes a').click(function() {
 		$('#maxDownloadTimeInMinutes input')
 			.removeClass('non-editable')
@@ -103,6 +96,127 @@ function doOnDomReady(nextExecutionLink) {
     });
 
 };
+
+
+function prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll){
+
+    addNullProfileOptions(customConnNameForNative)
+    selectOptionIfOneOfNullOptionsIsSetForJob(connectivityProfileId, noTrafficShapingAtAll, customConnNameForNative)
+    registerCustomConnEventHandlers(customConnNameForNative)
+
+}
+/**
+ * Adding the following two options to connectivity profiles:
+ * <ul>
+ *     <li>Custom: custom connectivity where attributes like bandwidth and latency can be set manually</li>
+ *     <li>Native: No traffic shaping at all</li>
+ * </ul>
+ * @param customConnNameForNative Custom connectivity name for native connectivity.
+ */
+function addNullProfileOptions(customConnNameForNative){
+    var optNative = document.createElement('option');
+    optNative.value = null;
+    optNative.text = customConnNameForNative;
+    var optCustom = document.createElement('option');
+    optCustom.value = null;
+    optCustom.text = 'Custom';
+    var connProfileSelect = document.getElementById('connectivityProfile');
+    connProfileSelect.appendChild(optNative);
+    connProfileSelect.appendChild(optCustom);
+    connProfileSelect.dispatchEvent(new Event("chosen:updated"));
+
+    document.getElementById('custom-connectivity-name').value = getCustomConnNameFrom();
+}
+//set native
+function selectOptionIfOneOfNullOptionsIsSetForJob(connectivityProfileId, noTrafficShapingAtAll, customConnNameForNative){
+
+    var profilesSelect = document.getElementById('connectivityProfile');
+
+    if(connectivityProfileId == null){
+        if(noTrafficShapingAtAll){
+
+            for (var i = 0; i < profilesSelect.options.length; i++) {
+                if (profilesSelect.options[i].text === customConnNameForNative) {
+                    profilesSelect.selectedIndex = i;
+                    break;
+                }
+            }
+
+            profilesSelect.options[profilesSelect.options.selectedIndex].selected = true;
+        }else {
+
+            for (var i = 0; i < profilesSelect.options.length; i++) {
+                if (profilesSelect.options[i].text != customConnNameForNative && profilesSelect.options[i].value == "null") {
+                    profilesSelect.selectedIndex = i;
+                    break;
+                }
+            }
+
+        }
+    }
+}
+function registerCustomConnEventHandlers(customConnNameForNative){
+
+    document.getElementById('connectivityProfile').onchange = function(){
+        var selectedOption = this.options[this.selectedIndex];
+        if(selectedOption.text == "Custom"){
+
+            toggleCustomConnDetails(true)
+            document.getElementById('noTrafficShapingAtAll').value = false;
+            document.getElementById('customConnectivityProfile').value = true;
+
+        }else {
+
+            toggleCustomConnDetails(false)
+            document.getElementById('customConnectivityProfile').value = false;
+            if(selectedOption.text == customConnNameForNative){
+                document.getElementById('noTrafficShapingAtAll').value = true;
+            }else {
+                document.getElementById('noTrafficShapingAtAll').value = false;
+            }
+        }
+    };
+
+    var customConnNameInput = document.getElementById('custom-connectivity-name');
+
+    document.getElementById('custom-bandwidthDown').oninput = function () {
+        customConnNameInput.value = getCustomConnNameFrom();
+    };
+    document.getElementById('custom-bandwidthUp').oninput = function () {
+        customConnNameInput.value = getCustomConnNameFrom();
+    };
+    document.getElementById('custom-latency').oninput = function () {
+        customConnNameInput.value = getCustomConnNameFrom();
+    };
+    document.getElementById('custom-packetLoss').oninput = function () {
+        customConnNameInput.value = getCustomConnNameFrom();
+    };
+
+}
+function toggleCustomConnDetails(visibilityToSet){
+    $('#connectivityProfileDetails').toggle(visibilityToSet);
+    if(!visibilityToSet){
+        document.getElementById('custom-connectivity-name').value = "";
+        document.getElementById('custom-bandwidthDown').value = "";
+        document.getElementById('custom-bandwidthUp').value = "";
+        document.getElementById('custom-latency').value = "";
+        document.getElementById('custom-packetLoss').value = "";
+    }
+}
+function getCustomConnNameFrom(){
+
+    var bandwidthDownValue = document.getElementById('custom-bandwidthDown').value;
+    var bandwidthUpValue = document.getElementById('custom-bandwidthUp').value;
+    var latencyValue = document.getElementById('custom-latency').value;
+    var packetLossValue = document.getElementById('custom-packetLoss').value;
+
+    var bwDownOrEmpty = bandwidthDownValue?bandwidthDownValue:"[bwDown]";
+    var bwUpOrEmpty = bandwidthUpValue?bandwidthUpValue:"[bwUp]";
+    var latencyOrEmpty = latencyValue?latencyValue:"[latency]";
+    var plrOrEmpty = packetLossValue?packetLossValue:"[plr]";
+
+    return "Custom (" + bwDownOrEmpty + "/" + bwUpOrEmpty + " Kbps, " + latencyOrEmpty + "ms, " + plrOrEmpty + "% PLR)";
+}
 
 // from http://stackoverflow.com/a/21375637
 // necessary to prevent Chosen from being cut off in tabs

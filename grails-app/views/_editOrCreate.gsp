@@ -7,19 +7,15 @@
     <title><g:message code="default.${mode}.label" args="[entityDisplayName]"/></title>
 
     <style type="text/css">
-    .control-label {
-        width: 250px !important;
-        margin-right: 1em !important;
-    }
-
-    .form-group {
-        margin-bottom: 0.4em !important;
-    }
-
-    .checkbox {
-        margin-left: 263px;
-    }
+        .control-label {
+            width: 250px !important;
+            margin-right: 1em !important;
+        }
+        .form-group {
+            margin-bottom: 0.4em !important;
+        }
     </style>
+
     <script>
 		    function getExecutionScheduleSetButInactiveLabel() {
 	       return '${message(code:'job.executionScheduleSetButInactive.label')}';

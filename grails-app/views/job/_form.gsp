@@ -51,7 +51,7 @@
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="1">      
-	  <g:render template="testSettingsTab" model="${['job': job]}" />
+	  <g:render template="testSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
     </div>
     <div class="tab-pane" id="2">
       <g:render template="scriptTab" model="${['job': job]}" />

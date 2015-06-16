@@ -93,6 +93,12 @@ class Job implements Taggable {
     boolean keepua
 
     /**
+     * True if measurement should happen without any traffic shaping.
+     * Corresponds with selection 'Native (No Traffic Shaping)' in job creation.
+     */
+    boolean noTrafficShapingAtAll
+
+    /**
      * Pre-configured {@link ConnectivityProfile} associated with this Job.
      */
     ConnectivityProfile connectivityProfile
@@ -187,22 +193,28 @@ class Job implements Taggable {
         continuousVideo(nullable: true)
         keepua(nullable: true)
 
-        // If custom is set, no ConnectivityProfile may be specified and
-        // bandwidthDown, bandwidthUp, latency and packetLoss may not  be null.
         connectivityProfile(nullable: true, validator: { profile, instance ->
 
-            boolean notCustom = !instance.customConnectivityProfile
-            boolean allSetManually = !profile && instance.bandwidthDown != null && instance.bandwidthUp != null && instance.latency != null && instance.packetLoss != null
+            boolean notNull = profile != null
+            boolean nullAndCustom =
+                    profile == null &&
+                    instance.customConnectivityProfile == true &&
+                    instance.noTrafficShapingAtAll == false &&
+                    instance.bandwidthDown != null && instance.bandwidthUp != null && instance.latency != null && instance.packetLoss != null
+            boolean nullAndNative =
+                    profile == null &&
+                    instance.customConnectivityProfile == false &&
+                    instance.noTrafficShapingAtAll == true
 
-            return notCustom || allSetManually;
+            return notNull || nullAndCustom || nullAndNative;
 
         })
         customConnectivityName(nullable: true, validator: { connName, instance ->
 
-            boolean predefinedProfileIsSet = instance.connectivityProfile != null
-            boolean customConnNameIsSet = connName != null
+            boolean notNull = connName != null
+            boolean nullAndNotCustom = connName == null && instance.customConnectivityProfile == false
 
-            return predefinedProfileIsSet || customConnNameIsSet
+            return notNull || nullAndNotCustom
 
         })
         bandwidthDown(nullable: true, min: -2147483648, max: 2147483647)
@@ -235,6 +247,7 @@ class Job implements Taggable {
 
     static mapping = {
         sort 'label':'asc'
+        noTrafficShapingAtAll defaultValue: false
         customConnectivityProfile defaultValue: false
         persistNonMedianResults defaultValue: '1'
     }

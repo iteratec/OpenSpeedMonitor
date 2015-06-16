@@ -115,22 +115,22 @@ class JobProcessingService {
 			]
 
 		// specify connectivity
-		if (!job.customConnectivityProfile && !job.connectivityProfile) {
-			parameters.location += ".Native"
-		} else {
-			parameters.location += ".custom"
-			if (job.customConnectivityProfile) {
-				parameters.bwDown = job.bandwidthDown
-				parameters.bwUp = job.bandwidthUp
-				parameters.latency = job.latency
-				parameters.plr = job.packetLoss
-			} else {
-				parameters.bwDown = job.connectivityProfile.bandwidthDown
-				parameters.bwUp = job.connectivityProfile.bandwidthUp
-				parameters.latency = job.connectivityProfile.latency
-				parameters.plr = job.connectivityProfile.packetLoss
-			}
-		}
+        if (job.customConnectivityProfile && job.customConnectivityName.equals('Native')) {
+            parameters.location += ".Native"
+        } else {
+            parameters.location += ".custom"
+            if (job.customConnectivityProfile) {
+                parameters.bwDown = job.bandwidthDown
+                parameters.bwUp = job.bandwidthUp
+                parameters.latency = job.latency
+                parameters.plr = job.packetLoss
+            } else {
+                parameters.bwDown = job.connectivityProfile.bandwidthDown
+                parameters.bwUp = job.connectivityProfile.bandwidthUp
+                parameters.latency = job.connectivityProfile.latency
+                parameters.plr = job.connectivityProfile.packetLoss
+            }
+        }
 
 		if (job.script) {
 			parameters.script = job.script.getParsedNavigationScript(job)
