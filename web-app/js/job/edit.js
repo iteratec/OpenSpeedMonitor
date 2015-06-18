@@ -15,6 +15,47 @@
 * limitations under the License.
 */
 
+function doOnDomReady(nextExecutionLink, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll) {
+
+    $("[rel=tooltip]").tooltip({ html: true });
+    $("[rel=popover]").popover();
+
+    $('#active').change(function () {
+        $('[name="execution-schedule-shown"]').keyup();
+    });
+
+    prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll)
+    $('#connectivityProfile').change();
+
+    initializeSelects();
+
+    $('#maxDownloadTimeInMinutes a').click(function() {
+        $('#maxDownloadTimeInMinutes input')
+            .removeClass('non-editable')
+            .removeAttr('readonly');
+        $('#maxDownloadTimeInMinutes a').css('visibility', 'hidden');
+    });
+
+    var cronExpression = $('#execution-schedule').val();
+    jQuery.ajax({
+        type: 'POST',
+        data: 'value=' + cronExpression,
+        url: nextExecutionLink,
+        success: function (data, textStatus) {
+            $('#cronhelp-next-execution').html(
+                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
+            );
+            FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
+            $('#cronhelp-readable-expression').html(
+                data ? getPrettyCron(cronExpression.substr(cronExpression.indexOf(' ') + 1)) : ''
+            );
+
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {}
+    });
+
+};
+
 function initializeSelects() {
 	  var chosenOptions = {
 			  disable_search_threshold: 10,
@@ -28,9 +69,9 @@ function initializeSelects() {
 	  if ($('select#location').size() > 0) {
 		  $('select#location').chosen(chosenOptions);
 	  }		  
-	  //if ($('select#connectivityProfile').size() > 0) {
-		//  $('select#connectivityProfile').chosen(chosenOptions);
-	  //}
+	  if ($('select#connectivityProfile').size() > 0) {
+		  $('select#connectivityProfile').chosen(chosenOptions);
+	  }
 	  if ($('select#script').size() > 0) {
 		  chosenOptions.allow_single_deselect = true;
 		  $('select#script').chosen(chosenOptions);
@@ -55,54 +96,24 @@ jQuery.fn.visibilityToggle = function() {
     });
 };
 
-function doOnDomReady(nextExecutionLink, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll) {
-    initializeSelects();
-    $("[rel=tooltip]").tooltip({ html: true });
-    $("[rel=popover]").popover();
-  	
-	$('#active').change(function () {
-		$('[name="execution-schedule-shown"]').keyup();
-	});
-
-    prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll)
-	$('#connectivityProfile').change();
-
-	$('#maxDownloadTimeInMinutes a').click(function() {
-		$('#maxDownloadTimeInMinutes input')
-			.removeClass('non-editable')
-			.removeAttr('readonly');
-		$('#maxDownloadTimeInMinutes a').css('visibility', 'hidden');
-	});
-
-    var cronExpression = $('#execution-schedule').val();
-    jQuery.ajax({
-        type: 'POST',
-        data: 'value=' + cronExpression,
-        url: nextExecutionLink,
-        success: function (data, textStatus) {
-
-            //$('#execution-schedule').val(execScheduleWithSeconds);
-            //alert(data);
-            $('#cronhelp-next-execution').html(
-                data + ' ' + warnInactive(data, getExecutionScheduleSetButInactiveLabel()) + ' '
-            );
-            FutureOnlyTimeago.init($('abbr.timeago'), nextExecutionLink);
-            $('#cronhelp-readable-expression').html(
-                data ? getPrettyCron(cronExpression.substr(cronExpression.indexOf(' ') + 1)) : ''
-            );
-
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {}
-    });
-
-};
-
-
+/**
+ * <ul>
+ *  <li>Adding options to connectivity profiles select which do not represent conn profile domain objects ('Native' and 'Custom').</li>
+ *  <li>Register all necessary event handlers for connectivity concerned controls.</li>
+ *  <li>If Job to show has 'native' or 'custom' connectivity. So no conn profile domain object is associated to it,
+ *  the connectivity option will be selected manually in select.</li>
+ * </ul>
+ * @param customConnNameForNative The name for option 'Native'. It's defined as a constant in a backend service.
+ * @param connectivityProfileId Id of job associated connectivity profile. May be null if job has 'Native' or 'Custom' connectivity.
+ * @param noTrafficShapingAtAll True, if job has 'Native' connectivity. Otherwise false.
+ */
 function prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll){
 
     addNullProfileOptions(customConnNameForNative)
-    selectOptionIfOneOfNullOptionsIsSetForJob(connectivityProfileId, noTrafficShapingAtAll, customConnNameForNative)
-    registerCustomConnEventHandlers(customConnNameForNative)
+    registerConnectivityProfilesEventHandlers(customConnNameForNative)
+    if(connectivityProfileId == null){
+        selectNativeOrCustomConnectivity(noTrafficShapingAtAll, customConnNameForNative)
+    }
 
 }
 /**
@@ -124,38 +135,42 @@ function addNullProfileOptions(customConnNameForNative){
     connProfileSelect.appendChild(optNative);
     connProfileSelect.appendChild(optCustom);
     connProfileSelect.dispatchEvent(new Event("chosen:updated"));
-
-    document.getElementById('custom-connectivity-name').value = getCustomConnNameFrom();
 }
-//set native
-function selectOptionIfOneOfNullOptionsIsSetForJob(connectivityProfileId, noTrafficShapingAtAll, customConnNameForNative){
+
+function selectNativeOrCustomConnectivity(noTrafficShapingAtAll, customConnNameForNative){
 
     var profilesSelect = document.getElementById('connectivityProfile');
+    if(noTrafficShapingAtAll){
 
-    if(connectivityProfileId == null){
-        if(noTrafficShapingAtAll){
-
-            for (var i = 0; i < profilesSelect.options.length; i++) {
-                if (profilesSelect.options[i].text === customConnNameForNative) {
-                    profilesSelect.selectedIndex = i;
-                    break;
-                }
+        for (var i = 0; i < profilesSelect.options.length; i++) {
+            if (profilesSelect.options[i].text === customConnNameForNative) {
+                profilesSelect.selectedIndex = i;
+                break;
             }
-
-            profilesSelect.options[profilesSelect.options.selectedIndex].selected = true;
-        }else {
-
-            for (var i = 0; i < profilesSelect.options.length; i++) {
-                if (profilesSelect.options[i].text != customConnNameForNative && profilesSelect.options[i].value == "null") {
-                    profilesSelect.selectedIndex = i;
-                    break;
-                }
-            }
-
         }
+
+    }else {
+
+        for (var i = 0; i < profilesSelect.options.length; i++) {
+            if (profilesSelect.options[i].text != customConnNameForNative && profilesSelect.options[i].value == "null") {
+
+                var customConnNameInput = document.getElementById('custom-connectivity-name');
+                if(getCustomConnNameFromDom() != customConnNameInput.value){
+                    customConnNameInput.readOnly = false;
+                    document.getElementById('setCustomConnNameManually').checked = true;
+                    removeUpdateCustomNameEventListeners();
+                }
+                profilesSelect.selectedIndex = i;
+
+                break;
+
+            }
+        }
+
     }
+    profilesSelect.options[profilesSelect.options.selectedIndex].selected = true;
 }
-function registerCustomConnEventHandlers(customConnNameForNative){
+function registerConnectivityProfilesEventHandlers(customConnNameForNative){
 
     document.getElementById('connectivityProfile').onchange = function(){
         var selectedOption = this.options[this.selectedIndex];
@@ -174,24 +189,67 @@ function registerCustomConnEventHandlers(customConnNameForNative){
             }else {
                 document.getElementById('noTrafficShapingAtAll').value = false;
             }
+
         }
     };
 
-    var customConnNameInput = document.getElementById('custom-connectivity-name');
+    addUpdateCustomNameEventListeners();
 
-    document.getElementById('custom-bandwidthDown').oninput = function () {
-        customConnNameInput.value = getCustomConnNameFrom();
-    };
-    document.getElementById('custom-bandwidthUp').oninput = function () {
-        customConnNameInput.value = getCustomConnNameFrom();
-    };
-    document.getElementById('custom-latency').oninput = function () {
-        customConnNameInput.value = getCustomConnNameFrom();
-    };
-    document.getElementById('custom-packetLoss').oninput = function () {
-        customConnNameInput.value = getCustomConnNameFrom();
-    };
+    document.getElementById('setCustomConnNameManually').onchange = function(){
+        var manualCustomConnName = this.checked;
+        if(manualCustomConnName){
+            document.getElementById('custom-connectivity-name').readOnly = false;
+            removeUpdateCustomNameEventListeners();
+        }else{
+            document.getElementById('custom-connectivity-name').readOnly = true;
+            updateCustomConnName();
+            addUpdateCustomNameEventListeners();
+        }
+    }
 
+}
+function addUpdateCustomNameEventListeners(){
+    if (document.addEventListener) {
+        addUpdateCustomNameEventListenersForAllMajorBrowsers();
+    } else if (document.attachEvent) {
+        addUpdateCustomNameEventListenersForIE8AndEarlier();
+    }
+
+}
+function addUpdateCustomNameEventListenersForAllMajorBrowsers(){
+    document.getElementById('custom-bandwidthDown').addEventListener("input", updateCustomConnName);
+    document.getElementById('custom-bandwidthUp').addEventListener("input", updateCustomConnName);
+    document.getElementById('custom-latency').addEventListener("input", updateCustomConnName);
+    document.getElementById('custom-packetLoss').addEventListener("input", updateCustomConnName);
+}
+function addUpdateCustomNameEventListenersForIE8AndEarlier(){
+    document.getElementById('custom-bandwidthDown').attachEvent("onchange", updateCustomConnName);
+    document.getElementById('custom-bandwidthUp').attachEvent("onchange", updateCustomConnName);
+    document.getElementById('custom-latency').attachEvent("onchange", updateCustomConnName);
+    document.getElementById('custom-packetLoss').attachEvent("onchange", updateCustomConnName);
+}
+function removeUpdateCustomNameEventListeners(){
+    if (document.removeEventListener) {
+        removeUpdateCustomNameEventListenersForAllMajorBrowsers();
+    } else if (document.detachEvent) {
+        removeUpdateCustomNameEventListenersForIE8AndEarlier();
+    }
+
+}
+function removeUpdateCustomNameEventListenersForAllMajorBrowsers(){
+    document.getElementById('custom-bandwidthDown').removeEventListener("input", updateCustomConnName);
+    document.getElementById('custom-bandwidthUp').removeEventListener("input", updateCustomConnName);
+    document.getElementById('custom-latency').removeEventListener("input", updateCustomConnName);
+    document.getElementById('custom-packetLoss').removeEventListener("input", updateCustomConnName);
+}
+function removeUpdateCustomNameEventListenersForIE8AndEarlier(){
+    document.getElementById('custom-bandwidthDown').detachEvent("onchange", updateCustomConnName);
+    document.getElementById('custom-bandwidthUp').detachEvent("onchange", updateCustomConnName);
+    document.getElementById('custom-latency').detachEvent("onchange", updateCustomConnName);
+    document.getElementById('custom-packetLoss').detachEvent("onchange", updateCustomConnName);
+}
+function updateCustomConnName() {
+    document.getElementById('custom-connectivity-name').value = getCustomConnNameFromDom();
 }
 function toggleCustomConnDetails(visibilityToSet){
     $('#connectivityProfileDetails').toggle(visibilityToSet);
@@ -203,7 +261,7 @@ function toggleCustomConnDetails(visibilityToSet){
         document.getElementById('custom-packetLoss').value = "";
     }
 }
-function getCustomConnNameFrom(){
+function getCustomConnNameFromDom(){
 
     var bandwidthDownValue = document.getElementById('custom-bandwidthDown').value;
     var bandwidthUpValue = document.getElementById('custom-bandwidthUp').value;
