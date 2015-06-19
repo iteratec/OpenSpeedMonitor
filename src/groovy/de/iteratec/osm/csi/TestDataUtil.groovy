@@ -240,9 +240,9 @@ class TestDataUtil {
 		}
 		
 	}
-	static createConnectivityProfile(){
-		new GraphitePath(
-			name: 'name',
+	static createConnectivityProfile(String profileName){
+		new ConnectivityProfile(
+			name: profileName,
 			bandwidthDown: 6000,
 			bandwidthUp: 512,
 			latency: 40,
@@ -786,6 +786,13 @@ class TestDataUtil {
 				proxyIdentifier : 'server 1 - wpt example'
 				).save(failOnError: true)
 	}
+
+    static Page createUndefinedPage(){
+        return new Page(
+                name: Page.UNDEFINED,
+                weight: 0
+        ).save(failOnError: true)
+    }
 
 	static List<Page> createPages(List<String> allPageNames){
 		List<Page> allPages = []
@@ -1349,6 +1356,17 @@ class TestDataUtil {
 			measuredValueId: measuredValueId,
 			updateCause: cause
 		).save(failOnError: true)
-	} 
+	}
+
+    public static setPredefinedConnectivityForJob(ConnectivityProfile profile, Job job){
+        job.connectivityProfile = profile
+        job.customConnectivityProfile = false
+        job.customConnectivityName = null
+        job.bandwidthDown = null
+        job.bandwidthUp = null
+        job.latency = null
+        job.packetLoss = null
+        jo.save()
+    }
 	
 }

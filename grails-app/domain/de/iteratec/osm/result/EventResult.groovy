@@ -18,7 +18,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
@@ -191,8 +190,22 @@ class EventResult implements CsiValue {
 
         testAgent(nullable: true)
 
-		connectivityProfile(nullable: true, validator: { val, obj -> return (val == null && obj.customConnectivityName != null) || (val != null) })
-		customConnectivityName(nullable: true, validator: { val, obj -> (val == null && obj.connectivityProfile != null) || (val != null) })
+		connectivityProfile(nullable: true, validator: { currentProfile, eventResultInstance ->
+
+            boolean noPredefinedProfileButCustomName = currentProfile == null && eventResultInstance.customConnectivityName != null
+            boolean predefinedProfile = currentProfile != null
+
+            return noPredefinedProfileButCustomName || predefinedProfile
+
+        })
+		customConnectivityName(nullable: true, validator: { currentCustomName, eventResultInstance ->
+
+            boolean noCustomNameButPredefinedProfile = currentCustomName == null && eventResultInstance.connectivityProfile != null
+            boolean customName = currentCustomName != null
+
+            return noCustomNameButPredefinedProfile || customName
+
+        })
 	}
 
 	static mapping = {
