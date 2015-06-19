@@ -1366,7 +1366,7 @@ class TestDataUtil {
         job.bandwidthUp = null
         job.latency = null
         job.packetLoss = null
-        jo.save()
+        job.save()
     }
 	
 }
