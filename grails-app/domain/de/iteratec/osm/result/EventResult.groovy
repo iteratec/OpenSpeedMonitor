@@ -191,8 +191,8 @@ class EventResult implements CsiValue {
 
         testAgent(nullable: true)
 
-		connectivityProfile(nullable: true, validator: { connectivityProfileobj && !customConnectivityName })
-		customConnectivityName(nullable: true, validator: { customConnectivityName && !connectivityProfile  })
+		connectivityProfile(nullable: true, validator: { val, obj -> return (val == null && obj.customConnectivityName != null) || (val != null) })
+		customConnectivityName(nullable: true, validator: { val, obj -> (val == null && obj.connectivityProfile != null) || (val != null) })
 	}
 
 	static mapping = {
