@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
 
 import org.apache.commons.lang.time.DateUtils
@@ -45,7 +47,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  */
 @TestFor(ResultMeasuredValueService)
 @Mock([EventResult, Job, JobResult, JobGroup, MeasuredValue, MeasuredEvent, WebPageTestServer,
-	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script])
+	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script, ConnectivityProfile])
 class ResultMeasuredValueServiceTests {
 
 	ResultMeasuredValueService serviceUnderTest
@@ -65,6 +67,8 @@ class ResultMeasuredValueServiceTests {
 
 	JobResult runInHour_One, runInHour_Two, runBeforeHour, runAfterHour
 	EventResult resultRunInHour_One, resultRunInHour_Two, resultRunBeforeHour, resultRunAfterHour
+
+	ConnectivityProfile connectivityProfile
 
 	@Before
 	void setUp() {
@@ -135,6 +139,8 @@ class ResultMeasuredValueServiceTests {
 				name: 'homepage',
 				weight: 0.5
 				).save(failOnError: true)
+
+		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
 
 		daily = new MeasuredValueInterval(name: "daily", intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
 		weekly = new MeasuredValueInterval(name: "weekly", intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
@@ -255,7 +261,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runInHour_One.date,
 				jobResultJobConfigId: runInHour_One.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runInHour_One.save(failOnError: true)
@@ -300,7 +307,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runInHour_Two.date,
 				jobResultJobConfigId: runInHour_Two.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runInHour_Two.save(failOnError: true)
@@ -345,7 +353,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runBeforeHour.date,
 				jobResultJobConfigId: runBeforeHour.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runBeforeHour.save(failOnError: true)
@@ -390,7 +399,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runAfterHour.date,
 				jobResultJobConfigId: runAfterHour.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runAfterHour.save(failOnError: true)

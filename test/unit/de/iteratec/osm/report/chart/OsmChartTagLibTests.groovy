@@ -185,7 +185,7 @@ class OsmChartTagLibTests {
 		String actualHtml = applyTemplate(
 				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"800px\" '+
 				'title=\"${chartTitle}\" yType=\"${targetYType}\" width=\"${targetWidth}\" xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" yAxisMax=\"${yAxisMax}\"' +
-				' measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" />',
+				' measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" labelSummary=""/>',
 				model).stripIndent()
 
 		// assertions
@@ -200,6 +200,9 @@ class OsmChartTagLibTests {
 		sw  = """
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
+			<div id="rickshaw_label_summary_box">
+                <div id="rickshaw_chart_label_summary" class="rickshaw_legend"></div>
+            </div>
 			<div id="rickshaw_main">
 				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
@@ -306,7 +309,7 @@ class OsmChartTagLibTests {
 		// execute test
 		String actualHtml = applyTemplate(
 				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600px\" '+
-				'title=\"${title}\" highChartLabels=\"${highChartLabels}\" />',
+				'title=\"${title}\" highChartLabels=\"${highChartLabels}\" labelSummary="" />',
 				model).stripIndent()
 
 		// assertions
@@ -319,6 +322,9 @@ class OsmChartTagLibTests {
 		sw <<"""
 		<div id="${divId}" class="graph">
 			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
+			<div id="rickshaw_label_summary_box">
+                <div id="rickshaw_chart_label_summary" class="rickshaw_legend"></div>
+            </div>
 			<div id="rickshaw_main">
 				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>

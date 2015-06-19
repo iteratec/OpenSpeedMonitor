@@ -19,6 +19,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+
 import static org.junit.Assert.assertEquals
 import grails.test.mixin.*
 import grails.test.mixin.support.*
@@ -54,7 +56,7 @@ import de.iteratec.osm.util.ServiceMocker
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
 @Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval,
-	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, HourOfDay, Script, MeasuredValueUpdateEvent])
+	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, HourOfDay, Script, MeasuredValueUpdateEvent, ConnectivityProfile])
 class UpdateEventResultDependentMeasuredValuesTests {
 	
 	static final double DELTA = 1e-15
@@ -81,6 +83,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	EventMeasuredValueService serviceUnderTest
 	ServiceMocker mockGenerator
 
+	ConnectivityProfile connectivityProfile = null
+
     void setUp() {
 		
 		serviceUnderTest = service	
@@ -105,10 +109,12 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			idAsStringToPageMap_irrelevantCauseNotUsedInTheseTests,
 			idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests,
 			idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests)
-		
+
+		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
+
 		createTestDataForAllTests()
 		initializeFields()
-		
+
     }
 
     void tearDown() {
@@ -259,6 +265,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			jobResultJobConfigId: jobResult.job.ident(),
 			measuredEvent: event,
 			speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+			connectivityProfile: connectivityProfile,
 			tag: resultTag).save(failOnError: true)
 			
 			jobResult.save(failOnError: true)
@@ -367,8 +374,10 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			script: script,
 			maxDownloadTimeInMinutes: 60,
             customConnectivityProfile: false,
-            customConnectivityName: 'custom'
+			connectivityProfile: connectivityProfile,
+			noTrafficShapingAtAll: false
         ).save(failOnError: true)
+
 		job2 = new Job(
 			active: false,
 			label: labelJobOfCsiGroup2,
@@ -379,9 +388,11 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			jobGroup: csiGroup2,
 			script: script,
 			maxDownloadTimeInMinutes: 60,
-            customConnectivityProfile: false,
-            customConnectivityName: 'custom'
+			customConnectivityProfile: false,
+			connectivityProfile: connectivityProfile,
+			noTrafficShapingAtAll: false
         ).save(failOnError: true)
+
 		//wptjobrun
 		new JobResult(
 			job: job1,

@@ -266,6 +266,7 @@ public class EventResultDashboardService {
             graphs.every { it ->
                 summarizedLabelParts.each { part ->
                     it.label = (it.label - part.value.trim()).replaceFirst("^[\\|\\s]+(?!\$)", "");
+                    it.label = it.label.replaceAll("[\\s\\|\\s]+\$", "");
                 }
             }
 
