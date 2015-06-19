@@ -435,11 +435,7 @@ class LocationAndResultPersisterService implements iListener{
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}
         result.testAgent=jobRun.testAgent
-        if (jobRun.job.connectivityProfile){
-            result.connectivityProfile = jobRun.job.connectivityProfile
-        }else{
-            result.customConnectivityName = jobRun.job.customConnectivityName
-        }
+        setConnectivity(result, jobRun)
 
 		// FIXME: 2014-01-27-nku
 		//The following line is necessary in unit-tests since Grails version 2.3, but isn't in production. Should be removed if this bug s fixed in grails.  
@@ -449,6 +445,15 @@ class LocationAndResultPersisterService implements iListener{
 		return result
 		
 	}
+    private void setConnectivity(EventResult result, JobResult jobRun){
+        if (jobRun.job.connectivityProfile){
+            result.connectivityProfile = jobRun.job.connectivityProfile
+        }else if(jobRun.job.noTrafficShapingAtAll){
+            result.customConnectivityName = ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        }else {
+            result.customConnectivityName = jobRun.job.customConnectivityName
+        }
+    }
 	private void informDependents(List<EventResult> results){
 		
 		log.debug('informing event result dependents ...')
