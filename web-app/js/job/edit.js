@@ -15,7 +15,9 @@
 * limitations under the License.
 */
 
-function doOnDomReady(nextExecutionLink, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll) {
+function doOnDomReady(newJob, nextExecutionLink, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll, tagsLink) {
+
+    $("ul[name='tags']").tagit({select:true, tagSource: tagsLink});
 
     $("[rel=tooltip]").tooltip({ html: true });
     $("[rel=popover]").popover();
@@ -24,7 +26,7 @@ function doOnDomReady(nextExecutionLink, customConnNameForNative, connectivityPr
         $('[name="execution-schedule-shown"]').keyup();
     });
 
-    prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll)
+    prepareConnectivityProfileControls(newJob, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll)
     $('#connectivityProfile').change();
 
     initializeSelects();
@@ -35,6 +37,8 @@ function doOnDomReady(nextExecutionLink, customConnNameForNative, connectivityPr
             .removeAttr('readonly');
         $('#maxDownloadTimeInMinutes a').css('visibility', 'hidden');
     });
+
+    fixChosen();
 
     var cronExpression = $('#execution-schedule').val();
     jQuery.ajax({
@@ -103,16 +107,17 @@ jQuery.fn.visibilityToggle = function() {
  *  <li>If Job to show has 'native' or 'custom' connectivity. So no conn profile domain object is associated to it,
  *  the connectivity option will be selected manually in select.</li>
  * </ul>
+ * @param newJob Boolean which describes whether or not this page is for creation of a new job.
  * @param customConnNameForNative The name for option 'Native'. It's defined as a constant in a backend service.
  * @param connectivityProfileId Id of job associated connectivity profile. May be null if job has 'Native' or 'Custom' connectivity.
  * @param noTrafficShapingAtAll True, if job has 'Native' connectivity. Otherwise false.
  */
-function prepareConnectivityProfileControls(customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll){
+function prepareConnectivityProfileControls(newJob, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll){
 
     addNullProfileOptions(customConnNameForNative)
     registerConnectivityProfilesEventHandlers(customConnNameForNative)
     if(connectivityProfileId == null){
-        selectNativeOrCustomConnectivity(noTrafficShapingAtAll, customConnNameForNative)
+        selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative)
     }
 
 }
@@ -137,10 +142,13 @@ function addNullProfileOptions(customConnNameForNative){
     connProfileSelect.dispatchEvent(new Event("chosen:updated"));
 }
 
-function selectNativeOrCustomConnectivity(noTrafficShapingAtAll, customConnNameForNative){
+function selectConnectivityManually(newJob, noTrafficShapingAtAll, customConnNameForNative){
 
     var profilesSelect = document.getElementById('connectivityProfile');
-    if(noTrafficShapingAtAll){
+
+    if(newJob){
+        profilesSelect.selectedIndex = 0;
+    } else if(noTrafficShapingAtAll){
 
         for (var i = 0; i < profilesSelect.options.length; i++) {
             if (profilesSelect.options[i].text === customConnNameForNative) {
@@ -149,7 +157,7 @@ function selectNativeOrCustomConnectivity(noTrafficShapingAtAll, customConnNameF
             }
         }
 
-    }else {
+    } else {
 
         for (var i = 0; i < profilesSelect.options.length; i++) {
             if (profilesSelect.options[i].text != customConnNameForNative && profilesSelect.options[i].value == "null") {
@@ -171,7 +179,6 @@ function selectNativeOrCustomConnectivity(noTrafficShapingAtAll, customConnNameF
     profilesSelect.options[profilesSelect.options.selectedIndex].selected = true;
 }
 function registerConnectivityProfilesEventHandlers(customConnNameForNative){
-
     document.getElementById('connectivityProfile').onchange = function(){
         var selectedOption = this.options[this.selectedIndex];
         if(selectedOption.text == "Custom"){
@@ -276,25 +283,6 @@ function getCustomConnNameFromDom(){
     return "Custom (" + bwDownOrEmpty + "/" + bwUpOrEmpty + " Kbps, " + latencyOrEmpty + "ms, " + plrOrEmpty + "% PLR)";
 }
 
-// from http://stackoverflow.com/a/21375637
-// necessary to prevent Chosen from being cut off in tabs
-$(function () {
-	   fixChoosen();
-});
-function fixChoosen() {
-   var els = jQuery(".chosen");
-   els.on("chosen:showing_dropdown", function () {
-      $(this).parents("div").css("overflow", "visible");
-   });
-   els.on("chosen:hiding_dropdown", function () {
-      var $parent = $(this).parents("div");
-
-      // See if we need to reset the overflow or not.
-      var noOtherExpanded = $('.chosen-with-drop', $parent).length == 0;
-      if (noOtherExpanded)
-         $parent.css("overflow", "");
-   });
-}
 function domainDeleteConfirmation(message,id,link){
     var confirmMessage = "";
     if(link != null || link == ""){
@@ -339,5 +327,24 @@ function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLi
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
         }
+    });
+}
+/**
+ * Necessary to prevent Chosen dropdown from being cut off in tabs
+ * @see http://stackoverflow.com/a/21375637
+ * TODO: after first selection dropdown of chosen select disappears after click. So one have to hold the mouse button while selection :(
+ */
+function fixChosen() {
+    var els = jQuery(".chosen");
+    els.on("chosen:showing_dropdown", function (event, chosen) {
+        $(this).parents("div").css("overflow", "visible");
+    });
+    els.on("chosen:hiding_dropdown", function () {
+        var $parent = $(this).parents("div");
+        // See if we need to reset the overflow or not.
+        var noOtherExpanded = $('.chosen-with-drop', $parent).length == 0;
+        if (noOtherExpanded)
+            $parent.css("overflow", "");
+        $('.tab-content').scrollTop(($('.tab-content').height()*2));
     });
 }

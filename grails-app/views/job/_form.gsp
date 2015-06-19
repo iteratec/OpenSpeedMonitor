@@ -5,11 +5,6 @@
 <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
 	<r:use modules="timeago-de" />
 </g:if>
-<r:script>
-    $(document).ready(function() {
-		    $("ul[name='tags']").tagit({select:true, tagSource: "${g.createLink(action: 'tags', absolute: true)}"});
-	});
-</r:script>
 
 <div class="row form-group ${hasErrors(bean: job, field: 'label', 'error')} required">
 	<label for="label" class="span3 text-right" style="width: 70px !important;">
@@ -50,7 +45,7 @@
     </li>            
   </ul>
   <div class="tab-content">
-    <div class="tab-pane active" id="1">      
+    <div class="tab-pane active" id="1">
 	  <g:render template="testSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
     </div>
     <div class="tab-pane" id="2">
@@ -64,3 +59,16 @@
 
 <!-- included because there is no way for the user to supply a value for validationRequest -->
 <g:hiddenField name="validationRequest" value="" />
+
+<r:script>
+    $(document).ready(
+        doOnDomReady(
+            ${job.label == null},
+            "${g.createLink(action: 'nextExecution', absolute: true)}",
+            '${customConnNameForNative}',
+            ${job.connectivityProfile?job.connectivityProfile.id:'null'},
+            ${job.noTrafficShapingAtAll},
+            "${g.createLink(action: 'tags', absolute: true)}"
+        )
+    );
+</r:script>

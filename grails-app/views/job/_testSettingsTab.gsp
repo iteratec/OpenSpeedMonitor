@@ -121,7 +121,7 @@
     </label>
     <div class="span8">
         %{--class="form-control chosen"--}%
-        <g:select id="connectivityProfile" name="connectivityProfile.id" from="${ connectivites }"
+        <g:select id="connectivityProfile" name="connectivityProfile.id" from="${ connectivites }" class="form-control chosen"
                  optionKey="id" value="${job.connectivityProfile?job.connectivityProfile.id:null}" />
     </div>
 </div>

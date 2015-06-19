@@ -16,6 +16,69 @@
 */
 
 /**
+ * Called on jquerys DOM-ready.
+ * Initializes DOM-nodes and registers events.
+ */
+function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
+
+    initDatepicker(dateFormat, weekStart, 24*3);
+
+    initTimepicker(false);
+
+    var preSelection = $('#timeframeSelect').val()>0;
+    disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
+
+    initIntervalSelect();
+
+    initChosenSelects(noResultsTextForChosenSelects);
+
+    updateCollapseInfos();
+
+    setChevron($('#collapseOne'));
+
+    $('#collapseOne').on('shown', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        e.preventDefault();
+        setCollapseDateInfos(false);
+    });
+    $('#collapseOne').on('hidden', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        setCollapseDateInfos(true);
+    });
+
+    setChevron($('#collapseTwo'));
+    $('#collapseTwo').on('shown', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        e.preventDefault();
+        setCollapseJobInfos(false);
+    });
+    $('#collapseTwo').on('hidden', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        setCollapseJobInfos(true);
+    });
+
+    setChevron($('#collapseThree'));
+
+    $('#collapseThree').on('shown', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        e.preventDefault();
+        setCollapseMeasurementInfos(false);
+    });
+    $('#collapseThree').on('hidden', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        setCollapseMeasurementInfos(true);
+    });
+
+    // Scroll to Chartbox
+    if($("#chartbox").length > 0){
+        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+180)},{duration: 'fast'});
+    }else{
+        $('html,body').animate({scrollTop: 0},{duration: 'fast'});
+    }
+
+}
+
+/**
  * Updates information shown on the right of the headers of collapsed parts of the gui.
  */
 var updateCollapseInfos = function() {
@@ -113,66 +176,4 @@ function initIntervalSelect() {
 	$('#selectedIntervalHtmlId').on("change", function(event){
 		setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
 	});
-}
-/**
- * Called on jquerys DOM-ready.
- * Initializes DOM-nodes and registers events. 
- */
-function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
-	
-	initDatepicker(dateFormat, weekStart, 24*3);
-
-	initTimepicker(false);
-
-	var preSelection = $('#timeframeSelect').val()>0;
-	disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
-
-	initIntervalSelect();
-
-	initChosenSelects(noResultsTextForChosenSelects);
-	
-	updateCollapseInfos();
-	
-	setChevron($('#collapseOne'));
-	
-	$('#collapseOne').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
-		e.preventDefault();
-		setCollapseDateInfos(false);
-	});
-	$('#collapseOne').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
-		setCollapseDateInfos(true);
-	});
-	
-	setChevron($('#collapseTwo'));
-	$('#collapseTwo').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
-		e.preventDefault();
-		setCollapseJobInfos(false);
-	});
-	$('#collapseTwo').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
-		setCollapseJobInfos(true);
-	});
-	
-	setChevron($('#collapseThree'));
-	
-	$('#collapseThree').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
-		e.preventDefault();
-		setCollapseMeasurementInfos(false);
-	});
-	$('#collapseThree').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
-		setCollapseMeasurementInfos(true);
-	});
-	
-	// Scroll to Chartbox
-	if($("#chartbox").length > 0){
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+180)},{duration: 'fast'});
-	}else{
-		$('html,body').animate({scrollTop: 0},{duration: 'fast'});
-	}
-
 }

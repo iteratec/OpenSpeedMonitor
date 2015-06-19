@@ -118,7 +118,7 @@ class JobController {
 	def create() {
 		Job job = new Job(params)
 		job.maxDownloadTimeInMinutes = configService.getDefaultMaxDownloadTimeInMinutes()
-		[job: job, 'defaultMaxDownloadTimeInMinutes': configService.getDefaultMaxDownloadTimeInMinutes(), connectivites: ConnectivityProfile.list()]
+		return [job: job] << getStaticModelPartForEditOrCreateView()
 	}
 
 	def save() {
@@ -130,12 +130,12 @@ class JobController {
                 'job.executionSchedule.executionScheduleInvalid',
                 ['', '', params.executionSchedule.substring(params.executionSchedule.indexOf(" ") + 1)] as Object[],
                 '[{2} is not a valid Cron expression]')
-            render(view: 'create', model: [job: job])
+            render(view: 'create', model: [job: job] << getStaticModelPartForEditOrCreateView())
             return
         } else {
 
     		if (!job.save(flush: true)) {
-    			render(view: 'create', model: [job: job])
+    			render(view: 'create', model: [job: job] << getStaticModelPartForEditOrCreateView())
     			return
     		} else {
     			// Tags can only be set after first successful save.
@@ -154,12 +154,7 @@ class JobController {
 	def edit() {
 		Job job = Job.get(params.id)
 		redirectIfNotFound(job, params.id)
-		[
-                job: job,
-                defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
-                connectivites: ConnectivityProfile.list(),
-                customConnNameForNative: ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
-        ]
+        return [job: job] << getStaticModelPartForEditOrCreateView()
 	}
 
 	def update() {
@@ -170,7 +165,10 @@ class JobController {
                 'job.executionSchedule.executionScheduleInvalid',
                 ['', '', params.executionSchedule.substring(params.executionSchedule.indexOf(" ") + 1)] as Object[],
                 '[{2} is not a valid Cron expression]')
-            render(view: 'edit', model: [job: job, customConnNameForNative: ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE])
+            render(
+                    view: 'edit',
+                    model: [job: job] << getStaticModelPartForEditOrCreateView()
+            )
             return
         } else {
     		def flashMessageArgs = [getJobI18n(), job.label]
@@ -181,7 +179,10 @@ class JobController {
     			if (job.version > version) {
     				job.errors.rejectValue("version", "default.optimistic.locking.failure", [getJobI18n()] as Object[],
     						  "Another user has updated this job while you were editing")
-    				render(view: 'edit', model: [job: job, customConnNameForNative: ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE])
+    				render(
+                            view: 'edit',
+                            model: [job: job] << getStaticModelPartForEditOrCreateView()
+                    )
     				return
     			}
     		}
@@ -190,7 +191,7 @@ class JobController {
     		setVariablesOnJob(params.variables, job)
     		job.tags = params.list('tags')
     		if (!job.save()) {
-    			render(view: 'edit', model: [job: job, customConnNameForNative: ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE])
+    			render(view: 'edit', model: [job: job] << getStaticModelPartForEditOrCreateView())
     			return
     		} else {
     			Map<Long, Object> massExecutionResults = [:]
@@ -401,4 +402,12 @@ class JobController {
 				job.variables[it.key] = it.value
 		}
 	}
+
+    Map getStaticModelPartForEditOrCreateView(){
+        return [
+                defaultMaxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes(),
+                connectivites: ConnectivityProfile.list(),
+                customConnNameForNative: ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        ]
+    }
 }
