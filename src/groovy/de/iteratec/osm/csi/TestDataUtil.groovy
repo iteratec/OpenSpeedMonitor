@@ -1360,12 +1360,35 @@ class TestDataUtil {
 
     public static setPredefinedConnectivityForJob(ConnectivityProfile profile, Job job){
         job.connectivityProfile = profile
+        job.noTrafficShapingAtAll = false
         job.customConnectivityProfile = false
         job.customConnectivityName = null
         job.bandwidthDown = null
         job.bandwidthUp = null
         job.latency = null
         job.packetLoss = null
+        job.save()
+    }
+    public static setNativeConnectivityForJob(Job job){
+        job.connectivityProfile = null
+        job.noTrafficShapingAtAll = true
+        job.customConnectivityProfile = false
+        job.customConnectivityName = null
+        job.bandwidthDown = null
+        job.bandwidthUp = null
+        job.latency = null
+        job.packetLoss = null
+        job.save()
+    }
+    public static setCustomConnectivityForJob(Job job){
+        job.connectivityProfile = null
+        job.noTrafficShapingAtAll = false
+        job.customConnectivityProfile = true
+        job.customConnectivityName = 'Custom (60.000/512 Kbps, 40ms, 0% PLR)'
+        job.bandwidthDown = 60000
+        job.bandwidthUp = 512
+        job.latency = 40
+        job.packetLoss = 0
         job.save()
     }
 	
