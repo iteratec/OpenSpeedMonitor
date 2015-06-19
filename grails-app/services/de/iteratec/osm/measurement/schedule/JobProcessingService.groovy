@@ -115,7 +115,7 @@ class JobProcessingService {
 			]
 
 		// specify connectivity
-        if (job.customConnectivityProfile && job.customConnectivityName.equals('Native')) {
+        if (job.noTrafficShapingAtAll) {
             parameters.location += ".Native"
         } else {
             parameters.location += ".custom"
