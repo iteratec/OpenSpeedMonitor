@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+
 import static de.iteratec.osm.util.Constants.*
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
@@ -249,10 +251,11 @@ public class EventResultDashboardService {
                     [ key: 'Messwert', value: temp[0] ]
             ]
 
-            if(temp.size() == 4) {
+            if(temp.size() == 5) {
                 labelParts.add([ key: 'Gruppe', value: temp[1] ]);
                 labelParts.add([ key: 'Event', value: temp[2] ]);
                 labelParts.add([ key: 'Location', value: temp[3] ]);
+                labelParts.add([ key: 'Connectivity', value: temp[4] ]);
             }else if(temp.size() == 2) {
                 labelParts.add([ key: 'Identifier', value: temp[1] ]);
             }
@@ -265,9 +268,10 @@ public class EventResultDashboardService {
 
             graphs.every { it ->
                 summarizedLabelParts.each { part ->
-                    it.label = (it.label - part.value.trim()).replaceFirst("^[\\|\\s]+(?!\$)", "");
-                    it.label = it.label.replaceAll("[\\s\\|\\s]+\$", "");
+                    it.label = (it.label - part.value.trim());
                 }
+                it.label = it.label.replaceAll("[|]\\s+[|]", "|");
+                it.label = it.label.replaceFirst("^\\s+[|]\\s+", "");
             }
 
             String summary = "";
@@ -291,6 +295,8 @@ public class EventResultDashboardService {
 
             eventResults.each { EventResult eventResult ->
 
+                String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
+
                 URL testsDetailsURL = eventResult.getTestDetailsWaterfallURL()
                 if (!testsDetailsURL) {
                     testsDetailsURL = this.buildTestsDetailsURL(eventResult)
@@ -299,7 +305,7 @@ public class EventResultDashboardService {
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
                     Double value = resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
                     if (value != null) {
-                        String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}"
+                        String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
                         OsmChartPoint chartPoint = new OsmChartPoint(time: eventResult.getJobResultDate().getTime(), measuredValue: value, countOfAggregatedResults: 1, sourceURL: testsDetailsURL, testingAgent: eventResult.testAgent)
                         if (chartPoint.isValid())
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
@@ -388,7 +394,6 @@ public class EventResultDashboardService {
         String firstViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingCached", "", null);
         String repeatedViewEnding = i18nService.msg("de.iteratec.isr.measurand.endingUncached", "", null);
 
-
         List<OsmChartGraph> graphs = []
 
         Map<Serializable, JobGroup> jobGroupMap = [:]
@@ -397,12 +402,16 @@ public class EventResultDashboardService {
 
         highchartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
             List<String> tokenizedGraphLabel = graphLabel.tokenize(UNIQUE_STRING_DELIMITTER)
-            if (tokenizedGraphLabel.size() != 2) {
-                throw new IllegalArgumentException("The graph-label should consist of two parts: AggregatorType and tag. This is no correct graph-label: ${graphLabel}")
+            if (tokenizedGraphLabel.size() != 3) {
+                throw new IllegalArgumentException("The graph-label should consist of three parts: AggregatorType and tag. This is no correct graph-label: ${graphLabel}")
             }
             AggregatorType aggregator = AggregatorType.findByName(tokenizedGraphLabel[0])
             if (!aggregator) {
                 throw new IllegalArgumentException("First part of graph-label should be the name of AggregatorType. This is no correct aggregator-name: ${tokenizedGraphLabel[0]}")
+            }
+            String connectivity = tokenizedGraphLabel[2]
+            if(!connectivity) {
+                throw new IllegalArgumentException("Thrid part of graph-label should be the the connectivity. This is no correct connectivity: ${tokenizedGraphLabel[2]}")
             }
 
             String measurand = i18nService.msg("de.iteratec.isr.measurand.${tokenizedGraphLabel[0].replace('Uncached', '').replace('Cached', '')}", tokenizedGraphLabel[0], null)
@@ -428,7 +437,8 @@ public class EventResultDashboardService {
 
                 if (group && measuredEvent && location) {
                     String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
-                            "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}"
+                            "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
+                            "${HIGHCHART_LEGEND_DELIMITTER}${connectivity}"
                     graphs.add(new OsmChartGraph(
                             label: newGraphLabel,
                             measurandGroup: aggregator.measurandGroup,

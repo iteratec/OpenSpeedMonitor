@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.result.JobResultService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -341,11 +342,6 @@ class LocationAndResultPersisterService implements iListener{
 		EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
         result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
-
-		/**
-		 * FIXME: Test for connectivity profile
-		 */
-		result.connectivityProfile = jobRun.getJob().connectivityProfile;
 
 		return result
 	}
