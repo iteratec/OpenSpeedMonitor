@@ -29,7 +29,7 @@ import grails.test.mixin.support.*
  */
 @TestMixin(GrailsUnitTestMixin)
 @Mock([Job, Location, Script])
-class JobSpec extends Specification{
+class JobSpec extends Specification {
 
     void "connectivityProfile: not custom or all set manually"() {
         when:
@@ -38,17 +38,17 @@ class JobSpec extends Specification{
         notPredefinedNoCustom.connectivityProfile = null
         Job predefinedCustom = getMostSimpleValidJob()
         predefinedCustom.with {
-            customConnectivityProfile= true
+            customConnectivityProfile = true
             customConnectivityName = 'custom...'
             bandwidthDown = 6000
             bandwidthUp = 512
             latency = 50
             packetLoss = 0
         }
-        Job notPredefinedCustom =getMostSimpleValidJob()
+        Job notPredefinedCustom = getMostSimpleValidJob()
         notPredefinedCustom.with {
             connectivityProfile = null
-            customConnectivityProfile= true
+            customConnectivityProfile = true
             customConnectivityName = 'custom...'
             bandwidthDown = 6000
             bandwidthUp = 512
@@ -59,7 +59,7 @@ class JobSpec extends Specification{
         then:
         predefinedNoCustom.validate() == true
         notPredefinedNoCustom.validate() == false
-        predefinedCustom.validate() == false
+        predefinedCustom.validate() == true
         notPredefinedCustom.validate() == true
     }
 
@@ -70,17 +70,17 @@ class JobSpec extends Specification{
         notPredefinedNoCustomName.connectivityProfile = null
         Job predefinedCustomName = getMostSimpleValidJob()
         predefinedCustomName.with {
-            customConnectivityProfile= true
+            customConnectivityProfile = true
             customConnectivityName = 'custom...'
             bandwidthDown = 6000
             bandwidthUp = 512
             latency = 50
             packetLoss = 0
         }
-        Job notPredefinedCustomName =getMostSimpleValidJob()
+        Job notPredefinedCustomName = getMostSimpleValidJob()
         notPredefinedCustomName.with {
             connectivityProfile = null
-            customConnectivityProfile= true
+            customConnectivityProfile = true
             customConnectivityName = 'custom...'
             bandwidthDown = 6000
             bandwidthUp = 512
@@ -91,11 +91,11 @@ class JobSpec extends Specification{
         then:
         predefinedNoCustomName.validate() == true
         notPredefinedNoCustomName.validate() == false
-        predefinedCustomName.validate() == false
+        predefinedCustomName.validate() == true
         notPredefinedCustomName.validate() == true
     }
 
-    void "execution schedule: must be valid if set"(){
+    void "execution schedule: must be valid if set"() {
         when:
         Job withoutSchedule = getMostSimpleValidJob()
         Job validSchedule = getMostSimpleValidJob()
@@ -109,7 +109,7 @@ class JobSpec extends Specification{
         invalidSchedule.validate() == false
     }
 
-    void "active: may only be true if execution schedule is set"(){
+    void "active: may only be true if execution schedule is set"() {
         when:
         Job activeWithoutSchedule = getMostSimpleValidJob()
         activeWithoutSchedule.active = true
@@ -121,7 +121,7 @@ class JobSpec extends Specification{
         activeWithSchedule.validate() == true
     }
 
-    private Job getMostSimpleValidJob(){
+    private Job getMostSimpleValidJob() {
         return new Job(
                 label: 'label',
                 script: new Script(),
