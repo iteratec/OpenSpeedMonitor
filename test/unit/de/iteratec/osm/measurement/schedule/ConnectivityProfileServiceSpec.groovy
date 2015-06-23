@@ -47,7 +47,7 @@ class ConnectivityProfileServiceSpec extends Specification{
         int plr = 0
 
         then:
-        serviceUnderTest.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50.000/6.000 Kbps, 50ms Latency)'
+        serviceUnderTest.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50000/6000 Kbps, 50ms Latency)'
     }
     void "get custom name for connectivity with packet loss"() {
         when:
@@ -57,7 +57,7 @@ class ConnectivityProfileServiceSpec extends Specification{
         int plr = 5
 
         then:
-        serviceUnderTest.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50.000/6.000 Kbps, 50ms Latency, 5% PLR)'
+        serviceUnderTest.getCustomConnectivityNameFor(bwDown, bwUp, latency, plr) == 'Custom (50000/6000 Kbps, 50ms Latency, 5% PLR)'
     }
     void "validation of invalid connectivity attributes"(){
         when:

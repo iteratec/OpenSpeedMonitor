@@ -25,6 +25,8 @@ package de.iteratec.osm.measurement.schedule
  */
 class ConnectivityProfile {
 
+    ConnectivityProfileService connectivityProfileService
+
     public static final int BANDWIDTH_DOWN_MIN = 0
     public static final int BANDWIDTH_UP_MIN = 0
     public static final int LATENCY_MIN = 0
@@ -44,7 +46,9 @@ class ConnectivityProfile {
         packetLoss(min: PLR_MIN)
     }
 
+    static transients = ['connectivityProfileService']
+
     public String toString() {
-        return "${name}: ${bandwidthDown}/${bandwidthUp} Kbps, ${latency}ms, ${packetLoss}% PLR"
+        return "${name}: ${connectivityProfileService.getConnectivitySpecificationFor(bandwidthDown, bandwidthUp, latency, packetLoss)}"
     }
 }

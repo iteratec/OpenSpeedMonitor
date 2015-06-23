@@ -38,8 +38,13 @@ $(document).ready(function(){
 		$('#selectedBrowsersHtmlId').change(function() { updateSelectFields("#selectedBrowsersHtmlId", "#selectedLocationsHtmlId", browserToLocation, allLocations); });
 		updateSelectFields("#selectedBrowsersHtmlId", "#selectedLocationsHtmlId", browserToLocation, allLocations);
 	}
+    if ($("#selectedAllConnectivityProfiles").length > 0 && $("#selectedConnectivityProfilesHtmlId").length > 0 ){
+        initSelectAndCheckBoxFunction("#selectedAllConnectivityProfiles", "#selectedConnectivityProfilesHtmlId");
+    }
 	$("#advanced-filter-row").fadeOut();
 	$('#simple-job-filter').button('toggle');
+
+    fixChosen();
 });
 
 function sortAlpha(a,b){  

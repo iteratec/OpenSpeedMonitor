@@ -57,12 +57,12 @@ class ConnectivityProfileService {
      * @return Default name for a connectivity defined by params.
      */
     String getCustomConnectivityNameFor(Integer bwDown, Integer bwUp, Integer latency, Integer plr) {
-
+        return "Custom ${getConnectivitySpecificationFor(bwDown, bwUp, latency, plr)}"
+    }
+    String getConnectivitySpecificationFor(Integer bwDown, Integer bwUp, Integer latency, Integer plr){
         validateConnectivityAttributes(bwDown, bwUp, latency, plr)
-        DecimalFormat decimalFormat = new DecimalFormat(DECIMAL_FORMAT_PATTERN, new DecimalFormatSymbols(LocaleContextHolder.locale))
-        String plrPart = plr ? ", ${decimalFormat.format(plr)}% PLR" : ""
-        return "Custom (${decimalFormat.format(bwDown)}/${decimalFormat.format(bwUp)} Kbps, ${decimalFormat.format(latency)}ms Latency${plrPart})"
-
+        String plrPart = plr ? ", ${plr}% PLR" : ""
+        return "(${bwDown}/${bwUp} Kbps, ${latency}ms Latency${plrPart})"
     }
 
     void validateConnectivityAttributes(Integer bwDown, Integer bwUp, Integer latency, Integer plr){

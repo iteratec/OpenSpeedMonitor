@@ -135,7 +135,25 @@
 						<g:if test="${request.queryString}"><div id="collapseTwo" class="accordion-body collapse"></g:if>
 						<g:else><div id="collapseTwo" class="accordion-body collapse in"></g:else>
 							<div class="accordion-inner" style="margin: 0px; padding: 4px;">
-								<g:render template="selectMeasurings" model="${['locationsOfBrowsers':locationsOfBrowsers, 'eventsOfPages':eventsOfPages,'folders':folders,'selectedFolder':selectedFolder, 'pages':pages,'selectedPage':selectedPage,'measuredEvents':measuredEvents,'selectedAllMeasuredEvents':selectedAllMeasuredEvents,'selectedMeasuredEvents':selectedMeasuredEvents,'browsers':browsers,'selectedBrowsers':selectedBrowsers,'selectedAllBrowsers':selectedAllBrowsers,'locations':locations,'selectedLocations':selectedLocations,'selectedAllLocations':selectedAllLocations]}"/>
+								<g:render template="selectMeasurings"
+                                          model="${['locationsOfBrowsers':locationsOfBrowsers,
+                                                    'eventsOfPages':eventsOfPages,
+                                                    'folders':folders,
+                                                    'selectedFolder':selectedFolder,
+                                                    'pages':pages,
+                                                    'selectedPage':selectedPage,
+                                                    'measuredEvents':measuredEvents,
+                                                    'selectedAllMeasuredEvents':selectedAllMeasuredEvents,
+                                                    'selectedMeasuredEvents':selectedMeasuredEvents,
+                                                    'browsers':browsers,
+                                                    'selectedBrowsers':selectedBrowsers,
+                                                    'selectedAllBrowsers':selectedAllBrowsers,
+                                                    'locations':locations,
+                                                    'selectedLocations':selectedLocations,
+                                                    'selectedAllLocations':selectedAllLocations,
+                                                    'connectivityProfiles':connectivityProfiles,
+                                                    'selectedConnectivityProfiles':selectedConnectivityProfiles,
+                                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles]}"/>
 							</div>
 						</div>
 					</div>

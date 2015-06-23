@@ -19,33 +19,27 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 
-import static de.iteratec.osm.util.Constants.*
-
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
-import org.joda.time.DateTime
-
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.OsmChartPoint
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.util.I18nService
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import org.joda.time.DateTime
+
+import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 
 /**
  * <p>
@@ -67,6 +61,7 @@ public class EventResultDashboardService {
     MeasuredValueUtilService measuredValueUtilService
     PerformanceLoggingService performanceLoggingService
     AggregatorTypeDaoService aggregatorTypeDaoService
+    ConnectivityProfileDaoService connectivityProfileDaoService
 
     /**
      * LabelSummary
@@ -111,6 +106,19 @@ public class EventResultDashboardService {
      */
     public List<Location> getAllLocations() {
         return locationDaoService.findAll().sort(false, { it.label });
+    }
+
+    /**
+     * Fetches all {@link ConnectivityProfile}s from Database.
+     *
+     * <p>
+     * 	Proxy for {@link ConnectivityDaoService}
+     * </p>
+     *
+     * @return all {@link ConnectivityProfile} ordered by their toString() representation.
+     */
+    public List<ConnectivityProfile> getAllConnectivityProfiles() {
+        return connectivityProfileDaoService.findAll().sort(false, { it.toString() });
     }
 
     /**

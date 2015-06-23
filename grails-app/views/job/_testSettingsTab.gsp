@@ -117,12 +117,16 @@
 <div class="row form-group">
     <label class="span3 text-right" for="connectivityProfile"> <g:message
             code="connectivityProfile.label" default="connectivityProfile" />
-        <span class="required-indicator">*</span>
+    <span class="required-indicator">*</span>
     </label>
     <div class="span8">
-        %{--class="form-control chosen"--}%
-        <g:select id="connectivityProfile" name="connectivityProfile.id" from="${ connectivites }" class="form-control chosen"
-                 optionKey="id" value="${job.connectivityProfile?job.connectivityProfile.id:null}" />
+        <g:select id="connectivityProfile"
+                  class="iteratec-element-select chosen"
+                  data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
+                  name="connectivityProfile.id"
+                  from="${ connectivites }"
+                  optionKey="id"
+                  value="${job.connectivityProfile?job.connectivityProfile.id:null}" />
     </div>
 </div>
 <div id="connectivityProfileDetails">
