@@ -68,9 +68,20 @@ class MvQueryParams {
 	 * never <code>null</code>.
 	 */
 	final SortedSet<Long> locationIds = new TreeSet<Long>()
+
+    /**
+     * Database-Ids of {@link ConnectivityProfile}s to find,
+     * never <code>null</code>.
+     */
+    final SortedSet<Long> connectivityProfileIds = new TreeSet<Long>()
 	
 	@Override
 	public String toString(){
-		return "jobGroupIds=${jobGroupIds*.toString()}, pageIds=${pageIds*.toString()}, measuredEventIds=${measuredEventIds*.toString()}, browserIds${browserIds*.toString()}, locationIds=${locationIds*.toString()}"
+		return "jobGroupIds=${jobGroupIds*.toString()}, " +
+                "pageIds=${pageIds*.toString()}, " +
+                "measuredEventIds=${measuredEventIds*.toString()}, " +
+                "browserIds${browserIds*.toString()}, " +
+                "locationIds=${locationIds*.toString()}, " +
+                "connectivityProfileIds=${connectivityProfileIds*.toString()}"
 	}
 }

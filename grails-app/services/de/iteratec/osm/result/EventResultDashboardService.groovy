@@ -17,8 +17,8 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService

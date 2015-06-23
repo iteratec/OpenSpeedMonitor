@@ -153,7 +153,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 		// TODO: Create a dummy data for expectedResult to pass it to EventResult
 		
 		new EventResult(
-			measuredEvent: event,y
+			measuredEvent: event,
 			wptStatus: 200,
 			medianValue: true,
 			numberOfWptRun: 1,

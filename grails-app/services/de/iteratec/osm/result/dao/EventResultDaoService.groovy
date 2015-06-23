@@ -128,6 +128,18 @@ public class EventResultDaoService {
 				ltConstraints.each {attr, ltValue ->
 					lt(attr, ltValue)
 				}
+                if (mvQueryParams.connectivityProfileIds.size() > 0){
+                    if (mvQueryParams.customConnectivityNameRegex == null){
+                        'in'('connectivityProfile.ident()', mvQueryParams.connectivityProfileIds)
+                    }else{
+                        or {
+                            'in'('connectivityProfile.ident()', mvQueryParams.connectivityProfileIds)
+                            rlike('customConnectivityName', ~/${mvQueryParams.customConnectivityNameRegex}/)
+                        }
+                    }
+                }else if (mvQueryParams.customConnectivityNameRegex != null){
+                    rlike('customConnectivityName', ~/${mvQueryParams.customConnectivityNameRegex}/)
+                }
 			}
 			return result;
 		} else {
@@ -141,8 +153,24 @@ public class EventResultDaoService {
 				ltConstraints.each {attr, ltValue ->
 					lt(attr, ltValue)
 				}
-			}
-			return eventResults.grep{ it.tag ==~ rlikePattern }
+			}.grep{ it.tag ==~ rlikePattern }
+
+            if (mvQueryParams.connectivityProfileIds.size() > 0){
+                if (mvQueryParams.customConnectivityNameRegex == null){
+                    eventResults = eventResults.findAll { mvQueryParams.connectivityProfileIds.contains(it.connectivityProfile.ident()) }
+                }else{
+                    eventResults = eventResults.findAll {
+                        mvQueryParams.connectivityProfileIds.contains(it.connectivityProfile.ident()) ||
+                        it.customConnectivityName ==~ ~/${mvQueryParams.customConnectivityNameRegex}/
+                    }
+                }
+            }else if (mvQueryParams.customConnectivityNameRegex != null){
+                eventResults = eventResults.findAll {
+                    it.customConnectivityName ==~ ~/${mvQueryParams.customConnectivityNameRegex}/
+                }
+            }
+
+			return eventResults
 		}
 	}
 		

@@ -57,4 +57,9 @@ class ErQueryParams extends MvQueryParams {
 	 * @see MeasurandGroup
 	 */
 	Integer minRequestSizeInBytes
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s.
+     * Results which attribute customConnectivityName matches this regex get included.
+     */
+    String customConnectivityNameRegex
 }
