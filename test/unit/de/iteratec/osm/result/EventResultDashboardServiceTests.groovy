@@ -92,6 +92,8 @@ class EventResultDashboardServiceTests {
     final static String location1Location = "ffLocationLocation"
     final static String location2Location = "ieLocationLocation"
     final static String i18nNameOfAggregatorTypeUsedInTests = 'i18nNameOfAggregatorTypeUsedInTests'
+    final static String connectivity1Connectivity = "Test"
+    final static String connectivity2Connectivity = "Test"
 
     @Before
     void setUp() {
@@ -465,14 +467,14 @@ class EventResultDashboardServiceTests {
         assertEquals(1, resultGraphs.size())
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location}"
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity1Connectivity}"
         }
         assertEquals(1, resultsCsi1.size())
         assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
         assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location}"
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${connectivity2Connectivity}"
         }
         assertEquals(0, resultsCsi2.size())
     }

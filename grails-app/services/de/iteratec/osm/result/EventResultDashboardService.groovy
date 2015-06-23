@@ -335,8 +335,9 @@ public class EventResultDashboardService {
                     if (isCachedViewEqualToAggregatorTypesView(eventResult, resultMeasuredValueService.getAggregatorTypeCachedViewType(aggregator))) {
                         Double value = resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
                         if (value != null) {
+                            String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
                             Long millisStartOfInterval = measuredValueUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
-                            eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}"] << value
+                            eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}${UNIQUE_STRING_DELIMITTER}${connectivity}"] << value
                         }
                     }
                 }
@@ -374,7 +375,8 @@ public class EventResultDashboardService {
                 }
 
                 performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'calculate value and create OsmChartPoint', IndentationDepth.THREE) {
-                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}"
+
+                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[2]}";
                     countValues = value.size()
                     if (countValues > 0) {
                         sum = 0
