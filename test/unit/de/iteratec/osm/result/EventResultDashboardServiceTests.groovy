@@ -94,6 +94,7 @@ class EventResultDashboardServiceTests {
     final static String i18nNameOfAggregatorTypeUsedInTests = 'i18nNameOfAggregatorTypeUsedInTests'
     final static String connectivity1Connectivity = "Test"
     final static String connectivity2Connectivity = "Test"
+    final static String connectivity3Connectivity = "1369821600000"
 
     @Before
     void setUp() {
@@ -329,7 +330,7 @@ class EventResultDashboardServiceTests {
 
         assertEquals(1, resultGraphs.size())
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location}"
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity1Connectivity}"
         }
         assertEquals(1, resultGraphsWithCorrectLabel.size())
         assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
@@ -422,12 +423,12 @@ class EventResultDashboardServiceTests {
         assertEquals(1, resultGraphs.size())
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location}"
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity1Connectivity}"
         }
         assertEquals(0, resultsCsi1.size())
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location}"
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${connectivity2Connectivity}"
         }
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
@@ -513,7 +514,7 @@ class EventResultDashboardServiceTests {
         //assertions
         assertEquals(1, resultGraphs.size())
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location}"
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity3Connectivity}"
         }
         assertEquals(1, resultGraphsWithCorrectLabel.size())
         assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())

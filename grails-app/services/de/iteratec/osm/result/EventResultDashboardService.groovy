@@ -269,9 +269,10 @@ public class EventResultDashboardService {
             graphs.every { it ->
                 summarizedLabelParts.each { part ->
                     it.label = (it.label - part.value.trim());
+                    it.label = it.label.replaceAll("[|]\\s+[|]", "|");
                 }
-                it.label = it.label.replaceAll("[|]\\s+[|]", "|");
                 it.label = it.label.replaceFirst("^\\s+[|]\\s+", "");
+                it.label = it.label.replaceFirst("\\s+[|]\\s+\$", "");
             }
 
             String summary = "";
