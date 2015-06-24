@@ -39,6 +39,7 @@ class MvQueryParamsTests {
 		assertNotNull(queryParams.pageIds)
 		assertNotNull(queryParams.browserIds)
 		assertNotNull(queryParams.locationIds)
+        assertNotNull(queryParams.connectivityProfileIds)
 	}
 
 	@Test
@@ -49,9 +50,11 @@ class MvQueryParamsTests {
 		out.pageIds.addAll([1, 3, 8]);
 		out.browserIds.addAll([7]);
 		out.locationIds.addAll([99, 101]);
+        out.connectivityProfileIds.addAll([1,2,4])
 
 		assertEquals(
-				'jobGroupIds=[8, 9], pageIds=[1, 3, 8], measuredEventIds=[38, 77], browserIds[7], locationIds=[99, 101]',
-				out.toString())
+				'jobGroupIds=[8, 9], pageIds=[1, 3, 8], measuredEventIds=[38, 77], browserIds[7], locationIds=[99, 101], connectivityProfileIds=[1, 2, 4]',
+				out.toString()
+        )
 	}
 }
