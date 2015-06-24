@@ -247,7 +247,8 @@ class TestDataUtil {
                 bandwidthDown: 6000,
                 bandwidthUp: 512,
                 latency: 40,
-                packetLoss: 0
+                packetLoss: 0,
+                active: true
         ).save(failOnError: true)
     }
 

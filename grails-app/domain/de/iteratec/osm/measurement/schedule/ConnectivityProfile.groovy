@@ -33,10 +33,23 @@ class ConnectivityProfile {
     public static final int PLR_MIN = 0
 
     String name
+    Boolean active;
     Integer bandwidthDown
     Integer bandwidthUp
     Integer latency
     Integer packetLoss
+
+    def beforeUpdate() {
+        if(this.getDirtyPropertyNames().size() == 1 && this.getDirtyPropertyNames().contains("active")) {
+            log.debug("Tried to update ConnectivityProfile, but got interrupted!")
+            return true;
+        } else
+            return false;
+    }
+
+    static mapping = {
+        active defaultValue: true
+    }
 
     static constraints = {
         name(blank: false, maxSize: 255)

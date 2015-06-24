@@ -25,7 +25,7 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class ConnectivityProfileController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", save: "POST", deactivate: "POST"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -33,22 +33,11 @@ class ConnectivityProfileController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [connectivityProfileInstanceList: ConnectivityProfile.list(params), connectivityProfileInstanceTotal: ConnectivityProfile.count()]
+        [connectivityProfileInstanceList: ConnectivityProfile.findAllByActive(true, params), connectivityProfileInstanceTotal: ConnectivityProfile.count()]
     }
 
     def create() {
         [connectivityProfileInstance: new ConnectivityProfile(params)]
-    }
-
-    def save() {
-        def connectivityProfileInstance = new ConnectivityProfile(params)
-        if (!connectivityProfileInstance.save(flush: true)) {
-            render(view: "create", model: [connectivityProfileInstance: connectivityProfileInstance])
-            return
-        }
-
-		flash.message = message(code: 'default.created.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
-        redirect(action: "list")
     }
 
     def edit() {
@@ -62,8 +51,9 @@ class ConnectivityProfileController {
         [connectivityProfileInstance: connectivityProfileInstance]
     }
 
-    def update() {
+    def deactivate() {
         def connectivityProfileInstance = ConnectivityProfile.get(params.id)
+
         if (!connectivityProfileInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), params.id])
             redirect(action: "list")
@@ -74,40 +64,64 @@ class ConnectivityProfileController {
             def version = params.version.toLong()
             if (connectivityProfileInstance.version > version) {
                 connectivityProfileInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile')] as Object[],
-                          "Another user has updated this ConnectivityProfile while you were editing")
+                        [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile')] as Object[],
+                        "Another user has updated this ConnectivityProfile while you were editing")
                 render(view: "edit", model: [connectivityProfileInstance: connectivityProfileInstance])
                 return
             }
         }
 
-        connectivityProfileInstance.properties = params
+        connectivityProfileInstance.active = false;
 
         if (!connectivityProfileInstance.save(flush: true)) {
             render(view: "edit", model: [connectivityProfileInstance: connectivityProfileInstance])
             return
         }
 
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
+        flash.message = message(code: 'default.deactivated.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
         redirect(action: "list")
     }
 
-    def delete() {
+    def save() {
+
+        // Deactivate previous version
         def connectivityProfileInstance = ConnectivityProfile.get(params.id)
+
         if (!connectivityProfileInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), params.id])
             redirect(action: "list")
             return
         }
 
-        try {
-            connectivityProfileInstance.delete(flush: true)
-			flash.message = message(code: 'default.deleted.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
-            redirect(action: "list")
+        if (params.version) {
+            def version = params.version.toLong()
+            if (connectivityProfileInstance.version > version) {
+                connectivityProfileInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
+                        [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile')] as Object[],
+                        "Another user has updated this ConnectivityProfile while you were editing")
+                render(view: "edit", model: [connectivityProfileInstance: connectivityProfileInstance])
+                return
+            }
         }
-        catch (DataIntegrityViolationException e) {
-			flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), params.id])
-            redirect(action: "list")
+
+        connectivityProfileInstance.active = false;
+
+        if (!connectivityProfileInstance.save(flush: true)) {
+            render(view: "edit", model: [connectivityProfileInstance: connectivityProfileInstance])
+            return
         }
+
+        // Create copy of connectivityProfile
+        def connectivityProfileInstanceCopy = new ConnectivityProfile(params)
+        connectivityProfileInstanceCopy.id = null;
+        connectivityProfileInstanceCopy.active = true;
+
+        if (!connectivityProfileInstanceCopy.save(flush: true, insert: true)) {
+            render(view: "create", model: [connectivityProfileInstance: connectivityProfileInstanceCopy])
+            return
+        }
+
+        flash.message = message(code: 'default.savedascopy.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
+        redirect(action: "list")
     }
 }
