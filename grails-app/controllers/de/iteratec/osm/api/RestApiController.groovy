@@ -65,6 +65,7 @@ import org.quartz.CronExpression
  * RestApiController
  * <p>
  * Contains all the actions to handle requests of osm RESTful API.
+ *
  * Note: If converted domain objects get returned as JSON representations some attributes get excluded
  * in Bootstrap method excludePropertiesInJsonRepresentationsofDomainObjects (see link below).
  * </p>

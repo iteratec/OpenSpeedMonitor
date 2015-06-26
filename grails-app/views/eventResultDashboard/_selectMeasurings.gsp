@@ -157,7 +157,7 @@ GSP-Template Mappings:
                     </label><br>
                     <label class="checkbox inline">
                         <g:checkBox name="includeNativeConnectivity"
-                                    checked="${selectedIncludeNativeConnectivity}" value="${true}"/>
+                                    checked="${includeNativeConnectivity}" value="${true}"/>
                         <g:message code="de.iteratec.osm.result.include-native-connectivity.label"
                                    default="Show measurements with native connectivity"/>
                     </label>
@@ -165,8 +165,13 @@ GSP-Template Mappings:
                         <g:message code="de.iteratec.osm.result.name-custom-connectivity.label"
                                    default="Name of custom connectivities to show:"/>
                     </label>
-                    <g:textField name="customConnectivityName" class="form-control input-xxlarge"
+                    <g:textField name="customConnectivityName" class="form-control input-xxlarge" value="customConnectivityName"
                                  placeholder="${g.message(code: 'de.iteratec.osm.result.name-custom-connectivity.placeholder', default: 'Search via regex')}"></g:textField>
+                    <br>
+                    <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"
+                    target="_blank">
+                        <g:message code="de.iteratec.osm.result.connectivity.regex.link.label" default="https://en.wikipedia.org/wiki/Regular_expression#Syntax" />
+                    </a>
                 </div>
             </div>
         </div>

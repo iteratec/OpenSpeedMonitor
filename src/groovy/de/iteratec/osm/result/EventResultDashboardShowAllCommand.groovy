@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.util.DateValueConverter
 import grails.validation.Validateable
@@ -417,6 +418,8 @@ public class EventResultDashboardShowAllCommand {
 
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
         viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
+        viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
+        viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
 
         DateValueConverter converter = DateValueConverter.getConverter()
 
@@ -496,6 +499,17 @@ public class EventResultDashboardShowAllCommand {
         }
         if (this.trimAboveRequestSizes) {
             result.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
+        }
+        if (this.includeNativeConnectivity){
+            result.includeNativeConnectivity = this.includeNativeConnectivity
+        }
+        if (this.selectedAllConnectivityProfiles){
+            result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
+        }else if (this.selectedConnectivityProfiles.size() > 0){
+            result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
+        }
+        if (this.customConnectivityName){
+            result.customConnectivityNameRegex = this.customConnectivityName
         }
 
         return result;

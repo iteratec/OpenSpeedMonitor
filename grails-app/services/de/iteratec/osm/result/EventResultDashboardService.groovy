@@ -92,7 +92,7 @@ public class EventResultDashboardService {
      * @return all {@link MeasuredEvent} ordered by their name.
      */
     public List<MeasuredEvent> getAllMeasuredEvents() {
-        return MeasuredEvent.findAll().sort(false, { it.name });
+        return MeasuredEvent.findAll().sort(false, { it.name.toLowerCase() });
     }
 
     /**
@@ -105,7 +105,7 @@ public class EventResultDashboardService {
      * @return all {@link Location} ordered by their label.
      */
     public List<Location> getAllLocations() {
-        return locationDaoService.findAll().sort(false, { it.label });
+        return locationDaoService.findAll().sort(false, { it.label.toLowerCase() });
     }
 
     /**
@@ -118,7 +118,7 @@ public class EventResultDashboardService {
      * @return all {@link ConnectivityProfile} ordered by their toString() representation.
      */
     public List<ConnectivityProfile> getAllConnectivityProfiles() {
-        return connectivityProfileDaoService.findAll().sort(false, { it.toString() });
+        return connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
     }
 
     /**
@@ -132,7 +132,7 @@ public class EventResultDashboardService {
      */
     public List<Browser> getAllBrowser() {
 
-        return browserDaoService.findAll().sort(false, { it.name });
+        return browserDaoService.findAll().sort(false, { it.name.toLowerCase() });
     }
 
     /**
@@ -145,7 +145,7 @@ public class EventResultDashboardService {
      * @return all {@link Page} ordered by their name.
      */
     public List<Page> getAllPages() {
-        return pageDaoService.findAll().sort(false, { it.name })
+        return pageDaoService.findAll().sort(false, { it.name.toLowerCase() })
     }
 
     /**
@@ -159,7 +159,7 @@ public class EventResultDashboardService {
      *
      */
     public List<JobGroup> getAllJobGroups() {
-        return jobGroupDaoService.findAll().sort(false, { it.name });
+        return jobGroupDaoService.findAll().sort(false, { it.name.toLowerCase() });
     }
 
     /**

@@ -699,19 +699,19 @@ class EventResultDashboardController {
         result.put('measuredValueIntervals', measuredValueIntervals)
 
         // JobGroups
-        List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups();
+        List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
         result.put('folders', jobGroups)
 
         // Pages
-        List<Page> pages = eventResultDashboardService.getAllPages();
+        List<Page> pages = eventResultDashboardService.getAllPages()
         result.put('pages', pages)
 
         // MeasuredEvents
-        List<MeasuredEvent> measuredEvents = eventResultDashboardService.getAllMeasuredEvents();
+        List<MeasuredEvent> measuredEvents = eventResultDashboardService.getAllMeasuredEvents()
         result.put('measuredEvents', measuredEvents)
 
         // Browsers
-        List<Browser> browsers = eventResultDashboardService.getAllBrowser();
+        List<Browser> browsers = eventResultDashboardService.getAllBrowser()
         result.put('browsers', browsers)
 
         // Locations

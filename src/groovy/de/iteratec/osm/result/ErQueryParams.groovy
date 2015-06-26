@@ -62,4 +62,10 @@ class ErQueryParams extends MvQueryParams {
      * Results which attribute customConnectivityName matches this regex get included.
      */
     String customConnectivityNameRegex
+    /**
+     * For querying of {@link de.iteratec.osm.result.EventResult}s.
+     * If true, Results of which customConnectivityName equals {@link ConnectivityProfileService#CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE}
+     * get included. Otherwise respective results get excluded.
+     */
+    Boolean includeNativeConnectivity = false
 }

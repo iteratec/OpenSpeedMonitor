@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -33,6 +34,7 @@ import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -52,6 +54,7 @@ import static org.mockito.Mockito.when
  * @since IT-98
  */
 @TestFor(EventResultDashboardController)
+@Mock([ConnectivityProfile])
 class EventResultDashboardControllerTests {
 	
 	EventResultDashboardController controllerUnderTest
@@ -125,7 +128,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromEmptyRequestArgsIsInvalid()
@@ -141,7 +144,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults()
@@ -231,7 +234,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate()
@@ -258,7 +261,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour()
@@ -285,7 +288,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute()
@@ -312,7 +315,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}. 
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults()
@@ -432,7 +435,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -458,7 +461,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_WEEKLY_PAGE()
@@ -484,7 +487,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedMeasuredEvents_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -510,7 +513,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedBrowsers_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -536,7 +539,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedLocations_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -729,7 +732,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap()
@@ -758,7 +761,9 @@ class EventResultDashboardControllerTests {
         command.includeNativeConnectivity = false
         command.selectedConnectivityProfiles = []
         command.selectedAllConnectivityProfiles = true
-		
+        command.includeNativeConnectivity = false
+        command.customConnectivityName = 'Custom (6000.*'
+
 		// Do we fill all fields?
 		assertTrue(command.validate())
 
@@ -767,7 +772,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(28, dataUnderTest.size());
+		assertEquals(30, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -786,10 +791,12 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'customConnectivityName', 'Custom (6000.*');
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap_defaultsForMissingValues()
@@ -823,7 +830,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(26, dataUnderTest.size());
+		assertEquals(28, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -841,7 +848,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap_selectAllSelection()
@@ -872,6 +879,8 @@ class EventResultDashboardControllerTests {
         command.customConnectivityName = 'Custom (6000/.*'
         command.selectedConnectivityProfiles = []
         command.selectedAllConnectivityProfiles = true
+        command.includeNativeConnectivity = false
+        command.customConnectivityName = 'Custom (6000.*'
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -881,7 +890,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(28, dataUnderTest.size());
+		assertEquals(30, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -900,10 +909,11 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'customConnectivityName', 'Custom (6000.*');
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams()
@@ -943,7 +953,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_MeasuredEvents()
@@ -983,7 +993,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Browsers()
@@ -1023,7 +1033,7 @@ class EventResultDashboardControllerTests {
 	}
 	
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Locations()
@@ -1062,8 +1072,45 @@ class EventResultDashboardControllerTests {
 				[] as SortedSet, mvQueryParams.locationIds);
 	}
 
+    /**
+     * Test for inner class {@link EventResultDashboardShowAllCommand}.
+     */
+    @Test
+    public void testShowAllCommand_testCreateMvQueryParams_()
+    {
+        // form = '18.08.2013'
+        command.from = new Date(1376776800000L)
+        command.fromHour = "12:00"
+        // to = '19.08.2013'
+        command.to = new Date(1376863200000L)
+        command.toHour = "13:00"
+        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+        command.selectedFolder = [1L]
+        command.selectedPages = [1L, 5L]
+        command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedBrowsers = [2L]
+        command.selectedLocations = [17L]
+        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
+        command.selectedAllMeasuredEvents = false
+        command.selectedAllBrowsers = false
+        command.selectedAllLocations = false
+        command.selectedTimeFrameInterval = 0
+        command.selectedAllConnectivityProfiles = []
+        command.includeNativeConnectivity = true
+
+        // Do we fill all fields?
+        assertTrue(command.validate())
+
+        // Run the test:
+        MvQueryParams mvQueryParams = command.createMvQueryParams();
+
+        // Verification:
+        assertNotNull(mvQueryParams);
+        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
+    }
+
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test(expected=IllegalStateException.class)
 	public void testShowAllCommand_testCreateMvQueryParams_invalidCommand()

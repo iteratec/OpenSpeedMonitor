@@ -334,17 +334,11 @@ environments {
                             'org.codehaus.groovy.grails.web.servlet',        // controllers
                             'org.codehaus.groovy.grails.web.sitemesh',       // layouts
                             'org.codehaus.groovy.grails.plugins',            // plugins
-                // URL mapping
-                'org.codehaus.groovy.grails.commons',
-                // core / classloading
-                'org.codehaus.groovy.grails.plugins',
-                // plugins
-                'org.codehaus.groovy.grails.orm.hibernate',
-                // hibernate integration
+                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
                             'org.springframework',
                             'net.sf.ehcache.hibernate',
                             'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-                            'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
+                            'org.hibernate.SQL', 'org.hibernate.transaction' //hibernate
                     ]
             )
         }

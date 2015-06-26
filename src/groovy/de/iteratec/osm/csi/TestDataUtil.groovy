@@ -837,6 +837,13 @@ class TestDataUtil {
         return allPages
     }
 
+    static Page createPage(String name, Double weight) {
+        return new Page(
+                name: name,
+                weight: weight
+        ).save(failOnError: true)
+    }
+
     static List<JobGroup> createJobGroups() {
         JobGroup group1 = new JobGroup(
                 name: "CSI",
@@ -981,7 +988,7 @@ class TestDataUtil {
      *
      * @return A newly created result, not <code>null</code>.
      */
-    private static JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation) {
+    static JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation) {
         return new JobResult(
                 date: dateOfJobRun,
                 testId: testId,
@@ -1015,8 +1022,7 @@ class TestDataUtil {
      * @param customerSatisfactionInPercent
      *         The customer-satisfaction-index in percent.
      */
-    private
-    static void createEventResult(Job job, JobResult jobResult, int docCompleteTimeInMillisecs, double customerSatisfactionInPercent, MeasuredEvent event) {
+    static EventResult createEventResult(Job job, JobResult jobResult, int docCompleteTimeInMillisecs, double customerSatisfactionInPercent, MeasuredEvent event) {
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1031,7 +1037,7 @@ class TestDataUtil {
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
         ).save(failOnError: true)
 
-        jobResult.save(failOnError: true)
+        return jobResult.save(failOnError: true)
     }
 
     /**
@@ -1055,8 +1061,14 @@ class TestDataUtil {
      * @param measuredValueTagService
      * 		   The {@link MeasuredValueTagService} for generating the tag of {@link EventResult}
      */
-    private
-    static void createEventResult(Job job, JobResult jobResult, int docCompleteTimeInMillisecs, double customerSatisfactionInPercent, MeasuredEvent event, MeasuredValueTagService measuredValueTagService) {
+    static EventResult createEventResult(
+            Job job,
+            JobResult jobResult,
+            int docCompleteTimeInMillisecs,
+            double customerSatisfactionInPercent,
+            MeasuredEvent event,
+            MeasuredValueTagService measuredValueTagService) {
+
         JobGroup jobGroup = job.jobGroup
         Page page = event.testedPage
         Location location = job.location
@@ -1075,10 +1087,11 @@ class TestDataUtil {
                 jobResultJobConfigId: jobResult.job.ident(),
                 measuredEvent: event,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: resultTag
+                tag: resultTag,
+                connectivityProfile: createConnectivityProfile('conn-profile-for-testing-purposes')
         ).save(failOnError: true)
 
-        jobResult.save(failOnError: true)
+        return eventResult.save(failOnError: true)
 
     }
 
