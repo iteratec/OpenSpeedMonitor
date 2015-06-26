@@ -14,39 +14,29 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
-
-
-import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
+import de.iteratec.osm.csi.*
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.Location
-import grails.util.Environment
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobProcessingService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.result.JobResultService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.EventMeasuredValueService
-import de.iteratec.osm.csi.HourOfDay
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
-import de.iteratec.osm.result.JobResultService
-import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.util.I18nService
+import grails.util.Environment
+import org.joda.time.DateTime
 
 class BootStrap {
 	
@@ -413,6 +403,7 @@ class BootStrap {
                 Map propertiesToRepresent = it.properties.findAll {k,v -> !propertiesToExcludeFromAllDomains.contains(k)}
                 propertiesToRepresent['id'] = it.ident()
 
+                removeAllServices(propertiesToRepresent)
                 removeDomainSpecificProperties(domainClass, propertiesToRepresent)
 
                 return propertiesToRepresent
@@ -421,8 +412,14 @@ class BootStrap {
         }
     }
     void removeDomainSpecificProperties(Class domainClass, Map propertiesToRepresent){
-        if (domainClass == BrowserAlias) propertiesToRepresent.remove('browser')
-        else if (domainClass == JobGroup) propertiesToRepresent.remove('graphiteServers')
+        if (domainClass == de.iteratec.osm.measurement.environment.BrowserAlias) propertiesToRepresent.remove('browser')
+        else if (domainClass == de.iteratec.osm.measurement.schedule.JobGroup) propertiesToRepresent.remove('graphiteServers')
+    }
+    void removeAllServices(Map propertiesToRepresent){
+        Iterator iterator = propertiesToRepresent.keySet().iterator()
+        while(iterator.hasNext()){
+            if (iterator.next().endsWith('Service')) iterator.remove()
+        }
     }
 
     void fixGrailsBugs(){
