@@ -95,7 +95,7 @@ grails.project.dependency.resolution = {
 	plugins {
 		//runtime//////////////////////////////////////////////////////////////////
 		runtime (
-			':twitter-bootstrap:2.3.0',
+			':twitter-bootstrap:2.3.2.2',
 			":hibernate:3.6.10.10",
 			":jquery:1.8.3",
 			":resources:1.2.7",
@@ -103,15 +103,15 @@ grails.project.dependency.resolution = {
 			":quartz:1.0.1",
 			":console:1.5.1"
 		)
-		runtime(":cached-resources:1.0") {
-			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-		 }
-		runtime(":zipped-resources:1.0") {
-			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-		 }
-		runtime(":cache-headers:1.1.7") {
-			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-		 }
+//		runtime(":cached-resources:1.0") {
+//			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
+//		 }
+//		runtime(":zipped-resources:1.0") {
+//			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
+//		 }
+//		runtime(":cache-headers:1.1.7") {
+//			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
+//		 }
 		//build//////////////////////////////////////////////////////////////////
 		build (
 			":tomcat:7.0.52.1",
