@@ -27,7 +27,7 @@ modules = {
     'core' {
     	dependsOn "jquery"
 		dependsOn "bootstrap"
-		dependsOn "bootstrap_utils"
+//		dependsOn "bootstrap_utils"
 
 		resource url:'js/application.js'
 		resource url:'css/application.css'

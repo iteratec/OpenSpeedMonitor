@@ -95,6 +95,7 @@ grails.project.dependency.resolution = {
 	plugins {
 		//runtime//////////////////////////////////////////////////////////////////
 		runtime (
+			':twitter-bootstrap:2.3.0',
 			":hibernate:3.6.10.10",
 			":jquery:1.8.3",
 			":resources:1.2.7",
@@ -117,9 +118,9 @@ grails.project.dependency.resolution = {
 			":resources:1.2.7",
 			":release:3.0.1"
 		)
-		build( ":kickstart-with-bootstrap:0.9.6"){
-			excludes "resources", "scaffolding"
-		}
+//		build( ":kickstart-with-bootstrap:0.9.6"){
+//			excludes "resources", "scaffolding"
+//		}
         //compile//////////////////////////////////////////////////////////////////
 		compile (
 			":joda-time:1.5",
@@ -130,16 +131,16 @@ grails.project.dependency.resolution = {
 			':rest:0.8',
 			':jmx:0.9',
 			':taggable:1.0.1',
-			':lesscss-resources:1.3.1',
+//			':lesscss-resources:1.3.1',
 			':cookie:1.0.1',
             ':codenarc:0.22'
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"
 		}
-		compile( ":kickstart-with-bootstrap:0.9.6"){
-			excludes "resources", "scaffolding"
-		}
+//		compile( ":kickstart-with-bootstrap:0.9.6"){
+//			excludes "resources", "scaffolding"
+//		}
 		compile( ':app-info:1.1.1'){
 			excludes "jquery"
 			if (Environment.getCurrent() == Environment.PRODUCTION || Environment.getCurrent() == Environment.TEST) { export = false }
