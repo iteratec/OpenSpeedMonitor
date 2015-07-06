@@ -30,6 +30,7 @@ class UrlMappings {
 		/*
 		 * Pages without controller
 		 */
+		"/releasenotes"		(view:"/siteinfo/releasenotes")
 		"/about"		(view:"/siteinfo/about")
 		"/systeminfo"	(view:"/siteinfo/systeminfo")
 

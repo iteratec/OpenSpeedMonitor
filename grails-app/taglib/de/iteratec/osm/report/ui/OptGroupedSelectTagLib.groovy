@@ -35,4 +35,10 @@ class OptGroupedSelectTagLib {
 			model: [dataMap:dataMap, optionKey: optionKey, optionValue: optionValue, multiple: multiple, id: id, cssClass: cssClass, style: style,
 				name: name, selectedValues: value])
 	}
+
+	def releaseNotes = { attrs ->
+		String text = attrs['text']
+
+		out << text.replaceAll('\n', '<br>')
+	}
 }

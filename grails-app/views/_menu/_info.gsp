@@ -11,6 +11,12 @@
 
 		<%-- Note: Links to pages without controller are redirected in conf/UrlMappings.groovy --%>
 		<li class="">
+			<a href="${createLink(uri: '/releasenotes')}" target="_blank">
+				<i class="icon-info-sign"></i>
+				<g:message code="de.iteratec.osm.releasenotes.manual.label" locale="${lang}"/>
+			</a>
+		</li>
+		<li class="">
 			<a href="${createLink(uri: '/rest/man')}" target="_blank">
 				<i class="icon-info-sign"></i>
 				<g:message code="de.iteratec.osm.api.manual.label" locale="${lang}"/>
