@@ -3,9 +3,10 @@
 <head>
 <meta name="layout" content="kickstart_osm" />
 <title><g:message code="queue.status.label" /></title>
-<r:use modules="queuestatus, timeago" />
+<asset:stylesheet src="queueStatus/list.css"/>
+<asset:javascript src="timeago/jquery.timeago.js"/>
 <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-	<r:use modules="timeago-de" />
+	<asset:javascript src="timeago/timeagoDe.js"/>
 </g:if>
 
 <g:javascript>

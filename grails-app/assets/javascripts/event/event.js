@@ -1,2 +1,2 @@
 //= require osmDashboardDatetimeAndChart.js
-//= require eventresultdashboard/showAll.js
+//= require event/createEdit.js

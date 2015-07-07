@@ -16,6 +16,7 @@
 */
 //= require jquery
 //= require bootstrap
+//= require_self
 
 if (typeof jQuery !== 'undefined') {
 	(function($) {

@@ -9,7 +9,7 @@
 <meta name="layout" content="kickstart_osm" />
 <title><g:message code="de.iteratec.isocsi.eventResultDashboard" /></title>
 
-<asset:javascript src="eventResultDashboard.js" />
+<asset:javascript src="eventresultdashboard/eventResultDashboard.js" />
 <asset:stylesheet src="rickshaw/rickshaw_custom.css" />
 
 <style type="text/css">

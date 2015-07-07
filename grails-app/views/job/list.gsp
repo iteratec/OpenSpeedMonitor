@@ -9,10 +9,17 @@
 	
 	<g:set var="entityName"	value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" />
 	
-	<r:require modules="prettycron, chosen, joblist, future-only-timeago, spin"/>
-	
+	<asset:javascript src="prettycron/prettycronManifest.js"/>
+	<asset:javascript src="chosen.jquery.min.js"/>
+	<asset:javascript src="job/jobList.js"/>
+	<asset:stylesheet src="job/jobList.css"/>
+	<asset:stylesheet src="table-fixed-header/table-fixed-header.css"/>
+	<asset:javascript src="timeago/futureOnlyTimeago.js"/>
+	<asset:javascript src="spin/spin.min.js"/>
+
+
 	<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-		<r:use modules="timeago-de" />
+		<asset:javascript src="timeago/timeagoDe.js"/>
 	</g:if>
 	
 	<style>

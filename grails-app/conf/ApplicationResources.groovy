@@ -76,66 +76,66 @@ modules = {
 //        dependsOn 'iteratec-chart'
 //        dependsOn 'spin'
 //    }
-    /**
-     * For template grails-app/views/eventResultDashboard/_selectMeasurings
-     */
-    'select-measurings' {
-        defaultBundle 'osm-dashboard'
-        resource url: 'js/select-measurings.js'
-    }
-    'tagit' {
-        dependsOn 'jquery-ui'
+//    /**
+//     * For template grails-app/views/eventResultDashboard/_selectMeasurings
+//     */
+//    'select-measurings' {
+//        defaultBundle 'osm-dashboard'
+//        resource url: 'js/select-measurings.js'
+//    }
+//    'tagit' {
+//        dependsOn 'jquery-ui'
+//
+//        resource 'css/jquery.tagit.css'
+//        resource 'css/jquery-ui-smoothness.css'
+//        resource 'js/tag-it.min.js'
+//    }
 
-        resource 'css/jquery.tagit.css'
-        resource 'css/jquery-ui-smoothness.css'
-        resource 'js/tag-it.min.js'
-    }
-
-    'prettycron' {
-        resource 'js/prettycron/later.min.js'
-        resource 'js/prettycron/moment.min.js'
-        resource 'js/prettycron/prettycron.js'
-        resource 'js/prettycron/cron-expressions.js'
-    }
-    'codemirror' {
-        resource '/css/codemirror/codemirror.css'
-        resource '/css/codemirror/warnings.css'
-        resource '/css/hint/show-hint.css'
-        resource '/js/codemirror/codemirror.js'
-        resource '/js/codemirror/hint/show-hint.js'
-        resource '/js/codemirror/hint/pts-hint.js'
-        resource '/js/codemirror/mode/pts.js'
-    }
-    'table-fixed-header' {
-        resource '/css/table-fixed-header/table-fixed-header.css'
-        resource '/js/table-fixed-header/table-fixed-header.js'
-    }
-    'joblist' {
-        dependsOn 'table-fixed-header'
-        resource '/css/job/list.css'
-        resource '/js/job/list.js'
-    }
-    'jobedit' {
-        resource '/css/job/edit.css'
-        resource '/js/job/edit.js'
-    }
+//    'prettycron' {
+//        resource 'js/prettycron/later.min.js'
+//        resource 'js/prettycron/moment.min.js'
+//        resource 'js/prettycron/prettycron.js'
+//        resource 'js/prettycron/cron-expressions.js'
+//    }
+//    'codemirror' {
+//        resource '/css/codemirror/codemirror.css'
+//        resource '/css/codemirror/warnings.css'
+//        resource '/css/hint/show-hint.css'
+//        resource '/js/codemirror/codemirror.js'
+//        resource '/js/codemirror/hint/show-hint.js'
+//        resource '/js/codemirror/hint/pts-hint.js'
+//        resource '/js/codemirror/mode/pts.js'
+//    }
+//    'table-fixed-header' {
+//        resource '/css/table-fixed-header/table-fixed-header.css'
+//        resource '/js/table-fixed-header/table-fixed-header.js'
+//    }
+//    'joblist' {
+//        dependsOn 'table-fixed-header'
+//        resource '/css/job/list.css'
+//        resource '/js/job/list.js'
+//    }
+//    'jobedit' {
+//        resource '/css/job/edit.css'
+//        resource '/js/job/edit.js'
+//    }
     'queuestatus' { resource '/css/queueStatus/list.css' }
-    'timeago' { resource '/js/timeago/jquery.timeago.js' }
-    'timeago-de' {
-        dependsOn 'timeago'
-        resource '/js/timeago/jquery.timeago.de.js'
-    }
-    'future-only-timeago' {
-        dependsOn 'timeago'
-        resource '/js/timeago/future-only-timeago.js'
-    }
-    'spin' { resource '/js/spin/spin.min.js' }
-    'chosen' {
-        resource 'css/chosen/chosen.css'
-        resource 'js/chosen/chosen.jquery.min.js'
-        //for debugging:
-        //		resource 'js/chosen/chosen.jquery.js'
-    }
+//    'timeago' { resource '/js/timeago/jquery.timeago.js' }
+//    'timeago-de' {
+//        dependsOn 'timeago'
+//        resource '/js/timeago/jquery.timeago.de.js'
+//    }
+//    'future-only-timeago' {
+//        dependsOn 'timeago'
+//        resource '/js/timeago/future-only-timeago.js'
+//    }
+//    'spin' { resource '/js/spin/spin.min.js' }
+//    'chosen' {
+//        resource 'css/chosen/chosen.css'
+//        resource 'js/chosen/chosen.jquery.min.js'
+//        //for debugging:
+//        //		resource 'js/chosen/chosen.jquery.js'
+//    }
 
     // bundles to use in views /////////////////////////////////////////////////////////////////////////////////
 
@@ -144,22 +144,22 @@ modules = {
 //
 //        resource url: 'js/eventresultdashboard/showAll.js'
 //    }
-    'csi-dashboard' {
-        dependsOn 'osm-dashboard-datetime-and-chart'
-
-        resource url: 'js/csidashboard/showAll.js'
-    }
-    'event' {
-        dependsOn 'osm-dashboard-datetime'
-
-        resource url: 'js/event/createEdit.js'
-    }
-    'eventresult' {
-        dependsOn 'osm-dashboard-datetime'
-
-        resource url: 'js/eventresult/listResult.js'
-    }
-    'batchactivity'{
-        resource '/js/batchactivity/list.js'
-    }
+//    'csi-dashboard' {
+//        dependsOn 'osm-dashboard-datetime-and-chart'
+//
+//        resource url: 'js/csidashboard/showAll.js'
+//    }
+//    'event' {
+//        dependsOn 'osm-dashboard-datetime'
+//
+//        resource url: 'js/event/createEdit.js'
+//    }
+//    'eventresult' {
+//        dependsOn 'osm-dashboard-datetime'
+//
+//        resource url: 'js/eventresult/listResult.js'
+//    }
+//    'batchactivity'{
+//        resource '/js/batchactivity/list.js'
+//    }
 }

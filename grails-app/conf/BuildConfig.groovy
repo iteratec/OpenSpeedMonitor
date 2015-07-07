@@ -101,7 +101,8 @@ grails.project.dependency.resolution = {
 //			":resources:1.2.7",
 			":database-migration:1.3.8",
 			":quartz:1.0.1",
-			":console:1.5.1"
+			":console:1.5.1",
+			":font-awesome-resources:4.3.0.2"
 		)
 //		runtime(":cached-resources:1.0") {
 //			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
@@ -146,7 +147,7 @@ grails.project.dependency.resolution = {
 			excludes "jquery"
 			if (Environment.getCurrent() == Environment.PRODUCTION || Environment.getCurrent() == Environment.TEST) { export = false }
 		}
-
+//		provided ":less-asset-pipeline:2.3.0"
         //test//////////////////////////////////////////////////////////////////
         test ":code-coverage:2.0.3-3"
 	}
