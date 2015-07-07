@@ -4,7 +4,7 @@
 <meta name="layout" content="kickstart_osm" />
 <title>CSI CheckDashboard</title>
 
-<r:require modules="csi-dashboard" />
+<asset:javascript src="csiDashboard" />
 
 <style>
 	/* css for timepicker */
@@ -114,7 +114,7 @@
              
         </div>
 	</div>
-	<r:script>
+	<g:javascript>
 		$(document).ready(function() {
 			if(typeof chart != 'undefined'){
 				jQuery.each(
@@ -134,6 +134,6 @@
 				$("#csi-table").fadeIn();
 			});
 		});
-	</r:script>
+	</g:javascript>
 </body>
 </html>

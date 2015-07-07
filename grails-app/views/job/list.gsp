@@ -151,7 +151,7 @@
 			</table>
 	</g:form>
 	</div>
-	<r:script>
+	<g:javascript>
 		$(document).ready(
 			doOnDomReady(
 				'${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
@@ -162,6 +162,6 @@
 				'${createLink(action: 'list', absolute: true)}'
 			)
 		);
-	</r:script>
+	</g:javascript>
 </body>
 </html>

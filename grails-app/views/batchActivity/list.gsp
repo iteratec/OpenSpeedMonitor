@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
     <g:set var="entityName" value="${message(code: 'de.iteratec.osm.batch.batchactivity.list.heading', default: 'Batch Activities')}"/>
-    <r:require modules="batchactivity"/>
+    <asset:javascript src="batchActivityList.js"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>
 </head>
 
@@ -51,7 +51,7 @@
     </g:if>
 </g:form>
 
-<r:script>
+<g:javascript>
 		$(document).ready(
 			updateIfNecessary(
 			    '${createLink(action: 'updateTable', absolute: true)}',
@@ -59,7 +59,7 @@
 			    '${createLink(action: 'getUpdate', absolute: true)}'
 			)
 		);
-</r:script>
+</g:javascript>
 </body>
 
 </html>

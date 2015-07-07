@@ -35,9 +35,9 @@
 
 </section>
 			
-  <r:script>
+  <g:javascript>
     $(document).ready(doOnDomReady());
-  </r:script>
+  </g:javascript>
 </body>
 
 </html>

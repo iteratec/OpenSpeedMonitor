@@ -98,7 +98,7 @@ grails.project.dependency.resolution = {
 			':twitter-bootstrap:2.3.2.2',
 			":hibernate:3.6.10.10",
 			":jquery:1.8.3",
-			":resources:1.2.7",
+//			":resources:1.2.7",
 			":database-migration:1.3.8",
 			":quartz:1.0.1",
 			":console:1.5.1"
@@ -115,7 +115,7 @@ grails.project.dependency.resolution = {
 		//build//////////////////////////////////////////////////////////////////
 		build (
 			":tomcat:7.0.52.1",
-			":resources:1.2.7",
+//			":resources:1.2.7",
 			":release:3.0.1"
 		)
 //		build( ":kickstart-with-bootstrap:0.9.6"){
@@ -133,7 +133,8 @@ grails.project.dependency.resolution = {
 			':taggable:1.0.1',
 //			':lesscss-resources:1.3.1',
 			':cookie:1.0.1',
-            ':codenarc:0.22'
+            ':codenarc:0.22',
+			":asset-pipeline:2.3.9"
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"

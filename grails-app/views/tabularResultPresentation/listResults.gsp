@@ -103,11 +103,11 @@
    	 		model="${[model: paginationListing] }" />
 		
 	</g:if>
-	<r:script>
+	<g:javascript>
 		$(document).ready(doOnDomReady(
 			'${dateFormat}', 
 			${weekStart}, 
 			'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'));
-	</r:script>
+	</g:javascript>
 </body>
 </html>

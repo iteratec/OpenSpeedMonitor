@@ -3,9 +3,11 @@
 <html lang="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<asset:stylesheet src="application.css"/>
+	<asset:javascript src="application.js"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<title><g:layoutTitle default="${meta(name:'app.name')}" /></title>
-	
+	%{----}%
     <meta charset="utf-8">
     <meta name="viewport"		content="width=device-width, initial-scale=1.0">
     <meta name="description"	content="">
@@ -16,12 +18,12 @@
 	<link rel="apple-touch-icon"	href="assets/ico/apple-touch-icon.png">
     <link rel="apple-touch-icon"	href="assets/ico/apple-touch-icon-72x72.png"	sizes="72x72">
     <link rel="apple-touch-icon"	href="assets/ico/apple-touch-icon-114x114.png"	sizes="114x114">
-	
+
+
 	<%-- Manual switch for the skin can be found in /view/_menu/_config.gsp --%>
-	<r:require modules="core"/>
 
 	<!-- Included Javascript files and other resources -->
-	<r:layoutResources />
+	%{--<r:layoutResources />--}%
 	<g:layoutHead />
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->

@@ -12,7 +12,7 @@
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isocsi.csiDashboard"/></title>
 	
-	<r:require modules="csi-dashboard" />
+	<asset:javascript src="csiDashboard" />
 	
 	<style>
 		/* css for timepicker */
@@ -226,7 +226,7 @@
 		</g:if>
 	</g:else>
   <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-	<r:script>
+	<g:javascript>
 		$(document).ready(
 			doOnDomReady(
 				'dd.mm.yyyy', 
@@ -234,6 +234,6 @@
 				'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
 			)
 		);		
-	</r:script>
+	</g:javascript>
 </body>
 </html>

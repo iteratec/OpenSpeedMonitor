@@ -16,7 +16,7 @@
 	</div>
 </div>
 
-<r:script>
+<g:javascript>
 
 	var editor = null;
 	var update = function() {
@@ -64,7 +64,7 @@
 			update();
 		}
 	});
-</r:script>
+</g:javascript>
 
 <p style="margin: 0; padding-top: 1em;"><g:message code="job.script.preview.label" /> <a href="" target="_blank" id="editScriptLink">
 			<i class="icon-edit icon-large" rel="tooltip" title="${ message(code: 'job.script.edit') }"></i>

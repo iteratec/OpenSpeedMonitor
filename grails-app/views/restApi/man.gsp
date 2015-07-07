@@ -805,7 +805,7 @@
 
 	--%>
 	
-	<r:script>
+	<g:javascript>
 		$(document).ready(function(){
 			$('body').scrollspy({
 				target: '#spied-nav',
@@ -818,7 +818,7 @@
 				scrollBy(0, -offset);
 			});
 		});
-	</r:script>
+	</g:javascript>
 
 </body>
 </html>

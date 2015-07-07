@@ -1,6 +1,6 @@
 <%@ page import="org.springframework.web.util.HtmlUtils" %>
 <r:use modules="codemirror" />
-<r:script>
+<g:javascript>
 	var markedLines = [];
 	
 	function markLine(editor, lineNumber, cssClass) {
@@ -115,7 +115,7 @@
 		createCodemirrorEditor();
 	}); 
 	</g:if>
-</r:script>
+</g:javascript>
 
 <label for="navigationScript">
     <g:message code="script.navigationScript.label" default="Code" />

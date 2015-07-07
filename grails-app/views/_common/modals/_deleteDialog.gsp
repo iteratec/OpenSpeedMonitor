@@ -3,7 +3,7 @@ This is the standard dialog that initiates the delete action.
 -->
 
 <!-- Modal dialog -->
-<r:require modules="spin"/>
+<asset:javascript src="spin.min.js"/>
 <div id="DeleteModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel" aria-hidden="true" onshow=changeText("${controllerLink}");>
 <div class="modal-header">
 		<button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>

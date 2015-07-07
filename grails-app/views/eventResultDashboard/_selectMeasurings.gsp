@@ -178,7 +178,7 @@ GSP-Template Mappings:
     </div>
 
 </div>
-<r:script>
+<g:javascript>
  	var pagesToEvents = [];
     <g:each var="page" in="${pages}">
     <g:if test="${eventsOfPages[page.id] != null}">
@@ -193,4 +193,4 @@ GSP-Template Mappings:
                                                        in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
         </g:if>
     </g:each>
-</r:script>
+</g:javascript>

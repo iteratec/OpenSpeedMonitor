@@ -9,7 +9,8 @@
 <meta name="layout" content="kickstart_osm" />
 <title><g:message code="de.iteratec.isocsi.eventResultDashboard" /></title>
 
-<r:require modules="eventresult-dashboard" />
+<asset:javascript src="eventResultDashboard.js" />
+<asset:stylesheet src="rickshaw/rickshaw_custom.css" />
 
 <style type="text/css">
 .accordion-link {
@@ -339,11 +340,11 @@
 	</g:else>
 	</div>
 	<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-	<r:script>
+	<g:javascript>
 		$(document).ready(doOnDomReady(
 			'${dateFormat}', 
 			${weekStart}, 
 			'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'));
-	</r:script>
+	</g:javascript>
 </body>
 </html>
