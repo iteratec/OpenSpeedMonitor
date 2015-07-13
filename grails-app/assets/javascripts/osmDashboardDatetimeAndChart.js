@@ -1,3 +1,3 @@
 //= require osmDashboardDatetime.js
-//= require spin.min.js
+//= require spin/spin.min.js
 //= require iteratecChartRickshaw.js

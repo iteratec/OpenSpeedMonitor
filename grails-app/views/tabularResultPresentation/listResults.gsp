@@ -3,7 +3,7 @@
 <head>
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isocsi.eventResult"/></title>
-	<r:require modules="eventresult" />
+	<asset:javascript src="eventresult/eventResult.js"/>
 	<style type="text/css">
 	/* css for timepicker */
 	.ui-timepicker-div .ui-widget-header {

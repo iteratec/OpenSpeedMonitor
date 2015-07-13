@@ -1,5 +1,6 @@
 <%@ page import="org.springframework.web.util.HtmlUtils" %>
-<r:use modules="codemirror" />
+<asset:stylesheet src="codemirror/codemirrorManifest.css"/>
+<asset:javascript src="codemirror/codemirrorManifest.js"/>
 <asset:script type="text/javascript">
 	var markedLines = [];
 	

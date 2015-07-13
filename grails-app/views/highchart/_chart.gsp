@@ -1,5 +1,5 @@
-<r:require modules="iteratec-chart" />
-
+<asset:javascript src="iteratecChartRickshaw.js"/>
+<asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
 
 %{--TODO merge the single- and multiple-axis-chart-function of highchart--}%
 <g:if test="${singleYAxis}">

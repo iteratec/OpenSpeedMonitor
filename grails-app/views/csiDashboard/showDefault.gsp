@@ -4,7 +4,7 @@
 <meta name="layout" content="kickstart_osm" />
 <title>CSI CheckDashboard</title>
 
-<asset:javascript src="csiDashboard" />
+<asset:javascript src="csidashboard/csiDashboard.js" />
 
 <style>
 	/* css for timepicker */

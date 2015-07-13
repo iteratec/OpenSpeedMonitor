@@ -12,7 +12,7 @@
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isocsi.csiDashboard"/></title>
 	
-	<asset:javascript src="csiDashboard" />
+	<asset:javascript src="csidashboard/csiDashboard.js" />
 	
 	<style>
 		/* css for timepicker */

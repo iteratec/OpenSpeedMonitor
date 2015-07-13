@@ -7,7 +7,7 @@
 	<meta name="layout" content="kickstart" />
 	<g:set var="entityName" value="${message(code: 'event.label', default: 'Event')}" />
 	<title><g:message code="default.edit.label" args="[entityName]" /></title>
-  <r:require modules="event" />
+  <asset:javascript src="event/event.js" />
 </head>
 
 <as>

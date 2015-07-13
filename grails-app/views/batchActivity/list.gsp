@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
     <g:set var="entityName" value="${message(code: 'de.iteratec.osm.batch.batchactivity.list.heading', default: 'Batch Activities')}"/>
-    <asset:javascript src="batchActivityList.js"/>
+    <asset:javascript src="batchactivity/batchActivityList.js"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>
 </head>
 
