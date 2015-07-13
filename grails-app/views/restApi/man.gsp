@@ -4,7 +4,7 @@
 <title>Manual of REST API</title>
 <meta name="layout" content="kickstart_osm" />
 </head>
-<body data-spy="scroll" data-target="#spied-nav">
+<as data-spy="scroll" data-target="#spied-nav">
 %{--<body data-spy="scroll" data-target="#spied-nav">--}%
 	<div class="container">
 
@@ -804,8 +804,8 @@
 	</div>
 
 	--%>
-	
-	<g:javascript>
+
+	<asset:script type="text/javascript">
 		$(document).ready(function(){
 			$('body').scrollspy({
 				target: '#spied-nav',
@@ -818,7 +818,7 @@
 				scrollBy(0, -offset);
 			});
 		});
-	</g:javascript>
+	</asset:script>
 
 </body>
 </html>

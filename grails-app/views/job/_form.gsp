@@ -60,7 +60,7 @@
 <!-- included because there is no way for the user to supply a value for validationRequest -->
 <g:hiddenField name="validationRequest" value="" />
 
-<g:javascript>
+<asset:script type="text/javascript">
     $(document).ready(
         doOnDomReady(
             ${job.label == null},
@@ -71,4 +71,4 @@
             "${g.createLink(action: 'tags', absolute: true)}"
         )
     );
-</g:javascript>
+</asset:script>

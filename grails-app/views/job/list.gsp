@@ -2,7 +2,7 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.Job"%>
 <%@ page import="de.iteratec.osm.result.JobResult"%>
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isj.jobs" /></title>
@@ -151,7 +151,7 @@
 			</table>
 	</g:form>
 	</div>
-	<g:javascript>
+	<asset:script type="text/javascript">
 		$(document).ready(
 			doOnDomReady(
 				'${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
@@ -162,6 +162,6 @@
 				'${createLink(action: 'list', absolute: true)}'
 			)
 		);
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

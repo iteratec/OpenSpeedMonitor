@@ -51,7 +51,7 @@
     </g:if>
 </g:form>
 
-<g:javascript>
+<asset:script type="text/javascript">
 		$(document).ready(
 			updateIfNecessary(
 			    '${createLink(action: 'updateTable', absolute: true)}',
@@ -59,7 +59,7 @@
 			    '${createLink(action: 'getUpdate', absolute: true)}'
 			)
 		);
-</g:javascript>
+</asset:script>
 </body>
 
 </html>

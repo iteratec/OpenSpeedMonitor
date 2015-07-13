@@ -2,7 +2,7 @@
 	<g:render template="checkbox" model="${['booleanAttribute': booleanAttribute, 'job': job]}" />
 </g:each>
 
-<g:javascript>
+<asset:script type="text/javascript">
 	$(document).ready(function() {
 		$('#provideAuthenticateInformation').click(function() {
 			$('.authInfo').toggle($(this).prop('checked'));
@@ -13,7 +13,7 @@
 			document.getElementById('authPassword').setAttribute('type', 'password');
 		}
 	});
-</g:javascript>
+</asset:script>
 
 <div class="row fieldcontain ${hasErrors(bean: job, field: 'provideAuthenticateInformation', 'error')}">
 	<label class="span3 text-right">

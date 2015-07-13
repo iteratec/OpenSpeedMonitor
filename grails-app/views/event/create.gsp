@@ -31,10 +31,10 @@
 	</g:form>
 	
 </section>
-		
-  <g:javascript>
-    $(document).ready(doOnDomReady());
-  </g:javascript>
+
+	<asset:script type="text/javascript">
+    	$(document).ready(doOnDomReady());
+  	</asset:script>
 </body>
 
 </html>

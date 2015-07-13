@@ -114,7 +114,7 @@
              
         </div>
 	</div>
-	<g:javascript>
+	<asset:script type="text/javascript">
 		$(document).ready(function() {
 			if(typeof chart != 'undefined'){
 				jQuery.each(
@@ -134,6 +134,6 @@
 				$("#csi-table").fadeIn();
 			});
 		});
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

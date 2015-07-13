@@ -226,7 +226,7 @@
 		</g:if>
 	</g:else>
   <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-	<g:javascript>
+	<asset:script type="text/javascript">
 		$(document).ready(
 			doOnDomReady(
 				'dd.mm.yyyy', 
@@ -234,6 +234,6 @@
 				'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
 			)
 		);		
-	</g:javascript>
+	</asset:script>
 </body>
 </html>

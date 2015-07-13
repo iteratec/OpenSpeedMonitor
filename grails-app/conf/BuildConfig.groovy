@@ -97,7 +97,7 @@ grails.project.dependency.resolution = {
 		runtime (
 			':twitter-bootstrap:2.3.2.2',
 			":hibernate:3.6.10.10",
-			":jquery:1.8.3",
+			":jquery:1.11.1",
 //			":resources:1.2.7",
 			":database-migration:1.3.8",
 			":quartz:1.0.1",

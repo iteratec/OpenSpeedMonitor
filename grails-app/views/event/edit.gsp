@@ -10,7 +10,7 @@
   <r:require modules="event" />
 </head>
 
-<body>
+<as>
 
 <section id="edit-event" class="first">
 
@@ -34,10 +34,10 @@
 	</g:form>
 
 </section>
-			
-  <g:javascript>
+
+<asset:script type="text/javascript">
     $(document).ready(doOnDomReady());
-  </g:javascript>
+</asset:script>
 </body>
 
 </html>

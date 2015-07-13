@@ -8,7 +8,7 @@
 	<r:use modules="timeago-de" />
 </g:if>
 
-<g:javascript>
+<asset:script type="text/javascript">
 	/*
 	function refreshQueues() {
 		var rowVisible = []
@@ -88,7 +88,7 @@
 		});
 		*/
 	});
-</g:javascript>
+</asset:script>
 <style>
 .running {
 	background: center left no-repeat url('<g:resource dir="images" file="loading_indicator.gif" absolute="true" />');
