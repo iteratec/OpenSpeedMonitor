@@ -207,6 +207,10 @@ grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.h
 // unit: seconds
 grails.plugins.cookie.cookieage.default = 60*60*24*36
 
+grails.assets.less.compile = 'less4j'
+grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
+grails.assets.plugin."twitter-bootstrap".includes = ["bootstrap.less"]
+
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 environments {

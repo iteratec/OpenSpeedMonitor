@@ -135,7 +135,8 @@ grails.project.dependency.resolution = {
 //			':lesscss-resources:1.3.1',
 			':cookie:1.0.1',
             ':codenarc:0.22',
-			":asset-pipeline:2.3.9"
+			":asset-pipeline:2.3.9",
+				":less-asset-pipeline:2.3.0"
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"

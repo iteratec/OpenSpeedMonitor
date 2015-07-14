@@ -1,0 +1,12 @@
+@import "bootstrap.less";
+@import "openspeedmonitor.less";
+
+// Workaround since Bootstrap 2.X doesn't work with Less v2, see
+// http://stackoverflow.com/questions/26628309/less-v2-does-not-compile-twitters-bootstrap-2-x
+#grid {
+  .core  {
+    .span(@gridColumns) {
+      width: (@gridColumnWidth * @gridColumns) + (@gridGutterWidth * (@gridColumns - 1));
+    }
+  }
+}
