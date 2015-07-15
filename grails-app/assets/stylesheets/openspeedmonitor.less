@@ -142,3 +142,107 @@ input.ui-autocomplete-input {
   margin-left: 60px;
   margin-right: 40px;
 }
+
+//bootstrap component-animation
+.collapse {
+  position: relative;
+  height: 0;
+  overflow: auto;
+  .transition(height .35s ease);
+  &.in {
+    height: auto;
+  }
+}
+
+//bootstrap popovers
+.popover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: @zindexPopover;
+  display: none;
+  max-width: 800px;
+  padding: 1px;
+  text-align: left; // Reset given new insertion method
+  background-color: @popoverBackground;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0,0,0,.2);
+  .border-radius(6px);
+  .box-shadow(0 5px 10px rgba(0,0,0,.2));
+
+  // Overrides for proper insertion
+  white-space: normal;
+
+  // Offset the popover to account for the popover arrow
+  &.top     { margin-top: -10px; }
+  &.right   { margin-left: 10px; }
+  &.bottom  { margin-top: 10px; }
+  &.left    { margin-left: -10px; }
+}
+
+//bootstrap forms
+// Shared size and type resets
+select,
+textarea,
+input[type="text"],
+input[type="password"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="date"],
+input[type="month"],
+input[type="time"],
+input[type="week"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+input[type="search"],
+input[type="tel"],
+input[type="color"],
+.uneditable-input {
+  display: inline-block;
+  margin-bottom: @baseLineHeight / 2;
+  font-size: @baseFontSize;
+  color: @gray;
+  .border-radius(@inputBorderRadius);
+  vertical-align: middle;
+  height: 24px;
+  padding: 2px 6px !important;
+  line-height: 24px !important;
+}
+//bootstrap navbar
+// Brand: website or project name
+// -------------------------
+.navbar .brand {
+  float: left;
+  display: block;
+  // Vertically center the text given @navbarHeight
+  padding: ((@navbarHeight - @baseLineHeight) / 2) 20px 6px !important;
+  margin-left: -20px; // negative indent to left-align the text down the page
+  font-size: 20px;
+  font-weight: 200;
+  color: @navbarBrandColor;
+  text-shadow: 0 1px 0 @navbarBackgroundHighlight;
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+}
+.navbar img.logo	{ max-height: 39px !important; margin-top: -3px;}
+
+//bootstrap variables
+@navbarBackgroundHighlight:       #AB0C0C;/*ffffff;*/
+
+//bootstrap responsive-utilities
+// Required for Windows 8 Metro split-screen snapping with IE10
+// Source: http://timkadlec.com/2012/10/ie10-snap-mode-and-responsive-design/
+@-ms-viewport{
+  width: auto !important;
+}
+
+//bootstrap dropdown
+//was deleted with IT-508, removed body to remove behavior TODO maybe there is a better way
+.dropdown-submenu:hover > .dropdown-menu {
+}
