@@ -115,46 +115,90 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         ])
     }
     void "aggregation RAW - every legend part in every event result the same"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation RAW - some legend parts in every event result the same, some different"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
 
     // HOURLY ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void "aggregation HOURLY - no summarization possible"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation HOURLY - every legend part in every event result the same"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation HOURLY - some legend parts in every event result the same, some different"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
 
     // DAILY ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void "aggregation DAILY - no summarization possible"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation DAILY - every legend part in every event result the same"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation DAILY - some legend parts in every event result the same, some different"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
 
     // WEEKLY ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void "aggregation WEEKLY - no summarization possible"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation WEEKLY - every legend part in every event result the same"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
     void "aggregation WEEKLY - some legend parts in every event result the same, some different"() {
-        fail "please implement me"
+        when:
+        String implementationStatus = 'to be done'
+
+        then:
+        implementationStatus == 'done'
     }
 
     EventResult createEventResult(String tag, String connectivityProfileName){
