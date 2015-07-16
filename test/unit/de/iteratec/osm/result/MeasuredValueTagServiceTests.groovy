@@ -505,8 +505,8 @@ class MeasuredValueTagServiceTests {
 		serviceUnderTest.jobService = jobServiceMocked.createMock()
 	}
 	private mockJobResultService(JobResult toReturn){
-		def jobResultServiceMocked = mockFor(JobResultService)
-		jobResultServiceMocked.demand.findJobResultByEventResult(1..10000) { EventResult eventResult -> return toReturn }
-		serviceUnderTest.jobResultService = jobResultServiceMocked.createMock()
+		def jobResultDaoServiceMocked = mockFor(JobResultDaoService)
+		jobResultDaoServiceMocked.demand.findJobResultByEventResult(1..10000) { EventResult eventResult -> return toReturn }
+		serviceUnderTest.jobResultDaoService = jobResultDaoServiceMocked.createMock()
 	}
 }

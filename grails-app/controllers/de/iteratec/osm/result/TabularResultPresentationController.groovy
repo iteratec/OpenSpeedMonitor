@@ -63,7 +63,7 @@ class TabularResultPresentationController {
     PerformanceLoggingService performanceLoggingService
 
     OsmDataSourceService osmDataSourceService
-    JobResultService jobResultService
+    JobResultDaoService jobResultDaoService
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
     //	LinkGenerator grailsLinkGenerator

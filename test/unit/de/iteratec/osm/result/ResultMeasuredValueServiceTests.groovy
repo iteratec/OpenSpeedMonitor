@@ -80,7 +80,7 @@ class ResultMeasuredValueServiceTests {
 		serviceUnderTest.browserDaoService = browserDaoServiceMock;
 		
 		//DB Call Find By should explicit be tested
-		serviceUnderTest.jobResultService = new JobResultService();
+		serviceUnderTest.jobResultDaoService = new JobResultDaoService();
 		serviceUnderTest.eventResultDaoService = new EventResultDaoService();
 
 		/** Functional Services **/

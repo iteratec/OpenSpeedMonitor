@@ -17,10 +17,10 @@
 
 package de.iteratec.osm.report.chart.dao;
 
+import de.iteratec.osm.report.chart.AggregatorType;
+
 import java.util.Map;
 import java.util.Set;
-
-import de.iteratec.osm.report.chart.AggregatorType;
 
 /**
  * <p>
@@ -31,7 +31,7 @@ import de.iteratec.osm.report.chart.AggregatorType;
  * @since IT-74
  */
 public interface AggregatorTypeDaoService {
-	
+
 	/**
 	 * <p>
 	 * Finds all {@linkplain AggregatorType aggregation types} currently 

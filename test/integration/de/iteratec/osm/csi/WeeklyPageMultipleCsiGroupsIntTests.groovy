@@ -20,9 +20,6 @@ package de.iteratec.osm.csi
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 
-import java.lang.reflect.UndeclaredThrowableException
-import java.util.Map;
-
 import static org.junit.Assert.*
 
 import org.joda.time.DateTime
@@ -42,8 +39,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.csi.EventMeasuredValueService
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 
 @TestMixin(IntegrationTestMixin)
 class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWithDBCleanup {
@@ -104,7 +100,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 
 	@Before
 	void setUp() {
-		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
+		JobResultDaoService.metaClass.findJobResultByEventResult{EventResult eventResult ->
 			List<JobResult> results = JobResult.list().findAll{eventResult in it.eventResults}
 			return results.get(0)
 		}
