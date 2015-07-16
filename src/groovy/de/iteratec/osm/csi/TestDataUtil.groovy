@@ -200,47 +200,6 @@ class TestDataUtil {
         ]
     }
 
-    /**
-     * Creates at least one instance of each domain and persists these instances to database.
-     * For testing db-cleanup in tests. The instances doesn't make any sense in their content.
-     */
-    public static createAtLLeastOneObjectOfEachDomain() {
-
-        Job.withTransaction { TransactionStatus status ->
-
-            createMeasuredValueUpdateEvent(new Date(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED, '1')
-            List<MeasuredValueInterval> intervals = createMeasuredValueIntervals()
-            List<AggregatorType> aggregators = createAggregatorTypes()
-            List<Page> pages = createPages(['page01', 'page02', 'page03'])
-            MeasuredEvent event = createMeasuredEvent('event', pages[0])
-            createWebPageTestServer('server 1 - wpt example', '', 1, 'http://example.com')
-            List<Browser> browsers = createBrowsersAndAliases()
-            List<Location> locations = createLocations()
-            List<JobGroup> jobGroups = createJobGroups()
-            Script script = createScript('label', '', '', false)
-            Job job = createJob('label', script, locations[0], jobGroups[0], '', 1, true)
-            JobResult jobResult = createJobResult('label', new Date(), job, locations[0])
-            createEventResult(job, jobResult, 1000, 100, event)
-            WaterfallEntry waterfallEntry = createWaterfallEntry()
-            createWebPerformanceWaterfall()
-            createHoursOfDay()
-            createMeasuredValue(new Date(), intervals[0], aggregators[0], '1', 42, "1,2,3", false)
-            createOsmConfiguration(12)
-            createOsmConfig()
-            createHttpArchive(jobResult)
-            createTimeToCsMapping(pages[0])
-            createCustomerFrustration(pages[0])
-            CsTargetValue csTargetValue = createCsTargetValue()
-            createCsTargetGraph(csTargetValue, csTargetValue)
-            GraphitePath graphitePath = createGraphitePath('prefix.', aggregators[0])
-            createGraphiteServer("", 100, [graphitePath])
-            createConnectivityProfile()
-
-            status.flush()
-        }
-
-    }
-
     static ConnectivityProfile createConnectivityProfile(String profileName) {
         return new ConnectivityProfile(
                 name: profileName,
@@ -1022,7 +981,13 @@ class TestDataUtil {
      * @param customerSatisfactionInPercent
      *         The customer-satisfaction-index in percent.
      */
-    static EventResult createEventResult(Job job, JobResult jobResult, int docCompleteTimeInMillisecs, double customerSatisfactionInPercent, MeasuredEvent event) {
+    static EventResult createEventResult(
+            Job job,
+            JobResult jobResult,
+            int docCompleteTimeInMillisecs,
+            double customerSatisfactionInPercent,
+            MeasuredEvent event,
+            ConnectivityProfile connectivityProfile) {
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1035,9 +1000,10 @@ class TestDataUtil {
                 jobResultJobConfigId: jobResult.job.ident(),
                 measuredEvent: event,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                connectivityProfile: connectivityProfile
         ).save(failOnError: true)
 
-        return jobResult.save(failOnError: true)
+        return eventResult.save(failOnError: true)
     }
 
     /**
@@ -1152,7 +1118,7 @@ class TestDataUtil {
         assertNotNull(jobResult)
 
         if (columns.length > 8 && !columns[8].isEmpty()) {
-            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage);
+            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, createConnectivityProfile('the profile'));
         }
     }
 
@@ -1274,6 +1240,15 @@ class TestDataUtil {
         AggregatorType pageAggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         AggregatorType shopAggregator = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         return [eventAggregator, pageAggregator, shopAggregator]
+    }
+
+    /**
+     * <p>
+     * Creates an AggregatorType with given name and group.
+     * </p>
+     */
+    public static AggregatorType createAggregatorType(String name, MeasurandGroup group) {
+        return new AggregatorType(name: name, measurandGroup: group).save(failOnError: true)
     }
 
     /**
