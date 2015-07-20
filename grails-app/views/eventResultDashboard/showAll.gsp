@@ -11,6 +11,7 @@
 
 <asset:javascript src="eventresultdashboard/eventResultDashboard.js" />
 <asset:stylesheet src="rickshaw/rickshaw_custom.css" />
+<asset:stylesheet src="date-time-picker/bootstrap-datepicker.min.css" />
 
 <style type="text/css">
 .accordion-link {

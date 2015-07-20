@@ -165,32 +165,6 @@ grails.plugins.springsecurity.interceptUrlMap = [
 	'/**'                       				: ['ROLE_ADMIN','ROLE_SUPER_ADMIN']
 ]
 
-grails.plugins.dynamicController.mixins = [
-    'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin':
-    'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin' :
-    'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-    'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-    'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin' :
-    'com.burtbeckwith.appinfo_test.AdminManageController',
-
-    /*
-     'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-     'com.burtbeckwith.appinfo_test.AdminManageController',
-     'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-     'com.burtbeckwith.appinfo_test.AdminManageController',
-     'app.info.custom.example.MyConfigControllerMixin' :
-     'com.burtbeckwith.appinfo_test.AdminManageController'
-     */
-]
-
 /*
  *	Configure charting libraries available in OpenSpeedMonitor.
  * 	Default is rickshaw, see http://code.shutterstock.com/rickshaw/
@@ -212,6 +186,10 @@ grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
 //grails.assets.plugin."twitter-bootstrap".includes = ["bootstrap.less"]
 grails.assets.excludes = ["**/*.less"]
 grails.assets.includes = ["bootstrap-custom.less"]
+
+grails.assets.minifyJs = true
+grails.assets.minifyCss = true
+
 
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

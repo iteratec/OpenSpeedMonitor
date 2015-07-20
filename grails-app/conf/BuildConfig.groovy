@@ -98,30 +98,15 @@ grails.project.dependency.resolution = {
 			':twitter-bootstrap:2.3.2.2',
 			":hibernate:3.6.10.10",
 			":jquery:1.11.1",
-//			":resources:1.2.7",
 			":database-migration:1.3.8",
 			":quartz:1.0.1",
 			":console:1.5.1",
-//			":font-awesome-resources:4.3.0.2"
 		)
-//		runtime(":cached-resources:1.0") {
-//			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-//		 }
-//		runtime(":zipped-resources:1.0") {
-//			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-//		 }
-//		runtime(":cache-headers:1.1.7") {
-//			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-//		 }
 		//build//////////////////////////////////////////////////////////////////
 		build (
 			":tomcat:7.0.52.1",
-//			":resources:1.2.7",
 			":release:3.0.1"
 		)
-//		build( ":kickstart-with-bootstrap:0.9.6"){
-//			excludes "resources", "scaffolding"
-//		}
         //compile//////////////////////////////////////////////////////////////////
 		compile (
 			":joda-time:1.5",
@@ -132,7 +117,6 @@ grails.project.dependency.resolution = {
 			':rest:0.8',
 			':jmx:0.9',
 			':taggable:1.0.1',
-//			':lesscss-resources:1.3.1',
 			':cookie:1.0.1',
             ':codenarc:0.22',
 			":asset-pipeline:2.3.9",
@@ -140,13 +124,6 @@ grails.project.dependency.resolution = {
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"
-		}
-//		compile( ":kickstart-with-bootstrap:0.9.6"){
-//			excludes "resources", "scaffolding"
-//		}
-		compile( ':app-info:1.1.1'){
-			excludes "jquery"
-			if (Environment.getCurrent() == Environment.PRODUCTION || Environment.getCurrent() == Environment.TEST) { export = false }
 		}
 //		provided ":less-asset-pipeline:2.3.0"
         //test//////////////////////////////////////////////////////////////////
