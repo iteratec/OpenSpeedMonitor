@@ -17,9 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
-import de.iteratec.osm.result.JobResultService
 import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
 
@@ -39,18 +37,15 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.WptXmlResultVersion
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 

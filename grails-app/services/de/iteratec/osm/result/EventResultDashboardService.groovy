@@ -52,11 +52,10 @@ public class EventResultDashboardService {
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
     LocationDaoService locationDaoService
-    MeasuredEventDaoService measuredEventDaoService
     ResultMeasuredValueService resultMeasuredValueService
     I18nService i18nService
     MeasuredValueTagService measuredValueTagService
-    JobResultService jobResultService
+    JobResultDaoService jobResultDaoService
     EventResultDaoService eventResultDaoService
     MeasuredValueUtilService measuredValueUtilService
     PerformanceLoggingService performanceLoggingService
@@ -240,8 +239,12 @@ public class EventResultDashboardService {
         }
         List<OsmChartGraph> graphs = []
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels and sorting', IndentationDepth.ONE) {
-            graphs = setSpeakingGraphLabelsAndSort(calculatedResultMap)
-            graphs = summarizeGraphs(graphs)
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels', IndentationDepth.TWO) {
+                graphs = setSpeakingGraphLabelsAndSort(calculatedResultMap)
+            }
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting', IndentationDepth.TWO) {
+                graphs = summarizeGraphs(graphs)
+            }
         }
         return graphs
     }
@@ -330,14 +333,6 @@ public class EventResultDashboardService {
         Map<String, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
         Map<String, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting lookup-maps', IndentationDepth.TWO) {
-            Map<Long, JobGroup> jobGroupMap = jobGroupDaoService.getIdToObjectMap()
-            Map<Long, Page> pageMap = pageDaoService.getIdToObjectMap()
-            Map<Long, MeasuredEvent> measuredEventMap = measuredEventDaoService.getIdToObjectMap()
-            Map<Long, Browser> browserMap = browserDaoService.getIdToObjectMap()
-            Map<Long, Location> locationMap = locationDaoService.getIdToObjectMap()
-        }
-
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', IndentationDepth.TWO) {
             eventResults.each { EventResult eventResult ->
                 aggregators.each { AggregatorType aggregator ->
@@ -368,24 +363,24 @@ public class EventResultDashboardService {
                 Long millisStartOfInterval
                 AggregatorType aggregator
 
-                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'tokenize', IndentationDepth.THREE) {
-                    performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'inner tokenize', IndentationDepth.FOUR) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'tokenize', IndentationDepth.THREE) {
+                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'inner tokenize', IndentationDepth.FOUR) {
                         tokenized = key.tokenize(UNIQUE_STRING_DELIMITTER)
                     }
-                    performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'Long.valueOf()', IndentationDepth.FOUR) {
+                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'Long.valueOf()', IndentationDepth.FOUR) {
                         millisStartOfInterval = Long.valueOf(tokenized[2])
                     }
-                    performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting Aggregator from db', IndentationDepth.FOUR) {
+                    performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'getting Aggregator from db', IndentationDepth.FOUR) {
                         aggregator = aggregatorTypeMap[tokenized[0]]
                     }
                 }
-                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'buildTestsDetailsURL', IndentationDepth.THREE) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'buildTestsDetailsURL', IndentationDepth.THREE) {
                     testsDetailsURL = buildTestsDetailsURL(tokenized[1], aggregator, millisStartOfInterval, interval, value.size())
                 }
 
-                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'calculate value and create OsmChartPoint', IndentationDepth.THREE) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', IndentationDepth.THREE) {
 
-                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[2]}";
+                    String graphLabel = "${tokenized[0]}${UNIQUE_STRING_DELIMITTER}${tokenized[1]}${UNIQUE_STRING_DELIMITTER}${tokenized[3]}";
                     countValues = value.size()
                     if (countValues > 0) {
                         sum = 0

@@ -17,10 +17,6 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
@@ -44,7 +40,7 @@ class HighchartPointDetailsController {
 
 	MeasuredValueDaoService measuredValueDaoService;
 	EventResultDaoService eventResultDaoService
-	JobResultService jobResultService;
+	JobResultDaoService jobResultDaoService;
 	/**
 	 * The Grails engine to generate links.
 	 *

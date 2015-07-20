@@ -23,7 +23,7 @@ import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 
 /**
  * Provides methods for calculating and retrieving {@link MeasuredValue}s.
@@ -36,7 +36,7 @@ class MeasuredValueUpdateService {
 	PageMeasuredValueService pageMeasuredValueService
 	ShopMeasuredValueService shopMeasuredValueService
 	MeasuredValueUtilService measuredValueUtilService
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 	
 	/**
 	 * Calculates or recalculates hourly-job {@link MeasuredValue}s which depend from param newResult.

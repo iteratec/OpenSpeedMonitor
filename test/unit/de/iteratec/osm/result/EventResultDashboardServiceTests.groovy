@@ -64,8 +64,6 @@ import de.iteratec.osm.util.I18nService
 class EventResultDashboardServiceTests {
 
     EventResultDashboardService serviceUnderTest
-    EventResultDaoService eventResultDaoService
-    ResultMeasuredValueService resultMeasuredValueService
 
     /* Mocked Data */
     Browser browser
@@ -85,16 +83,11 @@ class EventResultDashboardServiceTests {
     final static String page2Name = "page2"
     final static String event1Name = "event1"
     final static String event2Name = "event2"
-    final static String browser1Name = "browser1"
-    final static String browser2Name = "browser2"
     final static String location1Label = "ffLocationLabel"
     final static String location2Label = "ieLocationLabel"
     final static String location1Location = "ffLocationLocation"
     final static String location2Location = "ieLocationLocation"
-    final static String i18nNameOfAggregatorTypeUsedInTests = 'i18nNameOfAggregatorTypeUsedInTests'
-    final static String connectivity1Connectivity = "Test"
-    final static String connectivity2Connectivity = "Test"
-    final static String connectivity3Connectivity = "1369821600000"
+    final static String predefinedConnectivityName = "DSL 6.000"
 
     @Before
     void setUp() {
@@ -103,7 +96,7 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.resultMeasuredValueService = new ResultMeasuredValueService()
         serviceUnderTest.resultMeasuredValueService.eventResultDaoService = new EventResultDaoService()
         serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
-        serviceUnderTest.jobResultService = Mockito.mock(JobResultService.class);
+        serviceUnderTest.jobResultDaoService = Mockito.mock(JobResultDaoService.class);
         mockI18nService()
 
         runDate = new DateTime(2013, 5, 29, 10, 13, 2, 564, DateTimeZone.UTC)
@@ -116,7 +109,322 @@ class EventResultDashboardServiceTests {
         createPages();
         createMeasuredEvents();
         createJobResults();
-        createEventResult();
+        createEventResults();
+    }
+
+    @Test
+    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED() {
+
+        mockEventResultDaoService()
+        mockPerformanceLoggingService()
+        mockJobGroupDaoService()
+        mockPageDaoService()
+        mockBrowserDaoService()
+        mockLocationDaoService()
+        mockMeasuredValueTagService()
+
+        ErQueryParams queryParams = new ErQueryParams();
+        queryParams.browserIds.add(browser.id)
+        queryParams.jobGroupIds.add(jobGroup.id)
+        queryParams.locationIds.add(location.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(page.id)
+
+        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
+        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
+
+        Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+
+        assertEquals(1, resultGraphs.size())
+        List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+        }
+        assertEquals(1, resultGraphsWithCorrectLabel.size())
+        assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+    }
+
+    @Test
+    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED() {
+
+        mockEventResultDaoService()
+        mockPerformanceLoggingService()
+        mockJobGroupDaoService()
+        mockPageDaoService()
+        mockBrowserDaoService()
+        mockLocationDaoService()
+        mockMeasuredValueTagService()
+
+        ErQueryParams queryParams = new ErQueryParams();
+        queryParams.browserIds.add(browser.id)
+        queryParams.jobGroupIds.add(jobGroup.id)
+        queryParams.locationIds.add(location.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(page.id)
+
+        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
+        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
+
+        Collection<AggregatorType> aggregatorTypes = []
+        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
+        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
+
+        assertEquals(2, aggregatorTypes.size());
+
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+
+        assertEquals(2, resultGraphs.size())
+
+        /**
+         * IT-643
+         *
+         * Removed page name and location to match the result of summarizeLabel @Link
+         */
+        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
+        }
+        assertEquals(1, resultsCsi1.size())
+        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+
+        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
+        }
+        assertEquals(1, resultsCsi2.size())
+        assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
+    }
+
+    @Test
+    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED_LIMITED_MIN() {
+
+        mockEventResultDaoService()
+        mockPerformanceLoggingService()
+        mockJobGroupDaoService()
+        mockPageDaoService()
+        mockBrowserDaoService()
+        mockLocationDaoService()
+        mockMeasuredValueTagService()
+
+        ErQueryParams queryParams = new ErQueryParams();
+        queryParams.browserIds.add(browser.id)
+        queryParams.jobGroupIds.add(jobGroup.id)
+        queryParams.locationIds.add(location.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(page.id)
+        queryParams.minLoadTimeInMillisecs = 5.0d
+
+        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
+        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
+
+        Collection<AggregatorType> aggregatorTypes = []
+//		aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
+        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
+
+        assertEquals(1, aggregatorTypes.size());
+
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+
+        assertEquals(1, resultGraphs.size())
+
+        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+        }
+        assertEquals(0, resultsCsi1.size())
+
+        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+        }
+        assertEquals(1, resultsCsi2.size())
+        assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
+    }
+
+    @Test
+    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED_LIMITED_MAX() {
+
+        mockEventResultDaoService()
+        mockPerformanceLoggingService()
+        mockJobGroupDaoService()
+        mockPageDaoService()
+        mockBrowserDaoService()
+        mockLocationDaoService()
+        mockMeasuredValueTagService()
+
+        ErQueryParams queryParams = new ErQueryParams();
+        queryParams.browserIds.add(browser.id)
+        queryParams.jobGroupIds.add(jobGroup.id)
+        queryParams.locationIds.add(location.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(page.id)
+        queryParams.maxLoadTimeInMillisecs = 15.0d
+
+        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
+        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
+
+        Collection<AggregatorType> aggregatorTypes = []
+        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
+
+        assertEquals(1, aggregatorTypes.size());
+
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+
+        assertEquals(1, resultGraphs.size())
+
+        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+        }
+        assertEquals(1, resultsCsi1.size())
+        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+
+        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+        }
+        assertEquals(0, resultsCsi2.size())
+    }
+
+    @Test
+    void testGetEventResultDashboardChartMap_AGGREGATED_DATA_CACHED() {
+
+        //mocks
+        mockEventResultDaoService()
+        mockPerformanceLoggingService()
+        mockMeasuredValueUtilService()
+        mockJobGroupDaoService()
+        mockPageDaoService()
+        mockBrowserDaoService()
+        mockLocationDaoService()
+        mockMeasuredValueTagService()
+        mockAggregatorTypeDaoService()
+
+        //test-specific data
+        ErQueryParams queryParams = new ErQueryParams();
+        queryParams.browserIds.add(browser.id)
+        queryParams.jobGroupIds.add(jobGroup.id)
+        queryParams.locationIds.add(location.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(page.id)
+
+        Date startTime = runDate.minusDays(5).toDate()
+        Date endTime = runDate.plusDays(5).toDate()
+
+        Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
+
+        //test-execution
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+
+        //assertions
+        assertEquals(1, resultGraphs.size())
+        List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
+        }
+        assertEquals(1, resultGraphsWithCorrectLabel.size())
+        assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+    }
+
+    @Test
+    void testGetEventResultDashboardChartMap_AGGREGATED_DATA_CACHED_AND_UNCACHED() {
+
+        //mocks
+        mockEventResultDaoService()
+        mockPerformanceLoggingService()
+        mockMeasuredValueUtilService()
+        mockJobGroupDaoService()
+        mockPageDaoService()
+        mockBrowserDaoService()
+        mockLocationDaoService()
+        mockMeasuredValueTagService()
+        mockAggregatorTypeDaoService()
+
+        //test-specific data
+        ErQueryParams queryParams = new ErQueryParams();
+        queryParams.browserIds.add(browser.id)
+        queryParams.jobGroupIds.add(jobGroup.id)
+        queryParams.locationIds.add(location.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(page.id)
+
+        Date startTime = runDate.minusDays(5).toDate()
+        Date endTime = runDate.plusDays(5).toDate()
+
+        Collection<AggregatorType> aggregatorTypes = []
+        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
+        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
+        assertEquals(2, aggregatorTypes.size());
+
+        //test-execution
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+
+        //assertions
+        assertEquals(2, resultGraphs.size())
+
+        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
+        }
+        assertEquals(1, resultsCsi1.size())
+        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+
+        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
+            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
+        }
+        assertEquals(1, resultsCsi2.size())
+        assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
+        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
+    }
+
+    public void testTryToBuildTestsDetailsURL_OneSingleResult() {
+        tryToBuildTestsDetailsURL('1', 1, new URL('http://wptserver.example.com/result/testTryToBuildTestsDetailsURL_OneSingleResult'));
+    }
+
+    public void testTryToBuildTestsDetailsURL_TwoResults() {
+        tryToBuildTestsDetailsURL('1,2', 2, new URL('http://wptserver.example.com/testTryToBuildTestsDetailsURL_TwoResults'));
+    }
+
+    private void tryToBuildTestsDetailsURL(String resultIDs, Integer resultIDsCount, final URL expectedURL) {
+        // Create some data:
+        final MeasuredValue measuredValue = new MeasuredValue(
+                resultIds: resultIDs
+        ) {
+            public Long getId() {
+                return 4;
+            }
+        };
+        assertEquals(resultIDsCount, measuredValue.countResultIds());
+
+        // Simulate GrailsLinkGenerator
+        LinkGenerator grailsLinkGeneratorMock = Mockito.mock(LinkGenerator.class);
+        Mockito.when(grailsLinkGeneratorMock.link(Mockito.any(Map.class))).thenReturn(expectedURL.toString());
+
+        // Inject relevant services
+        serviceUnderTest.grailsLinkGenerator = grailsLinkGeneratorMock;
+
+        // Run the (whitebox-)test:
+        URL result = serviceUnderTest.tryToBuildTestsDetailsURL(measuredValue);
+
+        // Verify result:
+        // - is the URL the expected one?
+        assertEquals(expectedURL, result)
+
+        // - was the link requested properly?
+        ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
+        Mockito.verify(grailsLinkGeneratorMock).link(argument.capture());
+        Map linkRequest = argument.getValue();
+
+        assertEquals('highchartPointDetails', linkRequest.get('controller'));
+        assertEquals('listAggregatedResults', linkRequest.get('action'));
+        assertEquals(true, linkRequest.get('absolute'));
+
+        Object paramsEntry = linkRequest.get('params')
+        assertNotNull(paramsEntry);
+        assertTrue(paramsEntry instanceof Map);
+
+        Map paramsMap = (Map) paramsEntry;
+        assertEquals('4', paramsMap.get('measuredValueId'));
+        assertEquals(String.valueOf(resultIDsCount), paramsMap.get('lastKnownCountOfAggregatedResultsOrNull'));
     }
 
     void createMeasuredValueInterval() {
@@ -257,13 +565,13 @@ class EventResultDashboardServiceTests {
     }
 
     ConnectivityProfile mockConnectivity = new ConnectivityProfile(
-            name: "Test",
+            name: predefinedConnectivityName,
             bandwidthDown: 0,
             bandwidthUp: 0,
             latency: 0,
             packetLoss: 0)
 
-    private void createEventResult() {
+    private void createEventResults() {
         eventResultCached = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.CACHED,
@@ -301,327 +609,6 @@ class EventResultDashboardServiceTests {
         ).save(failOnError: true)
 
         jobResult2.save(failOnError: true)
-    }
-
-    @Test
-    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED() {
-
-        mockEventResultDaoService()
-        mockPerformanceLoggingService()
-        mockJobGroupDaoService()
-        mockPageDaoService()
-        mockMeasuredEventDaoService()
-        mockBrowserDaoService()
-        mockLocationDaoService()
-        mockMeasuredValueTagService()
-
-        ErQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(browser.id)
-        queryParams.jobGroupIds.add(jobGroup.id)
-        queryParams.locationIds.add(location.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(page.id)
-
-        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
-        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
-
-        Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
-
-        assertEquals(1, resultGraphs.size())
-        List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity1Connectivity}"
-        }
-        assertEquals(1, resultGraphsWithCorrectLabel.size())
-        assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
-    }
-
-    @Test
-    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED() {
-
-        mockEventResultDaoService()
-        mockPerformanceLoggingService()
-        mockJobGroupDaoService()
-        mockPageDaoService()
-        mockMeasuredEventDaoService()
-        mockBrowserDaoService()
-        mockLocationDaoService()
-        mockMeasuredValueTagService()
-
-        ErQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(browser.id)
-        queryParams.jobGroupIds.add(jobGroup.id)
-        queryParams.locationIds.add(location.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(page.id)
-
-        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
-        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
-
-        Collection<AggregatorType> aggregatorTypes = []
-        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
-        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
-
-        assertEquals(2, aggregatorTypes.size());
-
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
-
-        assertEquals(2, resultGraphs.size())
-
-        /**
-         * IT-643
-         *
-         * Removed page name and location to match the result of summarizeLabel @Link
-         */
-        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
-        }
-        assertEquals(1, resultsCsi1.size())
-        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
-
-        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
-        }
-        assertEquals(1, resultsCsi2.size())
-        assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
-    }
-
-    @Test
-    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED_LIMITED_MIN() {
-
-        mockEventResultDaoService()
-        mockPerformanceLoggingService()
-        mockJobGroupDaoService()
-        mockPageDaoService()
-        mockMeasuredEventDaoService()
-        mockBrowserDaoService()
-        mockLocationDaoService()
-        mockMeasuredValueTagService()
-
-        ErQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(browser.id)
-        queryParams.jobGroupIds.add(jobGroup.id)
-        queryParams.locationIds.add(location.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(page.id)
-        queryParams.minLoadTimeInMillisecs = 5.0d
-
-        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
-        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
-
-        Collection<AggregatorType> aggregatorTypes = []
-//		aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
-        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
-
-        assertEquals(1, aggregatorTypes.size());
-
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
-
-        assertEquals(1, resultGraphs.size())
-
-        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity1Connectivity}"
-        }
-        assertEquals(0, resultsCsi1.size())
-
-        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${connectivity2Connectivity}"
-        }
-        assertEquals(1, resultsCsi2.size())
-        assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
-    }
-
-    @Test
-    void testGetEventResultDashboardChartMap_RAW_DATA_CACHED_AND_UNCACHED_LIMITED_MAX() {
-
-        mockEventResultDaoService()
-        mockPerformanceLoggingService()
-        mockJobGroupDaoService()
-        mockPageDaoService()
-        mockMeasuredEventDaoService()
-        mockBrowserDaoService()
-        mockLocationDaoService()
-        mockMeasuredValueTagService()
-
-        ErQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(browser.id)
-        queryParams.jobGroupIds.add(jobGroup.id)
-        queryParams.locationIds.add(location.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(page.id)
-        queryParams.maxLoadTimeInMillisecs = 15.0d
-
-        Date startTime = runDate.withMinuteOfHour(0).withSecondOfMinute(0).toDate()
-        Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
-
-        Collection<AggregatorType> aggregatorTypes = []
-        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
-
-        assertEquals(1, aggregatorTypes.size());
-
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
-
-        assertEquals(1, resultGraphs.size())
-
-        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity1Connectivity}"
-        }
-        assertEquals(1, resultsCsi1.size())
-        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
-
-        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${connectivity2Connectivity}"
-        }
-        assertEquals(0, resultsCsi2.size())
-    }
-
-    @Test
-    void testGetEventResultDashboardChartMap_AGGREGATED_DATA_CACHED() {
-
-        //mocks
-        mockEventResultDaoService()
-        mockPerformanceLoggingService()
-        mockMeasuredValueUtilService()
-        mockJobGroupDaoService()
-        mockPageDaoService()
-        mockMeasuredEventDaoService()
-        mockBrowserDaoService()
-        mockLocationDaoService()
-        mockMeasuredValueTagService()
-        mockAggregatorTypeDaoService()
-
-        //test-specific data
-        ErQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(browser.id)
-        queryParams.jobGroupIds.add(jobGroup.id)
-        queryParams.locationIds.add(location.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(page.id)
-
-        Date startTime = runDate.minusDays(5).toDate()
-        Date endTime = runDate.plusDays(5).toDate()
-
-        Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
-
-        //test-execution
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
-
-        //assertions
-        assertEquals(1, resultGraphs.size())
-        List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name} | ${event1Name} | ${location1Location} | ${connectivity3Connectivity}"
-        }
-        assertEquals(1, resultGraphsWithCorrectLabel.size())
-        assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
-    }
-
-    @Test
-    void testGetEventResultDashboardChartMap_AGGREGATED_DATA_CACHED_AND_UNCACHED() {
-
-        //mocks
-        mockEventResultDaoService()
-        mockPerformanceLoggingService()
-        mockMeasuredValueUtilService()
-        mockJobGroupDaoService()
-        mockPageDaoService()
-        mockMeasuredEventDaoService()
-        mockBrowserDaoService()
-        mockLocationDaoService()
-        mockMeasuredValueTagService()
-        mockAggregatorTypeDaoService()
-
-        //test-specific data
-        ErQueryParams queryParams = new ErQueryParams();
-        queryParams.browserIds.add(browser.id)
-        queryParams.jobGroupIds.add(jobGroup.id)
-        queryParams.locationIds.add(location.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(page.id)
-
-        Date startTime = runDate.minusDays(5).toDate()
-        Date endTime = runDate.plusDays(5).toDate()
-
-        Collection<AggregatorType> aggregatorTypes = []
-        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME))
-        aggregatorTypes.add(AggregatorType.findAllByName(AggregatorType.RESULT_UNCACHED_DOM_TIME))
-        assertEquals(2, aggregatorTypes.size());
-
-        //test-execution
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
-
-        //assertions
-        assertEquals(2, resultGraphs.size())
-
-        List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group1Name}"
-        }
-        assertEquals(1, resultsCsi1.size())
-        assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
-
-        List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
-            it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
-        }
-        assertEquals(1, resultsCsi2.size())
-        assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
-    }
-
-    public void testTryToBuildTestsDetailsURL_OneSingleResult() {
-        tryToBuildTestsDetailsURL('1', 1, new URL('http://wptserver.example.com/result/testTryToBuildTestsDetailsURL_OneSingleResult'));
-    }
-
-    public void testTryToBuildTestsDetailsURL_TwoResults() {
-        tryToBuildTestsDetailsURL('1,2', 2, new URL('http://wptserver.example.com/testTryToBuildTestsDetailsURL_TwoResults'));
-    }
-
-    private void tryToBuildTestsDetailsURL(String resultIDs, Integer resultIDsCount, final URL expectedURL) {
-        // Create some data:
-        final MeasuredValue measuredValue = new MeasuredValue(
-                resultIds: resultIDs
-        ) {
-            public Long getId() {
-                return 4;
-            }
-        };
-        assertEquals(resultIDsCount, measuredValue.countResultIds());
-
-        // Simulate GrailsLinkGenerator
-        LinkGenerator grailsLinkGeneratorMock = Mockito.mock(LinkGenerator.class);
-        Mockito.when(grailsLinkGeneratorMock.link(Mockito.any(Map.class))).thenReturn(expectedURL.toString());
-
-        // Inject relevant services
-        serviceUnderTest.grailsLinkGenerator = grailsLinkGeneratorMock;
-
-        // Run the (whitebox-)test:
-        URL result = serviceUnderTest.tryToBuildTestsDetailsURL(measuredValue);
-
-        // Verify result:
-        // - is the URL the expected one?
-        assertEquals(expectedURL, result)
-
-        // - was the link requested properly?
-        ArgumentCaptor<Map> argument = ArgumentCaptor.forClass(Map.class);
-        Mockito.verify(grailsLinkGeneratorMock).link(argument.capture());
-        Map linkRequest = argument.getValue();
-
-        assertEquals('highchartPointDetails', linkRequest.get('controller'));
-        assertEquals('listAggregatedResults', linkRequest.get('action'));
-        assertEquals(true, linkRequest.get('absolute'));
-
-        Object paramsEntry = linkRequest.get('params')
-        assertNotNull(paramsEntry);
-        assertTrue(paramsEntry instanceof Map);
-
-        Map paramsMap = (Map) paramsEntry;
-        assertEquals('4', paramsMap.get('measuredValueId'));
-        assertEquals(String.valueOf(resultIDsCount), paramsMap.get('lastKnownCountOfAggregatedResultsOrNull'));
     }
 
     //mocking inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -709,16 +696,6 @@ class EventResultDashboardServiceTests {
             return [1: Page.get(1), 2: Page.get(2)]
         }
         serviceUnderTest.pageDaoService = pageDaoService.createMock()
-    }
-    /**
-     * Mocks {@linkplain EventMeasuredValueService#measuredEventDaoService}.
-     */
-    private void mockMeasuredEventDaoService() {
-        def measuredEventDaoService = mockFor(DefaultMeasuredEventDaoService, true)
-        measuredEventDaoService.demand.getIdToObjectMap(1..10000) { ->
-            return [1: MeasuredEvent.get(1), 2: MeasuredEvent.get(2)]
-        }
-        serviceUnderTest.measuredEventDaoService = measuredEventDaoService.createMock()
     }
     /**
      * Mocks {@linkplain EventMeasuredValueService#browserDaoService}.

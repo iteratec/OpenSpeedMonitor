@@ -30,7 +30,7 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -42,7 +42,7 @@ class BootStrap {
 	
 	EventMeasuredValueService eventMeasuredValueService
 	MeasuredValueUtilService measuredValueUtilService
-	JobResultService jobResultService
+	JobResultDaoService jobResultService
 	JobProcessingService jobProcessingService
 	I18nService i18nService
 	LocationAndResultPersisterService locationAndResultPersisterService

@@ -17,9 +17,6 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
 import grails.test.mixin.*
 
 import org.junit.*
@@ -27,11 +24,11 @@ import org.junit.*
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(JobResultService)
+@TestFor(JobResultDaoService)
 @Mock([JobResult, EventResult])
-class JobResultServiceTests {
+class JobResultDaoServiceTests {
 
-	JobResultService serviceUnderTest
+	JobResultDaoService serviceUnderTest
 
 	@Before
 	void setUp() {

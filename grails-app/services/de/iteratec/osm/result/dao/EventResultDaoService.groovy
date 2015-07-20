@@ -26,7 +26,7 @@ import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.ErQueryParams
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.measurement.schedule.Job
@@ -43,7 +43,7 @@ public class EventResultDaoService {
 		
 	OsmDataSourceService osmDataSourceService
 
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 
 	MeasuredValueTagService measuredValueTagService
 
@@ -118,7 +118,7 @@ public class EventResultDaoService {
 		
 		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(queryParams)
 		def criteria = EventResult.createCriteria()
-		
+
 		if(osmDataSourceService.getRLikeSupport()){
 			List result = criteria.list {
 				rlike('tag', rlikePattern)
@@ -187,11 +187,11 @@ public class EventResultDaoService {
 				}
 			}.grep{ it.tag ==~ rlikePattern }
 
-			return applyConnectivityQueryParams(eventResults, queryParams)
+			return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
 		}
 	}
 
-    private List<EventResult> applyConnectivityQueryParams(List<EventResult> eventResults, ErQueryParams queryParams){
+    private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
         if (queryParams.connectivityProfileIds.size() > 0){
             if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false){
                 eventResults = eventResults.findAll {

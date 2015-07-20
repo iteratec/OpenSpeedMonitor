@@ -220,6 +220,7 @@ class EventResult implements CsiValue {
 		tag(index: 'GetLimitedMedianEventResultsBy')
 		medianValue(index: 'GetLimitedMedianEventResultsBy')
 		cachedView(index: 'GetLimitedMedianEventResultsBy')
+        connectivityProfile(index: 'GetLimitedMedianEventResultsBy')
 	}
 
 	static transients = ['csiRelevant', 'osmConfigCacheService']

@@ -41,11 +41,9 @@ GSP-Template Mappings:
     <div class="span7 tabbable">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tab1" data-toggle="tab">
-                <g:message code="de.iteratec.osm.result.page.label" default="Page"/>&nbsp;+&nbsp;
-                <g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/></a></li>
+                <g:message code="de.iteratec.osm.result.page.label" default="Page"/>&nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/></a></li>
             <li><a href="#tab2" data-toggle="tab">
-                <g:message code="browser.label" default="Browser"/>&nbsp;+&nbsp;
-                <g:message code="job.location.label" default="Location"/></a></li>
+                <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message code="job.location.label" default="Location"/></a></li>
             <li><a href="#tab3" data-toggle="tab">
                 <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/></a></li>
         </ul>
@@ -151,13 +149,13 @@ GSP-Template Mappings:
                               optionValue="name" multiple="true"
                               value="${selectedConnectivityProfiles}"/>
                     <label class="checkbox inline">
-                        <g:checkBox name="selectedAllConnectivityProfiles"
+                        <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
                                     checked="${selectedAllConnectivityProfiles}" value="${true}"/>
                         <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
                                    default="Select all Connectivity Profiles"/>
                     </label><br>
                     <label class="checkbox inline">
-                        <g:checkBox name="includeNativeConnectivity"
+                        <g:checkBox name="includeNativeConnectivity" id="includeNativeConnectivity"
                                     checked="${includeNativeConnectivity}" value="${true}"/>
                         <g:message code="de.iteratec.osm.result.include-native-connectivity.label"
                                    default="Show measurements with native connectivity"/>
@@ -166,7 +164,7 @@ GSP-Template Mappings:
                         <g:message code="de.iteratec.osm.result.name-custom-connectivity.label"
                                    default="Name of custom connectivities to show:"/>
                     </label>
-                    <g:textField name="customConnectivityName" class="form-control input-xxlarge" value="customConnectivityName"
+                    <g:textField name="customConnectivityName" class="form-control input-xxlarge" value="${customConnectivityName}" id="customConnectivityName"
                                  placeholder="${g.message(code: 'de.iteratec.osm.result.name-custom-connectivity.placeholder', default: 'Search via regex')}"></g:textField>
                     <br>
                     <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"

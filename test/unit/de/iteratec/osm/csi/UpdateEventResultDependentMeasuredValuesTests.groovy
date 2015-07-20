@@ -94,7 +94,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		mockGenerator = ServiceMocker.create()
 		mockGenerator.mockOsmConfigCacheService(serviceUnderTest)
 		mockGenerator.mockEventResultService(serviceUnderTest)
-		mockGenerator.mockJobResultService(serviceUnderTest)
+		mockGenerator.mockJobResultDaoService(serviceUnderTest)
 		mockGenerator.mockBrowserService(serviceUnderTest)
 		mockGenerator.mockMeasuredValueUpdateEventDaoService(serviceUnderTest)
 		Map idAsStringToJobGroupMap_irrelevantCauseNotUsedInTheseTests = [:]

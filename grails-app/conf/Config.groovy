@@ -25,7 +25,7 @@ import org.apache.log4j.RollingFileAppender
 def appNameForLog4jConfig = appName
 
 grails.databinding.dateFormats = [
-    'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
+        'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
 
 /*
  * locations to search for config files that get merged into the main config:
@@ -33,15 +33,15 @@ grails.databinding.dateFormats = [
  * 	in the classpath in ConfigSlurper format
  */
 if (System.properties["osm_config_location"]) {
-	log.info('system property for external configuration found')
+    log.info('system property for external configuration found')
     grails.config.locations = ["file:" + System.properties["osm_config_location"]]
 } else {
-	 grails.config.locations = [
-		 "classpath:${appName}-config.properties",
-		 "classpath:${appName}-config.groovy",
-		 "file:${userHome}/.grails/${appName}-config.properties",
-		 "file:${userHome}/.grails/${appName}-config.groovy"]
- }
+    grails.config.locations = [
+            "classpath:${appName}-config.properties",
+            "classpath:${appName}-config.groovy",
+            "file:${userHome}/.grails/${appName}-config.properties",
+            "file:${userHome}/.grails/${appName}-config.groovy"]
+}
 
 // config for all environments //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -49,18 +49,18 @@ grails.project.groupId = appName // change this to alter the default package nam
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
 grails.mime.types = [
-    all:           '*/*',
-    atom:          'application/atom+xml',
-    css:           'text/css',
-    csv:           'text/csv',
-    form:          'application/x-www-form-urlencoded',
-    html:          ['text/html','application/xhtml+xml'],
-    js:            'text/javascript',
-    json:          ['application/json', 'text/json'],
-    multipartForm: 'multipart/form-data',
-    rss:           'application/rss+xml',
-    text:          'text/plain',
-    xml:           ['text/xml', 'application/xml']
+        all          : '*/*',
+        atom         : 'application/atom+xml',
+        css          : 'text/css',
+        csv          : 'text/csv',
+        form         : 'application/x-www-form-urlencoded',
+        html         : ['text/html', 'application/xhtml+xml'],
+        js           : 'text/javascript',
+        json         : ['application/json', 'text/json'],
+        multipartForm: 'multipart/form-data',
+        rss          : 'application/rss+xml',
+        text         : 'text/plain',
+        xml          : ['text/xml', 'application/xml']
 ]
 
 // URL Mapping Cache Max Size, defaults to 5000
@@ -91,7 +91,7 @@ grails.enable.native2ascii = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
 // whether to disable processing of multi part requests
-grails.web.disable.multipart=false
+grails.web.disable.multipart = false
 
 // request parameters to mask when logging exceptions
 grails.exceptionresolver.params.exclude = ['password']
@@ -100,8 +100,8 @@ grails.exceptionresolver.params.exclude = ['password']
 grails.hibernate.cache.queries = false
 
 // so Tag and TagLink can be referenced in HQL queries. See http://grails.org/plugin/taggable
-grails.taggable.tag.autoImport=true
-grails.taggable.tagLink.autoImport=true
+grails.taggable.tag.autoImport = true
+grails.taggable.tagLink.autoImport = true
 
 grails.cache.enabled = false
 
@@ -118,51 +118,51 @@ grails.plugins.springsecurity.interceptUrlMap = [
 //////////////////////////////////////////////////////////////////
 //free for all (even guests not logged in)
 //////////////////////////////////////////////////////////////////
-    '/static/**'                                    : ["permitAll"],
-    '/static/*'                    	                : ["permitAll"],
-    '/css/**'                                       : ["permitAll"],
-    '/js/**'                                        : ["permitAll"],
-    '/images/**'                                    : ["permitAll"],
-    '/less/**'                                      : ["permitAll"],
-    '/'                  		                    : ["permitAll"],
-    '/proxy/**'                                     : ["permitAll"],
-    '/wptProxy/**'                                  : ["permitAll"],
-    '/csiDashboard/index'                           : ["permitAll"],
-    '/csiDashboard/showAll'                         : ["permitAll"],
-    '/csiDashboard/csiValuesCsv'                    : ["permitAll"],
-    '/csiDashboard/showDefault'                     : ["permitAll"],
-    '/csiDashboard/weights'                         : ["permitAll"],
-    '/csiDashboard/downloadBrowserWeights'          : ["permitAll"],
-    '/csiDashboard/downloadPageWeights'             : ["permitAll"],
-    '/csiDashboard/downloadHourOfDayWeights'        : ["permitAll"],
-    '/eventResultDashboard/**'                      : ["permitAll"],
-    '/eventResult/**'                               : ["permitAll"],
-    '/highchartPointDetails/**'                     : ["permitAll"],
-    '/rest/**'                                      : ["permitAll"],
-	'/login/**'                 				    : ["permitAll"],
-	'/logout/**'                    				: ["permitAll"],
-	'/job/list'                	    				: ["permitAll"],
-    '/job/getRunningAndRecentlyFinishedJobs'        : ["permitAll"],
-    '/job/nextExecution'                            : ["permitAll"],
-    '/job/getLastRun'                               : ["permitAll"],
-	'/script/list'                			    	: ["permitAll"],
-	'/queueStatus/list'                    			: ["permitAll"],
-	'/queueStatus/refresh'                    		: ["permitAll"],
-	'/connectivityProfile/list'                    	: ["permitAll"],
-	'/about'                					    : ["permitAll"],
-	'/cookie/**'							    	: ["permitAll"],
-    '/csiDashboard/storeCustomDashboard'            : ["permitAll"],
-    '/csiDashboard/validateDashboardName'           : ["permitAll"],
-    '/csiDashboard/validateAndSaveDashboardValues'  : ["permitAll"],
+'/static/**'                                  : ["permitAll"],
+'/static/*'                                   : ["permitAll"],
+'/css/**'                                     : ["permitAll"],
+'/js/**'                                      : ["permitAll"],
+'/images/**'                                  : ["permitAll"],
+'/less/**'                                    : ["permitAll"],
+'/'                                           : ["permitAll"],
+'/proxy/**'                                   : ["permitAll"],
+'/wptProxy/**'                                : ["permitAll"],
+'/csiDashboard/index'                         : ["permitAll"],
+'/csiDashboard/showAll'                       : ["permitAll"],
+'/csiDashboard/csiValuesCsv'                  : ["permitAll"],
+'/csiDashboard/showDefault'                   : ["permitAll"],
+'/csiDashboard/weights'                       : ["permitAll"],
+'/csiDashboard/downloadBrowserWeights'        : ["permitAll"],
+'/csiDashboard/downloadPageWeights'           : ["permitAll"],
+'/csiDashboard/downloadHourOfDayWeights'      : ["permitAll"],
+'/eventResultDashboard/**'                    : ["permitAll"],
+'/eventResult/**'                             : ["permitAll"],
+'/highchartPointDetails/**'                   : ["permitAll"],
+'/rest/**'                                    : ["permitAll"],
+'/login/**'                                   : ["permitAll"],
+'/logout/**'                                  : ["permitAll"],
+'/job/list'                                   : ["permitAll"],
+'/job/getRunningAndRecentlyFinishedJobs'      : ["permitAll"],
+'/job/nextExecution'                          : ["permitAll"],
+'/job/getLastRun'                             : ["permitAll"],
+'/script/list'                                : ["permitAll"],
+'/queueStatus/list'                           : ["permitAll"],
+'/queueStatus/refresh'                        : ["permitAll"],
+'/connectivityProfile/list'                   : ["permitAll"],
+'/about'                                      : ["permitAll"],
+'/cookie/**'                                  : ["permitAll"],
+'/csiDashboard/storeCustomDashboard'          : ["permitAll"],
+'/csiDashboard/validateDashboardName'         : ["permitAll"],
+'/csiDashboard/validateAndSaveDashboardValues': ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////
-	'/console/**'                				: ['ROLE_SUPER_ADMIN'],
-	'/apiKey/**'								: ['ROLE_SUPER_ADMIN'],
+'/console/**'                                 : ['ROLE_SUPER_ADMIN'],
+'/apiKey/**'                                  : ['ROLE_SUPER_ADMIN'],
 //////////////////////////////////////////////////////////////////
 //ADMIN or SUPER_ADMIN log in
 //////////////////////////////////////////////////////////////////
-	'/**'                       				: ['ROLE_ADMIN','ROLE_SUPER_ADMIN']
+'/**'                                         : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
 ]
 
 /*
@@ -179,7 +179,7 @@ grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.h
 
 // if not specified default in code is 30 days
 // unit: seconds
-grails.plugins.cookie.cookieage.default = 60*60*24*36
+grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
 
 grails.assets.less.compile = 'less4j'
 grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
@@ -215,8 +215,10 @@ environments {
         //grails.resources.debug=true
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
-        grails.plugin.console.enabled = true // Whether to enable the plugin. Default is true for the development environment, false otherwise.
-        grails.plugin.console.fileStore.remote.enabled = true // Whether to include the remote file store functionality. Default is true.
+        grails.plugin.console.enabled = true
+        // Whether to enable the plugin. Default is true for the development environment, false otherwise.
+        grails.plugin.console.fileStore.remote.enabled = true
+        // Whether to include the remote file store functionality. Default is true.
 
         log4j = {
 
@@ -251,14 +253,14 @@ environments {
             appenders {
 
                 console(
-                        name:'stdout',
-                        layout:pattern(conversionPattern: '%c{2} %m%n'),
+                        name: 'stdout',
+                        layout: pattern(conversionPattern: '%c{2} %m%n'),
                         threshold: org.apache.log4j.Level.ERROR
                 )
 
                 /**
                  * Standard-appender for openSpeedMonitor-app. One Logging-level for the whole application.
-                 *	Nothing else is logged.
+                 * 	Nothing else is logged.
                  */
                 appender new DailyRollingFileAppender(
                         name: 'osmAppender',
@@ -271,14 +273,14 @@ environments {
                  * Detail-appender for openSpeedMonitor-app. Logging-level can be set for every package separately at runtime.
                  * Grails-core packages get logged, too.
                  */
-                 RollingFileAppender rollingFileAppender = new RollingFileAppender(
-                     name: 'osmAppenderDetails',
-                     fileName: "logs/${appNameForLog4jConfig}Details.log",
-                     layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
-                     maxFileSize: '20MB',
-                     maxBackupIndex: 5,
-                     threshold: org.apache.log4j.Level.DEBUG
-                 )
+                RollingFileAppender rollingFileAppender = new RollingFileAppender(
+                        name: 'osmAppenderDetails',
+                        fileName: "logs/${appNameForLog4jConfig}Details.log",
+                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
+                        maxFileSize: '20MB',
+                        maxBackupIndex: 5,
+                        threshold: org.apache.log4j.Level.DEBUG
+                )
                 appender rollingFileAppender
                 AsyncAppender asyncAppender = new AsyncAppender(
                         name: 'asyncOsmAppenderDetails',
@@ -308,7 +310,7 @@ environments {
                             'org.springframework',
                             'net.sf.ehcache.hibernate',
                             'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-                            'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
+                            'org.hibernate.SQL', 'org.hibernate.transaction'    //hibernate],
                     ],
                     asyncOsmAppenderDetails: [
                             'org.codehaus.groovy.grails.commons',            // core / classloading
@@ -339,8 +341,10 @@ environments {
         grails.dbconsole.urlRoot = '/admin/dbconsole'
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
-        grails.plugin.console.enabled = true // Whether to enable the plugin. Default is true for the development environment, false otherwise.
-        grails.plugin.console.fileStore.remote.enabled = true // Whether to include the remote file store functionality. Default is true.
+        grails.plugin.console.enabled = true
+        // Whether to enable the plugin. Default is true for the development environment, false otherwise.
+        grails.plugin.console.fileStore.remote.enabled = true
+        // Whether to include the remote file store functionality. Default is true.
 
         log4j = {
 
@@ -374,9 +378,9 @@ environments {
 
             appenders {
 
-				console(
-                        name:'stdout',
-                        layout:pattern(conversionPattern: '%c{2} %m%n'),
+                console(
+                        name: 'stdout',
+                        layout: pattern(conversionPattern: '%c{2} %m%n'),
                         threshold: org.apache.log4j.Level.ERROR
                 )
 
@@ -389,9 +393,9 @@ environments {
                         name: 'osmAppender',
                         datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
                         fileName: "${logFolder}${appNameForLog4jConfig}.log",
-					layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
-                    threshold: org.apache.log4j.Level.ERROR
-                        )
+                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
+                        threshold: org.apache.log4j.Level.ERROR
+                )
                 /**
                  * Detail-appender for OpenSpeedMonitor-app.
                  * Log-level DEBUG as threshold.
@@ -414,50 +418,50 @@ environments {
             }
             // Per default all is logged for application artefacts.
             // Appenders apply their own threshold level to limit logs.
-			all(
-				osmAppender: [
-                    'grails.app'
-                ],
-                asyncOsmAppenderDetails: [
-                    'grails.app'
-                ]
+            all(
+                    osmAppender: [
+                            'grails.app'
+                    ],
+                    asyncOsmAppenderDetails: [
+                            'grails.app'
+                    ]
             )
             error(
-                osmAppender: [
-                        'org.codehaus.groovy.grails.commons',            // core / classloading
-                        'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-                        'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                        'org.codehaus.groovy.grails.web.pages',          // GSP
-                        'org.codehaus.groovy.grails.web.servlet',        // controllers
-                        'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-                        'org.codehaus.groovy.grails.plugins',            // plugins
-                        // GSP
-                        'org.codehaus.groovy.grails.web.servlet',
-                        // controllers
-                        'org.codehaus.groovy.grails.web.sitemesh',
-                        // layouts
-                        'org.codehaus.groovy.grails.plugins',
-                        // plugins
-                        'org.springframework',
-                        'net.sf.ehcache.hibernate',
-                        'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-                        'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
-                ],
-                asyncOsmAppenderDetails: [
-                        'org.codehaus.groovy.grails.commons',            // core / classloading
-                        'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-                        'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-                        'org.codehaus.groovy.grails.web.pages',          // GSP
-                        'org.codehaus.groovy.grails.web.servlet',        // controllers
-                        'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-                        'org.codehaus.groovy.grails.plugins',            // plugins
-                        'org.springframework',
-                        'net.sf.ehcache.hibernate',
-                        'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-                        'org.hibernate.SQL', 'org.hibernate.transaction' 	//hibernate],
-                ]
+                    osmAppender: [
+                            'org.codehaus.groovy.grails.commons',            // core / classloading
+                            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+                            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                            'org.codehaus.groovy.grails.web.pages',          // GSP
+                            'org.codehaus.groovy.grails.web.servlet',        // controllers
+                            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+                            'org.codehaus.groovy.grails.plugins',            // plugins
+                            // GSP
+                            'org.codehaus.groovy.grails.web.servlet',
+                            // controllers
+                            'org.codehaus.groovy.grails.web.sitemesh',
+                            // layouts
+                            'org.codehaus.groovy.grails.plugins',
+                            // plugins
+                            'org.springframework',
+                            'net.sf.ehcache.hibernate',
+                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+                            'org.hibernate.SQL', 'org.hibernate.transaction'    //hibernate],
+                    ],
+                    asyncOsmAppenderDetails: [
+                            'org.codehaus.groovy.grails.commons',            // core / classloading
+                            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
+                            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
+                            'org.codehaus.groovy.grails.web.pages',          // GSP
+                            'org.codehaus.groovy.grails.web.servlet',        // controllers
+                            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
+                            'org.codehaus.groovy.grails.plugins',            // plugins
+                            'org.springframework',
+                            'net.sf.ehcache.hibernate',
+                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
+                            'org.hibernate.SQL', 'org.hibernate.transaction'    //hibernate],
+                    ]
             )
-		}
+        }
     }
     test {
         grails.logging.jul.usebridge = true
@@ -466,12 +470,14 @@ environments {
         grails.dbconsole.urlRoot = '/admin/dbconsole'
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
-        grails.plugin.console.enabled = true // Whether to enable the plugin. Default is true for the development environment, false otherwise.
-        grails.plugin.console.fileStore.remote.enabled = true // Whether to include the remote file store functionality. Default is true.
+        grails.plugin.console.enabled = true
+        // Whether to enable the plugin. Default is true for the development environment, false otherwise.
+        grails.plugin.console.fileStore.remote.enabled = true
+        // Whether to include the remote file store functionality. Default is true.
 
         log4j = {
             appenders {
-                console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
+                console name: 'stdout', layout: pattern(conversionPattern: '%c{2} %m%n')
             }
 
             info(stdout: ['grails.app', 'co.freeside.betamax'])

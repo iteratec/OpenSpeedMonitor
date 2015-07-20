@@ -28,7 +28,7 @@ import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.report.chart.OsmChartGraph
 import de.iteratec.osm.report.chart.OsmChartPoint
 import de.iteratec.osm.result.EventResultDashboardService
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.MvQueryParams
@@ -63,7 +63,7 @@ class CustomerSatisfactionHighChartService {
 	PageMeasuredValueService pageMeasuredValueService
 	ShopMeasuredValueService shopMeasuredValueService
 	MeasuredValueTagService measuredValueTagService
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 	EventResultDashboardService eventResultDashboardService
 	CsTargetGraphDaoService csTargetGraphDaoService
 	MeasuredValueUtilService measuredValueUtilService

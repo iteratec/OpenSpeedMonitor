@@ -117,13 +117,13 @@ class AggregatorType {
 	
 	static constraints = {
 		name(unique:true)
-		measurandGroup(nulable: false)
+		measurandGroup(nullable: false)
 	}	
 	static mapping = {
 		cache usage: 'nonstrict-read-write'
 	}
 	
-	static transients = ['cached'];
+	static transients = ['cached', 'cachedCriteriaApplicable'];
 	
 	/**
 	 * <p>
