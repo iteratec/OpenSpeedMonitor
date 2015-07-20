@@ -101,7 +101,7 @@ grails.project.dependency.resolution = {
 			":database-migration:1.3.8",
 			":quartz:1.0.1",
 			":console:1.5.1",
-			":font-awesome-resources:4.3.0.1"
+			":font-awesome-resources:4.2.0.0"
 		)
 		//build//////////////////////////////////////////////////////////////////
 		build (
