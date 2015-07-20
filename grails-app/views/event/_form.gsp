@@ -21,7 +21,7 @@
                    ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
                    </g:if>
                    <g:else>00:00</g:else>">
-            <span class="add-on"><i class="icon-time"></i></span>
+            <span class="add-on"><i class="fa fa-clock-o"></i></span>
         </div>
     </div>
 </div>

@@ -21,9 +21,9 @@
  */
 function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 
-    initDatepicker(dateFormat, weekStart, 24*3);
-
-    initTimepicker(false);
+    //initDatepicker(dateFormat, weekStart, 24*3);
+    //
+    //initTimepicker(false);
 
     var preSelection = $('#timeframeSelect').val()>0;
     disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
@@ -37,35 +37,35 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
     setChevron($('#collapseOne'));
 
     $('#collapseOne').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
         e.preventDefault();
         setCollapseDateInfos(false);
     });
     $('#collapseOne').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
         setCollapseDateInfos(true);
     });
 
     setChevron($('#collapseTwo'));
     $('#collapseTwo').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
         e.preventDefault();
         setCollapseJobInfos(false);
     });
     $('#collapseTwo').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
         setCollapseJobInfos(true);
     });
 
     setChevron($('#collapseThree'));
 
     $('#collapseThree').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
         e.preventDefault();
         setCollapseMeasurementInfos(false);
     });
     $('#collapseThree').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
         setCollapseMeasurementInfos(true);
     });
 
@@ -161,9 +161,9 @@ var getMaxCharacters = function(toGetMaxFrom, max){
 };
 var setChevron = function(accordionElement) {
 	if(!accordionElement.hasClass("collapse")) {
-		$(accordionElement).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up")
+		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up")
 	} else {
-		$(accordionElement).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down")
+		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down")
 	}
 }
 function initIntervalSelect() {

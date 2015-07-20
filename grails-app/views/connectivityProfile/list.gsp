@@ -11,7 +11,7 @@
 <g:render template="/layouts/mainMenu" />
 
 <a href="<g:createLink action="create" />" class="btn btn-primary" style="margin-bottom: 1em;">
-		<i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+		<i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
 	</a> 
 <section id="list-connectivityProfile" class="first">
 
