@@ -22,25 +22,26 @@
 //= require_self
 
 if (typeof jQuery !== 'undefined') {
-	(function($) {
-		$('#spinner').ajaxStart(function() {
-			$(this).fadeIn();
-		}).ajaxStop(function() {
-			$(this).fadeOut();
-		});
-	})(jQuery);
+    (function($) {
+        $('#spinner').ajaxStart(function() {
+            $(this).fadeIn();
+        }).ajaxStop(function() {
+            $(this).fadeOut();
+        });
+    })(jQuery);
 }
 
-jQuery('ul.nav li.dropdown').hover(function() {
-  jQuery(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn();
-}, function() {
-  jQuery(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut();
-});
+$( document ).ready( function(){
 
-jQuery('li.dropdown-submenu').hover(function() {
-  jQuery(this).children('ul').stop(true, true).delay(100).fadeIn();
-}, function() {
-  jQuery(this).children('ul').stop(true, true).delay(100).fadeOut();
+    $('ul.nav li.dropdown').hover(
+        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn(); },
+        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut(); }
+    );
+    $('li.dropdown-submenu').hover(
+        function() { $(this).children('ul').stop(true, true).delay(100).fadeIn(); },
+        function() { $(this).children('ul').stop(true, true).delay(100).fadeOut(); }
+    );
+
 });
 
 function stringToBoolean(string) {
@@ -108,7 +109,7 @@ function domainDeleteConfirmation(message,id,link){
  * TODO: after first selection dropdown of chosen select disappears after click. So one have to hold the mouse button while selection :(
  */
 function fixChosen() {
-    var els = jQuery(".chosen");
+    var els = $(".chosen");
     els.on("chosen:showing_dropdown", function (event, chosen) {
         $(this).parents("div").css("overflow", "visible");
     });
