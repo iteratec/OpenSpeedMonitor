@@ -184,8 +184,8 @@ grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
 grails.assets.less.compile = 'less4j'
 grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
 //grails.assets.plugin."twitter-bootstrap".includes = ["bootstrap.less"]
-grails.assets.excludes = ["**/*.less"]
-grails.assets.includes = ["bootstrap-custom.less"]
+grails.assets.excludes = ["openspeedmonitor.less"]
+//grails.assets.includes = ["bootstrap-custom.less"]
 
 grails.assets.minifyJs = true
 grails.assets.minifyCss = true

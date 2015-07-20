@@ -82,7 +82,7 @@
 		</tbody>
 	</table>
 	<a href="<g:createLink controller="webPageTestServer" action="loadLocations" id="${webPageTestServerInstance.id}"/>" class="btn btn-info">
-		<i class="icon-refresh"></i>
+		<i class="fa fa-refresh"></i>
 		<g:message code="de.iteratec.osm.measurement.environment.fetchlocations.button.label" default="Label" />
 	</a>
 </section>

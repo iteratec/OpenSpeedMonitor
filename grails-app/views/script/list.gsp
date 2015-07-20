@@ -22,7 +22,7 @@ td, th {
 	</div>
 	<div class="controlribbon">
 		<a href="<g:createLink action="create" />" class="btn btn-primary">
-			<i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+			<i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
 		</a>
 	</div><br>
     <g:if test="${scripts.isEmpty()}">

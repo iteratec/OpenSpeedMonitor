@@ -81,7 +81,7 @@
                value="${job.executionSchedule ? job.executionSchedule.substring(job.executionSchedule.indexOf(' ')+1, job.executionSchedule.size()) : ''}"
                onchange="updateExecScheduleInformations('0 ' + this.value, '${createLink(action: 'nextExecution', absolute: true)}')">
         <input type="text" id="execution-schedule" name="executionSchedule" value="${job?.executionSchedule}" style="display: none">
-        <i class="icon-question-sign icon-large clickable-icon" onclick="toggleCronInstructions()"></i>
+        <i class="fa fa-question-circle fa-lg clickable-icon" onclick="toggleCronInstructions()"></i>
         <br><span id="cronhelp-readable-expression"></span>
 		<br><span id="cronhelp-next-execution"></span>
         <br>

@@ -8,7 +8,7 @@
 			<input id="variables.${variable.name}" type="hidden" name="variables.${variable.name}" value="${variable.value}" />
 			${variable.value}
 			<a onclick="$('#${variable.name}').remove();">
-				<i class="icon-remove icon-large" rel="tooltip" title="Delete" style="cursor: pointer; text-decoration: none;"></i>
+				<i class="fa fa-times" rel="tooltip" title="Delete" style="cursor: pointer; text-decoration: none;"></i>
 			</a>
 		</g:else>
 	</div>

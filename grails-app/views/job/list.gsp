@@ -111,7 +111,7 @@
 			</div>
 		</div>
 		<div class="controlribbon" style="border: 1px solid green width: 100%;">
-      <i class="icon-arrow-down"></i>
+      <i class="fa fa-arrow-down"></i>
       <g:message code="de.iteratec.isj.job.selected"
         default="Markierte Jobs" />:&nbsp;
       <g:actionSubmit action="activate" class="btn btn-default"
@@ -123,7 +123,7 @@
       <span style="margin-left:100px;">  
 	      <a
 	        href="<g:createLink action="create" />" class="btn btn-primary">
-	        <i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+	        <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
 	      </a>  
       </span>  
       <span style="float:right;margin-top: 12px;">        

@@ -3,7 +3,7 @@
 	<li class="dropdown dropdown-btn">
 		
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-    		<i class="icon-info-sign"></i>
+    		<i class="fa fa-info-circle"></i>
 			<g:message code="default.info.label" locale="${lang}"/> <b class="caret"></b>
 		</a>
 
@@ -18,20 +18,20 @@
 		</li>
 		<li class="">
 			<a href="${createLink(uri: '/rest/man')}" target="_blank">
-				<i class="icon-info-sign"></i>
+				<i class="fa fa-info-circle"></i>
 				<g:message code="de.iteratec.osm.api.manual.label" locale="${lang}"/>
 			</a>
 		</li>
 		<li class="">
 			<a href="${createLink(uri: '/about')}" target="_blank">
-				<i class="icon-info-sign"></i>
+				<i class="fa fa-info-circle"></i>
 				<g:message code="de.iteratec.osm.about.label" locale="${lang}"/>
 			</a>
 		</li>
 
 		<li class="">
 			<a href="mailto:wpt@iteratec.de">
-				<i class="icon-envelope"></i>
+				<i class="fa fa-envelope-o"></i>
 				<g:message code="de.iteratec.osm.contact.label" locale="${lang}"/>
 			</a>
 		</li>

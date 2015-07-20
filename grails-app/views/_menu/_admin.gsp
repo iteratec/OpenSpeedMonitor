@@ -2,33 +2,33 @@
 <ul class="nav pull-right">
 	<li class="dropdown">
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
-    		<i class="icon-wrench"></i>
+    		<i class="fa fa-wrench"></i>
 			<g:message code="default.admin.label" locale="${lang}"/><b class="caret"></b>
 		</a>
 		<ul class="dropdown-menu">
 			<li class="">
 				%{--All modal dialogs are located in /grails-app/views/_modals/--}%
 				<a href="#modal-p13n" data-toggle="modal" >
-					<i class="icon-star-empty"></i>
+					<i class="fa fa-star-o"></i>
 					<g:message code="de.iteratec.osm.p13n.cookiebased.label" locale="${lang}"/>
 				</a>
 			</li>
 			<sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
 				<li class="">
 					<a href="${createLink(controller: 'batchActivity')}">
-						<i class="icon-tasks"></i>
+						<i class="fa fa-tasks"></i>
 						<g:message code="de.iteratec.osm.batch.batchactivity.list.heading" locale="${lang}"/>
 					</a>
 				</li>
 				<li class="">
 					<a href="${createLink(uri: '/systeminfo')}">
-						<i class="icon-info-sign"></i>
+						<i class="fa fa-info-circle	"></i>
 						<g:message code="default.systeminfo.label" locale="${lang}"/>
 					</a>
 				</li>
 				<li class="dropdown-submenu">
 					<a tabindex="-1" href="#">
-						<i class="icon-sitemap"></i>
+						<i class="fa fa-sitemap"></i>
 						All Controller
 					</a>
 					<ul class="dropdown-menu scrollable">
@@ -62,7 +62,7 @@
 			<g:if env="development">
 				<li class="">
 					<a href="${createLink(uri: '/admin/dbconsole')}" target="_blank">
-						<i class="icon-dashboard"></i>
+						<i class="fa fa-tachometer"></i>
 						<g:message code="de.iteratec.osm.persistence.dbconsole.label" locale="${lang}"/>
 					</a>
 				</li>

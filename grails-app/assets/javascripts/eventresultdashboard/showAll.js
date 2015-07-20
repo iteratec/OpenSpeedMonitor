@@ -21,9 +21,9 @@
  */
 function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 
-    initDatepicker(dateFormat, weekStart, 24*3);
-
-    initTimepicker(false);
+    //initDatepicker(dateFormat, weekStart, 24*3);
+    //
+    //initTimepicker(false);
 
     var preSelection = $('#timeframeSelect').val()>0;
     disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
@@ -52,19 +52,19 @@ function scrollToChartbox() {
 
 function addAccordionHandlers() {
     $('#collapseOne').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
         e.preventDefault();
     });
     $('#collapseOne').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
     });
     setChevron($('#collapseThree'));
     $('#collapseThree').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
         e.preventDefault();
     });
     $('#collapseThree').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
     });
 
     addAccordionInfoHandlers()
@@ -241,9 +241,9 @@ function ensureMinLength(targetString, minLength){
 }
 function setChevron(accordionElement) {
 	if(!accordionElement.hasClass("collapse")) {
-		$(accordionElement).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up")
+		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-dow")
 	} else {
-		$(accordionElement).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down")
+		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up")
 	}
 }
 function initIntervalSelect() {
