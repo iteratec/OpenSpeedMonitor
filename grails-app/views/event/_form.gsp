@@ -17,8 +17,9 @@
     <div class="controls">
         <div class="input-append bootstrap-timepicker" }>
             <input id="fromHourTimepicker" name="time" type="text" class="input-small content-box"
-                   value="<g:if test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
-                   ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
+                   value="<g:if
+                           test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
+                       ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
                    </g:if>
                    <g:else>00:00</g:else>">
             <span class="add-on"><i class="fa fa-clock-o"></i></span>
@@ -36,7 +37,7 @@
 
 <div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'description', 'error')} ">
     <label for="description" class="control-label"><g:message code="event.description.label"
-                                                                  default="Html Description"/></label>
+                                                              default="Html Description"/></label>
 
     <div class="controls">
         <g:textArea name="description" cols="40" rows="5" maxlength="255"
@@ -44,12 +45,13 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')} ">
+<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')}</> ">
     <label for="globallyVisible" class="control-label"><g:message code="event.globallyVisible.label"
                                                                   default="Globally Visible"/></label>
 
     <div class="controls">
-        <bs:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}"/>
+        <input type="checkBox" name="globallyVisible" value="${eventInstance?.globallyVisible}"/>
+        %{--<bs:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}"/>--}%
     </div>
 </div>
 
