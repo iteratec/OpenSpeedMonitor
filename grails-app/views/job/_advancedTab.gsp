@@ -14,7 +14,7 @@
 		}
 	});
 </asset:script>
-
+<asset:deferredScripts/>
 <div class="row fieldcontain ${hasErrors(bean: job, field: 'provideAuthenticateInformation', 'error')}">
 	<label class="span3 text-right">
 		<g:message code="script.authentication.label" default="Authenfizierung" />

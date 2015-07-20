@@ -195,3 +195,4 @@ GSP-Template Mappings:
         </g:if>
     </g:each>
 </asset:script>
+<asset:deferredScripts/>

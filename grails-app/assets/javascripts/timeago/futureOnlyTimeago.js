@@ -1,2 +1,2 @@
-//= require timeago/jquery.timeago.js
-//= require timeago/future-ony-timeago.js
+//= require jquery.timeago.js
+//= require future-only-timeago.js

@@ -10,12 +10,13 @@
 	<g:set var="entityName"	value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" />
 	
 	<asset:javascript src="prettycron/prettycronManifest.js"/>
-	<asset:javascript src="chosen.jquery.min.js"/>
 	<asset:javascript src="job/jobList.js"/>
 	<asset:stylesheet src="job/jobList.css"/>
 	<asset:stylesheet src="table-fixed-header/table-fixed-header.css"/>
 	<asset:javascript src="timeago/futureOnlyTimeago.js"/>
 	<asset:javascript src="spin/spin.min.js"/>
+	<asset:javascript src="chosen/chosen.jquery.min.js"/>
+	<asset:stylesheet src="chosen/chosen.css"/>
 
 
 	<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
@@ -24,7 +25,7 @@
 	
 	<style>
 	.running {
-		background: center left no-repeat url('<g:resource dir="images" file="loading_indicator.gif" absolute="true" />');
+		background: center left no-repeat url('loading_indicator.gif');
 		padding-left: 20px;
 	}
 	</style>
@@ -159,9 +160,9 @@
 	</g:form>
 	</div>
 	<asset:script type="text/javascript">
-		$(document).ready(
-			doOnDomReady(
-				'${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
+    $(document).ready(
+        doOnDomReady(
+            '${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
 				'${createLink(action: 'cancelJobRun', absolute: true)}',
 				'${createLink(action: 'getLastRun', absolute: true)}',
 				${onlyActiveJobs},
@@ -170,5 +171,6 @@
 			)
 		);
 	</asset:script>
+	<asset:deferredScripts/>
 </body>
 </html>

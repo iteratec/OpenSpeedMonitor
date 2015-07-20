@@ -60,6 +60,7 @@
 			)
 		);
 </asset:script>
+<asset:deferredScripts/>
 </body>
 
 </html>

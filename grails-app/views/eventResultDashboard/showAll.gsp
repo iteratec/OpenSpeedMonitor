@@ -346,5 +346,6 @@
 			${weekStart}, 
 			'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'));
 	</asset:script>
+	<asset:deferredScripts/>
 </body>
 </html>

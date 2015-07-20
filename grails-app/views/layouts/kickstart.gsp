@@ -21,7 +21,7 @@
 
 	<%-- Manual switch for the skin can be found in /view/_menu/_config.gsp --%>
 
-	<r:layoutResources />
+	%{--<r:layoutResources />--}%
 	<g:layoutHead />
 
 	<!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -66,7 +66,7 @@
 	</g:else>
 	
 	<!-- Included Javascript files and other resources -->
-	<r:layoutResources />
+	%{--<r:layoutResources />--}%
 </body>
 
 </html>

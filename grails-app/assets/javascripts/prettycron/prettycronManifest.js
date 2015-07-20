@@ -1,1 +1,1 @@
-//= require_tree prettycron
+//= require_tree .

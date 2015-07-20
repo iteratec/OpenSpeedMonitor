@@ -102,7 +102,7 @@ grails.project.dependency.resolution = {
 			":database-migration:1.3.8",
 			":quartz:1.0.1",
 			":console:1.5.1",
-			":font-awesome-resources:4.3.0.2"
+//			":font-awesome-resources:4.3.0.2"
 		)
 //		runtime(":cached-resources:1.0") {
 //			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
@@ -136,7 +136,7 @@ grails.project.dependency.resolution = {
 			':cookie:1.0.1',
             ':codenarc:0.22',
 			":asset-pipeline:2.3.9",
-				":less-asset-pipeline:2.3.0"
+			":less-asset-pipeline:2.3.0"
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"

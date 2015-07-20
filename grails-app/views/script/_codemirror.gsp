@@ -117,7 +117,7 @@
 	}); 
 	</g:if>
 </asset:script>
-
+<asset:deferredScripts/>
 <label for="navigationScript">
     <g:message code="script.navigationScript.label" default="Code" />
 </label>

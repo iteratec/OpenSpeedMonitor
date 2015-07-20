@@ -65,7 +65,7 @@
 		}
 	});
 </asset:script>
-
+<asset:deferredScripts/>
 <p style="margin: 0; padding-top: 1em;"><g:message code="job.script.preview.label" /> <a href="" target="_blank" id="editScriptLink">
 			<i class="icon-edit icon-large" rel="tooltip" title="${ message(code: 'job.script.edit') }"></i>
 		</a>:</p>

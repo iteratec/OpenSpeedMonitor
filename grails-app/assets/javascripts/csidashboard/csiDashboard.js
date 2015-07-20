@@ -1,2 +1,2 @@
 //= require osmDashboardDatetimeAndChart.js
-//= require csidashboard/showAll.js
+//= require showAll.js

@@ -1,2 +1,2 @@
 //= require jquery-ui
-//= require tagit/tag-it.min.js
+//= require tag-it.min.js

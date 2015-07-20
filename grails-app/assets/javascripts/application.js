@@ -16,6 +16,9 @@
 */
 //= require jquery
 //= require bootstrap
+//= require bootstrap.min
+//= require kickstart/kickstart
+//= require kickstart/checkboxes
 //= require_self
 
 if (typeof jQuery !== 'undefined') {

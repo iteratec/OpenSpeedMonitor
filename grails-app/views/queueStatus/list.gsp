@@ -90,9 +90,10 @@
 		*/
 	});
 </asset:script>
+<asset:deferredScripts/>
 <style>
 .running {
-	background: center left no-repeat url('<g:resource dir="images" file="loading_indicator.gif" absolute="true" />');
+	background: center left no-repeat url('loading_indicator.gif');
 	padding-left: 20px;
 }
 .new-col-sec {

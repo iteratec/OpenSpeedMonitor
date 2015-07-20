@@ -54,3 +54,4 @@
 
     });
 </asset:script>
+<asset:deferredScripts/>

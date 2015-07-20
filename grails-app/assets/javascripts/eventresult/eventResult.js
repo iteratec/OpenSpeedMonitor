@@ -1,2 +1,2 @@
 //= require osmDashboardDatetime.js
-//= require eventresult/listResult.js
+//= require listResult.js

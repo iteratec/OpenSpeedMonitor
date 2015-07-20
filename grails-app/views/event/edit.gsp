@@ -38,6 +38,7 @@
 <asset:script type="text/javascript">
     $(document).ready(doOnDomReady());
 </asset:script>
+<asset:deferredScripts/>
 </body>
 
 </html>
