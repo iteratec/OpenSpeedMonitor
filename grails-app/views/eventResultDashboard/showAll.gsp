@@ -76,7 +76,7 @@
 								<div class="span12">
 								<div class="row">
 									<div class="span4">
-										<a class="accordion-toggle accordion-link fa fa-chevron-down" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+										<a class="accordion-toggle accordion-link fa fa-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
 											<g:message code="de.iteratec.sri.wptrd.time.filter.heading" default="Zeitraum ausw&auml;hlen" />
 										</a>
 									</div>
@@ -122,7 +122,7 @@
 								<div class="span12">
 								<div class="row">
 									<div class="span4">
-										<a class="accordion-toggle accordion-link fa fa-chevron-down" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+										<a class="accordion-toggle accordion-link fa fa-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
 											<g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" />
 										</a>
 									</div>
@@ -164,7 +164,7 @@
 								<div class="span12">
 								<div class="row">
 									<div class="span4">
-										<a class="accordion-toggle accordion-link fa fa-chevron-down" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+										<a class="accordion-toggle accordion-link fa fa-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
 											<g:message code="de.iteratec.sri.wptrd.measurement.filter.heading" default="Messwerte auw&auml;hlen" />
 										</a>
 									</div>
