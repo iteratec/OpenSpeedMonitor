@@ -79,7 +79,6 @@ function isPageOne() {
  * @param rowObject([activity,endDate,htmlId,lastFailureMessage,lastUpdated,progress,startDate,status])
  */
 function updateRow(rowObject) {
-    console.log("will be activated: " + JSON.stringify(rowObject));
     var idxFieldActivity = 1;
     var idxFieldStatus = 2;
     var idxFieldProgress = 3;
