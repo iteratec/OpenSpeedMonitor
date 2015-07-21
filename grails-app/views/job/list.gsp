@@ -11,7 +11,7 @@
 	
 	<asset:javascript src="prettycron/prettycronManifest.js"/>
 	<asset:javascript src="job/jobList.js"/>
-	<asset:stylesheet src="job/jobList.css"/>
+	<asset:stylesheet src="job/list.css"/>
 	<asset:stylesheet src="table-fixed-header/table-fixed-header.css"/>
 	<asset:javascript src="timeago/futureOnlyTimeago.js"/>
 	<asset:javascript src="spin/spin.min.js"/>
