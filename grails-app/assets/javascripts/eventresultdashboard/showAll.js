@@ -58,6 +58,14 @@ function addAccordionHandlers() {
     $('#collapseOne').on('hidden', function (e) {
         $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
     });
+    setChevron($('#collapseTwo'));
+    $('#collapseTwo').on('shown', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
+        e.preventDefault();
+    });
+    $('#collapseTwo').on('hidden', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down");
+    });
     setChevron($('#collapseThree'));
     $('#collapseThree').on('shown', function (e) {
         $(this).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up");
