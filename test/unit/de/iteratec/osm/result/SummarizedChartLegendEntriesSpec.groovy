@@ -97,7 +97,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
     // RAW ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void "aggregation RAW - no summarization possible"() {
+    void "aggregation RAW - no summarization possible because every legend part in every event result different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
             [
@@ -125,7 +125,35 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
     }
-    void "aggregation RAW - every legend part in every event result the same"() {
+    void "aggregation RAW - no summarization necessary because all event results belong to same graph"() {
+        setup:
+        MOCKER.mockEventResultDaoService(serviceUnderTest,
+                [
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                ]
+        )
+
+        when:
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+                RUN_DATE.toDate(),
+                RUN_DATE.plusHours(1).toDate(),
+                MeasuredValueInterval.RAW,
+                [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
+                QUERY_PARAMS);
+
+        then:
+        resultGraphs.size() == 1
+        resultGraphs[0].label ==
+                [
+                        AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+                        JOB_GROUP_1_NAME,
+                        EVENT_1_NAME,
+                        LOCATION_1_UNIQUE_IDENTIFIER,
+                        PROFILE_1_NAME
+                ].join(HIGHCHART_LEGEND_DELIMITTER)
+    }
+    void "aggregation RAW - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -150,7 +178,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
     }
-    void "aggregation RAW - some legend parts in every event result the same, some different"() {
+    void "aggregation RAW - single legend parts in some but not all event results the same"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -187,7 +215,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
     // HOURLY ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void "aggregation HOURLY - no summarization possible"() {
+    void "aggregation HOURLY - no summarization possible because every legend part in every event result different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -216,7 +244,35 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
     }
-    void "aggregation HOURLY - every legend part in every event result the same"() {
+    void "aggregation HOURLY - no summarization necessary because all event results belong to same graph"() {
+        setup:
+        MOCKER.mockEventResultDaoService(serviceUnderTest,
+                [
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                ]
+        )
+
+        when:
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+                RUN_DATE.minusDays(7).toDate(),
+                RUN_DATE.plusDays(7).toDate(),
+                MeasuredValueInterval.HOURLY,
+                [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
+                QUERY_PARAMS);
+
+        then:
+        resultGraphs.size() == 1
+        resultGraphs[0].label ==
+                [
+                        AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+                        JOB_GROUP_1_NAME,
+                        EVENT_1_NAME,
+                        LOCATION_1_UNIQUE_IDENTIFIER,
+                        PROFILE_1_NAME
+                ].join(HIGHCHART_LEGEND_DELIMITTER)
+    }
+    void "aggregation HOURLY - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -241,7 +297,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
     }
-    void "aggregation HOURLY - some legend parts in every event result the same, some different"() {
+    void "aggregation HOURLY - single legend parts in some but not all event results the same"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -278,7 +334,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
     // DAILY ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void "aggregation DAILY - no summarization possible"() {
+    void "aggregation DAILY - no summarization possible because every legend part in every event result different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -307,7 +363,35 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
     }
-    void "aggregation DAILY - every legend part in every event result the same"() {
+    void "aggregation DAILY - no summarization necessary because all event results belong to same graph"() {
+        setup:
+        MOCKER.mockEventResultDaoService(serviceUnderTest,
+                [
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME),
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME)
+                ]
+        )
+
+        when:
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+                RUN_DATE.minusDays(7).toDate(),
+                RUN_DATE.plusDays(7).toDate(),
+                MeasuredValueInterval.DAILY,
+                [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
+                QUERY_PARAMS);
+
+        then:
+        resultGraphs.size() == 1
+        resultGraphs[0].label ==
+                [
+                        AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+                        JOB_GROUP_1_NAME,
+                        EVENT_1_NAME,
+                        LOCATION_1_UNIQUE_IDENTIFIER,
+                        PROFILE_2_NAME
+                ].join(HIGHCHART_LEGEND_DELIMITTER)
+    }
+    void "aggregation DAILY - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -332,7 +416,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
     }
-    void "aggregation DAILY - some legend parts in every event result the same, some different"() {
+    void "aggregation DAILY - single legend parts in some but not all event results the same"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -369,7 +453,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
     // WEEKLY ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    void "aggregation WEEKLY - no summarization possible"() {
+    void "aggregation WEEKLY - no summarization possible because every legend part in every event result different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -398,7 +482,35 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
     }
-    void "aggregation WEEKLY - every legend part in every event result the same"() {
+    void "aggregation WEEKLY - no summarization necessary because all event results belong to same graph"() {
+        setup:
+        MOCKER.mockEventResultDaoService(serviceUnderTest,
+                [
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                ]
+        )
+
+        when:
+        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+                RUN_DATE.minusDays(7).toDate(),
+                RUN_DATE.plusDays(7).toDate(),
+                MeasuredValueInterval.WEEKLY,
+                [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
+                QUERY_PARAMS);
+
+        then:
+        resultGraphs.size() == 1
+        resultGraphs[0].label ==
+                [
+                        AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+                        JOB_GROUP_1_NAME,
+                        EVENT_1_NAME,
+                        LOCATION_1_UNIQUE_IDENTIFIER,
+                        PROFILE_1_NAME
+                ].join(HIGHCHART_LEGEND_DELIMITTER)
+    }
+    void "aggregation WEEKLY - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
@@ -423,7 +535,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
     }
-    void "aggregation WEEKLY - some legend parts in every event result the same, some different"() {
+    void "aggregation WEEKLY - single legend parts in some but not all event results the same"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
