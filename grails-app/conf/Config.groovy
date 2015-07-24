@@ -103,8 +103,6 @@ grails.hibernate.cache.queries = false
 grails.taggable.tag.autoImport = true
 grails.taggable.tagLink.autoImport = true
 
-grails.cache.enabled = false
-
 def logDirectory = '.'
 
 grails.config.defaults.locations = [KickstartResources]
