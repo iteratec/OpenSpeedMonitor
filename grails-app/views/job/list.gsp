@@ -127,7 +127,7 @@
 	      </a>  
       </span>  
       <span style="float:right;margin-top: 12px;">        
-        <a href="#" id="updateHints" class="icon-question-sign icon-large clickable-icon" rel="popover"
+        <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
         data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true" style="text-decoration:none;color: #3a87ad;"></a>
       </span>
 		</div>
