@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <asset:javascript src="prettycron/prettycronManifest.js"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="default.${mode}.label" args="[entityDisplayName]"/></title>

@@ -4,6 +4,7 @@
 <asset:javascript src="tagit/tagit.js"/>
 <asset:stylesheet src="tagit.css"/>
 <asset:javascript src="chosen/chosen.jquery.min.js"/>
+<asset:stylesheet src="chosen/chosen.css"/>
 <asset:javascript src="job/edit.js"/>
 <asset:stylesheet src="job/edit.css"/>
 <asset:javascript src="timeago/futureOnlyTimeago.js"/>

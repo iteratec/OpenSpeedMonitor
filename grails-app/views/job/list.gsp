@@ -25,7 +25,7 @@
 	
 	<style>
 	.running {
-		background: center left no-repeat url('loading_indicator.gif');
+		background: center left no-repeat url('../images/loading_indicator.gif');
 		padding-left: 20px;
 	}
 	</style>
