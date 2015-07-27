@@ -112,7 +112,7 @@ grails.project.dependency.resolution = {
 		compile (
 			":joda-time:1.5",
 			':scaffolding:2.0.3',
-			':spring-security-core:1.2.7.3',
+			':spring-security-core:2.0-RC5',
 			':quartz:1.0.1',
 			':rest:0.8',
 			':jmx:0.9',

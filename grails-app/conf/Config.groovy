@@ -107,12 +107,12 @@ def logDirectory = '.'
 
 grails.config.defaults.locations = [KickstartResources]
 
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
-grails.plugins.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
-grails.plugins.springsecurity.securityConfigType = "InterceptUrlMap"
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
+grails.plugin.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
+grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
 
-grails.plugins.springsecurity.interceptUrlMap = [
+grails.plugin.springsecurity.interceptUrlMap = [
 //////////////////////////////////////////////////////////////////
 //free for all (even guests not logged in)
 //////////////////////////////////////////////////////////////////
@@ -198,6 +198,10 @@ environments {
 
         grails.dbconsole.enabled = true
         grails.dbconsole.urlRoot = '/admin/dbconsole'
+
+        // backwards compability: default hash algo in :spring-security-core:1.2.7.3
+        grails.plugin.springsecurity.password.algorithm = 'SHA-256'
+        grails.plugin.springsecurity.password.hash.iterations = 1
 
         // disabling hashing and caching of resources:
         // 2014-03-31 nku: doesn't work :-(
