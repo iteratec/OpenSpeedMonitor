@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ page import="de.iteratec.osm.report.chart.AggregatorType" %>
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
-<%@ page import="grails.plugins.springsecurity.SpringSecurityService" %>
+<%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificDashboard" %>
 <%
