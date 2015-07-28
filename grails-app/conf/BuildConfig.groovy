@@ -42,7 +42,7 @@ grails.project.fork = [
 		run: false
 ]
 
-//grails.project.dependency.resolver = "maven" // or ivy
+grails.project.dependency.resolver = "maven" // or ivy
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -62,7 +62,7 @@ grails.project.dependency.resolution = {
 
         mavenLocal()
         mavenCentral()
-        flatDir name:'local jars', dirs:'./lib/'
+//        flatDir name:'local jars', dirs:'./lib/'
 
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
         mavenRepo "http://repo.grails.org/grails/plugins/"
@@ -83,7 +83,8 @@ grails.project.dependency.resolution = {
 			'net.sf.supercsv:super-csv:2.1.0'
 		)
 		build (
-			'net.sf.supercsv:super-csv:2.1.0'
+			'net.sf.supercsv:super-csv:2.1.0',
+			'org.yaml:snakeyaml:1.10'//To fix betamax tests, see https://github.com/robfletcher/betamax/issues/153
 		)
 		 test (
 			'org.mockito:mockito-all:1.9.5',
@@ -96,7 +97,7 @@ grails.project.dependency.resolution = {
 		//runtime//////////////////////////////////////////////////////////////////
 		runtime (
 			':twitter-bootstrap:2.3.2.2',
-			":hibernate:3.6.10.10",
+			":hibernate:3.6.10.19",
 			":jquery:1.11.1",
 			":database-migration:1.4.0",
 			":quartz:1.0.1",
@@ -111,7 +112,7 @@ grails.project.dependency.resolution = {
         //compile//////////////////////////////////////////////////////////////////
 		compile (
 			":joda-time:1.5",
-			':scaffolding:2.0.3',
+			':scaffolding:2.1.0',
 			':spring-security-core:2.0-RC5',
 			':quartz:1.0.1',
 			':rest:0.8',

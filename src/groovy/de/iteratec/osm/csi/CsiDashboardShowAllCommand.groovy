@@ -28,7 +28,7 @@ import org.joda.time.format.DateTimeFormatter
  * @author mze
  * @since IT-74
  */
-@Validateable
+@Validateable(nullable = true)
 public class CsiDashboardShowAllCommand {
 
     MeasuredValueUtilService measuredValueUtilService
