@@ -627,7 +627,7 @@ class RestApiController {
  * @author mze
  * @since IT-81
  */
-@Validateable
+@Validateable(nullable = true)
 public class ResultsRequestCommand {
 
 	/**
@@ -846,7 +846,7 @@ public class ResultsRequestCommand {
  * Parameters of rest api function /rest/event/create.
  * Created by nkuhn on 08.05.15.
  */
-@Validateable
+@Validateable(nullable = true)
 class CreateEventCommand {
 	String apiKey
 	String shortName
@@ -904,7 +904,7 @@ class CreateEventCommand {
  * /rest/config/deactivateMeasurementsGenerally.
  * Created by nkuhn on 08.05.15.
  */
-@Validateable
+@Validateable(nullable = true)
 class MeasurementActivationCommand {
 
     String apiKey
