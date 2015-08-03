@@ -184,11 +184,11 @@ grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.h
 // unit: seconds
 grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
 
+//Exclude alle .less files, but not the main less files. This.will solv.dependency errors and will increase the performance.
 grails.assets.less.compile = 'less4j'
 grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
-//grails.assets.plugin."twitter-bootstrap".includes = ["bootstrap.less"]
+grails.assets.plugin."font-awesome-resources".excludes = ["**/*.less"]
 grails.assets.excludes = ["openspeedmonitor.less"]
-//grails.assets.includes = ["bootstrap-custom.less"]
 
 grails.assets.minifyJs = true
 grails.assets.minifyCss = true
