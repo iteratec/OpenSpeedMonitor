@@ -99,6 +99,11 @@ grails.exceptionresolver.params.exclude = ['password']
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
 
+beans {
+    cacheManager {
+        shared = true
+    }
+}
 // so Tag and TagLink can be referenced in HQL queries. See http://grails.org/plugin/taggable
 grails.taggable.tag.autoImport = true
 grails.taggable.tagLink.autoImport = true
