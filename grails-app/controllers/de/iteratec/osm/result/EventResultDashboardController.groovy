@@ -222,7 +222,9 @@ class EventResultDashboardController {
    * @return nothing, immediately sends HTTP response codes to client.
    */
        def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
+
            JSONObject dashboardValues = JSON.parse(values)
+
            Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
            Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
            Collection<Long> selectedFolder = []
@@ -239,6 +241,7 @@ class EventResultDashboardController {
            String selectedLocationsString = ""
            String selectedAggrGroupValuesCachedString = ""
            String selectedAggrGroupValuesUnCachedString = ""
+
            dashboardValues.each { id, data ->
                def dataToAssign
                if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
@@ -292,11 +295,13 @@ class EventResultDashboardController {
                        break
                }
            }
-           def cmd = new EventResultDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, toHour: dashboardValues.toHour, aggrGroup: dashboardValues.aggrGroup,
-               selectedFolder: selectedFolder, selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
-               selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: dashboardValues.selectedAllLocations,
-               selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
-               overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
+           def cmd = new EventResultDashboardShowAllCommand(
+                   from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, toHour: dashboardValues.toHour, aggrGroup: dashboardValues.aggrGroup,
+                   selectedFolder: selectedFolder, selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
+                   selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: dashboardValues.selectedAllLocations,
+                   selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
+                   overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
+
            if (dashboardValues.selectedInterval != null) { if (dashboardValues.selectedInterval != "") { cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()}}
            if (dashboardValues.selectedTimeFrameInterval != null) { if (dashboardValues.selectedTimeFrameInterval != "") { cmd.selectedTimeFrameInterval = dashboardValues.selectedTimeFrameInterval.toInteger()}}
            if (dashboardValues.selectChartType != null) { if (dashboardValues.selectChartType != "") { cmd.selectChartType = dashboardValues.selectChartType.toInteger()}}
@@ -308,27 +313,27 @@ class EventResultDashboardController {
            if (dashboardValues.trimBelowLoadTimes != null) { if (dashboardValues.trimBelowLoadTimes != "") { cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()}}
            if (!cmd.validate()) {
                //send errors
-           def errMsgList = cmd.errors.allErrors.collect{g.message([error : it])}
-           response.sendError(400, "rkrkrk" + errMsgList.toString() + "rkrkrk") // Apache Tomcat will output the response as part of (HTML) error page - 'rkrkrk' are the delimiters so the AJAX frontend can find the message
-           return null
-       } else {
-          def username = springSecurityService.authentication.principal.getUsername()
-           UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.EVENT, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
-               toHour: cmd.toHour, aggrGroup: cmd.aggrGroup, selectedInterval: cmd.selectedInterval, selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, selectChartType: cmd.selectChartType,
-               selectedFolder: selectedFolderString, selectedPages: selectedPagesString, selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents,
-               selectedBrowsers: selectedBrowsersString, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations,
-               selectedAggrGroupValuesCached: selectedAggrGroupValuesCachedString, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCachedString, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
-               trimAboveLoadTimes: cmd.trimAboveLoadTimes, trimBelowRequestCounts: cmd.trimBelowRequestCounts, trimAboveRequestCounts: cmd.trimAboveRequestCounts,
-               trimBelowRequestSizes: cmd.trimBelowRequestSizes, trimAboveRequestSizes: cmd.trimAboveRequestSizes, overwriteWarningAboutLongProcessingTime: cmd.overwriteWarningAboutLongProcessingTime,
-               debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: publiclyVisible, wideScreenDiagramMontage: wideScreenDiagramMontage, dashboardName: dashboardName, username: username)
-          if (!newCustomDashboard.save(failOnError: true, flush: true)) {
-              response.sendError(500, 'save error')
-              return null
-          } else {
-              response.sendError(200, 'OK')
-              return null
-          }
-       }
+               def errMsgList = cmd.errors.allErrors.collect{g.message([error : it])}
+               response.sendError(400, "rkrkrk" + errMsgList.toString() + "rkrkrk") // Apache Tomcat will output the response as part of (HTML) error page - 'rkrkrk' are the delimiters so the AJAX frontend can find the message
+               return null
+           } else {
+              def username = springSecurityService.authentication.principal.getUsername()
+               UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.EVENT, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
+                   toHour: cmd.toHour, aggrGroup: cmd.aggrGroup, selectedInterval: cmd.selectedInterval, selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, selectChartType: cmd.selectChartType,
+                   selectedFolder: selectedFolderString, selectedPages: selectedPagesString, selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents,
+                   selectedBrowsers: selectedBrowsersString, selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations,
+                   selectedAggrGroupValuesCached: selectedAggrGroupValuesCachedString, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCachedString, trimBelowLoadTimes: cmd.trimBelowLoadTimes,
+                   trimAboveLoadTimes: cmd.trimAboveLoadTimes, trimBelowRequestCounts: cmd.trimBelowRequestCounts, trimAboveRequestCounts: cmd.trimAboveRequestCounts,
+                   trimBelowRequestSizes: cmd.trimBelowRequestSizes, trimAboveRequestSizes: cmd.trimAboveRequestSizes, overwriteWarningAboutLongProcessingTime: cmd.overwriteWarningAboutLongProcessingTime,
+                   debug: cmd.debug, setFromHour: cmd.setFromHour, setToHour: cmd.setToHour, publiclyVisible: publiclyVisible, wideScreenDiagramMontage: wideScreenDiagramMontage, dashboardName: dashboardName, username: username)
+              if (!newCustomDashboard.save(failOnError: true, flush: true)) {
+                  response.sendError(500, 'save error')
+                  return null
+              } else {
+                  response.sendError(200, 'OK')
+                  return null
+              }
+           }
    }
 
     private void fillWithMeasuredValueData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
