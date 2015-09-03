@@ -4,6 +4,8 @@ jdk:
 branches:
   only:
     - master
-script: ./grailsw "refresh-dependencies"
+script: .grailsw clean
+	&& ./grailsw clean-all
+	&& ./grailsw refresh-dependencies
   && ./grailsw "test-app unit:"
   && ./grailsw "war"
