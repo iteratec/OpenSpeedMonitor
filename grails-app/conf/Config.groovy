@@ -232,7 +232,7 @@ environments {
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
         grails.plugin.console.enabled = true
-        // Whether to enable the plugin. Default is true for the development environment, false otherwise.
+        grails.plugin.console.fileStore.remote.enabled = false // Whether to include the remote file store functionality. Default is true.
         grails.plugin.console.fileStore.remote.enabled = true
         // Whether to include the remote file store functionality. Default is true.
 
@@ -357,10 +357,12 @@ environments {
         grails.dbconsole.urlRoot = '/admin/dbconsole'
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
-        grails.plugin.console.enabled = true
         // Whether to enable the plugin. Default is true for the development environment, false otherwise.
-        grails.plugin.console.fileStore.remote.enabled = true
+        grails.plugin.console.enabled = true
         // Whether to include the remote file store functionality. Default is true.
+        // Should never be set to true in production. Otherwise everybody with an account in group root has access for
+        // all files of unix user the servlet container is running as!!!
+        grails.plugin.console.fileStore.remote.enabled = false
 
         log4j = {
 
