@@ -10,12 +10,19 @@
 <ul class="dropdown-menu">
 
 		<%-- Note: Links to pages without controller are redirected in conf/UrlMappings.groovy --%>
-		<li class="">
-			<a href="${createLink(uri: '/releasenotes')}" target="_blank">
-				<i class="icon-info-sign"></i>
-				<g:message code="de.iteratec.osm.releasenotes.manual.label" locale="${lang}"/>
-			</a>
-		</li>
+        <li class="dropdown-submenu">
+            <a tabindex="-1" href="#">
+                <i class="icon-info-sign"></i>
+                <g:message code="de.iteratec.osm.releasenotes.manual.label" default="Release notes"/>
+            </a>
+            <ul class="dropdown-menu scrollable">
+                <li class="controller">
+                    <g:message
+                            code="de.iteratec.osm.releasenotes.temporary-explanation"
+                            default="Release notes coming soon..."/>
+                </li>
+            </ul>
+        </li>
 		<li class="">
 			<a href="${createLink(uri: '/rest/man')}" target="_blank">
 				<i class="icon-info-sign"></i>
