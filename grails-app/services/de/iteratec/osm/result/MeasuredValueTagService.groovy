@@ -59,7 +59,7 @@ class MeasuredValueTagService {
 	
 	PageService pageService
 	JobService jobService
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 
 	/*
 	 * Creation of tags

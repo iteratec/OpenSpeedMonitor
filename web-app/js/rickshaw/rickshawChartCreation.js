@@ -460,7 +460,7 @@ function XAxis(args) {
       }
     }
     
-    if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+    if(window.location.href.indexOf("wideScreenDiagramMontage") > -1) {
       resultsSelectedInterval = [];
       resultsSelectedInterval[1] = 10080;      
     }
@@ -1020,8 +1020,10 @@ function ChartAdjuster(args) {
     self.createYAxisAdjuster(args);
     self.replaceDataMarkerCheckbox();
     self.replaceDataLabelsCheckbox();
+    self.replaceWideScreenDiagramMontageCheckbox();    
     self.addFunctionalityShowDataMarker();
     self.addFunctionalityShowDataLabels();
+    self.addFunctionalityToggleWideScreenExport();
   }
   
   this.addFunctionalityAdjustingChartSize = function() {
@@ -1153,6 +1155,13 @@ function ChartAdjuster(args) {
     checkbox.detach();
     parentContainer.append(checkbox);
   }
+  
+  this.replaceWideScreenDiagramMontageCheckbox = function() {
+    var checkbox = $("#wide-screen-diagram-montage").parent().parent();
+    var parentContainer = checkbox.parent();
+    checkbox.detach();
+    parentContainer.append(checkbox);
+  }
 
   this.addFunctionalityShowDataMarker = function() {
     $('#to-enable-marker').bind('change', function(){
@@ -1169,6 +1178,17 @@ function ChartAdjuster(args) {
         $(this).prop('checked', false);
       } else {
         rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
+      }
+    });
+  }
+  this.addFunctionalityToggleWideScreenExport = function() {
+    $('#wide-screen-diagram-montage').bind('change', function(){
+      if ($(this).is(':checked')) {
+        window.history.pushState('',document.title,(document.location.href+'&wideScreenDiagramMontage=on')); 
+      } else {
+        var url = document.location.href
+        url = url.replace(/&wideScreenDiagramMontage=on/,'');
+        window.history.pushState('',document.title,url); 
       }
     });
   }
@@ -1235,10 +1255,11 @@ function ChartExporter(args) {
       self.renameChildNodeIds(cln);
       deferrerCollection = new Array();
       
-      if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+      if(window.location.href.indexOf("wideScreenDiagramMontage") > -1) {
         //resize
         deferrerCollection.push($.Deferred());
-        var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'))-25;
+        var rightOffset = 25;
+        var previousWidth=parseFloat($('#rickshaw_chart_title').css('width'))-rightOffset;
         var previousHeight=parseFloat($('#rickshaw_yAxis_0').css('height'));
         self.resizeGraphTo(1393, 467, deferrerCollection[deferrerCollection.length - 1]);
         //reapply dataLabels
@@ -1262,7 +1283,7 @@ function ChartExporter(args) {
         pointMarkerCount++;
       });
       
-      if(window.location.href.indexOf("csiDashboard/showDefault") < 0) {
+      if(window.location.href.indexOf("wideScreenDiagramMontage") < 0) {
         var titleContent = $('#rickshaw_chart_title').html().trim();
         if (titleContent != "") {
           deferrerCollection.push($.Deferred());
@@ -1303,7 +1324,7 @@ function ChartExporter(args) {
         //merge all canvases into one
         var reduceHeightBy = 112; // slider isn't included in export, thus height is lower
         var moveOffsetUpwardsBy = 0;
-        if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+        if(window.location.href.indexOf("wideScreenDiagramMontage") > -1) {
           reduceHeightBy = 182; // for this diagramm, title isn't included in export, thus height is lower
           moveOffsetUpwardsBy = 65; // for this diagramm, title isn't included in export, thus all elements are closer to the top
         }
@@ -1378,7 +1399,7 @@ function ChartExporter(args) {
         try {
         downloadCanvas(canvas, "jpeg");
 //        downloadCanvas(canvas, "png");
-          if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+          if(window.location.href.indexOf("wideScreenDiagramMontage") > -1) {
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
           }
@@ -1391,7 +1412,7 @@ function ChartExporter(args) {
           document.body.scroll = "yes"; // ie only
         } 
         catch(err) {          
-          if(window.location.href.indexOf("csiDashboard/showDefault") > -1) {
+          if(window.location.href.indexOf("wideScreenDiagramMontage") > -1) {
             deferrerCollection.push($.Deferred());
             self.resizeGraphTo(previousWidth, previousHeight, deferrerCollection[deferrerCollection.length - 1]);
           }

@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
@@ -140,6 +140,16 @@ class EventResult implements CsiValue {
 	Date jobResultDate
 	Long jobResultJobConfigId
 
+	/**
+	 * These values are to be used to distinguish results according to their connectivities
+	 *
+	 * @since IT-643
+	 */
+	ConnectivityProfile connectivityProfile;
+
+	// For reasons of performance is this just a string
+	String customConnectivityName;
+
 	//static belongsTo = JobResult
 	static belongsTo = [jobResult: JobResult]
 
@@ -179,6 +189,23 @@ class EventResult implements CsiValue {
 		webPerformanceWaterfall(nullable: true)
 
         testAgent(nullable: true)
+
+		connectivityProfile(nullable: true, validator: { currentProfile, eventResultInstance ->
+
+            boolean noPredefinedProfileButCustomName = currentProfile == null && eventResultInstance.customConnectivityName != null
+            boolean predefinedProfile = currentProfile != null
+
+            return noPredefinedProfileButCustomName || predefinedProfile
+
+        })
+		customConnectivityName(nullable: true, validator: { currentCustomName, eventResultInstance ->
+
+            boolean noCustomNameButPredefinedProfile = currentCustomName == null && eventResultInstance.connectivityProfile != null
+            boolean customName = currentCustomName != null
+
+            return noCustomNameButPredefinedProfile || customName
+
+        })
 	}
 
 	static mapping = {
@@ -193,6 +220,7 @@ class EventResult implements CsiValue {
 		tag(index: 'GetLimitedMedianEventResultsBy')
 		medianValue(index: 'GetLimitedMedianEventResultsBy')
 		cachedView(index: 'GetLimitedMedianEventResultsBy')
+        connectivityProfile(index: 'GetLimitedMedianEventResultsBy')
 	}
 
 	static transients = ['csiRelevant', 'osmConfigCacheService']

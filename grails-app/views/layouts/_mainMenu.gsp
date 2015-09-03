@@ -1,3 +1,8 @@
+<%@ page import="de.iteratec.osm.report.UserspecificDashboard" %>
+
+<%
+    def userspecificDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificDashboard').newInstance()
+%>
 <%-- determine main-tab an set variable respectively --%>
 <g:if test="${controllerName.equals('eventResultDashboard')||controllerName.equals('tabularResultPresentation')}"><g:set var="mainTab" value="results" /></g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi" /></g:elseif>
@@ -41,6 +46,25 @@
 			<li class="controller glyphicon glyphicon-dashboard ${controllerName.equals('eventResultDashboard')?'active':''}">
 				<g:link controller="eventResultDashboard" action="showAll"><i class="icon-signal"></i> <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard" /></g:link>
 			</li>
+			
+	    <div class="btn-group">
+	      <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+	        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />
+	        <span class="caret"></span>
+	      </a>
+	      <ul class="dropdown-menu" id="customDashBoardSelection">
+	      <g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("EVENT")}" />
+		      
+	        <g:if test="${availableDashboards.size() > 0}">
+				    <g:each in="${availableDashboards}" var="availableDashboard">
+				      <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
+			      </g:each>
+		      </g:if>
+			    <g:else>
+              <li><a href="#"><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable" default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!" /></a></li>
+			    </g:else>
+	      </ul>
+	    </div>
 			<li class="controller ${controllerName.equals('tabularResultPresentation')?'active':''}">
 	            <g:link controller="tabularResultPresentation" action="listResults"><i class="icon-th-list"></i> <g:message code="de.iteratec.result.title" default="Einzelergebnisse" /></g:link>
 	        </li>
@@ -49,9 +73,28 @@
 			<li class="controller ${actionName.equals('showAll')?'active':''}">
 				<g:link controller="csiDashboard" action="showAll"><i class="icon-signal"></i> <g:message code="de.iteratec.isocsi.csiDashboard" default="Dashboard" /></g:link>
 			</li>
+      <div class="btn-group">
+        <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+          <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />
+          <span class="caret"></span>
+        </a>
+        <ul class="dropdown-menu">
+        <g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("CSI")}" />
+          
+          <g:if test="${availableDashboards.size() > 0}">
+            <g:each in="${availableDashboards}" var="availableDashboard">
+              <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
+            </g:each>
+          </g:if>
+          <g:else>
+              <li><a href="#"><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable" default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!" /></a></li>
+          </g:else>
+        </ul>
+      </div>
+			<%-- 
 			<li class="controller ${actionName.equals('showDefault')?'active':''}">
 				<g:link controller="csiDashboard" action="showDefault"><i class="icon-picture"></i> <g:message code="de.iteratec.isocsi.csi.linktext.staticDashboard" default="Statische Ansicht"/></g:link>
-			</li>
+			</li> --%>
 			<li class="controller ${actionName.equals('weights')?'active':''}">
 				<g:link controller="csiDashboard" action="weights"><i class="icon-tasks"></i> <g:message code="de.iteratec.isocsi.weight" default="Gewichtung" /></g:link>
 			</li>

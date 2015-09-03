@@ -37,10 +37,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.util.PerformanceLoggingService;
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
-import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 
 
 @TestMixin(IntegrationTestMixin)
@@ -104,7 +101,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 //		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
 //			return mapToFindJobResultByEventResult[eventResult.ident()]
 //		}
-		JobResultService.metaClass.findJobResultByEventResult = {EventResult eventResult ->
+		JobResultDaoService.metaClass.findJobResultByEventResult = {EventResult eventResult ->
 			JobResult jobResultToReturn
 			JobResult.list().each {jobResult ->
 				if(jobResult.eventResults*.ident().contains(eventResult.ident())) {

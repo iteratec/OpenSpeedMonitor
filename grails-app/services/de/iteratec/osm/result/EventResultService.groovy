@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.result
 
-import groovy.util.slurpersupport.GPathResult
-
 import java.util.zip.GZIPInputStream
 
 import org.joda.time.DateTime
@@ -35,7 +33,7 @@ import de.iteratec.osm.measurement.environment.Location
  */
 class EventResultService {
 	
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 	
 	List<EventResult> findSinceDate(Date timestamp) {
 		

@@ -104,34 +104,6 @@
 	</div>
 </div>
 
-<div class="row form-group">
-	<label class="span3 text-right" for="connectivityProfile"> <g:message
-			code="connectivityProfile.label" default="connectivityProfile" />
-			 <span class="required-indicator">*</span>
-	</label>
-	<div class="span8">
-		<g:select id="connectivityProfile" class="form-control chosen" name="connectivityProfile.id" from="${ ConnectivityProfile.list() }"
-			optionKey="id" noSelection="${['null':'Native: No synthetic traffic shaping applied']}"
-			value="${job?.connectivityProfile?.id}" />
-	</div>
-</div>
-
-<div id="connectivityProfileDetails">
-	<input type="hidden" id="customConnectivityProfile" name="customConnectivityProfile" value="${job?.customConnectivityProfile}" />
-	<g:each var="attribute" in="['bandwidthDown', 'bandwidthUp', 'latency', 'packetLoss']">
-		<div class="row form-group ${hasErrors(bean: job, field: attribute, 'error')}">
-			<label class="span3 text-right" for="${attribute}">
-				<g:message code="connectivityProfile.${attribute}.label"
-					default="${attribute}" />
-			</label>
-			<div class="span8">
-				<g:textField class="form-control" name="${attribute}"
-					value="${job?."$attribute"}" />
-			</div>
-		</div>	
-	</g:each>
-</div>
-
 <div class="row form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
 	<label class="span3 text-right" for="runs"> <g:message
 			code="job.runs.label" default="runs" /> <span
@@ -140,4 +112,49 @@
 	<div class="span8">
 		<g:textField class="form-control" name="runs" value="${job?.runs ?: 1}" />
 	</div>
+</div>
+
+<div class="row form-group">
+    <label class="span3 text-right" for="connectivityProfile"> <g:message
+            code="connectivityProfile.label" default="connectivityProfile" />
+    <span class="required-indicator">*</span>
+    </label>
+    <div class="span8">
+        <g:select id="connectivityProfile"
+                  class="iteratec-element-select chosen"
+                  data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
+                  name="connectivityProfile.id"
+                  from="${ connectivites }"
+                  optionKey="id"
+                  value="${job.connectivityProfile?job.connectivityProfile.id:null}" />
+    </div>
+</div>
+<div id="connectivityProfileDetails">
+    <input type="hidden" id="customConnectivityProfile" name="customConnectivityProfile" value="${job?.customConnectivityProfile}" />
+    <input type="hidden" id="noTrafficShapingAtAll" name="noTrafficShapingAtAll" value="${job?.noTrafficShapingAtAll}" />
+    <div class="row form-group">
+        <label class="span3 text-right" for="customConnectivityName">
+            <g:message code="job.customConnectivityProfile.label" default="Name of custom connectivity profile" />
+        </label>
+        <div class="span8">
+            <g:textField class="form-control input-xxlarge" name="customConnectivityName" id="custom-connectivity-name"
+                         value="${job?.customConnectivityName}" readonly="readonly" />
+            <label class="checkbox inline">
+                <g:checkBox name="setCustomConnNameManually" id="setCustomConnNameManually"></g:checkBox>
+                <g:message code="job.customConnectivityProfile.setnamemanually.label" default="Set name manually." />
+            </label>
+        </div>
+    </div>
+    <g:each var="attribute" in="['bandwidthDown', 'bandwidthUp', 'latency', 'packetLoss']">
+        <div class="row form-group ${hasErrors(bean: job, field: attribute, 'error')}">
+            <label class="span3 text-right" for="${attribute}">
+                <g:message code="connectivityProfile.${attribute}.label"
+                           default="${attribute}" />
+            </label>
+            <div class="span8">
+                <g:textField class="form-control" name="${attribute}" id="custom-${attribute}"
+                             value="${job?."$attribute"}" />
+            </div>
+        </div>
+    </g:each>
 </div>

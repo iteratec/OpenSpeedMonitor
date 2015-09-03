@@ -273,8 +273,8 @@ class CustomerSatisfactionHighChartServiceTests {
 		Integer numberOfGroupPageCombinations = 2
 		Integer numberOfValuesInGraphOfGroupPageCombination_11 = 3
 		Integer numberOfValuesInGraphOfGroupPageCombination_12 = 2
-		String expectedGraphLabelOfGroupPageCombination_11 = "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[0]}"
-		String expectedGraphLabelOfGroupPageCombination_12 = "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
+		String expectedGraphLabelOfGroupPageCombination_11 = "${expectedPageNames[0]}"
+		String expectedGraphLabelOfGroupPageCombination_12 = "${expectedPageNames[1]}"
 
 		//mock inner service
 

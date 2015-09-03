@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
 
 import org.apache.commons.lang.time.DateUtils
@@ -45,12 +47,10 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  */
 @TestFor(ResultMeasuredValueService)
 @Mock([EventResult, Job, JobResult, JobGroup, MeasuredValue, MeasuredEvent, WebPageTestServer,
-	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script])
+	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script, ConnectivityProfile])
 class ResultMeasuredValueServiceTests {
-	//ResultMeasuredValueService, JobResultService, MeasuredValueUtilService, BrowserDaoService, MeasuredValueTagService
 
 	ResultMeasuredValueService serviceUnderTest
-
 	BrowserDaoService browserDaoServiceMock
 	MeasuredValueUtilService measuredValueUtilServiceMock
 	MeasuredValueTagService measuredValueTagServiceMock
@@ -68,6 +68,8 @@ class ResultMeasuredValueServiceTests {
 	JobResult runInHour_One, runInHour_Two, runBeforeHour, runAfterHour
 	EventResult resultRunInHour_One, resultRunInHour_Two, resultRunBeforeHour, resultRunAfterHour
 
+	ConnectivityProfile connectivityProfile
+
 	@Before
 	void setUp() {
 		serviceUnderTest = service;
@@ -78,7 +80,7 @@ class ResultMeasuredValueServiceTests {
 		serviceUnderTest.browserDaoService = browserDaoServiceMock;
 		
 		//DB Call Find By should explicit be tested
-		serviceUnderTest.jobResultService = new JobResultService();
+		serviceUnderTest.jobResultDaoService = new JobResultDaoService();
 		serviceUnderTest.eventResultDaoService = new EventResultDaoService();
 
 		/** Functional Services **/
@@ -138,6 +140,8 @@ class ResultMeasuredValueServiceTests {
 				weight: 0.5
 				).save(failOnError: true)
 
+		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
+
 		daily = new MeasuredValueInterval(name: "daily", intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
 		weekly = new MeasuredValueInterval(name: "weekly", intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
 		hourly = new MeasuredValueInterval(name: "hourly", intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true)
@@ -174,29 +178,41 @@ class ResultMeasuredValueServiceTests {
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
 		job1 = new Job(
-				id: 1,
-				active: false,
-				label: 'BV1 - Step 01',
-				description: 'This is job 01...',
-				location: ffAgent1,
-				frequencyInMin: 5,
-				runs: 1,
-				jobGroup: jobGroup,
-				script: script,
-				maxDownloadTimeInMinutes: 60	
-				).save(failOnError: true)
+            id: 1,
+            active: false,
+            label: 'BV1 - Step 01',
+            description: 'This is job 01...',
+            location: ffAgent1,
+            frequencyInMin: 5,
+            runs: 1,
+            jobGroup: jobGroup,
+            script: script,
+            maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: true,
+            customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+            bandwidthDown: 6000,
+            bandwidthUp: 512,
+            latency: 50,
+            packetLoss: 0
+        ).save(failOnError: true)
 
 		job2 = new Job(
-				active: false,
-				label: 'BV1 - Step 02',
-				description: 'This is job 02...',
-				location: ffAgent1,
-				frequencyInMin: 5,
-				runs: 1,
-				jobGroup: jobGroup,
-				script: script,
-				maxDownloadTimeInMinutes: 60	
-				).save(failOnError: true)
+            active: false,
+            label: 'BV1 - Step 02',
+            description: 'This is job 02...',
+            location: ffAgent1,
+            frequencyInMin: 5,
+            runs: 1,
+            jobGroup: jobGroup,
+            script: script,
+            maxDownloadTimeInMinutes: 60,
+            customConnectivityProfile: true,
+            customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+            bandwidthDown: 6000,
+            bandwidthUp: 512,
+            latency: 50,
+            packetLoss: 0
+        ).save(failOnError: true)
 
 		measuredEvent = new MeasuredEvent()
 		measuredEvent.setName('Test event')
@@ -245,7 +261,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runInHour_One.date,
 				jobResultJobConfigId: runInHour_One.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runInHour_One.save(failOnError: true)
@@ -290,7 +307,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runInHour_Two.date,
 				jobResultJobConfigId: runInHour_Two.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runInHour_Two.save(failOnError: true)
@@ -335,7 +353,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runBeforeHour.date,
 				jobResultJobConfigId: runBeforeHour.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runBeforeHour.save(failOnError: true)
@@ -380,7 +399,8 @@ class ResultMeasuredValueServiceTests {
 				jobResultDate: runAfterHour.date,
 				jobResultJobConfigId: runAfterHour.job.ident(),
 				measuredEvent: measuredEvent,
-				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+				connectivityProfile: connectivityProfile
 				).save(failOnError: true)
 		
 		runAfterHour.save(failOnError: true)

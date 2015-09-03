@@ -1,4 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
+<% def springSecurityService %>
+<%@ page import="de.iteratec.osm.report.UserspecificDashboard" %>
+<%
+    def userspecificDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificDashboard').newInstance()
+%>
 <html>
 <head>
 <meta name="layout" content="kickstart_osm" />
@@ -6,31 +11,11 @@
 
 <r:require modules="eventresult-dashboard" />
 
-<style type="text/css">
-.accordion-link {
-	display: block;
-	width: 100%;
-	padding: 0;
-	font-size: 21px;
-	line-height: 40px;
-	color: #333333;
-	border: 0;
-}
-
-.accordion-custom-heading {
-	background-color: #EEEEEE;
-}
-
-</style>
 </head>
 <body>
 
 	<%-- main menu --%>
 	<g:render template="/layouts/mainMenu"/>
-
-	<g:if test="${flash.message}">
-		<div class="message" role="status">${flash.message}</div>
-	</g:if>
 
 	<div class="row">
 		<div class="span12">
@@ -50,7 +35,9 @@
 	</div>
 	<div class="row">
 		<div class="span12">
-			<form method="get" action="">
+			<form method="get" action="" id="dashBoardParamsForm">
+      <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message code="de.iteratec.ism.ui.labels.save.success" default="Successfully saved these settings as custom dashboard." /></div>
+      <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
 			<g:if test="${warnAboutLongProcessingTime}">
 				<div class="alert">
 					<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title" /></strong>
@@ -69,18 +56,20 @@
 					<div class="accordion-group">
 						<div class="accordion-heading accordion-custom-heading">
 							<div class="row">
-								<div class="span12">
-								<div class="row">
-									<div class="span4">
-										<a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
-											<g:message code="de.iteratec.sri.wptrd.time.filter.heading" default="Zeitraum ausw&auml;hlen" />
-										</a>
-									</div>
-									<div class="span8">
-										<div class="accordion-info text-info" id="accordion-info-date"></div>
-									</div>
-								</div>
-								</div>
+                                <div class="span12">
+                                    <div class="row">
+                                        <div class="span3">
+                                            <a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+                                                <g:message code="de.iteratec.sri.wptrd.time.filter.heading" default="Zeitraum ausw&auml;hlen" />
+                                            </a>
+                                        </div>
+                                        <div class="span2 accordion-info text-right">
+                                            <g:message code="de.iteratec.isocsi.csi.aggreator.heading" default="Aggregation" />:<br>
+                                            <g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Timeframe" />:
+                                        </div>
+                                        <div class="span7 accordion-info" id="accordion-info-date"></div>
+                                    </div>
+                                </div>
 							</div>
 						</div>
 						<g:if test="${request.queryString}"><div id="collapseOne" class="accordion-body collapse"></g:if>
@@ -116,23 +105,45 @@
 						<div class="accordion-heading accordion-custom-heading">
 							<div class="row">
 								<div class="span12">
-								<div class="row">
-									<div class="span4">
-										<a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
-											<g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" />
-										</a>
-									</div>
-									<div class="span8">
-										<div class="accordion-info text-info" id="accordion-info-jobs"></div>
-									</div>
-								</div>
+                                    <div class="row">
+                                        <div class="span3">
+                                            <a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+                                                <g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" />
+                                            </a>
+                                        </div>
+                                        <div class="span2 accordion-info text-right">
+                                            <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Job Group:" /><br>
+                                            <g:message code="de.iteratec.osm.result.page.label" default="Page"/>&nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>:<br>
+                                            <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message code="job.location.label" default="Location"/>:<br>
+                                            <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>:<br>
+                                        </div>
+                                        <div class="span7 accordion-info" id="accordion-info-jobs"></div>
+                                    </div>
 								</div>
 							</div>
 						</div>
 						<g:if test="${request.queryString}"><div id="collapseTwo" class="accordion-body collapse"></g:if>
 						<g:else><div id="collapseTwo" class="accordion-body collapse in"></g:else>
 							<div class="accordion-inner" style="margin: 0px; padding: 4px;">
-								<g:render template="selectMeasurings" model="${['locationsOfBrowsers':locationsOfBrowsers, 'eventsOfPages':eventsOfPages,'folders':folders,'selectedFolder':selectedFolder, 'pages':pages,'selectedPage':selectedPage,'measuredEvents':measuredEvents,'selectedAllMeasuredEvents':selectedAllMeasuredEvents,'selectedMeasuredEvents':selectedMeasuredEvents,'browsers':browsers,'selectedBrowsers':selectedBrowsers,'selectedAllBrowsers':selectedAllBrowsers,'locations':locations,'selectedLocations':selectedLocations,'selectedAllLocations':selectedAllLocations]}"/>
+								<g:render template="selectMeasurings"
+                                          model="${['locationsOfBrowsers':locationsOfBrowsers,
+                                                    'eventsOfPages':eventsOfPages,
+                                                    'folders':folders,
+                                                    'selectedFolder':selectedFolder,
+                                                    'pages':pages,
+                                                    'selectedPage':selectedPage,
+                                                    'measuredEvents':measuredEvents,
+                                                    'selectedAllMeasuredEvents':selectedAllMeasuredEvents,
+                                                    'selectedMeasuredEvents':selectedMeasuredEvents,
+                                                    'browsers':browsers,
+                                                    'selectedBrowsers':selectedBrowsers,
+                                                    'selectedAllBrowsers':selectedAllBrowsers,
+                                                    'locations':locations,
+                                                    'selectedLocations':selectedLocations,
+                                                    'selectedAllLocations':selectedAllLocations,
+                                                    'connectivityProfiles':connectivityProfiles,
+                                                    'selectedConnectivityProfiles':selectedConnectivityProfiles,
+                                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles]}"/>
 							</div>
 						</div>
 					</div>
@@ -141,14 +152,16 @@
 							<div class="row">
 								<div class="span12">
 								<div class="row">
-									<div class="span4">
+									<div class="span3">
 										<a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
 											<g:message code="de.iteratec.sri.wptrd.measurement.filter.heading" default="Messwerte auw&auml;hlen" />
 										</a>
 									</div>
-									<div class="span8">
-									<div class="accordion-info text-info" id="accordion-info-measurements"></div>
-									</div>
+                                    <div class="span2 accordion-info text-right">
+                                        <g:message code="job.firstView.label" default="First View" />:<br>
+                                        <g:message code="job.repeatedView.label" default="Repeated View" />:<br>
+                                    </div>
+                                    <div class="span7 accordion-info" id="accordion-info-measurements"></div>
 								</div>
 								</div>
 							</div>
@@ -228,12 +241,23 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="span2">
+						<div class="span12">
 							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll"
 								id="graphButtonHtmlId" class="btn btn-primary"
 								style="margin-top: 16px;" />
-							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
-								class="btn btn-primary" style="margin-top: 16px;" />
+              <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
+                class="btn btn-primary" style="margin-top: 16px;" />
+              <sec:ifLoggedIn>
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+							   <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+						    </sec:ifAnyGranted>
+							</sec:ifLoggedIn>
+		          <g:if test="${params.id}">
+		            <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+		            <g:render template="/_common/modals/deleteCustomDashboard"/>
+		              
+		            </g:if>           
+		          </g:if> 
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.
@@ -306,6 +330,7 @@
 		</g:if>
 	</g:else>
 	</div>
+	<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 	<r:script>
 		$(document).ready(doOnDomReady(
 			'${dateFormat}', 

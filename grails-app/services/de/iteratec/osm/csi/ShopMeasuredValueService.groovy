@@ -34,7 +34,7 @@ import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -53,7 +53,7 @@ class ShopMeasuredValueService {
 	MeasuredValueTagService measuredValueTagService
 	PerformanceLoggingService performanceLoggingService
 	JobService jobService
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 	MeasuredValueDaoService measuredValueDaoService
 	MeasuredValueUtilService measuredValueUtilService
 	WeightingService weightingService

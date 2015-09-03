@@ -23,8 +23,6 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
-import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.util.I18nService
 
@@ -37,7 +35,7 @@ class ResultMeasuredValueService {
 
 
 	/** injected by grails */
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 	MeasuredValueUtilService measuredValueUtilService
 	BrowserDaoService browserDaoService
 	MeasuredValueTagService measuredValueTagService

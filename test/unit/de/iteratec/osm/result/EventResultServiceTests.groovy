@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
 import groovy.util.slurpersupport.GPathResult
 
@@ -36,7 +38,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * Test-suite of {@link de.iteratec.osm.result.EventResultService}.
  */
 @TestFor(EventResultService)
-@Mock([Browser, Page, Job, Location, WebPageTestServer, JobResult, EventResult, MeasuredEvent, JobGroup, Script])
+@Mock([Browser, Page, Job, Location, WebPageTestServer, JobResult, EventResult, MeasuredEvent, JobGroup, Script, ConnectivityProfile])
 class EventResultServiceTests {
 
 	EventResultService serviceUnderTest
@@ -59,6 +61,8 @@ class EventResultServiceTests {
 	
 	JobGroup jobGroupUndefined
 
+	ConnectivityProfile connectivityProfile;
+
 	@Before
 	void setUp() {
 		serviceUnderTest = service
@@ -67,6 +71,8 @@ class EventResultServiceTests {
 		threeHoursAgo = DateUtils.addHours(now, -3)
 		twoHoursAgo = DateUtils.addHours(now, -2)
 		oneHoursAgo = DateUtils.addHours(now, -1)
+
+		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
 
 		server1 = new WebPageTestServer(
 				baseUrl : 'http://server1.wpt.server.de',
@@ -145,7 +151,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script,
-				maxDownloadTimeInMinutes: 60	
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job2 = new Job(
@@ -157,7 +169,13 @@ class EventResultServiceTests {
 				runs: 1,
 				script: script	,
 				jobGroup: jobGroupUndefined,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job3 = new Job(
@@ -169,7 +187,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script	,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job4 = new Job(
@@ -181,7 +205,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script	,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job5 = new Job(
@@ -193,7 +223,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script,
-				maxDownloadTimeInMinutes: 60	
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job6 = new Job(
@@ -205,7 +241,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script	,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job7 = new Job(
@@ -217,7 +259,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script	,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job8 = new Job(
@@ -229,7 +277,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script	,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		job9 = new Job(
@@ -241,7 +295,13 @@ class EventResultServiceTests {
 				runs: 1,
 				jobGroup: jobGroupUndefined,
 				script: script	,
-				maxDownloadTimeInMinutes: 60
+				maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
 				).save(failOnError: true)
 
 		jobs = [
@@ -255,6 +315,13 @@ class EventResultServiceTests {
 			job8,
 			job9
 		]
+
+		ConnectivityProfile mockConnectivity = new ConnectivityProfile(
+				name: "Test",
+				bandwidthDown: 0,
+				bandwidthUp: 0,
+				latency: 0,
+				packetLoss: 0)
 
 		for (int i = 0; i < jobs.size(); i++) {
 			int j = i + 1
@@ -340,7 +407,8 @@ class EventResultServiceTests {
 					jobResult: runOfCurJob_now,
 					jobResultDate: runOfCurJob_now.date,
 					jobResultJobConfigId: runOfCurJob_now.job.ident(),
-					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+					connectivityProfile: mockConnectivity
 					).save(failOnError: true)
 			
 			runOfCurJob_now.save(failOnError: true)
@@ -369,7 +437,8 @@ class EventResultServiceTests {
 					jobResult: runOfCurJob_1HoursAgo,
 					jobResultDate: runOfCurJob_1HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_1HoursAgo.job.ident(),
-					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+					connectivityProfile: mockConnectivity
 					).save(failOnError: true)
 			
 			runOfCurJob_1HoursAgo.save(failOnError: true)
@@ -399,7 +468,8 @@ class EventResultServiceTests {
 					jobResult: runOfCurJob_2HoursAgo,
 					jobResultDate: runOfCurJob_2HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_2HoursAgo.job.ident(),
-					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+					connectivityProfile: mockConnectivity
 					).save(failOnError: true)
 			
 			runOfCurJob_2HoursAgo.save(failOnError: true)
@@ -428,7 +498,8 @@ class EventResultServiceTests {
 					jobResult: runOfCurJob_3HoursAgo,
 					jobResultDate: runOfCurJob_3HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_3HoursAgo.job.ident(),
-					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE
+					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+					connectivityProfile: mockConnectivity
 					).save(failOnError: true)
 			
 			runOfCurJob_3HoursAgo.save(failOnError: true)
@@ -642,7 +713,22 @@ class EventResultServiceTests {
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
 		// Define a job:
-		Job theJobWichIsNotOfInterestHere = new Job(label:'testjob', active: false, location: location, description:'This is a test job only required during constraints', runs:1, jobGroup: jobGroupUndefined, script: script, maxDownloadTimeInMinutes: 60).save(failOnError:true)
+		Job theJobWichIsNotOfInterestHere = new Job(
+                label:'testjob',
+                active: false,
+                location: location,
+                description:'This is a test job only required during constraints',
+                runs:1,
+                jobGroup: jobGroupUndefined,
+                script: script,
+                maxDownloadTimeInMinutes: 60,
+                customConnectivityProfile: true,
+                customConnectivityName: 'Custom (6.000/512 Kbps, 50ms)',
+                bandwidthDown: 6000,
+                bandwidthUp: 512,
+                latency: 50,
+                packetLoss: 0
+        ).save(failOnError:true)
 
 		// Define some job results (we will only query on copied fields, so we skip references except the ones to event results):
 		// - the first within range, measured at 08.08.2013 - 14:02:14:
@@ -693,7 +779,7 @@ class EventResultServiceTests {
 	 * @return
 	 */
 	private EventResult createEventResult(MeasuredEvent theEventToLookFor,CachedView cachedView,Boolean medianValue, JobResult jobResultWithinDateRange1, Date measuringDateOfWithinDateRange1){
-		new EventResult(measuredEvent : theEventToLookFor, cachedView : cachedView, medianValue: medianValue, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE).save(failOnError:true);
+		new EventResult(measuredEvent : theEventToLookFor, cachedView : cachedView, medianValue: medianValue, jobResult: jobResultWithinDateRange1, jobResultDate: measuringDateOfWithinDateRange1, /*Not of interest but required by constraint: */jobResultJobConfigId: 1, wptStatus:200, numberOfWptRun:1, speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE, connectivityProfile: connectivityProfile).save(failOnError:true);
 	}
 
 	/**

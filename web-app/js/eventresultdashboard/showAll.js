@@ -16,87 +16,230 @@
 */
 
 /**
+ * Called on jquerys DOM-ready.
+ * Initializes DOM-nodes and registers events.
+ */
+function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
+
+    initDatepicker(dateFormat, weekStart, 24*3);
+
+    initTimepicker(false);
+
+    var preSelection = $('#timeframeSelect').val()>0;
+    disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
+
+    initIntervalSelect();
+
+    initChosenSelects(noResultsTextForChosenSelects);
+
+    updateCollapseInfos();
+
+    setChevron($('#collapseOne'));
+
+    addAccordionHandlers();
+
+    scrollToChartbox();
+
+}
+
+function scrollToChartbox() {
+    if($("#chartbox").length > 0){
+        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+200)},{duration: 'fast'});
+    }else{
+        $('html,body').animate({scrollTop: 0},{duration: 'fast'});
+    }
+}
+
+function addAccordionHandlers() {
+    $('#collapseOne').on('shown', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        e.preventDefault();
+    });
+    $('#collapseOne').on('hidden', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+    });
+    setChevron($('#collapseThree'));
+    $('#collapseThree').on('shown', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
+        e.preventDefault();
+    });
+    $('#collapseThree').on('hidden', function (e) {
+        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
+    });
+
+    addAccordionInfoHandlers()
+}
+
+function addAccordionInfoHandlers(){
+    addTimeframeInfoHandlers();
+    addJobfilterInfoHandlers();
+    addMeasurandsInfoHandlers();
+}
+
+function addJobfilterInfoHandlers() {
+    $('#folderSelectHtmlId').on('change', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#pageSelectHtmlId').on('change', function (e) {
+        //setCollapseJobInfos();
+    });
+
+    $('#selectedMeasuredEventsHtmlId').on('chosen:updated', function (evt, params) {
+        setCollapseJobInfos();
+    });
+    $('#selectedBrowsersHtmlId').on('change', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#selectedLocationsHtmlId').on('chosen:updated', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#selectedConnectivityProfilesHtmlId').on('chosen:updated', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#selectedAllConnectivityProfiles').on('change', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#customConnectivityName').on('input', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#selectedAllMeasuredEvents').on('change', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#selectedAllBrowsers').on('change', function (e) {
+        setCollapseJobInfos();
+    });
+    $('#includeNativeConnectivity').on('change', function (e) {
+        setCollapseJobInfos();
+    });
+}
+function addTimeframeInfoHandlers() {
+    $('#selectedIntervalHtmlId').on('change', function (e) {
+        setCollapseDateInfos();
+    });
+    $('#timeframeSelect').on('change', function (e) {
+        setCollapseDateInfos();
+    });
+    $('#fromDatepicker').on('change', function (e) {
+        setCollapseDateInfos();
+    });
+    $('#toDatepicker').on('change', function (e) {
+        setCollapseDateInfos();
+    });
+    $('#fromHourTimepicker').on('change', function (e) {
+        setCollapseDateInfos();
+    });
+    $('#toHourTimepicker').on('change', function (e) {
+        setCollapseDateInfos();
+    });
+}
+function addMeasurandsInfoHandlers() {
+    $('#selectAggregatorUncachedHtmlId').on('change', function (e) {
+        setCollapseMeasurementInfos()
+    });
+    $('#selectAggregatorCachedHtmlId').on('change', function (e) {
+        setCollapseMeasurementInfos()
+    });
+}
+
+/**
  * Updates information shown on the right of the headers of collapsed parts of the gui.
  */
-var updateCollapseInfos = function() {
-	if($('#collapseOne').height() == 0){
-		setCollapseDateInfos(true);
-	}else{
-		setCollapseDateInfos(false);
-	}
-	if($('#collapseTwo').height() == 0){
-		setCollapseJobInfos(true);
-	}else{
-		setCollapseJobInfos(false);
-	}
-	if($('#collapseThree').height() == 0){
-		setCollapseMeasurementInfos(true);
-	}else{
-		setCollapseMeasurementInfos(false);
-	}
-};
-var setCollapseDateInfos = function(toSet){
-	if(toSet){
-		var aggregation = $('#selectedIntervalHtmlId option:selected').text();
-		aggregation = aggregation?aggregation:'\u2205';
-		var dateToSet;
-		if($('#timeframeSelect').val()==0){
-			var from = $('#from').val();
-			from = from?from:'\u2205';
-			var to = $('#to').val();
-			to = to?to:'\u2205';
-			var toHour = $('#toHour').val();
-			toHour = toHour?toHour:'\u2205';
-			var fromHour = $('#fromHour').val();
-			fromHour = fromHour?fromHour:'\u2205';
-			dateToSet = from+' '+fromHour+'\xA0\xBB\xA0'+to+' '+toHour;
-		}else{
-			dateToSet = $('#timeframeSelect :selected').text();
-		}
-		$('#accordion-info-date').text(aggregation+' | '+dateToSet);
-	}else{
-		$('#accordion-info-date').text('');
-	}
-};
-	var setCollapseJobInfos = function(toSet){
-	if(toSet){
-		var delimitterIfMultipleOptions = ', ';
-		var selectedGroups = getMaxCharacters(getTextList($('#folderSelectHtmlId option:selected')).join(delimitterIfMultipleOptions), 50);
-		var selectedPages = getMaxCharacters(getTextList($('#pageSelectHtmlId option:selected')).join(delimitterIfMultipleOptions), 50);
-		var selectedEvents = $('#selectedAllMeasuredEvents').is(':checked')?
-				'ALL':getMaxCharacters(getTextList($('#selectedMeasuredEventsHtmlId option:selected')).join(delimitterIfMultipleOptions), 50);
-		var selectedBrowsers = $('#selectedAllBrowsers').is(':checked')?
-				'ALL':getMaxCharacters(getTextList($('#selectedBrowsersHtmlId option:selected')).join(delimitterIfMultipleOptions), 50);
-		var selectedLocations = $('#selectedAllLocations').is(':checked')?
-				'ALL':getMaxCharacters(getTextList($('#selectedLocationsHtmlId option:selected')).join(delimitterIfMultipleOptions), 50);
-		$('#accordion-info-jobs').text(selectedGroups + ' | ' + selectedPages + ' | ' + selectedEvents + ' | ' + selectedBrowsers + ' | ' + selectedLocations);
-	}else{
-		$('#accordion-info-jobs').text('');
-	}
-};
-var setCollapseMeasurementInfos = function(toSet){
-	if(toSet){
-		var delimitterIfMultipleOptions = ', ';
-		var selectedUncached = getMaxCharacters(getTextList($('#selectAggregatorUncachedHtmlId option:selected')).join(delimitterIfMultipleOptions), 100);
-		var selectedCached = getMaxCharacters(getTextList($('#selectAggregatorCachedHtmlId option:selected')).join(delimitterIfMultipleOptions), 100);
-		$('#accordion-info-measurements').text(selectedUncached + ' | ' + selectedCached);
-	}else{
-		$('#accordion-info-measurements').text('');
-	}
-};
-var getTextList = function(selectedOptions){
+function updateCollapseInfos() {
+    setCollapseDateInfos();
+    setCollapseJobInfos();
+    setCollapseMeasurementInfos();
+}
+function setCollapseDateInfos(){
+
+    var aggregation = $('#selectedIntervalHtmlId option:selected').text();
+    var unicodeEmptySet = '\u2205';
+    aggregation = aggregation?aggregation:unicodeEmptySet;
+    var dateToSet;
+    if($('#timeframeSelect').val()==0){
+        var from = $('#from').val();
+        from = from?from:'\u2205';
+        var to = $('#to').val();
+        to = to?to:'\u2205';
+        var toHour = $('#toHour').val();
+        toHour = toHour?toHour:'\u2205';
+        var fromHour = $('#fromHour').val();
+        fromHour = fromHour?fromHour:'\u2205';
+        dateToSet = from+' '+fromHour+'\xA0\xBB\xA0'+to+' '+toHour;
+    }else{
+        dateToSet = $('#timeframeSelect :selected').text();
+    }
+
+    $('#accordion-info-date').text('');
+    document.getElementById('accordion-info-date').appendChild(document.createTextNode(aggregation));
+    document.getElementById('accordion-info-date').appendChild(document.createElement('br'));
+    document.getElementById('accordion-info-date').appendChild(document.createTextNode(dateToSet));
+
+}
+function setCollapseJobInfos(){
+
+        var delimitterIfMultipleOptions = ', ';
+        var delimitterInfoTypes = ' | ';
+        var maxNumberOfLetters = 50;
+
+		var selectedGroups = getMaxCharacters(getTextList($('#folderSelectHtmlId option:selected')).join(delimitterIfMultipleOptions), 85);
+        var selectedPages = getMaxCharacters(getTextList($('#pageSelectHtmlId option:selected')).join(delimitterIfMultipleOptions), maxNumberOfLetters);
+        var selectedEvents = $('#selectedAllMeasuredEvents').is(':checked')?
+				'ALL':getMaxCharacters(getTextList($('#selectedMeasuredEventsHtmlId option:selected')).join(delimitterIfMultipleOptions), maxNumberOfLetters);
+        var selectedBrowsers = $('#selectedAllBrowsers').is(':checked')?
+				'ALL':getMaxCharacters(getTextList($('#selectedBrowsersHtmlId option:selected')).join(delimitterIfMultipleOptions), maxNumberOfLetters);
+        var selectedLocations = $('#selectedAllLocations').is(':checked')?
+				'ALL':getMaxCharacters(getTextList($('#selectedLocationsHtmlId option:selected')).join(delimitterIfMultipleOptions), maxNumberOfLetters);
+        var selectedConnectivities = $('#selectedAllConnectivityProfiles').is(':checked')?
+            'ALL PREDEFINED':getMaxCharacters(getTextList($('#selectedConnectivityProfilesHtmlId option:selected')).join(delimitterIfMultipleOptions), maxNumberOfLetters);
+        if(document.getElementById('includeNativeConnectivity').checked){
+            selectedConnectivities += ", NATIVE"
+        }
+        var customConnNameRegex = document.getElementById('customConnectivityName').value;
+        if(customConnNameRegex){
+            selectedConnectivities += ", '" + customConnNameRegex + "'"
+        }
+
+        $('#accordion-info-jobs').text('');
+        document.getElementById('accordion-info-jobs').appendChild(document.createTextNode(selectedGroups));
+        document.getElementById('accordion-info-jobs').appendChild(document.createElement('br'));
+        document.getElementById('accordion-info-jobs').appendChild(document.createTextNode(
+                [selectedPages, selectedEvents].join(delimitterInfoTypes))
+        );
+        document.getElementById('accordion-info-jobs').appendChild(document.createElement('br'));
+        document.getElementById('accordion-info-jobs').appendChild(document.createTextNode(
+                [selectedBrowsers, selectedLocations].join(delimitterInfoTypes))
+        );
+        document.getElementById('accordion-info-jobs').appendChild(document.createElement('br'));
+        document.getElementById('accordion-info-jobs').appendChild(document.createTextNode(selectedConnectivities));
+
+}
+function setCollapseMeasurementInfos(){
+    $('#accordion-info-measurements').text('');
+    var delimitterIfMultipleOptions = ', ';
+    var selectedUncached = getMaxCharacters(getTextList($('#selectAggregatorUncachedHtmlId option:selected')).join(delimitterIfMultipleOptions), 100);
+    var selectedCached = getMaxCharacters(getTextList($('#selectAggregatorCachedHtmlId option:selected')).join(delimitterIfMultipleOptions), 100);
+    document.getElementById('accordion-info-measurements').appendChild(document.createTextNode(selectedUncached));
+    document.getElementById('accordion-info-measurements').appendChild(document.createElement('br'));
+    document.getElementById('accordion-info-measurements').appendChild(document.createTextNode(selectedCached));
+}
+function getTextList(selectedOptions){
 	var groupsTextList = [];
 	selectedOptions.each(function(i){
 		groupsTextList.push($(this).text());
 	});	
 	return groupsTextList;
-};
-var getMaxCharacters = function(toGetMaxFrom, max){
+}
+function getMaxCharacters(toGetMaxFrom, max){
 	var maxChar = toGetMaxFrom.length > max?toGetMaxFrom.substring(0,max-3)+'...':toGetMaxFrom;
 	maxChar = maxChar==''?'\u2205':maxChar;
 	return maxChar;
-};
-var setChevron = function(accordionElement) {
+}
+function ensureMinLength(targetString, minLength){
+    while(targetString.length < minLength){
+        targetString += ' '
+    }
+}
+function setChevron(accordionElement) {
 	if(!accordionElement.hasClass("collapse")) {
 		$(accordionElement).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up")
 	} else {
@@ -113,66 +256,4 @@ function initIntervalSelect() {
 	$('#selectedIntervalHtmlId').on("change", function(event){
 		setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
 	});
-}
-/**
- * Called on jquerys DOM-ready.
- * Initializes DOM-nodes and registers events. 
- */
-function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
-	
-	initDatepicker(dateFormat, weekStart, 24*3);
-
-	initTimepicker(false);
-
-	var preSelection = $('#timeframeSelect').val()>0;
-	disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
-
-	initIntervalSelect();
-
-	initChosenSelects(noResultsTextForChosenSelects);
-	
-	updateCollapseInfos();
-	
-	setChevron($('#collapseOne'));
-	
-	$('#collapseOne').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
-		e.preventDefault();
-		setCollapseDateInfos(false);
-	});
-	$('#collapseOne').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
-		setCollapseDateInfos(true);
-	});
-	
-	setChevron($('#collapseTwo'));
-	$('#collapseTwo').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
-		e.preventDefault();
-		setCollapseJobInfos(false);
-	});
-	$('#collapseTwo').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
-		setCollapseJobInfos(true);
-	});
-	
-	setChevron($('#collapseThree'));
-	
-	$('#collapseThree').on('shown', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-down").addClass("icon-chevron-up");
-		e.preventDefault();
-		setCollapseMeasurementInfos(false);
-	});
-	$('#collapseThree').on('hidden', function (e) {
-        $(this).parent().find("a.accordion-toggle").removeClass("icon-chevron-up").addClass("icon-chevron-down");
-		setCollapseMeasurementInfos(true);
-	});
-	
-	// Scroll to Chartbox
-	if($("#chartbox").length > 0){
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+180)},{duration: 'fast'});
-	}else{
-		$('html,body').animate({scrollTop: 0},{duration: 'fast'});
-	}
-
 }

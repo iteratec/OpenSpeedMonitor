@@ -24,17 +24,44 @@ package de.iteratec.osm.measurement.schedule
  * @author dri
  */
 class ConnectivityProfile {
+
+    ConnectivityProfileService connectivityProfileService
+
+    public static final int BANDWIDTH_DOWN_MIN = 0
+    public static final int BANDWIDTH_UP_MIN = 0
+    public static final int LATENCY_MIN = 0
+    public static final int PLR_MIN = 0
+
     String name
+    Boolean active;
     Integer bandwidthDown
     Integer bandwidthUp
     Integer latency
     Integer packetLoss
 
-    static constraints = {
-        name(blank: false, maxSize: 255)
+    def beforeUpdate() {
+        if(this.getDirtyPropertyNames().size() == 1 && this.getDirtyPropertyNames().contains("active")) {
+            log.debug("Tried to update ConnectivityProfile, but got interrupted!")
+            return true;
+        } else
+            return false;
     }
 
+    static mapping = {
+        active defaultValue: true
+    }
+
+    static constraints = {
+        name(blank: false, maxSize: 255)
+        bandwidthDown(min: BANDWIDTH_DOWN_MIN)
+        bandwidthUp(min: BANDWIDTH_UP_MIN)
+        latency(min: LATENCY_MIN)
+        packetLoss(min: PLR_MIN)
+    }
+
+    static transients = ['connectivityProfileService']
+
     public String toString() {
-        return "$name: $bandwidthDown Kbps down, $bandwidthUp Kbps up, $latency ms first-hop RTT, $packetLoss% packet loss"
+        return "${name}: ${connectivityProfileService.getConnectivitySpecificationFor(bandwidthDown, bandwidthUp, latency, packetLoss)}"
     }
 }

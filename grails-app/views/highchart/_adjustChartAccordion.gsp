@@ -88,6 +88,10 @@
                 <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/></div>
                 <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}" /></div>
               </div>
+            <div class ="row">
+                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.wideScreenDiagramMontage" default="Exportierte Diagramme für Breitbild-Darstellung optimieren"/></div>
+                <div class="span9"><g:checkBox id="wide-screen-diagram-montage" name="wideScreenDiagramMontage" checked="${params.wideScreenDiagramMontage?true:false}" /></div>
+              </div>
 					</g:else>
 				</div>
 			</div>

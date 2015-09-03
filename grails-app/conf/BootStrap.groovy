@@ -14,43 +14,35 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
-
-
-import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
-import grails.util.Environment
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.csi.*
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserAlias
+import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobProcessingService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.EventMeasuredValueService
-import de.iteratec.osm.csi.HourOfDay
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
-import de.iteratec.osm.result.JobResultService
-import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.util.I18nService
+import grails.util.Environment
+import org.joda.time.DateTime
 
 class BootStrap {
 	
 	EventMeasuredValueService eventMeasuredValueService
 	MeasuredValueUtilService measuredValueUtilService
-	JobResultService jobResultService
+	JobResultDaoService jobResultService
 	JobProcessingService jobProcessingService
 	I18nService i18nService
 	LocationAndResultPersisterService locationAndResultPersisterService
@@ -89,11 +81,12 @@ class BootStrap {
 		initMeasurementInfrastructure()
 		initJobScheduling()
 		cancelActiveBatchActivity()
+        excludePropertiesInJsonRepresentationsofDomainObjects()
         fixGrailsBugs()
-		
+
 		log.info "initApplicationData() OSM ends"
 	}
-	
+
 	void initConfig(){
 		log.info "initConfig() OSM starts"
 		
@@ -122,7 +115,7 @@ class BootStrap {
 		createConnectivityProfileIfMissing(6000, 512, 50, 'DSL 6.000', 0)
 		createConnectivityProfileIfMissing(384, 384, 140, 'UMTS', 0)
 		createConnectivityProfileIfMissing(3600, 1500, 40, 'UMTS - HSDPA', 0)
-		
+
 		jobProcessingService.scheduleAllActiveJobs()
 		
 		log.info "initJobScheduling() OSM ends"
@@ -399,6 +392,35 @@ class BootStrap {
 			}
 		}
 	}
+
+    void excludePropertiesInJsonRepresentationsofDomainObjects(){
+
+        ArrayList<String> propertiesToExcludeFromAllDomains = ['class', 'dirty', 'dirtyPropertyNames', 'errors', 'properties']
+
+        grailsApplication.domainClasses*.clazz.each {domainClass ->
+            grails.converters.JSON.registerObjectMarshaller(domainClass) {
+
+                Map propertiesToRepresent = it.properties.findAll {k,v -> !propertiesToExcludeFromAllDomains.contains(k)}
+                propertiesToRepresent['id'] = it.ident()
+
+                removeAllServices(propertiesToRepresent)
+                removeDomainSpecificProperties(domainClass, propertiesToRepresent)
+
+                return propertiesToRepresent
+
+            }
+        }
+    }
+    void removeDomainSpecificProperties(Class domainClass, Map propertiesToRepresent){
+        if (domainClass == de.iteratec.osm.measurement.environment.BrowserAlias) propertiesToRepresent.remove('browser')
+        else if (domainClass == de.iteratec.osm.measurement.schedule.JobGroup) propertiesToRepresent.remove('graphiteServers')
+    }
+    void removeAllServices(Map propertiesToRepresent){
+        Iterator iterator = propertiesToRepresent.keySet().iterator()
+        while(iterator.hasNext()){
+            if (iterator.next().endsWith('Service')) iterator.remove()
+        }
+    }
 
     void fixGrailsBugs(){
         // without this it's not safe to test on JSONObject instances in a groovy way

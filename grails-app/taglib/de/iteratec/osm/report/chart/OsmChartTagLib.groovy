@@ -30,6 +30,7 @@ class OsmChartTagLib {
 
 		List<OsmChartGraph> data = attrs["data"];
 		String title = attrs["title"]
+		String labelSummary = attrs["labelSummary"];
 		String lineType = attrs["lineType"]
 		String yType = attrs["yType"]
 		String width= attrs["width"]
@@ -66,7 +67,7 @@ class OsmChartTagLib {
 			highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
 
 			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, markerEnabled, annotations)
+			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, labelSummary, markerEnabled, annotations)
 		}else {
 			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
 					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
@@ -80,6 +81,7 @@ class OsmChartTagLib {
 
 		List<OsmChartGraph> data = attrs["data"];
 		String title = attrs["title"]
+		String labelSummary = attrs["labelSummary"];
 		String lineType = attrs["lineType"]
 		String width= attrs["width"]
 		String yAxisMaxs = attrs["yAxisMax"] ?: "null;null;null"
@@ -117,7 +119,7 @@ class OsmChartTagLib {
 		{
 			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
 			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, markerEnabled, annotations)
+			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, labelSummary, markerEnabled, annotations)
 		} else {
 			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
 					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")

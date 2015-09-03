@@ -17,9 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.*
-
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -28,17 +25,12 @@ import org.junit.Before
 import org.junit.Test
 
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.MeasuredValue
 import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser

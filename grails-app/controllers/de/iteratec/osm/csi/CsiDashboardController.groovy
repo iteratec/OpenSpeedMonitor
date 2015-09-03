@@ -27,6 +27,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.report.UserspecificDashboard
+import de.iteratec.osm.report.UserspecificDashboardDiagramType
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
@@ -37,10 +39,12 @@ import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
+import grails.converters.JSON
 
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 
+import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.Days
@@ -48,12 +52,12 @@ import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
-
 //TODO: implement some tests for this controller
 
 /**
@@ -78,7 +82,7 @@ class CsiDashboardController {
     MeasuredValueUtilService measuredValueUtilService
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
-
+    def springSecurityService
     /**
      * The Grails engine to generate links.
      *
@@ -185,6 +189,32 @@ class CsiDashboardController {
     }
 
     /**
+     * deletes custom Dashboard
+     *
+     * @return Nothing, redirects immediately.
+     */
+    Map<String, Object> delete() {
+
+        def userspecificDashboardInstance = UserspecificDashboard.get(params.id)
+        if (!userspecificDashboardInstance) {
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+            redirect(action: "list")
+            return
+        }
+
+        try {
+           userspecificDashboardInstance.delete(flush: true)
+                flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+                redirect(action: "list")
+        } catch (DataIntegrityViolationException e) {
+                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+                redirect(action: "show", id: params.id)
+        }
+
+        redirectWith303('showAll')
+    }
+
+    /**
      * Thats the view used to show CSI graphs with previous selection of date
      * range, groups and more filter criteria. This page is intended to be
      * used by admins and developers.
@@ -196,7 +226,6 @@ class CsiDashboardController {
      *         {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
-
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 
@@ -360,6 +389,8 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
+        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
+
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
     }
@@ -404,6 +435,8 @@ class CsiDashboardController {
         modelToRender.put('toTimestampForHighChart', resetToDate.toDate().getTime())
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
 
         modelToRender.put('markerShouldBeEnabled', false)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -500,6 +533,8 @@ class CsiDashboardController {
         modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -676,6 +711,128 @@ class CsiDashboardController {
         response.getOutputStream().flush()
         response.sendError(200, 'OK')
         return null
+    }
+
+    /**
+     * <p>
+    * Ajax service to confirm that dashboard name entered for saving custom dashboard was unique.
+    * </p>
+    *
+    * @param proposedDashboardName
+    *         The proposed Dashboard Name;
+    *         not <code>null</code>.
+    * @return nothing, immediately sends HTTP response codes to client.
+    */
+    def validateDashboardName(String proposedDashboardName) {
+        UserspecificDashboard newCustomDashboard = new UserspecificDashboard(dashboardName: proposedDashboardName)
+        if (!newCustomDashboard.validate()) {
+            response.sendError(302, 'dashboard by that name exists already')
+            return null
+        } else {
+            response.sendError(200, 'OK')
+            return null
+        }
+    }
+
+    /**
+     * <p>
+    * Ajax service to validate and store custom dashboard settings.
+    * </p>
+    *
+    * @param values
+    *         The dashboard settings, JSON encoded;
+    *         not <code>null</code>.
+    * @param dashboardName
+    *         The proposed Dashboard Name;
+    *         not <code>null</code>.
+    * @param publiclyVisible
+    *         boolean value indicating if the custom dashboard should be visible to everyone or just its creator;
+    *         not <code>null</code>.
+    * @return nothing, immediately sends HTTP response codes to client.
+    */
+    def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
+        JSONObject dashboardValues = JSON.parse(values)
+        Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
+        Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
+        Collection<Long> selectedFolder = []
+        Collection<Long> selectedPages = []
+        Collection<Long> selectedMeasuredEventIds = []
+        Collection<Long> selectedBrowsers = []
+        Collection<Long> selectedLocations = []
+        String selectedFolderString = ""
+        String selectedPagesString = ""
+        String selectedMeasuredEventIdsString = ""
+        String selectedBrowsersString = ""
+        String selectedLocationsString = ""
+        dashboardValues.each { id, data ->
+           def dataToAssign
+           if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
+               dataToAssign = data.join(',')
+               dataToAssign = dataToAssign.replace( '"', '' )
+           } else {
+               dataToAssign = data
+           }
+            switch (id) {
+                   case ~/^selectedFolder$/:
+                       selectedFolderString = dataToAssign
+                       data.each() {
+                           selectedFolder.push(it)
+                       }
+                       break
+                   case ~/^selectedPages$/:
+                       selectedPagesString = dataToAssign
+                       data.each() {
+                           selectedPages.push(it)
+                       }
+                       break
+                   case ~/^selectedMeasuredEventIds$/:
+                       selectedMeasuredEventIdsString = dataToAssign
+                       data.each() {
+                           selectedMeasuredEventIds.push(it)
+                       }
+                       break
+                   case ~/^selectedBrowsers$/:
+                       selectedBrowsersString = dataToAssign
+                       data.each() {
+                           selectedBrowsers.push(it)
+                       }
+                       break
+                   case ~/^selectedLocations$/:
+                       selectedLocationsString = dataToAssign
+                       data.each() {
+                           selectedLocations.push(it)
+                       }
+                       break
+            }
+        }
+        def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
+            toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroup: dashboardValues.aggrGroup, selectedFolder: selectedFolder,
+            selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
+            selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
+            selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: dashboardValues.selectedTimeFrameInterval,
+            includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
+
+        if (!cmd.validate()) {
+            //send errors
+            def errMsgList = cmd.errors.allErrors.collect{g.message([error : it])}
+            response.sendError(400, "rkrkrk" + errMsgList.toString() + "rkrkrk") // Apache Tomcat will output the response as part of (HTML) error page - 'rkrkrk' are the delimiters so the AJAX frontend can find the message
+            return null
+        } else {
+           def username = springSecurityService.authentication.principal.getUsername()
+            UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
+                fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute, aggrGroup: cmd.aggrGroup, selectedFolder: selectedFolderString, selectedPages: selectedPagesString,
+                selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: selectedBrowsersString,
+                selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
+                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, wideScreenDiagramMontage: wideScreenDiagramMontage, dashboardName: dashboardName, username: username,
+                setFromHour: cmd.setFromHour, setToHour: cmd.setToHour)
+           if (!newCustomDashboard.save(failOnError: true, flush: true)) {
+               response.sendError(500, 'save error')
+               return null
+           } else {
+               response.sendError(200, 'OK')
+               return null
+           }
+        }
     }
 
     /**

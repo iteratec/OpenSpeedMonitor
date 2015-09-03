@@ -17,13 +17,16 @@
 
 package de.iteratec.osm.result.dao
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+
 import java.util.regex.Pattern
 
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.ErQueryParams
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.measurement.schedule.Job
@@ -40,7 +43,7 @@ public class EventResultDaoService {
 		
 	OsmDataSourceService osmDataSourceService
 
-	JobResultService jobResultService
+	JobResultDaoService jobResultDaoService
 
 	MeasuredValueTagService measuredValueTagService
 
@@ -111,11 +114,11 @@ public class EventResultDaoService {
 	 * @return
 	 */
 	public List<EventResult> getLimitedMedianEventResultsBy(
-		Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams mvQueryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints){
+		Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams queryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints){
 		
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams)
+		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(queryParams)
 		def criteria = EventResult.createCriteria()
-		
+
 		if(osmDataSourceService.getRLikeSupport()){
 			List result = criteria.list {
 				rlike('tag', rlikePattern)
@@ -128,6 +131,47 @@ public class EventResultDaoService {
 				ltConstraints.each {attr, ltValue ->
 					lt(attr, ltValue)
 				}
+                if (queryParams.connectivityProfileIds.size() > 0){
+                    List<ConnectivityProfile> predefinedProfiles = queryParams.connectivityProfileIds.collect {ConnectivityProfile.get(it)}
+                    if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false){
+                        connectivityProfile{
+                            'in'('id', predefinedProfiles*.ident())
+                        }
+                    }else if (queryParams.includeNativeConnectivity == false){
+                        or {
+                            connectivityProfile{
+                                'in'('id', predefinedProfiles*.ident())
+                            }
+                            rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                        }
+                    }else if (queryParams.customConnectivityNameRegex == null){
+                        or {
+                            connectivityProfile{
+                                'in'('id', predefinedProfiles*.ident())
+                            }
+                            eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                        }
+                    }else{
+                        or {
+                            connectivityProfile{
+                                'in'('id', predefinedProfiles*.ident())
+                            }
+                            rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                            eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                        }
+                    }
+                }else{
+                    if (queryParams.customConnectivityNameRegex != null && queryParams.includeNativeConnectivity == true){
+                        or {
+                            rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                            eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                        }
+                    }else if (queryParams.customConnectivityNameRegex != null){
+                        rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                    }else if (queryParams.includeNativeConnectivity == true){
+                        eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                    }
+                }
 			}
 			return result;
 		} else {
@@ -141,10 +185,53 @@ public class EventResultDaoService {
 				ltConstraints.each {attr, ltValue ->
 					lt(attr, ltValue)
 				}
-			}
-			return eventResults.grep{ it.tag ==~ rlikePattern }
+			}.grep{ it.tag ==~ rlikePattern }
+
+			return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
 		}
 	}
+
+    private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
+        if (queryParams.connectivityProfileIds.size() > 0){
+            if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false){
+                eventResults = eventResults.findAll {
+                    it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())
+                }
+            }else if (queryParams.includeNativeConnectivity == false){
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                            (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
+                }
+            }else if (queryParams.customConnectivityNameRegex == null){
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                    (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                }
+            }else{
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
+                    (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                }
+            }
+        }else{
+            if (queryParams.customConnectivityNameRegex != null && queryParams.includeNativeConnectivity == true){
+                eventResults = eventResults.findAll {
+                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
+                            (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                }
+            }else if (queryParams.customConnectivityNameRegex != null){
+                eventResults = eventResults.findAll {
+                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
+                }
+            }else if (queryParams.includeNativeConnectivity == true){
+                eventResults = eventResults.findAll {
+                    (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                }
+            }
+        }
+        return eventResults
+    }
 		
 	/**
 	 * Gets a Collection of {@link EventResult}s for specified time frame, {@link MvQueryParams} and {@link CachedView}s.

@@ -95,3 +95,23 @@ $.extend({
 function domainDeleteConfirmation(message,id,link){
     return message;
 }
+
+/**
+ * Necessary to prevent Chosen dropdown from being cut off in tabs
+ * @see http://stackoverflow.com/a/21375637
+ * TODO: after first selection dropdown of chosen select disappears after click. So one have to hold the mouse button while selection :(
+ */
+function fixChosen() {
+    var els = jQuery(".chosen");
+    els.on("chosen:showing_dropdown", function (event, chosen) {
+        $(this).parents("div").css("overflow", "visible");
+    });
+    els.on("chosen:hiding_dropdown", function () {
+        var $parent = $(this).parents("div");
+        // See if we need to reset the overflow or not.
+        var noOtherExpanded = $('.chosen-with-drop', $parent).length == 0;
+        if (noOtherExpanded)
+            $parent.css("overflow", "");
+        //$('.tab-content').scrollTop(($('.tab-content').height()*2));
+    });
+}

@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.result.JobResultService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
 
@@ -37,18 +37,15 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.WptXmlResultVersion
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 
@@ -77,6 +74,7 @@ class LocationAndResultPersisterService implements iListener{
 	HarParserService harParserService
 	ConfigService configService
     PerformanceLoggingService performanceLoggingService
+    ConnectivityProfileService connectivityProfileService
 
 
     /**
@@ -131,7 +129,9 @@ class LocationAndResultPersisterService implements iListener{
 			
         Job jobConfig
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
-            jobConfig = Job.findByLabel(resultXml.getLabel())?:persistNewJobConfig(resultXml, wptserverOfResult).save(failOnError: true)
+            String jobLabel = resultXml.getLabel()
+            jobConfig = Job.findByLabel(jobLabel)
+            if (jobConfig == null) throw new RuntimeException("No measurement job could be found for label from result xml: ${jobLabel}")
         }
 
 		if (jobConfig != null) {
@@ -200,27 +200,6 @@ class LocationAndResultPersisterService implements iListener{
 				throw e;
 			}
 		}
-	}
-
-	protected Job persistNewJobConfig(WptResultXml resultXml, WebPageTestServer wptserverOfResult){
-		String jobConfLabel = resultXml.getLabel()
-		log.debug("persisting new Job ${jobConfLabel}")
-		Location location = getOrFetchLocation(wptserverOfResult, resultXml.getLocation());
-		JobGroup jobGroup = JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-		log.debug("Incoming Result for unknown Job.")	
-			
-		Job jobConfig = new Job(
-				location: location,
-				active: false,
-				label: jobConfLabel,
-				runs: resultXml.getRunCount(),
-				jobGroup: jobGroup,
-				script: Script.createDefaultScript(jobConfLabel).save(failOnError: true),
-				maxDownloadTimeInMinutes: configService.getDefaultMaxDownloadTimeInMinutes()
-				)
-		//new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
-		jobConfig.setDescription('')
-		return jobConfig
 	}
 
 	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){
@@ -353,6 +332,8 @@ class LocationAndResultPersisterService implements iListener{
 		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, 
 		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor) {
 
+		jobRun.getJob().getConnectivityProfile()
+
 		EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
         result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
@@ -445,6 +426,7 @@ class LocationAndResultPersisterService implements iListener{
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}
         result.testAgent=jobRun.testAgent
+        setConnectivity(result, jobRun)
 
 		// FIXME: 2014-01-27-nku
 		//The following line is necessary in unit-tests since Grails version 2.3, but isn't in production. Should be removed if this bug s fixed in grails.  
@@ -454,6 +436,15 @@ class LocationAndResultPersisterService implements iListener{
 		return result
 		
 	}
+    private void setConnectivity(EventResult result, JobResult jobRun){
+        if (jobRun.job.connectivityProfile){
+            result.connectivityProfile = jobRun.job.connectivityProfile
+        }else if(jobRun.job.noTrafficShapingAtAll){
+            result.customConnectivityName = ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        }else {
+            result.customConnectivityName = jobRun.job.customConnectivityName
+        }
+    }
 	private void informDependents(List<EventResult> results){
 		
 		log.debug('informing event result dependents ...')

@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -30,10 +31,10 @@ import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.ChartingLibrary
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.result.EventResultDashboardController.ShowAllCommand
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -46,16 +47,18 @@ import static org.mockito.Mockito.when
 /**
  * <p>
  * Test-suite of {@link EventResultDashboardController} and 
- * {@link EventResultDashboardController.ShowAllCommand}.
+ * {@link EventResultDashboardShowAllCommand}.
  * </p> 
  * 
  * @author rhe
  * @since IT-98
  */
 @TestFor(EventResultDashboardController)
+@Mock([ConnectivityProfile])
 class EventResultDashboardControllerTests {
 	
 	EventResultDashboardController controllerUnderTest
+    static EventResultDashboardShowAllCommand command
 
 	// Mocks:
 
@@ -77,12 +80,13 @@ class EventResultDashboardControllerTests {
         }
 
 		// Enable constraint tests:
-		mockForConstraintsTests(ShowAllCommand.class);
+		mockForConstraintsTests(EventResultDashboardShowAllCommand.class);
 
 		// The controller under test:
 		controllerUnderTest = controller;
 
 		// Mock relevant services:
+        command = new EventResultDashboardShowAllCommand()
 		this.aggregatorTypeDaoServiceMock = Mockito.mock(AggregatorTypeDaoService.class);
 		controllerUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoServiceMock;
 
@@ -115,36 +119,32 @@ class EventResultDashboardControllerTests {
 	@Test
 	public void testShowAllCommand_EmptyCreationIsInvalid()
 	{
-		ShowAllCommand out = new ShowAllCommand()
-
-		assertFalse(out.validate())
-		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPages)
-		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-		assertNotNull("Collections are never null", out.selectedBrowsers)
-		assertNotNull("Collections are never null", out.selectedLocations)
+		assertFalse(command.validate())
+		assertNotNull("Collections are never null", command.selectedFolder)
+		assertNotNull("Collections are never null", command.selectedPages)
+		assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
+		assertNotNull("Collections are never null", command.selectedBrowsers)
+		assertNotNull("Collections are never null", command.selectedLocations)
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromEmptyRequestArgsIsInvalid()
 	{
-		ShowAllCommand out = new ShowAllCommand()
+		controllerUnderTest.bindData(command, params)
 
-		controllerUnderTest.bindData(out, params)
-
-		assertFalse(out.validate())
-		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPages)
-		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-		assertNotNull("Collections are never null", out.selectedBrowsers)
-		assertNotNull("Collections are never null", out.selectedLocations)
+		assertFalse(command.validate())
+		assertNotNull("Collections are never null", command.selectedFolder)
+		assertNotNull("Collections are never null", command.selectedPages)
+		assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
+		assertNotNull("Collections are never null", command.selectedBrowsers)
+		assertNotNull("Collections are never null", command.selectedLocations)
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults()
@@ -171,47 +171,47 @@ class EventResultDashboardControllerTests {
 		params.selectedAllMeasuredEvents = false
 		params.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
 		params.selectedTimeFrameInterval = 0
+        params.includeNativeConnectivity = false
 		
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertTrue(out.validate())
-		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPages)
-		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-		assertNotNull("Collections are never null", out.selectedBrowsers)
-		assertNotNull("Collections are never null", out.selectedLocations)
+		assertTrue(command.validate())
+		assertNotNull("Collections are never null", command.selectedFolder)
+		assertNotNull("Collections are never null", command.selectedPages)
+		assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
+		assertNotNull("Collections are never null", command.selectedBrowsers)
+		assertNotNull("Collections are never null", command.selectedLocations)
 
-		assertEquals(expectedDateForFrom, out.from);
-		assertEquals("12:00", out.fromHour);
-		assertEquals("13:00", out.toHour);
-		assertEquals(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, out.aggrGroup);
+		assertEquals(expectedDateForFrom, command.from);
+		assertEquals("12:00", command.fromHour);
+		assertEquals("13:00", command.toHour);
+		assertEquals(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, command.aggrGroup);
 
-		assertEquals(1, out.selectedFolder.size())
-		assertTrue(out.selectedFolder.contains(1L))
+		assertEquals(1, command.selectedFolder.size())
+		assertTrue(command.selectedFolder.contains(1L))
 
-		assertEquals(2, out.selectedPages.size())
-		assertTrue(out.selectedPages.contains(1L))
-		assertTrue(out.selectedPages.contains(5L))
+		assertEquals(2, command.selectedPages.size())
+		assertTrue(command.selectedPages.contains(1L))
+		assertTrue(command.selectedPages.contains(5L))
 
-		assertFalse(out.selectedAllMeasuredEvents as boolean)
-		assertEquals(3, out.selectedMeasuredEventIds.size())
-		assertTrue(out.selectedMeasuredEventIds.contains(7L))
-		assertTrue(out.selectedMeasuredEventIds.contains(8L))
-		assertTrue(out.selectedMeasuredEventIds.contains(9L))
+		assertFalse(command.selectedAllMeasuredEvents as boolean)
+		assertEquals(3, command.selectedMeasuredEventIds.size())
+		assertTrue(command.selectedMeasuredEventIds.contains(7L))
+		assertTrue(command.selectedMeasuredEventIds.contains(8L))
+		assertTrue(command.selectedMeasuredEventIds.contains(9L))
 
-		assertFalse(out.selectedAllBrowsers as boolean)
-		assertEquals(1, out.selectedBrowsers.size())
-		assertTrue(out.selectedBrowsers.contains(2L))
+		assertFalse(command.selectedAllBrowsers as boolean)
+		assertEquals(1, command.selectedBrowsers.size())
+		assertTrue(command.selectedBrowsers.contains(2L))
 
-		assertFalse(out.selectedAllLocations as boolean)
-		assertEquals(1, out.selectedLocations.size())
-		assertTrue(out.selectedLocations.contains(17L))
+		assertFalse(command.selectedAllLocations as boolean)
+		assertEquals(1, command.selectedLocations.size())
+		assertTrue(command.selectedLocations.contains(17L))
 
 		// Could we assume the time frame at once?
-		Interval timeFrame = out.selectedTimeFrame;
+		Interval timeFrame = command.selectedTimeFrame;
 
 		DateTime start = timeFrame.getStart();
 		DateTime end = timeFrame.getEnd();
@@ -234,7 +234,7 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate()
@@ -254,15 +254,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour()
@@ -282,15 +281,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute()
@@ -310,15 +308,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}. 
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults()
@@ -344,47 +341,47 @@ class EventResultDashboardControllerTests {
 		params.selectedAllMeasuredEvents = false
 		params.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
 		params.selectedTimeFrameInterval = 0
+        params.includeNativeConnectivity = false
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertTrue(out.validate())
-		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPages)
-		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-		assertNotNull("Collections are never null", out.selectedBrowsers)
-		assertNotNull("Collections are never null", out.selectedLocations)
+		assertTrue(command.validate())
+		assertNotNull("Collections are never null", command.selectedFolder)
+		assertNotNull("Collections are never null", command.selectedPages)
+		assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
+		assertNotNull("Collections are never null", command.selectedBrowsers)
+		assertNotNull("Collections are never null", command.selectedLocations)
 
-		assertEquals(expectedDateForFrom, out.from);
-		assertEquals("16:00", out.fromHour);
-		assertEquals("18:00", out.toHour);
-		assertEquals(AggregatorType.PAGE, out.aggrGroup);
+		assertEquals(expectedDateForFrom, command.from);
+		assertEquals("16:00", command.fromHour);
+		assertEquals("18:00", command.toHour);
+		assertEquals(AggregatorType.PAGE, command.aggrGroup);
 
-		assertEquals(1, out.selectedFolder.size())
-		assertTrue(out.selectedFolder.contains(1L))
+		assertEquals(1, command.selectedFolder.size())
+		assertTrue(command.selectedFolder.contains(1L))
 
-		assertEquals(2, out.selectedPages.size())
-		assertTrue(out.selectedPages.contains(1L))
-		assertTrue(out.selectedPages.contains(5L))
+		assertEquals(2, command.selectedPages.size())
+		assertTrue(command.selectedPages.contains(1L))
+		assertTrue(command.selectedPages.contains(5L))
 
-		assertFalse(out.selectedAllMeasuredEvents as boolean)
-		assertEquals(3, out.selectedMeasuredEventIds.size())
-		assertTrue(out.selectedMeasuredEventIds.contains(7L))
-		assertTrue(out.selectedMeasuredEventIds.contains(8L))
-		assertTrue(out.selectedMeasuredEventIds.contains(9L))
+		assertFalse(command.selectedAllMeasuredEvents as boolean)
+		assertEquals(3, command.selectedMeasuredEventIds.size())
+		assertTrue(command.selectedMeasuredEventIds.contains(7L))
+		assertTrue(command.selectedMeasuredEventIds.contains(8L))
+		assertTrue(command.selectedMeasuredEventIds.contains(9L))
 
-		assertFalse(out.selectedAllBrowsers as boolean)
-		assertEquals(1, out.selectedBrowsers.size())
-		assertTrue(out.selectedBrowsers.contains(2L))
+		assertFalse(command.selectedAllBrowsers as boolean)
+		assertEquals(1, command.selectedBrowsers.size())
+		assertTrue(command.selectedBrowsers.contains(2L))
 
-		assertFalse(out.selectedAllLocations as boolean)
-		assertEquals(1, out.selectedLocations.size())
-		assertTrue(out.selectedLocations.contains(17L))
+		assertFalse(command.selectedAllLocations as boolean)
+		assertEquals(1, command.selectedLocations.size())
+		assertTrue(command.selectedLocations.contains(17L))
 
 		// Could we assume the time frame at once?
-		Interval timeFrame = out.selectedTimeFrame;
+		Interval timeFrame = command.selectedTimeFrame;
 
 		DateTime start = timeFrame.getStart();
 		DateTime end = timeFrame.getEnd();
@@ -423,23 +420,22 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
-		assertNotNull("Collections are never null", out.selectedFolder)
-		assertNotNull("Collections are never null", out.selectedPages)
-		assertNotNull("Collections are never null", out.selectedMeasuredEventIds)
-		assertNotNull("Collections are never null", out.selectedBrowsers)
-		assertNotNull("Collections are never null", out.selectedLocations)
+		assertFalse(command.validate())
+		assertNotNull("Collections are never null", command.selectedFolder)
+		assertNotNull("Collections are never null", command.selectedPages)
+		assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
+		assertNotNull("Collections are never null", command.selectedBrowsers)
+		assertNotNull("Collections are never null", command.selectedLocations)
 
-		assertTrue("Invalid data -> no elements in Collection", out.selectedPages.isEmpty())
-		assertTrue("Invalid data -> no elements in Collection", out.selectedLocations.isEmpty())
+		assertTrue("Invalid data -> no elements in Collection", command.selectedPages.isEmpty())
+		assertTrue("Invalid data -> no elements in Collection", command.selectedLocations.isEmpty())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -458,15 +454,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedPage_isEmpty_for_WEEKLY_PAGE()
@@ -485,15 +480,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedMeasuredEvents_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -512,15 +506,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedBrowsers_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -539,15 +532,14 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedLocations_isEmpty_for_RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES()
@@ -566,11 +558,10 @@ class EventResultDashboardControllerTests {
 		params._action_showAll = 'Anzeigen'
 
 		// Create and fill the command:
-		ShowAllCommand out = new ShowAllCommand()
-		controllerUnderTest.bindData(out, params)
+		controllerUnderTest.bindData(command, params)
 
 		// Verification:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 	}
 
 	@Test
@@ -651,7 +642,7 @@ class EventResultDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(16, result.size());
+		assertEquals(17, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))
@@ -741,43 +732,47 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap()
 	{
 		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
         Date expectedFromDate = new Date(1376776800000L)
-        out.from = expectedFromDate
-		out.fromHour = "12:00"
+        command.from = expectedFromDate
+		command.fromHour = "12:00"
         Date expectedToDate = new Date(1376863200000L)
-        out.to = expectedToDate
-		out.toHour = "13:00"
-        out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedMeasuredEventIds = [7L, 8L, 9L]
-		out.selectedBrowsers = [2L]
-		out.selectedLocations = [17L]
-		out.selectedAllBrowsers = false
-		out.selectedAllLocations = false
-		out.selectedAllMeasuredEvents = false
-		out.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
-		out.debug = false
-		out.setFromHour = false
-		out.setToHour = false
-		
+        command.to = expectedToDate
+		command.toHour = "13:00"
+        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+		command.selectedBrowsers = [2L]
+		command.selectedLocations = [17L]
+		command.selectedAllBrowsers = false
+		command.selectedAllLocations = false
+		command.selectedAllMeasuredEvents = false
+		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+		command.debug = false
+		command.setFromHour = false
+		command.setToHour = false
+        command.includeNativeConnectivity = false
+        command.selectedConnectivityProfiles = []
+        command.selectedAllConnectivityProfiles = true
+        command.includeNativeConnectivity = false
+        command.customConnectivityName = 'Custom (6000.*'
+
 		// Do we fill all fields?
-		assertTrue(out.validate())
+		assertTrue(command.validate())
 
 		// Run the test:
 		Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-		out.copyRequestDataToViewModelMap(dataUnderTest);
+		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(26, dataUnderTest.size());
+		assertEquals(30, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -794,43 +789,48 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'customConnectivityName', 'Custom (6000.*');
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap_defaultsForMissingValues()
 	{
 		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
         Date expectedFromDate = new Date(1376776800000L)
-        out.from = expectedFromDate
-		out.fromHour = null // Missing!
+        command.from = expectedFromDate
+		command.fromHour = null // Missing!
         Date expectedToDate = new Date(1376863200000L)
-        out.to = expectedToDate
-		out.toHour = null // Missing!
-        out.aggrGroup = null // Missing!
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedMeasuredEventIds = [7L, 8L, 9L]
-		out.selectedBrowsers = [2L]
-		out.selectedLocations = [17L]
-		out.selectedAllBrowsers = false
-		out.selectedAllLocations = false
-		out.selectedAllMeasuredEvents = false
-		out.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
-		out.debug = false
-		out.setFromHour = false
-		out.setToHour = false
+        command.to = expectedToDate
+		command.toHour = null // Missing!
+        command.aggrGroup = null // Missing!
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+		command.selectedBrowsers = [2L]
+		command.selectedLocations = [17L]
+		command.selectedAllBrowsers = false
+		command.selectedAllLocations = false
+		command.selectedAllMeasuredEvents = false
+		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+		command.debug = false
+		command.setFromHour = false
+		command.setToHour = false
+        command.includeNativeConnectivity = false
+        command.customConnectivityName = 'Custom (6000.*'
 
 		// Run the test:
 		Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-		out.copyRequestDataToViewModelMap(dataUnderTest);
+		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(24, dataUnderTest.size());
+		assertEquals(28, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -848,44 +848,49 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCopyRequestDataToViewModelMap_selectAllSelection()
 	{
 		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
         Date expectedFromDate = new Date(1376776800000L)
-        out.from = expectedFromDate
-		out.fromHour = "12:00"
-				// to = '19.08.2013'
+        command.from = expectedFromDate
+		command.fromHour = "12:00"
+        // to = '19.08.2013'
         Date expectedToDate = new Date(1376863200000L)
-        out.to = expectedToDate
-		out.toHour = "13:00"
-				out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedAllMeasuredEvents = 'on'
-		out.selectedMeasuredEventIds = []
-		out.selectedBrowsers = [2L]
-		out.selectedLocations = [17L]
-		out.selectedAllBrowsers = false
-		out.selectedAllLocations = false
-		out.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
-		out.debug = true
-		out.setFromHour = false
-		out.setToHour = false
+        command.to = expectedToDate
+		command.toHour = "13:00"
+        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedAllMeasuredEvents = 'on'
+		command.selectedMeasuredEventIds = []
+		command.selectedBrowsers = [2L]
+		command.selectedLocations = [17L]
+		command.selectedAllBrowsers = false
+		command.selectedAllLocations = false
+		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+		command.debug = true
+		command.setFromHour = false
+		command.setToHour = false
+        command.includeNativeConnectivity = false
+        command.customConnectivityName = 'Custom (6000/.*'
+        command.selectedConnectivityProfiles = []
+        command.selectedAllConnectivityProfiles = true
+        command.includeNativeConnectivity = false
+        command.customConnectivityName = 'Custom (6000.*'
 
 		// Do we fill all fields?
-		assertTrue(out.validate())
+		assertTrue(command.validate())
 
 		// Run the test:
 		Map<String, Object> dataUnderTest = new HashMap<String, Object>();
-		out.copyRequestDataToViewModelMap(dataUnderTest);
+		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(26, dataUnderTest.size());
+		assertEquals(30, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -902,40 +907,41 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', "13:00");
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllConnectivityProfiles', true);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'customConnectivityName', 'Custom (6000.*');
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams()
 	{
-		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
-		
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
-		out.fromHour = "12:00"
+		command.from = new Date(1376776800000L)
+		command.fromHour = "12:00"
 		// to = '19.08.2013'
-		out.to = new Date(1376863200000L)
-		out.toHour = "13:00"
-		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedMeasuredEventIds = [7L, 8L, 9L]
-		out.selectedBrowsers = [2L]
-		out.selectedLocations = [17L]
-		out.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
-		out.selectedAllMeasuredEvents = false
-		out.selectedAllBrowsers = false
-		out.selectedAllLocations = false
-        out.selectedTimeFrameInterval = 0
+		command.to = new Date(1376863200000L)
+		command.toHour = "13:00"
+		command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+		command.selectedBrowsers = [2L]
+		command.selectedLocations = [17L]
+		command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
+		command.selectedAllMeasuredEvents = false
+		command.selectedAllBrowsers = false
+		command.selectedAllLocations = false
+        command.selectedTimeFrameInterval = 0
+        command.includeNativeConnectivity = false
 
 		// Do we fill all fields?
-		assertTrue(out.validate())
+		assertTrue(command.validate())
 
 		// Run the test:
-		MvQueryParams mvQueryParams = out.createMvQueryParams();
+		MvQueryParams mvQueryParams = command.createMvQueryParams();
 
 		// Verification:
 		assertNotNull(mvQueryParams);
@@ -947,35 +953,34 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_MeasuredEvents()
 	{
-		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
-		out.fromHour = "12:00"
+		command.from = new Date(1376776800000L)
+		command.fromHour = "12:00"
 		// to = '19.08.2013'
-		out.to = new Date(1376863200000L)
-		out.toHour = "13:00"
-		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedAllMeasuredEvents = 'on';
-		out.selectedMeasuredEventIds = [7L, 8L, 9L]
-		out.selectedBrowsers = [2L]
-		out.selectedLocations = [17L]
-		out.selectedAllBrowsers = false
-		out.selectedAllLocations = false
-		out.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+		command.to = new Date(1376863200000L)
+		command.toHour = "13:00"
+		command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedAllMeasuredEvents = 'on';
+		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+		command.selectedBrowsers = [2L]
+		command.selectedLocations = [17L]
+		command.selectedAllBrowsers = false
+		command.selectedAllLocations = false
+		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+        command.includeNativeConnectivity = false
 
 		// Do we fill all fields?
-		assertTrue(out.validate())
+		assertTrue(command.validate())
 
 		// Run the test:
-		MvQueryParams mvQueryParams = out.createMvQueryParams();
+		MvQueryParams mvQueryParams = command.createMvQueryParams();
 
 		// Verification:
 		assertNotNull(mvQueryParams);
@@ -988,35 +993,34 @@ class EventResultDashboardControllerTests {
 	}
 
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Browsers()
 	{
-		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
-		out.fromHour = "12:00"
+		command.from = new Date(1376776800000L)
+		command.fromHour = "12:00"
 		// to = '19.08.2013'
-		out.to = new Date(1376863200000L)
-		out.toHour = "13:00"
-		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedMeasuredEventIds = [7L, 8L, 9L]
-		out.selectedAllBrowsers = true;
-		out.selectedBrowsers = [2L]
-		out.selectedLocations = [17L]
-		out.selectedAllLocations = false
-		out.selectedAllMeasuredEvents = false
-		out.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+		command.to = new Date(1376863200000L)
+		command.toHour = "13:00"
+		command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+		command.selectedAllBrowsers = true;
+		command.selectedBrowsers = [2L]
+		command.selectedLocations = [17L]
+		command.selectedAllLocations = false
+		command.selectedAllMeasuredEvents = false
+		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+        command.includeNativeConnectivity = false
 
 		// Do we fill all fields?
-		assertTrue(out.validate())
+		assertTrue(command.validate())
 
 		// Run the test:
-		MvQueryParams mvQueryParams = out.createMvQueryParams();
+		MvQueryParams mvQueryParams = command.createMvQueryParams();
 
 		// Verification:
 		assertNotNull(mvQueryParams);
@@ -1029,35 +1033,34 @@ class EventResultDashboardControllerTests {
 	}
 	
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test
 	public void testShowAllCommand_testCreateMvQueryParams_SelectAllIgnoresRealSelection_Locations()
 	{
-		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
 		// form = '18.08.2013'
-		out.from = new Date(1376776800000L)
-		out.fromHour = "12:00"
+		command.from = new Date(1376776800000L)
+		command.fromHour = "12:00"
 		// to = '19.08.2013'
-		out.to = new Date(1376863200000L)
-		out.toHour = "13:00"
-		out.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
-		out.selectedFolder = [1L]
-		out.selectedPages = [1L, 5L]
-		out.selectedMeasuredEventIds = [7L, 8L, 9L]
-		out.selectedBrowsers = [2L]
-		out.selectedAllLocations = true;
-		out.selectedLocations = [17L]
-		out.selectedAllBrowsers = false
-		out.selectedAllMeasuredEvents = false
-		out.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+		command.to = new Date(1376863200000L)
+		command.toHour = "13:00"
+		command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+		command.selectedFolder = [1L]
+		command.selectedPages = [1L, 5L]
+		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+		command.selectedBrowsers = [2L]
+		command.selectedAllLocations = true;
+		command.selectedLocations = [17L]
+		command.selectedAllBrowsers = false
+		command.selectedAllMeasuredEvents = false
+		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
+        command.includeNativeConnectivity = false
 		
 		// Do we fill all fields?
-		assertTrue(out.validate())
+		assertTrue(command.validate())
 
 		// Run the test:
-		MvQueryParams mvQueryParams = out.createMvQueryParams();
+		MvQueryParams mvQueryParams = command.createMvQueryParams();
 
 		// Verification:
 		assertNotNull(mvQueryParams);
@@ -1069,20 +1072,54 @@ class EventResultDashboardControllerTests {
 				[] as SortedSet, mvQueryParams.locationIds);
 	}
 
+    /**
+     * Test for inner class {@link EventResultDashboardShowAllCommand}.
+     */
+    @Test
+    public void testShowAllCommand_testCreateMvQueryParams_()
+    {
+        // form = '18.08.2013'
+        command.from = new Date(1376776800000L)
+        command.fromHour = "12:00"
+        // to = '19.08.2013'
+        command.to = new Date(1376863200000L)
+        command.toHour = "13:00"
+        command.aggrGroup = AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES.toString()
+        command.selectedFolder = [1L]
+        command.selectedPages = [1L, 5L]
+        command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedBrowsers = [2L]
+        command.selectedLocations = [17L]
+        command.selectedAggrGroupValuesCached = [AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES]
+        command.selectedAllMeasuredEvents = false
+        command.selectedAllBrowsers = false
+        command.selectedAllLocations = false
+        command.selectedTimeFrameInterval = 0
+        command.selectedAllConnectivityProfiles = []
+        command.includeNativeConnectivity = true
+
+        // Do we fill all fields?
+        assertTrue(command.validate())
+
+        // Run the test:
+        MvQueryParams mvQueryParams = command.createMvQueryParams();
+
+        // Verification:
+        assertNotNull(mvQueryParams);
+        assertEquals([1L] as SortedSet, mvQueryParams.jobGroupIds);
+    }
+
 	/**
-	 * Test for inner class {@link CsiDashboardController.ShowAllCommand}.
+	 * Test for inner class {@link EventResultDashboardShowAllCommand}.
 	 */
 	@Test(expected=IllegalStateException.class)
 	public void testShowAllCommand_testCreateMvQueryParams_invalidCommand()
 	{
-		// Create and fill a command:
-		ShowAllCommand out = new ShowAllCommand()
-
 		// Should be invalid:
-		assertFalse(out.validate())
+		assertFalse(command.validate())
 
 		// Run the test:
-		out.createMvQueryParams();
+		command.createMvQueryParams();
 	}
 
 	/**
