@@ -325,6 +325,7 @@ class BootStrap {
 	void createConnectivityProfileIfMissing(Integer bwDown, Integer bwUp, Integer latency, String name, Integer packetLoss){
 		ConnectivityProfile.findByName(name)?:
 			new ConnectivityProfile(
+                active: true,
 				bandwidthDown: bwDown,
 				bandwidthUp: bwUp,
 				latency: latency,
