@@ -68,6 +68,20 @@ modules = {
         resource url: 'js/charts/chart-export.js'
         resource url: 'js/charts/chart-adjustment.js'
     }
+    'iteratec-chart-minimal' {
+
+        //TODO: refactoring of js/rickshaw/rickshawChartCreation.js so that it can be used in a generic way for different charts. The use of
+        //          separate rickshaw-libs is no good idea at all, but I had to implement default csi functionality very urgent
+        //          nkuhn, 2015-09-07
+
+        if (grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs.contains(ChartingLibrary.RICKSHAW)) {
+            resource url: 'js/d3/d3.v3.js'
+            resource url: 'css/rickshaw/rickshaw.min.css'
+            resource url: 'js/rickshaw/rickshaw.min.js'
+            resource url: 'js/rickshaw/SimpleGraphBuilder.js'
+        }
+
+    }
     /**
      * Just a wrapper for date and timepicker-logic and charting-stuff for dashboards.
      */

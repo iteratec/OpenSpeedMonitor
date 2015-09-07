@@ -17,7 +17,49 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.csi.DefaultTimeToCsMapping
+import de.iteratec.osm.csi.RickshawTransformableCsMapping
+
 class RickshawHtmlCreater {
+
+    def generateCsiMappingsChartHtml = {defaultMappings, chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
+                                        chartBottomOffset, yAxisTopOffset, bottomOffsetLegend ->
+
+        def sw = new StringWriter()
+
+        //edit/show: 130
+        //modal: 220
+
+        sw << """
+        <div id="chart_container_${chartIdentifier} style="position: relative;margin-left: 25px;">
+            <div id="y_axis_${chartIdentifier}" style="position:relative;right:${yAxisRightOffset}px;top:${yAxisTopOffset}px"></div>
+            <div id="chart_${chartIdentifier}" style="position:relative;bottom:${chartBottomOffset}px;"></div>
+            <div id="legend_container_${chartIdentifier}">
+                <div id="smoother_${chartIdentifier}" title="Smoothing"></div>
+                <div id="legend_${chartIdentifier}" style="position:relative;bottom:${bottomOffsetLegend}px;"></div>
+            </div>
+            <div id="x_axis_${chartIdentifier}" style="position:relative;bottom: ${bottomOffsetXAxis}px;"></div>
+        </div>
+
+        <script>
+
+        var graphBuilder_${chartIdentifier}
+
+        \$(document).ready(function(){
+
+            var palette = new Rickshaw.Color.Palette();
+            var args = {
+                defaultMappings: ${transformCSIMappingData(defaultMappings)},
+                chartIdentifier: '${chartIdentifier}'
+            };
+
+            graphBuilder_${chartIdentifier} = new SimpleGraphBuilder(args);
+
+        })
+        </script>
+        """
+
+    }
 
     /**
      * Generates Html code to define containers used by rickshaw
@@ -141,5 +183,32 @@ class RickshawHtmlCreater {
             prefix = ","
         }
         sw << """ ]"""
+    }
+
+    /**
+     * Transforms the data stored in a List of {@link DefaultTimeToCsMapping}s
+     * into a datastructure which can be used in javascript.
+     */
+    def transformCSIMappingData = { List<RickshawTransformableCsMapping> transformableMappings ->
+
+        def sw = new StringWriter()
+        sw << "["
+
+        Map seriesData = [:].withDefault{key -> new HashMap<Integer, Double>()}
+        transformableMappings.each {mapping ->
+            seriesData[mapping.retrieveGroupingCriteria()][mapping.retrieveLoadTimeInMilliSecs()]=mapping.retrieveCustomerSatisfactionInPercent()
+        }
+        seriesData.each {String name, Map loadTimeToCsMap ->
+            sw << " { "
+            sw << " name: '${name}', "
+            sw << " color: palette.color(), "
+            sw << " data: [ "
+            loadTimeToCsMap.keySet().sort().each{loadTime ->
+                sw << " {x: ${loadTime}, y: ${loadTimeToCsMap[loadTime]}}, "
+            }
+            sw << " ]}, "
+        }
+
+        sw << " ]"
     }
 }

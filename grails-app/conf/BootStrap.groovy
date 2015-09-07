@@ -38,6 +38,8 @@ import de.iteratec.osm.util.I18nService
 import grails.util.Environment
 import org.joda.time.DateTime
 
+import static de.iteratec.osm.util.Constants.*
+
 class BootStrap {
 	
 	EventMeasuredValueService eventMeasuredValueService
@@ -318,9 +320,36 @@ class BootStrap {
 //			targetGraph.pointOne = val1
 //			targetGraph.save(failOnError: true)
 //		}
-				
+
+        createDefaultTimeToCsiMappingIfMissing()
+
 		log.info "initCsiData ends"
 	}
+
+    /**
+     * These default mappings can be assigned to measured pages if no data of a real customer survey exist.
+     * Get created only if no one exist at all.
+     */
+    void createDefaultTimeToCsiMappingIfMissing(){
+
+        if(DefaultTimeToCsMapping.list().size()==0){
+
+            Map indexToMappingName = [1: '1 - impatient', 2: '2', 3: '3', 4: '4', 5: '5 - patient']
+            DEFAULT_CSI_MAPPINGS.each {mappingDataList ->
+
+                5.times{defaultMappingindex ->
+                    new DefaultTimeToCsMapping(
+                        name: indexToMappingName[defaultMappingindex+1],
+                        loadTimeInMilliSecs: mappingDataList[0],
+                        customerSatisfactionInPercent: mappingDataList[defaultMappingindex+1]
+                    ).save(failOnError: true)
+                }
+
+            }
+
+        }
+
+    }
 	
 	void createConnectivityProfileIfMissing(Integer bwDown, Integer bwUp, Integer latency, String name, Integer packetLoss){
 		ConnectivityProfile.findByName(name)?:

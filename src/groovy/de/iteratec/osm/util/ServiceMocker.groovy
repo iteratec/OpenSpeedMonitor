@@ -18,7 +18,6 @@
 package de.iteratec.osm.util
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
@@ -30,7 +29,6 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.persistence.DbCleanupService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.*
 import grails.test.mixin.TestMixin
@@ -398,14 +396,14 @@ class ServiceMocker {
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param timeToCsMappings
-	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getTimeToCsMappings()}.
+	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getMappings()}.
 	 * @param frustrations
 	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
 	 */
 	void mockTimeToCsMappingService(serviceToMockIn, timeToCsMappings, frustrations){
 		def timeToCsMappingCacheService = mockFor(TimeToCsMappingCacheService)
-		
-		timeToCsMappingCacheService.demand.getTimeToCsMappings(0..25) { ->
+
+		timeToCsMappingCacheService.demand.getMappingsFor(0..25) {Page page ->
 			return timeToCsMappings
 		}
 		timeToCsMappingCacheService.demand.getCustomerFrustrations(0..25) {Page page ->
@@ -428,6 +426,9 @@ class ServiceMocker {
 		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
 			//not the concern of this test
 		}
+        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
+            //not the concern of this test
+        }
 		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.createMock()
 	}
 	/**
