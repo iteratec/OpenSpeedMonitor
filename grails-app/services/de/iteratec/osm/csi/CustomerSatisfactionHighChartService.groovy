@@ -375,8 +375,9 @@ class CustomerSatisfactionHighChartService {
 
 		List<OsmChartGraph> result=Collections.checkedList(new ArrayList<OsmChartGraph>(), OsmChartGraph.class);
 
+        CsTargetGraph actualTargetGraph
         try{
-            CsTargetGraph actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
+            actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
         }catch(NullPointerException npe){
             log.info("No customer satisfaction target graph exist for actual locale.")
         }

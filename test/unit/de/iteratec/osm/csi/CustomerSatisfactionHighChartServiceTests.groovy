@@ -559,7 +559,7 @@ class CustomerSatisfactionHighChartServiceTests {
 									interval: hourly,
 									aggregator: measured_event,
 									tag: "${zeroBasedIndexJobGroup+1};${zeroBasedIndexPage+1};${zeroBasedIndexMeasuredEvent+1};${zeroBasedIndexBrowser+1};${zeroBasedIndexLocation+1}",
-									value: 0.85,
+									value: 85,
 									resultIds: '1,2'
 									))
 						}}}}}
@@ -570,7 +570,7 @@ class CustomerSatisfactionHighChartServiceTests {
 			interval: hourly,
 			aggregator: page,
 			tag: "1;1",
-			value: 0.85,
+			value: 85,
 			resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -578,7 +578,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;1",
-				value: 0.83,
+				value: 83,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -586,7 +586,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;1",
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			),
 			new MeasuredValue(
@@ -594,7 +594,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;2",
-				value: 0.65,
+				value: 65,
 				resultIds: '7,8'
 			),
 			new MeasuredValue(
@@ -602,7 +602,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;2",
-				value: 0.67,
+				value: 67,
 				resultIds: '9,10'
 			)
 		]
@@ -613,7 +613,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.85,
+				value: 85,
 				resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -621,7 +621,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.83,
+				value: 83,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -629,7 +629,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			)
 		]
@@ -648,7 +648,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.83,
+				value: 83,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -656,7 +656,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			)
 		]
@@ -667,7 +667,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.32,
+				value: 32,
 				resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -675,7 +675,7 @@ class CustomerSatisfactionHighChartServiceTests {
 			interval: weekly,
 			aggregator: shop,
 			tag: '1',
-			value: 0.83,
+			value: 83,
 			resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -683,7 +683,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			)
 		]
@@ -694,7 +694,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.324562,
+				value: 32.4562,
 				resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -702,7 +702,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.8312367,
+				value: 83.12367,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -710,7 +710,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.790968,
+				value: 79.0968,
 				resultIds: '3,4'
 			)
 		]
