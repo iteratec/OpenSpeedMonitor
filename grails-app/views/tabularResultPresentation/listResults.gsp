@@ -3,7 +3,7 @@
 <head>
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isocsi.eventResult"/></title>
-	<r:require modules="eventresult" />
+	<asset:javascript src="eventresult/eventResult.js"/>
 	<style type="text/css">
 	/* css for timepicker */
 	.ui-timepicker-div .ui-widget-header {
@@ -103,11 +103,12 @@
    	 		model="${[model: paginationListing] }" />
 		
 	</g:if>
-	<r:script>
+	<asset:script type="text/javascript">
 		$(document).ready(doOnDomReady(
 			'${dateFormat}', 
 			${weekStart}, 
 			'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'));
-	</r:script>
+	</asset:script>
+	<asset:deferredScripts/>
 </body>
 </html>

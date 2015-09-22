@@ -1,6 +1,7 @@
 <%@ page import="org.springframework.web.util.HtmlUtils" %>
-<r:use modules="codemirror" />
-<r:script>
+<asset:stylesheet src="codemirror/codemirrorManifest.css"/>
+<asset:javascript src="codemirror/codemirrorManifest.js"/>
+<asset:script type="text/javascript">
 	var markedLines = [];
 	
 	function markLine(editor, lineNumber, cssClass) {
@@ -34,7 +35,7 @@
 				for (var lineNumber in result.warnings) {
 					lineNumber = parseInt(lineNumber);
 					markLine(editor, lineNumber, 'setEventName-warning-line');
-					var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return warningMsgs[warning.type.name]; }).join('</li><li>');
+					var warningsForCurrentLine = result.warnings[lineNumber].map(function(warning) { return warningMsgs[warning.type.name]; }).join('</li><a>');
 					editor.setGutterMarker(lineNumber, 'setEventName-warning-gutter',
 						 $('#setEventName-warning-clone').clone()
 						 	.attr('id', '')
@@ -115,8 +116,8 @@
 		createCodemirrorEditor();
 	}); 
 	</g:if>
-</r:script>
-
+</asset:script>
+<asset:deferredScripts/>
 <label for="navigationScript">
     <g:message code="script.navigationScript.label" default="Code" />
 </label>

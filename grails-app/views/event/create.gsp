@@ -7,7 +7,7 @@
 	<meta name="layout" content="kickstart" />
 	<g:set var="entityName" value="${message(code: 'event.label', default: 'Event')}" />
 	<title><g:message code="default.create.label" args="[entityName]" /></title>
-  <r:require modules="event" />
+  <asset:javascript src="event/event.js" />
 </head>
 
 <body>
@@ -31,10 +31,11 @@
 	</g:form>
 	
 </section>
-		
-  <r:script>
-    $(document).ready(doOnDomReady());
-  </r:script>
+
+	<asset:script type="text/javascript">
+    	$(document).ready(doOnDomReady());
+  	</asset:script>
+	<asset:deferredScripts/>
 </body>
 
 </html>

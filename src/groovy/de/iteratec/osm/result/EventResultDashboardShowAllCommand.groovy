@@ -26,7 +26,7 @@ import java.util.regex.Pattern
  * @author mze , rhe
  * @since IT-6
  */
-@Validateable
+@Validateable(nullable = true)
 public class EventResultDashboardShowAllCommand {
 
     public final static Integer LINE_CHART_SELECTION = 0;

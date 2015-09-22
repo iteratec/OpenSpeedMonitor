@@ -4,7 +4,7 @@
 <meta name="layout" content="kickstart_osm" />
 <g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Skript')}" />
 <title><g:message code="de.iteratec.iss.scripts" /></title>
-<script src="<g:resource dir="js/script" file="list.js" absolute="true" />"></script>
+<asset:javascript src="script/list.js"/>
 <style>
 td, th {
 	border: 1px #ccc solid;
@@ -22,7 +22,7 @@ td, th {
 	</div>
 	<div class="controlribbon">
 		<a href="<g:createLink action="create" />" class="btn btn-primary">
-			<i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+			<i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
 		</a>
 	</div><br>
     <g:if test="${scripts.isEmpty()}">

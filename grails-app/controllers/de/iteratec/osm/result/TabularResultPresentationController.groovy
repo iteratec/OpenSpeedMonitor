@@ -197,7 +197,7 @@ class TabularResultPresentationController {
         render(view: 'listResults', model: modelToRender)
     }
 
-    @Validateable
+    @Validateable(nullable = true)
     public static class EventResultsCommandBase {
         /**
          * The selected start date.
@@ -371,7 +371,7 @@ class TabularResultPresentationController {
         }
     }
 
-    @Validateable
+    @Validateable(nullable = true)
     public static class ListResultsForSpecificJobCommand extends EventResultsCommandBase {
         Job job
 
@@ -397,7 +397,7 @@ class TabularResultPresentationController {
      * @author mze
      * @since IT-74
      */
-    @Validateable
+    @Validateable(nullable = true)
     public static class ListResultsCommand extends EventResultsCommandBase{
         /**
          * The database IDs of the selected {@linkplain JobGroup CSI groups}

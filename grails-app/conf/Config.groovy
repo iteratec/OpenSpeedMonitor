@@ -99,22 +99,25 @@ grails.exceptionresolver.params.exclude = ['password']
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
 
+beans {
+    cacheManager {
+        shared = true
+    }
+}
 // so Tag and TagLink can be referenced in HQL queries. See http://grails.org/plugin/taggable
 grails.taggable.tag.autoImport = true
 grails.taggable.tagLink.autoImport = true
-
-grails.cache.enabled = false
 
 def logDirectory = '.'
 
 grails.config.defaults.locations = [KickstartResources]
 
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
-grails.plugins.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
-grails.plugins.springsecurity.securityConfigType = "InterceptUrlMap"
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
+grails.plugin.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
+grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
 
-grails.plugins.springsecurity.interceptUrlMap = [
+grails.plugin.springsecurity.interceptUrlMap = [
 //////////////////////////////////////////////////////////////////
 //free for all (even guests not logged in)
 //////////////////////////////////////////////////////////////////
@@ -165,32 +168,6 @@ grails.plugins.springsecurity.interceptUrlMap = [
 '/**'                                         : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
 ]
 
-grails.plugins.dynamicController.mixins = [
-        'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin'  :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin'  :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin':
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        /*
-         'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-         'com.burtbeckwith.appinfo_test.AdminManageController',
-         'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-         'com.burtbeckwith.appinfo_test.AdminManageController',
-         'app.info.custom.example.MyConfigControllerMixin' :
-         'com.burtbeckwith.appinfo_test.AdminManageController'
-         */
-]
-
 /*
  *	Configure charting libraries available in OpenSpeedMonitor.
  * 	Default is rickshaw, see http://code.shutterstock.com/rickshaw/
@@ -207,6 +184,16 @@ grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.h
 // unit: seconds
 grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
 
+//Exclude alle .less files, but not the main less files. This.will solv.dependency errors and will increase the performance.
+grails.assets.less.compile = 'less4j'
+grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
+grails.assets.plugin."font-awesome-resources".excludes = ["**/*.less"]
+grails.assets.excludes = ["openspeedmonitor.less"]
+
+grails.assets.minifyJs = true
+grails.assets.minifyCss = true
+
+
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 environments {
@@ -216,6 +203,10 @@ environments {
 
         grails.dbconsole.enabled = true
         grails.dbconsole.urlRoot = '/admin/dbconsole'
+
+        // backwards compability: default hash algo in :spring-security-core:1.2.7.3
+        grails.plugin.springsecurity.password.algorithm = 'SHA-256'
+        grails.plugin.springsecurity.password.hash.iterations = 1
 
         // disabling hashing and caching of resources:
         // 2014-03-31 nku: doesn't work :-(

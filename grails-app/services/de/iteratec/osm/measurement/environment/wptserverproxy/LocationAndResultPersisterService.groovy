@@ -559,8 +559,8 @@ class LocationAndResultPersisterService implements iListener{
 	void deleteResultsMarkedAsPendingAndRunning(String jobLabel, String testId){
 		JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true)
 	}
-	
-	public String getName() {
+	@Override
+	public String getListenerName() {
 		return "LocationAndResultPersisterService"
 	}
 }

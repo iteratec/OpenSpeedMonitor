@@ -52,7 +52,7 @@ class BootStrap {
 	def grailsApplication
 
 	def init = { servletContext ->
-		
+
 		switch (Environment.getCurrent()) {
 			case Environment.DEVELOPMENT :
 				initApplicationData(true)

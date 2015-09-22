@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <%@ page import="de.iteratec.osm.report.chart.AggregatorType" %>
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
-<%@ page import="grails.plugins.springsecurity.SpringSecurityService" %>
+<%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificDashboard" %>
 <%
@@ -12,7 +12,7 @@
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isocsi.csiDashboard"/></title>
 	
-	<r:require modules="csi-dashboard" />
+	<asset:javascript src="csidashboard/csiDashboard.js" />
 	
 	<style>
 		/* css for timepicker */
@@ -226,7 +226,7 @@
 		</g:if>
 	</g:else>
   <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-	<r:script>
+	<asset:script type="text/javascript">
 		$(document).ready(
 			doOnDomReady(
 				'dd.mm.yyyy', 
@@ -234,6 +234,7 @@
 				'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
 			)
 		);		
-	</r:script>
+	</asset:script>
+	<asset:deferredScripts/>
 </body>
 </html>

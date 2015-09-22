@@ -35,7 +35,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 				<div class="span2">
 					<div class="input-append bootstrap-timepicker">
 						<input id="fromHourTimepicker" type="text" class="input-small content-box" value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled>
-						<span class="add-on"><i class="icon-time"></i></span>
+						<span class="add-on"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</div>
 			</fieldset>
@@ -67,7 +67,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 				<div class="span2">
 					<div class="input-append bootstrap-timepicker">
 						<input id="toHourTimepicker" type="text" class="input-small content-box" value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled>
-						<span class="add-on"><i class="icon-time"></i></span>
+						<span class="add-on"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</div>
 			</fieldset>

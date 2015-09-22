@@ -3,12 +3,13 @@
 <head>
 <meta name="layout" content="kickstart_osm" />
 <title><g:message code="queue.status.label" /></title>
-<r:use modules="queuestatus, timeago" />
+<asset:stylesheet src="queueStatus/list.css"/>
+<asset:javascript src="timeago/jquery.timeago.js"/>
 <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-	<r:use modules="timeago-de" />
+	<asset:javascript src="timeago/timeagoDe.js"/>
 </g:if>
 
-<r:script>
+<asset:script type="text/javascript">
 	/*
 	function refreshQueues() {
 		var rowVisible = []
@@ -88,10 +89,11 @@
 		});
 		*/
 	});
-</r:script>
+</asset:script>
+<asset:deferredScripts/>
 <style>
 .running {
-	background: center left no-repeat url('<g:resource dir="images" file="loading_indicator.gif" absolute="true" />');
+	background: center left no-repeat url('loading_indicator.gif');
 	padding-left: 20px;
 }
 .new-col-sec {

@@ -29,7 +29,7 @@
         </button>
     </div>
 </div>
-<r:script>
+<asset:script type="text/javascript">
     $(document).ready(function(){
 
         var cookieKeyCsiDashboardTitle = '${de.iteratec.osm.util.Constants.COOKIE_KEY_CSI_DASHBOARD_TITLE}';
@@ -53,4 +53,5 @@
         });
 
     });
-</r:script>
+</asset:script>
+<asset:deferredScripts/>

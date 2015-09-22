@@ -20,8 +20,9 @@ GSP-Template Mappings:
 * selectedLocations
 * selectedAllLocations
  --%>
-
-<r:require modules="select-measurings, chosen"/>
+<asset:javascript src="select-measurings.js"/>
+<asset:javascript src="chosen/chosen.jquery.min.js"/>
+<asset:stylesheet src="chosen/chosen.css"/>
 
 <div class="row">
     <div class="span4">
@@ -176,7 +177,7 @@ GSP-Template Mappings:
     </div>
 
 </div>
-<r:script>
+<asset:script type="text/javascript">
  	var pagesToEvents = [];
     <g:each var="page" in="${pages}">
     <g:if test="${eventsOfPages[page.id] != null}">
@@ -191,4 +192,5 @@ GSP-Template Mappings:
                                                        in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
         </g:if>
     </g:each>
-</r:script>
+</asset:script>
+<asset:deferredScripts/>

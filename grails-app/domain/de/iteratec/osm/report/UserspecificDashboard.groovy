@@ -21,9 +21,7 @@ package de.iteratec.osm.report
 
 import java.text.SimpleDateFormat
 
-import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
-
-
+import grails.plugin.springsecurity.SpringSecurityUtils
 
 
 
