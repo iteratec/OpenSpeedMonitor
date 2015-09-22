@@ -21,23 +21,31 @@ import org.joda.time.DateTime
 import org.joda.time.Duration
 
 class TimeToCsMappingCacheService {
-	
-	private Map<String, Double> timeToCsMappings
+
+	private List<TimeToCsMapping> timeToCsMappings
 	private final Integer fetchingMappingsFrequencyInHours = 24
 	private DateTime lastFetchOfMappings = new DateTime(1980,1,1,0,0)
-	
+
 	private Map<String, List<Integer>> frustrations
 	private final Integer fetchingFrustrationsFrequencyInHours = 24
 	private DateTime lastFetchOfFrustrations = new DateTime(1980,1,1,0,0)
-	
-	public Map<String, Double> getTimeToCsMappings(){
+
+    public List<TimeToCsMapping> getMappingsFor(Page page){
+        Duration durationSinceLastFetch = new Duration(lastFetchOfMappings.getMillis(), new DateTime().getMillis())
+        if(!timeToCsMappings || durationSinceLastFetch.getStandardHours()>fetchingMappingsFrequencyInHours){
+            fetchMappings()
+        }
+        return timeToCsMappings.findAll {it.page.ident() == page.ident()}
+    }
+
+	public List<TimeToCsMapping> getMappings(){
 		Duration durationSinceLastFetch = new Duration(lastFetchOfMappings.getMillis(), new DateTime().getMillis())
 		if(!timeToCsMappings || durationSinceLastFetch.getStandardHours()>fetchingMappingsFrequencyInHours){
 			fetchMappings()
 		}
 		return timeToCsMappings
 	}
-	
+
 	public List<Integer> getCustomerFrustrations(Page page){
 		Duration durationSinceLastFetch = new Duration(lastFetchOfFrustrations.getMillis(), new DateTime().getMillis())
 		if (log.infoEnabled) {
@@ -49,33 +57,57 @@ class TimeToCsMappingCacheService {
 		}
 		return frustrations[page.name]
 	}
-	
-	private fetchMappings(){
-		timeToCsMappings = [:]
-		def query = TimeToCsMapping.where {
-			mappingVersion >= max(mappingVersion)//bug in grails 2.1.1: == doesn't work with subqueries
-		  }
-		List<TimeToCsMapping> timeToCsMappingsFromDb = query.findAll()
-		List actualMapings = TimeToCsMapping.findAllByMappingVersion(timeToCsMappingsFromDb?timeToCsMappingsFromDb[0].mappingVersion:-1)
-		Integer i
-		for(i=0;i<actualMapings.size();i++){
-			if (log.infoEnabled) {
-				log.info("key in der mapping-map=${actualMapings[i].page.name}_${actualMapings[i].loadTimeInMilliSecs.toString()}")
-			}
-			timeToCsMappings["${actualMapings[i].page.name}_${actualMapings[i].loadTimeInMilliSecs.toString()}"]=actualMapings[i].customerSatisfaction
-		}
-		//grails-/groovy-bug: the following leeds to StackOverflow...
-//		actualMapings.each{mapping ->
-//			log.info("key in der mapping-map=${mapping.page.name}_${mapping.loadTimeInMilliSecs.toString()}")
-//			timeToCsMappings["${mapping.page.name}_${mapping.loadTimeInMilliSecs.toString()}"]=mapping.customerSatisfaction
-//		}
+
+	void fetchMappings(){
+
+        log.info('start fetch mapping for cache')
+        timeToCsMappings = getActualMappingsFromDb()
+
 		lastFetchOfMappings = new DateTime()
-		if(log.debugEnabled){
-			timeToCsMappings.each{entry ->
-				log.debug "entry.key=${entry.key}, entry.value=${entry.value}"
-			}
-		}
+
+        List<Page> pagesWithInvalidMappings = []
+        timeToCsMappings*.page.unique().each {page ->
+            List<TimeToCsMapping> mappingsOfActualPage = timeToCsMappings.findAll { it.page.ident() == page.ident() }
+            if (!isValid(mappingsOfActualPage)){
+                pagesWithInvalidMappings.add(page)
+            }
+        }
+        pagesWithInvalidMappings.each {page ->
+            log.error("The page '${page.name}' has an invalid mapping in database!")
+            timeToCsMappings.removeAll {it.page.ident() == page.ident()}
+        }
 	}
+
+    /**
+     * Checks validity of mapping.
+     * @param mappingsForOnePage
+     * @return True if mapping is valid.
+     */
+    Boolean isValid(List<TimeToCsMapping> mappingsForOnePage){
+
+        if(mappingsForOnePage.size() == 0)
+            return false
+
+        List loadTimes = mappingsForOnePage*.loadTimeInMilliSecs
+        if (loadTimes.size() > loadTimes.unique().size())
+            return false
+
+        201.times{
+            if(!loadTimes.contains(it*100))
+                return false
+        }
+
+        return true
+
+    }
+
+    List getActualMappingsFromDb(){
+        def query = TimeToCsMapping.where {
+            mappingVersion >= max(mappingVersion)//bug in grails 2.1.1: == doesn't work with subqueries
+        }
+        List<TimeToCsMapping> timeToCsMappingsFromDb = query.findAll()
+        return TimeToCsMapping.findAllByMappingVersion(timeToCsMappingsFromDb?timeToCsMappingsFromDb[0].mappingVersion:-1)
+    }
 	
 	private fetchFrustrations(){
 		frustrations = [:].withDefault {[]}

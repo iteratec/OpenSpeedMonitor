@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 
 class OsmChartTagLib {
@@ -127,5 +128,33 @@ class OsmChartTagLib {
 
 		return out.toString()
 	}
+
+    def csiMappingChart = { attrs, body ->
+
+        List<DefaultTimeToCsMapping> mappings = attrs['transformableMappings']
+        String chartIdentifier = attrs['chartIdentifier']
+        String bottomOffsetXAxis = attrs['bottomOffsetXAxis']
+        String yAxisRightOffset = attrs['yAxisRightOffset']
+        String chartBottomOffset = attrs['chartBottomOffset']
+        String yAxisTopOffset = attrs['yAxisTopOffset']
+        String bottomOffsetLegend = attrs['bottomOffsetLegend']
+
+        ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
+        log.debug("chartLibToUse while processing osm chart tgalib=${chartLibToUse}")
+
+        if (chartLibToUse == ChartingLibrary.HIGHCHARTS) {
+            out << "<div><p>Charting library ${ChartingLibrary.HIGHCHARTS} not supprted!</p></div>"
+        }else if (chartLibToUse == ChartingLibrary.RICKSHAW)
+        {
+            def htmlCreater = new RickshawHtmlCreater()
+            out << htmlCreater.generateCsiMappingsChartHtml(mappings, chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
+                    chartBottomOffset, yAxisTopOffset, bottomOffsetLegend)
+        }else {
+            throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
+                    "${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
+        }
+
+        return out.toString()
+    }
 
 }

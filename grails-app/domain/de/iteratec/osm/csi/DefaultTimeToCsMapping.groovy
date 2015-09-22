@@ -17,27 +17,33 @@
 
 package de.iteratec.osm.csi
 
-class TimeToCsMapping implements RickshawTransformableCsMapping {
-	Page page
+/**
+ * Default mappings 'load time to percentage of customers of your site who would be satisfied
+ * by that load time' are defined by all elements of this domain with the same name.
+ * These defaults can be used for pages if no data of a customer survey exist.
+
+ * <b>Note:</b> Some of these defaults get created in Bootstrap.groovy.
+ *
+ */
+class DefaultTimeToCsMapping implements RickshawTransformableCsMapping {
+
+    String name
 	Integer loadTimeInMilliSecs
-	Double customerSatisfaction
-	/** each investigation of customer satisfaction with different load-times will provide a new set of TimeToCiMapping's */
-	Integer mappingVersion
+	Double customerSatisfactionInPercent
 
     static constraints = {
-		page()
+        name()
 		loadTimeInMilliSecs()
-		customerSatisfaction()
-		mappingVersion()
+		customerSatisfactionInPercent()
     }
 
     public String retrieveGroupingCriteria(){
-        return page.name
+        return name
     }
     public Integer retrieveLoadTimeInMilliSecs(){
         return loadTimeInMilliSecs
     }
     public Double retrieveCustomerSatisfactionInPercent(){
-        return customerSatisfaction
+        return customerSatisfactionInPercent
     }
 }

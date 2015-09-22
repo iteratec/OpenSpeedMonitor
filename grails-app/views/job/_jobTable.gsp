@@ -21,7 +21,7 @@
 				<g:if test="${job.script}">
 					<br />
 					<a
-						href="<g:createLink controller="script" action="edit" id="${job.script.id}"/>" class="skript">
+						href="${createLink(controller: 'script', action: 'edit', id: job.script.id, absolute: true)}" class="skript">
 						${job.script.label}
 					</a>
 					<span title="${message(code: 'script.measuredEventsCount.label')}">(${job.script.measuredEventsCount})</span>

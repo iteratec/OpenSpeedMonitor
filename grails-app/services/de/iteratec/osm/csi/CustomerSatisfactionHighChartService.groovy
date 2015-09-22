@@ -256,7 +256,7 @@ class CustomerSatisfactionHighChartService {
 				/*
 				 * round to 2 decimal places
 				 */
-				BigDecimal valueForRounding = new BigDecimal(eachCsiVal.value * 100)
+				BigDecimal valueForRounding = new BigDecimal(eachCsiVal.value)
 				double value = valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
 
 				URL linkForPoint = getLinkFor(eachCsiVal)
@@ -435,7 +435,12 @@ class CustomerSatisfactionHighChartService {
 
 		List<OsmChartGraph> result=Collections.checkedList(new ArrayList<OsmChartGraph>(), OsmChartGraph.class);
 
-		CsTargetGraph actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
+        CsTargetGraph actualTargetGraph
+        try{
+            actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
+        }catch(NullPointerException npe){
+            log.info("No customer satisfaction target graph exist for actual locale.")
+        }
 
 		if (actualTargetGraph) {
 			OsmChartPoint fromPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(fromDate.toDate()), measuredValue: (double) actualTargetGraph.getPercentOfDate(fromDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);

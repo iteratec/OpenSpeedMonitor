@@ -38,6 +38,8 @@ import de.iteratec.osm.util.I18nService
 import grails.util.Environment
 import org.joda.time.DateTime
 
+import static de.iteratec.osm.util.Constants.*
+
 class BootStrap {
 	
 	EventMeasuredValueService eventMeasuredValueService
@@ -294,33 +296,55 @@ class BootStrap {
 			date: date,
 			csInPercent: percent,
 			).save(failOnError: true)
-		
-		String labelTargetCsi = i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Target-CSI')
-		String descriptionTargetCsi = i18nService.msg('de.iteratec.isocsi.targetcsi.description', 'Customer satisfaction index defined as target.')
-		CsTargetGraph targetGraph = CsTargetGraph.findByLabel(labelTargetCsi)?:new CsTargetGraph(
-			label: labelTargetCsi,
-			description: descriptionTargetCsi,
+
+		String labelTargetCsi_EN = i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label', Locale.ENGLISH, 'Target-CSI')
+		String descriptionTargetCsi_EN = i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.description', Locale.ENGLISH, 'Customer satisfaction index defined as target.')
+		CsTargetGraph.findByLabel(labelTargetCsi_EN)?:new CsTargetGraph(
+			label: labelTargetCsi_EN,
+			description: descriptionTargetCsi_EN,
 			pointOne: val1,
 			pointTwo: val2,
 			defaultVisibility: true
 			).save(failOnError: true)
+        String labelTargetCsi_DE = i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label', Locale.GERMAN, 'Target-CSI')
+        String descriptionTargetCsi_DE = i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.description', Locale.GERMAN, 'Customer satisfaction index defined as target.')
+        CsTargetGraph.findByLabel(labelTargetCsi_DE)?:new CsTargetGraph(
+                label: labelTargetCsi_DE,
+                description: descriptionTargetCsi_DE,
+                pointOne: val1,
+                pointTwo: val2,
+                defaultVisibility: true
+        ).save(failOnError: true)
 			
-			/*
-			 * The following doesn't work with grails version 2.3.3.
-			 *  Leeds to exceptions on startup ...
-			 */
-			
-//		if (!targetGraph.pointOne.equals(val1)) {
-//			targetGraph.pointOne = val1
-//			targetGraph.save(failOnError: true)
-//		}
-//		if (!targetGraph.pointTwo.equals(val2)) {
-//			targetGraph.pointOne = val1
-//			targetGraph.save(failOnError: true)
-//		}
-				
+        createDefaultTimeToCsiMappingIfMissing()
+
 		log.info "initCsiData ends"
 	}
+
+    /**
+     * These default mappings can be assigned to measured pages if no data of a real customer survey exist.
+     * Get created only if no one exist at all.
+     */
+    void createDefaultTimeToCsiMappingIfMissing(){
+
+        if(DefaultTimeToCsMapping.list().size()==0){
+
+            Map indexToMappingName = [1: '1 - impatient', 2: '2', 3: '3', 4: '4', 5: '5 - patient']
+            DEFAULT_CSI_MAPPINGS.each {mappingDataList ->
+
+                5.times{defaultMappingindex ->
+                    new DefaultTimeToCsMapping(
+                        name: indexToMappingName[defaultMappingindex+1],
+                        loadTimeInMilliSecs: mappingDataList[0],
+                        customerSatisfactionInPercent: mappingDataList[defaultMappingindex+1]
+                    ).save(failOnError: true)
+                }
+
+            }
+
+        }
+
+    }
 	
 	void createConnectivityProfileIfMissing(Integer bwDown, Integer bwUp, Integer latency, String name, Integer packetLoss){
 		ConnectivityProfile.findByName(name)?:
