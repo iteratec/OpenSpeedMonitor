@@ -134,10 +134,10 @@ class MeasuredValueDaoServiceSpec {
 		
 		//execute tests and assertions
 		
-		assertThat(serviceUnderTest.getUpdateEvents([mvWithFiveEvents]).size(), is(5))
-		assertThat(serviceUnderTest.getUpdateEvents([mvWithoutEvents]).size(), is(0))
-		assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent]).size(), is(1))
-		assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent, mvWithFiveEvents,mvWithoutEvents]).size(), is(6))
+		assertThat(serviceUnderTest.getUpdateEvents([mvWithFiveEvents.ident()]).size(), is(5))
+		assertThat(serviceUnderTest.getUpdateEvents([mvWithoutEvents.ident()]).size(), is(0))
+		assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent.ident()]).size(), is(1))
+		assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent.ident(), mvWithFiveEvents.ident(),mvWithoutEvents.ident()]).size(), is(6))
 		
 		List<MeasuredValue> emptyList = []
 		assertThat(serviceUnderTest.getUpdateEvents(emptyList*.ident()).size(), is(0))

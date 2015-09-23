@@ -27,7 +27,6 @@ class EventController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def markdownService
     EventService eventService
 
     def index() {
