@@ -1,4 +1,3 @@
-<asset:stylesheet src="flags.css"/>
 <g:set var="lang"
        value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE' ?: org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).toString().substring(0, 2)}"/>
 <g:set var="currentURL" value="${request.forwardURI}"/>
@@ -9,31 +8,17 @@
             <img class="flag flag-${lang.toString()}"/>
         </a>
         <ul class="dropdown-menu dropdown-menu-dark" role="menu">
-
-            <!-- assuming that the default locale is English -->
-            <li><a class="js-language-link" title="English" data-lang-code="en" href="${currentURL + '?lang=en'}">
-                <!--  <li><a class="js-language-link" title="English" data-lang-code="en" href="${currentURL + '?lang=en' + (params.isEmpty() ? '' : '&') + params.entrySet().findAll({
-                    it.key != 'lang'
-                }).collect({ it.key + '=' + it.value }).join('&')}"> -->
-                <img class="flag flag-en"/>
-                <g:message code="language.en" default="en"/> ${currentlURL}
-            </a></li>
-
-            <li class="divider"></li>
-
-        <!-- get list of all locales available due to an existing property-file in /grails-app/i18n (set once in Bootstrap.groovy) -->
-        %{--TODO make this work again and replace hardcoded locales
-        <g:set var="allLocales" value="${grailsApplication.config.grails.i18n.locales}"/>--}%
-            <g:set var="allLocales" value="${["de"]}"/>
+            <g:set var="allLocales" value="${grailsApplication.config.grails.i18n.locales}"/>
             <g:each status="i" var="locale" in="${allLocales}">
-                <li><a class="js-language-link" title="${message(code: 'language.' + locale, default: locale)}"
-                       data-lang-code="${locale}" href="${currentURL + '?lang=' + locale}">
-                    <!-- <li><a class="js-language-link" title="${message(code: 'language.' + locale, default: locale)}" data-lang-code="${locale}" href="${currentURL + '?lang=' + locale + (params.isEmpty() ? '' : '&') + params.entrySet().findAll({
-                        it.key != 'lang'
-                    }).collect({ it.key + '=' + it.value }).join('&')}"> -->
-                    <img class="flag flag-${locale}"/>
-                    <g:message code="language.${locale}" default="${locale}"/>
-                </a></li>
+                <li>
+                    <a class="js-language-link"
+                       title="${message(code: 'language.' + locale, default: locale)}"
+                       data-lang-code="${locale}"
+                       href="${currentURL + '?lang=' + locale + (params.isEmpty() ? '' : '&') + params.entrySet().findAll({it.key != 'lang'}).collect({ it.key + '=' + it.value }).join('&')}">
+                        <img class="flag flag-${locale}"/>
+                        <g:message code="language.${locale}" default="${locale}"/>
+                    </a>
+                </li>
             </g:each>
 
         </ul>

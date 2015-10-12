@@ -27,6 +27,7 @@ import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
 
 // Place your Spring DSL code here
+
 beans = {
     doubleValueConverter(DoubleValueConverter)
     dateValueConverter(DateValueConverter)

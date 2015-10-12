@@ -1,17 +1,6 @@
 <%@ page import="de.iteratec.osm.measurement.environment.Location"%>
 <%@ page import="de.iteratec.osm.measurement.environment.WebPageTestServer" %>
 
-<asset:javascript src="tagit/tagit.js"/>
-<asset:stylesheet src="tagit.css"/>
-<asset:javascript src="chosen/chosen.jquery.min.js"/>
-<asset:stylesheet src="chosen/chosen.css"/>
-<asset:javascript src="job/edit.js"/>
-<asset:stylesheet src="job/edit.css"/>
-<asset:javascript src="timeago/futureOnlyTimeago.js"/>
-<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-    <asset:javascript src="timeago/timeagoDe.js"/>
-</g:if>
-
 <div class="row form-group ${hasErrors(bean: job, field: 'label', 'error')} required">
 	<label for="label" class="span3 text-right" style="width: 70px !important;">
 		<g:message code="job.label.label" default="label" /><span class="required-indicator">*</span>
@@ -65,17 +54,3 @@
 
 <!-- included because there is no way for the user to supply a value for validationRequest -->
 <g:hiddenField name="validationRequest" value="" />
-
-<asset:script type="text/javascript">
-    $(document).ready(
-        doOnDomReady(
-            ${job.label == null},
-            "${g.createLink(action: 'nextExecution', absolute: true)}",
-            '${customConnNameForNative}',
-            ${job.connectivityProfile?job.connectivityProfile.id:'null'},
-            ${job.noTrafficShapingAtAll},
-            "${g.createLink(action: 'tags', absolute: true)}"
-        )
-    );
-</asset:script>
-<asset:deferredScripts/>

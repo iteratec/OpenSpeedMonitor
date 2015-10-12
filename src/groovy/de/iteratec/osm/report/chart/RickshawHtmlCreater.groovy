@@ -22,7 +22,7 @@ import de.iteratec.osm.csi.RickshawTransformableCsMapping
 
 class RickshawHtmlCreater {
 
-    def generateCsiMappingsChartHtml = {defaultMappings, chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
+    def generateCsiMappingsChartHtml = {chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
                                         chartBottomOffset, yAxisTopOffset, bottomOffsetLegend ->
 
         def sw = new StringWriter()
@@ -40,23 +40,6 @@ class RickshawHtmlCreater {
             </div>
             <div id="x_axis_${chartIdentifier}" style="position:relative;bottom: ${bottomOffsetXAxis}px;"></div>
         </div>
-
-        <script>
-
-        var graphBuilder_${chartIdentifier}
-
-        \$(document).ready(function(){
-
-            var palette = new Rickshaw.Color.Palette();
-            var args = {
-                defaultMappings: ${transformCSIMappingData(defaultMappings)},
-                chartIdentifier: '${chartIdentifier}'
-            };
-
-            graphBuilder_${chartIdentifier} = new SimpleGraphBuilder(args);
-
-        })
-        </script>
         """
 
     }
@@ -100,23 +83,23 @@ class RickshawHtmlCreater {
 			</div>
 		</div>
 
-		<script type="text/javascript">
-			var CHARTLIB="RICKSHAW";
-			var rickshawGraphBuilder;
-			\$(document).ready(function(){
-				var args = {
-					divId: "${divId}",
-					title: "${title}",
-					data : ${data},
-					heightOfChart :  ${height},
+        <script type="text/javascript">
+            var CHARTLIB="RICKSHAW";
+            var rickshawGraphBuilder;
+            var createGraph = function(){
+                var args = {
+                    divId: "${divId}",
+                    title: "${title}",
+                    data : ${data},
+                    heightOfChart :  ${height},
                     dataLabelsActivated : ${dataLabelsActivated},
-					NUMBER_OF_YAXIS_TICKS : 5,
-					drawPointMarkers: ${markerEnabled},
+                    NUMBER_OF_YAXIS_TICKS : 5,
+                    drawPointMarkers: ${markerEnabled},
                     annotations : ${annotations}
-				};
-				rickshawGraphBuilder = new RickshawGraphBuilder(args);
-			});
-		</script> """
+                };
+                rickshawGraphBuilder = new RickshawGraphBuilder(args);
+            }
+        </script>"""
     }
 
     /**

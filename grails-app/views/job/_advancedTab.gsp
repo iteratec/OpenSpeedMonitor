@@ -2,19 +2,6 @@
 	<g:render template="checkbox" model="${['booleanAttribute': booleanAttribute, 'job': job]}" />
 </g:each>
 
-<asset:script type="text/javascript">
-	$(document).ready(function() {
-		$('#provideAuthenticateInformation').click(function() {
-			$('.authInfo').toggle($(this).prop('checked'));
-			document.getElementById('authPassword').setAttribute('type', 'password');
-		});
-		$('.authInfo').toggle($('#provideAuthenticateInformation').prop('checked'));
-		if ($('#provideAuthenticateInformation').prop('checked')){
-			document.getElementById('authPassword').setAttribute('type', 'password');
-		}
-	});
-</asset:script>
-<asset:deferredScripts/>
 <div class="row fieldcontain ${hasErrors(bean: job, field: 'provideAuthenticateInformation', 'error')}">
 	<label class="span3 text-right">
 		<g:message code="script.authentication.label" default="Authenfizierung" />

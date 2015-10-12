@@ -89,7 +89,8 @@ grails.project.dependency.resolution = {
 		 test (
 			'org.mockito:mockito-all:1.9.5',
 			'org.hamcrest:hamcrest-all:1.3',
-			'co.freeside:betamax:1.1.2'
+			'co.freeside:betamax:1.1.2',
+            'net.sourceforge.nekohtml:nekohtml:1.9.14'
 		)
     }
 

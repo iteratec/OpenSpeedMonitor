@@ -18,8 +18,13 @@
 /*
  * Contains functionality used in template /eventResultDashboard/_selectMeasurings.gsp
 */
-
-$(document).ready(function(){
+var initSelectMeasuringsControls = function(
+    pagesToEvents,
+    browserToLocation,
+    allMeasuredEventElements,
+    allBrowsers,
+    allLocations
+){
 	if ($("#selectedAllMeasuredEvents").length > 0 && $("#selectedMeasuredEventsHtmlId").length > 0 ){
 		collectAllValues(allMeasuredEventElements, "#selectedMeasuredEventsHtmlId");
 		initSelectAndCheckBoxFunction("#selectedAllMeasuredEvents", "#selectedMeasuredEventsHtmlId");
@@ -45,7 +50,7 @@ $(document).ready(function(){
 	$('#simple-job-filter').button('toggle');
 
     fixChosen();
-});
+};
 
 function sortAlpha(a,b){  
 	return a.innerHTML.toLowerCase() > b.innerHTML.toLowerCase() ? 1 : -1;

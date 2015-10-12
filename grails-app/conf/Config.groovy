@@ -66,12 +66,6 @@ grails.mime.types = [
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000
 
-// disabling processing of resources generally:
-//grails.resources.processing.enabled = false
-// What URL patterns should be processed by the resources plugin:
-//grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
-grails.resources.adhoc.excludes = ['**/WEB-INF/**', '**/META-INF/**']
-
 // The default codec used to encode data with ${}
 grails.views.default.codec = "none" // none, html, base64
 //"ISO-8859-1"
@@ -157,6 +151,8 @@ grails.plugin.springsecurity.interceptUrlMap = [
 '/csiDashboard/storeCustomDashboard'          : ["permitAll"],
 '/csiDashboard/validateDashboardName'         : ["permitAll"],
 '/csiDashboard/validateAndSaveDashboardValues': ["permitAll"],
+'/i18n/getAllMessages'                        : ["permitAll"],
+'/tabularResultPresentation/listResults'      : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////
@@ -174,17 +170,15 @@ grails.plugin.springsecurity.interceptUrlMap = [
  * 	Highcharts (http://www.highcharts.com/) is possible, too, but licensed proprietary.
  */
 /** default charting lib */
-grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.HIGHCHARTS
+grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.RICKSHAW
 /** all available charting libs */
-grails.de.iteratec.osm.report.chart.availableChartTagLibs = [ChartingLibrary.RICKSHAW, ChartingLibrary.HIGHCHARTS]
-/** url to highchart's export server (for exporting charts as bitmaps or vector graphics). */
-grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
+grails.de.iteratec.osm.report.chart.availableChartTagLibs = [ChartingLibrary.RICKSHAW]
 
 // if not specified default in code is 30 days
 // unit: seconds
 grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
 
-//Exclude alle .less files, but not the main less files. This.will solv.dependency errors and will increase the performance.
+//Exclude all less files, but not the main less files. This.will solv.dependency errors and will increase the performance.
 grails.assets.less.compile = 'less4j'
 grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
 grails.assets.plugin."font-awesome-resources".excludes = ["**/*.less"]
@@ -192,6 +186,8 @@ grails.assets.excludes = ["openspeedmonitor.less"]
 
 grails.assets.minifyJs = true
 grails.assets.minifyCss = true
+
+grails.i18n.locales = ['en','de']
 
 
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,24 +204,11 @@ environments {
         grails.plugin.springsecurity.password.algorithm = 'SHA-256'
         grails.plugin.springsecurity.password.hash.iterations = 1
 
-        // disabling hashing and caching of resources:
-        // 2014-03-31 nku: doesn't work :-(
-        //		grails.resources.mappers.hashandcache.enabled = false
-        // exclude resources from hashing and caching:
-        // (used as a workaround, cause general disabling doesn't work)
-        grails.resources.mappers.hashandcache.excludes = ['**/*.css', '**/*.less', '**/*.js', '**/*.woff']
-        // disable caching-headers:
-        cache.headers.enabled = false
-        // disable bundling of resources:
-        grails.resources.mappers.bundle.enabled = false
-        // Forces debug mode all the time, as if you added _debugResources=y to every request:
-        //grails.resources.debug=true
-
         // grails console-plugin, see https://github.com/sheehan/grails-console
         grails.plugin.console.enabled = true
         grails.plugin.console.fileStore.remote.enabled = false // Whether to include the remote file store functionality. Default is true.
-        grails.plugin.console.fileStore.remote.enabled = true
-        // Whether to include the remote file store functionality. Default is true.
+
+        grails.assets.bundle=true
 
         log4j = {
 

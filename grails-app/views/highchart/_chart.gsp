@@ -1,6 +1,3 @@
-<asset:javascript src="iteratecChartRickshaw.js"/>
-<asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
-
 %{--TODO merge the single- and multiple-axis-chart-function of highchart--}%
 <g:if test="${singleYAxis}">
 	<iteratec:singleYAxisChart data="${chartData}" yType="${yAxisLabel}"
@@ -34,17 +31,5 @@
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
-
-<script type="text/javascript">
-$(document).ready(function () {
-  if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
-  //if ($.browser.mozilla) {
-    $("#dia-save-chart-as-png").removeClass("btn-primary");
-    $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
-    $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
-    $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
-   }
-});
-</script>
-  <button class="span btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.save.name"/></button>
+    <button class="span btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.save.name"/></button>
 </div>

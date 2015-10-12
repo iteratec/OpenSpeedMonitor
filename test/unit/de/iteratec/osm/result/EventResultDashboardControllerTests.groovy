@@ -110,7 +110,6 @@ class EventResultDashboardControllerTests {
 		this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
 		controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
 
-		controllerUnderTest.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.RICKSHAW}] as CookieBasedSettingsService
 	}
 
 	/**
@@ -642,7 +641,7 @@ class EventResultDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(17, result.size());
+		assertEquals(16, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))

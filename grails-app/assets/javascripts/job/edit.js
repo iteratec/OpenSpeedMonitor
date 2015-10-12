@@ -14,8 +14,18 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
-
-function doOnDomReady(newJob, nextExecutionLink, customConnNameForNative, connectivityProfileId, noTrafficShapingAtAll, tagsLink) {
+//= require prettycron/prettycronManifest.js
+//= require tagit/tagit.js
+//= require tagit/tagit.js
+//= require_self
+function doOnDomReady(
+    newJob,
+    nextExecutionLink,
+    customConnNameForNative,
+    connectivityProfileId,
+    noTrafficShapingAtAll,
+    tagsLink
+) {
 
     $("ul[name='tags']").tagit({select:true, tagSource: tagsLink});
 
@@ -306,7 +316,7 @@ function domainDeleteConfirmation(message,id,link){
 function toggleCronInstructions(){
     var cronInstructions = document.querySelector('#cron-instructions');
     cronInstructions.style.display=="none" ?
-        cronInstructions.style.display="inline" : cronInstructions.style.display="none";
+    cronInstructions.style.display="inline" : cronInstructions.style.display="none";
 }
 function updateExecScheduleInformations(execScheduleWithSeconds, nextExecutionLink) {
     jQuery.ajax({

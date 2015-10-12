@@ -8,28 +8,9 @@
 	<title><g:message code="de.iteratec.isj.jobs" /></title>
 	
 	<g:set var="entityName"	value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" />
-	
-	<asset:javascript src="prettycron/prettycronManifest.js"/>
-	<asset:javascript src="job/jobList.js"/>
-	<asset:stylesheet src="job/list.css"/>
-	<asset:stylesheet src="table-fixed-header/table-fixed-header.css"/>
-	<asset:javascript src="timeago/futureOnlyTimeago.js"/>
-	<asset:javascript src="spin/spin.min.js"/>
-	<asset:javascript src="chosen/chosen.jquery.min.js"/>
-	<asset:stylesheet src="chosen/chosen.css"/>
 
+    <asset:stylesheet src="job/list.css"/>
 
-	<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-		<asset:javascript src="timeago/timeagoDe.js"/>
-	</g:if>
-	
-	<style>
-	.running {
-		background: center left no-repeat url('../images/loading_indicator.gif');
-		padding-left: 20px;
-	}
-	</style>
-	
 </head>
 <body>
 	<%-- main menu --%>
@@ -159,18 +140,26 @@
 			</table>
 	</g:form>
 	</div>
-	<asset:script type="text/javascript">
-    $(document).ready(
-        doOnDomReady(
-            '${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
-				'${createLink(action: 'cancelJobRun', absolute: true)}',
-				'${createLink(action: 'getLastRun', absolute: true)}',
-				${onlyActiveJobs},
-				"${createLink(action: 'nextExecution', absolute: true)}",
-				'${createLink(action: 'list', absolute: true)}'
-			)
-		);
-	</asset:script>
-	<asset:deferredScripts/>
+    <content tag="include.bottom">
+        <asset:javascript src="prettycron/prettycronManifest.js"/>
+        <asset:javascript src="job/jobList.js"/>
+        <asset:javascript src="timeago/futureOnlyTimeago.js"/>
+        <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
+            <asset:javascript src="timeago/timeagoDe.js"/>
+        </g:if>
+        <asset:script type="text/javascript">
+            $(document).ready(
+                doOnDomReady(
+                    '${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
+                    '${createLink(action: 'cancelJobRun', absolute: true)}',
+                    '${createLink(action: 'getLastRun', absolute: true)}',
+                    ${onlyActiveJobs},
+                    "${createLink(action: 'nextExecution', absolute: true)}",
+                    '${createLink(action: 'list', absolute: true)}'
+                )
+		    );
+        </asset:script>
+        <asset:deferredScripts/>
+    </content>
 </body>
 </html>

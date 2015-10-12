@@ -108,7 +108,6 @@ class CsiDashboardControllerTests {
 		this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
 		controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
 
-		controllerUnderTest.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.RICKSHAW}] as CookieBasedSettingsService
 		controllerUnderTest.csiHelperService = [getCsiChartDefaultTitle: {-> return 'not relevant for these tests'}] as CsiHelperService
 	}
 
@@ -826,7 +825,7 @@ class CsiDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(13, result.size());
+		assertEquals(12, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))
@@ -977,7 +976,7 @@ class CsiDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(13, result.size());
+		assertEquals(12, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))

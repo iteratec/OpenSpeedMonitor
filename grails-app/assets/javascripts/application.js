@@ -20,6 +20,9 @@
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
 //= require date-time-picker/bootstrap-datepicker.min.js
+//= require postload/PostLoader.js
+//= require spin/spin.min.js
+//= require chosen/chosen.jquery.min.js
 //= require_self
 
 if (typeof jQuery !== 'undefined') {
@@ -31,19 +34,6 @@ if (typeof jQuery !== 'undefined') {
         });
     })(jQuery);
 }
-
-$( document ).ready( function(){
-
-    $('ul.nav li.dropdown').hover(
-        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn(); },
-        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut(); }
-    );
-    $('li.dropdown-submenu').hover(
-        function() { $(this).children('ul').stop(true, true).delay(100).fadeIn(); },
-        function() { $(this).children('ul').stop(true, true).delay(100).fadeOut(); }
-    );
-
-});
 
 function stringToBoolean(string) {
 	if(!string) return false;
@@ -123,3 +113,22 @@ function fixChosen() {
         //$('.tab-content').scrollTop(($('.tab-content').height()*2));
     });
 }
+
+function fireWindowEvent(eventName){
+    var event = document.createEvent('Event');
+    event.initEvent(eventName, true, true);
+    window.dispatchEvent(event);
+}
+
+$( document ).ready( function(){
+
+    $('ul.nav li.dropdown').hover(
+        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeIn(); },
+        function() { $(this).children('.dropdown-menu').stop(true, true).delay(100).fadeOut(); }
+    );
+    $('li.dropdown-submenu').hover(
+        function() { $(this).children('ul').stop(true, true).delay(100).fadeIn(); },
+        function() { $(this).children('ul').stop(true, true).delay(100).fadeOut(); }
+    );
+
+});

@@ -1,21 +1,20 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
-<meta name="layout" content="kickstart_osm" />
-<g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Skript')}" />
-<title><g:message code="de.iteratec.iss.scripts" /></title>
-<asset:javascript src="script/list.js"/>
-<style>
-td, th {
-	border: 1px #ccc solid;
-	padding: 0.3em;
-}
-</style>
+    <meta name="layout" content="kickstart_osm" />
+    <g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Skript')}" />
+    <title><g:message code="de.iteratec.iss.scripts" /></title>
+    <style>
+        td, th {
+            border: 1px #ccc solid;
+            padding: 0.3em;
+        }
+    </style>
 </head>
 <body>
 	<%-- main menu --%>
 	<g:render template="/layouts/mainMenu"/>
-	
+
 	<div class="controlribbon">
 		<h5><g:message code="script.list.label.filter" default="Skripte filtern" /></h5>
 		<input type="text" id="filterByLabel" onkeyup="filterScriptList()" oninput="filterScriptList()" placeholder="<g:message code="script.list.filter.name" default="Nach Skript-Namen" />" />
@@ -31,7 +30,7 @@ td, th {
 	</p>
 	</g:if>
 	<g:else>
-	
+
 	<table class="table-striped">
 		<thead>
 		<tr>
@@ -52,8 +51,11 @@ td, th {
 	     </g:each>
 	    </tbody>
 	</table>
-	
-				
+
+
 	</g:else>
+    <content tag="include.bottom">
+        <asset:javascript src="script/list.js"/>
+    </content>
 </body>
 </html>

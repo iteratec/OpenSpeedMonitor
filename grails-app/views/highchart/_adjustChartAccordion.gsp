@@ -36,63 +36,33 @@
 						</div>
 					</div>
 					<!-- Y-Axis -->
-					<g:if test="${chartRenderingLibrary != null && chartRenderingLibrary == ChartingLibrary.HIGHCHARTS}">
-						<!-- highchart -->
-						<g:if test="${singleYAxis}">
-							<div id="adjust_chart_y_axis" class ="row">
-								<div class="span2 text-right"><g:message code="de.iteratec.chart.axis.y.name"/></div>
-								<div class="span9">
-									<div class="input-prepend">
-										<span class="add-on"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
-										<input class="span1 content-box" id="dia-y-axis-min" type="text" value="${yAxisMin?:'' }">
-									</div>
-									<div class="input-prepend">
-										<span class="add-on"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
-										<input class="span1 content-box" id="dia-y-axis-max" type="text" value="${yAxisMax?:'' }">
-									</div>
-									<button class="btn" id="dia-change-yaxis" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.apply.name"/></button>
-								</div>
-							</div>
-						</g:if>
-							<!-- Show data-markers -->
-              <div class ="row">
-                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/></div>
-                <div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
-              </div>
-              <div class ="row">
-                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/></div>
-                <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}" /></div>
-              </div>
-					</g:if>
-					<g:else>
 					<!-- rickshaw -->
-						<div id="adjust_chart_y_axis" class ="row">
-							<div class="span2 text-right"><g:message code="de.iteratec.chart.axis.y.name"/></div>
-							<div class="span9">
-								<div class="input-prepend">
-									<span class="add-on"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
-									<input class="span1 content-box" id="dia-y-axis-min" type="text" value="${yAxisMin?:'' }">
-								</div>
-								<div class="input-prepend">
-									<span class="add-on"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
-									<input class="span1 content-box" id="dia-y-axis-max" type="text" value="${yAxisMax?:'' }">
-								</div>
-								<button class="btn" id="dia-change-yaxis" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.apply.name"/></button>
-							</div>
-						</div>
-            <div class ="row">
-                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/></div>
-                <div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
-              </div>
-            <div class ="row">
-                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/></div>
-                <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}" /></div>
-              </div>
-            <div class ="row">
-                <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.wideScreenDiagramMontage" default="Exportierte Diagramme für Breitbild-Darstellung optimieren"/></div>
-                <div class="span9"><g:checkBox id="wide-screen-diagram-montage" name="wideScreenDiagramMontage" checked="${params.wideScreenDiagramMontage?true:false}" /></div>
-              </div>
-					</g:else>
+                    <div id="adjust_chart_y_axis" class ="row">
+                        <div class="span2 text-right"><g:message code="de.iteratec.chart.axis.y.name"/></div>
+                        <div class="span9">
+                            <div class="input-prepend">
+                                <span class="add-on"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
+                                <input class="span1 content-box" id="dia-y-axis-min" type="text" value="${yAxisMin?:'' }">
+                            </div>
+                            <div class="input-prepend">
+                                <span class="add-on"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
+                                <input class="span1 content-box" id="dia-y-axis-max" type="text" value="${yAxisMax?:'' }">
+                            </div>
+                            <button class="btn" id="dia-change-yaxis" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.apply.name"/></button>
+                        </div>
+                    </div>
+                    <div class ="row">
+                        <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/></div>
+                        <div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}" /></div>
+                      </div>
+                    <div class ="row">
+                        <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels" default="Datenlabels anzeigen"/></div>
+                        <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel" checked="${labelShouldBeEnabled}" /></div>
+                      </div>
+                    <div class ="row">
+                        <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.wideScreenDiagramMontage" default="Exportierte Diagramme für Breitbild-Darstellung optimieren"/></div>
+                        <div class="span9"><g:checkBox id="wide-screen-diagram-montage" name="wideScreenDiagramMontage" checked="${params.wideScreenDiagramMontage?true:false}" /></div>
+                    </div>
 				</div>
 			</div>
 		</div>

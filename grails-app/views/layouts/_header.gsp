@@ -1,2 +1,2 @@
-<header style="height: 45px;">
+<header style="height: 57px;">
 </header>

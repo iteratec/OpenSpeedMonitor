@@ -14,12 +14,12 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
+
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -38,7 +38,7 @@ import de.iteratec.osm.util.I18nService
 import grails.util.Environment
 import org.joda.time.DateTime
 
-import static de.iteratec.osm.util.Constants.*
+import static de.iteratec.osm.util.Constants.DEFAULT_CSI_MAPPINGS
 
 class BootStrap {
 	

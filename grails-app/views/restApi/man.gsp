@@ -2,7 +2,7 @@
 
 <head>
 <title>Manual of REST API</title>
-<meta name="layout" content="kickstart_osm" />
+    <meta name="layout" content="kickstart_osm" />
 </head>
 <body data-spy="scroll" data-target="#spied-nav">
 %{--<body data-spy="scroll" data-target="#spied-nav">--}%
@@ -804,21 +804,22 @@
 	</div>
 
 	--%>
+    <content tag="include.bottom">
+        <asset:script type="text/javascript">
+            $(document).ready(function(){
+                $('body').scrollspy({
+                    target: '#spied-nav',
+                    offset: 100
+                });
+                var offset = 60;
+                $('#spied-nav ul li a').click(function(event) {
+                    event.preventDefault();
+                    $($(this).attr('href'))[0].scrollIntoView();
+                    scrollBy(0, -offset);
+                });
+            });
+        </asset:script>
+    </content>
 
-	<asset:script type="text/javascript">
-		$(document).ready(function(){
-			$('body').scrollspy({
-				target: '#spied-nav',
-				offset: 100
-			});
-			var offset = 60;
-			$('#spied-nav ul li a').click(function(event) {
-				event.preventDefault();
-				$($(this).attr('href'))[0].scrollIntoView();
-				scrollBy(0, -offset);
-			});
-		});
-	</asset:script>
-	<asset:deferredScripts/>
 </body>
 </html>

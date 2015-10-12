@@ -35,6 +35,14 @@ class CookieBasedSettingsService {
     OsmCookieService osmCookieService
     def grailsApplication
 
+    /**
+     * Gets charting library to use. Value is read by cookie value or from static grails config as default.
+     * @return
+     * @deprecated since 2015-10-08
+     *      Highcharts as charting library was removed so set charting lib to use as a cookie based p13n isn't
+     *      necessary anymore.
+     */
+    @Deprecated
     ChartingLibrary getChartingLibraryToUse() {
         String cookieValue = osmCookieService.getBase64DecodedCookieValue(COOKIE_KEY_CHARTING_LIB_TO_USE)
         log.debug("cookie-value while getting charting library to use: ${cookieValue}")

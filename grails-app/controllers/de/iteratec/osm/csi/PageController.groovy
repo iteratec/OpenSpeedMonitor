@@ -78,10 +78,12 @@ class PageController {
             return
         }
 
+        List<DefaultTimeToCsMapping> defaultTimeToCsMappings = defaultTimeToCsMappingService.getAll().findAll { it.loadTimeInMilliSecs <= 8000 }
         return [
                 pageInstance: pageInstance,
                 mappingsOfPage: timeToCsMappingCacheService.getMappingsFor(pageInstance),
-                defaultMappings: defaultTimeToCsMappingService.getAll().findAll {it.loadTimeInMilliSecs<=8000}
+                defaultMappings: defaultTimeToCsMappings,
+                defaultMappingsJson: new RickshawHtmlCreater().transformCSIMappingData(defaultTimeToCsMappings)
         ]
     }
 

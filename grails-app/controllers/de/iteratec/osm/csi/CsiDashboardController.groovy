@@ -514,12 +514,7 @@ class CsiDashboardController {
 
         Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
         DateTime resetFromDateWithOffsetChange = resetFromDate.minusMinutes(oneDayOffset)
-        Integer rightOffset
-        if (cookieBasedSettingsService.getChartingLibraryToUse() == ChartingLibrary.HIGHCHARTS){
-            rightOffset = oneDayOffset * 4
-        }else {
-            rightOffset = oneDayOffset
-        }
+        Integer rightOffset = oneDayOffset
         DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
 
         if( withTargetGraph )
@@ -1037,7 +1032,6 @@ class CsiDashboardController {
             locationsOfBrowsers.put(eachBrowser.getId(), locationIds)
         }
         result.put('locationsOfBrowsers', locationsOfBrowsers)
-        result.put("chartRenderingLibrary", cookieBasedSettingsService.getChartingLibraryToUse())
         result.put('defaultChartTitle', csiHelperService.getCsiChartDefaultTitle())
 
         // Done! :)

@@ -6,8 +6,6 @@
 	
 	<title>openSpeed &mdash; Events from which the value was calculated</title>
 	
-	<style type="text/css">
-	</style>
 </head>
 <body>
     <%-- main menu --%>

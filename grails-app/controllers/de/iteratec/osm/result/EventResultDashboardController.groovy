@@ -16,6 +16,7 @@
  */
 
 package de.iteratec.osm.result
+
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -27,26 +28,13 @@ import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.UserspecificDashboard
 import de.iteratec.osm.report.UserspecificDashboardDiagramType
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.EventService
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.report.chart.OsmChartAxis
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.OsmChartPoint
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
-import grails.validation.Validateable
-
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -60,8 +48,8 @@ import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
-import java.util.regex.Pattern
-
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
 
 class EventResultDashboardController {
 
@@ -764,7 +752,6 @@ class EventResultDashboardController {
 
         result.put("selectedChartType", 0);
         result.put("warnAboutExceededPointsPerGraphLimit", false);
-        result.put("chartRenderingLibrary", cookieBasedSettingsService.getChartingLibraryToUse())
 
         // Done! :)
         return result;

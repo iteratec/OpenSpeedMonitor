@@ -1,6 +1,7 @@
 /*
 *= require bootstrap-custom
 *= require date-time-picker/bootstrap-datepicker.min.css
+*= require chosen/chosen.css
 *= require_self
 */
 .form-group.error label, .fieldcontain.error label {

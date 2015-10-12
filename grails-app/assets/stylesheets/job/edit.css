@@ -1,3 +1,8 @@
+/*
+*= require chosen/chosen.css
+*= require tagit.css
+*= require_self
+*/
 #placeholderCandidates {
 	display: inline-block;
 }

@@ -34,9 +34,13 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 
     updateCollapseInfos();
 
-    setChevron($('#collapseOne'));
+    //setChevron($('#collapseOne'));
 
     addAccordionHandlers();
+
+    if($("#chartbox").length > 0){
+        createGraph();
+    }
 
     scrollToChartbox();
 
