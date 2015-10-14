@@ -23,7 +23,6 @@
  * @param dataFromGsp This contains all init data and is filled in _common/_postloadInitializedJS.gsp
  * @constructor
  */
-//= require date-time-picker/bootstrap-datepicker.min.js
 //= require /lib/bootstrap/bootstrap-dropdown.js
 //= require spin/spin.min.js
 //= require_self

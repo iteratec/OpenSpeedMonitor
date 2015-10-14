@@ -5,5 +5,6 @@ package de.iteratec.osm.d3Data
  */
 class ChartEntry {
     String name;
+
     double weight;
 }

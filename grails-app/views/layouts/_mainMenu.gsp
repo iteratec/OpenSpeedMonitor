@@ -95,8 +95,8 @@
               <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />
               <span class="caret"></span>
             </a>
-            < class="dropdown-menu">
-            <g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("CSI")}" />
+            <ul class="dropdown-menu">
+                <g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("CSI")}" />
 
               <g:if test="${availableDashboards.size() > 0}">
                 <g:each in="${availableDashboards}" var="availableDashboard">

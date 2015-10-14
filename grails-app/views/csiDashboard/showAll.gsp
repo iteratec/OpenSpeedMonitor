@@ -231,11 +231,11 @@
             <asset:javascript src="csidashboard/csiDashboard.js" />
             <asset:javascript src="iteratecChartRickshaw.js"/>
             <asset:script type="text/javascript">
-                $(document).ready(
+                $(document).ready(function(){
                     doOnDomReady(
-                        'dd.mm.yyyy',
-                        ${weekStart},
-                        '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
+                            'dd.mm.yyyy',
+                            ${weekStart},
+                            '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
                     )
                     if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
                         $("#dia-save-chart-as-png").removeClass("btn-primary");
@@ -243,7 +243,7 @@
                         $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
                         $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
                     }
-                );
+                });
             </asset:script>
         </content>
 
