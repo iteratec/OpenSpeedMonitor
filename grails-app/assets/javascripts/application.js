@@ -19,9 +19,7 @@
 //= require bootstrap.min
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
-//= require date-time-picker/bootstrap-datepicker.min.js
 //= require postload/PostLoader.js
-//= require spin/spin.min.js
 //= require chosen/chosen.jquery.min.js
 //= require_self
 

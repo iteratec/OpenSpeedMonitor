@@ -23,6 +23,10 @@
  * @param dataFromGsp This contains all init data and is filled in _common/_postloadInitializedJS.gsp
  * @constructor
  */
+//= require date-time-picker/bootstrap-datepicker.min.js
+//= require /lib/bootstrap/bootstrap-dropdown.js
+//= require spin/spin.min.js
+//= require_self
 function PostLoaded(dataFromGsp){
 
     this.i18n_duplicatePrompt = dataFromGsp.i18n_duplicatePrompt
@@ -30,7 +34,7 @@ function PostLoaded(dataFromGsp){
     this.deletionConfirmMessage = dataFromGsp.deletionConfirmMessage
     this.idOfItemToDelete = dataFromGsp.idOfItemToDelete
 
-    this.init = function(){
+    this.postloadInit = function(){
 
     }
     this.promptForDuplicateName = function() {
@@ -68,6 +72,7 @@ function PostLoaded(dataFromGsp){
             $('#DeleteModal').find('p').html(text);
         },1);
     }
-    this.init()
+    this.postloadInit()
 }
+$('.dropdown-toggle').dropdown();
 fireWindowEvent('PostLoadedScriptArrived');

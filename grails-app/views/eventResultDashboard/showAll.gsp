@@ -36,8 +36,8 @@
 	<div class="row">
 		<div class="span12">
 			<form method="get" action="" id="dashBoardParamsForm">
-      <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message code="de.iteratec.ism.ui.labels.save.success" default="Successfully saved these settings as custom dashboard." /></div>
-      <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
+            <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message code="de.iteratec.ism.ui.labels.save.success" default="Successfully saved these settings as custom dashboard." /></div>
+            <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
 			<g:if test="${warnAboutLongProcessingTime}">
 				<div class="alert">
 					<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title" /></strong>
@@ -75,7 +75,7 @@
 						<g:if test="${request.queryString}"><div id="collapseOne" class="accordion-body collapse"></g:if>
 						<g:else><div id="collapseOne" class="accordion-body collapse in"></g:else>
 							<div class="accordion-inner" id="accordion-inner-date">
-							
+
 								<div class="row">
 									<div class="span5">
 										<legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading" default="Aggregation" /></legend>
@@ -241,17 +241,20 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="span12">
+						<div class="span12" id="bottomCommitButtons">
 							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll"
 								id="graphButtonHtmlId" class="btn btn-primary"
 								style="margin-top: 16px;" />
-              <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
-                class="btn btn-primary" style="margin-top: 16px;" />
-              <sec:ifLoggedIn>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-							   <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-						    </sec:ifAnyGranted>
-							</sec:ifLoggedIn>
+                          <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
+                            class="btn btn-primary" style="margin-top: 16px;" />
+                        <sec:ifLoggedIn>
+                            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                                <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
+                                   style="margin-top: 16px;" data-toggle="modal">
+                                    ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
+                                </a>
+                            </sec:ifAnyGranted>
+                        </sec:ifLoggedIn>
 		          <g:if test="${params.id}">
 		            <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
 		            <g:render template="/_common/modals/deleteCustomDashboard"/>

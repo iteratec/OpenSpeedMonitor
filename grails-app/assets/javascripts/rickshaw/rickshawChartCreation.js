@@ -1013,7 +1013,7 @@ function ChartAdjuster(args) {
   this.initialize = function(args) {
     $('#dia-width').val(args.graph.width);
     $('#dia-height').val(args.graph.height);
-    $(".collapse").collapse('hide');
+    $("#collapseAdjustment").collapse('hide');
     
     self.addFunctionalityAdjustingChartSize();
     self.addFunctionalityCustomizeTitle();
