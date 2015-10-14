@@ -47,7 +47,7 @@ function createBarChart(altWidth, altHeight, data, img, id) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// barwidth = width of diagram / data count (if there was no space between them)
+// barwidth = width of diagram / data count (if there would be no space between them)
     var barWidth = width / bars.length;
     var barSpace = barWidth / 5; // scales spaces between bars
 
@@ -129,7 +129,7 @@ function createBarChart(altWidth, altHeight, data, img, id) {
     chart.append("text")
         .attr("class", "axisLabel")
         .attr("toSelect", "x")
-        .attr("y", height + 50) // TODO replace 5 with text-height
+        .attr("y", height + 50) // TODO replace 5 with text-height or try setting dy
         .attr("x", width)
         .text(data.xLabel);
 

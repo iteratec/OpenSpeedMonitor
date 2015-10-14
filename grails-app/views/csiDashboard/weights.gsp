@@ -57,9 +57,7 @@
         %{-- Begin diagram view--}%
         <g:render template="/d3js/treemap"
                   model="[
-                          data: treemapData,
-                          design: 'rect',
-                          id:'chart1'
+                          id:'pageWeightTreemap'
                   ]"> </g:render>
         %{--End diagram View--}%
             <table class="table table-bordered">
@@ -115,9 +113,7 @@
 		<br />
 		<g:render template="/d3js/barChart"
 			model="[
-					img: 'clocks',
-                    data: barchartData,
-                    id: 'chart2'
+                    id: 'hoursOfDayBarchart'
 			]"> </g:render>
 		<br/>
 		%{--End diagram View--}%
@@ -145,6 +141,8 @@
                 $('input[id=theHourOfDayCsvFile]').change(function() {
                     $('#theHourOfDayCsvFileTwitter').val($(this).val());
                 });
+                createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap")
+                createBarChart(1000, 750, ${barchartData},"clocks", "hoursOfDayBarchart")
             </asset:script>
         </content>
     </body>

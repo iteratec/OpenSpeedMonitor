@@ -19,6 +19,3 @@
     <div class="span1" id="zeroWeightSpan">
     </div>
 </div>
-<asset:script type="text/javascript">
-    $(document).ready (createTreemap(1200, 750, ${data}, "${design}","${id}"));
-</asset:script>

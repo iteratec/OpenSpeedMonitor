@@ -12,6 +12,3 @@
         <svg class="chart" id= ${id}></svg>
     </div>
 </div>
-<asset:script type="text/javascript">
-    $(document).ready(createBarChart(1000, 750, ${data},"none", "${id}"));
-</asset:script>
