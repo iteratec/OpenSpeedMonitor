@@ -31,7 +31,7 @@ class TimeToCsMappingService {
 		if (page.isUndefinedPage()) {
 			return null;
 		}else{
-			return getCustomerSatisfactionInPercentViaMapping(docReadyTimeInMilliSecs, page)
+			return getCustomerSatisfactionPercentRank(docReadyTimeInMilliSecs, page)
 		}
 	}
 	
