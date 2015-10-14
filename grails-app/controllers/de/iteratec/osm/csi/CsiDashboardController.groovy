@@ -17,8 +17,10 @@
 
 package de.iteratec.osm.csi
 
-import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.d3Data.BarChartData
+import de.iteratec.osm.d3Data.TreemapData
+import de.iteratec.osm.d3Data.ChartEntry
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
@@ -40,10 +42,6 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
-
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -58,6 +56,12 @@ import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
+
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+
+import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
+
 //TODO: implement some tests for this controller
 
 /**
@@ -1078,11 +1082,24 @@ class CsiDashboardController {
     def weights() {
         CsiDashboardController.log.info("params=$params")
         //		List<String> params.errorMessagesCsi instanceof String?[params.errorMessagesCsi]:params.errorMessagesCsi
+
+        // arrange treemap data
+        TreemapData treemapData = new TreemapData(zeroWeightLabel: "Pages ohne Gewichtung", dataName: "Page", weightName: "Gewichtung");
+        pageDaoService.findAll().each {p -> treemapData.addNode(new ChartEntry(name: p.name, weight: p.weight))}
+        def treemapDataJSON = treemapData as JSON
+
+        // arrange barchart data
+        BarChartData barChartData = new BarChartData(xLabel: "Tageszeit", yLabel: "Gewichtung")
+        HourOfDay.findAll().each {h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight))}
+        def barChartJSON = barChartData as JSON
+
         [browsers:browserDaoService.findAll(),
             pages: pageDaoService.findAll(),
             // FIXME Change to use a DAO
             hoursOfDay: HourOfDay.findAll(),
-            errorMessagesCsi: params.list('errorMessagesCsi')]
+            errorMessagesCsi: params.list('errorMessagesCsi'),
+            treemapData: treemapDataJSON,
+            barchartData: barChartJSON]
     }
     def uploadBrowserWeights(){
         MultipartFile csv = request.getFile('browserCsv')

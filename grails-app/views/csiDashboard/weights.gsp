@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8"%>
+<%@ page import="grails.converters.JSON" contentType="text/html;charset=UTF-8"%>
 <html>
     <head>
         <meta name="layout" content="kickstart_osm" />
@@ -52,7 +52,16 @@
                     </div>
                 </g:uploadForm>
             </sec:ifAllGranted>
+        <hr />
             <h4><g:message code="de.iteratec.isocsi.page_weight" default="Page" /></h4>
+        %{-- Begin diagram view--}%
+        <g:render template="/d3js/treemap"
+                  model="[
+                          data: treemapData,
+                          design: 'rect',
+                          id:'chart1'
+                  ]"> </g:render>
+        %{--End diagram View--}%
             <table class="table table-bordered">
                 <tbody>
                     <tr>
@@ -81,23 +90,37 @@
                     </div>
                 </g:uploadForm>
             </sec:ifAllGranted>
+
+        <hr />
             <h4><g:message code="de.iteratec.isocsi.hour_weight" default="Tageszeit" /></h4>
-            <table class="table table-bordered">
-                <tbody>
-                <tr>
-                    <td class="text-info"><strong><g:message code="de.iteratec.isocsi.hour_weight" default="Stunde" /></strong></td>
-                    <g:each var="hourOfDay" in="${hoursOfDay?}">
-                        <td>${hourOfDay.fullHour}</td>
-                    </g:each>
-                </tr>
-                <tr>
-                    <td class="text-info"><strong><g:message code="de.iteratec.isocsi.weight" default="Gewichtung" /></strong></td>
-                    <g:each var="hourOfDay" in="${hoursOfDay?}">
-                        <td>${hourOfDay.weight}</td>
-                    </g:each>
-                </tr>
-                </tbody>
-            </table>
+        %{-- Begin table view daytime--}%
+		%{--<table class="table table-bordered">--}%
+			%{--<tbody>--}%
+			%{--<tr>--}%
+				%{--<td class="text-info"><strong><g:message code="de.iteratec.isocsi.hour_weight" default="Stunde" /></strong></td>--}%
+				%{--<g:each var="hourOfDay" in="${hoursOfDay?}">--}%
+					%{--<td>${hourOfDay.fullHour}</td>--}%
+				%{--</g:each>--}%
+			%{--</tr>--}%
+			%{--<tr>--}%
+				%{--<td class="text-info"><strong><g:message code="de.iteratec.isocsi.weight" default="Gewichtung" /></strong></td>--}%
+				%{--<g:each var="hourOfDay" in="${hoursOfDay?}">--}%
+					%{--<td>${hourOfDay.weight}</td>--}%
+				%{--</g:each>--}%
+			%{--</tr>--}%
+			%{--</tbody>--}%
+		%{--</table>--}%
+        %{-- End table view daytime--}%
+		%{-- Begin diagram view--}%
+		<br />
+		<g:render template="/d3js/barChart"
+			model="[
+					img: 'clocks',
+                    data: barchartData,
+                    id: 'chart2'
+			]"> </g:render>
+		<br/>
+		%{--End diagram View--}%
             <g:link action="downloadHourOfDayWeights"><g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download" /></g:link>
             <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
                 <g:uploadForm action="uploadHourOfDayWeights">
