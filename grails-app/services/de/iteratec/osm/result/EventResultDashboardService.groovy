@@ -208,7 +208,7 @@ public class EventResultDashboardService {
         }
 
         Collection<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
+//        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
             eventResults = eventResultDaoService.getLimitedMedianEventResultsBy(
                     startDate,
                     endDate,
@@ -219,7 +219,7 @@ public class EventResultDashboardService {
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
-        }
+//        }
 
         return calculateResultMap(eventResults, aggregators, interval)
 

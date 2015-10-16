@@ -23,6 +23,7 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
@@ -561,7 +562,14 @@ class ServiceMocker {
     void mockEventResultDaoService(serviceToMockIn, ArrayList<EventResult> eventResults) {
         def eventResultDaoService = mockFor(EventResultDaoService, true)
         eventResultDaoService.demand.getLimitedMedianEventResultsBy(1..10000) {
-            Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams queryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints ->
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            ErQueryParams queryParams,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            Map listCriteriaRestrictionMap,
+            CriteriaSorting sorting ->
                 return eventResults
         }
         serviceToMockIn.eventResultDaoService = eventResultDaoService.createMock()
