@@ -12,6 +12,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.result.ErQueryParams
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
@@ -76,7 +77,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
             ] as Set,
             queryParams,
             [:],
-            [:]
+            [:],
+            [:],
+            new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -104,7 +107,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -135,7 +140,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -163,7 +170,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -194,7 +203,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -225,7 +236,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -255,7 +268,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -286,7 +301,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:
@@ -316,7 +333,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
                 ] as Set,
                 queryParams,
                 [:],
-                [:]
+                [:],
+                [:],
+                new CriteriaSorting(sortingActive: false)
         )
 
         then:

@@ -255,28 +255,6 @@ class ResultMeasuredValueService {
 	}
 
 	/**
-	 * Gets a Collection of {@link EventResult}s for specified time frame, {@link MvQueryParams} and {@link CachedView}s.
-	 *
-	 * <strong>Important:</strong> This method is using a rlike pattern, which is not supported by Grails/GORM in test environment!
-	 * @param startOfInterval
-	 *         The first relevant date (inclusive), not <code>null</code>.
-	 * @param endOfInterval
-	 *         The last relevant date (inclusive), not <code>null</code>.
-	 * @param cachedViews
-	 *         The relevant cached views, not <code>null</code>.
-	 * @param queryParams
-	 *         The relevant query params, not <code>null</code>.
-	 * @return never <code>null</code>, potently empty if no results available
-	 *         for selection.
-	 */
-	public Collection<EventResult> getEventResults(Date startOfInterval, Date endOfInterval, Collection<CachedView> cachedViews, MvQueryParams queryParams) {
-
-		Collection<EventResult> eventResults=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startOfInterval, endOfInterval, cachedViews, queryParams);
-
-		return eventResults;
-	}
-
-	/**
 	 * Returns the {@link CachedView} the Result-{@link AggregatorType} is bound to.
 	 *
 	 * <p>
