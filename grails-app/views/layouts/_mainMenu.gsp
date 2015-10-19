@@ -9,6 +9,7 @@
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management" /></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management" /></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management" /></g:elseif>
+<g:elseif test="${controllerName.equals('jobSchedule')}"><g:set var="mainTab" value="management" /></g:elseif>
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management" /></g:elseif>
 <g:else><g:set var="mainTab" value="unnknown" /></g:else>
 
@@ -44,6 +45,9 @@
 			<li class="controller ${controllerName.equals('queueStatus')?'active':''}">
 				<g:link controller="queueStatus" action="list"><i class="fa fa-inbox"></i> <g:message code="queue.status.label" /></g:link>
 			</li>
+            <li class="controller ${controllerName.equals('jobSchedule')?'active':''}">
+                <g:link controller="jobSchedule" action="schedules"><i class="fa fa-clock-o"></i> <g:message code="job.Schedule.label" /></g:link>
+            </li>
 			<li class="controller ${controllerName.equals('connectivityProfile')?'active':''}">
 				<g:link controller="connectivityProfile" action="list"><i class="fa fa-globe"></i> <g:message code="connectivityProfile.label.plural" /></g:link>
 			</li>

@@ -17,7 +17,9 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.PageService
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import de.iteratec.osm.batch.Activity
@@ -26,8 +28,8 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
-
-import java.text.DecimalFormat
+import org.joda.time.DateTime
+import org.quartz.CronExpression
 
 class JobService {
     static transactional = false
@@ -161,4 +163,35 @@ class JobService {
             }
         }
     }
+
+    /**
+     * Creates a list of execution dates for the given Job in the given interval
+     * @param job The job, not <code>null</code>
+     * @param startDate the begin of the interval
+     * @param endDate the end of the interval
+     * @return a List of DateTimes when the job will be executed
+     */
+    List<DateTime> getExecutionDatesInInterval(Job job, DateTime startDate, DateTime endDate) {
+        Date startDateJava = startDate.toDate()
+        Date endDatejava = endDate.toDate()
+
+        List<DateTime> executionDates = new ArrayList<>()
+
+        if (job.getExecutionSchedule() != null) {
+
+            Date nextExecution = job.getNextExecutionTime()
+            CronExpression expr = new CronExpression(job.getExecutionSchedule())
+            while (nextExecution && nextExecution.before(endDatejava)) {
+
+                if (nextExecution.after(startDateJava)) {
+                    executionDates << new DateTime(nextExecution)
+                }
+
+                nextExecution = CronExpressionFormatter.getNextValidTimeAfter(expr, nextExecution)
+            }
+        }
+        return executionDates
+    }
+
+
 }
