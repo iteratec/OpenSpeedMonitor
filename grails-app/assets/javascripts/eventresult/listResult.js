@@ -24,5 +24,10 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 	initDatepicker(dateFormat, weekStart, 24*3);
 	
 	initTimepicker(false);
+
+    var preSelection = $('#timeframeSelect').val()>0;
+    disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
+
+    initChosenSelects(noResultsTextForChosenSelects);
 	
 }

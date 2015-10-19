@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
 import grails.test.mixin.support.*
@@ -619,28 +620,36 @@ class EventResultDashboardServiceTests {
     private void mockEventResultDaoService() {
         def eventResultDaoService = mockFor(EventResultDaoService, true)
         eventResultDaoService.demand.getLimitedMedianEventResultsBy(1..10000) {
-            Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams erQueryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints ->
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            ErQueryParams queryParams,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            Map listCriteriaRestrictionMap,
+            CriteriaSorting sorting ->
+
                 List<EventResult> results = []
                 if (cachedViews.contains(CachedView.CACHED)) {
-                    if (!erQueryParams.minLoadTimeInMillisecs && !erQueryParams.maxLoadTimeInMillisecs) {
+                    if (!queryParams.minLoadTimeInMillisecs && !queryParams.maxLoadTimeInMillisecs) {
                         results.add(eventResultCached)
                     } else {
-                        if (erQueryParams.minLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs > erQueryParams.minLoadTimeInMillisecs) {
+                        if (queryParams.minLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs > queryParams.minLoadTimeInMillisecs) {
                             results.add(eventResultCached)
                         }
-                        if (erQueryParams.maxLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs < erQueryParams.maxLoadTimeInMillisecs) {
+                        if (queryParams.maxLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs < queryParams.maxLoadTimeInMillisecs) {
                             results.add(eventResultCached)
                         }
                     }
                 }
                 if (cachedViews.contains(CachedView.UNCACHED)) {
-                    if (!erQueryParams.minLoadTimeInMillisecs && !erQueryParams.maxLoadTimeInMillisecs) {
+                    if (!queryParams.minLoadTimeInMillisecs && !queryParams.maxLoadTimeInMillisecs) {
                         results.add(eventResultUncached)
                     } else {
-                        if (erQueryParams.minLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs > erQueryParams.minLoadTimeInMillisecs) {
+                        if (queryParams.minLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs > queryParams.minLoadTimeInMillisecs) {
                             results.add(eventResultUncached)
                         }
-                        if (erQueryParams.maxLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs < erQueryParams.maxLoadTimeInMillisecs) {
+                        if (queryParams.maxLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs < queryParams.maxLoadTimeInMillisecs) {
                             results.add(eventResultUncached)
                         }
                     }

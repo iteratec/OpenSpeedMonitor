@@ -17,8 +17,10 @@
 
 package de.iteratec.osm.result.dao
 
+import de.iteratec.osm.dao.CriteriaAggregator
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+import de.iteratec.osm.dao.CriteriaSorting
 
 import java.util.regex.Pattern
 
@@ -42,9 +44,7 @@ import de.iteratec.osm.persistence.OsmDataSourceService;
 public class EventResultDaoService {
 		
 	OsmDataSourceService osmDataSourceService
-
 	JobResultDaoService jobResultDaoService
-
 	MeasuredValueTagService measuredValueTagService
 
 	/**
@@ -99,9 +99,38 @@ public class EventResultDaoService {
 	 * @param rlikePattern
 	 * @return
 	 */
-	public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, MvQueryParams mvQueryParams){
+	public List<EventResult> getMedianEventResultsBy(
+            Date fromDate, Date toDate, Set<CachedView> cachedViews, MvQueryParams mvQueryParams
+    ){
+
 		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams)
 		return getMedianEventResultsBy(fromDate, toDate, cachedViews, rlikePattern.pattern)
+
+	}
+
+    /**
+	 * Returns a Collection of {@link EventResult}s for specified time frame and {@link MvQueryParams}.
+	 * @param erQueryParams
+	 * 			The relevant query params, not <code>null</code>.
+	 * @param fromDate
+	 * 			The first relevant date (inclusive), not <code>null</code>.
+	 * @param toDate
+	 * 			The last relevant date (inclusive), not <code>null</code>.
+	 * @param max
+	 * 			The number of records to display per page
+	 * @param offset
+	 * 			Pagination offset
+	 * @return never <code>null</code>, potently empty if no results available
+	 *         for selection.
+	 */
+	public Collection<EventResult> getCountedByStartAndEndTimeAndMvQueryParams(
+            ErQueryParams erQueryParams, Date fromDate, Date toDate, Integer max, Integer offset, CriteriaSorting sorting
+    ){
+
+        return getLimitedMedianEventResultsBy(
+            fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [:], [:], [max: max, offset:offset], sorting
+        )
+
 	}
 	
 	/**
@@ -114,82 +143,191 @@ public class EventResultDaoService {
 	 * @return
 	 */
 	public List<EventResult> getLimitedMedianEventResultsBy(
-		Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams queryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints){
+		Date fromDate,
+        Date toDate,
+        Set<CachedView> cachedViews,
+        ErQueryParams queryParams,
+        Map<String, Number> gtConstraints,
+        Map<String, Number> ltConstraints,
+        Map listCriteriaRestrictionMap,
+        CriteriaSorting sorting
+    ){
 		
 		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(queryParams)
-		def criteria = EventResult.createCriteria()
 
-		if(osmDataSourceService.getRLikeSupport()){
-			List result = criteria.list {
-				rlike('tag', rlikePattern)
-				between('jobResultDate', fromDate, toDate)
-				eq('medianValue', true)
-				'in'('cachedView', cachedViews)
-				gtConstraints.each {attr, gtValue ->
-					gt(attr, gtValue)
-				}
-				ltConstraints.each {attr, ltValue ->
-					lt(attr, ltValue)
-				}
-                if (queryParams.connectivityProfileIds.size() > 0){
-                    List<ConnectivityProfile> predefinedProfiles = queryParams.connectivityProfileIds.collect {ConnectivityProfile.get(it)}
-                    if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false){
-                        connectivityProfile{
-                            'in'('id', predefinedProfiles*.ident())
-                        }
-                    }else if (queryParams.includeNativeConnectivity == false){
-                        or {
-                            connectivityProfile{
-                                'in'('id', predefinedProfiles*.ident())
-                            }
-                            rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                        }
-                    }else if (queryParams.customConnectivityNameRegex == null){
-                        or {
-                            connectivityProfile{
-                                'in'('id', predefinedProfiles*.ident())
-                            }
-                            eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
-                        }
-                    }else{
-                        or {
-                            connectivityProfile{
-                                'in'('id', predefinedProfiles*.ident())
-                            }
-                            rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                            eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
-                        }
-                    }
-                }else{
-                    if (queryParams.customConnectivityNameRegex != null && queryParams.includeNativeConnectivity == true){
-                        or {
-                            rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                            eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
-                        }
-                    }else if (queryParams.customConnectivityNameRegex != null){
-                        rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                    }else if (queryParams.includeNativeConnectivity == true){
-                        eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
-                    }
-                }
-			}
-			return result;
-		} else {
-			List<EventResult> eventResults = criteria.list {
-				between('jobResultDate', fromDate, toDate)
-				eq('medianValue', true)
-				'in'('cachedView', cachedViews)
-				gtConstraints.each {attr, gtValue ->
-					gt(attr, gtValue)
-				}
-				ltConstraints.each {attr, ltValue ->
-					lt(attr, ltValue)
-				}
-			}.grep{ it.tag ==~ rlikePattern }
+        if(osmDataSourceService.getRLikeSupport()){
 
-			return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
-		}
+            return getLimitedMedianEventResultsWithTheAidOfRlike(
+                    rlikePattern,
+                    fromDate,
+                    toDate,
+                    cachedViews,
+                    gtConstraints,
+                    ltConstraints,
+                    queryParams,
+                    sorting,
+                    listCriteriaRestrictionMap
+            )
+
+        } else {
+
+            //FIXME: rlike isn't supported in H2-db used in unit-tests. The following Environment-switch should be replaced with metaclass-method-replacement in tests.
+            return getLimitedMedianEventResultsByGrepingListWithRlikePatternInMemory(
+                    listCriteriaRestrictionMap,
+                    fromDate,
+                    toDate,
+                    cachedViews,
+                    gtConstraints,
+                    ltConstraints,
+                    rlikePattern,
+                    queryParams
+            )
+
+        }
 	}
+
+    private List<EventResult> getLimitedMedianEventResultsByGrepingListWithRlikePatternInMemory(
+            Map listCriteriaRestrictionMap,
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            Pattern rlikePattern,
+            ErQueryParams queryParams
+    ) {
+
+        List<EventResult> eventResults = criteria.list(listCriteriaRestrictionMap) {
+            between('jobResultDate', fromDate, toDate)
+            eq('medianValue', true)
+            'in'('cachedView', cachedViews)
+            gtConstraints.each { attr, gtValue ->
+                gt(attr, gtValue)
+            }
+            ltConstraints.each { attr, ltValue ->
+                lt(attr, ltValue)
+            }
+        }.grep { it.tag ==~ rlikePattern }
+
+        return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
+
+    }
+
+    private List<EventResult> getLimitedMedianEventResultsWithTheAidOfRlike(
+            Pattern rlikePattern,
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            ErQueryParams queryParams,
+            CriteriaSorting sorting,
+            Map listCriteriaRestrictionMap
+    ) {
+
+        CriteriaAggregator eventResultQueryAggregator = new CriteriaAggregator(EventResult.class)
+
+        eventResultQueryAggregator.addCriteria {
+            rlike('tag', rlikePattern)
+            between('jobResultDate', fromDate, toDate)
+            eq('medianValue', true)
+            'in'('cachedView', cachedViews)
+        }
+
+        gtConstraints.each { attr, gtValue ->
+            eventResultQueryAggregator.addCriteria {
+                gt(attr, gtValue)
+            }
+        }
+        ltConstraints.each { attr, ltValue ->
+            eventResultQueryAggregator.addCriteria {
+                lt(attr, ltValue)
+            }
+        }
+
+        addConnectivityRelatedCriteria(queryParams, eventResultQueryAggregator)
+
+        if (sorting.sortingActive) {
+            eventResultQueryAggregator.addCriteria {
+                order(sorting.sortAttribute, sorting.sortOrder.getHibernateCriteriaRepresentation())
+            }
+        }
+
+        return eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap);
+
+    }
+
+    private void addConnectivityRelatedCriteria(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator) {
+        if (queryParams.connectivityProfileIds.size() > 0) {
+
+            addConnectivityRelatedCriteriaWithPredefinedConnectivities(queryParams, eventResultQueryAggregator)
+
+        } else {
+
+            addConnectivityRelatedCriteriaWithoutPredefinedConnectivities(queryParams, eventResultQueryAggregator)
+
+        }
+    }
+
+    private void addConnectivityRelatedCriteriaWithPredefinedConnectivities(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator){
+        List<ConnectivityProfile> predefinedProfiles = queryParams.connectivityProfileIds.collect {
+            ConnectivityProfile.get(it)
+        }
+        if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false) {
+            eventResultQueryAggregator.addCriteria {
+                connectivityProfile {
+                    'in'('id', predefinedProfiles*.ident())
+                }
+            }
+        } else if (queryParams.includeNativeConnectivity == false) {
+            eventResultQueryAggregator.addCriteria {
+                or {
+                    connectivityProfile {
+                        'in'('id', predefinedProfiles*.ident())
+                    }
+                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                }
+            }
+        } else if (queryParams.customConnectivityNameRegex == null) {
+            eventResultQueryAggregator.addCriteria {
+                or {
+                    connectivityProfile {
+                        'in'('id', predefinedProfiles*.ident())
+                    }
+                    eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                }
+            }
+
+        } else {
+            eventResultQueryAggregator.addCriteria {
+                or {
+                    connectivityProfile {
+                        'in'('id', predefinedProfiles*.ident())
+                    }
+                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                    eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                }
+            }
+        }
+    }
+    private void addConnectivityRelatedCriteriaWithoutPredefinedConnectivities(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator){
+        if (queryParams.customConnectivityNameRegex != null && queryParams.includeNativeConnectivity == true) {
+            eventResultQueryAggregator.addCriteria {
+                or {
+                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                    eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                }
+            }
+        } else if (queryParams.customConnectivityNameRegex != null) {
+            eventResultQueryAggregator.addCriteria {
+                rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+            }
+        } else if (queryParams.includeNativeConnectivity == true) {
+            eventResultQueryAggregator.addCriteria {
+                eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+            }
+        }
+    }
 
     private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
         if (queryParams.connectivityProfileIds.size() > 0){
@@ -249,12 +387,13 @@ public class EventResultDaoService {
 	 * @return never <code>null</code>, potently empty if no results available 
 	 *         for selection.
 	 */
-	public Collection<EventResult> getByStartAndEndTimeAndMvQueryParams(Date fromDate, Date toDate, Collection<CachedView> cachedViews, MvQueryParams mvQueryParams){
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams);
-		
-		
+	public Collection<EventResult> getByStartAndEndTimeAndMvQueryParams(
+            Date fromDate, Date toDate, Collection<CachedView> cachedViews, MvQueryParams mvQueryParams
+    ){
+
+        Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams);
+
 		def criteria = EventResult.createCriteria()
-		//FIXME: rlike isn't supported in H2-db used in unit-tests. The following Environment-switch should be replaced with metaclass-method-replacement in tests.
 		if(osmDataSourceService.getRLikeSupport()) {
 			return criteria.list {
 				between("jobResultDate", fromDate, toDate)
@@ -269,59 +408,20 @@ public class EventResultDaoService {
 			return eventResults.grep{ it.tag ==~ rlikePattern }
 		}
 	}
-	/**
-	 * Gets all {@link EventResult}s from db associated with {@link WebPerformanceWaterfall} waterfall.
-	 * @param waterfall
-	 * @return List of {@link EventResult}s associated with {@link WebPerformanceWaterfall} waterfall.
-	 */
-	public List<EventResult> findEventResultsAssociatedTo(WebPerformanceWaterfall waterfall) {
-		return EventResult.findAllByWebPerformanceWaterfall(waterfall)
-	}
-	
-	/**
-	 * Returns a Collection of {@link EventResult}s for specified time frame and {@link MvQueryParams}.
-	 * @param mvQueryParams
-	 * 			The relevant query params, not <code>null</code>.
-	 * @param fromDate
-	 * 			The first relevant date (inclusive), not <code>null</code>.
-	 * @param toDate
-	 * 			The last relevant date (inclusive), not <code>null</code>.
-	 * @param max 
-	 * 			The number of records to display per page 
-	 * @param offset
-	 * 			Pagination offset
-	 * @return never <code>null</code>, potently empty if no results available 
-	 *         for selection.
-	 */
-	public Collection<EventResult> getCountedByStartAndEndTimeAndMvQueryParams(MvQueryParams mvQueryParams, Date fromDate, Date toDate, Integer max, Integer offset){
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams);
-			
-		def eventResultCriteria = EventResult.createCriteria()
-			
-		if(osmDataSourceService.getRLikeSupport()){
-			def eventResults = eventResultCriteria.list (max: max, offset:offset) {
-				and {	
-					
-					rlike("tag", rlikePattern.pattern)
-					between("jobResultDate", fromDate, toDate)
-					
-				}
-				order('jobResultDate', 'desc')
-			}
-			return eventResults
-		}
-		
-		List<EventResult> eventResults = eventResultCriteria.list (max: max, offset:offset) {
-			between("jobResultDate", fromDate, toDate)
-		}
-		return eventResults.grep{ it.tag ==~ rlikePattern }
-		
-	}
-	
+
 	/**
 	 * Returns all EventResults belonging to the specified Job.
 	 */
 	public Collection<EventResult> getEventResultsByJob(Job _job, Date fromDate, Date toDate, Integer max, Integer offset){
 		return EventResult.where { jobResultJobConfigId == _job.id && jobResultDate >= fromDate && jobResultDate <= toDate }.list(sort: 'jobResultDate', order: 'desc', max: max, offset: offset)
 	}
+
+    /**
+     * Gets all {@link EventResult}s from db associated with {@link WebPerformanceWaterfall} waterfall.
+     * @param waterfall
+     * @return List of {@link EventResult}s associated with {@link WebPerformanceWaterfall} waterfall.
+     */
+    public List<EventResult> findEventResultsAssociatedTo(WebPerformanceWaterfall waterfall) {
+        return EventResult.findAllByWebPerformanceWaterfall(waterfall)
+    }
 }

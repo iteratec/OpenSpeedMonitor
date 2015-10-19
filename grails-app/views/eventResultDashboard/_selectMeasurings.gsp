@@ -160,11 +160,13 @@ GSP-Template Mappings:
                         <g:message code="de.iteratec.osm.result.name-custom-connectivity.label"
                                    default="Name of custom connectivities to show:"/>
                     </label>
-                    <g:textField name="customConnectivityName" class="form-control input-xxlarge" value="${customConnectivityName}" id="customConnectivityName"
-                                 placeholder="${g.message(code: 'de.iteratec.osm.result.name-custom-connectivity.placeholder', default: 'Search via regex')}"></g:textField>
+                    <g:textField name="customConnectivityName" class="form-control input-xxlarge"
+                                 value="${customConnectivityName}" id="customConnectivityName"
+                                 placeholder="${g.message(code: 'de.iteratec.osm.result.name-custom-connectivity.placeholder', default: 'Search via regex')}">
+                    </g:textField>
                     <br>
                     <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"
-                    target="_blank">
+                        target="_blank">
                         <g:message code="de.iteratec.osm.result.connectivity.regex.link.label" default="https://en.wikipedia.org/wiki/Regular_expression#Syntax" />
                     </a>
                 </div>

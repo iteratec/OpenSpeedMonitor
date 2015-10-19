@@ -133,7 +133,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 '/csiDashboard/downloadPageWeights'           : ["permitAll"],
 '/csiDashboard/downloadHourOfDayWeights'      : ["permitAll"],
 '/eventResultDashboard/**'                    : ["permitAll"],
-'/eventResult/**'                             : ["permitAll"],
+'/tabularResultPresentation/**'                             : ["permitAll"],
 '/highchartPointDetails/**'                   : ["permitAll"],
 '/rest/**'                                    : ["permitAll"],
 '/login/**'                                   : ["permitAll"],
@@ -153,7 +153,6 @@ grails.plugin.springsecurity.interceptUrlMap = [
 '/csiDashboard/validateDashboardName'         : ["permitAll"],
 '/csiDashboard/validateAndSaveDashboardValues': ["permitAll"],
 '/i18n/getAllMessages'                        : ["permitAll"],
-'/tabularResultPresentation/listResults'      : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////

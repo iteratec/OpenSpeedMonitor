@@ -18,6 +18,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
@@ -30,7 +31,6 @@ import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -208,10 +208,18 @@ public class EventResultDashboardService {
         }
 
         Collection<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
+//        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
             eventResults = eventResultDaoService.getLimitedMedianEventResultsBy(
-                    startDate, endDate, [CachedView.CACHED, CachedView.UNCACHED] as Set, queryParams, gtValues, ltValues)
-        }
+                    startDate,
+                    endDate,
+                    [CachedView.CACHED, CachedView.UNCACHED] as Set,
+                    queryParams,
+                    gtValues,
+                    ltValues,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+//        }
 
         return calculateResultMap(eventResults, aggregators, interval)
 
