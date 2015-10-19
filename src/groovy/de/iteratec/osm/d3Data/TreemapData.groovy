@@ -1,7 +1,8 @@
 package de.iteratec.osm.d3Data
 
 /**
- * Created by mmi on 09.10.2015.
+ * This class represents a model for the creation of a d3 treemap
+ * A treemap consists of a specified amount of ChartEntries containing a name and a weight
  */
 class TreemapData {
     final String name = "tree"

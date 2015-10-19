@@ -1,7 +1,7 @@
 package de.iteratec.osm.d3Data
 
 /**
- * Created by mmi on 09.10.2015.
+ * Class symbolizing a chart datum with a name and a value (weight)
  */
 class ChartEntry {
     String name;

@@ -1,8 +1,8 @@
 package de.iteratec.osm.d3Data
 
-
 /**
- * Created by mmi on 12.10.2015.
+ * This class represents a model for the creation of a d3 bar chart
+ * A bar chart consists of a specified amount of ChartEntries containing a name and a weight
  */
 class BarChartData {
     List<ChartEntry> bars;

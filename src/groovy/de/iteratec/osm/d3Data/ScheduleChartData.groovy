@@ -3,7 +3,9 @@ package de.iteratec.osm.d3Data
 import org.joda.time.DateTime
 
 /**
- * Created by mmi on 15.10.2015.
+ * This class represents a model for the creation of a d3 schedule chart
+ * A schedule chart is separated into n location.
+ * Each location is again separated into m jobs.
  */
 class ScheduleChartData {
     String name

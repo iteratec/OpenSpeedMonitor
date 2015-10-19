@@ -1,7 +1,7 @@
 package de.iteratec.osm.d3Data
 
 /**
- * Created by mmi on 15.10.2015.
+ * A classification for a schedule chart
  */
 class ScheduleChartLocation {
     String name
