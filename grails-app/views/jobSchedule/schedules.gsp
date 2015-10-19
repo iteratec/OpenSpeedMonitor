@@ -15,18 +15,22 @@
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
 
-<g:each in="${chartList}" var="chartData" status="i">
-    <g:render template="/d3js/scheduleChart" model="[chartData: chartData, id: i]"/>
+<g:each in="${chartList}" var="notUsed" status="i">
+    <g:render template="/d3js/scheduleChart" model="[id: i]"/>
     <br/>
     <br/>
 </g:each>
-%{--<!-- <input type="checkbox" id="autoRefresh" /> <label for="autoRefresh"><g:message--}%
-        %{--code="queue.autorefresh.label"/></label>  -->--}%
-<content tag="include.bottom">
+
+</conten tag="include.bottom">
     <asset:javascript src="timeago/jquery.timeago.js"/>
     <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
         <asset:javascript src="timeago/timeagoDe.js"/>
     </g:if>
+    <asset:script type="text/javascript">
+        <g:each in="${chartList}" var="chartData" status="i">
+            createScheduleChart(${chartData}, "${"ScheduleChart" + i}")
+        </g:each>
+    </asset:script>
 </content>
 </body>
 </html>
