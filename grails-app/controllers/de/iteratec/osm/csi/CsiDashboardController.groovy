@@ -1083,13 +1083,20 @@ class CsiDashboardController {
         CsiDashboardController.log.info("params=$params")
         //		List<String> params.errorMessagesCsi instanceof String?[params.errorMessagesCsi]:params.errorMessagesCsi
 
+        //Labels for charts
+        String zeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.zeroWeightLabel", "Pages ohne Gewichtung")
+        String dataLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.dataLabel", "Page")
+        String weightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.weightLabel", "Gewichtung")
+        String xAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.xAxisLabel", "Tageszeit")
+        String yAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.yAxisLabel", "Gewichtung")
+
         // arrange treemap data
-        TreemapData treemapData = new TreemapData(zeroWeightLabel: "Pages ohne Gewichtung", dataName: "Page", weightName: "Gewichtung");
+        TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
         pageDaoService.findAll().each {p -> treemapData.addNode(new ChartEntry(name: p.name, weight: p.weight))}
         def treemapDataJSON = treemapData as JSON
 
         // arrange barchart data
-        BarChartData barChartData = new BarChartData(xLabel: "Tageszeit", yLabel: "Gewichtung")
+        BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
         HourOfDay.findAll().each {h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight))}
         def barChartJSON = barChartData as JSON
 

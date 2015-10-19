@@ -2,8 +2,8 @@
  * Creates a bar chart
  *
  * Data to inject:
- * width : diagram width in px in case no suitable div is found (div id='barChartSpan')
- * height : diagram height in px in case no suitable div is found (div id='barChartSpan')
+ * altWidth : diagram width in px in case no suitable div is found (div id='barChartSpan')
+ * altHeight : diagram height in px in case no suitable div is found (div id='barChartSpan')
  * data : de.iteratec.osm.d3data.BarChartData-Object as JSON
  * img : one of 'clocks', 'none'
  * id : the id of the barChart on this page (unique)
@@ -129,13 +129,14 @@ function createBarChart(altWidth, altHeight, data, img, id) {
     chart.append("text")
         .attr("class", "axisLabel")
         .attr("toSelect", "x")
-        .attr("y", height + 50) // TODO replace 5 with text-height or try setting dy
+        .attr("y", height + margin.bottom)
+        .attr("dy", "-0.35em")
         .attr("x", width)
         .text(data.xLabel);
 
 
-    // TODO width, height, x,y are fixed values whereas dimension of diagram varies
-    if (img == "clocks") {
+    // Create clock icons if img=='clocks'
+    if (img.toLowerCase() == "clocks") {
         // Images instead of text
         chart.select(".xAxis").selectAll("text").remove();
         chart.select(".xAxis").selectAll("line").remove();
