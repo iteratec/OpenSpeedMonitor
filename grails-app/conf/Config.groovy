@@ -106,6 +106,8 @@ def logDirectory = '.'
 
 grails.config.defaults.locations = [KickstartResources]
 
+grails.plugin.springsecurity.password.algorithm = 'SHA-512'
+grails.plugin.springsecurity.password.hash.iterations = 1
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
 grails.plugin.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
@@ -199,10 +201,6 @@ environments {
 
         grails.dbconsole.enabled = true
         grails.dbconsole.urlRoot = '/admin/dbconsole'
-
-        // backwards compability: default hash algo in :spring-security-core:1.2.7.3
-        grails.plugin.springsecurity.password.algorithm = 'SHA-256'
-        grails.plugin.springsecurity.password.hash.iterations = 1
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
         grails.plugin.console.enabled = true
