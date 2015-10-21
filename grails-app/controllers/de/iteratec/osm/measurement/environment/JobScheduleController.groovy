@@ -33,13 +33,13 @@ import org.springframework.context.MessageSource
  * JobScheduleController
  */
 class JobScheduleController {
-
+//
     QueueAndJobStatusService queueAndJobStatusService
-
-    JobService jobService
-    PageService pageService
-
-    I18nService i18nService
+//
+//    JobService jobService
+//    PageService pageService
+//
+//    I18nService i18nService
 
     def index() {
         redirect(action: 'schedules')
@@ -51,66 +51,66 @@ class JobScheduleController {
         DateTime end = start.plusDays(1);
 
         // Create data for chart in interval
-        List chartDataList = createChartData(start, end)
+        List<ScheduleChartData> chartDataList = queueAndJobStatusService.createChartData(start, end)
 
         [chartList: chartDataList]
     }
 
-    /**
-     *
-     * @param start starting point of specified interval
-     * @param end ending point of specified interval
-     * @return List of JSON objects for schedule chart
-     */
-    private def createChartData(DateTime start, DateTime end) {
-
-        def chartDataList = new ArrayList();
-        def wptServer = WebPageTestServer.findAllByActive(true)
-
-        String discountedLocationsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedLocationsLabel", "Discarded Locations")
-        String discountedJobsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedJobsLabel", "Discarded Jobs")
-
-
-        // Iterate over active servers
-        for (WebPageTestServer server : wptServer) {
-            ScheduleChartData scheduleChartServer = new ScheduleChartData(name: server.label,
-                                                                        startDate: start, endDate: end,
-                                                                        discountedLocationsLabel: discountedLocationsLabel,
-                                                                        discountedJobsLabel: discountedJobsLabel)
-
-            def locations = queueAndJobStatusService.getFilteredLocations(server)
-
-            // iterate over locations
-            locations.each { loc ->
-                ScheduleChartLocation scheduleChartLocation = new ScheduleChartLocation(name: loc.location.uniqueIdentifierForServer)
-                def jobs = Job.findAllByLocation(loc.location)
-
-                // iterate over jobs
-                for (Job j : jobs) {
-                    ScriptParser parser = new ScriptParser(pageService, j.script.navigationScript);
-                    def minutes = parser.calculateDurationInMinutes()
-                    // Add jobs which are going to run in given interval to the list
-                    // otherwise the job is added to the list of discounted jobs
-                    ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, durationInMinutes: minutes)
-                    if (!scheduleChartJob.executionDates.isEmpty()) {
-                        scheduleChartLocation.addJob(scheduleChartJob)
-                    } else {
-                        scheduleChartServer.addDiscountedJob(loc.location.uniqueIdentifierForServer + ": " + j.label)
-                    }
-                }
-
-                // if a location has no job which is going to run in the interval
-                // the whole location is added to the list of discarded locations
-                if (!scheduleChartLocation.jobs.isEmpty()) {
-                    scheduleChartServer.addLocation(scheduleChartLocation)
-                } else {
-                    scheduleChartServer.addDiscountedLocation(loc.location.uniqueIdentifierForServer)
-                }
-            }
-
-            chartDataList.add(scheduleChartServer as JSON)
-        }
-
-        return chartDataList
-    }
+//    /**
+//     *
+//     * @param start starting point of specified interval
+//     * @param end ending point of specified interval
+//     * @return List of JSON objects for schedule chart
+//     */
+//    private def createChartData(DateTime start, DateTime end) {
+//
+//        def chartDataList = new ArrayList();
+//        def wptServer = WebPageTestServer.findAllByActive(true)
+//
+//        String discountedLocationsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedLocationsLabel", "Discarded Locations")
+//        String discountedJobsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedJobsLabel", "Discarded Jobs")
+//
+//
+//        // Iterate over active servers
+//        for (WebPageTestServer server : wptServer) {
+//            ScheduleChartData scheduleChartServer = new ScheduleChartData(name: server.label,
+//                                                                        startDate: start, endDate: end,
+//                                                                        discountedLocationsLabel: discountedLocationsLabel,
+//                                                                        discountedJobsLabel: discountedJobsLabel)
+//
+//            def locations = queueAndJobStatusService.getFilteredLocations(server)
+//
+//            // iterate over locations
+//            locations.each { loc ->
+//                ScheduleChartLocation scheduleChartLocation = new ScheduleChartLocation(name: loc.location.uniqueIdentifierForServer)
+//                def jobs = Job.findAllByLocation(loc.location)
+//
+//                // iterate over jobs
+//                for (Job j : jobs) {
+//                    ScriptParser parser = new ScriptParser(pageService, j.script.navigationScript);
+//                    def minutes = parser.calculateDurationInMinutes()
+//                    // Add jobs which are going to run in given interval to the list
+//                    // otherwise the job is added to the list of discounted jobs
+//                    ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, durationInMinutes: minutes)
+//                    if (!scheduleChartJob.executionDates.isEmpty()) {
+//                        scheduleChartLocation.addJob(scheduleChartJob)
+//                    } else {
+//                        scheduleChartServer.addDiscountedJob(loc.location.uniqueIdentifierForServer + ": " + j.label)
+//                    }
+//                }
+//
+//                // if a location has no job which is going to run in the interval
+//                // the whole location is added to the list of discarded locations
+//                if (!scheduleChartLocation.jobs.isEmpty()) {
+//                    scheduleChartServer.addLocation(scheduleChartLocation)
+//                } else {
+//                    scheduleChartServer.addDiscountedLocation(loc.location.uniqueIdentifierForServer)
+//                }
+//            }
+//
+//            chartDataList.add(scheduleChartServer as JSON)
+//        }
+//
+//        return chartDataList
+//    }
 }

@@ -5,7 +5,7 @@ package de.iteratec.osm.d3Data
  * A bar chart consists of a specified amount of ChartEntries containing a name and a weight
  */
 class BarChartData {
-    List<ChartEntry> bars;
+    List<ChartEntry> bars
     String xLabel
     String yLabel
 

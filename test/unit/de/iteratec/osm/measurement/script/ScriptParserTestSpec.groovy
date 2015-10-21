@@ -178,6 +178,6 @@ class ScriptParserTestSpec extends Specification {
                             """)
 
         then:
-        parser.allPageLoadEvents == 9
+        parser.allPageLoadEvents == 6
     }
 }

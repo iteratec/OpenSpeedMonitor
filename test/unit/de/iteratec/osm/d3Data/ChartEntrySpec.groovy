@@ -15,19 +15,24 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.measurement.environment
+package de.iteratec.osm.d3Data
 
-
-import grails.test.mixin.*
-import org.junit.*
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import spock.lang.Specification
 
 /**
- * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
+ * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-@TestFor(JobScheduleController)
-class JobScheduleControllerSpec {
+@TestMixin(GrailsUnitTestMixin)
+class ChartEntrySpec extends Specification{
 
-    void testSomething() {
-        fail "Implement me"
-    }
+   def "chart Entry getter and setter test" () {
+       when:
+       ChartEntry chartEntry = new ChartEntry(name: "Test", weight: 5)
+
+       then:
+       chartEntry.name == "Test"
+       chartEntry.weight == 5.0
+   }
 }

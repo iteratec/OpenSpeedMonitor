@@ -21,14 +21,14 @@
     <br/>
 </g:each>
 
-</conten tag="include.bottom">
+</content tag="include.bottom">
     <asset:javascript src="timeago/jquery.timeago.js"/>
     <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
         <asset:javascript src="timeago/timeagoDe.js"/>
     </g:if>
     <asset:script type="text/javascript">
         <g:each in="${chartList}" var="chartData" status="i">
-            createScheduleChart(${chartData}, "${"ScheduleChart" + i}")
+            createScheduleChart(${chartData as grails.converters.JSON}, "${"ScheduleChart" + i}")
         </g:each>
     </asset:script>
 </content>

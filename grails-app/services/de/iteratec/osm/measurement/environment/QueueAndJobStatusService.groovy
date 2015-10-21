@@ -17,8 +17,17 @@
 
 package de.iteratec.osm.measurement.environment
 
+import de.iteratec.osm.d3Data.ScheduleChartData
+import de.iteratec.osm.d3Data.ScheduleChartJob
+import de.iteratec.osm.d3Data.ScheduleChartLocation
+import de.iteratec.osm.measurement.schedule.JobService
+import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.result.PageService
+import de.iteratec.osm.util.I18nService
+import grails.converters.JSON
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.ContentType
+import org.joda.time.DateTime
 import org.quartz.CronExpression
 
 import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
@@ -41,6 +50,9 @@ class QueueAndJobStatusService {
 	HttpRequestService httpRequestService
 	MeasuredValueTagService measuredValueTagService
 	EventResultDaoService eventResultDaoService
+	I18nService i18nService
+	JobService jobService
+	PageService pageService
 
 	/**
 	 * Retrieves only those locations for the given WebPageTestServer from the database which are also returned
@@ -52,10 +64,13 @@ class QueueAndJobStatusService {
 	List<Map<Location, Object>> getFilteredLocations(WebPageTestServer wptServer) {
 		GPathResult locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
 		List locations = []
+		if (locationsResponse != null) {
 		locationsResponse.data.location.each { locationTagInXml ->
 			Location location = Location.findByWptServerAndUniqueIdentifierForServer(wptServer, locationTagInXml.id.text())
 			if (location)
 				locations << [ location: location, tag: locationTagInXml ]
+		}
+
 		}
 		return locations
 	}
@@ -192,5 +207,64 @@ class QueueAndJobStatusService {
 				.findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == 100 || result['status'] == 101)) || (result['date'] >= successfulSinceWhen && result['status'] == 200)  || (result['date'] >= errorSinceWhen && result['status'] >= 400) }
 		}
 		return filteredJobResults
+	}
+
+	/**
+	 * Creates a schedule chart data object for each active server.
+	 *
+	 * @param start starting point of specified interval
+	 * @param end ending point of specified interval
+	 * @return List of schedule chart data objects for schedule chart
+	 */
+	List<ScheduleChartData> createChartData(DateTime start, DateTime end) {
+
+		List<ScheduleChartData> chartDataList = new ArrayList();
+		def wptServer = WebPageTestServer.findAllByActive(true)
+
+		String discountedLocationsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedLocationsLabel", "Discarded Locations")
+		String discountedJobsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedJobsLabel", "Discarded Jobs")
+
+
+		// Iterate over active servers
+		for (WebPageTestServer server : wptServer) {
+			ScheduleChartData scheduleChartServer = new ScheduleChartData(name: server.label,
+					startDate: start, endDate: end,
+					discountedLocationsLabel: discountedLocationsLabel,
+					discountedJobsLabel: discountedJobsLabel)
+
+			def locations = getFilteredLocations(server)
+
+			// iterate over locations
+			locations.each { loc ->
+				ScheduleChartLocation scheduleChartLocation = new ScheduleChartLocation(name: loc.location.uniqueIdentifierForServer)
+				def jobs = Job.findAllByLocation(loc.location)
+
+				// iterate over jobs
+				for (Job j : jobs) {
+					ScriptParser parser = new ScriptParser(pageService, j.script.navigationScript);
+					def minutes = parser.calculateDurationInMinutes()
+					// Add jobs which are going to run in given interval to the list
+					// otherwise the job is added to the list of discounted jobs
+					ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, durationInMinutes: minutes)
+					if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
+						scheduleChartLocation.addJob(scheduleChartJob)
+					} else {
+						scheduleChartServer.addDiscountedJob(loc.location.uniqueIdentifierForServer + ": " + j.label)
+					}
+				}
+
+				// if a location has no job which is going to run in the interval
+				// the whole location is added to the list of discarded locations
+				if (!scheduleChartLocation.jobs.isEmpty()) {
+					scheduleChartServer.addLocation(scheduleChartLocation)
+				} else {
+					scheduleChartServer.addDiscountedLocation(loc.location.uniqueIdentifierForServer)
+				}
+			}
+
+			chartDataList.add(scheduleChartServer)
+		}
+
+		return chartDataList
 	}
 }
