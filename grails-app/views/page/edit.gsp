@@ -7,6 +7,29 @@
         <meta name="layout" content="kickstart" />
         <g:set var="entityName" value="${message(code: 'page.label', default: 'Page')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
+        %{--Styles for multi line chart--}%
+        <style>
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crisp-edges ;
+        }
+        .line {
+            fill: none;
+            stroke-width: 2px;
+        }
+        .verticalLine,
+        .horizontalLine {
+            opacity: 0.3;
+            stroke-dasharray: 3,3;
+            stroke: blue;
+        }
+        .xTextContainer,
+        .tooltipTextContainer{
+            opacity: 0.5;
+        }
+        </style>
     </head>
 
     <body>
@@ -28,7 +51,7 @@
                 <div class="form-actions">
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
-                    %{--<g:render template="/_common/modals/chooseCsiMapping" />--}%
+                    <g:render template="/_common/modals/chooseCsiMapping" />
                     <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>

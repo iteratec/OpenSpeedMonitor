@@ -8,12 +8,12 @@ This is a dialog to choose from different default csi mappings.
         <button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>
         <h3 id="ModalLabel"><g:message code="de.iteratec.osm.csi.mapping.title" default="Mapping: load time &rarr; customer satisfaction"/></h3>
     </div>
-    <div class="modal-body">
+    <div class="modal-body row">
         <div id="spinner-position"></div>
         <g:render template="/chart/csi-mappings"
-                  model="${['transformableMappings': defaultMappings, 'chartIdentifier': 'choose_default_csi',
+                  model="${['chartData': defaultMultiLineChart, 'chartIdentifier': 'choose_default_csi',
                             'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                            'yAxisTopOffset': 8, 'bottomOffsetLegend': 220]}" />
+                            'yAxisTopOffset': 8, 'bottomOffsetLegend': 220, 'modal': true]}" />
     </div>
     <div class="modal-footer">
         <g:form>

@@ -14,22 +14,22 @@
     </div>
 </div>
 
-%{--<div class="control-group">--}%
-    %{----}%
-    %{--<div class="control-label"><g:message code="page.csimapping.existence.label" default="CSI-Mapping" /></div>--}%
-    %{--<div class="controls">--}%
-        %{--<g:if test="${mappingsOfPage}">--}%
-            %{--<g:render template="/chart/csi-mappings"--}%
-                      %{--model="${['transformableMappings': mappingsOfPage, 'chartIdentifier': 'edit_page',--}%
-                                %{--'bottomOffsetXAxis': 216, 'yAxisRightOffset': 989, 'chartBottomOffset': 170,--}%
-                                %{--'yAxisTopOffset': 5, 'bottomOffsetLegend': 130]}"/>--}%
-            %{--<a href="#CsiMappingModal" role="button" class="btn btn-primary" data-toggle="modal">${message(code: 'de.iteratec.osm.csi.edit-mapping.label', default: 'Edit CSI mapping')}</a>--}%
-        %{--</g:if>--}%
-        %{--<g:else>--}%
-            %{--<p><g:message code="page.csimapping.nonexistence" default="None associated"/></p>--}%
-            %{--<a href="#CsiMappingModal" role="button" class="btn btn-primary" data-toggle="modal">${message(code: 'de.iteratec.osm.csi.edit-mapping.label', default: 'Add CSI mapping')}</a>--}%
-        %{--</g:else>--}%
-    %{--</div>--}%
+<div class="control-group">
 
-%{--</div>--}%
+    <div class="control-label"><g:message code="page.csimapping.existence.label" default="CSI-Mapping" /></div>
+    <div class="controls">
+        <g:if test="${mappingsOfPage}">
+            <g:render template="/chart/csi-mappings"
+                      model="${['chartData':multiLineChart, 'chartIdentifier': 'edit_page',
+                                'bottomOffsetXAxis': 216, 'yAxisRightOffset': 989, 'chartBottomOffset': 170,
+                                'yAxisTopOffset': 5, 'bottomOffsetLegend': 130]}"/>
+            <a href="#CsiMappingModal" role="button" class="btn btn-primary" data-toggle="modal">${message(code: 'de.iteratec.osm.csi.edit-mapping.label', default: 'Edit CSI mapping')}</a>
+        </g:if>
+        <g:else>
+            <p><g:message code="page.csimapping.nonexistence" default="None associated"/></p>
+            <a href="#CsiMappingModal" role="button" class="btn btn-primary" data-toggle="modal">${message(code: 'de.iteratec.osm.csi.edit-mapping.label', default: 'Add CSI mapping')}</a>
+        </g:else>
+    </div>
+
+</div>
 
