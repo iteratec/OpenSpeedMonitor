@@ -33,13 +33,8 @@ import org.springframework.context.MessageSource
  * JobScheduleController
  */
 class JobScheduleController {
-//
+
     QueueAndJobStatusService queueAndJobStatusService
-//
-//    JobService jobService
-//    PageService pageService
-//
-//    I18nService i18nService
 
     def index() {
         redirect(action: 'schedules')
