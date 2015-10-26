@@ -44,6 +44,11 @@
         stroke: none;
         text-anchor: middle;
     }
+    .verticalLine{
+        opacity: 1;
+        stroke-dasharray: 3,3;
+        stroke: blue;
+    }
     </style>
 </head>
 

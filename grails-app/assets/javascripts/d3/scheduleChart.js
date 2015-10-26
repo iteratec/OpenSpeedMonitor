@@ -85,7 +85,6 @@ function createScheduleChart(data, id) {
     var svg = div.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        .call(zoom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -217,6 +216,24 @@ function createScheduleChart(data, id) {
         }
     }
 
+    // Append vertical aid line at mouse position
+    var verticalLine = drawingPlane.append("line")
+        .attr("class", "verticalLine")
+        .attr("y1", 0)
+        .attr("y2", height);
+    // Append area for spotting mouse events
+    svg.append("rect")
+        .attr("class", "mouseEventArea")
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function() { verticalLine.style("display", null); })
+        .on("mouseout", function() { verticalLine.style("display", "none"); })
+        .on("mousemove", mousemove)
+        .call(zoom);
+
+
     // Function called on zoom
     function zoomed() {
         svg.select(".x.axis").call(xAxis);
@@ -231,6 +248,14 @@ function createScheduleChart(data, id) {
                 return xScale(endDate) - xScale(startDate);
             });
     }
+    // function updating aid line position on mouse move
+    function mousemove() {
+        var mouseXValue = xScale.invert(d3.mouse(this)[0]);
+        drawingPlane.select(".verticalLine")
+            .attr("transform", "translate(" + xScale(mouseXValue) + ",0)");
+    }
+
+
 }
 
 /**
