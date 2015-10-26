@@ -30,8 +30,29 @@ class D3ChartTagLib {
      * If attrs['modal'] == true the created container is smaller
      */
     def multiLineChart = { attrs, body ->
-        def htmlCreator = new D3HtmlCreator()
+        D3HtmlCreator htmlCreator = new D3HtmlCreator()
         out << htmlCreator.generateMultiLineChartHtml(attrs['chartIdentifier'], attrs['modal'])
+
+        return out.toString()
+    }
+
+    def barChart = {attrs, body ->
+        D3HtmlCreator htmlCreator = new D3HtmlCreator()
+        out << htmlCreator.generateBarChartHtml(attrs['chartIdentifier'])
+
+        return out.toString()
+    }
+
+    def treemap = {attrs, body ->
+        D3HtmlCreator htmlCreator = new D3HtmlCreator()
+        out << htmlCreator.generateTreemapHtml(attrs['chartIdentifier'])
+
+        return out.toString()
+    }
+
+    def scheduleChart = {attrs, body ->
+        D3HtmlCreator htmlCreator = new D3HtmlCreator()
+        out << htmlCreator.generateScheduleChartHtml(attrs['chartIdentifier'])
 
         return out.toString()
     }

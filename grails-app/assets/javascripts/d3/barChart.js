@@ -35,7 +35,7 @@ function createBarChart(altWidth, altHeight, data, img, id) {
     }
 
 // Defines the margins and the size of the diagram
-    var margin = {top: 20, right: 30, bottom: 100, left: 50},
+    var margin = {top: 20, right: 30, bottom: 80, left: 50},
         width = rawWidth - margin.left - margin.right,
         height = rawHeight - margin.top - margin.bottom;
 
@@ -130,7 +130,7 @@ function createBarChart(altWidth, altHeight, data, img, id) {
         .attr("class", "axisLabel")
         .attr("toSelect", "x")
         .attr("y", height + margin.bottom)
-        .attr("dy", "-0.35em")
+        .attr("dy", "-0.55em")
         .attr("x", width)
         .text(data.xLabel);
 

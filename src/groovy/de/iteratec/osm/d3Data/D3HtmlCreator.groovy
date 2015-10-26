@@ -23,7 +23,7 @@ class D3HtmlCreator {
      * @param modal if modal == true the created chart div is smaller
      */
     def generateMultiLineChartHtml = {chartIdentifier, modal ->
-        def writer = new StringWriter()
+        StringWriter writer = new StringWriter()
 
         if(modal){
             return writer << """<div class="span4" id="${chartIdentifier}">
@@ -39,7 +39,49 @@ class D3HtmlCreator {
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
                                     </div>
-                                </div><br />"""
+                                </div>"""
         }
+    }
+
+    /**
+     * Creates container for de.iteratec.osm.d3data.BarChartData
+     */
+    def generateBarChartHtml = {chartIdentifier ->
+        StringWriter writer = new StringWriter()
+            return writer << """<div class="row">
+                                    <div class="span8" id="barChartSpan">
+                                        <svg class="chart" id="${chartIdentifier}" }></svg>
+                                    </div>
+                                </div>"""
+    }
+
+    /**
+     * Creates container for de.iteratec.osm.d3data.TreemapData
+     */
+    def generateTreemapHtml = {chartIdentifier ->
+        StringWriter writer = new StringWriter()
+        return writer << """<div class="row">
+                                <div class="span8" id="treemapSpan">
+                                    <div class="treemap" id= ${chartIdentifier}></div>
+                                    <div id="tooltip" class="hidden">
+                                        <p><strong id="heading"></strong></p>
+
+                                        <p><span id="info"></span></p>
+                                    </div>
+                                </div>
+                                <div class="span1" id="zeroWeightSpan">
+                                </div>
+                            </div>"""
+    }
+
+    /**
+     * Creates container for de.iteratec.osm.d3data.ScheduleChartData
+     */
+    def generateScheduleChartHtml = {chartIdentifier ->
+        StringWriter writer = new StringWriter()
+        return writer << """<div class="row">
+                                <div class="span12" id="${"ScheduleChart" + chartIdentifier}">
+                                </div>
+                            </div>"""
     }
 }

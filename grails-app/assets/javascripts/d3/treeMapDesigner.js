@@ -103,10 +103,7 @@ function designBrowser(selection, differentColors) {
         .text(function () {
             return d3.select(this.parentNode).attr("text");
         })
-        .each(getFontSize)
-        .style("font-size", function (d) {
-            return d.scaleFont + "px";
-        });
+        .each(getFontSize);
 
     function getFontSize(d) {
         var bbox = this.getBBox(),

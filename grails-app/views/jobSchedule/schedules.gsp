@@ -8,6 +8,42 @@
     label {
         display: inline;
     }
+
+    /*ScheduleChart styles*/
+    .axis text {
+        font: 10px sans-serif;
+    }
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+    }
+    .xAxisGrid path,
+    .xAxisGrid line {
+        fill: none;
+        stroke: grey;
+        stroke-dasharray: 2,2;
+    }
+    .xAxisGrid text {
+        display: none;
+    }
+    .locationAxis path,
+    .locationAxis line {
+        fill: none;
+        stroke: none;
+    }
+    .locationAxis text {
+        font: 10px sans-serif;
+    }
+    .resetButton {
+        fill: lightgrey;
+    }
+    .resetButtonText {
+        fill: white;
+        stroke: none;
+        text-anchor: middle;
+    }
     </style>
 </head>
 
@@ -16,12 +52,14 @@
 <g:render template="/layouts/mainMenu"/>
 
 <g:each in="${chartList}" var="notUsed" status="i">
-    <g:render template="/d3js/scheduleChart" model="[id: i]"/>
+    <iteratec:scheduleChart
+            chartIdentifier = "${i}"/>
     <br/>
     <br/>
 </g:each>
 
 </content tag="include.bottom">
+    <asset:javascript src="d3/scheduleChart.js"/>
     <asset:javascript src="timeago/jquery.timeago.js"/>
     <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
         <asset:javascript src="timeago/timeagoDe.js"/>

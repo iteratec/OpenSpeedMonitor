@@ -18,17 +18,94 @@
 package de.iteratec.osm.d3
 
 
-
 import grails.test.mixin.*
+import groovy.util.slurpersupport.NodeChild
 import org.junit.*
+import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.web.GroovyPageUnitTestMixin} for usage instructions
  */
 @TestFor(D3ChartTagLib)
-class D3ChartTagLibSpec {
+class D3ChartTagLibSpec extends Specification {
 
-    void testSomething() {
-        fail "Implement me"
+    static def HTML_FRAGMENT_PARSER
+
+    void setup(){
+        HTML_FRAGMENT_PARSER = new org.cyberneko.html.parsers.SAXParser()
+        HTML_FRAGMENT_PARSER.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true)
+    }
+
+    def "HTML provided by taglib iteratec:multiLineChart returns container with correct identifier"() {
+        given:
+        String identifier = "ChartIdentifier"
+
+        when:
+        String testHTML = applyTemplate("""<iteratec:multiLineChart chartIdentifier ="${identifier}"/>""")
+
+        then:
+        NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
+        testHtmlAsNode.size() == 1
+        def chartContainerNode = testHtmlAsNode.getAt(0)
+        chartContainerNode.attributes['id'] == identifier
+        chartContainerNode.attributes['class'] == "span8"
+    }
+
+    def "HTML provided by taglib iteratec:multiLineChart creates smaller container for modal dialog"() {
+        given:
+        String identifier = "ChartIdentifier"
+
+        when:
+        String testHTML = applyTemplate("""<iteratec:multiLineChart chartIdentifier ="${identifier}"
+                                            modal="true" />""")
+
+        then:
+        NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
+        def chartContainerNode = testHtmlAsNode.getAt(0)
+        chartContainerNode.attributes['class'] == "span4"
+    }
+
+    def "HTML provided by taglib iteratec:barChart returns svg container with correct identifier"() {
+        given:
+        String identifier = "ChartIdentifier"
+
+        when:
+        String testHTML = applyTemplate("""<iteratec:barChart chartIdentifier ="${identifier}"/>""")
+
+        then:
+        NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
+        testHtmlAsNode.size() == 1
+        def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(0).childNodes().getAt(0)
+        chartSVGContainerNode.attributes['id'] == identifier
+    }
+
+    def "HTML provided by taglib iteratec:treemap returns two containers with correct identifiers"() {
+        given:
+        String identifier = "ChartIdentifier"
+
+        when:
+        String testHTML = applyTemplate("""<iteratec:treemap chartIdentifier ="${identifier}"/>""")
+
+        then:
+        NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
+        testHtmlAsNode.childNodes().size() == 2
+        def chartContainerNode = testHtmlAsNode.childNodes().getAt(0)
+        chartContainerNode.childNodes().getAt(0).attributes['id'] == identifier
+        def zeroWeigthSpan = testHtmlAsNode.childNodes().getAt(1)
+        zeroWeigthSpan.attributes['id'] == "zeroWeightSpan"
+    }
+
+    def "HTML provided by taglib iteratec:scheduleChart returns container with correct identifier"() {
+        given:
+        String identifier = "ChartIdentifier"
+
+        when:
+        String testHTML = applyTemplate("""<iteratec:scheduleChart chartIdentifier ="${identifier}"/>""")
+
+        then:
+        NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
+        testHtmlAsNode.size() == 1
+        def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(0)
+        chartSVGContainerNode.attributes['id'] == "ScheduleChart" + identifier
     }
 }
