@@ -151,6 +151,9 @@ function createScheduleChart(data, id) {
     var xAxis = d3.svg.axis()
         .scale(xScale)
         .orient("bottom");
+    var xAxisTop = d3.svg.axis()
+        .scale(xScale)
+        .orient("top");
     var xAxisGrid = d3.svg.axis()
         .scale(xScale)
         .orient("bottom")
@@ -159,6 +162,9 @@ function createScheduleChart(data, id) {
         .attr("class", "x axis")
         .call(xAxis)
         .attr("transform", "translate(0," + height + ")");
+    svg.append("g")
+        .attr("class", "x axis top")
+        .call(xAxisTop);
     svg.append("g")
         .attr("class", "xAxisGrid")
         .call(xAxisGrid)
@@ -237,6 +243,7 @@ function createScheduleChart(data, id) {
     // Function called on zoom
     function zoomed() {
         svg.select(".x.axis").call(xAxis);
+        svg.selectAll(".x.axis.top").call(xAxisTop);
         svg.select(".xAxisGrid").call(xAxisGrid);
         svg.selectAll(".jobRect")
             .attr("x", function (d) {
