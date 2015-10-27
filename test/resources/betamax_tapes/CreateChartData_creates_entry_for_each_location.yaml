@@ -1,7 +1,7 @@
 !tape
-name: CreateChartData_creates_entr_for_each_location_without_job_in_appropriate_list
+name: CreateChartData creates entry for each location
 interactions:
-- recorded: 2015-10-21T13:09:22.521Z
+- recorded: 2015-10-26T14:16:21.213Z
   request:
     method: GET
     uri: http://dev.server01.wpt.iteratec.de/getLocations.php
@@ -17,15 +17,15 @@ interactions:
       Cache-Control: max-age=3600, public
       Content-Encoding: gzip
       Content-Type: text/xml
-      Date: Wed, 21 Oct 2015 13:09:22 GMT
-      Expires: Wed, 21 Oct 2015 14:09:22 GMT
+      Date: Mon, 26 Oct 2015 14:16:21 GMT
+      Expires: Mon, 26 Oct 2015 15:16:21 GMT
       Server: Apache/2.2.22 (Debian)
-      Set-Cookie: o=6fe1a44c8a8fad0e82a9520978ee03b5f08c32a3; expires=Thu, 20-Oct-2016 13:09:22 GMT; path=/
+      Set-Cookie: o=96a46d5a1827ef4dbb3b0ce4bbc5a39e0a18c373; expires=Tue, 25-Oct-2016 14:16:21 GMT; path=/
       Vary: Accept-Encoding
       X-Powered-By: PHP/5.4.45-0+deb7u1
     body: !!binary |-
       H4sIAAAAAAAAA+2WUW/aMBDH3/MprDwvDdBSaGVSqVXbIaG1UukH8MiVZHVtZB8l7NPvbJJiyrohbaIvvCS/4y73P9t/hfCL6kWyVzC21GoQt49aMQM10XmppoP4cXyT9OOLLOKuLLG4lGALAGS4nMEgRqgwrazcfoYVBp4G8RRwpCcCqbk98oUbUq6zATujLBBaFDi3VzqHrNNq8TSIm+SYFLO75ybnw4jnAgXdZC1FWOZZiWAEwiTJ4TUpAH8qMMmiVL3zq8LoF+ApFUV8JL6D/LiYp6uCoPsfaoMJLo1eWDBZI9bEbsVSLB/A0FZkPA2jOtdsWZMdrbtKN8xDoQ1mNyVtsa6+sKGigRQdynU1k9qAYULlbKXLEtYMEDxKOwZPYi4xa/O0wYjfg3JnOAaLlsJZO6NDoCthx2PH4bHHY4cnHk8cdj12HZ56PHXY89hz2PfYd3jm8YxwrFFIF60g4l/LaXFvSm1KXLrfN2I6LL0Is2FIzWhuGt+3qzHiw1yCW6W/Rzx9t8bwxHa1T73xe/LPm9qnGehtgg0HHcyyk1mG13vyiRP6NIs48YM7dnLHrdZTCd+gmttzf+0G7+iPnKLoP/CH/ZtHgta/tciW3H/3y2oC5oVIZ0vw4JF/9Qi7BBR7NkqtuWe31KoHy6z3Lq0/dNP1R/MvOpIgOsELAAA=
-- recorded: 2015-10-21T13:09:22.606Z
+- recorded: 2015-10-26T14:16:21.288Z
   request:
     method: GET
     uri: http://dev.server02.wpt.iteratec.de/getLocations.php
@@ -41,11 +41,11 @@ interactions:
       Cache-Control: max-age=3600, public
       Content-Encoding: gzip
       Content-Type: text/xml
-      Date: Wed, 21 Oct 2015 13:09:22 GMT
-      Expires: Wed, 21 Oct 2015 14:09:22 GMT
+      Date: Mon, 26 Oct 2015 14:16:21 GMT
+      Expires: Mon, 26 Oct 2015 15:16:21 GMT
       Server: Apache/2.2.22 (Debian)
-      Set-Cookie: o=74b98d7f1f319e40ec62dd5ab5ffb115d3b9b98a; expires=Thu, 20-Oct-2016 13:09:22 GMT; path=/
+      Set-Cookie: o=2dff3e06a9805b80bd0e5d509ed4a4a244817c32; expires=Tue, 25-Oct-2016 14:16:21 GMT; path=/
       Vary: Accept-Encoding
       X-Powered-By: PHP/5.4.45-0+deb7u1
     body: !!binary |-
-      H4sIAAAAAAAAA+2VwU7DMAyG732KqGdKtjHGQFmQQCAmTQKJ8QBhNWtEaKbEQMfT42TL1sEBuMCFS/u5dmzX/qWI0+bJsBdwXtt6lHf3OzmDemZLXc9H+d30shjmpzITIazwuDTgKwBkuFzAKEdokDfefD7DKgcPo3wOOLEzhZTc78fAnVIhswO/IC8QelT47M9tCbLX6QjespNzShXl9WPyRTMTpUJFL7MuRahLqRGcQpgVJbwUFeBbDa4Y9O81Ft6XJ5eaOrSN4BSaiYm6B/PFEcFXUa1CXx1odXTm7KsHJzd104cwAqOWt+BoNlLwtrX2pRkm72Sb1oSWbivrMGXeY+eVs0/AVF2ycU0d1rSwi2ZhrAPHCrbpoHWWZggP6tmg7AqeMBM3UIetTsGjJ3PRlbQWehL2IvYCHkQ8CNiP2A94GFLRk3AQvw4CHkU8CjiMOAx4HPGYcGpRGdkTfAWZuNLz6sZp6zQuQ9SOTYuzrxuL6rVNSkZ9U/vBkTAT49JASBTfmeAf/rG9sx8JajX1X9dTKvtnckoN7KjpXzjfF8744tdFE0r+mWBC8X+xbEfI19cX316F7z9ALNGXBwAA
+      H4sIAAAAAAAAA+2VwU4jMQyG7/MU0ZwZ0pZSCkoHaRGISpUWifIAoWM60YZJlRiY8vRrpw2dwoHdC1y4TD7Hie2xfynqvH204hl8MK6Z5P3DXi6gWbjKNMtJfje/Ksb5eZkpPlYEXFsINQAKXK9gkiO0KNtgP94RtYeHSb4EnLmFRgoeDuPBvVQc2UNYkRcIA2p8CheugnLQ6ynZsZNzThnL33+SL5qZqjRqWuw2FaGpSoPgNcKiqOC5qAFfG/DFaHhvsAihOrsyVKFrlaSjmZrpe7CfXFFyc6qT6LMLnYp+efcSwJdvedMGt8Dq9S146k2pZNfa+lIPk3e2C2u5pNvaeUyRD8RF7d0jCN1UYtpQhQ0N7LJdWefBi0K8VdC5Sz2EB/1ksewrmTBTN9DwVOcQMJC56pc0FvoSDiIOGI8iHjEOIw4ZjyMeM44ijhhPIp4wjiOOGU8jnhLOHWrL1gYydW2W9Y03zhtc8/6eTYNzL11v16RgVDeVH8NtMVPTygL/ZVwzJd/9Y3dm/yWoTde/XE8p7bfJKRWwp6Yf4fy7cKaXXy4aTvltguHkP2LZtVBuny+5ewr/AlNz4t6XBwAA

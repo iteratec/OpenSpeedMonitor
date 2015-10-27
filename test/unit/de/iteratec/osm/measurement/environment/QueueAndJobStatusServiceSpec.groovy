@@ -30,7 +30,8 @@ import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 @Mock([WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration, AggregatorType, MeasuredValueInterval])
 class QueueAndJobStatusServiceSpec extends Specification {
 
-    @Rule public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
+    @Rule
+    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
 
     public static final String WPTSERVER_URL = 'dev.server01.wpt.iteratec.de'
     private static final String LOCATION_IDENTIFIER_SERVER1_CHROME = 'iteratec-dev-hetzner-win7:Chrome'
@@ -54,8 +55,8 @@ class QueueAndJobStatusServiceSpec extends Specification {
     private String labelJobWithExecutionSchedule = 'BV1 - Step 01'
     String jobGroupName
 
-    @Betamax(tape = 'CreateChartData_creates_one_Schedule_Chart_Data_Object_per_Server')
-    def "CreateChartData creates one Schedule Chart Data Object per Server"() {
+    @Betamax(tape = 'CreateChartData creates a map entry per server')
+    def "CreateChartData creates a map entry per server"() {
         given:
         def start = new DateTime()
         def end = start.plusDays(1)
@@ -63,14 +64,14 @@ class QueueAndJobStatusServiceSpec extends Specification {
         createTestDataCommonForAllTests()
 
         when:
-        def resultList = serviceUnderTest.createChartData(start, end)
+        def resultMap = serviceUnderTest.createChartData(start, end)
 
         then:
-        resultList.size() == 2
+        resultMap.keySet().size() == 2
     }
 
-    @Betamax(tape = 'CreateChartData_creates_entr_for_each_location_without_job_in_appropriate_list')
-    def "CreateChartData creates entry for each location without job in appropriate list"() {
+    @Betamax(tape = 'CreateChartData creates entry for each location')
+    def "CreateChartData creates entry for each location"() {
         given:
         def start = new DateTime()
         def end = start.plusDays(1)
@@ -78,11 +79,11 @@ class QueueAndJobStatusServiceSpec extends Specification {
         createTestDataCommonForAllTests()
 
         when:
-        def resultList = serviceUnderTest.createChartData(start, end)
+        def resultMap = serviceUnderTest.createChartData(start, end)
 
         then:
-        resultList[0].discountedLocations.size() == 5
-        resultList[1].discountedLocations.size() == 3
+        resultMap.get(server1).size() == 5
+        resultMap.get(server2).size() == 3
     }
 
     private void mockServices() {
@@ -92,13 +93,13 @@ class QueueAndJobStatusServiceSpec extends Specification {
         serviceUnderTest.jobService = Mock(JobService)
 
         // betamax fix for sorting
-        TapePropertyUtils.metaClass.sort = {Set<Property> properties, List<String> names ->
+        TapePropertyUtils.metaClass.sort = { Set<Property> properties, List<String> names ->
             new LinkedHashSet(properties.sort(true, new OrderedPropertyComparator(names)))
         }
 
         Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
         HttpRequestService httpRequestService = new HttpRequestService()
-        httpRequestService.metaClass.getRestClientFrom = {WebPageTestServer wptserver ->
+        httpRequestService.metaClass.getRestClientFrom = { WebPageTestServer wptserver ->
             RESTClient restClient = new RESTClient(wptserver.baseUrl)
             restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))
             return restClient

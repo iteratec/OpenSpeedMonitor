@@ -23,7 +23,7 @@
     .xAxisGrid line {
         fill: none;
         stroke: grey;
-        stroke-dasharray: 2,2;
+        stroke-dasharray: 2, 2;
     }
     .xAxisGrid text {
         display: none;
@@ -44,9 +44,9 @@
         stroke: none;
         text-anchor: middle;
     }
-    .verticalLine{
+    .verticalLine {
         opacity: 1;
-        stroke-dasharray: 3,3;
+        stroke-dasharray: 3, 3;
         stroke: blue;
     }
     </style>
@@ -56,24 +56,31 @@
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
 
-<g:each in="${chartList}" var="notUsed" status="i">
-    <iteratec:scheduleChart
-            chartIdentifier = "${i}"/>
+%{--<g:each in="${chartList}" var="notUsed" status="i">--}%
+<g:each in="${chartMap}" var="server" status="i">
+    <h3>${server.key}</h3>
+    <g:each in="${server.value}" var="location" status="j">
+        <h4>${location.name}</h4>
+        <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
+        <br />
+    </g:each>
     <br/>
     <br/>
 </g:each>
 
 </content tag="include.bottom">
-    <asset:javascript src="d3/scheduleChart.js"/>
-    <asset:javascript src="timeago/jquery.timeago.js"/>
-    <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-        <asset:javascript src="timeago/timeagoDe.js"/>
-    </g:if>
-    <asset:script type="text/javascript">
-        <g:each in="${chartList}" var="chartData" status="i">
-            createScheduleChart(${chartData as grails.converters.JSON}, "${"ScheduleChart" + i}")
+<asset:javascript src="d3/scheduleChart.js"/>
+<asset:javascript src="timeago/jquery.timeago.js"/>
+<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
+    <asset:javascript src="timeago/timeagoDe.js"/>
+</g:if>
+<asset:script type="text/javascript">
+    <g:each in="${chartMap}" var="server" status="i">
+        <g:each in="${server.value}" var="location" status="j">
+            createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}")
         </g:each>
-    </asset:script>
+    </g:each>
+</asset:script>
 </content>
 </body>
 </html>

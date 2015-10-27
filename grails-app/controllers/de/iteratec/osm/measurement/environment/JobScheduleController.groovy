@@ -18,16 +18,7 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.d3Data.ScheduleChartData
-import de.iteratec.osm.d3Data.ScheduleChartJob
-import de.iteratec.osm.d3Data.ScheduleChartLocation
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobService
-import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.PageService
-import de.iteratec.osm.util.I18nService
-import grails.converters.JSON
 import org.joda.time.DateTime
-import org.springframework.context.MessageSource
 
 /**
  * JobScheduleController
@@ -46,8 +37,10 @@ class JobScheduleController {
         DateTime end = start.plusDays(1);
 
         // Create data for chart in interval
-        List<ScheduleChartData> chartDataList = queueAndJobStatusService.createChartData(start, end)
+        Map<WebPageTestServer, List<ScheduleChartData>> serverData = queueAndJobStatusService.createChartData(start, end)
 
-        [chartList: chartDataList]
+        [chartMap : serverData,
+         startDate: start,
+         endDate  : end]
     }
 }

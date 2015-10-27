@@ -17,23 +17,15 @@
 
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.d3Data.ScheduleChartJob
-import de.iteratec.osm.d3Data.ScheduleChartLocation
-import de.iteratec.osm.d3Data.ScheduleChartData
-import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
-import de.iteratec.osm.measurement.schedule.JobService
-import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.PageService
-import grails.converters.JSON
-import groovy.time.TimeCategory
-import groovy.util.slurpersupport.GPathResult
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import org.joda.time.DateTime
-import org.quartz.CronExpression
+import groovy.time.TimeCategory
+import groovy.util.slurpersupport.GPathResult
 
 class QueueStatusController {
     QueueAndJobStatusService queueAndJobStatusService
@@ -130,49 +122,7 @@ class QueueStatusController {
     }
 
     def list() {
-        DateTime start = new DateTime();
-        DateTime end = start.plusDays(1);
-
-        def chartDataList = new ArrayList()
-
-        createChartData(start, end, chartDataList)
-
-        [servers  : getServersWithQueues(),
-         chartList: chartDataList]
-    }
-
-    private void createChartData(DateTime start, DateTime end, ArrayList chartDataList) {
-        def wptServer = WebPageTestServer.findAllByActive(true)
-
-        for (WebPageTestServer server : wptServer) {
-            ScheduleChartData scheduleChartServer = new ScheduleChartData(name: server.label, startDate: start, endDate: end)
-
-            def locations = queueAndJobStatusService.getFilteredLocations(server)
-
-            locations.each { loc ->
-                ScheduleChartLocation scheduleChartLocation = new ScheduleChartLocation(name: loc.location.uniqueIdentifierForServer)
-                def jobs = Job.findAllByLocation(loc.location)
-
-                for (Job j : jobs) {
-                    ScriptParser parser = new ScriptParser(pageService, j.script.navigationScript);
-                    def minutes = parser.calculateDurationInMinutes()
-                    ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, durationInMinutes: minutes)
-                    if (!scheduleChartJob.executionDates.isEmpty()) {
-                        scheduleChartLocation.addJob(scheduleChartJob)
-                    } else {
-                        scheduleChartServer.addDiscountedJob(loc.location.uniqueIdentifierForServer + ": " + j.label)
-                    }
-                }
-
-                if (!scheduleChartLocation.jobs.isEmpty()) {
-                    scheduleChartServer.addLocation(scheduleChartLocation)
-                } else {
-                    scheduleChartServer.addDiscountedLocation(loc.location.uniqueIdentifierForServer)
-                }
-            }
-
-            chartDataList.add(scheduleChartServer as JSON)
-        }
+        [servers  : getServersWithQueues()]
     }
 
     // for Ajax requests return only the table, not the entire HTML page

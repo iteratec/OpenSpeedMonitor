@@ -17,27 +17,20 @@
 
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.d3Data.ScheduleChartData
 import de.iteratec.osm.d3Data.ScheduleChartJob
-import de.iteratec.osm.d3Data.ScheduleChartLocation
+import de.iteratec.osm.d3Data.ScheduleChartData
+import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
+import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.PageService
+import de.iteratec.osm.result.*
+import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
-import grails.converters.JSON
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.ContentType
 import org.joda.time.DateTime
 import org.quartz.CronExpression
-
-import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.EventResultDaoService
 
 /**
  * QueueAndJobStatusService returns various figures regarding Jobs, Queues and EventResults.
@@ -216,29 +209,34 @@ class QueueAndJobStatusService {
      * @param end ending point of specified interval
      * @return List of schedule chart data objects for schedule chart
      */
-    List<ScheduleChartData> createChartData(DateTime start, DateTime end) {
+    Map<WebPageTestServer, List<ScheduleChartData>> createChartData(DateTime start, DateTime end) {
 
-        List<ScheduleChartData> chartDataList = new ArrayList();
+        Map<WebPageTestServer, List<ScheduleChartData>> result = new HashMap<>()
+
         def wptServer = WebPageTestServer.findAllByActive(true)
 
-        String discountedLocationsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedLocationsLabel", "Discarded Locations")
         String discountedJobsLabel = i18nService.msg("de.iteratec.osm.d3Data.ScheduleChart.discardedJobsLabel", "Discarded Jobs")
 
         // Iterate over active servers
         for (WebPageTestServer server : wptServer) {
-            ScheduleChartData scheduleChartServer = new ScheduleChartData(name: server.label,
-                    startDate: start, endDate: end,
-                    discountedLocationsLabel: discountedLocationsLabel,
-                    discountedJobsLabel: discountedJobsLabel)
+            List<ScheduleChartData> locationChartData = new ArrayList<>()
 
             List locations = getFilteredLocations(server)
 
+            Map<String, ScheduleChartData> scheduleChartLocations = new HashMap<>()
+
             // iterate over locations
             locations.each { loc ->
+                Location currentLocation = loc.location
+
                 // filter only active locations
-                if (loc.location.active == true) {
-                    ScheduleChartLocation scheduleChartLocation = new ScheduleChartLocation(name: loc.location.uniqueIdentifierForServer)
-                    def jobs = Job.findAllByLocation(loc.location)
+                if (currentLocation.active == true) {
+                    if (!scheduleChartLocations.containsKey(currentLocation.label)) {
+                        scheduleChartLocations.put(currentLocation.label, new ScheduleChartData(name: currentLocation.label, discountedJobsLabel: discountedJobsLabel))
+                    }
+
+                    ScheduleChartData scheduleChartLocation = scheduleChartLocations.get(currentLocation.label)
+                    def jobs = Job.findAllByLocation(currentLocation)
 
                     // iterate over jobs
                     for (Job j : jobs) {
@@ -246,27 +244,26 @@ class QueueAndJobStatusService {
                         def minutes = parser.calculateDurationInMinutes()
                         // Add jobs which are going to run in given interval to the list
                         // otherwise the job is added to the list of discounted jobs
-                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, durationInMinutes: minutes)
+                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, description: "(" + currentLocation.browser.name + ")", durationInMinutes: minutes)
                         if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
                             scheduleChartLocation.addJob(scheduleChartJob)
                         } else {
-                            scheduleChartServer.addDiscountedJob(loc.location.uniqueIdentifierForServer + ": " + j.label)
+                            scheduleChartLocation.addDiscountedJob(j.label)
                         }
                     }
 
-                    // if a location has no job which is going to run in the interval
-                    // the whole location is added to the list of discarded locations
-                    if (!scheduleChartLocation.jobs.isEmpty()) {
-                        scheduleChartServer.addLocation(scheduleChartLocation)
-                    } else {
-                        scheduleChartServer.addDiscountedLocation(loc.location.uniqueIdentifierForServer)
-                    }
                 }
             }
 
-            chartDataList.add(scheduleChartServer)
+            // if a location has no job which is going to run in the interval
+            // the whole location is added to the list of discarded locations
+            scheduleChartLocations.each { k, v ->
+                locationChartData.add(v)
+            }
+
+           result.put(server, locationChartData)
         }
 
-        return chartDataList
+        return result
     }
 }

@@ -27,59 +27,40 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 class ScheduleChartDataSpec extends Specification{
 
-    def "schedule chart data initialisation test" () {
+    def "initialisation test" () {
         when:
         ScheduleChartData scheduleChartData = new ScheduleChartData()
 
         then:
         !scheduleChartData.name.isEmpty()
         !scheduleChartData.discountedJobsLabel.isEmpty()
-        !scheduleChartData.discountedLocationsLabel.isEmpty()
-        scheduleChartData.locations.size() == 0
+        scheduleChartData.jobs.size() == 0
         scheduleChartData.discountedJobs.size() == 0
-        scheduleChartData.discountedLocations.size() == 0
-        scheduleChartData.startDate.getMillis() != 0
-        scheduleChartData.endDate.getMillis() != 0
     }
 
-    def "addLocation adds a location to list"() {
+    def "addJob adds schedule chart job to list" () {
         given:
         ScheduleChartData scheduleChartData = new ScheduleChartData()
-        ScheduleChartLocation location = new ScheduleChartLocation()
+        ScheduleChartJob job = new ScheduleChartJob()
 
         when:
-        scheduleChartData.addLocation(location)
+        scheduleChartData.addJob(job)
 
         then:
-        scheduleChartData.locations.size() == 1
-        scheduleChartData.locations[0] == location
+        scheduleChartData.jobs.size() == 1
+        scheduleChartData.jobs[0] == job
     }
 
-    def "addDiscountedJob adds String to List of discounted job"() {
+    def "addDiscountedJob adds job to list" () {
         given:
         ScheduleChartData scheduleChartData = new ScheduleChartData()
-        String discription = "discountedJob"
+        String job = "Job"
 
         when:
-        scheduleChartData.addDiscountedJob(discription)
+        scheduleChartData.addDiscountedJob(job)
 
         then:
         scheduleChartData.discountedJobs.size() == 1
-        scheduleChartData.discountedJobs[0] == discription
-        scheduleChartData.discountedLocations.size() == 0
-    }
-
-    def "addDiscountedLocation adds String to List of discounted locations"() {
-        given:
-        ScheduleChartData scheduleChartData = new ScheduleChartData()
-        String discription = "discountedLocation"
-
-        when:
-        scheduleChartData.addDiscountedLocation(discription)
-
-        then:
-        scheduleChartData.discountedLocations.size() == 1
-        scheduleChartData.discountedLocations[0] == discription
-        scheduleChartData.discountedJobs.size() == 0
+        scheduleChartData.discountedJobs[0] == job
     }
 }

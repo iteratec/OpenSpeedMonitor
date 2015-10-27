@@ -33,29 +33,19 @@ function createScheduleChart(data, id) {
     var endDateString = "" + endDate.getDate() + "." + endDate.getMonth() + "." + endDate.getFullYear() + ", "
         + twoDigitString(endDate.getHours()) + ":" + twoDigitString(endDate.getMinutes()) + ":" + twoDigitString(endDate.getSeconds());
 
-
-    // create Headlines
-    div.append("h4")
-        .text(data.name);
     div.append("h5")
         .text(startDateString + " - " + endDateString);
 
-    // get locations
-    var locations = data.locations;
-
-    // Overall Domain
-    var minDate = getMinDate(locations);
-    var maxDate = getMaxDate(locations);
-    var jobCount = getJobCount(locations);
-    var jobNames = getJobNames(locations);
-    var locationNames = getLocationNames(locations);
-    var yRangeLocations = getYRangeLocations(locations, jobHeight);
+    // Get Domain for the location
+    var jobCountLocation = data.jobs.length;
+    var minDate = getMinDate(data);
+    var maxDate = getMaxDate(data);
+    var jobNames = getJobNames(data);
 
     // Define margins, width and height
-    var margin = {top: 20, right: 100, bottom: 20, left: 150},
+    var margin = {top: 20, right: 50, bottom: 20, left: 200},
         width = divWidth - margin.left - margin.right,
-        height = jobCount * jobHeight;
-
+        height = jobCountLocation * jobHeight;
 
     // Scale for x-Axis (Time)
     var xScale = d3.time.scale()
@@ -64,12 +54,8 @@ function createScheduleChart(data, id) {
         .range([0, width]);
     // Scale for y-axis (Ordinal)
     var yScale = d3.scale.ordinal()
-        .domain(jobNames)
+        .domain(d3.range(jobNames.length))
         .rangeBands([0, height]);
-    // Scale for right hand side y-Axis (Location ordinal scale)
-    var yScaleRight = d3.scale.ordinal()
-        .domain(locationNames)
-        .range(yRangeLocations);
 
     // Define zoom behavior
     var zoom = d3.behavior.zoom()
@@ -80,72 +66,49 @@ function createScheduleChart(data, id) {
     // Color scale for locations
     var locColor = d3.scale.category20b();
 
-
-    // Create SVG Container
-    var svg = div.append("svg")
+    // svg container
+    var locContainer = div.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // Create drawing plane
-    var drawingPlane = svg.append("svg")
+    // create drawing plane
+    var drawingPlane = locContainer.append("svg")
         .attr("width", width)
         .attr("height", height);
 
-    // Iterate over locations
     var yOffset = 0;
-    for (var i = 0; i < locations.length; i++) {
-        var loc = locations[i];
-        var locContainer = drawingPlane.append("g")
-            .attr("locName", loc.name);
+    //iterate over jobs
+    for (var j = 0; j < data.jobs.length; j++) {
+        var job = data.jobs[j];
 
-        // iterate over jobs
-        for (var j = 0; j < loc.jobs.length; j++) {
-            var job = loc.jobs[j];
+        var jobContainer = drawingPlane.append("g")
+            .attr("name", job.name);
 
-            var jobContainer = locContainer.append("g")
-                .attr("name", job.name);
+        var jobExe = jobContainer.selectAll(".jobExe")
+            .data(job.executionDates)
+            .enter()
+            .append("g")
+            .attr("transform", "translate(0," + yOffset + ")");
 
-            var jobExe = jobContainer.selectAll(".jobExe")
-                .data(job.executionDates)
-                .enter()
-                .append("g")
-                .attr("transform", "translate(0," + yOffset + ")");
+        // Append rect for each execution date
+        jobExe.append("rect")
+            .attr("duration", job.durationInMinutes)
+            .attr("y", jobPadding)
+            .attr("x", function (d) {
+                return xScale(new Date(d));
+            })
+            .attr("width", function (d) {
+                var startDate = new Date(d);
+                var endDate = new Date(startDate.getTime() + (job.durationInMinutes * 60 * 1000));
+                return xScale(endDate) - xScale(startDate);
+            })
+            .attr("height", jobHeight - 2 * jobPadding)
+            .attr("class", "jobRect")
+            .style("fill", locColor(job.name));
 
-            // Append rect for each execution date
-            jobExe.append("rect")
-                .attr("duration", job.durationInMinutes)
-                .attr("y", jobPadding)
-                .attr("x", function (d) {
-                    return xScale(new Date(d));
-                })
-                .attr("width", function (d) {
-                    var startDate = new Date(d);
-                    var endDate = new Date(startDate.getTime() + (job.durationInMinutes * 60 * 1000));
-                    return xScale(endDate) - xScale(startDate);
-                })
-                .attr("height", jobHeight - 2 * jobPadding)
-                .attr("class", "jobRect")
-                .style("fill", locColor(job.name));
-
-            yOffset += jobHeight;
-        }
-
-        // make Seperator after Location
-        svg.append("rect")
-            .attr("class", "seperator")
-            .attr("height", 1)
-            .attr("width", width + margin.right)
-            .attr("y", yOffset);
+        yOffset += jobHeight;
     }
-
-    // Resets the zoom and pan
-    function reset() {
-        zoom.translate([0, 0]).scale(1);
-        zoomed();
-    }
-
 
     // Append Axis
     var xAxis = d3.svg.axis()
@@ -158,33 +121,42 @@ function createScheduleChart(data, id) {
         .scale(xScale)
         .orient("bottom")
         .tickSize(-height);
-    svg.append("g")
+    locContainer.append("g")
         .attr("class", "x axis")
         .call(xAxis)
         .attr("transform", "translate(0," + height + ")");
-    svg.append("g")
+    locContainer.append("g")
         .attr("class", "x axis top")
         .call(xAxisTop);
-    svg.append("g")
+    locContainer.append("g")
         .attr("class", "xAxisGrid")
         .call(xAxisGrid)
         .attr("transform", "translate(0," + height + ")");
-    svg.append("g")
+    locContainer.append("g")
         .attr("class", "y axis")
         .call(d3.svg.axis().scale(yScale).orient("left"));
-    svg.append("g")
-        .attr("transform", "translate(" + width + ",0)")
-        .attr("class", "locationAxis")
-        .call(d3.svg.axis().scale(yScaleRight).orient("right"));
-    svg.append("rect")
+    locContainer.selectAll(".y.axis .tick").each(function(d) {
+        d3.select(this).select("text")
+            .text(jobNames[d].name);
+    });
+    locContainer.selectAll(".y.axis .tick").each(function(d) {
+        var node = d3.select(this)
+            .append("text")
+            .attr("x", -9)
+            .attr("y", 15)
+            .attr("dy",".32em")
+            .style("text-anchor", "end")
+            .text(jobNames[d].description);
+    });
+    locContainer.append("rect")
         .attr("height", height)
         .attr("width", 1)
         .attr("x", width);
 
 
     // Append Reset button
-    var buttonContainer = svg.append("g")
-        .attr("transform", "translate(" + width + "," +  height + ")")
+    var buttonContainer = locContainer.append("g")
+        .attr("transform", "translate(" + width + "," + height + ")")
         .on("click", function (d) {
             reset()
         });
@@ -200,52 +172,44 @@ function createScheduleChart(data, id) {
         .attr("y", margin.bottom / 2)
         .attr("dy", ".35em");
 
-
-
-    // List discounted Locations
-    if (data.discountedLocations.length > 0) {
-        div.append("h5")
-            .text(data.discountedLocationsLabel);
-        for (var a = 0; a < data.discountedLocations.length; a++) {
-            div.append("text")
-                .html(data.discountedLocations[a] + "<br />");
-        }
-    }
-
     // List discounted Jobs
     if (data.discountedJobs.length > 0) {
         div.append("h5")
             .text(data.discountedJobsLabel);
         for (var k = 0; k < data.discountedJobs.length; k++) {
             div.append("text")
-                .html(data.discountedJobs[i] + "<br />");
+                .html(data.discountedJobs[k] + "<br />");
         }
     }
 
     // Append vertical aid line at mouse position
-    var verticalLine = drawingPlane.append("line")
+    var verticalLine = locContainer.append("line")
         .attr("class", "verticalLine")
         .attr("y1", 0)
         .attr("y2", height);
     // Append area for spotting mouse events
-    svg.append("rect")
+    locContainer.append("rect")
         .attr("class", "mouseEventArea")
         .attr("width", width)
         .attr("height", height)
         .style("fill", "none")
         .style("pointer-events", "all")
-        .on("mouseover", function() { verticalLine.style("display", null); })
-        .on("mouseout", function() { verticalLine.style("display", "none"); })
+        .on("mouseover", function () {
+            verticalLine.style("display", null);
+        })
+        .on("mouseout", function () {
+            verticalLine.style("display", "none");
+        })
         .on("mousemove", mousemove)
         .call(zoom);
 
 
     // Function called on zoom
     function zoomed() {
-        svg.select(".x.axis").call(xAxis);
-        svg.selectAll(".x.axis.top").call(xAxisTop);
-        svg.select(".xAxisGrid").call(xAxisGrid);
-        svg.selectAll(".jobRect")
+        locContainer.select(".x.axis").call(xAxis);
+        locContainer.selectAll(".x.axis.top").call(xAxisTop);
+        locContainer.select(".xAxisGrid").call(xAxisGrid);
+        locContainer.selectAll(".jobRect")
             .attr("x", function (d) {
                 return xScale(new Date(d));
             })
@@ -255,118 +219,66 @@ function createScheduleChart(data, id) {
                 return xScale(endDate) - xScale(startDate);
             });
     }
+
     // function updating aid line position on mouse move
     function mousemove() {
         var mouseXValue = xScale.invert(d3.mouse(this)[0]);
-        drawingPlane.select(".verticalLine")
+        locContainer.select(".verticalLine")
             .attr("transform", "translate(" + xScale(mouseXValue) + ",0)");
     }
 
 
+    // Resets the zoom and pan
+    function reset() {
+        zoom.translate([0, 0]).scale(1);
+        zoomed();
+    }
 }
 
 /**
  * Returns the earliest date found in all job execution dates
- * @param locations the locations to iterate over
+ * @param location the location
  * @returns the earliest date
  */
-function getMinDate(locations) {
+function getMinDate(location) {
     var locMinDates = [];
 
-    for (var i = 0; i < locations.length; i++) {
-        var loc = locations[i];
-        locMinDates.push(d3.min(loc.jobs, function (d) {
-            return d3.min(d.executionDates, function (x) {
-                return new Date(x);
-            });
+    for (var i = 0; i < location.jobs.length; i++) {
+        locMinDates.push(d3.min(location.jobs[i].executionDates, function (x) {
+            return new Date(x);
         }));
     }
+
     return d3.min(locMinDates);
 }
 /**
  * Returns the latest date found in all job execution dates
- * @param locations the locations to iterate over
+ * @param location the location
  * @returns the latest date
  */
-function getMaxDate(locations) {
-    var locMaxDates = [];
+function getMaxDate(location) {
+    var locMinDates = [];
 
-    for (var i = 0; i < locations.length; i++) {
-        var loc = locations[i];
-        locMaxDates.push(d3.max(loc.jobs, function (d) {
-            return d3.max(d.executionDates, function (x) {
-                return new Date(x);
-            });
+    for (var i = 0; i < location.jobs.length; i++) {
+        locMinDates.push(d3.max(location.jobs[i].executionDates, function (x) {
+            return new Date(x);
         }));
     }
-    return d3.min(locMaxDates);
-}
-/**
- * Return the overall count of jobs
- * @param locations the locations to iterate over
- * @returns {number} count of overall jobs
- */
-function getJobCount(locations) {
-    var jobCount = 0;
 
-    for (var i = 0; i < locations.length; i++) {
-        jobCount += locations[i].jobs.length;
-    }
-    return jobCount;
+    return d3.max(locMinDates);
 }
+
 /**
  * Returns the job names
- * @param locations the locations to iterate over
+ * @param locations the location to iterate over
  * @returns {Array} job names
  */
-function getJobNames(locations) {
+function getJobNames(location) {
     var jobNames = [];
-    for (var i = 0; i < locations.length; i++) {
-        var loc = locations[i];
-
-        for (var j = 0; j < loc.jobs.length; j++) {
-            jobNames.push("" + loc.jobs[j].name);
-        }
-
+    for (var j = 0; j < location.jobs.length; j++) {
+        jobNames.push({name: location.jobs[j].name, description: location.jobs[j].description});
     }
     return jobNames;
-}
-/**
- * Returns the location Names
- * @param locations the locations to iterate over
- * @returns {Array} the location names
- */
-function getLocationNames(locations) {
-    var locationNames = [];
-
-    for (var i = 0; i < locations.length; i++) {
-        locationNames.push("" + locations[i].name);
-    }
-
-    return locationNames;
-}
-/**
- * Returns a List of Numbers which are centered in the location area
- * @param locations the locations to iterate over
- * @param jobHeight the Height of one job
- * @returns {Array} of Numbers
- */
-function getYRangeLocations(locations, jobHeight) {
-    var yRange = [];
-
-    var offset = 0;
-
-    for (var i = 0; i < locations.length; i++) {
-        locationMid = (locations[i].jobs.length * jobHeight) / 2;
-
-        offset += locationMid;
-
-        yRange.push(offset);
-
-        offset += locationMid;
-    }
-
-    return yRange;
 }
 /**
  * Returns a String consists of minimum two Digits

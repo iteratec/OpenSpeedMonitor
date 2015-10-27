@@ -3,46 +3,34 @@ package de.iteratec.osm.d3Data
 import org.joda.time.DateTime
 
 /**
- * This class represents a model for the creation of a d3 schedule chart
- * A schedule chart is separated into n location.
- * Each location is again separated into m jobs.
+ * A classification for a schedule chart
  */
 class ScheduleChartData {
     String name
-    List<ScheduleChartLocation> locations
+    List<ScheduleChartJob> jobs
 
-    List<String> discountedJobs
     String discountedJobsLabel
-
-    List<String> discountedLocations
-    String discountedLocationsLabel
+    List<String> discountedJobs
 
     DateTime startDate
     DateTime endDate
 
     ScheduleChartData() {
-        name = "Server"
-        locations = new ArrayList<>()
-
-        discountedJobs = new ArrayList<>()
-        discountedLocations = new ArrayList<>()
-
-        discountedLocationsLabel = "Missing Label Text"
-        discountedJobsLabel = "Missing Label Text"
+        name = "Location"
+        jobs = new ArrayList<>()
 
         startDate = new DateTime()
         endDate = new DateTime()
+
+        discountedJobs = new ArrayList<>()
+        discountedJobsLabel = "discounted Jobs"
     }
 
-    def addLocation(ScheduleChartLocation location) {
-        locations.add(location)
+    def addJob(ScheduleChartJob job) {
+        jobs.add(job)
     }
 
-    def addDiscountedJob(String discription) {
-        discountedJobs.add(discription)
-    }
-
-    def addDiscountedLocation(String discription) {
-        discountedLocations.add(discription)
+    def addDiscountedJob(String jobName) {
+        discountedJobs.add(jobName)
     }
 }
