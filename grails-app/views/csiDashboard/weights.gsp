@@ -59,7 +59,7 @@
     }
     #tooltip {
         position: absolute;
-        width: 220px;
+        width: auto;
         height: auto;
         padding: 10px;
         background-color: white;

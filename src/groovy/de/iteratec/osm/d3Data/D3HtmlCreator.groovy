@@ -65,7 +65,6 @@ class D3HtmlCreator {
                                     <div class="treemap" id= ${chartIdentifier}></div>
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
-
                                         <p><span id="info"></span></p>
                                     </div>
                                 </div>
@@ -81,6 +80,10 @@ class D3HtmlCreator {
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
                                 <div class="span12" id="${"ScheduleChart" + chartIdentifier}">
+                                    <div id="tooltip" class="hidden">
+                                        <p><strong id="heading"></strong></p>
+                                        <p><span id="info"></span></p>
+                                    </div>
                                 </div>
                             </div>"""
     }

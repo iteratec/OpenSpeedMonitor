@@ -40,7 +40,8 @@ function createScheduleChart(data, id) {
     var jobCountLocation = data.jobs.length;
     var minDate = getMinDate(data);
     var maxDate = getMaxDate(data);
-    var jobNames = getJobNames(data);
+    var jobNamesAndDescriptions = getJobNames(data);
+    var jobNamesTrimmed = trimJobNames(jobNamesAndDescriptions);
 
     // Define margins, width and height
     var margin = {top: 20, right: 50, bottom: 20, left: 200},
@@ -54,7 +55,7 @@ function createScheduleChart(data, id) {
         .range([0, width]);
     // Scale for y-axis (Ordinal)
     var yScale = d3.scale.ordinal()
-        .domain(d3.range(jobNames.length))
+        .domain(d3.range(jobNamesAndDescriptions.length))
         .rangeBands([0, height]);
 
     // Define zoom behavior
@@ -72,6 +73,7 @@ function createScheduleChart(data, id) {
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
     // create drawing plane
     var drawingPlane = locContainer.append("svg")
         .attr("width", width)
@@ -132,26 +134,47 @@ function createScheduleChart(data, id) {
         .attr("class", "xAxisGrid")
         .call(xAxisGrid)
         .attr("transform", "translate(0," + height + ")");
-    locContainer.append("g")
+    var yAxisContainer = locContainer.append("g")
         .attr("class", "y axis")
         .call(d3.svg.axis().scale(yScale).orient("left"));
-    locContainer.selectAll(".y.axis .tick").each(function(d) {
+    locContainer.selectAll(".y.axis .tick").each(function (d) {
         d3.select(this).select("text")
-            .text(jobNames[d].name);
+            .text(jobNamesTrimmed[d]);
     });
-    locContainer.selectAll(".y.axis .tick").each(function(d) {
+    locContainer.selectAll(".y.axis .tick").each(function (d) {
         var node = d3.select(this)
             .append("text")
             .attr("x", -9)
             .attr("y", 15)
-            .attr("dy",".32em")
+            .attr("dy", ".32em")
             .style("text-anchor", "end")
-            .text(jobNames[d].description);
+            .text(jobNamesAndDescriptions[d].description);
     });
+    // Vertical border on the right-hand side
     locContainer.append("rect")
         .attr("height", height)
         .attr("width", 1)
         .attr("x", width);
+
+    // Tooltip on mouse event on y axis ticks
+    locContainer.selectAll(".y.axis .tick")
+        .style("pointer-events", "all")
+        .on("mousemove", function(d){
+            var xPosition = d3.event.pageX + 10;
+            var yPosition = d3.event.pageY + 10;
+
+            d3.select("#tooltip")
+                .style("left", xPosition + "px")
+                .style("top", yPosition + "px");
+            d3.select("#tooltip #heading")
+                .text(jobNamesAndDescriptions[d].name);
+            d3.select("#tooltip #info")
+                .text(jobNamesAndDescriptions[d].description);
+            d3.select("#tooltip").classed("hidden", false);
+        })
+        .on("mouseout", function(){
+            d3.select("#tooltip").classed("hidden", true);
+        });
 
 
     // Append Reset button
@@ -279,6 +302,38 @@ function getJobNames(location) {
         jobNames.push({name: location.jobs[j].name, description: location.jobs[j].description});
     }
     return jobNames;
+}
+/**
+ * Cuts equal beginnings of the job names
+ * @param jobNames job names to be trimmed
+ */
+function trimJobNames(jobNames) {
+    var result = [];
+    for(var j=0; j < jobNames.length; j++) {
+        result.push(jobNames[j].name.slice(0))
+    }
+    var change = true;
+    while(change) {
+        var letter = result[0].charAt(0);
+        if(result.every(function(elem) {return beginsWith(elem, letter)})) {
+            for(var i = 0; i < result.length; i++) {
+                result[i] =  result[i].substring(1);
+            }
+        } else {
+            change = false;
+        }
+    }
+    return result;
+}
+
+/**
+ * Checks if a word begins with a given letter
+ * @param word the word to check
+ * @param letter the letter interested in
+ * @returns {boolean} true if word.charAt(0) == letter
+ */
+function beginsWith(word, letter) {
+    return word.charAt(0) == letter;
 }
 /**
  * Returns a String consists of minimum two Digits
