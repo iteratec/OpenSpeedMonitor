@@ -17,7 +17,8 @@
 
 package de.iteratec.osm.d3
 
-
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.*
 import groovy.util.slurpersupport.NodeChild
 import org.junit.*
@@ -34,6 +35,8 @@ class D3ChartTagLibSpec extends Specification {
     void setup(){
         HTML_FRAGMENT_PARSER = new org.cyberneko.html.parsers.SAXParser()
         HTML_FRAGMENT_PARSER.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true)
+        def d3ChartTagLib = mockTagLib(D3ChartTagLib)
+        d3ChartTagLib.i18nService = Mock(I18nService)
     }
 
     def "HTML provided by taglib iteratec:multiLineChart returns container with correct identifier"() {
@@ -104,8 +107,8 @@ class D3ChartTagLibSpec extends Specification {
 
         then:
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
-        testHtmlAsNode.size() == 1
-        def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(0)
+        testHtmlAsNode.childNodes().size() == 2
+        def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(1)
         chartSVGContainerNode.attributes['id'] == "ScheduleChart" + identifier
     }
 }

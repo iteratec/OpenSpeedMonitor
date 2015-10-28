@@ -14,8 +14,11 @@
  *
  * @param data de.iteratec.osm.d3Data.ScheduleChartData as JSON
  * @param id a unique id for the container (div) to draw in
+ * @param formId a unique id for the form belongs to the chart
  */
-function createScheduleChart(data, id) {
+function createScheduleChart(rawdata, id, formId) {
+
+    var data = rawdata;
 
     // pick div and set width
     var div = d3.select("#" + id);
@@ -25,21 +28,23 @@ function createScheduleChart(data, id) {
     var jobHeight = 50;
     var jobPadding = 5;
 
+    // start value
+    var selectedHour = 6;
+
     // format start and end date
     var startDate = new Date(data.startDate);
-    var endDate = new Date(data.endDate);
-    var startDateString = "" + startDate.getDate() + "." + startDate.getMonth() + "." + startDate.getFullYear() + ", "
-        + twoDigitString(startDate.getHours()) + ":" + twoDigitString(startDate.getMinutes()) + ":" + twoDigitString(startDate.getSeconds());
-    var endDateString = "" + endDate.getDate() + "." + endDate.getMonth() + "." + endDate.getFullYear() + ", "
-        + twoDigitString(endDate.getHours()) + ":" + twoDigitString(endDate.getMinutes()) + ":" + twoDigitString(endDate.getSeconds());
+    var endDate = new Date(startDate);
+    endDate.setHours(startDate.getHours() + selectedHour);
+
+    var startDateString = getDateString(startDate);
+    var endDateString = getDateString(endDate);
 
     div.append("h5")
+        .attr("class", "intervalHeadline")
         .text(startDateString + " - " + endDateString);
 
     // Get Domain for the location
     var jobCountLocation = data.jobs.length;
-    var minDate = getMinDate(data);
-    var maxDate = getMaxDate(data);
     var jobNamesAndDescriptions = getJobNames(data);
     var jobNamesTrimmed = trimJobNames(jobNamesAndDescriptions);
 
@@ -50,9 +55,9 @@ function createScheduleChart(data, id) {
 
     // Scale for x-Axis (Time)
     var xScale = d3.time.scale()
-        .domain([minDate, maxDate])
         .nice(d3.time.hour)
         .range([0, width]);
+    xScale.domain([startDate, endDate]);
     // Scale for y-axis (Ordinal)
     var yScale = d3.scale.ordinal()
         .domain(d3.range(jobNamesAndDescriptions.length))
@@ -67,6 +72,7 @@ function createScheduleChart(data, id) {
     // Color scale for locations
     var locColor = d3.scale.category20b();
 
+
     // svg container
     var locContainer = div.append("svg")
         .attr("width", width + margin.left + margin.right)
@@ -79,36 +85,23 @@ function createScheduleChart(data, id) {
         .attr("width", width)
         .attr("height", height);
 
+    // append rect showing selected interval
+    drawingPlane.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .style("fill", "lightgrey")
+        .style("opacity", "0.4");
+    drawingPlane.append("rect")
+        .attr("class", "intervalRect")
+        .attr("height", height)
+        .style("fill", "white");
+
+    // append job container
     var yOffset = 0;
-    //iterate over jobs
-    for (var j = 0; j < data.jobs.length; j++) {
-        var job = data.jobs[j];
-
-        var jobContainer = drawingPlane.append("g")
-            .attr("name", job.name);
-
-        var jobExe = jobContainer.selectAll(".jobExe")
-            .data(job.executionDates)
-            .enter()
-            .append("g")
+    for (var i = 0; i < data.jobs.length; i++) {
+        drawingPlane.append("g")
+            .attr("class", "jobContainer" + i)
             .attr("transform", "translate(0," + yOffset + ")");
-
-        // Append rect for each execution date
-        jobExe.append("rect")
-            .attr("duration", job.durationInMinutes)
-            .attr("y", jobPadding)
-            .attr("x", function (d) {
-                return xScale(new Date(d));
-            })
-            .attr("width", function (d) {
-                var startDate = new Date(d);
-                var endDate = new Date(startDate.getTime() + (job.durationInMinutes * 60 * 1000));
-                return xScale(endDate) - xScale(startDate);
-            })
-            .attr("height", jobHeight - 2 * jobPadding)
-            .attr("class", "jobRect")
-            .style("fill", locColor(job.name));
-
         yOffset += jobHeight;
     }
 
@@ -159,7 +152,7 @@ function createScheduleChart(data, id) {
     // Tooltip on mouse event on y axis ticks
     locContainer.selectAll(".y.axis .tick")
         .style("pointer-events", "all")
-        .on("mousemove", function(d){
+        .on("mousemove", function (d) {
             var xPosition = d3.event.pageX + 10;
             var yPosition = d3.event.pageY + 10;
 
@@ -172,7 +165,7 @@ function createScheduleChart(data, id) {
                 .text(jobNamesAndDescriptions[d].description);
             d3.select("#tooltip").classed("hidden", false);
         })
-        .on("mouseout", function(){
+        .on("mouseout", function () {
             d3.select("#tooltip").classed("hidden", true);
         });
 
@@ -241,6 +234,9 @@ function createScheduleChart(data, id) {
                 var endDate = new Date(startDate.getTime() + (d3.select(this).attr("duration") * 60 * 1000));
                 return xScale(endDate) - xScale(startDate);
             });
+        drawingPlane.select(".intervalRect")
+            .attr("x", xScale(startDate))
+            .attr("width", xScale(endDate) - xScale(startDate));
     }
 
     // function updating aid line position on mouse move
@@ -256,39 +252,68 @@ function createScheduleChart(data, id) {
         zoom.translate([0, 0]).scale(1);
         zoomed();
     }
-}
 
-/**
- * Returns the earliest date found in all job execution dates
- * @param location the location
- * @returns the earliest date
- */
-function getMinDate(location) {
-    var locMinDates = [];
+    // Handles radio buttons
+    d3.select("#" + formId).selectAll("input").on("change", change);
 
-    for (var i = 0; i < location.jobs.length; i++) {
-        locMinDates.push(d3.min(location.jobs[i].executionDates, function (x) {
-            return new Date(x);
-        }));
+    function change() {
+        selectedHour = parseInt(this.value);
+        endDate = new Date(startDate);
+        endDate.setHours(startDate.getHours() + selectedHour);
+        refreshGraph()
     }
 
-    return d3.min(locMinDates);
-}
-/**
- * Returns the latest date found in all job execution dates
- * @param location the location
- * @returns the latest date
- */
-function getMaxDate(location) {
-    var locMinDates = [];
 
-    for (var i = 0; i < location.jobs.length; i++) {
-        locMinDates.push(d3.max(location.jobs[i].executionDates, function (x) {
-            return new Date(x);
-        }));
+    function refreshGraph() {
+        xScale.domain([startDate, endDate]);
+        zoom.x(xScale);
+
+        drawingPlane.select(".intervalRect")
+            .attr("x", xScale(startDate))
+            .attr("width", xScale(endDate) - xScale(startDate));
+
+        div.select(".intervalHeadline")
+            .text(startDateString + " - " + getDateString(endDate));
+
+        var yOffset = 0;
+        //iterate over jobs
+        for (var j = 0; j < data.jobs.length; j++) {
+            var job = data.jobs[j];
+            var usedExecutionDates = getExecutionDates(job, startDate, selectedHour);
+
+            // select job container
+            var jobContainer = drawingPlane.select(".jobContainer" + j);
+
+            var jobExe = jobContainer.selectAll(".jobExe").data(usedExecutionDates);
+            jobExe.enter()
+                .append("g")
+                .attr("class", "jobExe")
+                .attr("transform", "translate(0," + yOffset + ")")
+                .append("rect")
+                .attr("duration", job.durationInMinutes)
+                .attr("y", jobPadding)
+                .attr("x", function (d) {
+                    return xScale(new Date(d));
+                })
+                .attr("width", function (d) {
+                    var startDate = new Date(d);
+                    var jobEndPoint = new Date(startDate.getTime() + (job.durationInMinutes * 60 * 1000));
+                    return xScale(jobEndPoint) - xScale(startDate);
+                })
+                .attr("height", jobHeight - 2 * jobPadding)
+                .attr("class", "jobRect")
+                .style("fill", locColor(job.name));
+
+            jobExe.exit().remove();
+
+            yOffset += jobHeight;
+        }
+        zoomed();
+
     }
 
-    return d3.max(locMinDates);
+    // First time drawing chart
+    refreshGraph()
 }
 
 /**
@@ -309,15 +334,17 @@ function getJobNames(location) {
  */
 function trimJobNames(jobNames) {
     var result = [];
-    for(var j=0; j < jobNames.length; j++) {
+    for (var j = 0; j < jobNames.length; j++) {
         result.push(jobNames[j].name.slice(0))
     }
     var change = true;
-    while(change) {
+    while (change) {
         var letter = result[0].charAt(0);
-        if(result.every(function(elem) {return beginsWith(elem, letter)})) {
-            for(var i = 0; i < result.length; i++) {
-                result[i] =  result[i].substring(1);
+        if (result.every(function (elem) {
+                return beginsWith(elem, letter)
+            })) {
+            for (var i = 0; i < result.length; i++) {
+                result[i] = result[i].substring(1);
             }
         } else {
             change = false;
@@ -329,7 +356,7 @@ function trimJobNames(jobNames) {
 /**
  * Checks if a word begins with a given letter
  * @param word the word to check
- * @param letter the letter interested in
+ * @param letter the letter to check
  * @returns {boolean} true if word.charAt(0) == letter
  */
 function beginsWith(word, letter) {
@@ -347,4 +374,37 @@ function twoDigitString(number) {
     else {
         return "" + number;
     }
+}
+
+/**
+ * Gets the execution dates for a job in the next X hours
+ * @param job the job to get the dates for
+ * @param selectedHour the interval
+ * @returns {Array} an Array of execution dates. An empty array if none is found
+ */
+function getExecutionDates(job, startdate, selectedHour) {
+    var result = [];
+    var endOfInterval = new Date(startdate);
+    endOfInterval.setHours(startdate.getHours() + selectedHour);
+    var allExecutionDates = job.executionDates;
+
+    var counter = 0;
+    var loopDate = new Date(allExecutionDates[counter]);
+    while((loopDate <= endOfInterval) && !(typeof allExecutionDates[counter] === undefined)) {
+        result.push(allExecutionDates[counter]);
+        counter++;
+        loopDate = new Date(allExecutionDates[counter]);
+    }
+
+    return result;
+}
+
+/**
+ * Creates a string representing a given date [DD.MM.YYYY, HH:MM:SS]
+ * @param date the date
+ * @returns {string} the string representation
+ */
+function getDateString(date) {
+    return "" + date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + ", "
+        + twoDigitString(date.getHours()) + ":" + twoDigitString(date.getMinutes()) + ":" + twoDigitString(date.getSeconds());
 }

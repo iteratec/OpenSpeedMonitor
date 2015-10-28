@@ -18,12 +18,14 @@
 package de.iteratec.osm.d3
 
 import de.iteratec.osm.d3Data.D3HtmlCreator
+import de.iteratec.osm.util.I18nService
 
 /**
  * TagLib for D3 charts
  */
 class D3ChartTagLib {
     static namespace = "iteratec"
+    I18nService i18nService
 
     /**
      * attrs['chartIdentifer'] has to be unique for the page, otherwise d3 overrides other charts
@@ -51,8 +53,10 @@ class D3ChartTagLib {
     }
 
     def scheduleChart = {attrs, body ->
+        def unit1 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnit1", "hour")
+        def unit2 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnitMore", "hours")
         D3HtmlCreator htmlCreator = new D3HtmlCreator()
-        out << htmlCreator.generateScheduleChartHtml(attrs['chartIdentifier'])
+        out << htmlCreator.generateScheduleChartHtml(attrs['chartIdentifier'], unit1, unit2)
 
         return out.toString()
     }

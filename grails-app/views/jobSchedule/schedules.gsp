@@ -72,6 +72,9 @@
         font-size: 14px;
         line-height: 20px;
     }
+    form {
+            text-align: right;
+    }
     </style>
 </head>
 
@@ -86,6 +89,7 @@
         <h4>${location.name}</h4>
         <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
         <br />
+        %{--<div>${location as grails.converters.JSON}</div>--}%
     </g:each>
     <br/>
     <br/>
@@ -100,7 +104,7 @@
 <asset:script type="text/javascript">
     <g:each in="${chartMap}" var="server" status="i">
         <g:each in="${server.value}" var="location" status="j">
-            createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}")
+            createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}", "${"ScheduleChartForm" + i + j}")
         </g:each>
     </g:each>
 </asset:script>

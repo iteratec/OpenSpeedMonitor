@@ -14,6 +14,7 @@ class ScheduleChartData {
 
     DateTime startDate
     DateTime endDate
+    int agentCount
 
     ScheduleChartData() {
         name = "Location"

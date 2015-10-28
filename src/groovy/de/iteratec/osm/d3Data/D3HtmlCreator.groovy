@@ -16,7 +16,11 @@
  */
 package de.iteratec.osm.d3Data
 
+import org.springframework.beans.factory.annotation.Autowired
+
 class D3HtmlCreator {
+    def i18nService
+
     /**
      * Creates divs for de.iteratec.osm.d3data.MultiLineChart
      * @param chartIdentifer a unique name for chart on the page
@@ -76,9 +80,21 @@ class D3HtmlCreator {
     /**
      * Creates container for de.iteratec.osm.d3data.ScheduleChartData
      */
-    def generateScheduleChartHtml = {chartIdentifier ->
+    def generateScheduleChartHtml = {chartIdentifier, unitOne, unitMultiple ->
+
+
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
+                                <div class="span12 pull-right" id="${"ScheduleChartForm" + chartIdentifier}">
+                                    <form>
+                                      <label><input type="radio" name="mode" value="1"> 1 ${unitOne}</label>
+                                      <label><input type="radio" name="mode" value="2"> 2 ${unitMultiple}</label>
+                                      <label><input type="radio" name="mode" value="4"> 4 ${unitMultiple}</label>
+                                      <label><input type="radio" name="mode" value="6" checked> 6 ${unitMultiple}</label>
+                                      <label><input type="radio" name="mode" value="12"> 12 ${unitMultiple}</label>
+                                      <label><input type="radio" name="mode" value="24"> 24 ${unitMultiple}</label>
+                                    </form>
+                                </div>
                                 <div class="span12" id="${"ScheduleChart" + chartIdentifier}">
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>

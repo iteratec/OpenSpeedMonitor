@@ -36,6 +36,7 @@ class ScheduleChartDataSpec extends Specification{
         !scheduleChartData.discountedJobsLabel.isEmpty()
         scheduleChartData.jobs.size() == 0
         scheduleChartData.discountedJobs.size() == 0
+        scheduleChartData.agentCount == 0;
     }
 
     def "addJob adds schedule chart job to list" () {

@@ -232,7 +232,7 @@ class QueueAndJobStatusService {
                 // filter only active locations
                 if (currentLocation.active == true) {
                     if (!scheduleChartLocations.containsKey(currentLocation.label)) {
-                        scheduleChartLocations.put(currentLocation.label, new ScheduleChartData(name: currentLocation.label, discountedJobsLabel: discountedJobsLabel))
+                        scheduleChartLocations.put(currentLocation.label, new ScheduleChartData(name: currentLocation.label, discountedJobsLabel: discountedJobsLabel, agentCount: getAgentCount(currentLocation)))
                     }
 
                     ScheduleChartData scheduleChartLocation = scheduleChartLocations.get(currentLocation.label)
@@ -255,8 +255,7 @@ class QueueAndJobStatusService {
                 }
             }
 
-            // if a location has no job which is going to run in the interval
-            // the whole location is added to the list of discarded locations
+            // add locations to schedule chart
             scheduleChartLocations.each { k, v ->
                 locationChartData.add(v)
             }
@@ -265,5 +264,14 @@ class QueueAndJobStatusService {
         }
 
         return result
+    }
+
+    /**
+     * gets the count of agents for a location
+     * @param location
+     * @return
+     */
+    private int getAgentCount(Location location) {
+        4
     }
 }
