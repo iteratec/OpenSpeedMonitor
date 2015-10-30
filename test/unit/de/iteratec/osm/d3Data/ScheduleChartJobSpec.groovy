@@ -34,8 +34,9 @@ class ScheduleChartJobSpec extends Specification{
         ScheduleChartJob scheduleChartJob = new ScheduleChartJob()
 
         then:
-        scheduleChartJob.durationInMinutes != 0
+        scheduleChartJob.durationInSeconds != 0
         scheduleChartJob.executionDates.size() == 0
         !scheduleChartJob.name.isEmpty()
+        !scheduleChartJob.description.isEmpty()
     }
 }

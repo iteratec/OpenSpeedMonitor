@@ -25,11 +25,12 @@ function createScheduleChart(rawdata, id, formId) {
     var divWidth = parseInt(div.style("width"), 10);
 
     // height for one job
-    var jobHeight = 50;
-    var jobPadding = 5;
+    var jobHeight = 40;
+    var jobPadding = 3;
 
     // start value
     var selectedHour = 6;
+    var showIntersections = false;
 
     // format start and end date
     var startDate = new Date(data.startDate);
@@ -44,14 +45,14 @@ function createScheduleChart(rawdata, id, formId) {
         .text(startDateString + " - " + endDateString);
 
     // Get Domain for the location
-    var jobCountLocation = data.jobs.length;
+    var jobCount = data.jobs.length;
     var jobNamesAndDescriptions = getJobNames(data);
     var jobNamesTrimmed = trimJobNames(jobNamesAndDescriptions);
 
     // Define margins, width and height
     var margin = {top: 20, right: 50, bottom: 20, left: 200},
         width = divWidth - margin.left - margin.right,
-        height = jobCountLocation * jobHeight;
+        height = jobCount * jobHeight;
 
     // Scale for x-Axis (Time)
     var xScale = d3.time.scale()
@@ -67,10 +68,10 @@ function createScheduleChart(rawdata, id, formId) {
     var zoom = d3.behavior.zoom()
         .x(xScale)
         .scaleExtent([0, Infinity])
-        .on("zoom", zoomed);
+        .on("zoom", performScaling);
 
     // Color scale for locations
-    var locColor = d3.scale.category20b();
+    var locColor = d3.scale.category20c();
 
 
     // svg container
@@ -203,6 +204,7 @@ function createScheduleChart(rawdata, id, formId) {
         .attr("class", "verticalLine")
         .attr("y1", 0)
         .attr("y2", height);
+
     // Append area for spotting mouse events
     locContainer.append("rect")
         .attr("class", "mouseEventArea")
@@ -218,10 +220,19 @@ function createScheduleChart(rawdata, id, formId) {
         })
         .on("mousemove", mousemove)
         .call(zoom);
+    // Add listener to radio buttons
+    d3.selectAll("#" + formId).selectAll("input").on("change", change);
 
 
-    // Function called on zoom
-    function zoomed() {
+    // function updating aid line position on mouse move
+    function mousemove() {
+        var mouseXValue = xScale.invert(d3.mouse(this)[0]);
+        locContainer.select(".verticalLine")
+            .attr("transform", "translate(" + xScale(mouseXValue) + ",0)");
+    }
+
+    // updates the x scales of the objects
+    function performScaling() {
         locContainer.select(".x.axis").call(xAxis);
         locContainer.selectAll(".x.axis.top").call(xAxisTop);
         locContainer.select(".xAxisGrid").call(xAxisGrid);
@@ -231,40 +242,51 @@ function createScheduleChart(rawdata, id, formId) {
             })
             .attr("width", function (d) {
                 var startDate = new Date(d);
-                var endDate = new Date(startDate.getTime() + (d3.select(this).attr("duration") * 60 * 1000));
+                var endDate = new Date(startDate);
+                endDate.setSeconds(startDate.getSeconds() + d3.select(this).attr("duration"))
                 return xScale(endDate) - xScale(startDate);
             });
         drawingPlane.select(".intervalRect")
             .attr("x", xScale(startDate))
             .attr("width", xScale(endDate) - xScale(startDate));
-    }
+        drawingPlane.selectAll(".intersectionRect")
+            .attr("x", function (d) {
+                return xScale(d.start);
+            })
+            .attr("width", function (d) {
+                return xScale(d.end) - xScale(d.start);
+            });
 
-    // function updating aid line position on mouse move
-    function mousemove() {
-        var mouseXValue = xScale.invert(d3.mouse(this)[0]);
-        locContainer.select(".verticalLine")
-            .attr("transform", "translate(" + xScale(mouseXValue) + ",0)");
     }
-
 
     // Resets the zoom and pan
     function reset() {
         zoom.translate([0, 0]).scale(1);
-        zoomed();
+        performScaling();
     }
 
-    // Handles radio buttons
-    d3.select("#" + formId).selectAll("input").on("change", change);
 
+    // handles checked radio button change
     function change() {
-        selectedHour = parseInt(this.value);
-        endDate = new Date(startDate);
-        endDate.setHours(startDate.getHours() + selectedHour);
-        refreshGraph()
+        if (this.value === "on") {
+            showIntersections = true;
+            drawIntersectionRects()
+            performScaling()
+        } else if (this.value === "off") {
+            showIntersections = false;
+            drawingPlane.selectAll(".intersectionRect").remove()
+            performScaling()
+        } else {
+            selectedHour = parseInt(this.value);
+            endDate = new Date(startDate);
+            endDate.setHours(startDate.getHours() + selectedHour);
+            updateGraph()
+        }
     }
 
 
-    function refreshGraph() {
+    // updates graph data
+    function updateGraph() {
         xScale.domain([startDate, endDate]);
         zoom.x(xScale);
 
@@ -275,7 +297,6 @@ function createScheduleChart(rawdata, id, formId) {
         div.select(".intervalHeadline")
             .text(startDateString + " - " + getDateString(endDate));
 
-        var yOffset = 0;
         //iterate over jobs
         for (var j = 0; j < data.jobs.length; j++) {
             var job = data.jobs[j];
@@ -288,38 +309,60 @@ function createScheduleChart(rawdata, id, formId) {
             jobExe.enter()
                 .append("g")
                 .attr("class", "jobExe")
-                .attr("transform", "translate(0," + yOffset + ")")
                 .append("rect")
-                .attr("duration", job.durationInMinutes)
+                .attr("duration", job.durationInSeconds)
                 .attr("y", jobPadding)
-                .attr("x", function (d) {
-                    return xScale(new Date(d));
-                })
-                .attr("width", function (d) {
-                    var startDate = new Date(d);
-                    var jobEndPoint = new Date(startDate.getTime() + (job.durationInMinutes * 60 * 1000));
-                    return xScale(jobEndPoint) - xScale(startDate);
-                })
                 .attr("height", jobHeight - 2 * jobPadding)
                 .attr("class", "jobRect")
                 .style("fill", locColor(job.name));
 
             jobExe.exit().remove();
 
-            yOffset += jobHeight;
         }
-        zoomed();
 
+        // Update intersection rects
+        if(showIntersections == true) {
+            drawIntersectionRects();
+        }
+
+        // scale everything
+        performScaling();
+    }
+
+    // Draws red rectangles for intersections
+    function drawIntersectionRects() {
+        var intersections = calculateIntersections(data, startDate, selectedHour, data.agentCount - 1);
+
+        var redScale = d3.scale.linear()
+            .domain([data.agentCount, intersections.maxIntersections])
+            .range([230, 255]);
+        var opacityScale = d3.scale.linear()
+            .domain([data.agentCount, intersections.maxIntersections])
+            .range([0.2, 0.7]);
+
+        var intersectionContainer = drawingPlane.selectAll(".intersectionRect")
+            .data(intersections.intersections);
+        intersectionContainer.enter()
+            .append("rect")
+            .attr("class", "intersectionRect")
+            .attr("height", height)
+            .style("fill", function (d) {
+                return d3.rgb(redScale(d.intersectionCount), 0, 0);
+            })
+            .style("opacity", function (d) {
+                return opacityScale(d.intersectionCount)
+            });
+        intersectionContainer.exit().remove();
     }
 
     // First time drawing chart
-    refreshGraph()
+    updateGraph();
 }
 
 /**
- * Returns the job names
+ * Returns the job names and their description
  * @param locations the location to iterate over
- * @returns {Array} job names
+ * @returns {object} with form {name: String, description: String}
  */
 function getJobNames(location) {
     var jobNames = [];
@@ -329,10 +372,15 @@ function getJobNames(location) {
     return jobNames;
 }
 /**
- * Cuts equal beginnings of the job names
+ * Cuts equal beginnings of the job names and returns a new list as result
+ * If jobNames.length <= 1 then result == jobNames
  * @param jobNames job names to be trimmed
+ * @return {Array} the trimmed job Names
  */
 function trimJobNames(jobNames) {
+    if(jobNames.length <= 1) {
+        return jobNames;
+    }
     var result = [];
     for (var j = 0; j < jobNames.length; j++) {
         result.push(jobNames[j].name.slice(0))
@@ -390,7 +438,7 @@ function getExecutionDates(job, startdate, selectedHour) {
 
     var counter = 0;
     var loopDate = new Date(allExecutionDates[counter]);
-    while((loopDate <= endOfInterval) && !(typeof allExecutionDates[counter] === undefined)) {
+    while ((loopDate <= endOfInterval) && !(typeof allExecutionDates[counter] === undefined)) {
         result.push(allExecutionDates[counter]);
         counter++;
         loopDate = new Date(allExecutionDates[counter]);
@@ -407,4 +455,56 @@ function getExecutionDates(job, startdate, selectedHour) {
 function getDateString(date) {
     return "" + date.getDate() + "." + date.getMonth() + "." + date.getFullYear() + ", "
         + twoDigitString(date.getHours()) + ":" + twoDigitString(date.getMinutes()) + ":" + twoDigitString(date.getSeconds());
+}
+
+/**
+ * Calculates the intersections of dates
+ * @param data the incoming data
+ * @param startDate the start date
+ * @param selectedHours the length of the interval
+ * @returns {Object} with form: {maxIntersections: int, intersections: Array}  intersections has objects having form: {start: Date, end: Date, intersectionCount: Int}
+ */
+function calculateIntersections(data, startDate, selectedHours, toleratedIntersectionCount) {
+    var result = {maxIntersections: 0, intersections: []};
+    var endDate = new Date(startDate);
+    endDate.setHours(startDate.getHours() + selectedHours);
+    var allExecutionDates = data.allExecutionDates.slice();
+    var allEndDates = data.allEndDates.slice();
+    allExecutionDates.sort();
+    allEndDates.sort();
+
+
+    // Gets and removes the first element from array
+    var selectedDate = new Date(allExecutionDates.shift());
+    var nextExeDate = new Date(allExecutionDates.shift());
+    var nextEndDate = new Date(allEndDates.shift());
+    var intersections = 0;
+    var maxIntersections = 0;
+
+    while (!allExecutionDates.length == 0 && !allEndDates.length == 0 && (selectedDate <= endDate)) {
+        var interval;
+
+        if (nextExeDate <= nextEndDate) {
+            interval = {start: selectedDate, end: nextExeDate, intersectionCount: intersections};
+            selectedDate = nextExeDate;
+            nextExeDate = new Date(allExecutionDates.shift());
+            intersections++;
+            if (intersections > maxIntersections) {
+                maxIntersections = intersections;
+            }
+        }
+        else {
+            interval = {start: selectedDate, end: nextEndDate, intersectionCount: intersections};
+            selectedDate = nextEndDate;
+            nextEndDate = new Date(allEndDates.shift());
+            intersections--;
+        }
+
+        if (interval.intersectionCount > toleratedIntersectionCount && interval.start < interval.end) {
+            result.intersections.push(interval);
+        }
+    }
+
+    result.maxIntersections = maxIntersections;
+    return result;
 }

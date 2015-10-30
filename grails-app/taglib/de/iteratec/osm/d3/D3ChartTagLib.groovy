@@ -53,10 +53,13 @@ class D3ChartTagLib {
     }
 
     def scheduleChart = {attrs, body ->
-        def unit1 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnit1", "hour")
-        def unit2 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnitMore", "hours")
+        String unit1 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnit1", "hour")
+        String unit2 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnitMore", "hours")
+        String on =  i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.onLabel", "on")
+        String off =  i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.offLabel", "off")
+        String intersectionLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.intersectionLabel", "show intersections")
         D3HtmlCreator htmlCreator = new D3HtmlCreator()
-        out << htmlCreator.generateScheduleChartHtml(attrs['chartIdentifier'], unit1, unit2)
+        out << htmlCreator.generateScheduleChartHtml(attrs['chartIdentifier'], unit1, unit2, on, off, intersectionLabel)
 
         return out.toString()
     }

@@ -23,7 +23,6 @@ import org.junit.Rule
 import org.yaml.snakeyaml.introspector.Property
 import spock.lang.Specification
 
-import static de.iteratec.osm.csi.TestDataUtil.createJob
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 
 @TestFor(QueueAndJobStatusService)
@@ -34,16 +33,11 @@ class QueueAndJobStatusServiceSpec extends Specification {
     public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
 
     public static final String WPTSERVER_URL = 'dev.server01.wpt.iteratec.de'
-    private static final String LOCATION_IDENTIFIER_SERVER1_CHROME = 'iteratec-dev-hetzner-win7:Chrome'
-    private static final String LOCATION_IDENTIFIER_SERVER1_FIREFOX = 'iteratec-dev-hetzner-win7:Firefox'
-    private static final String LOCATION_IDENTIFIER_SERVER1_IE = 'iteratec-dev-hetzner-win7:IE'
-    private static final String LOCATION_IDENTIFIER_SERVER1_CHROMENEXUS = 'iteratec-dev-GoogleNexus:Nexus5 - Chrome'
-    private static final String LOCATION_IDENTIFIER_SERVER1_CHROMENEXUSBETA = 'iteratec-dev-GoogleNexus:Nexus5 - Chrome Beta'
+    private static final String LOCATION_IDENTIFIER_SERVER1_HETZNER = 'iteratec-dev-hetzner-win7'
+    private static final String LOCATION_IDENTIFIER_SERVER1_NEXUS = 'iteratec-dev-GoogleNexus'
 
     public static final String WPTSERVER2_URL = 'dev.server02.wpt.iteratec.de'
-    private static final String LOCATION_IDENTIFIER_SERVER2_FIREFOX = 'iteratec-dev-hetzner-64bit-ssd:Firefox'
-    private static final String LOCATION_IDENTIFIER_SERVER2_CHROME = 'iteratec-dev-hetzner-64bit-ssd:Chrome'
-    private static final String LOCATION_IDENTIFIER_SERVER2_IE = 'iteratec-dev-hetzner-64bit-ssd:IE'
+    private static final String LOCATION_IDENTIFIER_SERVER2_HETZNER = 'iteratec-dev-hetzner-64bit-ssd'
 
     QueueAndJobStatusService serviceUnderTest
 
@@ -82,8 +76,8 @@ class QueueAndJobStatusServiceSpec extends Specification {
         def resultMap = serviceUnderTest.createChartData(start, end)
 
         then:
-        resultMap.get(server1).size() == 5
-        resultMap.get(server2).size() == 3
+        resultMap.get(server1).size() == 2
+        resultMap.get(server2).size() == 1
     }
 
     private void mockServices() {
@@ -117,14 +111,8 @@ class QueueAndJobStatusServiceSpec extends Specification {
         server2 = TestDataUtil.createWebPageTestServer(WPTSERVER2_URL, WPTSERVER2_URL, true, "http://${WPTSERVER2_URL}/")
         List<Browser> browsers = TestDataUtil.createBrowsersAndAliases()
         TestDataUtil.createJobGroups()
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_CHROME, browsers[0], true)
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_FIREFOX, browsers[0], true)
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_IE, browsers[0], true)
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_CHROMENEXUS, browsers[0], true)
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_CHROMENEXUSBETA, browsers[0], true)
-        TestDataUtil.createLocation(server2, LOCATION_IDENTIFIER_SERVER2_CHROME, browsers[1], true)
-        TestDataUtil.createLocation(server2, LOCATION_IDENTIFIER_SERVER2_FIREFOX, browsers[1], true)
-        TestDataUtil.createLocation(server2, LOCATION_IDENTIFIER_SERVER2_IE, browsers[1], true)
-
+        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_HETZNER, browsers[0], true)
+        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_NEXUS, browsers[0], true)
+        TestDataUtil.createLocation(server2, LOCATION_IDENTIFIER_SERVER2_HETZNER, browsers[1], true)
     }
 }

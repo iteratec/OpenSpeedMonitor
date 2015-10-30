@@ -19,6 +19,7 @@ package de.iteratec.osm.d3Data
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import org.joda.time.DateTime
 import spock.lang.Specification
 
 /**
@@ -37,19 +38,40 @@ class ScheduleChartDataSpec extends Specification{
         scheduleChartData.jobs.size() == 0
         scheduleChartData.discountedJobs.size() == 0
         scheduleChartData.agentCount == 0;
+        scheduleChartData.allExecutionDates.size() == 0;
+        scheduleChartData.allEndDates.size() == 0
     }
 
     def "addJob adds schedule chart job to list" () {
         given:
         ScheduleChartData scheduleChartData = new ScheduleChartData()
-        ScheduleChartJob job = new ScheduleChartJob()
+        List executionDates = new ArrayList<>()
+        DateTime date1 = new DateTime()
+        DateTime date2 = date1.plusDays(1)
+        DateTime date3 = date1.plusDays(5)
+        executionDates.add(date1)
+        executionDates.add(date2)
+        executionDates.add(date3)
+
+        ScheduleChartJob job = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 60)
+        ScheduleChartJob job2 = new ScheduleChartJob(executionDates: executionDates, durationInSeconds: 120)
 
         when:
         scheduleChartData.addJob(job)
+        scheduleChartData.addJob(job2)
 
         then:
-        scheduleChartData.jobs.size() == 1
+        scheduleChartData.jobs.size() == 2
         scheduleChartData.jobs[0] == job
+        scheduleChartData.allExecutionDates.size() == job.executionDates.size() + job2.executionDates.size()
+        scheduleChartData.allEndDates.size() == job.executionDates.size() + job2.executionDates.size()
+        // lists should be sorted
+        scheduleChartData.allExecutionDates[0] == date1
+        scheduleChartData.allExecutionDates[1] == date1
+        scheduleChartData.allExecutionDates[2] == date2
+        scheduleChartData.allEndDates[0] == date1.plusSeconds(job.durationInSeconds)
+        scheduleChartData.allEndDates[1] == date1.plusSeconds(job2.durationInSeconds)
+        scheduleChartData.allEndDates[2] == date2.plusSeconds(job.durationInSeconds)
     }
 
     def "addDiscountedJob adds job to list" () {

@@ -17,8 +17,8 @@
 
 package de.iteratec.osm.measurement.environment
 
-import de.iteratec.osm.d3Data.ScheduleChartJob
 import de.iteratec.osm.d3Data.ScheduleChartData
+import de.iteratec.osm.d3Data.ScheduleChartJob
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
 import de.iteratec.osm.measurement.schedule.Job
@@ -219,59 +219,110 @@ class QueueAndJobStatusService {
 
         // Iterate over active servers
         for (WebPageTestServer server : wptServer) {
-            List<ScheduleChartData> locationChartData = new ArrayList<>()
+            List<ScheduleChartData> serverChartData = new ArrayList<>()
 
-            List locations = getFilteredLocations(server)
+            Map<Location, Integer> locationsAndTesterCount = getActiveLocationsAndTesterCount(server)
 
-            Map<String, ScheduleChartData> scheduleChartLocations = new HashMap<>()
+            locationsAndTesterCount.each { loc, agentCount ->
+                ScheduleChartData locationChartData = new ScheduleChartData(name: loc.getLocation(), discountedJobsLabel: discountedJobsLabel, agentCount: agentCount)
 
-            // iterate over locations
-            locations.each { loc ->
-                Location currentLocation = loc.location
+                // iterate over jobs
+                List<Job> jobs = Job.findAllByLocation(loc)
+                jobs.each { job ->
+                    ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);
+                    int seconds = parser.calculateDurationInSeconds()
 
-                // filter only active locations
-                if (currentLocation.active == true) {
-                    if (!scheduleChartLocations.containsKey(currentLocation.label)) {
-                        scheduleChartLocations.put(currentLocation.label, new ScheduleChartData(name: currentLocation.label, discountedJobsLabel: discountedJobsLabel, agentCount: getAgentCount(currentLocation)))
+                    // Add jobs which are going to run in given interval to the list
+                    // otherwise the job is added to the list of discounted jobs
+                    ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + loc.browser.name + ")", durationInSeconds: seconds)
+                    if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
+                        locationChartData.addJob(scheduleChartJob)
+                    } else {
+                        locationChartData.addDiscountedJob(job.label)
                     }
-
-                    ScheduleChartData scheduleChartLocation = scheduleChartLocations.get(currentLocation.label)
-                    def jobs = Job.findAllByLocation(currentLocation)
-
-                    // iterate over jobs
-                    for (Job j : jobs) {
-                        ScriptParser parser = new ScriptParser(pageService, j.script.navigationScript);
-                        def minutes = parser.calculateDurationInMinutes()
-                        // Add jobs which are going to run in given interval to the list
-                        // otherwise the job is added to the list of discounted jobs
-                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(j, start, end), name: j.label, description: "(" + currentLocation.browser.name + ")", durationInMinutes: minutes)
-                        if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
-                            scheduleChartLocation.addJob(scheduleChartJob)
-                        } else {
-                            scheduleChartLocation.addDiscountedJob(j.label)
-                        }
-                    }
-
                 }
+
+                serverChartData.add(locationChartData)
             }
 
-            // add locations to schedule chart
-            scheduleChartLocations.each { k, v ->
-                locationChartData.add(v)
+            // Trim location names
+            List<String> names = serverChartData*.name
+            trimNames(names);
+            for(int i = 0; i < serverChartData.size(); ++i) {
+                serverChartData[i].name = names[i]
             }
 
-           result.put(server, locationChartData)
+
+            result.put(server, serverChartData)
         }
 
         return result
     }
 
     /**
-     * gets the count of agents for a location
-     * @param location
-     * @return
+     * Gets all locations and the count of testers for it from 'getTesters.php'
+     * @param wptServer the server
+     * @return map, mapping a location to its tester count
      */
-    private int getAgentCount(Location location) {
-        4
+    private Map<Location, Integer> getActiveLocationsAndTesterCount(WebPageTestServer wptServer) {
+        Map<Location, Integer> result = new HashMap<>();
+
+        GPathResult gPathResult = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getTesters.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
+
+        gPathResult.data.location.each { locationTagInXml ->
+            int agents = 0
+            Location currentLocation = Location.findByWptServerAndLocation(wptServer, locationTagInXml.id)
+
+            if (currentLocation) {
+                locationTagInXml.testers.tester.each { t ->
+                    agents++
+                }
+
+                if (agents == 0 || minOneTesterHasLastCheckUnderThreshold(locationTagInXml)) {
+                    result.put(currentLocation, agents)
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Checks if at least one tester has 'last check' under a threshold
+     * @param locationTagInXML
+     * @return true, if at least one tester has 'last check' under threshold
+     */
+    private boolean minOneTesterHasLastCheckUnderThreshold(def locationTagInXML) {
+        boolean result = false
+
+        locationTagInXML.testers.tester.each { t ->
+            if (Integer.parseInt(t.elapsed.toString()) < 20000) // TODO adjust value
+                result = true
+        }
+
+        return result
+    }
+
+    /**
+     * Cuts equal beginnings of strings
+     *
+     * @param names a list of String to be trimmed
+     */
+    private void trimNames(List<String> names) {
+        if(names.size() <= 1)
+            return
+
+        boolean change = true
+
+        while(change) {
+            char letter = names[0].charAt(0)
+            if(names.every{it.charAt(0) == letter}) {
+                for(int i = 0; i < names.size(); ++i) {
+                    names[i] = names[i].substring(1)
+                }
+            } else {
+                change = false
+            }
+        }
     }
 }

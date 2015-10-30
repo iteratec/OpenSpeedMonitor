@@ -80,7 +80,7 @@ class D3HtmlCreator {
     /**
      * Creates container for de.iteratec.osm.d3data.ScheduleChartData
      */
-    def generateScheduleChartHtml = {chartIdentifier, unitOne, unitMultiple ->
+    def generateScheduleChartHtml = {chartIdentifier, unitOne, unitMultiple, on, off, intersectionLabel ->
 
 
         StringWriter writer = new StringWriter()
@@ -93,6 +93,13 @@ class D3HtmlCreator {
                                       <label><input type="radio" name="mode" value="6" checked> 6 ${unitMultiple}</label>
                                       <label><input type="radio" name="mode" value="12"> 12 ${unitMultiple}</label>
                                       <label><input type="radio" name="mode" value="24"> 24 ${unitMultiple}</label>
+                                    </form>
+                                </div>
+                                <div class="span12 pull-right" id="${"ScheduleChartForm" + chartIdentifier}">
+                                    <form>
+                                      <label>${intersectionLabel}</label>
+                                      <label><input type="radio" name="mode" value="on">${on}</label>
+                                      <label><input type="radio" name="mode" value="off" checked>${off}</label>
                                     </form>
                                 </div>
                                 <div class="span12" id="${"ScheduleChart" + chartIdentifier}">

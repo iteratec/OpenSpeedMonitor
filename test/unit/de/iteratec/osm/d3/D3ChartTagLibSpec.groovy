@@ -107,8 +107,11 @@ class D3ChartTagLibSpec extends Specification {
 
         then:
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
-        testHtmlAsNode.childNodes().size() == 2
-        def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(1)
+        def formContainer = testHtmlAsNode.childNodes().getAt(0)
+        def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(2)
+
+        testHtmlAsNode.childNodes().size() == 3
+        formContainer.attributes['id'] == "ScheduleChartForm" + identifier
         chartSVGContainerNode.attributes['id'] == "ScheduleChart" + identifier
     }
 }

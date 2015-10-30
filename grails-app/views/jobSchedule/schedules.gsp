@@ -13,42 +13,51 @@
     .axis text {
         font: 10px sans-serif;
     }
+
     .axis path,
     .axis line {
         fill: none;
         stroke: #000;
         shape-rendering: crispEdges;
     }
+
     .xAxisGrid path,
     .xAxisGrid line {
         fill: none;
         stroke: grey;
         stroke-dasharray: 2, 2;
     }
+
     .xAxisGrid text {
         display: none;
     }
+
     .locationAxis path,
     .locationAxis line {
         fill: none;
         stroke: none;
     }
+
     .locationAxis text {
         font: 10px sans-serif;
     }
+
     .resetButton {
         fill: lightgrey;
     }
+
     .resetButtonText {
         fill: white;
         stroke: none;
         text-anchor: middle;
     }
+
     .verticalLine {
         opacity: 1;
         stroke-dasharray: 3, 3;
         stroke: blue;
     }
+
     #tooltip {
         position: absolute;
         width: auto;
@@ -63,17 +72,20 @@
         box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
         pointer-events: none;
     }
+
     #tooltip.hidden {
         display: none;
     }
+
     #tooltip p {
         margin: 0;
         font-family: sans-serif;
         font-size: 14px;
         line-height: 20px;
     }
+
     form {
-            text-align: right;
+        text-align: right;
     }
     </style>
 </head>
@@ -86,10 +98,16 @@
 <g:each in="${chartMap}" var="server" status="i">
     <h3>${server.key}</h3>
     <g:each in="${server.value}" var="location" status="j">
-        <h4>${location.name}</h4>
-        <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
+        <h4>${location.name} (${location.agentCount} agents)</h4>
+        <g:if test="${location.jobs.size() > 0}">
+            <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
+        </g:if>
+        <g:else>
+            <g:message code="de.iteratec.osm.d3Data.multiLineChart.noJobsInInterval" default="Gewichtungen CSI"/>
+        </g:else>
         <br />
-        %{--<div>${location as grails.converters.JSON}</div>--}%
+        <hr />
+        <br/>
     </g:each>
     <br/>
     <br/>
@@ -104,7 +122,9 @@
 <asset:script type="text/javascript">
     <g:each in="${chartMap}" var="server" status="i">
         <g:each in="${server.value}" var="location" status="j">
-            createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}", "${"ScheduleChartForm" + i + j}")
+            <g:if test="${location.jobs.size() > 0}">
+                createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}", "${"ScheduleChartForm" + i + j}")
+            </g:if>
         </g:each>
     </g:each>
 </asset:script>

@@ -348,15 +348,10 @@ class ScriptParser {
 	 * Calculates the duration of a navigation script.
 	 * It uses the number of steps in the script.
 	 * It also adds time that every Job needs for init and exit etc.
-	 * @return the duration in minutes
+	 * @return the duration in seconds
 	 */
-	double calculateDurationInMinutes() {
-		double result = 0.0;
-
-		double seconds = allPageLoadEvents * TIME_PER_STEP + DELAY_PER_SCRIPT
-
-		result = seconds / 60;
-		return result;
+	int calculateDurationInSeconds() {
+		return allPageLoadEvents * TIME_PER_STEP + DELAY_PER_SCRIPT
 	}
 
 }

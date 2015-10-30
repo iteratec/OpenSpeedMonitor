@@ -8,6 +8,9 @@ import org.joda.time.DateTime
 class ScheduleChartData {
     String name
     List<ScheduleChartJob> jobs
+    // Sorted List
+    List<DateTime> allExecutionDates
+    List<DateTime> allEndDates
 
     String discountedJobsLabel
     List<String> discountedJobs
@@ -25,10 +28,19 @@ class ScheduleChartData {
 
         discountedJobs = new ArrayList<>()
         discountedJobsLabel = "discounted Jobs"
+
+        allExecutionDates = new ArrayList<>()
+        allEndDates = new ArrayList<>()
     }
 
     def addJob(ScheduleChartJob job) {
         jobs.add(job)
+        job.executionDates.each {date ->
+            allExecutionDates.add(date)
+            allEndDates.add(date.plusSeconds(job.durationInSeconds))
+        }
+        allEndDates.sort()
+        allExecutionDates.sort()
     }
 
     def addDiscountedJob(String jobName) {
