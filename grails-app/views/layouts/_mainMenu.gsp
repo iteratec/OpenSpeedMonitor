@@ -63,29 +63,30 @@
 			<li class="controller ${controllerName.equals('tabularResultPresentation')?'active':''}">
 	            <g:link controller="tabularResultPresentation" action="listResults"><i class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title" default="Einzelergebnisse" /></g:link>
 	        </li>
-            <div class="btn-toolbar" style="margin: 0;">
-                <div class="btn-group">
-                    <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" id="customDashBoardSelection">
-                        <g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("EVENT")}" />
-                        <g:if test="${availableDashboards.size() > 0}">
-                            <g:each in="${availableDashboards}" var="availableDashboard">
-                                <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
-                            </g:each>
-                        </g:if>
-                        <g:else>
-                            <g:set var="anchorDashboardCreation" value="#"/>
-                            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                            </sec:ifAnyGranted>
-                            <li><a href="${anchorDashboardCreation}"><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable" default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!" /></a></li>
-                        </g:else>
-                    </ul>
-                </div>
-            </div>
+                    %{--Toggled until IT-701 is implemented--}%
+            %{--<div class="btn-toolbar" style="margin: 0;">--}%
+                %{--<div class="btn-group">--}%
+                    %{--<a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">--}%
+                        %{--<g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />--}%
+                        %{--<span class="caret"></span>--}%
+                    %{--</a>--}%
+                    %{--<ul class="dropdown-menu" id="customDashBoardSelection">--}%
+                        %{--<g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("EVENT")}" />--}%
+                        %{--<g:if test="${availableDashboards.size() > 0}">--}%
+                            %{--<g:each in="${availableDashboards}" var="availableDashboard">--}%
+                                %{--<li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>--}%
+                            %{--</g:each>--}%
+                        %{--</g:if>--}%
+                        %{--<g:else>--}%
+                            %{--<g:set var="anchorDashboardCreation" value="#"/>--}%
+                            %{--<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">--}%
+                                %{--<g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>--}%
+                            %{--</sec:ifAnyGranted>--}%
+                            %{--<li><a href="${anchorDashboardCreation}"><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable" default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!" /></a></li>--}%
+                        %{--</g:else>--}%
+                    %{--</ul>--}%
+                %{--</div>--}%
+            %{--</div>--}%
 		</g:elseif>
 
         <%-- CSI --%>
@@ -94,30 +95,31 @@
 			<li class="controller ${actionName.equals('showAll')?'active':''}">
 				<g:link controller="csiDashboard" action="showAll"><i class="fa fa-signal"></i> <g:message code="de.iteratec.isocsi.csiDashboard" default="Dashboard" /></g:link>
 			</li>
-            <div class="btn-group">
-            <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-              <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />
-              <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("CSI")}" />
+                %{--Toggled until IT-701 is implemented--}%
+            %{--<div class="btn-group">--}%
+            %{--<a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">--}%
+              %{--<g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label" default="Dashboard-Ansicht ausw&auml;hlen" />--}%
+              %{--<span class="caret"></span>--}%
+            %{--</a>--}%
+            %{--<ul class="dropdown-menu">--}%
+                %{--<g:set var="availableDashboards" value="${userspecificDashboardService.getListOfAvailableDashboards("CSI")}" />--}%
 
-              <g:if test="${availableDashboards.size() > 0}">
-                <g:each in="${availableDashboards}" var="availableDashboard">
-                  <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
-                </g:each>
-              </g:if>
-              <g:else>
-                  <g:set var="anchorDashboardCreation" value="#"/>
-                  <sec:ifLoggedIn>
-                      <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                          <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                      </sec:ifAnyGranted>
-                  </sec:ifLoggedIn>
-                  <li><a href="${anchorDashboardCreation}"><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable" default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!" /></a></li>
-              </g:else>
-            </ul>
-            </div>
+              %{--<g:if test="${availableDashboards.size() > 0}">--}%
+                %{--<g:each in="${availableDashboards}" var="availableDashboard">--}%
+                  %{--<li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>--}%
+                %{--</g:each>--}%
+              %{--</g:if>--}%
+              %{--<g:else>--}%
+                  %{--<g:set var="anchorDashboardCreation" value="#"/>--}%
+                  %{--<sec:ifLoggedIn>--}%
+                      %{--<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">--}%
+                          %{--<g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>--}%
+                      %{--</sec:ifAnyGranted>--}%
+                  %{--</sec:ifLoggedIn>--}%
+                  %{--<li><a href="${anchorDashboardCreation}"><g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable" default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!" /></a></li>--}%
+              %{--</g:else>--}%
+            %{--</ul>--}%
+            %{--</div>--}%
 			<li class="controller ${actionName.equals('showDefault')?'active':''}">
 				<g:link controller="csiDashboard" action="showDefault"><i class="fa fa-picture-o"></i> <g:message code="de.iteratec.isocsi.csi.linktext.staticDashboard" default="Statische Ansicht"/></g:link>
 			</li>

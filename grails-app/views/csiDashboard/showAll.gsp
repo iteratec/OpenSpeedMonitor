@@ -104,16 +104,17 @@
                     <p>
                         <g:actionSubmit id="chart-submit" value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll" class="btn btn-primary" style="margin-top: 16px;" />
               <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;" />
-              <sec:ifLoggedIn>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                 <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" data-toggle="modal" style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-                </sec:ifAnyGranted>
-              </sec:ifLoggedIn>
+                        %{--Toggled until IT-701 is implemented --}%
+                        %{--<sec:ifLoggedIn>--}%
+                %{--<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">--}%
+                 %{--<a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" data-toggle="modal" style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>--}%
+                %{--</sec:ifAnyGranted>--}%
+              %{--</sec:ifLoggedIn>--}%
               <g:if test="${params.id}">
-                <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
-                <g:render template="/_common/modals/deleteCustomDashboard"/>
-
-                  </g:if>
+                %{--Toggled until IT-701 is implemented --}%
+                %{--<g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">--}%
+                %{--<g:render template="/_common/modals/deleteCustomDashboard"/>--}%
+                  %{--</g:if>--}%
               </g:if>
                     </p>
                     <g:if test="${exceedsTimeframeBoundary}">
@@ -225,7 +226,8 @@
             </g:if>
         </g:else>
 
-        <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
+    %{--Toggled until IT-701 is implemented --}%
+        %{--<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>--}%
 
         <content tag="include.bottom">
             <asset:javascript src="csidashboard/csiDashboard.js" />

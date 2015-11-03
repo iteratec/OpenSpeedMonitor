@@ -247,20 +247,21 @@
 								style="margin-top: 16px;" />
                           <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
                             class="btn btn-primary" style="margin-top: 16px;" />
-                        <sec:ifLoggedIn>
-                            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
-                                   style="margin-top: 16px;" data-toggle="modal">
-                                    ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
-                                </a>
-                            </sec:ifAnyGranted>
-                        </sec:ifLoggedIn>
-		          <g:if test="${params.id}">
-		            <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
-		            <g:render template="/_common/modals/deleteCustomDashboard"/>
-		              
-		            </g:if>           
-		          </g:if> 
+						%{--Toggled until IT-701 is implemented --}%
+                        %{--<sec:ifLoggedIn>--}%
+                            %{--<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">--}%
+                                %{--<a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"--}%
+                                   %{--style="margin-top: 16px;" data-toggle="modal">--}%
+                                    %{--${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}--}%
+                                %{--</a>--}%
+                            %{--</sec:ifAnyGranted>--}%
+                        %{--</sec:ifLoggedIn>--}%
+		          %{--<g:if test="${params.id}">--}%
+		            %{--<g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">--}%
+		            %{--<g:render template="/_common/modals/deleteCustomDashboard"/>--}%
+
+		            %{--</g:if>--}%
+		          %{--</g:if>--}%
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.
