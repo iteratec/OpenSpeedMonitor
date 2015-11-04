@@ -119,14 +119,20 @@
         <asset:javascript src="iteratecChartRickshaw.js"/>
         <asset:script type="text/javascript">
             $(document).ready(function() {
+
+                if($("#chartbox").length > 0){
+                    createGraph();
+                    $('#rickshaw_label_summary_box').hide();
+                }
                 if(typeof chart != 'undefined'){
-                    jQuery.each(
+                    $.each(
                         chart.series,
                         function (i, series) {
                             //series.setVisible(series.name=="live");
                             series.setVisible($.inArray(series.name, ${namesOfCsiGroupsAndStaticGraphsToShow.collect{'"'+it+'"'}}) != -1);
 					});
 			    }
+
                 // Toggle Buttons
                 $("#chart-toggle").click(function() {
                     $("#csi-table").hide();
