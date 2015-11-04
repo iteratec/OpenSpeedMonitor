@@ -61,6 +61,7 @@ public class EventResultDashboardService {
     PerformanceLoggingService performanceLoggingService
     AggregatorTypeDaoService aggregatorTypeDaoService
     ConnectivityProfileDaoService connectivityProfileDaoService
+    OsmChartProcessingService osmChartProcessingService
 
     /**
      * LabelSummary
@@ -176,7 +177,7 @@ public class EventResultDashboardService {
      *
      * @todo TODO mze-2013-09-12: Suggest to move to a generic HighchartFactoryService.
      */
-    public List<OsmChartGraph> getEventResultDashboardHighchartGraphs(
+    public OsmRickshawChart getEventResultDashboardHighchartGraphs(
             Date startDate, Date endDate, Integer interval, List<AggregatorType> aggregators, ErQueryParams queryParams) {
 
         Map<String, Number> gtValues = [:]
@@ -236,7 +237,7 @@ public class EventResultDashboardService {
      * @param interval
      * @return
      */
-    private List<OsmChartGraph> calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval) {
+    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval) {
         def calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', IndentationDepth.ONE) {
             if (interval == MeasuredValueInterval.RAW) {
@@ -246,15 +247,16 @@ public class EventResultDashboardService {
             }
         }
         List<OsmChartGraph> graphs = []
+        OsmRickshawChart chart
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels and sorting', IndentationDepth.ONE) {
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels', IndentationDepth.TWO) {
                 graphs = setSpeakingGraphLabelsAndSort(calculatedResultMap)
             }
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting', IndentationDepth.TWO) {
-                graphs = summarizeGraphs(graphs)
+                chart = osmChartProcessingService.summarizeEventResultGraphs(graphs)
             }
         }
-        return graphs
+        return chart
     }
 
     private List<OsmChartGraph> summarizeGraphs(List<OsmChartGraph> graphs) {

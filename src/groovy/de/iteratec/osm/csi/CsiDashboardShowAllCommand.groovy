@@ -1,5 +1,6 @@
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
@@ -105,7 +106,7 @@ public class CsiDashboardShowAllCommand {
      * <code>true</code>, the selections in
      * {@link #selectedMeasuredEventIds} should be ignored.
      */
-    Boolean selectedAllMeasuredEvents
+    Boolean selectedAllMeasuredEvents = true
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Browser
@@ -125,7 +126,7 @@ public class CsiDashboardShowAllCommand {
      * <code>true</code>, the selections in
      * {@link #selectedBrowsers} should be ignored.
      */
-    Boolean selectedAllBrowsers
+    Boolean selectedAllBrowsers = true
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Location
@@ -145,7 +146,7 @@ public class CsiDashboardShowAllCommand {
      * <code>true</code>, the selections in
      * {@link #selectedLocations} should be ignored.
      */
-    Boolean selectedAllLocations
+    Boolean selectedAllLocations = true
 
     /**
      * If the user has been warned about a potentially long processing
@@ -184,65 +185,147 @@ public class CsiDashboardShowAllCommand {
     Boolean includeInterval
 
     /**
+     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
+     *
+     * These selections are only relevant if
+     * {@link #selectedAllConnectivityProfiles} is evaluated to
+     * <code>false</code>.
+     */
+    Collection<Long> selectedConnectivityProfiles = []
+
+    /**
+     * User enforced the selection of all ConnectivityProfiles.
+     * This selection <em>is not</em> reflected in
+     * {@link #selectedConnectivityProfiles} cause of URL length
+     * restrictions. If this flag is evaluated to
+     * <code>true</code>, the selections in
+     * {@link #selectedConnectivityProfiles} should be ignored.
+     */
+    Boolean selectedAllConnectivityProfiles = true
+
+    /**
      * Constraints needs to fit.
      */
     static constraints = {
+
         from(nullable: true, validator: {Date currentFrom, CsiDashboardShowAllCommand cmd ->
+
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentFrom == null) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.from.nullWithManualSelection']
+
+            if(manualTimeframe && currentFrom == null) {
+                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.from.nullWithManualSelection']
+            }
+
         })
+
         to(nullable:true, validator: { Date currentTo, CsiDashboardShowAllCommand cmd ->
+
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentTo == null) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.nullWithManualSelection']
-            else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.beforeFromDate']
+
+            if(manualTimeframe && currentTo == null) {
+                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.nullWithManualSelection']
+            }
+            else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) {
+                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.beforeFromDate']
+            }
         })
+
         fromHour(nullable: true, validator: {String currentFromHour, CsiDashboardShowAllCommand cmd ->
+
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentFromHour == null) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
+
+            if(manualTimeframe && currentFromHour == null) {
+                return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
+            }
+
         })
+
         toHour(nullable: true, validator: {String currentToHour, CsiDashboardShowAllCommand cmd ->
+
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
+
             if(manualTimeframe && currentToHour == null) {
                 return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.nullWithManualSelection']
             }
             else if(manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
+
                 DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
                 DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
+
+                if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) {
+                    return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
+                }
+
             }
         })
+
         aggrGroup(nullable:false, inList: [AggregatorType.MEASURED_EVENT, AggregatorType.PAGE, AggregatorType.SHOP, CsiDashboardController.DAILY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_SHOP])
+
         selectedFolder(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
+            if (currentCollection.isEmpty()) {
+                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
+            }
         })
 
-        // selectedPages is only allowed to be empty if aggrGroup is AggregatorType.SHOP
         selectedPages(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty())) ||
-                    ( (AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)) && (!currentCollection.isEmpty())) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
+
+            boolean correctBecauseHourlyEventAndNotEmpty = AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty())
+            boolean correctBecausePageAggregatorAndNotEmpty =
+                    (AggregatorType.PAGE.equals(cmd.aggrGroup) ||
+                    CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)) &&
+                    !currentCollection.isEmpty()
+            boolean correctBecauseShop = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+
+            if ( ! (correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty|| correctBecauseShop) ) {
+                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
+            }
+
         })
-        // selectedMeasuredEventIds is only allowed to be empty if aggrGroup is NOT AggregatorType.MEASURED_EVENT or selectedAllMeasuredEvents evaluates to true
+
         selectedMeasuredEventIds(nullable:false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)) ||
-                    AggregatorType.PAGE.equals(cmd.aggrGroup)  || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
+
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents =
+                    AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) &&
+                    (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
+            boolean correctBecausePageAggregator = AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)
+            boolean correctBecauseShopAggregator = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+
+            if ( ! (correctBecauseHourlyEventAndNotEmptyOrAllEvents || correctBecausePageAggregator || correctBecauseShopAggregator) ) {
+                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
+            }
+
         })
 
-        // selectedBrowsers is only allowed to be empty if aggrGroup is NOT AggregatorType.MEASURED_EVENT or selectedAllBrowsers evaluates to true
         selectedBrowsers(nullable:false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)) ||
-                    AggregatorType.PAGE.equals(cmd.aggrGroup)  || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
+
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers =
+                    AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) &&
+                    (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
+            boolean correctBecausePageAggregator = AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)
+            boolean correctBecauseShopAggregator = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+
+            if ( ! (correctBecauseHourlyEventAndNotEmptyOrAllBrowsers || correctBecausePageAggregator || correctBecauseShopAggregator) ) {
+                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
+            }
+
         })
 
-        // selectedLocations is only allowed to be empty if aggrGroup is NOT AggregatorType.MEASURED_EVENT or selectedAllLocations evaluates to true
         selectedLocations(nullable:false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (!((AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)) ||
-                    AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup) ||
-                    AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup))) return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
+
+            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations =
+                    AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) &&
+                    (!currentCollection.isEmpty() || cmd.selectedAllLocations)
+            boolean correctBecausePageAggregator = AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)
+            boolean correctBecauseShopAggregator = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+
+            if ( ! (correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations || correctBecausePageAggregator || correctBecauseShopAggregator) ) {
+                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
+            }
+
         })
+
         overwriteWarningAboutLongProcessingTime(nullable:true)
+
     }
 
     static transients = ['selectedTimeFrame', 'firstDayWithTime', 'selectedInterval', 'selectedAggregatorType']
@@ -363,14 +446,16 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
         viewModelToCopyTo.put('selectedPages', this.selectedPages)
 
-        viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
+        viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents))
         viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
 
-        viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers as boolean ? 'on' : ''))
+        viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers))
         viewModelToCopyTo.put('selectedBrowsers', this.selectedBrowsers)
 
-        viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
+        viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations))
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
+        viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
+        viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
 
         viewModelToCopyTo.put('from', this.from)
         if(!this.fromHour.is(null)) {
@@ -424,6 +509,11 @@ public class CsiDashboardShowAllCommand {
         if( !this.selectedAllLocations )
         {
             result.locationIds.addAll(this.selectedLocations)
+        }
+        if (this.selectedAllConnectivityProfiles){
+            result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
+        }else if (this.selectedConnectivityProfiles.size() > 0){
+            result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
         }
 
         return result

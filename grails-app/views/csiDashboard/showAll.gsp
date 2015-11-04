@@ -98,7 +98,26 @@
                         </div>
                     </div>
                     <g:render template="/eventResultDashboard/selectMeasurings"
-                            model="['locationsOfBrowsers':locationsOfBrowsers, 'eventsOfPages':eventsOfPages,'folders':folders,'selectedFolder':selectedFolder, 'pages':pages,'selectedPages':selectedPages,'measuredEvents':measuredEvents,'selectedAllMeasuredEvents':selectedAllMeasuredEvents,'selectedMeasuredEvents':selectedMeasuredEvents,'browsers':browsers,'selectedBrowsers':selectedBrowsers,'selectedAllBrowsers':selectedAllBrowsers,'locations':locations,'selectedLocations':selectedLocations,'selectedAllLocations':selectedAllLocations]"/>
+                            model="[
+                                    'locationsOfBrowsers':locationsOfBrowsers,
+                                    'eventsOfPages':eventsOfPages,
+                                    'folders':folders,
+                                    'selectedFolder':selectedFolder,
+                                    'pages':pages,
+                                    'selectedPages':selectedPages,
+                                    'measuredEvents':measuredEvents,
+                                    'selectedAllMeasuredEvents':selectedAllMeasuredEvents,
+                                    'selectedMeasuredEvents':selectedMeasuredEvents,
+                                    'browsers':browsers,
+                                    'selectedBrowsers':selectedBrowsers,
+                                    'selectedAllBrowsers':selectedAllBrowsers,
+                                    'locations':locations,
+                                    'selectedLocations':selectedLocations,
+                                    'selectedAllLocations':selectedAllLocations,
+                                    'connectivityProfiles':connectivityProfiles,
+                                    'selectedConnectivityProfiles':selectedConnectivityProfiles,
+                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles,
+                                    'showConnectivitySettings': false]"/>
 
                     <div style="clear:both;"></div>
                     <p>
@@ -176,7 +195,7 @@
                     <div class="span12 well">
                             <g:render template="/highchart/chart"
                                 model="[
-                                singleYAxis: 'true',
+                                singleYAxis: 'false',
                                 chartData: wptCustomerSatisfactionValues,
                                 chartTitle: defaultChartTitle,
                                 yAxisLabel: g.message(code:'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
@@ -190,7 +209,7 @@
                                 yAxisScalable: 'false',
                                 optimizeForExport: 'false',
                                 openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
-                  annotations: annotations]" />
+                                annotations: annotations]" />
                     </div>
                 </div>
                 <%-- table --%>
@@ -233,7 +252,26 @@
             <asset:javascript src="csidashboard/csiDashboard.js" />
             <asset:javascript src="iteratecChartRickshaw.js"/>
             <asset:script type="text/javascript">
+
+                var pagesToEvents = [];
+                <g:each var="page" in="${pages}">
+                    <g:if test="${eventsOfPages[page.id] != null}">
+                        pagesToEvents[${page.id}]= [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
+                    </g:if>
+                </g:each>
+
+                var browserToLocation = [];
+                <g:each var="browser" in="${browsers}">
+                    <g:if test="${locationsOfBrowsers[browser.id] != null}">
+                        browserToLocation[${browser.id}]=[ <g:each var="location"
+                                                                   in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
+                    </g:if>
+                </g:each>
+
                 $(document).ready(function(){
+
+                    initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
+
                     doOnDomReady(
                             'dd.mm.yyyy',
                             ${weekStart},
@@ -245,6 +283,7 @@
                         $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
                         $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
                     }
+
                 });
             </asset:script>
         </content>

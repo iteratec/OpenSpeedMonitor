@@ -347,13 +347,14 @@ class EventResultDashboardController {
 
         MvQueryParams queryParams = cmd.createMvQueryParams();
 
-        List<OsmChartGraph> graphCollection = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
-                timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, aggregators, queryParams);
-        modelToRender.put("eventResultValues", graphCollection);
+        OsmRickshawChart chart = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
+                timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.selectedInterval, aggregators, queryParams
+        )
+        modelToRender.put("eventResultValues", chart.osmChartGraphs);
 
-        modelToRender.put("labelSummary", eventResultDashboardService.getLabelSummary());
+        modelToRender.put("labelSummary", chart.osmChartGraphsCommonLabel);
 
-        if (isHighchartGraphLimitReached(graphCollection)) {
+        if (isHighchartGraphLimitReached(chart.osmChartGraphs)) {
             modelToRender.put("warnAboutExceededPointsPerGraphLimit", true);
         }
         modelToRender.put("highChartsTurboThreshold", RESULT_DASHBOARD_MAX_POINTS_PER_SERIES);

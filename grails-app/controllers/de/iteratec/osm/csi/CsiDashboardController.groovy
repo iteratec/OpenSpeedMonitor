@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -87,6 +88,7 @@ class CsiDashboardController {
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
     def springSecurityService
+    ConnectivityProfileDaoService connectivityProfileDaoService
     /**
      * The Grails engine to generate links.
      *
@@ -373,7 +375,8 @@ class CsiDashboardController {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
 
-        List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval)
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval)
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
@@ -381,7 +384,7 @@ class CsiDashboardController {
         if( withTargetGraph )
         {
             graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
-                    resetFromDate.minusDays(1), resetToDate.plusDays(1)))
+            resetFromDate.minusDays(1), resetToDate.plusDays(1)))
         }
 
         boolean includeCsTargetGraphs = false
@@ -393,7 +396,7 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -425,8 +428,9 @@ class CsiDashboardController {
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY)
 
-        List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
-                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams)
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
+                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams
+        )
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
@@ -437,10 +441,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDate.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDate.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues', graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues', chart.osmChartGraphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(chart.osmChartGraphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', false)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -501,14 +505,15 @@ class CsiDashboardController {
             boolean withTargetGraph,
             boolean moveGraphsByOneWeek)
     {
-        // TODO Test this: Structure and data...
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
 
-        List<OsmChartGraph> graphs = customerSatisfactionHighChartService.getCalculatedShopMeasuredValuesAsHighChartMap(
-                fixedTimeFrame, interval, measuredValuesQueryParams)
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedShopMeasuredValuesAsHighChartMap(
+                fixedTimeFrame, interval, measuredValuesQueryParams
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
 
         if(moveGraphsByOneWeek==true) {
             moveDataPointsOneWeekForward(graphs)
@@ -524,7 +529,8 @@ class CsiDashboardController {
         if( withTargetGraph )
         {
             graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
-                    resetFromDateWithOffsetChange.minusDays(1), resetToDateWithOffsetChange.plusDays(1)))
+                    resetFromDateWithOffsetChange.minusDays(1), resetToDateWithOffsetChange.plusDays(1))
+            )
         }
 
         boolean includeCsTargetGraphs = true
@@ -533,7 +539,7 @@ class CsiDashboardController {
         modelToRender.put('wptCustomerSatisfactionValues', graphs)
         modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary', customerSatisfactionHighChartService.getLabelSummary());
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -998,6 +1004,9 @@ class CsiDashboardController {
                 sort(false, { Location it -> it.getBrowser().name }).
                 sort(false, { Location it -> it.location })
         result.put('locations', locations)
+
+        // ConnectivityProfiles
+        result['connectivityProfiles'] = connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
 
         // JavaScript-Utility-Stuff:
         result.put("dateFormatString", DATE_FORMAT_STRING_FOR_HIGH_CHART)

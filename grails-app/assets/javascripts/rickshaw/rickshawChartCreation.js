@@ -1617,3 +1617,11 @@ function ChartExporter(args) {
   
   this.initialize(args);
 }
+
+function scrollToChartbox(chartBoxTopOffset) {
+    if($("#chartbox").length > 0){
+        $('html,body').animate({scrollTop: ($("#chartbox").offset().top+chartBoxTopOffset)},{duration: 'fast'});
+    }else{
+        $('html,body').animate({scrollTop: 0},{duration: 'fast'});
+    }
+}

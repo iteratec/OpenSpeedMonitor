@@ -27,6 +27,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -96,7 +97,14 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	CustomerSatisfactionHighChartService serviceUnderTest
 	ServiceMocker mockGenerator
 
-	void setup() {
+    public static final String I18N_LABEL_JOB_GROUP = 'Job Group'
+    public static final String I18N_LABEL_MEASURED_EVENT = 'Measured step'
+    public static final String I18N_LABEL_LOCATION = 'Location'
+    public static final String I18N_LABEL_MEASURAND = 'Measurand'
+    public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
+
+
+    void setup() {
 
 		serviceUnderTest=service
 
@@ -198,13 +206,14 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
         Integer numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation = 32
 
         when:
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
 				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked
         )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
 
-		then:
-		result != null
-        result.size() == numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation
+        then:
+		graphs != null
+        graphs.size() == numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation
 
 	}
 
@@ -222,20 +231,21 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		mockGenerator.mockPageMeasuredValueService(serviceUnderTest, measuredValueForPageWeeklyList)
 
 		when:
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedPageMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedPageMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 new MvQueryParams(),
                 weekly
         )
-        List<OsmChartPoint> pointsGroupPageCombination_11 = findGraphByLabel(result, expectedGraphLabelOfGroupPageCombination_11).getPoints();
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> pointsGroupPageCombination_11 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_11).getPoints();
         List<Long> pointsTimesGroupPageCombination_11 = pointsGroupPageCombination_11*.time
-        List<OsmChartPoint> pointsGroupPageCombination_12 = findGraphByLabel(result, expectedGraphLabelOfGroupPageCombination_12).getPoints();
+        List<OsmChartPoint> pointsGroupPageCombination_12 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_12).getPoints();
         List<Long> pointsTimesGroupPageCombination_12 = pointsGroupPageCombination_12*.time
 
 
 		then:
-        result != null
-        result.size() == numberOfGroupPageCombinations
+        graphs != null
+        graphs.size() == numberOfGroupPageCombinations
 
         pointsGroupPageCombination_11.size() == numberOfValuesInGraphOfGroupPageCombination_11
         pointsTimesGroupPageCombination_11 == pointsTimesGroupPageCombination_11.sort()
@@ -255,17 +265,18 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
 
         when:
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams()
         )
-        List<OsmChartPoint> points = findGraphByLabel(result, expectedLabel).getPoints()
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
         List<Long> pointsTimes = points*.time
 
         then:
-		result != null
-		result.size() == 1
+		graphs != null
+		graphs.size() == 1
 
         points.size() == measuredValueForShopWeeklyList.size()
         points.every{point -> point.measuredValue > 0}
@@ -283,17 +294,18 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyWithNullList)
 
 		when:
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams()
         )
-        List<OsmChartPoint> points = findGraphByLabel(result, expectedLabel).getPoints()
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
         List<Long> pointsTimes = points*.time
 
 		then:
-		result != null
-		result.size() == 1
+		graphs != null
+		graphs.size() == 1
 
         points.size() == measuredValueForShopWeeklyWithNullList.size() - 1
         points.every{point -> point.measuredValue > 0}
@@ -311,17 +323,18 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
 
 		when:
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams()
         )
-        List<OsmChartPoint> points = findGraphByLabel(result, expectedLabel).getPoints()
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
         List<Long> pointsTimes = points*.time
 
 		then:
-        result != null
-        result.size() == 1
+        graphs != null
+        graphs.size() == 1
 
         points.size() == measuredValueListWithValuesLowerThanOne.size()
         points.every{point -> point.measuredValue > 1}
@@ -339,17 +352,18 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
 
 		when:
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams()
         )
-        List<OsmChartPoint> points = findGraphByLabel(result, expectedLabel).getPoints()
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
         List<Long> pointsTimes = points*.time
 
 		then:
-        result != null
-        result.size() == 1
+        graphs != null
+        graphs.size() == 1
 
         points.size() == measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces.size()
         points.every{point ->
@@ -388,14 +402,6 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
         oneMonthAgo.time == new DateTime(toDate, DateTimeZone.forID('MET')).getMillis()
         oneMonthAgoDeviationDueToRounding < tolerableDeviationDueToRounding
 	}
-
-    void "summarize graphs"(){
-        when:
-        boolean functionSummarizeGraphsIsTested = false
-
-        then:
-        functionSummarizeGraphsIsTested == true
-    }
 
 	//creating data common for all tests/////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -682,5 +688,19 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 ['1' : new Browser(id: 1, name: expectedBrowserNames[0]), '2' : new Browser(id: 2, name: expectedBrowserNames[1])],
                 ['1' : new Location(id: 1, location: expectedLocationNames[0]), '2' : new Location(location: expectedLocationNames[1])]
         )
+        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        serviceUnderTest.osmChartProcessingService.i18nService = [
+                msg: {String msgKey, String defaultMessage = null, List objs = null ->
+                    Map i18nKeysToValues = [
+                            'job.jobGroup.label':I18N_LABEL_JOB_GROUP,
+                            'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
+                            'job.location.label':I18N_LABEL_LOCATION,
+                            'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
+                            'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY
+                    ]
+                    return i18nKeysToValues[msgKey]
+                }
+        ] as I18nService
+
     }
 }

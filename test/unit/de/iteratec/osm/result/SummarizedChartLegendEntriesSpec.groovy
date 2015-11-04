@@ -19,6 +19,9 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.OsmChartProcessingService
+import de.iteratec.osm.report.chart.OsmRickshawChart
+import de.iteratec.osm.util.I18nService
 
 import static de.iteratec.osm.util.Constants.*
 
@@ -85,6 +88,12 @@ class SummarizedChartLegendEntriesSpec extends Specification{
     public static final String PROFILE_2_NAME = 'conn-profile 2'
     public static final String PROFILE_3_NAME = 'conn-profile 3'
 
+    public static final String I18N_LABEL_JOB_GROUP = 'Job Group'
+    public static final String I18N_LABEL_MEASURED_EVENT = 'Measured step'
+    public static final String I18N_LABEL_LOCATION = 'Location'
+    public static final String I18N_LABEL_MEASURAND = 'Measurand'
+    public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
+
     void setup() {
         serviceUnderTest = service
         prepareMocksCommonForAllTests()
@@ -107,13 +116,14 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
                 MeasuredValueInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         then:
         resultGraphs.size() == 4
@@ -124,6 +134,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
+        chart.osmChartGraphsCommonLabel == ""
+
     }
     void "aggregation RAW - no summarization necessary because all event results belong to same graph"() {
         setup:
@@ -135,12 +147,13 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
                 MeasuredValueInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         then:
         resultGraphs.size() == 1
@@ -152,6 +165,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                         LOCATION_1_UNIQUE_IDENTIFIER,
                         PROFILE_1_NAME
                 ].join(HIGHCHART_LEGEND_DELIMITTER)
+        chart.osmChartGraphsCommonLabel == ""
+
     }
     void "aggregation RAW - some legend parts in every event result the same, some different"() {
         setup:
@@ -163,12 +178,17 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
                 MeasuredValueInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
+        String expectedCommonLabel = "<b>${I18N_LABEL_MEASURAND}</b>: ${AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME} | " +
+                "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_1_NAME} | " +
+                "<b>${I18N_LABEL_LOCATION}</b>: ${LOCATION_1_UNIQUE_IDENTIFIER} | " +
+                "<b>${I18N_LABEL_CONNECTIVITY}</b>: ${PROFILE_1_NAME}"
 
         then:
         resultGraphs.size() == 2
@@ -177,6 +197,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
     void "aggregation RAW - single legend parts in some but not all event results the same"() {
         setup:
@@ -190,15 +211,16 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
                 MeasuredValueInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                 AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 8
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
@@ -211,6 +233,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_3_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_4_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, PROFILE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
 
     // HOURLY ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,7 +248,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.HOURLY,
@@ -233,8 +256,9 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
         TestDataUtil.createHoursOfDay()
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
@@ -243,6 +267,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
     void "aggregation HOURLY - no summarization necessary because all event results belong to same graph"() {
         setup:
@@ -254,40 +279,48 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 1
         resultGraphs[0].label ==
-                [
-                        AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
-                        JOB_GROUP_1_NAME,
-                        EVENT_1_NAME,
-                        LOCATION_1_UNIQUE_IDENTIFIER,
-                        PROFILE_1_NAME
-                ].join(HIGHCHART_LEGEND_DELIMITTER)
+            [
+                    AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+                    JOB_GROUP_1_NAME,
+                    EVENT_1_NAME,
+                    LOCATION_1_UNIQUE_IDENTIFIER,
+                    PROFILE_1_NAME
+            ].join(HIGHCHART_LEGEND_DELIMITTER
+        )
+        chart.osmChartGraphsCommonLabel == ''
     }
     void "aggregation HOURLY - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME),
+                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME)
                 ]
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
+        String expectedCommonLabel = "<b>${I18N_LABEL_MEASURAND}</b>: ${AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME} | " +
+                "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_1_NAME} | " +
+                "<b>${I18N_LABEL_LOCATION}</b>: ${LOCATION_1_UNIQUE_IDENTIFIER} | " +
+                "<b>${I18N_LABEL_CONNECTIVITY}</b>: ${PROFILE_2_NAME}"
 
         then:
         resultGraphs.size() == 2
@@ -296,6 +329,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
     void "aggregation HOURLY - single legend parts in some but not all event results the same"() {
         setup:
@@ -309,15 +343,16 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 8
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
@@ -330,6 +365,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_3_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_4_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, PROFILE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
 
     // DAILY ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,7 +380,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.DAILY,
@@ -352,8 +388,9 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
         TestDataUtil.createHoursOfDay()
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
@@ -362,6 +399,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
     void "aggregation DAILY - no summarization necessary because all event results belong to same graph"() {
         setup:
@@ -373,40 +411,49 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 1
         resultGraphs[0].label ==
-                [
-                        AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
-                        JOB_GROUP_1_NAME,
-                        EVENT_1_NAME,
-                        LOCATION_1_UNIQUE_IDENTIFIER,
-                        PROFILE_2_NAME
-                ].join(HIGHCHART_LEGEND_DELIMITTER)
+            [
+                    AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+                    JOB_GROUP_1_NAME,
+                    EVENT_1_NAME,
+                    LOCATION_1_UNIQUE_IDENTIFIER,
+                    PROFILE_2_NAME
+            ].join(HIGHCHART_LEGEND_DELIMITTER
+        )
+        chart.osmChartGraphsCommonLabel == ''
     }
     void "aggregation DAILY - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult("1;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
+                        createEventResult("2;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
                 ]
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
-                QUERY_PARAMS);
+                QUERY_PARAMS
+        );
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
+        String expectedCommonLabel = "<b>${I18N_LABEL_MEASURAND}</b>: ${AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME} | " +
+                "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_2_NAME} | " +
+                "<b>${I18N_LABEL_LOCATION}</b>: ${LOCATION_1_UNIQUE_IDENTIFIER} | " +
+                "<b>${I18N_LABEL_CONNECTIVITY}</b>: ${PROFILE_1_NAME}"
 
         then:
         resultGraphs.size() == 2
@@ -415,6 +462,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
     void "aggregation DAILY - single legend parts in some but not all event results the same"() {
         setup:
@@ -428,13 +476,15 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
-                QUERY_PARAMS);
+                QUERY_PARAMS
+        );
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         then:
         resultGraphs.size() == 8
@@ -449,6 +499,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_3_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_4_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, PROFILE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
 
     // WEEKLY ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -463,7 +514,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.WEEKLY,
@@ -471,8 +522,9 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
         TestDataUtil.createHoursOfDay()
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then:
+                then:
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
@@ -481,6 +533,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_2_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
     void "aggregation WEEKLY - no summarization necessary because all event results belong to same graph"() {
         setup:
@@ -492,12 +545,14 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
-                QUERY_PARAMS);
+                QUERY_PARAMS
+        )
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         then:
         resultGraphs.size() == 1
@@ -509,23 +564,30 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                         LOCATION_1_UNIQUE_IDENTIFIER,
                         PROFILE_1_NAME
                 ].join(HIGHCHART_LEGEND_DELIMITTER)
+        chart.osmChartGraphsCommonLabel == ''
     }
     void "aggregation WEEKLY - some legend parts in every event result the same, some different"() {
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_1_NAME),
+                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_1_NAME)
                 ]
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
-                QUERY_PARAMS);
+                QUERY_PARAMS
+        )
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
+        String expectedCommonLabel = "<b>${I18N_LABEL_MEASURAND}</b>: ${AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME} | " +
+                "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_1_NAME} | " +
+                "<b>${I18N_LABEL_LOCATION}</b>: ${LOCATION_2_UNIQUE_IDENTIFIER} | " +
+                "<b>${I18N_LABEL_CONNECTIVITY}</b>: ${PROFILE_1_NAME}"
 
         then:
         resultGraphs.size() == 2
@@ -534,6 +596,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [JOB_GROUP_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [JOB_GROUP_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
     void "aggregation WEEKLY - single legend parts in some but not all event results the same"() {
         setup:
@@ -547,13 +610,15 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         )
 
         when:
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
                 MeasuredValueInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
-                QUERY_PARAMS);
+                QUERY_PARAMS
+        )
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         then:
         resultGraphs.size() == 8
@@ -568,6 +633,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_3_NAME, EVENT_2_NAME, LOCATION_2_UNIQUE_IDENTIFIER, PROFILE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
                 [AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, JOB_GROUP_4_NAME, EVENT_3_NAME, LOCATION_3_UNIQUE_IDENTIFIER, PROFILE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER),
         ])
+        chart.osmChartGraphsCommonLabel == ''
     }
 
     EventResult createEventResult(String tag, String connectivityProfileName){
@@ -595,6 +661,19 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         serviceUnderTest.measuredValueTagService = new MeasuredValueTagService()
         serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService()
         serviceUnderTest.aggregatorTypeDaoService = new DefaultAggregatorTypeDaoService()
+        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        serviceUnderTest.osmChartProcessingService.i18nService = [
+                msg: {String msgKey, String defaultMessage = null, List objs = null ->
+                    Map i18nKeysToValues = [
+                            'job.jobGroup.label':I18N_LABEL_JOB_GROUP,
+                            'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
+                            'job.location.label':I18N_LABEL_LOCATION,
+                            'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
+                            'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY
+                    ]
+                    return i18nKeysToValues[msgKey]
+                }
+        ] as I18nService
     }
 
     void createTestDataCommonForAllTests() {

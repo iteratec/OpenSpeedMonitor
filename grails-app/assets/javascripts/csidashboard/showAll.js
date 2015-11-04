@@ -50,32 +50,31 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 		$("#csi-table").fadeIn();
 	});
 	
-	// Scroll to Chartbox
 	if($("#chartbox").length > 0){
-		$('html,body').animate({scrollTop: ($("#chartbox").offset().top-390)},'slow');
-	}	
+        createGraph();
+	}
+
+    scrollToChartbox(390);
 }
 /**
  * show or hide filter-elements, depending on aggregator type
  */
 var setFilterElementsVisibility = function() {
 	if ($(this).val() == 'measuredEvent') {
-		$("#browser-filter").fadeIn();
-			$("#advanced-filter-buttons").fadeIn();
-			
-		if($("#advanced-job-filter").hasClass('active')) {
-			$("#advanced-filter-row").fadeIn();
-		}
+        $("#filter-browser-and-location").fadeIn();
+        $("#filter-navtab-browser-and-location").fadeIn();
+        $("#filter-measured-event").fadeIn();
 	}
 	else {
-		$("#browser-filter").fadeOut();
-		$("#advanced-filter-row").fadeOut();
-		$("#advanced-filter-buttons").fadeOut();
+        $("#filter-browser-and-location").fadeOut();
+        $("#filter-navtab-browser-and-location").fadeOut();
+        $("#filter-measured-event").fadeOut();
+        $('#filter-navtab-page a').click();
 	}
-	if (($(this).val() != 'shop') && ($(this).val() != 'daily_shop')) {
-		$("#page-filter").fadeIn();
-	} else {
-		$("#page-filter").fadeOut();
-		$("#advanced-filter-row").fadeOut();
-	}
+
+    if (($(this).val() == 'shop') || ($(this).val() == 'daily_shop')) {
+        $("#filter-complete-tabbable").fadeOut();
+    } else {
+        $("#filter-complete-tabbable").fadeIn();
+    }
 }

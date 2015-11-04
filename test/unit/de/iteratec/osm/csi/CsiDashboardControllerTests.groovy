@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
@@ -36,6 +37,7 @@ import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
+import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -57,6 +59,7 @@ import static org.mockito.Mockito.when
  * @since IT-74
  */
 @TestFor(CsiDashboardController)
+@Mock([ConnectivityProfile])
 class CsiDashboardControllerTests {
 
 	CsiDashboardController controllerUnderTest
@@ -160,8 +163,11 @@ class CsiDashboardControllerTests {
 				params.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		params.selectedFolder = '1'
 		params.selectedPages = ['1', '5']
+        params.selectedAllMeasuredEvents = false
 		params.selectedMeasuredEventIds = ['7', '8', '9']
+        params.selectedAllBrowsers = false
 		params.selectedBrowsers = '2'
+        params.selectedAllLocations = false
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
 		params.selectedTimeFrameInterval = 0
@@ -323,11 +329,14 @@ class CsiDashboardControllerTests {
 		Date expectedDateForTo = new Date(1376776800000L)
 
 		params.toHour = '18:00'
-				params.aggrGroup = AggregatorType.PAGE.toString()
+        params.aggrGroup = AggregatorType.PAGE.toString()
 		params.selectedFolder = '1'
 		params.selectedPages = ['1', '5']
+        params.selectedAllMeasuredEvents = false
 		params.selectedMeasuredEventIds = ['7', '8', '9']
+        params.selectedAllBrowsers = false
 		params.selectedBrowsers = '2'
+        params.selectedAllLocations = false
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
 		params.selectedTimeFrameInterval = 0
@@ -410,8 +419,11 @@ class CsiDashboardControllerTests {
 				params.aggrGroup = DAILY_PAGE_AGGREGATOR
 		params.selectedFolder = '1'
 		params.selectedPages = ['1', '5']
+        params.selectedAllMeasuredEvents = false
 		params.selectedMeasuredEventIds = ['7', '8', '9']
+        params.selectedAllBrowsers = false
 		params.selectedBrowsers = '2'
+        params.selectedAllLocations = false
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
 		params.selectedTimeFrameInterval = 0
@@ -493,8 +505,11 @@ class CsiDashboardControllerTests {
 				params.aggrGroup = DAILY_SHOP_AGGREGATOR
 		params.selectedFolder = '1'
 		params.selectedPages = []
+        params.selectedAllMeasuredEvents = true
 		params.selectedMeasuredEventIds = []
+        params.selectedAllBrowsers = true
 		params.selectedBrowsers = []
+        params.selectedAllLocations = true
 		params.selectedLocations = []
 		params._action_showAll = 'Anzeigen'
 		params.selectedTimeFrameInterval = 0
@@ -520,13 +535,13 @@ class CsiDashboardControllerTests {
 
 		assertEquals(0, command.selectedPages.size())
 
-		assertFalse(command.selectedAllMeasuredEvents as boolean)
+		assertTrue(command.selectedAllMeasuredEvents as boolean)
 		assertEquals(0, command.selectedMeasuredEventIds.size())
 
-		assertFalse(command.selectedAllBrowsers as boolean)
+		assertTrue(command.selectedAllBrowsers as boolean)
 		assertEquals(0, command.selectedBrowsers.size())
 
-		assertFalse(command.selectedAllLocations as boolean)
+		assertTrue(command.selectedAllLocations as boolean)
 		assertEquals(0, command.selectedLocations.size())
 
 		// Could we assume the time frame at once?
@@ -706,7 +721,9 @@ class CsiDashboardControllerTests {
 				params.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		params.selectedFolder = '1'
 		params.selectedPages = ['1', '5']
+        params.selectedAllMeasuredEvents = false
 		params.selectedMeasuredEventIds = []
+        params.selectedAllBrowsers = false
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
@@ -727,13 +744,14 @@ class CsiDashboardControllerTests {
 		// Fill-in request args:
 		params.from = '18.08.2013'
 		params.fromHour = '16:00'
-				params.to = '18.08.2013'
+        params.to = '18.08.2013'
 		params.toHour = '18:00'
-				params.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
+        params.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		params.selectedFolder = '1'
 		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = []
+        params.selectedAllBrowsers = false
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
 
@@ -760,6 +778,7 @@ class CsiDashboardControllerTests {
 		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '1'
+        params.selectedAllLocations = false
 		params.selectedLocations = []
 		params._action_showAll = 'Anzeigen'
 
@@ -825,7 +844,7 @@ class CsiDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(12, result.size());
+		assertEquals(13, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))
@@ -976,7 +995,7 @@ class CsiDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(12, result.size());
+		assertEquals(13, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))
@@ -1085,8 +1104,11 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
+        command.selectedAllMeasuredEvents = false
 		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedAllBrowsers = false
 		command.selectedBrowsers = [2L]
+        command.selectedAllLocations = false
 		command.selectedLocations = [17L]
 		command.debug = true
 		command.selectedTimeFrameInterval = 0
@@ -1101,15 +1123,15 @@ class CsiDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(18, dataUnderTest.size());
+		assertEquals(20, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedDate);
@@ -1142,8 +1164,11 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = null // Missing! -> Default should be set
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
+        command.selectedAllMeasuredEvents = false
 		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedAllBrowsers = false
 		command.selectedBrowsers = [2L]
+        command.selectedAllLocations = false
 		command.selectedLocations = [17L]
 		command.debug = false
 		command.selectedTimeFrameInterval = 0
@@ -1155,15 +1180,15 @@ class CsiDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(18, dataUnderTest.size());
+		assertEquals(20, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', [7L, 8L, 9L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedDate);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
@@ -1194,9 +1219,11 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
-		command.selectedAllMeasuredEvents = 'on'
+		command.selectedAllMeasuredEvents = true
 		command.selectedMeasuredEventIds = []
+        command.selectedAllBrowsers = false
 		command.selectedBrowsers = [2L]
+        command.selectedAllLocations = false
 		command.selectedLocations = [17L]
 		command.debug = false
 		command.selectedTimeFrameInterval = 0
@@ -1211,15 +1238,15 @@ class CsiDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(18, dataUnderTest.size());
+		assertEquals(20, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', 'on');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllMeasuredEvents', true);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedMeasuredEventIds', []);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllBrowsers', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', '');
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
@@ -1251,8 +1278,11 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
+        command.selectedAllMeasuredEvents = false
 		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedAllBrowsers = false
 		command.selectedBrowsers = [2L]
+        command.selectedAllLocations = false
 		command.selectedLocations = [17L]
 
 		// Do we fill all fields?
@@ -1286,9 +1316,11 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
-		command.selectedAllMeasuredEvents = 'on';
+		command.selectedAllMeasuredEvents = true
 		command.selectedMeasuredEventIds = [7L, 8L, 9L]
-		command.selectedBrowsers = [2L]
+        command.selectedAllBrowsers = false
+        command.selectedBrowsers = [2L]
+        command.selectedAllLocations = false
 		command.selectedLocations = [17L]
 
 		// Do we fill all fields?
@@ -1323,9 +1355,11 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
+        command.selectedAllMeasuredEvents = false
 		command.selectedMeasuredEventIds = [7L, 8L, 9L]
 		command.selectedAllBrowsers = true;
 		command.selectedBrowsers = [2L]
+        command.selectedAllLocations = false
 		command.selectedLocations = [17L]
 
 		// Do we fill all fields?
@@ -1360,7 +1394,9 @@ class CsiDashboardControllerTests {
 		command.aggrGroup = AggregatorType.MEASURED_EVENT.toString()
 		command.selectedFolder = [1L]
 		command.selectedPages = [1L, 5L]
+        command.selectedAllMeasuredEvents = false
 		command.selectedMeasuredEventIds = [7L, 8L, 9L]
+        command.selectedAllBrowsers = false
 		command.selectedBrowsers = [2L]
 		command.selectedAllLocations = true;
 		command.selectedLocations = [17L]

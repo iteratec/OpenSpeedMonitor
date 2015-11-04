@@ -143,7 +143,10 @@
                                                     'selectedAllLocations':selectedAllLocations,
                                                     'connectivityProfiles':connectivityProfiles,
                                                     'selectedConnectivityProfiles':selectedConnectivityProfiles,
-                                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles]}"/>
+                                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles,
+                                                    'showConnectivitySettings': true,
+                                                    'showExtendedConnectivitySettings': true]}"
+                                />
 							</div>
 						</div>
 					</div>
