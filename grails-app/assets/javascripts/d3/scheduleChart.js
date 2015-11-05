@@ -378,12 +378,12 @@ function getJobNames(location) {
  * @return {Array} the trimmed job Names
  */
 function trimJobNames(jobNames) {
-    if(jobNames.length <= 1) {
-        return jobNames;
-    }
     var result = [];
     for (var j = 0; j < jobNames.length; j++) {
         result.push(jobNames[j].name.slice(0))
+    }
+    if(jobNames.length <= 1) {
+        return result;
     }
     var change = true;
     while (change) {
