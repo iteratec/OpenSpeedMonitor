@@ -100,7 +100,9 @@
                                 'selectedAllLocations':selectedAllLocations,
                                 'connectivityProfiles':connectivityProfiles,
                                 'selectedConnectivityProfiles':selectedConnectivityProfiles,
-                                'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles]}"/>
+                                'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles,
+                                'showConnectivitySettings': true,
+                                'showExtendedConnectivitySettings': true]}"/>
             </g:else>
             <p>
                 <g:actionSubmit
