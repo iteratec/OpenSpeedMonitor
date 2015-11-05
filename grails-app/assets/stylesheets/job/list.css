@@ -71,6 +71,6 @@ display: block;
 	font-weight: normal;
 }
 .running {
-    background: center left no-repeat url('spinner.gif');
+    background: center left no-repeat url(../../images/loading_indicator.gif);
     padding-left: 20px;
 }
