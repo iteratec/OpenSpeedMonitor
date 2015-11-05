@@ -91,43 +91,47 @@
 </head>
 
 <body>
-<%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
+    <%-- main menu --%>
+    <g:render template="/layouts/mainMenu"/>
 
-%{--<g:each in="${chartList}" var="notUsed" status="i">--}%
-<g:each in="${chartMap}" var="server" status="i">
-    <h3>${server.key}</h3>
-    <g:each in="${server.value}" var="location" status="j">
-        <h4>${location.name} (${location.agentCount} agents)</h4>
-        <g:if test="${location.jobs.size() > 0}">
-            <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
-        </g:if>
-        <g:else>
-            <g:message code="de.iteratec.osm.d3Data.multiLineChart.noJobsInInterval" default="Gewichtungen CSI"/>
-        </g:else>
-        <br />
+    %{--<g:each in="${chartList}" var="notUsed" status="i">--}%
+    <g:each in="${chartMap}" var="server" status="i">
+        <h3>
+            <span class="muted"><g:message code="de.iteratec.osm.webpagetest.server.label" default="WPT Server"/>:</span> ${server.key}
+        </h3>
         <hr />
+        <g:each in="${server.value}" var="location" status="j">
+            <h4>
+                <span class="muted"><g:message code="de.iteratec.isocsi.csi.labels.filterLocations" default="Location:"/></span> ${location.name} (${location.agentCount} agents)
+            </h4>
+            <g:if test="${location.jobs.size() > 0}">
+                <iteratec:scheduleChart chartIdentifier="${i}${j}"/>
+            </g:if>
+            <g:else>
+                <g:message code="de.iteratec.osm.d3Data.multiLineChart.noJobsInInterval" default="no jobs within the next 24 hours"/>
+            </g:else>
+            <br/>
+            <br/>
+        </g:each>
+        <br/>
         <br/>
     </g:each>
-    <br/>
-    <br/>
-</g:each>
 
-</content tag="include.bottom">
-<asset:javascript src="d3/scheduleChart.js"/>
-<asset:javascript src="timeago/jquery.timeago.js"/>
-<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-    <asset:javascript src="timeago/timeagoDe.js"/>
-</g:if>
-<asset:script type="text/javascript">
-    <g:each in="${chartMap}" var="server" status="i">
-        <g:each in="${server.value}" var="location" status="j">
-            <g:if test="${location.jobs.size() > 0}">
-                createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}", "${"ScheduleChartForm" + i + j}")
-            </g:if>
-        </g:each>
-    </g:each>
-</asset:script>
-</content>
+    <content tag="include.bottom">
+        <asset:javascript src="d3/scheduleChart.js"/>
+        <asset:javascript src="timeago/jquery.timeago.js"/>
+        <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
+            <asset:javascript src="timeago/timeagoDe.js"/>
+        </g:if>
+        <asset:script type="text/javascript">
+            <g:each in="${chartMap}" var="server" status="i">
+                <g:each in="${server.value}" var="location" status="j">
+                    <g:if test="${location.jobs.size() > 0}">
+                        createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}", "${"ScheduleChartForm" + i + j}")
+                    </g:if>
+                </g:each>
+            </g:each>
+        </asset:script>
+    </content>
 </body>
 </html>
