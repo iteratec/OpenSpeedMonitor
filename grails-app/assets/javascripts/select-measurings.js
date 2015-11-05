@@ -57,6 +57,7 @@ function sortAlpha(a,b){
 };  
 
 var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
+
 		$(checkBox).on('change', function(event) {
 			if(event.currentTarget.checked == true) {
 				$(selectBox).css({ opacity: 0.5 });
@@ -73,12 +74,6 @@ var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
 			$(selectBox).trigger("chosen:updated");
 		});
 		
-		if($(selectBox + " option:selected").val() == null) {
-			$(checkBox).prop('checked', true);
-			$(selectBox).css({ opacity: 0.5 });
-			$(selectBox).trigger("chosen:updated");
-		}
-
 }
 
 /*
