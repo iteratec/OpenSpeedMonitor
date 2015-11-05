@@ -58,89 +58,89 @@ GSP-Template Mappings:
             </ul>
 
             <div class="tab-content">
-                    <div class="tab-pane active" id="tab1">
+                <div class="tab-pane active" id="tab1">
+                    <div class="span6">
+                        <label for="pageSelectHtmlId">
+                            <strong>
+                                <g:message code="de.iteratec.isr.wptrd.labels.filterPage" default="Pages:"/>
+                            </strong>
+                        </label>
+                        <g:select id="pageSelectHtmlId" class="iteratec-element-select" name="selectedPages"
+                                  from="${pages}" optionKey="id" optionValue="name" multiple="true"
+                                  value="${selectedPages}"/>
+                    </div>
+                    <div id="filter-measured-event" class="span6">
+                        <label for="selectedMeasuredEventsHtmlId">
+                            <strong>
+                                <g:message code="de.iteratec.isr.wptrd.labels.filterMeasuredEvent"
+                                           default="Measured Event:"/>
+                            </strong>
+                        </label>
+                        <g:select id="selectedMeasuredEventsHtmlId"
+                                  class="iteratec-element-select chosen"
+                                  data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
+                                  name="selectedMeasuredEventIds"
+                                  from="${measuredEvents}"
+                                  optionKey="id"
+                                  optionValue="name"
+                                  value="${selectedMeasuredEventIds}"
+                                  multiple="true"/>
+                        <label class="checkbox inline">
+                            <g:checkBox name="selectedAllMeasuredEvents"
+                                        checked="${selectedAllMeasuredEvents}" value="${true}"/>
+                            <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllMeasuredEvents.label"
+                                       default="Select all measured steps"/>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab2">
+                    <div id="filter-browser-and-location">
                         <div class="span6">
-                            <label for="pageSelectHtmlId">
+                            <label for="selectedBrowsersHtmlId">
                                 <strong>
-                                    <g:message code="de.iteratec.isr.wptrd.labels.filterPage" default="Pages:"/>
+                                    <g:message code="de.iteratec.isr.wptrd.labels.filterBrowser"
+                                               default="Browser:"/>
                                 </strong>
                             </label>
-                            <g:select id="pageSelectHtmlId" class="iteratec-element-select" name="selectedPages"
-                                      from="${pages}" optionKey="id" optionValue="name" multiple="true"
-                                      value="${selectedPages}"/>
-                        </div>
-                        <div id="filter-measured-event" class="span6">
-                            <label for="selectedMeasuredEventsHtmlId">
-                                <strong>
-                                    <g:message code="de.iteratec.isr.wptrd.labels.filterMeasuredEvent"
-                                               default="Measured Event:"/>
-                                </strong>
-                            </label>
-                            <g:select id="selectedMeasuredEventsHtmlId"
-                                      class="iteratec-element-select chosen"
-                                      data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
-                                      name="selectedMeasuredEventIds"
-                                      from="${measuredEvents}"
-                                      optionKey="id"
-                                      optionValue="name"
-                                      value="${selectedMeasuredEventIds}"
-                                      multiple="true"/>
+                            <g:select id="selectedBrowsersHtmlId"
+                                      class="iteratec-element-select"
+                                      name="selectedBrowsers" from="${browsers}" optionKey="id"
+                                      optionValue="${{ it.name + ' (' + it.name + ')' }}" multiple="true"
+                                      value="${selectedBrowsers}"/>
                             <label class="checkbox inline">
-                                <g:checkBox name="selectedAllMeasuredEvents"
-                                            checked="${selectedAllMeasuredEvents}" value="${true}"/>
-                                <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllMeasuredEvents.label"
-                                           default="Select all measured steps"/>
+                                <g:checkBox name="selectedAllBrowsers"
+                                            checked="${selectedAllBrowsers}" value="${true}"/>
+                                <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllBrowsers.label"
+                                           default="Select all Browsers"/>
+                            </label>
+                        </div>
+
+                        <div class="span6">
+                            <br>
+                            <label for="selectedLocationsHtmlId">
+                                <strong>
+                                    <g:message code="de.iteratec.isr.wptrd.labels.filterLocation"
+                                               default="Location:"/>
+                                </strong>
+                            </label>
+                            <g:select id="selectedLocationsHtmlId"
+                                      class="iteratec-element-select chosen" style="height: 150px; width:90%"
+                                      data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Bitte ausw&auml;hlen')}"
+                                      name="selectedLocations" from="${locations}" optionKey="id"
+                                      optionValue="${it}"
+                                      multiple="true" value="${selectedLocations}"/>
+                            <br>
+                            <label class="checkbox inline">
+                                <g:checkBox name="selectedAllLocations"
+                                            checked="${selectedAllLocations}" value="${true}"/>
+                                <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllLocations.label"
+                                           default="Select all locations"/>
                             </label>
                         </div>
                     </div>
-
-                    <div class="tab-pane" id="tab2">
-                        <div id="filter-browser-and-location">
-                            <div class="span6">
-                                <label for="selectedBrowsersHtmlId">
-                                    <strong>
-                                        <g:message code="de.iteratec.isr.wptrd.labels.filterBrowser"
-                                                   default="Browser:"/>
-                                    </strong>
-                                </label>
-                                <g:select id="selectedBrowsersHtmlId"
-                                          class="iteratec-element-select"
-                                          name="selectedBrowsers" from="${browsers}" optionKey="id"
-                                          optionValue="${{ it.name + ' (' + it.name + ')' }}" multiple="true"
-                                          value="${selectedBrowsers}"/>
-                                <label class="checkbox inline">
-                                    <g:checkBox name="selectedAllBrowsers"
-                                                checked="${selectedAllBrowsers}" value="${true}"/>
-                                    <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllBrowsers.label"
-                                               default="Select all Browsers"/>
-                                </label>
-                            </div>
-
-                            <div class="span6">
-                                <br>
-                                <label for="selectedLocationsHtmlId">
-                                    <strong>
-                                        <g:message code="de.iteratec.isr.wptrd.labels.filterLocation"
-                                                   default="Location:"/>
-                                    </strong>
-                                </label>
-                                <g:select id="selectedLocationsHtmlId"
-                                          class="iteratec-element-select chosen" style="height: 150px; width:90%"
-                                          data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Bitte ausw&auml;hlen')}"
-                                          name="selectedLocations" from="${locations}" optionKey="id"
-                                          optionValue="${it}"
-                                          multiple="true" value="${selectedLocations}"/>
-                                <br>
-                                <label class="checkbox inline">
-                                    <g:checkBox name="selectedAllLocations"
-                                                checked="${selectedAllLocations}" value="${true}"/>
-                                    <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllLocations.label"
-                                               default="Select all locations"/>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <g:if test="${showConnectivitySettings}">
+                </div>
+                <g:if test="${showConnectivitySettings}">
                         <div class="tab-pane" id="tab3">
                             <div class="span6">
                                 <label for="selectedConnectivityProfilesHtmlId">
@@ -189,7 +189,6 @@ GSP-Template Mappings:
                             </div>
                         </div>
                     </g:if>
-                </div>
             </div>
         </div>
 
