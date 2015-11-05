@@ -18,21 +18,16 @@
 package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.dao.CriteriaAggregator
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
-import de.iteratec.osm.dao.CriteriaSorting
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.persistence.OsmDataSourceService
+import de.iteratec.osm.result.*
+import de.iteratec.osm.result.detail.WebPerformanceWaterfall
+import org.hibernate.criterion.CriteriaSpecification
 
 import java.util.regex.Pattern
-
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.ErQueryParams
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResultDaoService
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.persistence.OsmDataSourceService;
 
 /**
  * Contains only methods that query {@link EventResult}s from database. Doesn't contain any dependencies to other domains or
@@ -225,6 +220,24 @@ public class EventResultDaoService {
             Map listCriteriaRestrictionMap
     ) {
 
+        CriteriaAggregator eventResultQueryAggregator = getAggregatedCriteriasFor(
+                rlikePattern, fromDate, toDate, cachedViews, gtConstraints, ltConstraints, queryParams, sorting
+        )
+
+        return eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap);
+
+    }
+
+    private CriteriaAggregator getAggregatedCriteriasFor(
+            Pattern rlikePattern,
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            ErQueryParams queryParams,
+            CriteriaSorting sorting) {
+
         CriteriaAggregator eventResultQueryAggregator = new CriteriaAggregator(EventResult.class)
 
         eventResultQueryAggregator.addCriteria {
@@ -252,9 +265,7 @@ public class EventResultDaoService {
                 order(sorting.sortAttribute, sorting.sortOrder.getHibernateCriteriaRepresentation())
             }
         }
-
-        return eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap);
-
+        return eventResultQueryAggregator
     }
 
     private void addConnectivityRelatedCriteria(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator) {
@@ -282,7 +293,7 @@ public class EventResultDaoService {
         } else if (queryParams.includeNativeConnectivity == false) {
             eventResultQueryAggregator.addCriteria {
                 or {
-                    connectivityProfile {
+                    connectivityProfile(CriteriaSpecification.LEFT_JOIN) {
                         'in'('id', predefinedProfiles*.ident())
                     }
                     rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
@@ -291,7 +302,7 @@ public class EventResultDaoService {
         } else if (queryParams.customConnectivityNameRegex == null) {
             eventResultQueryAggregator.addCriteria {
                 or {
-                    connectivityProfile {
+                    connectivityProfile (CriteriaSpecification.LEFT_JOIN){
                         'in'('id', predefinedProfiles*.ident())
                     }
                     eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
@@ -301,7 +312,7 @@ public class EventResultDaoService {
         } else {
             eventResultQueryAggregator.addCriteria {
                 or {
-                    connectivityProfile {
+                    connectivityProfile (CriteriaSpecification.LEFT_JOIN){
                         'in'('id', predefinedProfiles*.ident())
                     }
                     rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
