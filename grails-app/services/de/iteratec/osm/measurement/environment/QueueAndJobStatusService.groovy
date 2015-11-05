@@ -229,16 +229,18 @@ class QueueAndJobStatusService {
                 // iterate over jobs
                 List<Job> jobs = Job.findAllByLocation(loc)
                 jobs.each { job ->
-                    ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);
-                    int seconds = parser.calculateDurationInSeconds()
+                    if (job.active) {
+                        ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);
+                        int seconds = parser.calculateDurationInSeconds()
 
-                    // Add jobs which are going to run in given interval to the list
-                    // otherwise the job is added to the list of discounted jobs
-                    ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + loc.browser.name + ")", durationInSeconds: seconds)
-                    if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
-                        locationChartData.addJob(scheduleChartJob)
-                    } else {
-                        locationChartData.addDiscountedJob(job.label)
+                        // Add jobs which are going to run in given interval to the list
+                        // otherwise the job is added to the list of discounted jobs
+                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + loc.browser.name + ")", durationInSeconds: seconds)
+                        if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
+                            locationChartData.addJob(scheduleChartJob)
+                        } else {
+                            locationChartData.addDiscountedJob(job.label)
+                        }
                     }
                 }
 
@@ -248,7 +250,7 @@ class QueueAndJobStatusService {
             // Trim location names
             List<String> names = serverChartData*.name
             trimNames(names);
-            for(int i = 0; i < serverChartData.size(); ++i) {
+            for (int i = 0; i < serverChartData.size(); ++i) {
                 serverChartData[i].name = names[i]
             }
 
@@ -262,7 +264,7 @@ class QueueAndJobStatusService {
     /**
      * Gets all locations and the count of testers for it from 'getTesters.php'
      * @param wptServer the server
-     * @return map, mapping a location to its tester count
+     * @return map , mapping a location to its tester count
      */
     private Map<Location, Integer> getActiveLocationsAndTesterCount(WebPageTestServer wptServer) {
         Map<Location, Integer> result = new HashMap<>();
@@ -290,7 +292,7 @@ class QueueAndJobStatusService {
     /**
      * Checks if at least one tester has 'last check' under a threshold
      * @param locationTagInXML
-     * @return true, if at least one tester has 'last check' under threshold
+     * @return true , if at least one tester has 'last check' under threshold
      */
     private boolean minOneTesterHasLastCheckUnderThreshold(def locationTagInXML) {
         boolean result = false
@@ -309,15 +311,15 @@ class QueueAndJobStatusService {
      * @param names a list of String to be trimmed
      */
     private void trimNames(List<String> names) {
-        if(names.size() <= 1)
+        if (names.size() <= 1)
             return
 
         boolean change = true
 
-        while(change) {
+        while (change) {
             char letter = names[0].charAt(0)
-            if(names.every{it.charAt(0) == letter}) {
-                for(int i = 0; i < names.size(); ++i) {
+            if (names.every { it.charAt(0) == letter }) {
+                for (int i = 0; i < names.size(); ++i) {
                     names[i] = names[i].substring(1)
                 }
             } else {
