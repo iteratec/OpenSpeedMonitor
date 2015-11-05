@@ -160,6 +160,9 @@ function createMultiLineGraph(data, chartDivIdentifier) {
 
     // --- Things for making tooltip and mouse event ---
     // append the rectangle to capture mouse
+    bisectXIndex = d3.bisector(function(d) { return d; }).left;
+    var focus = svg.append("g")
+        .style("display", "none");
     svg.append("rect")
         .attr("width", width)
         .attr("height", height)
@@ -168,9 +171,6 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .on("mouseover", function() { focus.style("display", null); })
         .on("mouseout", function() { focus.style("display", "none"); })
         .on("mousemove", mousemove);
-    bisectXIndex = d3.bisector(function(d) { return d; }).left;
-    var focus = svg.append("g")
-        .style("display", "none");
     // append the circle at the intersection
     focus.append("circle")
         .attr("class", "y")
