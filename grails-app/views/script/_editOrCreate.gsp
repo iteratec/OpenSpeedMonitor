@@ -64,20 +64,20 @@
         <content tag="include.bottom">
             <asset:javascript src="codemirror/codemirrorManifest.js"/>
             <asset:javascript src="prettycron/prettycronManifest.js"/>
-            <asset:script type="text/javascript">
+            <script type="text/javascript">
                 var editor = new CodemirrorEditor({
                     idCodemirrorElement: "navigationScript",
                     i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
                     i18nMessage_STEP_NOT_RECORDED: '${message(code: 'script.STEP_NOT_RECORDED.warning')}',
                     i18nMessage_DANGLING_SETEVENTNAME_STATEMENT: '${message(code: 'script.DANGLING_SETEVENTNAME_STATEMENT.warning')}',
                     i18nMessage_MISSING_SETEVENTNAME_STATEMENT: '${message(code: 'script.MISSING_SETEVENTNAME_STATEMENT.warning')}',
-                    measuredEvents: [],
+                    measuredEvents: ${measuredEvents},
                     linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                     linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
                     linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
                     readonly: false
                 });
-            </asset:script>
+            </script>
         </content>
     </body>
 </html>

@@ -54,9 +54,13 @@ function CodemirrorEditor(data) {
         for (index = 0; index < this.measuredEvents.length; ++index) {
             console.log(this.measuredEvents[index]);
             CodeMirror.measuredEvents.push({
-                text: this.measuredEvents[index].name,
-                displayText: this.measuredEvents[index].name + " (" + this.measuredEvents[index].testedPage.name + ")"});
+                text: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name,
+                displayText: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name
+            });
         }
+        CodeMirror.measuredEvents.sort(function(a, b) {
+            return a.displayText.localeCompare(b.displayText);
+        });
     };
 
     this.warningMsgs = {
