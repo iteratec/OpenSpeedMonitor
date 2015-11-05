@@ -33,11 +33,12 @@ class OsmDataSourceService {
 	 */
 	public Boolean getRLikeSupport(){
 
-        def mysql = "com.mysql.jdbc.Driver"
-        def oracle = "oracle.jdbc.driver.OracleDriver"
-        def p6spy = "com.p6spy.engine.spy.P6SpyDriver"
+        String actualDriverClassName = configService.getDatabaseDriverClassName()
+        boolean isMysql = actualDriverClassName.equals("com.mysql.jdbc.Driver")
+        boolean isOracle = actualDriverClassName.equals("oracle.jdbc.driver.OracleDriver")
+        boolean isP6spy = actualDriverClassName.equals("com.p6spy.engine.spy.P6SpyDriver")
 
-        return configService.getDatabaseDriverClassName() == mysql || oracle || p6spy
+        return isMysql || isOracle || isP6spy
 
 	}
 }
