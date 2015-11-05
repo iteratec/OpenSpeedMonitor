@@ -80,7 +80,8 @@ grails.project.dependency.resolution = {
 		)
 		compile (
 			'org.mockito:mockito-all:1.9.5',
-			'net.sf.supercsv:super-csv:2.1.0'
+			'net.sf.supercsv:super-csv:2.1.0',
+            'p6spy:p6spy:2.1.4',
 		)
 		build (
 			'net.sf.supercsv:super-csv:2.1.0',

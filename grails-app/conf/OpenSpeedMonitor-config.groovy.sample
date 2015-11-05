@@ -33,6 +33,17 @@ environments {
 	development {
 		dataSource {
 			dbCreate = "update"// one of 'create', 'create-drop', 'update', 'validate', ''
+
+			/**
+			* You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
+			* So you can see all prepared sql statements hibernate creates and fires against your data
+			* with all the parameters replaced with the real query values.
+			* @see https://github.com/p6spy/p6spy
+			*/
+			// url = "jdbc:p6spy:mysql://localhost/[your-dev-mysql-scheme]"
+            // driverClassName = "com.p6spy.engine.spy.P6SpyDriver"
+            // logSql = true
+
 			url = "jdbc:mysql://localhost/[your-dev-mysql-scheme]"
 			username = "[your-dev-mysql-user]"
 			password = "[password-of-your-dev-mysql-user]"
