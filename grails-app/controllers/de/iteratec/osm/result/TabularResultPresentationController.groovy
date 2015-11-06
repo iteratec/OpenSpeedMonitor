@@ -644,22 +644,17 @@ class TabularResultPresentationController {
             {
                 result.locationIds.addAll(this.selectedLocations);
             }
-            if (this.includeNativeConnectivity){
-                result.includeNativeConnectivity = this.includeNativeConnectivity
+
+            result.includeNativeConnectivity = this.includeNativeConnectivity
+            result.includeCustomConnectivity = this.includeCustomConnectivity
+            if (this.includeCustomConnectivity){
+                result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
             }
             if (this.selectedAllConnectivityProfiles){
                 result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
             }else if (this.selectedConnectivityProfiles.size() > 0){
                 result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
             }
-            if (this.includeCustomConnectivity) {
-                if (this.customConnectivityName){
-                    result.customConnectivityNameRegex = this.customConnectivityName
-                }else{
-                    result.customConnectivityNameRegex = ~/^(?!.*(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))/;
-                }
-            }
-
 
             return result;
         }

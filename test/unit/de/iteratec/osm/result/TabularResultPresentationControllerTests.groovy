@@ -137,6 +137,7 @@ class TabularResultPresentationControllerTests {
         params.selectedAllConnectivityProfiles = false
         params.includeNativeConnectivity = false
         params.customConnectivityName = "myconn"
+        params.includeCustomConnectivity = true
 		
 		// Create and fill the command:
 		ListResultsCommand out = new ListResultsCommand()

@@ -437,12 +437,15 @@ class LocationAndResultPersisterService implements iListener{
 		
 	}
     private void setConnectivity(EventResult result, JobResult jobRun){
-        if (jobRun.job.connectivityProfile){
-            result.connectivityProfile = jobRun.job.connectivityProfile
-        }else if(jobRun.job.noTrafficShapingAtAll){
-            result.customConnectivityName = ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
-        }else {
-            result.customConnectivityName = jobRun.job.customConnectivityName
+        if(jobRun.job.noTrafficShapingAtAll){
+            result.noTrafficShapingAtAll = true
+        }else{
+            result.noTrafficShapingAtAll = false
+            if(jobRun.job.connectivityProfile){
+                result.connectivityProfile = jobRun.job.connectivityProfile
+            }else if(jobRun.job.customConnectivityName){
+                result.customConnectivityName = jobRun.job.customConnectivityName
+            }
         }
     }
 	private void informDependents(List<EventResult> results){

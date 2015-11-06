@@ -284,98 +284,121 @@ public class EventResultDaoService {
         List<ConnectivityProfile> predefinedProfiles = queryParams.connectivityProfileIds.collect {
             ConnectivityProfile.get(it)
         }
-        if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false) {
+
+        boolean justPredefined = queryParams.includeCustomConnectivity == false && queryParams.includeNativeConnectivity == false
+        boolean predefinedAndCustomAndNative = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
+        boolean predefinedAndCustom = queryParams.includeCustomConnectivity == true
+        boolean predefinedAndNative = queryParams.includeNativeConnectivity == true
+
+        if (justPredefined) {
             eventResultQueryAggregator.addCriteria {
                 connectivityProfile {
                     'in'('id', predefinedProfiles*.ident())
                 }
             }
-        } else if (queryParams.includeNativeConnectivity == false) {
+        } else if (predefinedAndCustomAndNative){
+            eventResultQueryAggregator.addCriteria {
+                or {
+                    connectivityProfile (CriteriaSpecification.LEFT_JOIN){
+                        'in'('id', predefinedProfiles*.ident())
+                    }
+                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                    eq('noTrafficShapingAtAll', true)
+                }
+            }
+        } else if (predefinedAndCustom) {
             eventResultQueryAggregator.addCriteria {
                 or {
                     connectivityProfile(CriteriaSpecification.LEFT_JOIN) {
                         'in'('id', predefinedProfiles*.ident())
                     }
-                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
+                    rlike('customConnectivityName', ~/${ queryParams.customConnectivityNameRegex}/)
                 }
             }
-        } else if (queryParams.customConnectivityNameRegex == null) {
+        } else if (predefinedAndNative) {
             eventResultQueryAggregator.addCriteria {
                 or {
                     connectivityProfile (CriteriaSpecification.LEFT_JOIN){
                         'in'('id', predefinedProfiles*.ident())
                     }
-                    eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                    eq('noTrafficShapingAtAll', true)
                 }
             }
 
-        } else {
-            eventResultQueryAggregator.addCriteria {
-                or {
-                    connectivityProfile (CriteriaSpecification.LEFT_JOIN){
-                        'in'('id', predefinedProfiles*.ident())
-                    }
-                    rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                    eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
-                }
-            }
         }
     }
     private void addConnectivityRelatedCriteriaWithoutPredefinedConnectivities(ErQueryParams queryParams, CriteriaAggregator eventResultQueryAggregator){
-        if (queryParams.customConnectivityNameRegex != null && queryParams.includeNativeConnectivity == true) {
+
+        boolean nativeAndCustom = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
+        boolean justCustom = queryParams.includeCustomConnectivity == true
+        boolean justNative = queryParams.includeNativeConnectivity == true
+
+        if (nativeAndCustom) {
             eventResultQueryAggregator.addCriteria {
                 or {
                     rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
-                    eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                    eq('noTrafficShapingAtAll', true)
                 }
             }
-        } else if (queryParams.customConnectivityNameRegex != null) {
+        } else if (justCustom) {
             eventResultQueryAggregator.addCriteria {
                 rlike('customConnectivityName', ~/${queryParams.customConnectivityNameRegex}/)
             }
-        } else if (queryParams.includeNativeConnectivity == true) {
+        } else if (justNative) {
             eventResultQueryAggregator.addCriteria {
-                eq('customConnectivityName', ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)
+                eq('noTrafficShapingAtAll', true)
             }
         }
     }
 
     private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
+
         if (queryParams.connectivityProfileIds.size() > 0){
-            if (queryParams.customConnectivityNameRegex == null && queryParams.includeNativeConnectivity == false){
+
+            boolean justPredefined = queryParams.includeCustomConnectivity == false && queryParams.includeNativeConnectivity == false
+            boolean predefinedAndCustomAndNative = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
+            boolean predefinedAndCustom = queryParams.includeCustomConnectivity == true
+            boolean predefinedAndNative = queryParams.includeNativeConnectivity == true
+
+            if (justPredefined){
                 eventResults = eventResults.findAll {
                     it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())
                 }
-            }else if (queryParams.includeNativeConnectivity == false){
+            }else if (predefinedAndCustomAndNative){
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                            (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
+                            (it.noTrafficShapingAtAll == true)
+                }
+            } else if (predefinedAndCustom){
                 eventResults = eventResults.findAll {
                     (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
                             (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
                 }
-            }else if (queryParams.customConnectivityNameRegex == null){
+            } else if (predefinedAndNative){
                 eventResults = eventResults.findAll {
                     (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
-                    (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
-                }
-            }else{
-                eventResults = eventResults.findAll {
-                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
-                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
-                    (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                    (it.noTrafficShapingAtAll == true)
                 }
             }
         }else{
-            if (queryParams.customConnectivityNameRegex != null && queryParams.includeNativeConnectivity == true){
+
+            boolean nativeAndCustom = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
+            boolean justCustom = queryParams.includeCustomConnectivity == true
+            boolean justNative = queryParams.includeNativeConnectivity == true
+
+            if (nativeAndCustom){
                 eventResults = eventResults.findAll {
                     (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
-                            (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                    (it.noTrafficShapingAtAll == true)
                 }
-            }else if (queryParams.customConnectivityNameRegex != null){
+            }else if (justCustom){
                 eventResults = eventResults.findAll {
                     (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
                 }
-            }else if (queryParams.includeNativeConnectivity == true){
+            }else if (justNative){
                 eventResults = eventResults.findAll {
-                    (it.customConnectivityName != null && it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))
+                    (it.noTrafficShapingAtAll == true)
                 }
             }
         }

@@ -1000,7 +1000,9 @@ class TestDataUtil {
                 jobResultJobConfigId: jobResult.job.ident(),
                 measuredEvent: event,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                connectivityProfile: connectivityProfile
+                connectivityProfile: connectivityProfile,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
         return eventResult.save(failOnError: true)

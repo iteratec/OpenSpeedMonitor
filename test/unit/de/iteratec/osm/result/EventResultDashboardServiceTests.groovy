@@ -622,7 +622,9 @@ class EventResultDashboardServiceTests {
                 measuredEvent: measuredEvent,
                 tag: '1;1;1;1;1',
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                connectivityProfile: mockConnectivity
+                connectivityProfile: mockConnectivity,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
         jobResult.save(failOnError: true)
@@ -641,7 +643,9 @@ class EventResultDashboardServiceTests {
                 measuredEvent: measuredEvent,
                 tag: '2;1;1;1;1',
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                connectivityProfile: mockConnectivity
+                connectivityProfile: mockConnectivity,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
         jobResult2.save(failOnError: true)

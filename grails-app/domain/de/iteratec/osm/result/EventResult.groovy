@@ -141,14 +141,22 @@ class EventResult implements CsiValue {
 	Long jobResultJobConfigId
 
 	/**
-	 * These values are to be used to distinguish results according to their connectivities
+	 * This result was measured with a predefined connectivity profile.
 	 *
-	 * @since IT-643
 	 */
 	ConnectivityProfile connectivityProfile;
 
-	// For reasons of performance is this just a string
+    /**
+     * If this is not null this result was measured with a connectivity configured in {@link Job}.
+     *
+     */
 	String customConnectivityName;
+
+    /**
+     * True if this result was measured without traffic shaping at all.
+     */
+    boolean noTrafficShapingAtAll
+
 
 	//static belongsTo = JobResult
 	static belongsTo = [jobResult: JobResult]
@@ -190,20 +198,43 @@ class EventResult implements CsiValue {
 
         testAgent(nullable: true)
 
+//        connectivityProfile(nullable: true)
+//        customConnectivityName(nullable: true)
+
 		connectivityProfile(nullable: true, validator: { currentProfile, eventResultInstance ->
 
-            boolean noPredefinedProfileButCustomName = currentProfile == null && eventResultInstance.customConnectivityName != null
-            boolean predefinedProfile = currentProfile != null
+            boolean notNullAndNothingElse =
+                    currentProfile != null &&
+                        eventResultInstance.customConnectivityName == null &&
+                        eventResultInstance.noTrafficShapingAtAll == false
+            boolean nullAndCustom =
+                    currentProfile == null &&
+                            eventResultInstance.customConnectivityName != null &&
+                            eventResultInstance.noTrafficShapingAtAll == false
+            boolean nullAndNative =
+                    currentProfile == null &&
+                            eventResultInstance.customConnectivityName == null &&
+                            eventResultInstance.noTrafficShapingAtAll == true
 
-            return noPredefinedProfileButCustomName || predefinedProfile
+            return notNullAndNothingElse || nullAndCustom || nullAndNative;
 
         })
 		customConnectivityName(nullable: true, validator: { currentCustomName, eventResultInstance ->
 
-            boolean noCustomNameButPredefinedProfile = currentCustomName == null && eventResultInstance.connectivityProfile != null
-            boolean customName = currentCustomName != null
+            boolean notNullAndNothingElse =
+                    currentCustomName != null &&
+                            eventResultInstance.noTrafficShapingAtAll == false &&
+                            eventResultInstance.connectivityProfile == null
+            boolean nullAndNative =
+                    currentCustomName == null &&
+                            eventResultInstance.noTrafficShapingAtAll == true &&
+                            eventResultInstance.connectivityProfile == null
+            boolean nullAndPredefined =
+                    currentCustomName == null &&
+                            eventResultInstance.noTrafficShapingAtAll == false &&
+                            eventResultInstance.connectivityProfile != null
 
-            return noCustomNameButPredefinedProfile || customName
+            return notNullAndNothingElse || nullAndNative || nullAndPredefined
 
         })
 	}

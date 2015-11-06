@@ -508,17 +508,15 @@ public class EventResultDashboardShowAllCommand {
         if (this.trimAboveRequestSizes) {
             result.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
         }
-        if (this.includeNativeConnectivity){
-            result.includeNativeConnectivity = this.includeNativeConnectivity
+        result.includeNativeConnectivity = this.includeNativeConnectivity
+        result.includeCustomConnectivity = this.includeCustomConnectivity
+        if (this.includeCustomConnectivity){
+            result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
         }
-
         if (this.selectedAllConnectivityProfiles){
             result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
         }else if (this.selectedConnectivityProfiles.size() > 0){
             result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
-        }
-        if (this.customConnectivityName){
-            result.customConnectivityNameRegex = this.customConnectivityName
         }
 
         return result;
