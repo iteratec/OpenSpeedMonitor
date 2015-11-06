@@ -80,32 +80,35 @@ class D3HtmlCreator {
     /**
      * Creates container for de.iteratec.osm.d3data.ScheduleChartData
      */
-    def generateScheduleChartHtml = {chartIdentifier, unitOne, unitMultiple, on, off, intersectionLabel ->
+    def generateScheduleChartHtml = {
+        chartIdentifier, unitOne, unitMultiple, on, off, hideIntersectionLabel, showIntersectionLabel, showLabel ->
 
 
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
-                                <div class="span12 pull-right" id="${"ScheduleChartForm" + chartIdentifier}">
-                                    <form>
-                                      <label><input type="radio" name="mode" value="1"> 1 ${unitOne}</label>
-                                      <label><input type="radio" name="mode" value="2"> 2 ${unitMultiple}</label>
-                                      <label><input type="radio" name="mode" value="4"> 4 ${unitMultiple}</label>
-                                      <label><input type="radio" name="mode" value="6" checked> 6 ${unitMultiple}</label>
-                                      <label><input type="radio" name="mode" value="12"> 12 ${unitMultiple}</label>
-                                      <label><input type="radio" name="mode" value="24"> 24 ${unitMultiple}</label>
-                                    </form>
-                                </div>
-                                <div class="span12 pull-right" id="${"ScheduleChartForm" + chartIdentifier}">
-                                    <form>
-                                      <label>${intersectionLabel}</label>
-                                      <label><input type="radio" name="mode" value="on">${on}</label>
-                                      <label><input type="radio" name="mode" value="off" checked>${off}</label>
-                                    </form>
-                                </div>
                                 <div class="span12" id="${"ScheduleChart" + chartIdentifier}">
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
+                                    </div>
+                                </div>
+                                <div class="span12 text-center" id="${"duration-to-show" + chartIdentifier}">
+                                    <br>
+                                    ${showLabel}
+                                    <div class="btn-group">
+                                        <button class="btn btn-info btn-small" value="1">1</button>
+                                        <button class="btn btn-info btn-small" value="2">2</button>
+                                        <button class="btn btn-info btn-small" value="4">4</button>
+                                        <button class="btn btn-info btn-small" value="6">6</button>
+                                        <button class="btn btn-info btn-small" value="12">12</button>
+                                        <button class="btn btn-info btn-small" value="24">24</button>
+                                    </div>
+                                    ${unitMultiple}
+                                </div>
+                                <div class="span12 text-center" id="${"show-overused-queues" + chartIdentifier}">
+                                    <div class="btn-group">
+                                        <button class="btn btn-info btn-small" value="on">${showIntersectionLabel}</button>
+                                        <button class="btn btn-info btn-small" value="off">${hideIntersectionLabel}</button>
                                     </div>
                                 </div>
                             </div>"""

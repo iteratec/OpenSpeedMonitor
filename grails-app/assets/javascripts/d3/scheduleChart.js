@@ -12,11 +12,12 @@
  * ScheduleChart fits into container with given id
  * Its prerequisite that the container has a defined width
  *
- * @param data de.iteratec.osm.d3Data.ScheduleChartData as JSON
+ * @param rawdata de.iteratec.osm.d3Data.ScheduleChartData as JSON
  * @param id a unique id for the container (div) to draw in
- * @param formId a unique id for the form belongs to the chart
+ * @param htmlIdOfDurationToShowDiv HTML id of the div with duration toggle buttons
+ * @param htmlIdOfShowOverusedDiv HTML id of the div with show overused toggle buttons
  */
-function createScheduleChart(rawdata, id, formId) {
+function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfShowOverusedDiv) {
 
     var data = rawdata;
 
@@ -41,7 +42,7 @@ function createScheduleChart(rawdata, id, formId) {
     var endDateString = getDateString(endDate);
 
     div.append("h5")
-        .attr("class", "intervalHeadline")
+        .attr("class", "intervalHeadline text-center")
         .text(startDateString + " - " + endDateString);
 
     // Get Domain for the location
@@ -220,9 +221,30 @@ function createScheduleChart(rawdata, id, formId) {
         })
         .on("mousemove", mousemove)
         .call(zoom);
-    // Add listener to radio buttons
-    d3.selectAll("#" + formId).selectAll("input").on("change", change);
 
+    // Add listener to config buttons
+    d3.selectAll("#" + htmlIdOfDurationToShowDiv).selectAll("button").on("click", change);
+    d3.selectAll("#" + htmlIdOfShowOverusedDiv).selectAll("button").on("click", change);
+
+    // handles checked radio button change
+    function change() {
+
+        if (this.value === "on") {
+            showIntersections = true;
+            drawIntersectionRects()
+            performScaling()
+        } else if (this.value === "off") {
+            showIntersections = false;
+            drawingPlane.selectAll(".intersectionRect").remove()
+            performScaling()
+        } else {
+            selectedHour = parseInt(this.value);
+            endDate = new Date(startDate);
+            endDate.setHours(startDate.getHours() + selectedHour);
+            updateGraph()
+        }
+
+    }
 
     // function updating aid line position on mouse move
     function mousemove() {
@@ -264,26 +286,6 @@ function createScheduleChart(rawdata, id, formId) {
         zoom.translate([0, 0]).scale(1);
         performScaling();
     }
-
-
-    // handles checked radio button change
-    function change() {
-        if (this.value === "on") {
-            showIntersections = true;
-            drawIntersectionRects()
-            performScaling()
-        } else if (this.value === "off") {
-            showIntersections = false;
-            drawingPlane.selectAll(".intersectionRect").remove()
-            performScaling()
-        } else {
-            selectedHour = parseInt(this.value);
-            endDate = new Date(startDate);
-            endDate.setHours(startDate.getHours() + selectedHour);
-            updateGraph()
-        }
-    }
-
 
     // updates graph data
     function updateGraph() {

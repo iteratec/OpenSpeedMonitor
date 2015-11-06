@@ -127,7 +127,13 @@
             <g:each in="${chartMap}" var="server" status="i">
                 <g:each in="${server.value}" var="location" status="j">
                     <g:if test="${location.jobs.size() > 0}">
-                        createScheduleChart(${location as grails.converters.JSON}, "${"ScheduleChart" + i + j}", "${"ScheduleChartForm" + i + j}")
+                        createScheduleChart(
+                            ${location as grails.converters.JSON},
+                            "${"ScheduleChart" + i + j}",
+                            "${"duration-to-show" + i + j}",
+                            "${"show-overused-queues" + i + j}"
+                        )
+                        $('#${"show-overused-queues" + i + j} button[value="on"]').click()
                     </g:if>
                 </g:each>
             </g:each>

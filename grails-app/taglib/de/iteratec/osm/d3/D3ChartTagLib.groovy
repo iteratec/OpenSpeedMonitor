@@ -57,9 +57,20 @@ class D3ChartTagLib {
         String unit2 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnitMore", "hours")
         String on =  i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.onLabel", "on")
         String off =  i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.offLabel", "off")
-        String intersectionLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.intersectionLabel", "show intersections")
+        String hideIntersectionLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.hide-intersection.label", "Hide")
+        String showIntersectionLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.show-intersection.label", "Show")
+        String showLabel = i18nService.msg("de.iteratec.osm.show.label", "Show")
         D3HtmlCreator htmlCreator = new D3HtmlCreator()
-        out << htmlCreator.generateScheduleChartHtml(attrs['chartIdentifier'], unit1, unit2, on, off, intersectionLabel)
+        out << htmlCreator.generateScheduleChartHtml(
+                attrs['chartIdentifier'],
+                unit1,
+                unit2,
+                on,
+                off,
+                hideIntersectionLabel,
+                showIntersectionLabel,
+                showLabel
+        )
 
         return out.toString()
     }
