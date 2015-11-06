@@ -111,7 +111,7 @@ class D3ChartTagLibSpec extends Specification {
         def chartSVGContainerNode = testHtmlAsNode.childNodes().getAt(2)
 
         testHtmlAsNode.childNodes().size() == 3
-        formContainer.attributes['id'] == "ScheduleChartForm" + identifier
-        chartSVGContainerNode.attributes['id'] == "ScheduleChart" + identifier
+        formContainer.attributes['id'] == "ScheduleChart" + identifier
+        chartSVGContainerNode.attributes['id'] == "show-overused-queues" + identifier
     }
 }
