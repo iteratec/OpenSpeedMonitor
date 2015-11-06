@@ -173,12 +173,15 @@ GSP-Template Mappings:
                                                    default="Show measurements with native connectivity"/>
                                     </label>
                                     <label for="customConnectivityName">
-                                        <g:message code="de.iteratec.osm.result.name-custom-connectivity.label"
-                                                   default="Name of custom connectivities to show:"/>
+                                        <g:checkBox name="includeCustomConnectivity" id="includeCustomConnectivity"
+                                                    checked="${includeCustomConnectivity}" value="${true}"/>
+                                        <g:message code="de.iteratec.osm.result.include-custom-connectivity.label"
+                                                   default="Show measurements with custom connectivity (filter by regex expression):"/>
                                     </label>
                                     <g:textField name="customConnectivityName" class="form-control input-xxlarge"
                                                  value="${customConnectivityName}" id="customConnectivityName"
-                                                 placeholder="${g.message(code: 'de.iteratec.osm.result.name-custom-connectivity.placeholder', default: 'Search via regex')}">
+                                                 placeholder="${g.message(code: 'de.iteratec.osm.result.filter-custom-connectivity.placeholder', default: 'Search via regex')}"
+                                                 disabled="${!includeCustomConnectivity}">
                                     </g:textField>
                                     <br>
                                     <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"

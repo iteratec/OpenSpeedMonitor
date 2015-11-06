@@ -152,6 +152,7 @@ class PaginationService {
                         'selectedAllConnectivityProfiles': cmd.getSelectedAllConnectivityProfiles(),
                         'selectedConnectivityProfiles': cmd.getSelectedConnectivityProfiles(),
                         'includeNativeConnectivity': cmd.getIncludeNativeConnectivity(),
+						'includeCustomConnectivity':cmd.getIncludeCustomConnectivity(),
                         'customConnectivityName': cmd.getCustomConnectivityName(),
 						'max': cmd.getMax(),
 						'offset': offset

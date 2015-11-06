@@ -90,6 +90,7 @@ class TabularResultPresentationController {
                 if (cmd instanceof ListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
                             ((ListResultsCommand)cmd).createMvQueryParams(),
+                            ((ListResultsCommand)cmd),
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
@@ -502,6 +503,11 @@ class TabularResultPresentationController {
         Boolean includeNativeConnectivity
 
         /**
+         * Wheter or not EventResult measured with custom connectivity should get included.
+         */
+        Boolean includeCustomConnectivity;
+
+        /**
          * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
          * connectivity name matches this regex.
          */
@@ -534,6 +540,8 @@ class TabularResultPresentationController {
             selectedAllConnectivityProfiles(nullable: true)
 
             includeNativeConnectivity(nullable: false)
+
+            includeCustomConnectivity(nullable: false)
 
             customConnectivityName(nullable: true)
         }
@@ -569,6 +577,7 @@ class TabularResultPresentationController {
             viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
             viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
             viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
+            viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
             viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
 
             super.copyRequestDataToViewModelMap(viewModelToCopyTo)
@@ -590,6 +599,15 @@ class TabularResultPresentationController {
 
         /**
          * <p>
+         * Returns a boolean to include custom connectivity in selected connetivities
+         * </p>
+         */
+        public boolean includeCustomConnectivity() {
+            return includeCustomConnectivity;
+        }
+
+        /**
+         * <p>
          * Creates {@link MvQueryParams} based on this command. This command
          * need to be valid for this operation to be successful.
          * </p>
@@ -600,6 +618,7 @@ class TabularResultPresentationController {
          */
         private ErQueryParams createMvQueryParams() throws IllegalStateException
         {
+
             if( !this.validate() )
             {
                 throw new IllegalStateException('Query params are not available from an invalid command.')
@@ -633,9 +652,14 @@ class TabularResultPresentationController {
             }else if (this.selectedConnectivityProfiles.size() > 0){
                 result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
             }
-            if (this.customConnectivityName){
-                result.customConnectivityNameRegex = this.customConnectivityName
+            if (this.includeCustomConnectivity) {
+                if (this.customConnectivityName){
+                    result.customConnectivityNameRegex = this.customConnectivityName
+                }else{
+                    result.customConnectivityNameRegex = ~/^(?!.*(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE))/;
+                }
             }
+
 
             return result;
         }

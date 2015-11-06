@@ -46,6 +46,9 @@ var initSelectMeasuringsControls = function(
     if ($("#selectedAllConnectivityProfiles").length > 0 && $("#selectedConnectivityProfilesHtmlId").length > 0 ){
         initSelectAndCheckBoxFunction("#selectedAllConnectivityProfiles", "#selectedConnectivityProfilesHtmlId");
     }
+	if ($("#includeCustomConnectivity").length > 0 && $("#customConnectivityName").length > 0 ){
+		initTextFieldAndCheckBoxFunction("#includeCustomConnectivity", "#customConnectivityName");
+	}
 	$("#advanced-filter-row").fadeOut();
 	$('#simple-job-filter').button('toggle');
 
@@ -75,6 +78,16 @@ var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
 		});
 		
 }
+
+var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
+	$(checkBox).on('change', function(event) {
+		if(event.currentTarget.checked == true) {
+			$(textField).removeProp('disabled');
+		} else {
+			$(textField).prop('disabled', 'disabled');
+		}
+	});
+};
 
 /*
  * array of all selectable measured events

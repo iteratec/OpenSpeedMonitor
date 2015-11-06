@@ -115,6 +115,9 @@ function addJobfilterInfoHandlers() {
     $('#includeNativeConnectivity').on('change', function (e) {
         setCollapseJobInfos();
     });
+    $('#includeCustomConnectivity').on('change', function (e) {
+        setCollapseJobInfos();
+    });
 }
 function addTimeframeInfoHandlers() {
     $('#selectedIntervalHtmlId').on('change', function (e) {
@@ -198,9 +201,12 @@ function setCollapseJobInfos(){
         if(document.getElementById('includeNativeConnectivity').checked){
             selectedConnectivities += ", NATIVE"
         }
-        var customConnNameRegex = document.getElementById('customConnectivityName').value;
-        if(customConnNameRegex){
-            selectedConnectivities += ", '" + customConnNameRegex + "'"
+        if(document.getElementById('includeCustomConnectivity').checked){
+            selectedConnectivities += ", CUSTOM"
+            var customConnNameRegex = document.getElementById('customConnectivityName').value;
+            if(customConnNameRegex){
+                selectedConnectivities += ", '" + customConnNameRegex + "'"
+            }
         }
 
         $('#accordion-info-jobs').text('');
