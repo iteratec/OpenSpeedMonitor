@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.script
 
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 
@@ -99,6 +100,11 @@ class ScriptParser {
 
 	PageService pageService
 
+	// Time in seconds a page load command needs
+	final int TIME_PER_STEP = 5
+	// Delay for a script (Time every script needs) in seconds
+	final int DELAY_PER_SCRIPT = 60
+
 	// Keywords and pattern used for parsing
 	final static String logDataCmd = 'logData'  
 	final static String setEventNameCmd = 'setEventName'  
@@ -127,6 +133,11 @@ class ScriptParser {
 	 * The number of measuredEvents found in the parsed script 
 	 */
 	public int measuredEventsCount
+	/**
+	 * The number of navigate and execAndWait command in the parsed script
+	 * Commands in LogData 0 sections are included
+	 */
+	public int allPageLoadEvents
 	/**
 	 * Warnings reporting misplaced setEventName statements
 	 */
@@ -329,6 +340,18 @@ class ScriptParser {
 	 */
 	public ScriptParser(PageService pageService, String navigationScript) {
 		this.pageService = pageService
-		interpret(navigationScript)
+		def statements = interpret(navigationScript)
+		allPageLoadEvents = statements.findAll{(it.keyword == navigateCmd) || (it.keyword == execAndWaitCmd)}.size()
 	}
+
+	/**
+	 * Calculates the duration of a navigation script.
+	 * It uses the number of steps in the script.
+	 * It also adds time that every Job needs for init and exit etc.
+	 * @return the duration in seconds
+	 */
+	int calculateDurationInSeconds() {
+		return allPageLoadEvents * TIME_PER_STEP + DELAY_PER_SCRIPT
+	}
+
 }

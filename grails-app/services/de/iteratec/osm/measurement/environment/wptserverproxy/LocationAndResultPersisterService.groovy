@@ -417,9 +417,9 @@ class LocationAndResultPersisterService implements iListener{
 		try{
 			log.debug("step=${step}")
 			log.debug("step.testedPage=${step.testedPage}")
-			Boolean validFrustrationsExist = timeToCsMappingService.validFrustrationsExistFor(step.testedPage)
-			log.debug("validFrustrationsExist=${validFrustrationsExist}")
-			if(validFrustrationsExist) {
+			Boolean validCsiMappingExist = timeToCsMappingService.validMappingsExistFor(step.testedPage)
+			log.debug("validCsiMappingExist=${validCsiMappingExist}")
+			if(validCsiMappingExist) {
 				result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage)
 			}
 		}catch(Exception e){
@@ -437,12 +437,15 @@ class LocationAndResultPersisterService implements iListener{
 		
 	}
     private void setConnectivity(EventResult result, JobResult jobRun){
-        if (jobRun.job.connectivityProfile){
-            result.connectivityProfile = jobRun.job.connectivityProfile
-        }else if(jobRun.job.noTrafficShapingAtAll){
-            result.customConnectivityName = ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
-        }else {
-            result.customConnectivityName = jobRun.job.customConnectivityName
+        if(jobRun.job.noTrafficShapingAtAll){
+            result.noTrafficShapingAtAll = true
+        }else{
+            result.noTrafficShapingAtAll = false
+            if(jobRun.job.connectivityProfile){
+                result.connectivityProfile = jobRun.job.connectivityProfile
+            }else if(jobRun.job.customConnectivityName){
+                result.customConnectivityName = jobRun.job.customConnectivityName
+            }
         }
     }
 	private void informDependents(List<EventResult> results){
@@ -559,8 +562,8 @@ class LocationAndResultPersisterService implements iListener{
 	void deleteResultsMarkedAsPendingAndRunning(String jobLabel, String testId){
 		JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(jobLabel, testId, 200)?.delete(failOnError: true)
 	}
-	
-	public String getName() {
+	@Override
+	public String getListenerName() {
 		return "LocationAndResultPersisterService"
 	}
 }

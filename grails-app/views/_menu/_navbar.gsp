@@ -33,19 +33,19 @@
 
 								<li class="controller">
 									<g:link controller="job" action="list" title="${g.message([code:'de.iteratec.isr.managementDashboard', locale:lang])}">
-										<i class="icon-calendar"></i>
+										<i class="fa fa-calendar"></i>
 										<g:message code="de.iteratec.isr.managementDashboard" locale="${lang}"/>
 									</g:link>
 								</li>
 								<li class="controller">
 									<g:link controller="eventResultDashboard" action="showAll" title="${g.message([code:'eventResultDashboard.description', locale:lang])}">
-										<i class="icon-signal"></i>
+										<i class="fa fa-signal"></i>
 										<g:message code="eventResultDashboard.label" locale="${lang}"/>
 									</g:link>
 								</li>
 								<li class="controller">
 									<g:link controller="csiDashboard" action="showAll" title="${g.message([code:'csiDashboard.description', locale:lang])}">
-										<i class="icon-signal"></i>
+										<i class="fa fa-signal"></i>
 										<g:message code="csiDashboard.label" locale="${lang}"/>
 									</g:link>
 								</li>

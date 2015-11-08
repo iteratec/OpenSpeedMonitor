@@ -50,7 +50,7 @@
       limitations under the License.
     </g:else>
 		</p>
-		<h2><g:message code="de.iteratec.osm.oslUsed.label" default="about" locale="${lang}"/></h3>
+		<h2><g:message code="de.iteratec.osm.oslUsed.label" default="about" locale="${lang}"/></h2>
 		<p>
     <g:if test="${lang.toString().equals('de')}">
       Dieses Projekt enthält zahlreiche Bibliotheken und Plugins, welche von anderen Autoren stammen.<br>

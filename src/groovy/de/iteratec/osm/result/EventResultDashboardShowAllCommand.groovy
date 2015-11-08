@@ -26,7 +26,7 @@ import java.util.regex.Pattern
  * @author mze , rhe
  * @since IT-6
  */
-@Validateable
+@Validateable(nullable = true)
 public class EventResultDashboardShowAllCommand {
 
     public final static Integer LINE_CHART_SELECTION = 0;
@@ -248,6 +248,11 @@ public class EventResultDashboardShowAllCommand {
     Boolean includeNativeConnectivity
 
     /**
+     * Whether or not EventResults measured with native connectivity should get included.
+     */
+    Boolean includeCustomConnectivity
+
+    /**
      * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
      * connectivity name matches this regex.
      */
@@ -307,6 +312,8 @@ public class EventResultDashboardShowAllCommand {
         overwriteWarningAboutLongProcessingTime(nullable: true)
 
         includeNativeConnectivity(nullable: false)
+
+        includeCustomConnectivity(nullable: false)
 
         customConnectivityName(nullable: true)
 
@@ -419,6 +426,7 @@ public class EventResultDashboardShowAllCommand {
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
         viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
         viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
+        viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
         viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
 
         DateValueConverter converter = DateValueConverter.getConverter()
@@ -500,16 +508,15 @@ public class EventResultDashboardShowAllCommand {
         if (this.trimAboveRequestSizes) {
             result.maxRequestSizeInBytes = this.trimAboveRequestSizes * 1000
         }
-        if (this.includeNativeConnectivity){
-            result.includeNativeConnectivity = this.includeNativeConnectivity
+        result.includeNativeConnectivity = this.includeNativeConnectivity
+        result.includeCustomConnectivity = this.includeCustomConnectivity
+        if (this.includeCustomConnectivity){
+            result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
         }
         if (this.selectedAllConnectivityProfiles){
             result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
         }else if (this.selectedConnectivityProfiles.size() > 0){
             result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
-        }
-        if (this.customConnectivityName){
-            result.customConnectivityNameRegex = this.customConnectivityName
         }
 
         return result;

@@ -1,0 +1,29 @@
+/*
+*= require chosen/chosen.css
+*= require tagit.css
+*= require_self
+*/
+#placeholderCandidates {
+	display: inline-block;
+}
+
+#placeholderCandidates a, .alreadyUsed {
+	margin: 0.3em;
+	text-decoration: underline;
+	font-weight: bold;
+}
+#placeholderCandidates .alreadyUsed {
+	color: #999;
+}
+.popover {
+	max-width: 600px;
+	width: auto;
+}
+#maxDownloadTimeInMinutes input.non-editable {
+	border: none;
+	box-shadow: none;
+	color: #000;
+	width: 2em;
+	background: #fff;
+	cursor: default;
+}

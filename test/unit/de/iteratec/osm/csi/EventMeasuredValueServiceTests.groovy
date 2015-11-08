@@ -50,6 +50,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * Tests low level-functionality of {@link EventMeasuredValueService}.
  */
 @TestMixin(GrailsUnitTestMixin)
+@TestFor(EventMeasuredValueService)
 @Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval, 
 	AggregatorType, Location, EventResult, JobResult, Job, MeasuredValueUpdateEvent])
 class EventMeasuredValueServiceTests {
@@ -74,7 +75,7 @@ class EventMeasuredValueServiceTests {
 	AggregatorType measuredEvent
 	
     void setUp() {
-		serviceUnderTest = service	
+		serviceUnderTest = service
 //		serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
 		
 		new JobGroup(name: jobGroupName1).save(validate: false) 

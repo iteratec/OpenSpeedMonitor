@@ -74,5 +74,9 @@ class OsmDataSourceServiceSpec {
 		
 		mocker.mockConfigService(serviceUnderTest, 'oracle.jdbc.driver.OracleDriver', 60)
 		assertThat(serviceUnderTest.RLikeSupport, is(true))
+
+        mocker.mockConfigService(serviceUnderTest, 'com.p6spy.engine.spy.P6SpyDriver', 60)
+        assertThat(serviceUnderTest.RLikeSupport, is(true))
+
     }
 }

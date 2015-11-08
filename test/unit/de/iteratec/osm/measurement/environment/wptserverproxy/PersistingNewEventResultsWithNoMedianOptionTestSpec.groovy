@@ -305,6 +305,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
             //not the concern of this test
         }
+        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
+            //not the concern of this test
+        }
         serviceUnderTest.timeToCsMappingService = timeToCsMappingService.createMock()
     }
     private void mockMeasuredValueUpdateService(){

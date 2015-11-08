@@ -37,4 +37,3 @@
 					<g:field type="number" name="packetLoss" required="" value="${connectivityProfileInstance.packetLoss}"/>
 				</div>
 			</div>
-

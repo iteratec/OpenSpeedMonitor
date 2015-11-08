@@ -2,7 +2,7 @@
 
 <head>
 <title>Manual of REST API</title>
-<meta name="layout" content="kickstart_osm" />
+    <meta name="layout" content="kickstart_osm" />
 </head>
 <body data-spy="scroll" data-target="#spied-nav">
 %{--<body data-spy="scroll" data-target="#spied-nav">--}%
@@ -384,7 +384,7 @@
 
 					<h2>PUT Method:&nbsp;<span class="text-info">Job activation</span></h2>
 
-					<i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+					<i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
 					<h3>Request signature</h3>
 					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/job/[job-id]/activate</code></p>
 					<p>
@@ -437,7 +437,7 @@
 
 					<h2>PUT Method:&nbsp;<span class="text-info">Job deactivation</span></h2>
 
-					<i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+					<i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
 					<h3>Request signature</h3>
 					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/job/[job-id]/deactivate</code></p>
 					<p>
@@ -490,7 +490,7 @@
 
 					<h2>PUT Method:&nbsp;<span class="text-info">Set Execution Schedule</span></h2>
 
-					<i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+					<i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
 
 					<h3>Request signature</h3>
 					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/job/[job-id]/setExecutionSchedule</code></p>
@@ -552,7 +552,7 @@
 
                     <h2>Method:&nbsp;<span class="text-info">Create event</span></h2>
 
-                    <i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+                    <i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
 
                     <h3>Request signature</h3>
                     <p>
@@ -655,7 +655,7 @@
 
                     <h2>PUT Method:&nbsp;<span class="text-info">Measurement activation</span></h2>
 
-                    <i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+                    <i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
                     <h3>Request signature</h3>
                     <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/config/activateMeasurementsGenerally</code></p>
                     <p>
@@ -701,7 +701,7 @@
 
                     <h2>PUT Method:&nbsp;<span class="text-info">Measurement deactivation</span></h2>
 
-                    <i class="icon-info-sign">&nbsp;${protectedFunctionHint}</i>
+                    <i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
                     <h3>Request signature</h3>
                     <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/config/deactivateMeasurementsGenerally</code></p>
                     <p>
@@ -804,21 +804,22 @@
 	</div>
 
 	--%>
-	
-	<r:script>
-		$(document).ready(function(){
-			$('body').scrollspy({
-				target: '#spied-nav',
-				offset: 100
-			});
-			var offset = 60;
-			$('#spied-nav ul li a').click(function(event) {
-				event.preventDefault();
-				$($(this).attr('href'))[0].scrollIntoView();
-				scrollBy(0, -offset);
-			});
-		});
-	</r:script>
+    <content tag="include.bottom">
+        <asset:script type="text/javascript">
+            $(document).ready(function(){
+                $('body').scrollspy({
+                    target: '#spied-nav',
+                    offset: 100
+                });
+                var offset = 60;
+                $('#spied-nav ul li a').click(function(event) {
+                    event.preventDefault();
+                    $($(this).attr('href'))[0].scrollIntoView();
+                    scrollBy(0, -offset);
+                });
+            });
+        </asset:script>
+    </content>
 
 </body>
 </html>

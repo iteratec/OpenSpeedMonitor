@@ -1,0 +1,15 @@
+// Workaround since Bootstrap 2.X doesn't work with Less v2, see
+// http://stackoverflow.com/questions/26628309/less-v2-does-not-compile-twitters-bootstrap-2-x
+#grid {
+  .core  {
+    .span(@gridColumns) {
+      width: (@gridColumnWidth * @gridColumns) + (@gridGutterWidth * (@gridColumns - 1));
+    }
+  }
+}
+@import "bootstrap.less";//bootstrap plugin
+@import "responsive.less";//bootstrap plugin
+@import "openspeedmonitor.less";
+@import "font-awesome";
+@import "flags.less";
+@import "date-time-picker/timepicker.less";

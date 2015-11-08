@@ -176,11 +176,14 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         List<EventResult> allResults = EventResult.getAll()
         allResults.size() == 3
         allResults[0].connectivityProfile == null
-        allResults[0].customConnectivityName == ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        allResults[0].customConnectivityName == null
+        allResults[0].noTrafficShapingAtAll == true
         allResults[1].connectivityProfile == null
-        allResults[1].customConnectivityName == ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        allResults[1].customConnectivityName == null
+        allResults[1].noTrafficShapingAtAll == true
         allResults[2].connectivityProfile == null
-        allResults[2].customConnectivityName == ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        allResults[2].customConnectivityName == null
+        allResults[2].noTrafficShapingAtAll == true
 
     }
 
@@ -245,9 +248,11 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         List<EventResult> allResults = EventResult.getAll()
         allResults.size() == 2
         allResults[0].connectivityProfile == null
-        allResults[0].customConnectivityName == ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        allResults[0].customConnectivityName == null
+        allResults[0].noTrafficShapingAtAll == true
         allResults[1].connectivityProfile == null
-        allResults[1].customConnectivityName == ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        allResults[1].customConnectivityName == null
+        allResults[1].noTrafficShapingAtAll == true
 
     }
 

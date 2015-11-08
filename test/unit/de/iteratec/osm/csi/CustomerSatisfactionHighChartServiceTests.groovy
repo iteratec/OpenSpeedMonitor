@@ -17,34 +17,29 @@
 
 package de.iteratec.osm.csi
 
-import static de.iteratec.osm.util.Constants.*
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertTrue
-import grails.test.mixin.*
-
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.result.EventResultDashboardService
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.ServiceMocker
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
 import org.apache.commons.lang.time.DateUtils
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
-import org.junit.*
+import spock.lang.Shared
+import spock.lang.Specification
 
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.OsmChartPoint
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.result.EventResultDashboardService
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.util.ServiceMocker
+import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+import static org.junit.Assert.assertNotNull
 
 /**
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
@@ -52,18 +47,18 @@ import de.iteratec.osm.util.ServiceMocker
 @TestFor(CustomerSatisfactionHighChartService)
 @Mock([AggregatorType, MeasuredValue, MeasuredValueInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
 	Script, WebPageTestServer])
-class CustomerSatisfactionHighChartServiceTests {
+class CustomerSatisfactionHighChartServiceTests extends Specification{
 
-	MeasuredValueInterval hourly
-	MeasuredValueInterval weekly
+    @Shared MeasuredValueInterval hourly
+    @Shared MeasuredValueInterval weekly
 
-	AggregatorType measured_event
-	AggregatorType page
-	AggregatorType shop
+    @Shared AggregatorType measured_event
+    @Shared AggregatorType page
+    @Shared AggregatorType shop
 
-	Date now
-	Date tomorrow
-	Date fourMonthsAgo
+    @Shared Date now
+    @Shared Date tomorrow
+    @Shared Date fourMonthsAgo
 
 	/**
 	 * Contains one {@link MeasuredValue} for each existing combination of the following domain-objects
@@ -81,410 +76,331 @@ class CustomerSatisfactionHighChartServiceTests {
 	 * @see #createMeasuredValues()
 	 * @see MeasuredValue#tag
 	 */
-	List<MeasuredValue> measuredValueForEventHourlyList = []
-	List<MeasuredValue> measuredValueForPageWeeklyList = []
-	List<MeasuredValue> measuredValueForShopWeeklyList = []
-	List<MeasuredValue> measuredValueForShopWeeklyWithNullList = []
-	List<MeasuredValue> measuredValueListWithValuesLowerThanOne = []
-	List<MeasuredValue> measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
+    @Shared List<MeasuredValue> measuredValueForEventHourlyList = []
+    @Shared List<MeasuredValue> measuredValueForPageWeeklyList = []
+    @Shared List<MeasuredValue> measuredValueForShopWeeklyList = []
+    @Shared List<MeasuredValue> measuredValueForShopWeeklyWithNullList = []
+    @Shared List<MeasuredValue> measuredValueListWithValuesLowerThanOne = []
+    @Shared List<MeasuredValue> measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
 
-	List<String> expectedJobLabels = ['job1', 'job2']
+    @Shared List<String> expectedJobLabels = ['job1', 'job2']
 
-	List<String>  expectedJobGroupNames = ['group1', 'group2']
-	List<String>  expectedPageNames = ['page1', 'page2']
-	List<String>  expectedMeasuredEventNames = ['event1', 'event2']
-	List<String>  expectedBrowserNames = ['browser1', 'browser2']
-	List<String>  expectedLocationNames = ['location1', 'location2']
+	@Shared List<String>  expectedJobGroupNames = ['group1', 'group2']
+    @Shared List<String>  expectedPageNames = ['page1', 'page2']
+    @Shared List<String>  expectedMeasuredEventNames = ['event1', 'event2']
+    @Shared List<String>  expectedBrowserNames = ['browser1', 'browser2']
+    @Shared List<String>  expectedLocationNames = ['location1', 'location2']
 
-	String graphLabel
-	Double tolerableDeviationDueToRounding
+    @Shared String graphLabel
+    @Shared Double tolerableDeviationDueToRounding
 
 	CustomerSatisfactionHighChartService serviceUnderTest
 	ServiceMocker mockGenerator
 
-	@Before
-	void setUp() {
-		serviceUnderTest=service
+    public static final String I18N_LABEL_JOB_GROUP = 'Job Group'
+    public static final String I18N_LABEL_MEASURED_EVENT = 'Measured step'
+    public static final String I18N_LABEL_LOCATION = 'Location'
+    public static final String I18N_LABEL_MEASURAND = 'Measurand'
+    public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
-		// We simply a modified version of the original service here, because
-		// we expect only URL generation to be called and expect that
-		// the service under test don't care about the URL itself.
-		serviceUnderTest.eventResultDashboardService = new EventResultDashboardService() {
-					@Override
-					public URL tryToBuildTestsDetailsURL(MeasuredValue mv) {
-						return new URL('http://measuredvalue.example.com/'+mv.id);
-					}
-				}
+
+    void setup() {
+
+		serviceUnderTest=service
 
 		createDataCommonForAllTests()
 		
-		//mocks common for all tests
-		serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService()
-		mockGenerator = ServiceMocker.create()
-		mockGenerator.mockCsTargetGraphDaoService(serviceUnderTest, graphLabel)
-		mockGenerator.mockLinkGenerator(serviceUnderTest, 'http://www.iteratec.de')
-		mockGenerator.mockMeasuredValueTagService(
-			serviceUnderTest,
-			['1' : new JobGroup(id: 1, name: expectedJobGroupNames[0]), '2' : new JobGroup(id: 2, name: expectedJobGroupNames[1])],
-			['1' : new MeasuredEvent(id: 1, name: expectedMeasuredEventNames[0]), '2' : new MeasuredEvent(id: 2, name: expectedMeasuredEventNames[1])],
-			['1' : new Page(id: 1, name: expectedPageNames[0]), '2' : new Page(id: 2, name: expectedPageNames[1])],
-			['1' : new Browser(id: 1, name: expectedBrowserNames[0]), '2' : new Browser(id: 2, name: expectedBrowserNames[1])],
-			['1' : new Location(id: 1, location: expectedLocationNames[0]), '2' : new Location(location: expectedLocationNames[1])]
-		)
+		mockServicesCommonForAllTests()
 
 	}
 
-	@Test
-	void testGetGraphLabelForHourlyEventMvGraph(){
+    void "correct graph labels get created for hourly event measured values"(){
 
-		//create test-specific data
+        expect:
+        serviceUnderTest.getMapLabel(mv) == expectedLabel
 
-		MeasuredValue hemv12121 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
-				tag: "1;2;1;2;1")
-		MeasuredValue hemv11111 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
-				tag: "1;1;1;1;1")
-		MeasuredValue hemv22222 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
-				tag: "2;2;2;2;2")
-
-		//run tests and assertions
-
-		String calculatedLabel12121 = serviceUnderTest.getMapLabel(hemv12121)
-		String expectedLabel12121 =
-				"${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
-//				"${expectedPageNames[0]}${UNIQUE_STRING_DELIMITTER}"+
-				"${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
-//				"${expectedBrowserNames[1]}${UNIQUE_STRING_DELIMITTER}"+
-				"${expectedLocationNames[0]}"
-		assertEquals(expectedLabel12121, calculatedLabel12121)
-
-		String calculatedLabel11111 = serviceUnderTest.getMapLabel(hemv11111)
-		String expectedLabel11111 =
-				"${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
-//				"${expectedPageNames[0]}${UNIQUE_STRING_DELIMITTER}"+
-				"${expectedMeasuredEventNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
-//				"${expectedBrowserNames[0]}${UNIQUE_STRING_DELIMITTER}"+
-				"${expectedLocationNames[0]}"
-		assertEquals(expectedLabel11111, calculatedLabel11111)
-
-		String calculatedLabel22222 = serviceUnderTest.getMapLabel(hemv22222)
-		String expectedLabel22222 =
-				"${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
-//				"${expectedPageNames[1]}${UNIQUE_STRING_DELIMITTER}"+
-				"${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
-//				"${expectedBrowserNames[1]}${UNIQUE_STRING_DELIMITTER}"+
-				"${expectedLocationNames[1]}"
-		assertEquals(expectedLabel22222, calculatedLabel22222)
-	}
-
-	@Test
-	void testGetGraphLabelForWeeklyPageMvGraph(){
-
-		//create test-specific data
-
-		MeasuredValue wpmv11 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.PAGE),
-				interval: weekly,
-				tag: "1;1")
-		MeasuredValue wpmv12 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.PAGE),
-				interval: weekly,
-				tag: "1;2")
-		MeasuredValue wpmv22 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.PAGE),
-				interval: weekly,
-				tag: "2;2")
-
-		//run tests and assertions
-
-		String calculatedLabel11 = serviceUnderTest.getMapLabel(wpmv11)
-		String expectedLabel11 =
-				"${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[0]}"
-		assertEquals(expectedLabel11, calculatedLabel11)
-
-		String calculatedLabel12 = serviceUnderTest.getMapLabel(wpmv12)
-		String expectedLabel12 =
-				"${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
-		assertEquals(expectedLabel12, calculatedLabel12)
-
-		String calculatedLabel22 = serviceUnderTest.getMapLabel(wpmv22)
-		String expectedLabel22 =
-				"${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
-		assertEquals(expectedLabel22, calculatedLabel22)
-	}
-
-	@Test
-	void testGetGraphLabelForWeeklyShopMvGraph(){
-
-		//create test-specific data
-
-		MeasuredValue wsmv1 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.SHOP),
-				interval: weekly,
-				tag: "1")
-		MeasuredValue wsmv2 = new MeasuredValue(
-				aggregator: new AggregatorType(name: AggregatorType.SHOP),
-				interval: weekly,
-				tag: "2")
-
-		//run tests and assertions
-
-		String calculatedLabel1 = serviceUnderTest.getMapLabel(wsmv1)
-		String expectedLabel1 = "${expectedJobGroupNames[0]}"
-		assertEquals(expectedLabel1, calculatedLabel1)
-
-		String calculatedLabel2 = serviceUnderTest.getMapLabel(wsmv2)
-		String expectedLabel2 = "${expectedJobGroupNames[1]}"
-		assertEquals(expectedLabel2, calculatedLabel2)
+        where:
+        mv << [
+            new MeasuredValue(
+                    aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
+                    tag: "1;2;1;2;1"),
+            new MeasuredValue(
+                    aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
+                    tag: "1;1;1;1;1"),
+            new MeasuredValue(
+                    aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
+                    tag: "2;2;2;2;2")
+        ]
+        expectedLabel << [
+            "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                "${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                "${expectedLocationNames[0]}",
+            "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    "${expectedMeasuredEventNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    "${expectedLocationNames[0]}",
+            "${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    "${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    "${expectedLocationNames[1]}"
+        ]
 
 	}
 
-	@Test
-	void testGetOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMapForEventAggregator() {
+	void "correct graph labels get created for weekly page measured values"(){
 
+        expect:
+        serviceUnderTest.getMapLabel(mv) == expectedLabel
+
+        where:
+        mv << [
+                new MeasuredValue(
+                        aggregator: new AggregatorType(name: AggregatorType.PAGE),
+                        interval: weekly,
+                        tag: "1;1"),
+                new MeasuredValue(
+                        aggregator: new AggregatorType(name: AggregatorType.PAGE),
+                        interval: weekly,
+                        tag: "1;2"),
+                new MeasuredValue(
+                        aggregator: new AggregatorType(name: AggregatorType.PAGE),
+                        interval: weekly,
+                        tag: "2;2")
+        ]
+        expectedLabel << [
+                "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[0]}",
+                "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}",
+                "${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
+        ]
+
+	}
+
+	void "correct graph labels get created for weekly shop measured values"(){
+
+        expect:
+        serviceUnderTest.getMapLabel(mv) == expectedLabel
+
+        where:
+        mv << [
+                new MeasuredValue(
+                        aggregator: new AggregatorType(name: AggregatorType.SHOP),
+                        interval: weekly,
+                        tag: "1"),
+                new MeasuredValue(
+                        aggregator: new AggregatorType(name: AggregatorType.SHOP),
+                        interval: weekly,
+                        tag: "2")
+        ]
+        expectedLabel << [
+                "${expectedJobGroupNames[0]}",
+                "${expectedJobGroupNames[1]}"
+        ]
+
+	}
+
+	void "build osm chart graphs correctly from hourly event measured values"() {
+
+        setup:
 		//create test-specific data
-
 		MvQueryParams irrelevantQueryParamsCauseUsingFunctionalityIsMocked = new MvQueryParams()
-
 		//mock inner service
-
 		mockGenerator.mockEventMeasuredValueService(serviceUnderTest, measuredValueForEventHourlyList)
+        Integer numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation = 32
 
-		//run test
+        when:
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
+				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
 
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
-				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked)
-
-		//assertions
-
-		Integer numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation = 32
-		assertNotNull(result)
-		assertEquals(numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation, result.size())
+        then:
+		graphs != null
+        graphs.size() == numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation
 
 	}
 
-	@Test
-	void testGetOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMapForPageAggregator() {
+	void "build osm chart graphs correctly from page measured values"() {
 
+        setup:
 		//create test-specific data
-
 		Integer numberOfGroupPageCombinations = 2
 		Integer numberOfValuesInGraphOfGroupPageCombination_11 = 3
 		Integer numberOfValuesInGraphOfGroupPageCombination_12 = 2
 		String expectedGraphLabelOfGroupPageCombination_11 = "${expectedPageNames[0]}"
 		String expectedGraphLabelOfGroupPageCombination_12 = "${expectedPageNames[1]}"
-
+        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
-
 		mockGenerator.mockPageMeasuredValueService(serviceUnderTest, measuredValueForPageWeeklyList)
 
-		
-		
-		//run test
-		MeasuredValueInterval mvInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedPageMeasuredValuesAsHighChartMap(new Interval(now.getTime(), tomorrow.getTime()), new MvQueryParams(), mvInterval)
+		when:
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedPageMeasuredValuesAsHighChartMap(
+                new Interval(now.getTime(), tomorrow.getTime()),
+                new MvQueryParams(),
+                weekly
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> pointsGroupPageCombination_11 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_11).getPoints();
+        List<Long> pointsTimesGroupPageCombination_11 = pointsGroupPageCombination_11*.time
+        List<OsmChartPoint> pointsGroupPageCombination_12 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_12).getPoints();
+        List<Long> pointsTimesGroupPageCombination_12 = pointsGroupPageCombination_12*.time
 
-		//assertions
 
-		assertNotNull(result)
-		assertEquals(numberOfGroupPageCombinations, result.size())
+		then:
+        graphs != null
+        graphs.size() == numberOfGroupPageCombinations
 
-		OsmChartGraph graphUnderTest=findGraphByLabel(result, expectedGraphLabelOfGroupPageCombination_11);
-		
-		assertEquals(numberOfValuesInGraphOfGroupPageCombination_11, graphUnderTest.getPoints().size())
-		long lastTime = 0;
+        pointsGroupPageCombination_11.size() == numberOfValuesInGraphOfGroupPageCombination_11
+        pointsTimesGroupPageCombination_11 == pointsTimesGroupPageCombination_11.sort()
 
-		List<OsmChartPoint> points = graphUnderTest.getPoints();
-		for (OsmChartPoint eachPoint : points) {
-			assertTrue (lastTime < eachPoint.time)
-			lastTime = eachPoint.time
-		}
+        pointsGroupPageCombination_12.size() == numberOfValuesInGraphOfGroupPageCombination_12
+        pointsTimesGroupPageCombination_12 == pointsTimesGroupPageCombination_12.sort()
 
-		Long timestampKeyEarlierEveryMeasuredValue = -1;
-		lastTime = timestampKeyEarlierEveryMeasuredValue;
-		
-		
-		graphUnderTest=findGraphByLabel(result, expectedGraphLabelOfGroupPageCombination_12);
-		assertEquals(numberOfValuesInGraphOfGroupPageCombination_12, graphUnderTest.getPoints().size())
-
-		points = graphUnderTest.getPoints();
-		for (OsmChartPoint eachPoint : points) {
-			assertTrue (lastTime < eachPoint.time)
-			lastTime = eachPoint.time
-		}
 	}
 
-	@Test
-	void testGetOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMapForShopAggregator() {
+	void "build osm chart graphs correctly from shop measured values"() {
 
+        setup:
 		//create test-specific data
-
 		String expectedLabel = expectedJobGroupNames[0]
-
+        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
-
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
 
-		//run test
-		MeasuredValueInterval mvInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(new Interval(now.getTime(), tomorrow.getTime()), mvInterval, new MvQueryParams())
+        when:
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+                new Interval(now.getTime(), tomorrow.getTime()),
+                weekly,
+                new MvQueryParams()
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
+        List<Long> pointsTimes = points*.time
 
-		//assertions
+        then:
+		graphs != null
+		graphs.size() == 1
 
-		assertNotNull(result)
-		assertEquals(1, result.size())
-		
-		OsmChartGraph graphUnderTest=findGraphByLabel(result, expectedLabel);
-		
-		assertEquals(measuredValueForShopWeeklyList.size(), graphUnderTest.getPoints().size())
+        points.size() == measuredValueForShopWeeklyList.size()
+        points.every{point -> point.measuredValue > 0}
+        pointsTimes == pointsTimes.sort()
 
-		long lastTime = 0
-		List<OsmChartPoint> points = graphUnderTest.getPoints();
-		for (OsmChartPoint eachPoint : points) {
-			assertTrue(eachPoint.measuredValue >= 0)
-			assertTrue (lastTime < eachPoint.time)
-			lastTime = eachPoint.time
-		}
 	}
 
-	@Test
-	void testGetOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMapForShopAggregatorWithNullInDataSource() {
+	void "build osm chart graphs correctly from shop measured values with null in data source"() {
 
+        setup:
 		//create test-specific data
-
 		String expectedLabel = expectedJobGroupNames[0]
-
+        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
-
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyWithNullList)
 
-		//run test
-		
-		MeasuredValueInterval mvInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(new Interval(now.getTime(), tomorrow.getTime()), mvInterval, new MvQueryParams())
+		when:
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+                new Interval(now.getTime(), tomorrow.getTime()),
+                weekly,
+                new MvQueryParams()
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
+        List<Long> pointsTimes = points*.time
 
-		//assertions
+		then:
+		graphs != null
+		graphs.size() == 1
 
-		assertNotNull(result)
-		assertEquals(1, result.size())
+        points.size() == measuredValueForShopWeeklyWithNullList.size() - 1
+        points.every{point -> point.measuredValue > 0}
+        pointsTimes == pointsTimes.sort()
 
-		//measuredValueForShopHourlyWithNullList.size() - 1 because value of one element is null
-		
-		OsmChartGraph graphUnderTest=findGraphByLabel(result, expectedLabel);
-		assertEquals(measuredValueForShopWeeklyWithNullList.size() - 1, graphUnderTest.getPoints().size())
-
-		long lastTime = 0
-		List<OsmChartPoint> points = graphUnderTest.getPoints()
-		for (OsmChartPoint eachPoint : points) {
-			assertTrue(eachPoint.measuredValue >= 0)
-			assertTrue (lastTime < eachPoint.time)
-			lastTime = eachPoint.time
-		}
 	}
 
-	@Test
-	void testGetOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMapForShopAggregatorWithValuesLowerThanOneInDataSource() {
+	void "build osm chart graphs correctly from shop measured values with values lower than one in data source"() {
 
+        setup:
 		//create test-specific data
-
 		String expectedLabel = expectedJobGroupNames[0]
-
+        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
-
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
 
-		//run test
-		
-		MeasuredValueInterval mvInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(new Interval(now.getTime(), tomorrow.getTime()), mvInterval, new MvQueryParams())
+		when:
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+                new Interval(now.getTime(), tomorrow.getTime()),
+                weekly,
+                new MvQueryParams()
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
+        List<Long> pointsTimes = points*.time
 
-		//assertions
-		assertNotNull(result)
-		assertEquals(1, result.size())
-		
-		OsmChartGraph graphUnderTest=findGraphByLabel(result, expectedLabel);
-		assertEquals(measuredValueListWithValuesLowerThanOne.size(), graphUnderTest.getPoints().size())
+		then:
+        graphs != null
+        graphs.size() == 1
 
-		long lastTime = 0
-		List<OsmChartPoint> points = graphUnderTest.getPoints()
-		for (OsmChartPoint eachPoint : points) {
-			assertTrue(eachPoint.measuredValue > 1)
-			assertTrue (lastTime < eachPoint.time)
-			lastTime = eachPoint.time
-		}
+        points.size() == measuredValueListWithValuesLowerThanOne.size()
+        points.every{point -> point.measuredValue > 1}
+        pointsTimes == pointsTimes.sort()
+
 	}
 
-	@Test
-	void testGetOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMapForShopAggregatorWithValuesLowerThanOneAndMoreThanTwoDecimalPlacesInDataSource() {
+	void "build osm chart graphs correctly from shop measured values with values lower than one and with more than two decimal places in data source"() {
 
+        setup:
 		//create test-specific data
-
 		String expectedLabel = expectedJobGroupNames[0]
-
+        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
-
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
 
-		//run test
-		
-		MeasuredValueInterval mvInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
+		when:
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+                new Interval(now.getTime(), tomorrow.getTime()),
+                weekly,
+                new MvQueryParams()
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+        List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
+        List<Long> pointsTimes = points*.time
 
-		List<OsmChartGraph> result = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(new Interval(now.getTime(), tomorrow.getTime()), mvInterval, new MvQueryParams())
+		then:
+        graphs != null
+        graphs.size() == 1
 
-		//assertions
+        points.size() == measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces.size()
+        points.every{point ->
+            point.measuredValue > 1 &&
+                    String.valueOf(point.measuredValue).split("\\.")[1].length() <= 2
+        }
 
-		assertNotNull(result)
-		assertEquals(1,  result.size())
-		OsmChartGraph graphUnderTest=findGraphByLabel(result, expectedLabel);
-		assertEquals(measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces.size(), graphUnderTest.getPoints().size())
+        pointsTimes == pointsTimes.sort()
 
-		long lastTime = 0
-		List<OsmChartPoint> points = graphUnderTest.getPoints()
-		for (OsmChartPoint eachPoint : points) {
-			assertTrue(eachPoint.measuredValue > 1)
-
-			String[] splittedAtFractionPoint = String.valueOf(eachPoint.measuredValue).split("\\.");
-			//			splits[0].length()   // Before Decimal Count
-			//			splits[1].length()   // After  Deci
-			assertTrue(splittedAtFractionPoint[1].length() <= 2)
-
-			assertTrue (lastTime < eachPoint.time)
-			lastTime = eachPoint.time
-		}
 	}
 
-	@Test
-	void testGetCsRelevantStaticGraphsAsResultMapForChart(){
+	void "cs relevant static graphs get provided correctly"(){
 
+        setup:
 		//create test-specific data
-
 		DateTime fromDate = new DateTime(now).minusMonths(3)
 		DateTime toDate = new DateTime(now).minusMonths(1)
 
-		//run test
-
+		when:
 		List<OsmChartGraph> highcharts = serviceUnderTest.getCsRelevantStaticGraphsAsResultMapForChart(fromDate, toDate)
+        List<OsmChartPoint> points = findGraphByLabel(highcharts, graphLabel).getPoints();
+        OsmChartPoint threeMonthsAgo = points[0]
+        double threeMonthsAgoDeviationDueToRounding = Math.abs(threeMonthsAgo.measuredValue - 82.5)
+        OsmChartPoint oneMonthAgo = points[1]
+        double oneMonthAgoDeviationDueToRounding = Math.abs(oneMonthAgo.measuredValue - 87.5)
 
-		//assertions
+		then:
+		highcharts.size() == 1
 
-		assertEquals(1, highcharts.size())
-		List<OsmChartPoint> points = findGraphByLabel(highcharts, graphLabel).getPoints();
-		assertNotNull(points)
-		assertEquals(2, points.size())
+		points != null
+		points.size() == 2
 
-		OsmChartPoint threeMonthsAgo = points[0];
-		assertEquals(
-			new DateTime(fromDate, DateTimeZone.forID('MET')).getMillis(), 
-			threeMonthsAgo.time);
-		assertEquals(82.5, threeMonthsAgo.measuredValue, tolerableDeviationDueToRounding);
+        threeMonthsAgo.time == new DateTime(fromDate, DateTimeZone.forID('MET')).getMillis()
+        threeMonthsAgoDeviationDueToRounding < tolerableDeviationDueToRounding
 
-		OsmChartPoint oneMonthAgo = points[1];
-		assertEquals(
-			new DateTime(toDate, DateTimeZone.forID('MET')).getMillis(),
-			oneMonthAgo.time);
-		assertEquals(87.5, oneMonthAgo.measuredValue, tolerableDeviationDueToRounding);
+        oneMonthAgo.time == new DateTime(toDate, DateTimeZone.forID('MET')).getMillis()
+        oneMonthAgoDeviationDueToRounding < tolerableDeviationDueToRounding
 	}
 
 	//creating data common for all tests/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -559,7 +475,7 @@ class CustomerSatisfactionHighChartServiceTests {
 									interval: hourly,
 									aggregator: measured_event,
 									tag: "${zeroBasedIndexJobGroup+1};${zeroBasedIndexPage+1};${zeroBasedIndexMeasuredEvent+1};${zeroBasedIndexBrowser+1};${zeroBasedIndexLocation+1}",
-									value: 0.85,
+									value: 85,
 									resultIds: '1,2'
 									))
 						}}}}}
@@ -570,7 +486,7 @@ class CustomerSatisfactionHighChartServiceTests {
 			interval: hourly,
 			aggregator: page,
 			tag: "1;1",
-			value: 0.85,
+			value: 85,
 			resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -578,7 +494,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;1",
-				value: 0.83,
+				value: 83,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -586,7 +502,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;1",
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			),
 			new MeasuredValue(
@@ -594,7 +510,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;2",
-				value: 0.65,
+				value: 65,
 				resultIds: '7,8'
 			),
 			new MeasuredValue(
@@ -602,7 +518,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: page,
 				tag: "1;2",
-				value: 0.67,
+				value: 67,
 				resultIds: '9,10'
 			)
 		]
@@ -613,7 +529,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.85,
+				value: 85,
 				resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -621,7 +537,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.83,
+				value: 83,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -629,7 +545,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			)
 		]
@@ -648,7 +564,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.83,
+				value: 83,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -656,7 +572,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			)
 		]
@@ -667,7 +583,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.32,
+				value: 32,
 				resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -675,7 +591,7 @@ class CustomerSatisfactionHighChartServiceTests {
 			interval: weekly,
 			aggregator: shop,
 			tag: '1',
-			value: 0.83,
+			value: 83,
 			resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -683,7 +599,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.79,
+				value: 79,
 				resultIds: '3,4'
 			)
 		]
@@ -694,7 +610,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.324562,
+				value: 32.4562,
 				resultIds: '1,2'
 			),
 			new MeasuredValue(
@@ -702,7 +618,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.8312367,
+				value: 83.12367,
 				resultIds: '5,6'
 			),
 			new MeasuredValue(
@@ -710,7 +626,7 @@ class CustomerSatisfactionHighChartServiceTests {
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 0.790968,
+				value: 79.0968,
 				resultIds: '3,4'
 			)
 		]
@@ -749,4 +665,42 @@ class CustomerSatisfactionHighChartServiceTests {
 		
 		return graph;
 	}
+
+    void mockServicesCommonForAllTests() {
+        // We simply a modified version of the original service here, because
+        // we expect only URL generation to be called and expect that
+        // the service under test don't care about the URL itself.
+        serviceUnderTest.eventResultDashboardService = new EventResultDashboardService() {
+            @Override
+            public URL tryToBuildTestsDetailsURL(MeasuredValue mv) {
+                return new URL('http://measuredvalue.example.com/'+mv.id);
+            }
+        }
+        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService()
+        mockGenerator = ServiceMocker.create()
+        mockGenerator.mockCsTargetGraphDaoService(serviceUnderTest, graphLabel)
+        mockGenerator.mockLinkGenerator(serviceUnderTest, 'http://www.iteratec.de')
+        mockGenerator.mockMeasuredValueTagService(
+                serviceUnderTest,
+                ['1' : new JobGroup(id: 1, name: expectedJobGroupNames[0]), '2' : new JobGroup(id: 2, name: expectedJobGroupNames[1])],
+                ['1' : new MeasuredEvent(id: 1, name: expectedMeasuredEventNames[0]), '2' : new MeasuredEvent(id: 2, name: expectedMeasuredEventNames[1])],
+                ['1' : new Page(id: 1, name: expectedPageNames[0]), '2' : new Page(id: 2, name: expectedPageNames[1])],
+                ['1' : new Browser(id: 1, name: expectedBrowserNames[0]), '2' : new Browser(id: 2, name: expectedBrowserNames[1])],
+                ['1' : new Location(id: 1, location: expectedLocationNames[0]), '2' : new Location(location: expectedLocationNames[1])]
+        )
+        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        serviceUnderTest.osmChartProcessingService.i18nService = [
+                msg: {String msgKey, String defaultMessage = null, List objs = null ->
+                    Map i18nKeysToValues = [
+                            'job.jobGroup.label':I18N_LABEL_JOB_GROUP,
+                            'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
+                            'job.location.label':I18N_LABEL_LOCATION,
+                            'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
+                            'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY
+                    ]
+                    return i18nKeysToValues[msgKey]
+                }
+        ] as I18nService
+
+    }
 }

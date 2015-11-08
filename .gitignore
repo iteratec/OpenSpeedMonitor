@@ -12,6 +12,7 @@
 *.iws
 projectFilesBackup
 .idea
+.slcache/
 
 # ignore sublime-specifics
 *.sublime-project

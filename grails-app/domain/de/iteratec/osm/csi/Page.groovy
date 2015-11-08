@@ -17,12 +17,15 @@
 
 package de.iteratec.osm.csi
 
+import groovy.transform.EqualsAndHashCode
+
 /**
  * A Page of a web-application which performance is measured.
  *
  * @author nkuhn
  * @author mze
  */
+@EqualsAndHashCode
 class Page {
 
     /**

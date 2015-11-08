@@ -66,12 +66,6 @@ grails.mime.types = [
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000
 
-// disabling processing of resources generally:
-//grails.resources.processing.enabled = false
-// What URL patterns should be processed by the resources plugin:
-//grails.resources.adhoc.patterns = ['/images/*', '/css/*', '/js/*', '/plugins/*']
-grails.resources.adhoc.excludes = ['**/WEB-INF/**', '**/META-INF/**']
-
 // The default codec used to encode data with ${}
 grails.views.default.codec = "none" // none, html, base64
 //"ISO-8859-1"
@@ -99,22 +93,27 @@ grails.exceptionresolver.params.exclude = ['password']
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
 
+beans {
+    cacheManager {
+        shared = true
+    }
+}
 // so Tag and TagLink can be referenced in HQL queries. See http://grails.org/plugin/taggable
 grails.taggable.tag.autoImport = true
 grails.taggable.tagLink.autoImport = true
-
-grails.cache.enabled = false
 
 def logDirectory = '.'
 
 grails.config.defaults.locations = [KickstartResources]
 
-grails.plugins.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
-grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
-grails.plugins.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
-grails.plugins.springsecurity.securityConfigType = "InterceptUrlMap"
+grails.plugin.springsecurity.password.algorithm = 'SHA-512'
+grails.plugin.springsecurity.password.hash.iterations = 1
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'de.iteratec.osm.security.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'de.iteratec.osm.security.UserRole'
+grails.plugin.springsecurity.authority.className = 'de.iteratec.osm.security.Role'
+grails.plugin.springsecurity.securityConfigType = "InterceptUrlMap"
 
-grails.plugins.springsecurity.interceptUrlMap = [
+grails.plugin.springsecurity.interceptUrlMap = [
 //////////////////////////////////////////////////////////////////
 //free for all (even guests not logged in)
 //////////////////////////////////////////////////////////////////
@@ -136,7 +135,7 @@ grails.plugins.springsecurity.interceptUrlMap = [
 '/csiDashboard/downloadPageWeights'           : ["permitAll"],
 '/csiDashboard/downloadHourOfDayWeights'      : ["permitAll"],
 '/eventResultDashboard/**'                    : ["permitAll"],
-'/eventResult/**'                             : ["permitAll"],
+'/tabularResultPresentation/**'                             : ["permitAll"],
 '/highchartPointDetails/**'                   : ["permitAll"],
 '/rest/**'                                    : ["permitAll"],
 '/login/**'                                   : ["permitAll"],
@@ -148,12 +147,14 @@ grails.plugins.springsecurity.interceptUrlMap = [
 '/script/list'                                : ["permitAll"],
 '/queueStatus/list'                           : ["permitAll"],
 '/queueStatus/refresh'                        : ["permitAll"],
+'/jobSchedule/schedules'                      : ["permitAll"],
 '/connectivityProfile/list'                   : ["permitAll"],
 '/about'                                      : ["permitAll"],
 '/cookie/**'                                  : ["permitAll"],
 '/csiDashboard/storeCustomDashboard'          : ["permitAll"],
 '/csiDashboard/validateDashboardName'         : ["permitAll"],
 '/csiDashboard/validateAndSaveDashboardValues': ["permitAll"],
+'/i18n/getAllMessages'                        : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////
@@ -165,47 +166,31 @@ grails.plugins.springsecurity.interceptUrlMap = [
 '/**'                                         : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
 ]
 
-grails.plugins.dynamicController.mixins = [
-        'com.burtbeckwith.grails.plugins.appinfo.IndexControllerMixin'  :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.Log4jControllerMixin'  :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.MemoryControllerMixin' :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.ScopesControllerMixin' :
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        'com.burtbeckwith.grails.plugins.appinfo.ThreadsControllerMixin':
-                'com.burtbeckwith.appinfo_test.AdminManageController',
-
-        /*
-         'com.burtbeckwith.grails.plugins.appinfo.PropertiesControllerMixin' :
-         'com.burtbeckwith.appinfo_test.AdminManageController',
-         'com.burtbeckwith.grails.plugins.appinfo.SpringControllerMixin' :
-         'com.burtbeckwith.appinfo_test.AdminManageController',
-         'app.info.custom.example.MyConfigControllerMixin' :
-         'com.burtbeckwith.appinfo_test.AdminManageController'
-         */
-]
-
 /*
  *	Configure charting libraries available in OpenSpeedMonitor.
  * 	Default is rickshaw, see http://code.shutterstock.com/rickshaw/
  * 	Highcharts (http://www.highcharts.com/) is possible, too, but licensed proprietary.
  */
 /** default charting lib */
-grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.HIGHCHARTS
+grails.de.iteratec.osm.report.chart.chartTagLib = ChartingLibrary.RICKSHAW
 /** all available charting libs */
-grails.de.iteratec.osm.report.chart.availableChartTagLibs = [ChartingLibrary.RICKSHAW, ChartingLibrary.HIGHCHARTS]
-/** url to highchart's export server (for exporting charts as bitmaps or vector graphics). */
-grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.highcharts.com'
+grails.de.iteratec.osm.report.chart.availableChartTagLibs = [ChartingLibrary.RICKSHAW]
 
 // if not specified default in code is 30 days
 // unit: seconds
 grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
+
+//Exclude all less files, but not the main less files. This.will solv.dependency errors and will increase the performance.
+grails.assets.less.compile = 'less4j'
+grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
+grails.assets.plugin."font-awesome-resources".excludes = ["**/*.less"]
+grails.assets.excludes = ["openspeedmonitor.less"]
+
+grails.assets.minifyJs = true
+grails.assets.minifyCss = true
+
+grails.i18n.locales = ['en','de']
+
 
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -217,24 +202,11 @@ environments {
         grails.dbconsole.enabled = true
         grails.dbconsole.urlRoot = '/admin/dbconsole'
 
-        // disabling hashing and caching of resources:
-        // 2014-03-31 nku: doesn't work :-(
-        //		grails.resources.mappers.hashandcache.enabled = false
-        // exclude resources from hashing and caching:
-        // (used as a workaround, cause general disabling doesn't work)
-        grails.resources.mappers.hashandcache.excludes = ['**/*.css', '**/*.less', '**/*.js', '**/*.woff']
-        // disable caching-headers:
-        cache.headers.enabled = false
-        // disable bundling of resources:
-        grails.resources.mappers.bundle.enabled = false
-        // Forces debug mode all the time, as if you added _debugResources=y to every request:
-        //grails.resources.debug=true
-
         // grails console-plugin, see https://github.com/sheehan/grails-console
         grails.plugin.console.enabled = true
         grails.plugin.console.fileStore.remote.enabled = false // Whether to include the remote file store functionality. Default is true.
-        grails.plugin.console.fileStore.remote.enabled = true
-        // Whether to include the remote file store functionality. Default is true.
+
+        grails.assets.bundle=true
 
         log4j = {
 

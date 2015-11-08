@@ -28,7 +28,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 interface iListener {
-	public String getName()
+	public String getListenerName()
 	public void listenToLocations(GPathResult result, WebPageTestServer wptserver)
 	public void listenToResult(
 		GPathResult result,
@@ -113,7 +113,7 @@ class ProxyService {
 		
 		log.info("${this.listener.size} iListener(s) listen to the fetching of locations")
 		this.listener.each {
-			log.info("calling listenToLocations for iListener ${it.getName()}")
+			log.info("calling listenToLocations for iListener ${it.getListenerName()}")
 			it.listenToLocations(locationsResponse, wptserver)
 		}
 	}

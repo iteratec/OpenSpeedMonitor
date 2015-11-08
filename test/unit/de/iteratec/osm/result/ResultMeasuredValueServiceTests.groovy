@@ -262,7 +262,9 @@ class ResultMeasuredValueServiceTests {
 				jobResultJobConfigId: runInHour_One.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-				connectivityProfile: connectivityProfile
+				connectivityProfile: connectivityProfile,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
 				).save(failOnError: true)
 		
 		runInHour_One.save(failOnError: true)
@@ -308,7 +310,9 @@ class ResultMeasuredValueServiceTests {
 				jobResultJobConfigId: runInHour_Two.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-				connectivityProfile: connectivityProfile
+				connectivityProfile: connectivityProfile,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
 				).save(failOnError: true)
 		
 		runInHour_Two.save(failOnError: true)
@@ -354,7 +358,9 @@ class ResultMeasuredValueServiceTests {
 				jobResultJobConfigId: runBeforeHour.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-				connectivityProfile: connectivityProfile
+				connectivityProfile: connectivityProfile,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
 				).save(failOnError: true)
 		
 		runBeforeHour.save(failOnError: true)
@@ -400,7 +406,9 @@ class ResultMeasuredValueServiceTests {
 				jobResultJobConfigId: runAfterHour.job.ident(),
 				measuredEvent: measuredEvent,
 				speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-				connectivityProfile: connectivityProfile
+				connectivityProfile: connectivityProfile,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
 				).save(failOnError: true)
 		
 		runAfterHour.save(failOnError: true)

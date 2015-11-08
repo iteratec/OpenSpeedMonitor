@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.script
 
+import de.iteratec.osm.api.json.JSONLocationBox
 import de.iteratec.osm.result.PageService
 import grails.converters.JSON
 
@@ -57,7 +58,7 @@ class ScriptController {
 	}
 	
 	def create() {
-		[script: new Script(params)]
+		[script: new Script(params), measuredEvents: MeasuredEvent.findAllByNameNotLike("% %") as JSON]
 	}
 	
 	def save() {
@@ -76,7 +77,7 @@ class ScriptController {
 		Script script = Script.get(params.id)
 		redirectIfNotFound(script, params.id)
 		// only MeasuredEvents whose names do not contain spaces
-		[script: script, measuredEvents: MeasuredEvent.findAllByNameNotLike("% %", [sort: 'name'])]
+		[script: script, measuredEvents: MeasuredEvent.findAllByNameNotLike("% %") as JSON]
 	}
 	
 	def update() {

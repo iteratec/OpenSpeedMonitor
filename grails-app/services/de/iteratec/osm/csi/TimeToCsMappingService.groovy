@@ -45,12 +45,15 @@ class TimeToCsMappingService {
 	 * @return
 	 */
 	public Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page){
-		Map<String, Double> mappings = timeToCsMappingCacheService.getTimeToCsMappings()
+        List<TimeToCsMapping> mappingsForPage = timeToCsMappingCacheService.getMappingsFor(page)
 		
-		Integer lowerHundredthSec = Math.floor((docReadyTimeInMilliSecs/100))*100
-		Integer diffDocreadyToLowerHundredthSec = docReadyTimeInMilliSecs-lowerHundredthSec
-		Double upperCs = mappings["${page.name}_${lowerHundredthSec}"]?:0
-		Double lowerCs = mappings["${page.name}_${(lowerHundredthSec+100)}"]?:0
+		Integer lowerHundredthMillisecs = Math.floor((docReadyTimeInMilliSecs/100))*100
+        Integer upperHundredthMillisecs = lowerHundredthMillisecs + 100
+		Integer diffDocreadyToLowerHundredthSec = docReadyTimeInMilliSecs-lowerHundredthMillisecs
+		Double upperCs = lowerHundredthMillisecs == 0 ? 100 : lowerHundredthMillisecs > 20000 ? 0 :
+                mappingsForPage.find {it.loadTimeInMilliSecs == lowerHundredthMillisecs}.customerSatisfaction
+		Double lowerCs = upperHundredthMillisecs == 0 ? 100 : upperHundredthMillisecs > 20000 ? 0 :
+                mappingsForPage.find {it.loadTimeInMilliSecs == upperHundredthMillisecs}.customerSatisfaction
 		
 		Double customerSatisfaction
 		if (upperCs!=null && lowerCs!=null && upperCs>=lowerCs) {
@@ -102,7 +105,34 @@ class TimeToCsMappingService {
 	 * @return true if more than one different frustration timings exist for given {@link Page} page. false otherwise. false if page is null or undefinde page, too.
 	 */
 	public Boolean validFrustrationsExistFor(Page page){
-		return page != null && !page.isUndefinedPage() && getCachedFrustrations(page).unique().size()>1
+		return isValid(page) && getCachedFrustrations(page).unique().size()>1
+	}
+
+    public Boolean validMappingsExistFor(Page page){
+        return isValid(page) && timeToCsMappingCacheService.getMappingsFor(page)
+    }
+
+    Boolean isValid(Page page){
+        return page != null && !page.isUndefinedPage()
+    }
+
+	public getPageMappingAsChartData(Page page){
+		List<Integer> frustrations = getCachedFrustrations(page)
+		Integer countFrustrations = frustrations.size()
+		frustrations.sort()
+		int lastFloor = 0
+		List<Integer> frustrationsSinceLastCount = []
+		frustrations.each {frustration ->
+			double actualFloor = Math.floor(frustration / 100)
+			if (actualFloor > lastFloor){
+				lastFloor = actualFloor
+			}
+		}
+		int loadTimeInMillisecs = 100
+		while(loadTimeInMillisecs < 12000){
+
+			loadTimeInMillisecs+=100
+		}
 	}
 
 }

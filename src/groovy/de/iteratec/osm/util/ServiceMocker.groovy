@@ -23,6 +23,7 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
@@ -330,6 +331,10 @@ class ServiceMocker {
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
 		}
+        measuredValueTagServiceMocked.demand.findJobGroupOfEventResultTag(0..10000) {String mvTag ->
+            String idJobGroup = mvTag.split(";")[0]
+            return idAsStringToJobGroupMap[idJobGroup]
+        }
 		measuredValueTagServiceMocked.demand.findMeasuredEventOfHourlyEventTag(0..10000) {String mvTag ->
 			String measuredEventId = mvTag.split(";")[1]
 			return idAsStringToMeasuredEventMap[measuredEventId]
@@ -397,14 +402,14 @@ class ServiceMocker {
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param timeToCsMappings
-	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getTimeToCsMappings()}.
+	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getMappings()}.
 	 * @param frustrations
 	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
 	 */
 	void mockTimeToCsMappingService(serviceToMockIn, timeToCsMappings, frustrations){
 		def timeToCsMappingCacheService = mockFor(TimeToCsMappingCacheService)
-		
-		timeToCsMappingCacheService.demand.getTimeToCsMappings(0..25) { ->
+
+		timeToCsMappingCacheService.demand.getMappingsFor(0..25) {Page page ->
 			return timeToCsMappings
 		}
 		timeToCsMappingCacheService.demand.getCustomerFrustrations(0..25) {Page page ->
@@ -427,6 +432,9 @@ class ServiceMocker {
 		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
 			//not the concern of this test
 		}
+        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
+            //not the concern of this test
+        }
 		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.createMock()
 	}
 	/**
@@ -554,7 +562,14 @@ class ServiceMocker {
     void mockEventResultDaoService(serviceToMockIn, ArrayList<EventResult> eventResults) {
         def eventResultDaoService = mockFor(EventResultDaoService, true)
         eventResultDaoService.demand.getLimitedMedianEventResultsBy(1..10000) {
-            Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams queryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints ->
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            ErQueryParams queryParams,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            Map listCriteriaRestrictionMap,
+            CriteriaSorting sorting ->
                 return eventResults
         }
         serviceToMockIn.eventResultDaoService = eventResultDaoService.createMock()

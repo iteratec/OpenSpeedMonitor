@@ -80,6 +80,6 @@ class MeasuredValueUpdateEvent {
 	 */
 	@Override
 	public String toString() {
-		return "${dateOfUpdate}: ${updateCause} of MeasuredValue with id=${MeasuredValueId}";
+		return "${dateOfUpdate}: ${updateCause} of MeasuredValue with id=${measuredValueId}";
 	}
 }

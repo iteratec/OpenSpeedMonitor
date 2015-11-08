@@ -18,15 +18,16 @@
 package de.iteratec.osm.report.chart;
 
 /**
- * Application charts can be built with these libraries.
+ * Application time charts can be built with these libraries.
  * Rickshaw is published under a free license so it's the default charting library.
+ *
+ * 2015-10-08, nkuhn: HIGHCHARTS is removed.
+ *      So at the moment rickshaw is only charting library in addition to native d3.js.
  * 
  * @author wilhelm
  * @see http://code.shutterstock.com/rickshaw/
- * @see http://www.highcharts.com/
  *
  */
 public enum ChartingLibrary {
-	RICKSHAW,
-	HIGHCHARTS
+	RICKSHAW
 }

@@ -18,10 +18,12 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -66,7 +68,7 @@ class TabularResultPresentationController {
     JobResultDaoService jobResultDaoService
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
-    //	LinkGenerator grailsLinkGenerator
+    EventResultDashboardService eventResultDashboardService
 
     private Map<String, Object> listResultsByCommand(EventResultsCommandBase cmd) {
 
@@ -84,21 +86,27 @@ class TabularResultPresentationController {
                 modelToRender.put('command', cmd)
             } else {
                 Interval timeFrame = cmd.getSelectedTimeFrame();
-                Iterable<JobResult> jobResults = null
-                Iterable<EventResult> eventResults = null
-                Integer eventResultsTotalCount = null
+                List<EventResult> eventResults = null
                 if (cmd instanceof ListResultsCommand) {
-                    if(osmDataSourceService.getRLikeSupport()){
-                        eventResultsTotalCount = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(((ListResultsCommand)cmd).createMvQueryParams(), timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.getMax(), cmd.getOffset()).getTotalCount();
-                        paginationListing = paginationService.buildListResultsPagination((ListResultsCommand)cmd, eventResultsTotalCount)
-                    }
-                    eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(((ListResultsCommand)cmd).createMvQueryParams(), timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.getMax(), cmd.getOffset())
+                    eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
+                            ((ListResultsCommand)cmd).createMvQueryParams(),
+                            ((ListResultsCommand)cmd),
+                            timeFrame.getStart().toDate(),
+                            timeFrame.getEnd().toDate(),
+                            cmd.getMax(),
+                            cmd.getOffset(),
+                            new CriteriaSorting(sortAttribute: 'jobResultDate', sortOrder: CriteriaSorting.SortOrder.DESC)
+                    )
+                    paginationListing = paginationService.buildListResultsPagination((ListResultsCommand)cmd, eventResults.getTotalCount())
                 } else if (cmd instanceof ListResultsForSpecificJobCommand) {
-                    if(osmDataSourceService.getRLikeSupport()){
-                        eventResultsTotalCount = eventResultDaoService.getEventResultsByJob(((ListResultsForSpecificJobCommand)cmd).job, timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.getMax(), cmd.getOffset()).getTotalCount();
-                        paginationListing = paginationService.buildListResultsForJobPagination((ListResultsForSpecificJobCommand)cmd, eventResultsTotalCount)
-                    }
-                    eventResults = eventResultDaoService.getEventResultsByJob(((ListResultsForSpecificJobCommand)cmd).job, timeFrame.getStart().toDate(), timeFrame.getEnd().toDate(), cmd.getMax(), cmd.getOffset())
+                    eventResults = eventResultDaoService.getEventResultsByJob(
+                            ((ListResultsForSpecificJobCommand)cmd).job,
+                            timeFrame.getStart().toDate(),
+                            timeFrame.getEnd().toDate(),
+                            cmd.getMax(),
+                            cmd.getOffset()
+                    )
+                    paginationListing = paginationService.buildListResultsForJobPagination((ListResultsForSpecificJobCommand)cmd, eventResults.getTotalCount())
                 }
 
                 for(EventResult eachEventResult : eventResults)
@@ -109,7 +117,6 @@ class TabularResultPresentationController {
                     }
                     JobResult correspondingJobResult = eachEventResult.jobResult;
                     eventResultsListing.addRow(new EventResultListingRow(correspondingJobResult, eachEventResult))
-//                    formerly: eventResultsListing.addRow(new EventResultListingRow(jobResultService.findJobResultByEventResult(eachEventResult), eachEventResult));
                 }
 
                 modelToRender.put('showEventResultsListing', true);
@@ -197,7 +204,7 @@ class TabularResultPresentationController {
         render(view: 'listResults', model: modelToRender)
     }
 
-    @Validateable
+    @Validateable(nullable = true)
     public static class EventResultsCommandBase {
         /**
          * The selected start date.
@@ -371,7 +378,7 @@ class TabularResultPresentationController {
         }
     }
 
-    @Validateable
+    @Validateable(nullable = true)
     public static class ListResultsForSpecificJobCommand extends EventResultsCommandBase {
         Job job
 
@@ -397,7 +404,7 @@ class TabularResultPresentationController {
      * @author mze
      * @since IT-74
      */
-    @Validateable
+    @Validateable(nullable = true)
     public static class ListResultsCommand extends EventResultsCommandBase{
         /**
          * The database IDs of the selected {@linkplain JobGroup CSI groups}
@@ -472,6 +479,41 @@ class TabularResultPresentationController {
         Boolean selectedAllLocations
 
         /**
+         * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
+         *
+         * These selections are only relevant if
+         * {@link #selectedAllConnectivityProfiles} is evaluated to
+         * <code>false</code>.
+         */
+        Collection<Long> selectedConnectivityProfiles = []
+
+        /**
+         * User enforced the selection of all ConnectivityProfiles.
+         * This selection <em>is not</em> reflected in
+         * {@link #selectedConnectivityProfiles} cause of URL length
+         * restrictions. If this flag is evaluated to
+         * <code>true</code>, the selections in
+         * {@link #selectedConnectivityProfiles} should be ignored.
+         */
+        Boolean selectedAllConnectivityProfiles = true
+
+        /**
+         * Whether or not EventResults measured with native connectivity should get included.
+         */
+        Boolean includeNativeConnectivity
+
+        /**
+         * Wheter or not EventResult measured with custom connectivity should get included.
+         */
+        Boolean includeCustomConnectivity;
+
+        /**
+         * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
+         * connectivity name matches this regex.
+         */
+        String customConnectivityName
+
+        /**
          * Constraints needs to fit.
          */
         static constraints = {
@@ -494,6 +536,14 @@ class TabularResultPresentationController {
             selectedLocations(nullable:false, validator: { Collection currentCollection, ListResultsCommand cmd ->
                 return (cmd.selectedAllLocations || (!currentCollection.isEmpty()))
             })
+
+            selectedAllConnectivityProfiles(nullable: true)
+
+            includeNativeConnectivity(nullable: false)
+
+            includeCustomConnectivity(nullable: false)
+
+            customConnectivityName(nullable: true)
         }
 
         /**
@@ -524,6 +574,12 @@ class TabularResultPresentationController {
             viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
             viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
+            viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
+            viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
+            viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
+            viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
+            viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
+
             super.copyRequestDataToViewModelMap(viewModelToCopyTo)
         }
 
@@ -543,6 +599,15 @@ class TabularResultPresentationController {
 
         /**
          * <p>
+         * Returns a boolean to include custom connectivity in selected connetivities
+         * </p>
+         */
+        public boolean includeCustomConnectivity() {
+            return includeCustomConnectivity;
+        }
+
+        /**
+         * <p>
          * Creates {@link MvQueryParams} based on this command. This command
          * need to be valid for this operation to be successful.
          * </p>
@@ -551,14 +616,15 @@ class TabularResultPresentationController {
          * @throws IllegalStateException
          *         if called on an invalid instance.
          */
-        private MvQueryParams createMvQueryParams() throws IllegalStateException
+        private ErQueryParams createMvQueryParams() throws IllegalStateException
         {
+
             if( !this.validate() )
             {
                 throw new IllegalStateException('Query params are not available from an invalid command.')
             }
 
-            MvQueryParams result = new MvQueryParams();
+            ErQueryParams result = new ErQueryParams();
 
             result.jobGroupIds.addAll(this.selectedFolder);
 
@@ -577,6 +643,17 @@ class TabularResultPresentationController {
             if( !this.selectedAllLocations )
             {
                 result.locationIds.addAll(this.selectedLocations);
+            }
+
+            result.includeNativeConnectivity = this.includeNativeConnectivity
+            result.includeCustomConnectivity = this.includeCustomConnectivity
+            if (this.includeCustomConnectivity){
+                result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
+            }
+            if (this.selectedAllConnectivityProfiles){
+                result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
+            }else if (this.selectedConnectivityProfiles.size() > 0){
+                result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
             }
 
             return result;
@@ -662,6 +739,8 @@ class TabularResultPresentationController {
         // JavaScript-Utility-Stuff:
         result.put("dateFormat", DATE_FORMAT_STRING)
         result.put("weekStart", MONDAY_WEEKSTART)
+
+        result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
 
         // Done! :)
         return result;

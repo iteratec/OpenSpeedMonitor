@@ -1,20 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
-<meta name="layout" content="kickstart_osm" />
-<title>CSI CheckDashboard</title>
+    <meta name="layout" content="kickstart_osm" />
+    <title>CSI CheckDashboard</title>
 
-<r:require modules="csi-dashboard" />
-
-<style>
-	/* css for timepicker */
-	.ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
-	.ui-timepicker-div dl { text-align: left; }
-	.ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
-	.ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
-	.ui-timepicker-div td { font-size: 90%; }
-	.ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
-</style>
+    <asset:stylesheet src="rickshaw/rickshaw_custom.css" />
+    <style>
+        /* css for timepicker */
+        .ui-timepicker-div .ui-widget-header { margin-bottom: 8px; }
+        .ui-timepicker-div dl { text-align: left; }
+        .ui-timepicker-div dl dt { height: 25px; margin-bottom: -25px; }
+        .ui-timepicker-div dl dd { margin: 0 10px 10px 65px; }
+        .ui-timepicker-div td { font-size: 90%; }
+        .ui-tpicker-grid-label { background: none; border: none; margin: 0; padding: 0; }
+    </style>
 </head>
 <body>
   <%-- main menu --%>
@@ -114,26 +113,44 @@
              
         </div>
 	</div>
-	<r:script>
-		$(document).ready(function() {
-			if(typeof chart != 'undefined'){
-				jQuery.each(
-					chart.series, 
-					function (i, series) { 
-						//series.setVisible(series.name=="live");
-						series.setVisible($.inArray(series.name, ${namesOfCsiGroupsAndStaticGraphsToShow.collect{'"'+it+'"'}}) != -1);
+
+    <content tag="include.bottom">
+        <asset:javascript src="csidashboard/csiDashboard.js" />
+        <asset:javascript src="iteratecChartRickshaw.js"/>
+        <asset:script type="text/javascript">
+            $(document).ready(function() {
+
+                if($("#chartbox").length > 0){
+                    createGraph();
+                    $('#rickshaw_label_summary_box').hide();
+                }
+                if(typeof chart != 'undefined'){
+                    $.each(
+                        chart.series,
+                        function (i, series) {
+                            //series.setVisible(series.name=="live");
+                            series.setVisible($.inArray(series.name, ${namesOfCsiGroupsAndStaticGraphsToShow.collect{'"'+it+'"'}}) != -1);
 					});
-			}
-			// Toggle Buttons
-			$("#chart-toggle").click(function() {
-				$("#csi-table").hide();
-				$("#chartbox").fadeIn();
-			});
-			$("#table-toggle").click(function() {
-				$("#chartbox").hide();
-				$("#csi-table").fadeIn();
-			});
-		});
-	</r:script>
+			    }
+
+                // Toggle Buttons
+                $("#chart-toggle").click(function() {
+                    $("#csi-table").hide();
+                    $("#chartbox").fadeIn();
+                });
+                $("#table-toggle").click(function() {
+                    $("#chartbox").hide();
+                    $("#csi-table").fadeIn();
+                });
+                if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
+                    $("#dia-save-chart-as-png").removeClass("btn-primary");
+                    $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
+                    $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
+                    $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
+                }
+            });
+        </asset:script>
+    </content>
+
 </body>
 </html>

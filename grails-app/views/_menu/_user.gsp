@@ -5,7 +5,7 @@
 
 		<a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#" tabindex="-1">
 			<!-- TODO: integrate Springsource Security etc. and show User's name ... -->
-    		<i class="icon-user"></i>
+    		<i class="fa fa-user"></i>
     		<g:message code="security.signin.label" locale="${lang}"/><b class="caret"></b>
 		</a>
 
@@ -24,7 +24,7 @@
 <sec:ifLoggedIn>
 						
 						<a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#" tabindex="-1">
-							<i class="icon-user"></i>
+							<i class="fa fa-user"></i>
 				    		<sec:username/><b class="caret"></b>
 						</a>
 				

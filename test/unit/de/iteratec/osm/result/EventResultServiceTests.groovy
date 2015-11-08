@@ -408,7 +408,9 @@ class EventResultServiceTests {
 					jobResultDate: runOfCurJob_now.date,
 					jobResultJobConfigId: runOfCurJob_now.job.ident(),
 					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-					connectivityProfile: mockConnectivity
+					connectivityProfile: mockConnectivity,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: false
 					).save(failOnError: true)
 			
 			runOfCurJob_now.save(failOnError: true)
@@ -438,7 +440,9 @@ class EventResultServiceTests {
 					jobResultDate: runOfCurJob_1HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_1HoursAgo.job.ident(),
 					speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-					connectivityProfile: mockConnectivity
+					connectivityProfile: mockConnectivity,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: false
 					).save(failOnError: true)
 			
 			runOfCurJob_1HoursAgo.save(failOnError: true)

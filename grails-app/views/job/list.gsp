@@ -2,26 +2,15 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.Job"%>
 <%@ page import="de.iteratec.osm.result.JobResult"%>
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
 	<meta name="layout" content="kickstart_osm" />
 	<title><g:message code="de.iteratec.isj.jobs" /></title>
 	
 	<g:set var="entityName"	value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" />
-	
-	<r:require modules="prettycron, chosen, joblist, future-only-timeago, spin"/>
-	
-	<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-		<r:use modules="timeago-de" />
-	</g:if>
-	
-	<style>
-	.running {
-		background: center left no-repeat url('<g:resource dir="images" file="loading_indicator.gif" absolute="true" />');
-		padding-left: 20px;
-	}
-	</style>
-	
+
+    <asset:stylesheet src="job/list.css"/>
+
 </head>
 <body>
 	<%-- main menu --%>
@@ -103,7 +92,7 @@
 			</div>
 		</div>
 		<div class="controlribbon" style="border: 1px solid green width: 100%;">
-      <i class="icon-arrow-down"></i>
+      <i class="fa fa-arrow-down"></i>
       <g:message code="de.iteratec.isj.job.selected"
         default="Markierte Jobs" />:&nbsp;
       <g:actionSubmit action="activate" class="btn btn-default"
@@ -115,11 +104,11 @@
       <span style="margin-left:100px;">  
 	      <a
 	        href="<g:createLink action="create" />" class="btn btn-primary">
-	        <i class="icon-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+	        <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
 	      </a>  
       </span>  
       <span style="float:right;margin-top: 12px;">        
-        <a href="#" id="updateHints" class="icon-question-sign icon-large clickable-icon" rel="popover"
+        <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
         data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true" style="text-decoration:none;color: #3a87ad;"></a>
       </span>
 		</div>
@@ -151,17 +140,26 @@
 			</table>
 	</g:form>
 	</div>
-	<r:script>
-		$(document).ready(
-			doOnDomReady(
-				'${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
-				'${createLink(action: 'cancelJobRun', absolute: true)}',
-				'${createLink(action: 'getLastRun', absolute: true)}',
-				${onlyActiveJobs},
-				"${createLink(action: 'nextExecution', absolute: true)}",
-				'${createLink(action: 'list', absolute: true)}'
-			)
-		);
-	</r:script>
+    <content tag="include.bottom">
+        <asset:javascript src="prettycron/prettycronManifest.js"/>
+        <asset:javascript src="job/jobList.js"/>
+        <asset:javascript src="timeago/futureOnlyTimeago.js"/>
+        <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
+            <asset:javascript src="timeago/timeagoDe.js"/>
+        </g:if>
+        <asset:script type="text/javascript">
+            $(document).ready(
+                doOnDomReady(
+                    '${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
+                    '${createLink(action: 'cancelJobRun', absolute: true)}',
+                    '${createLink(action: 'getLastRun', absolute: true)}',
+                    ${onlyActiveJobs},
+                    "${createLink(action: 'nextExecution', absolute: true)}",
+                    '${createLink(action: 'list', absolute: true)}'
+                )
+		    );
+        </asset:script>
+        <asset:deferredScripts/>
+    </content>
 </body>
 </html>

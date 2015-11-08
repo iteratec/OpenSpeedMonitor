@@ -42,7 +42,7 @@
     
   </div>
 </div>
-<r:script>
+<asset:script type="text/javascript">
 
     function startSpinner(spinnerElement){
         var opts = {
@@ -170,4 +170,4 @@
         return false;
       }
     }
-</r:script>
+</asset:script>

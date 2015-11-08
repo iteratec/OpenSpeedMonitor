@@ -32,11 +32,13 @@ class OsmDataSourceService {
 	 * @return <code>true</code> if it is supported
 	 */
 	public Boolean getRLikeSupport(){
-		String driverClasseName = configService.getDatabaseDriverClassName()
-		
-		if(driverClasseName == "com.mysql.jdbc.Driver" || driverClasseName == "oracle.jdbc.driver.OracleDriver")
-			return true;
-			
-		return false;
+
+        String actualDriverClassName = configService.getDatabaseDriverClassName()
+        boolean isMysql = actualDriverClassName.equals("com.mysql.jdbc.Driver")
+        boolean isOracle = actualDriverClassName.equals("oracle.jdbc.driver.OracleDriver")
+        boolean isP6spy = actualDriverClassName.equals("com.p6spy.engine.spy.P6SpyDriver")
+
+        return isMysql || isOracle || isP6spy
+
 	}
 }

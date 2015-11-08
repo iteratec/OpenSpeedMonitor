@@ -83,8 +83,6 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	EventMeasuredValueService serviceUnderTest
 	ServiceMocker mockGenerator
 
-	ConnectivityProfile connectivityProfile = null
-
     void setUp() {
 		
 		serviceUnderTest = service	
@@ -108,10 +106,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			idAsStringToMeasuredEventMap_irrelevantCauseNotUsedInTheseTests,
 			idAsStringToPageMap_irrelevantCauseNotUsedInTheseTests,
 			idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests,
-			idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests)
-
-		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
-
+			idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests
+        )
 		createTestDataForAllTests()
 		initializeFields()
 
@@ -265,7 +261,9 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			jobResultJobConfigId: jobResult.job.ident(),
 			measuredEvent: event,
 			speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-			connectivityProfile: connectivityProfile,
+			connectivityProfile: null,
+            customConnectivityName: null,
+            noTrafficShapingAtAll: true,
 			tag: resultTag).save(failOnError: true)
 			
 			jobResult.save(failOnError: true)
@@ -374,8 +372,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			script: script,
 			maxDownloadTimeInMinutes: 60,
             customConnectivityProfile: false,
-			connectivityProfile: connectivityProfile,
-			noTrafficShapingAtAll: false
+			connectivityProfile: null,
+			noTrafficShapingAtAll: true
         ).save(failOnError: true)
 
 		job2 = new Job(
@@ -389,8 +387,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			script: script,
 			maxDownloadTimeInMinutes: 60,
 			customConnectivityProfile: false,
-			connectivityProfile: connectivityProfile,
-			noTrafficShapingAtAll: false
+			connectivityProfile: null,
+			noTrafficShapingAtAll: true
         ).save(failOnError: true)
 
 		//wptjobrun

@@ -17,7 +17,10 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.report.chart.OsmChartProcessingService
+import de.iteratec.osm.report.chart.OsmRickshawChart
 import grails.test.mixin.*
 import grails.test.mixin.support.*
 
@@ -88,28 +91,23 @@ class EventResultDashboardServiceTests {
     final static String location1Location = "ffLocationLocation"
     final static String location2Location = "ieLocationLocation"
     final static String predefinedConnectivityName = "DSL 6.000"
+    public static final String I18N_LABEL_JOB_GROUP = 'Job Group'
+    public static final String I18N_LABEL_MEASURED_EVENT = 'Measured step'
+    public static final String I18N_LABEL_LOCATION = 'Location'
+    public static final String I18N_LABEL_MEASURAND = 'Measurand'
+    public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
+
 
     @Before
     void setUp() {
+
         serviceUnderTest = service;
-
-        serviceUnderTest.resultMeasuredValueService = new ResultMeasuredValueService()
-        serviceUnderTest.resultMeasuredValueService.eventResultDaoService = new EventResultDaoService()
-        serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
-        serviceUnderTest.jobResultDaoService = Mockito.mock(JobResultDaoService.class);
-        mockI18nService()
-
         runDate = new DateTime(2013, 5, 29, 10, 13, 2, 564, DateTimeZone.UTC)
         runDateHourlyStart = new DateTime(2013, 5, 29, 10, 0, 0, 0, DateTimeZone.UTC)
 
-        createMeasuredValueInterval();
-        createBrowser();
-        createLocations();
-        createCSIGroups();
-        createPages();
-        createMeasuredEvents();
-        createJobResults();
-        createEventResults();
+        mocksCommonToAllTests()
+        createTestdataCommonForAllTests()
+
     }
 
     @Test
@@ -134,7 +132,8 @@ class EventResultDashboardServiceTests {
         Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
 
         Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         assertEquals(1, resultGraphs.size())
         List<OsmChartGraph> resultGraphsWithCorrectLabel = resultGraphs.findAll {
@@ -172,9 +171,10 @@ class EventResultDashboardServiceTests {
 
         assertEquals(2, aggregatorTypes.size());
 
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        assertEquals(2, resultGraphs.size())
+                assertEquals(2, resultGraphs.size())
 
         /**
          * IT-643
@@ -224,7 +224,8 @@ class EventResultDashboardServiceTests {
 
         assertEquals(1, aggregatorTypes.size());
 
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         assertEquals(1, resultGraphs.size())
 
@@ -268,7 +269,8 @@ class EventResultDashboardServiceTests {
 
         assertEquals(1, aggregatorTypes.size());
 
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         assertEquals(1, resultGraphs.size())
 
@@ -313,7 +315,8 @@ class EventResultDashboardServiceTests {
         Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
 
         //test-execution
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         //assertions
         assertEquals(1, resultGraphs.size())
@@ -356,9 +359,10 @@ class EventResultDashboardServiceTests {
         assertEquals(2, aggregatorTypes.size());
 
         //test-execution
-        List<OsmChartGraph> resultGraphs = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        //assertions
+                //assertions
         assertEquals(2, resultGraphs.size())
 
         List<OsmChartGraph> resultsCsi1 = resultGraphs.findAll {
@@ -425,6 +429,38 @@ class EventResultDashboardServiceTests {
         Map paramsMap = (Map) paramsEntry;
         assertEquals('4', paramsMap.get('measuredValueId'));
         assertEquals(String.valueOf(resultIDsCount), paramsMap.get('lastKnownCountOfAggregatedResultsOrNull'));
+    }
+
+    private void mocksCommonToAllTests(){
+        serviceUnderTest.resultMeasuredValueService = new ResultMeasuredValueService()
+        serviceUnderTest.resultMeasuredValueService.eventResultDaoService = new EventResultDaoService()
+        serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
+        serviceUnderTest.jobResultDaoService = Mockito.mock(JobResultDaoService.class);
+        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        mockI18nService()
+        serviceUnderTest.osmChartProcessingService.i18nService = [
+                msg: {String msgKey, String defaultMessage = null, List objs = null ->
+                    Map i18nKeysToValues = [
+                            'job.jobGroup.label':I18N_LABEL_JOB_GROUP,
+                            'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
+                            'job.location.label':I18N_LABEL_LOCATION,
+                            'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
+                            'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY
+                    ]
+                    return i18nKeysToValues[msgKey]
+                }
+        ] as I18nService
+    }
+
+    private void createTestdataCommonForAllTests(){
+        createMeasuredValueInterval();
+        createBrowser();
+        createLocations();
+        createCSIGroups();
+        createPages();
+        createMeasuredEvents();
+        createJobResults();
+        createEventResults();
     }
 
     void createMeasuredValueInterval() {
@@ -586,7 +622,9 @@ class EventResultDashboardServiceTests {
                 measuredEvent: measuredEvent,
                 tag: '1;1;1;1;1',
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                connectivityProfile: mockConnectivity
+                connectivityProfile: mockConnectivity,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
         jobResult.save(failOnError: true)
@@ -605,7 +643,9 @@ class EventResultDashboardServiceTests {
                 measuredEvent: measuredEvent,
                 tag: '2;1;1;1;1',
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                connectivityProfile: mockConnectivity
+                connectivityProfile: mockConnectivity,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
         jobResult2.save(failOnError: true)
@@ -619,28 +659,36 @@ class EventResultDashboardServiceTests {
     private void mockEventResultDaoService() {
         def eventResultDaoService = mockFor(EventResultDaoService, true)
         eventResultDaoService.demand.getLimitedMedianEventResultsBy(1..10000) {
-            Date fromDate, Date toDate, Set<CachedView> cachedViews, ErQueryParams erQueryParams, Map<String, Number> gtConstraints, Map<String, Number> ltConstraints ->
+            Date fromDate,
+            Date toDate,
+            Set<CachedView> cachedViews,
+            ErQueryParams queryParams,
+            Map<String, Number> gtConstraints,
+            Map<String, Number> ltConstraints,
+            Map listCriteriaRestrictionMap,
+            CriteriaSorting sorting ->
+
                 List<EventResult> results = []
                 if (cachedViews.contains(CachedView.CACHED)) {
-                    if (!erQueryParams.minLoadTimeInMillisecs && !erQueryParams.maxLoadTimeInMillisecs) {
+                    if (!queryParams.minLoadTimeInMillisecs && !queryParams.maxLoadTimeInMillisecs) {
                         results.add(eventResultCached)
                     } else {
-                        if (erQueryParams.minLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs > erQueryParams.minLoadTimeInMillisecs) {
+                        if (queryParams.minLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs > queryParams.minLoadTimeInMillisecs) {
                             results.add(eventResultCached)
                         }
-                        if (erQueryParams.maxLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs < erQueryParams.maxLoadTimeInMillisecs) {
+                        if (queryParams.maxLoadTimeInMillisecs && eventResultCached.domTimeInMillisecs < queryParams.maxLoadTimeInMillisecs) {
                             results.add(eventResultCached)
                         }
                     }
                 }
                 if (cachedViews.contains(CachedView.UNCACHED)) {
-                    if (!erQueryParams.minLoadTimeInMillisecs && !erQueryParams.maxLoadTimeInMillisecs) {
+                    if (!queryParams.minLoadTimeInMillisecs && !queryParams.maxLoadTimeInMillisecs) {
                         results.add(eventResultUncached)
                     } else {
-                        if (erQueryParams.minLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs > erQueryParams.minLoadTimeInMillisecs) {
+                        if (queryParams.minLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs > queryParams.minLoadTimeInMillisecs) {
                             results.add(eventResultUncached)
                         }
-                        if (erQueryParams.maxLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs < erQueryParams.maxLoadTimeInMillisecs) {
+                        if (queryParams.maxLoadTimeInMillisecs && eventResultUncached.domTimeInMillisecs < queryParams.maxLoadTimeInMillisecs) {
                             results.add(eventResultUncached)
                         }
                     }

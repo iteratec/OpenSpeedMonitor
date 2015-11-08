@@ -202,7 +202,7 @@ class FetchResultsFromWptserverTests {
 		GPathResult resultOfLastListening
 		WebPageTestServer wptserverOfLastListening
 
-		public String getName(){return 'test-listener'}
+		public String getListenerName(){return 'test-listener'}
 		public void listenToLocations(GPathResult result, WebPageTestServer wptserver){}
 		public void listenToResult(
 				GPathResult result,

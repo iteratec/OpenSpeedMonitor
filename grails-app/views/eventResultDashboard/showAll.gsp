@@ -6,10 +6,10 @@
 %>
 <html>
 <head>
-<meta name="layout" content="kickstart_osm" />
-<title><g:message code="de.iteratec.isocsi.eventResultDashboard" /></title>
+    <meta name="layout" content="kickstart_osm" />
+    <title><g:message code="de.iteratec.isocsi.eventResultDashboard" /></title>
 
-<r:require modules="eventresult-dashboard" />
+    <asset:stylesheet src="rickshaw/rickshaw_custom.css" />
 
 </head>
 <body>
@@ -36,8 +36,8 @@
 	<div class="row">
 		<div class="span12">
 			<form method="get" action="" id="dashBoardParamsForm">
-      <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message code="de.iteratec.ism.ui.labels.save.success" default="Successfully saved these settings as custom dashboard." /></div>
-      <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
+            <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message code="de.iteratec.ism.ui.labels.save.success" default="Successfully saved these settings as custom dashboard." /></div>
+            <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
 			<g:if test="${warnAboutLongProcessingTime}">
 				<div class="alert">
 					<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title" /></strong>
@@ -59,7 +59,7 @@
                                 <div class="span12">
                                     <div class="row">
                                         <div class="span3">
-                                            <a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
+										<a class="accordion-toggle accordion-link fa fa-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
                                                 <g:message code="de.iteratec.sri.wptrd.time.filter.heading" default="Zeitraum ausw&auml;hlen" />
                                             </a>
                                         </div>
@@ -75,7 +75,7 @@
 						<g:if test="${request.queryString}"><div id="collapseOne" class="accordion-body collapse"></g:if>
 						<g:else><div id="collapseOne" class="accordion-body collapse in"></g:else>
 							<div class="accordion-inner" id="accordion-inner-date">
-							
+
 								<div class="row">
 									<div class="span5">
 										<legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading" default="Aggregation" /></legend>
@@ -107,7 +107,7 @@
 								<div class="span12">
                                     <div class="row">
                                         <div class="span3">
-                                            <a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
+										<a class="accordion-toggle accordion-link fa fa-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
                                                 <g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" />
                                             </a>
                                         </div>
@@ -143,7 +143,10 @@
                                                     'selectedAllLocations':selectedAllLocations,
                                                     'connectivityProfiles':connectivityProfiles,
                                                     'selectedConnectivityProfiles':selectedConnectivityProfiles,
-                                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles]}"/>
+                                                    'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles,
+                                                    'showConnectivitySettings': true,
+                                                    'showExtendedConnectivitySettings': true]}"
+                                />
 							</div>
 						</div>
 					</div>
@@ -153,7 +156,7 @@
 								<div class="span12">
 								<div class="row">
 									<div class="span3">
-										<a class="accordion-toggle accordion-link icon-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
+										<a class="accordion-toggle accordion-link fa fa-chevron-up" data-toggle="collapse" data-parent="#accordion2" href="#collapseThree">
 											<g:message code="de.iteratec.sri.wptrd.measurement.filter.heading" default="Messwerte auw&auml;hlen" />
 										</a>
 									</div>
@@ -241,23 +244,27 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="span12">
+						<div class="span12" id="bottomCommitButtons">
 							<g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}" action="showAll"
 								id="graphButtonHtmlId" class="btn btn-primary"
 								style="margin-top: 16px;" />
-              <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
-                class="btn btn-primary" style="margin-top: 16px;" />
-              <sec:ifLoggedIn>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-							   <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary" style="margin-top: 16px;" data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-						    </sec:ifAnyGranted>
-							</sec:ifLoggedIn>
-		          <g:if test="${params.id}">
-		            <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
-		            <g:render template="/_common/modals/deleteCustomDashboard"/>
-		              
-		            </g:if>           
-		          </g:if> 
+                          <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default':'As CSV')}" action="downloadCsv"
+                            class="btn btn-primary" style="margin-top: 16px;" />
+						%{--Toggled until IT-701 is implemented --}%
+                        %{--<sec:ifLoggedIn>--}%
+                            %{--<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">--}%
+                                %{--<a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"--}%
+                                   %{--style="margin-top: 16px;" data-toggle="modal">--}%
+                                    %{--${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}--}%
+                                %{--</a>--}%
+                            %{--</sec:ifAnyGranted>--}%
+                        %{--</sec:ifLoggedIn>--}%
+		          %{--<g:if test="${params.id}">--}%
+		            %{--<g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">--}%
+		            %{--<g:render template="/_common/modals/deleteCustomDashboard"/>--}%
+
+		            %{--</g:if>--}%
+		          %{--</g:if>--}%
 						</div>
 						<div class="span3" style="display: none;">
 							<%-- Not used as the point chatType isn't requested.
@@ -316,7 +323,7 @@
 							yAxisScalable: 'false',
 							optimizeForExport: 'false',
 							openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
-              annotations: annotations]" />
+                            annotations: annotations]" />
 			</div>
 			</div>
 		</g:if>
@@ -331,11 +338,48 @@
 	</g:else>
 	</div>
 	<g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
-	<r:script>
-		$(document).ready(doOnDomReady(
-			'${dateFormat}', 
-			${weekStart}, 
-			'${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'));
-	</r:script>
+
+    <content tag="include.bottom">
+        <asset:javascript src="eventresultdashboard/eventResultDashboard.js" />
+        <asset:javascript src="iteratecChartRickshaw.js"/>
+        <asset:script type="text/javascript">
+
+            var pagesToEvents = [];
+            <g:each var="page" in="${pages}">
+                <g:if test="${eventsOfPages[page.id] != null}">
+                    pagesToEvents[${page.id}]= [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
+                </g:if>
+            </g:each>
+
+            var browserToLocation = [];
+            <g:each var="browser" in="${browsers}">
+                <g:if test="${locationsOfBrowsers[browser.id] != null}">
+                    browserToLocation[${browser.id}]=[ <g:each var="location"
+                                                               in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
+                </g:if>
+            </g:each>
+
+            $(document).ready(function(){
+
+                initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
+
+                doOnDomReady(
+                    '${dateFormat}',
+                    ${weekStart},
+                    '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
+                );
+
+                if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
+                    $("#dia-save-chart-as-png").removeClass("btn-primary");
+                    $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
+                    $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
+                    $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
+                }
+
+            });
+
+        </asset:script>
+    </content>
+
 </body>
 </html>

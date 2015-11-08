@@ -6,7 +6,7 @@
 				<h4><g:message code="default.product.title" locale="${lang}"/></h4>
 				<ul class="unstyled">
 					<li>
-			    		<i class="icon-home"></i>
+			    		<i class="fa fa-home"></i>
 						<a href="${createLink(uri: '/')}"><g:message code="default.home.label" locale="${lang}"/></a>
 					</li>					
 
@@ -16,13 +16,13 @@
 				<h4><g:message code="default.info.title" locale="${lang}"/></h4>
                 <ul class="unstyled">
                     <li>
-                        <i class="icon-info-sign"></i>
+                        <i class="fa fa-info-circle"></i>
                         <a href="${createLink(uri: '/about')}">
                             <g:message code="de.iteratec.osm.about.label" locale="${lang}"/>
                         </a>
                     </li>
                     <li>
-                        <i class="icon-envelope"></i>
+                        <i class="fa fa-envelope-o"></i>
                         <a href="mailto:wpt@iteratec.de">
                             <g:message code="de.iteratec.osm.contact.label" locale="${lang}"/>
                         </a>

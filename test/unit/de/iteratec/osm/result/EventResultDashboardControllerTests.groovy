@@ -110,7 +110,6 @@ class EventResultDashboardControllerTests {
 		this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
 		controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
 
-		controllerUnderTest.cookieBasedSettingsService = [getChartingLibraryToUse: {-> return ChartingLibrary.RICKSHAW}] as CookieBasedSettingsService
 	}
 
 	/**
@@ -172,6 +171,7 @@ class EventResultDashboardControllerTests {
 		params.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
 		params.selectedTimeFrameInterval = 0
         params.includeNativeConnectivity = false
+        params.includeCustomConnectivity = true
 		
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -342,6 +342,7 @@ class EventResultDashboardControllerTests {
 		params.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
 		params.selectedTimeFrameInterval = 0
         params.includeNativeConnectivity = false
+        params.includeCustomConnectivity = true
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -642,7 +643,7 @@ class EventResultDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(17, result.size());
+		assertEquals(16, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))
@@ -762,6 +763,7 @@ class EventResultDashboardControllerTests {
         command.selectedConnectivityProfiles = []
         command.selectedAllConnectivityProfiles = true
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = true
         command.customConnectivityName = 'Custom (6000.*'
 
 		// Do we fill all fields?
@@ -772,7 +774,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(30, dataUnderTest.size());
+		assertEquals(31, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -823,6 +825,7 @@ class EventResultDashboardControllerTests {
 		command.setFromHour = false
 		command.setToHour = false
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = true
         command.customConnectivityName = 'Custom (6000.*'
 
 		// Run the test:
@@ -830,7 +833,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(28, dataUnderTest.size());
+		assertEquals(29, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -880,6 +883,7 @@ class EventResultDashboardControllerTests {
         command.selectedConnectivityProfiles = []
         command.selectedAllConnectivityProfiles = true
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = true
         command.customConnectivityName = 'Custom (6000.*'
 
 		// Do we fill all fields?
@@ -890,7 +894,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(30, dataUnderTest.size());
+		assertEquals(31, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -936,6 +940,8 @@ class EventResultDashboardControllerTests {
 		command.selectedAllLocations = false
         command.selectedTimeFrameInterval = 0
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = false
+
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -975,6 +981,7 @@ class EventResultDashboardControllerTests {
 		command.selectedAllLocations = false
 		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = true
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -1015,6 +1022,7 @@ class EventResultDashboardControllerTests {
 		command.selectedAllMeasuredEvents = false
 		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = true
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -1055,6 +1063,7 @@ class EventResultDashboardControllerTests {
 		command.selectedAllMeasuredEvents = false
 		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
         command.includeNativeConnectivity = false
+        command.includeCustomConnectivity = true
 		
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -1097,6 +1106,7 @@ class EventResultDashboardControllerTests {
         command.selectedTimeFrameInterval = 0
         command.selectedAllConnectivityProfiles = []
         command.includeNativeConnectivity = true
+        command.includeCustomConnectivity = false
 
         // Do we fill all fields?
         assertTrue(command.validate())

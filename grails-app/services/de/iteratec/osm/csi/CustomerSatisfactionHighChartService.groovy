@@ -17,6 +17,9 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.report.chart.OsmChartProcessingService
+import de.iteratec.osm.report.chart.OsmRickshawChart
+
 import static de.iteratec.osm.util.Constants.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -42,11 +45,10 @@ import org.joda.time.format.DateTimeFormatter
 
 
 /**
- * @todo TODO mze-2013-09-12: Suggest to move to a generic HighchartFactoryService.
+ * Provides methods to get {@link MeasuredValue}s from db and transform them into a chart processable format.
  */
 class CustomerSatisfactionHighChartService {
 
-	static final String HIGHCHART_GRAPH_LABEL_NOT_ASSIGNABLE = "de.iteratec.isocsi.highchart.graph.lable.notassignable"
 	/**
 	 * The {@link DateTimeFormat} used for date-GET-params in created links.
 	 */
@@ -67,6 +69,7 @@ class CustomerSatisfactionHighChartService {
 	EventResultDashboardService eventResultDashboardService
 	CsTargetGraphDaoService csTargetGraphDaoService
 	MeasuredValueUtilService measuredValueUtilService
+    OsmChartProcessingService osmChartProcessingService
 
 	/**
 	 * The Grails engine to generate links.
@@ -79,67 +82,7 @@ class CustomerSatisfactionHighChartService {
 	def weeklyPageTagToGraphLabelMap = [:]
 
 	/**
-	 * LabelSummary
-	 */
-	private String labelSummary;
-
-	private String getLabelSummary() {
-		return (labelSummary == null)? "" : labelSummary;
-	}
-
-	private void setLabelSummary(String labelSummary) {
-		this.labelSummary = labelSummary;
-	}
-
-	private void deleteLabelSummary() {
-		this.labelSummary = "";
-	}
-
-	private List<OsmChartGraph> summarizeGraphs(List<OsmChartGraph> graphs) {
-
-		def summarizedLabelParts = [];
-
-		if (graphs.size > 1) {
-
-			def graph = graphs.get(0);
-			def temp = graph.label.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim());
-
-			def labelParts = []
-
-			if(temp.size() >= 1)
-				labelParts.add([ key: 'Gruppe', value: temp[0] ]);
-			if(temp.size() >= 2)
-				labelParts.add([ key: 'Event', value: temp[1] ]);
-			if(temp.size() >= 3)
-				labelParts.add([ key: 'Location', value: temp[2] ]);
-
-			summarizedLabelParts = labelParts.findAll { part ->
-				graphs.every { it ->
-					it.label.contains(part.value.trim());
-				}
-			}
-
-			graphs.every { it ->
-				summarizedLabelParts.each { part ->
-					it.label = (it.label - part.value.trim()).replaceFirst("^[\\|\\s]+(?!\$)", "");
-				}
-			}
-
-			String summary = "";
-			summarizedLabelParts.each { part ->
-				String labelNewPart = "<b>" + part.key + "</b>: " + part.value;
-				summary == "" ? (summary = labelNewPart) : (summary += " | " + labelNewPart);
-			}
-			setLabelSummary(summary)
-		}else{
-			deleteLabelSummary();
-		}
-
-		return graphs;
-	}
-
-	/**
-	 * Get hourly Customer Satisfaction {@ JobMeasuredValue}s as a List of{@link OsmChartGraph}s in format for highcharts-taglib.
+	 * Get hourly Customer Satisfaction job {@link MeasuredValue}s as a List of{@link OsmChartGraph}s in format for highcharts-taglib.
 	 * see {@link CustomerSatisfactionHighChartService#convertToHighChartMap}
 	 *
 	 * @param fromDate The first date, inclusive, to find values for; not <code>null</code>.
@@ -147,14 +90,12 @@ class CustomerSatisfactionHighChartService {
 	 * @param mvQueryParams The query parameters to find hourly values, not <code>null</code>.
 	 * @return not <code>null</code>.
 	 */
-	List<OsmChartGraph> getCalculatedHourlyEventMeasuredValuesAsHighChartMap(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
+	OsmRickshawChart getCalculatedHourlyEventMeasuredValuesAsHighChartMap(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
 		List<OsmChartGraph> resultList = []
 
 		List<MeasuredValue> csiValues = eventMeasuredValueService.getHourylMeasuredValues(fromDate, toDate, mvQueryParams)
 
-		resultList = summarizeGraphs(convertToHighchartGraphList(csiValues));
-
-		return resultList
+		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
 	}
 
 	/**
@@ -175,8 +116,7 @@ class CustomerSatisfactionHighChartService {
 	 * @return not <code>null</code>.
 	 * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
 	 */
-	List<OsmChartGraph> getCalculatedPageMeasuredValuesAsHighChartMap(Interval timeFrame, MvQueryParams queryParams, MeasuredValueInterval mvInterval) {
-		List<OsmChartGraph> resultMap = []
+	OsmRickshawChart getCalculatedPageMeasuredValuesAsHighChartMap(Interval timeFrame, MvQueryParams queryParams, MeasuredValueInterval mvInterval) {
 
 		"Customer satisfaction index (CSI)"
 
@@ -187,11 +127,11 @@ class CustomerSatisfactionHighChartService {
 		List<MeasuredValue> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
         log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
 
-		resultMap = summarizeGraphs(convertToHighchartGraphList(csiValues));
-        log.debug("Number of ChartGraphs made from MeasuredValues: ${resultMap.size()}")
-        log.debug("Number of points in each ChartGraph made from MeasuredValues: ${resultMap*.points.size()}")
+		OsmRickshawChart chart = osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
+        log.debug("Number of ChartGraphs made from MeasuredValues: ${chart.osmChartGraphs.size()}")
+        log.debug("Number of points in each ChartGraph made from MeasuredValues: ${chart.osmChartGraphs*.points.size()}")
 
-		return resultMap
+		return chart
 	}
 
     /**
@@ -209,7 +149,7 @@ class CustomerSatisfactionHighChartService {
      * @return not <code>null</code>.
      * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
      */
-    List<OsmChartGraph> getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
+    OsmRickshawChart getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
         List<OsmChartGraph> resultList = []
 
         Date fromDate = timeFrame.getStart().toDate();
@@ -217,9 +157,7 @@ class CustomerSatisfactionHighChartService {
         List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
         List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
 
-        resultList = summarizeGraphs(convertToHighchartGraphList(csiValues))
-
-        return resultList;
+        return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
     }
 
 	/**
@@ -238,46 +176,49 @@ class CustomerSatisfactionHighChartService {
 		// Cache of already added graphs by tag
 		Map<String, OsmChartGraph> tagToGraph=new HashMap<String, OsmChartGraph>();
 
-		List<OsmChartGraph> result=new ArrayList<OsmChartGraph>();
+		List<OsmChartGraph> graphs=new ArrayList<OsmChartGraph>();
 
 		for( MeasuredValue eachCsiVal : csiValues) {
 
 			if (eachCsiVal.value) {
+
 				if(!tagToGraph.containsKey(eachCsiVal.getTag())) {
 					OsmChartGraph graph=new OsmChartGraph();
 					graph.setLabel(getMapLabel(eachCsiVal));
 					tagToGraph.put(eachCsiVal.getTag(), graph);
-					result.add(graph);
+					graphs.add(graph);
 				}
 
-				List<OsmChartPoint> points = tagToGraph.get(eachCsiVal.getTag()).getPoints();
-				Long curTimestamp = getHighchartCompatibleTimestampFrom(eachCsiVal.started)
-
-				/*
-				 * round to 2 decimal places
-				 */
-				BigDecimal valueForRounding = new BigDecimal(eachCsiVal.value * 100)
-				double value = valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
-
-				URL linkForPoint = getLinkFor(eachCsiVal)
-
-                OsmChartPoint chartPoint = new OsmChartPoint(time: curTimestamp, measuredValue: value, countOfAggregatedResults: eachCsiVal.countResultIds(), sourceURL: linkForPoint, testingAgent: null)
+                OsmChartPoint chartPoint = new OsmChartPoint(
+                        time: getHighchartCompatibleTimestampFrom(eachCsiVal.started),
+                        measuredValue: formatPercentage(eachCsiVal),
+                        countOfAggregatedResults: eachCsiVal.countResultIds(),
+                        sourceURL: getLinkFor(eachCsiVal),
+                        testingAgent: null
+                )
                 if(chartPoint.isValid())
-				    points.add(chartPoint)
+                    tagToGraph[eachCsiVal.getTag()].getPoints().add(chartPoint)
 			}
 		}
 
-		// Sort all points
-		for(OsmChartGraph graph : result)
-		{
-			graph.getPoints().sort(true, { it.time });
-		}
+        sortPointsInAllGraphsByTime(graphs)
+        sortGraphsByLabel(graphs)
 
-		// Sort all graphs
-		result.sort(true, { it.label });
-
-		return result;
+		return graphs;
 	}
+
+    double formatPercentage(value){
+        BigDecimal valueForRounding = new BigDecimal(value.value*100)
+        return valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
+    }
+    void sortPointsInAllGraphsByTime(List<OsmChartGraph> graphs){
+        graphs.each{graph ->
+            graph.getPoints().sort(true, { it.time })
+        }
+    }
+    void sortGraphsByLabel(List<OsmChartGraph> graphs){
+        graphs.sort(true, { it.label })
+    }
 
 	/**
 	 * Creates an URL for a link for the {@link MeasuredValue} (MV) csiValue (to be used in diagrams). The URL links to the underlying data of csiValue:
@@ -435,7 +376,12 @@ class CustomerSatisfactionHighChartService {
 
 		List<OsmChartGraph> result=Collections.checkedList(new ArrayList<OsmChartGraph>(), OsmChartGraph.class);
 
-		CsTargetGraph actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
+        CsTargetGraph actualTargetGraph
+        try{
+            actualTargetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
+        }catch(NullPointerException npe){
+            log.info("No customer satisfaction target graph exist for actual locale.")
+        }
 
 		if (actualTargetGraph) {
 			OsmChartPoint fromPoint = new OsmChartPoint(time: getHighchartCompatibleTimestampFrom(fromDate.toDate()), measuredValue: (double) actualTargetGraph.getPercentOfDate(fromDate), countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);

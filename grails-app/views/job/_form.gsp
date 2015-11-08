@@ -1,11 +1,6 @@
 <%@ page import="de.iteratec.osm.measurement.environment.Location"%>
 <%@ page import="de.iteratec.osm.measurement.environment.WebPageTestServer" %>
 
-<r:use modules="tagit, chosen, jobedit, future-only-timeago" />
-<g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
-	<r:use modules="timeago-de" />
-</g:if>
-
 <div class="row form-group ${hasErrors(bean: job, field: 'label', 'error')} required">
 	<label for="label" class="span3 text-right" style="width: 70px !important;">
 		<g:message code="job.label.label" default="label" /><span class="required-indicator">*</span>
@@ -59,16 +54,3 @@
 
 <!-- included because there is no way for the user to supply a value for validationRequest -->
 <g:hiddenField name="validationRequest" value="" />
-
-<r:script>
-    $(document).ready(
-        doOnDomReady(
-            ${job.label == null},
-            "${g.createLink(action: 'nextExecution', absolute: true)}",
-            '${customConnNameForNative}',
-            ${job.connectivityProfile?job.connectivityProfile.id:'null'},
-            ${job.noTrafficShapingAtAll},
-            "${g.createLink(action: 'tags', absolute: true)}"
-        )
-    );
-</r:script>

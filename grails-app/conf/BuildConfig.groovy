@@ -42,7 +42,7 @@ grails.project.fork = [
 		run: false
 ]
 
-//grails.project.dependency.resolver = "maven" // or ivy
+grails.project.dependency.resolver = "maven" // or ivy
 
 grails.project.dependency.resolution = {
     // inherit Grails' default dependencies
@@ -62,7 +62,7 @@ grails.project.dependency.resolution = {
 
         mavenLocal()
         mavenCentral()
-        flatDir name:'local jars', dirs:'./lib/'
+//        flatDir name:'local jars', dirs:'./lib/'
 
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
         mavenRepo "http://repo.grails.org/grails/plugins/"
@@ -80,71 +80,55 @@ grails.project.dependency.resolution = {
 		)
 		compile (
 			'org.mockito:mockito-all:1.9.5',
-			'net.sf.supercsv:super-csv:2.1.0'
+			'net.sf.supercsv:super-csv:2.1.0',
+            'p6spy:p6spy:2.1.4',
 		)
 		build (
-			'net.sf.supercsv:super-csv:2.1.0'
+			'net.sf.supercsv:super-csv:2.1.0',
+			'org.yaml:snakeyaml:1.10'//To fix betamax tests, see https://github.com/robfletcher/betamax/issues/153
 		)
 		 test (
 			'org.mockito:mockito-all:1.9.5',
 			'org.hamcrest:hamcrest-all:1.3',
-			'co.freeside:betamax:1.1.2'
+			'co.freeside:betamax:1.1.2',
+            'net.sourceforge.nekohtml:nekohtml:1.9.14'
 		)
     }
 
 	plugins {
 		//runtime//////////////////////////////////////////////////////////////////
 		runtime (
-			":hibernate:3.6.10.10",
-			":jquery:1.8.3",
-			":resources:1.2.7",
-			":database-migration:1.3.8",
+			':twitter-bootstrap:2.3.2.2',
+			":hibernate:3.6.10.19",
+			":jquery:1.11.1",
+			":database-migration:1.4.0",
 			":quartz:1.0.1",
-			":console:1.5.1"
+			":console:1.5.1",
+			":font-awesome-resources:4.2.0.0"
 		)
-		runtime(":cached-resources:1.0") {
-			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-		 }
-		runtime(":zipped-resources:1.0") {
-			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-		 }
-		runtime(":cache-headers:1.1.7") {
-			if (Environment.getCurrent() == Environment.DEVELOPMENT) { export = false }
-		 }
 		//build//////////////////////////////////////////////////////////////////
 		build (
 			":tomcat:7.0.52.1",
-			":resources:1.2.7",
 			":release:3.0.1"
 		)
-		build( ":kickstart-with-bootstrap:0.9.6"){
-			excludes "resources", "scaffolding"
-		}
         //compile//////////////////////////////////////////////////////////////////
 		compile (
 			":joda-time:1.5",
-			':scaffolding:2.0.2',
-			':cache:1.1.1',
-			':spring-security-core:1.2.7.3',
+			':scaffolding:2.1.0',
+			':spring-security-core:2.0-RC5',
 			':quartz:1.0.1',
 			':rest:0.8',
 			':jmx:0.9',
-			':taggable:1.0.1',
-			':lesscss-resources:1.3.1',
+			':taggable:1.1.0',
 			':cookie:1.0.1',
-            ':codenarc:0.22'
+            ':codenarc:0.22',
+			":asset-pipeline:2.3.9",
+			":less-asset-pipeline:2.3.0"
 		)
 		compile( ':jquery-ui:1.10.4'){
 			excludes "jquery"
 		}
-		compile( ":kickstart-with-bootstrap:0.9.6"){
-			excludes "resources", "scaffolding"
-		}
-		compile( ':app-info:1.1.1'){
-			excludes "jquery"
-			if (Environment.getCurrent() == Environment.PRODUCTION || Environment.getCurrent() == Environment.TEST) { export = false }
-		}
-
+//		provided ":less-asset-pipeline:2.3.0"
         //test//////////////////////////////////////////////////////////////////
         test ":code-coverage:2.0.3-3"
 	}

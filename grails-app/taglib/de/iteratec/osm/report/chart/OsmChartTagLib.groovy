@@ -18,12 +18,11 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.csi.DefaultTimeToCsMapping
 
 class OsmChartTagLib {
 
 	ConfigService configService
-	CookieBasedSettingsService cookieBasedSettingsService
 	static namespace = "iteratec"
 
 	def singleYAxisChart = { attrs, body ->
@@ -46,32 +45,17 @@ class OsmChartTagLib {
 		String lineWidthGlobal = attrs["lineWidthGlobal"] = attrs['lineWidthGlobal'] ?: '2'
 		Boolean optimizeForExport = attrs['optimizeForExport']!=null ? Boolean.valueOf(attrs['optimizeForExport']) : false
 		Boolean openDatapointLinksInNewWindow = attrs['openDataPointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDataPointLinksInNewWindow'])  : true
-		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
         List annotations = attrs["annotations"]
 
-		ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
-		log.debug("chartLibToUse while processing osm chart tgalib=${chartLibToUse}")
+        String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
+        data.each {
+            it.measurandGroup = MeasurandGroup.PERCENTAGES
+        }
+        List<OsmChartAxis> highChartLabels = new LinkedList<OsmChartAxis>();
+        highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
 
-		if (chartLibToUse == ChartingLibrary.HIGHCHARTS) {
-			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}"
-			def htmlCreater = new HighchartHtmlCreater()
-			out << htmlCreater.createChartHtml(data, title, lineType, yType, width, yAxisMin, yAxisMax, divId, false, measurementUnit,
-					xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, heightOfChart, openDatapointLinksInNewWindow, exportUrl)
-		}else if (chartLibToUse == ChartingLibrary.RICKSHAW)
-		{
-			String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
-			data.each {
-				it.measurandGroup = MeasurandGroup.PERCENTAGES
-			}
-			List<OsmChartAxis> highChartLabels = new LinkedList<OsmChartAxis>();
-			highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
-
-			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, labelSummary, markerEnabled, annotations)
-		}else {
-			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
-					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
-		}
+        def htmlCreater = new RickshawHtmlCreater()
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, labelSummary, markerEnabled, annotations)
 
 		return out.toString()
 	}
@@ -98,7 +82,6 @@ class OsmChartTagLib {
 		Long defaultThreshold = 100000
 		Long highChartsTurboThreshold = attrs['highChartsTurboThreshold'] ? Long.valueOf(attrs['highChartsTurboThreshold']) : defaultThreshold
 		Boolean openDatapointLinksInNewWindow = attrs['openDatapointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDatapointLinksInNewWindow'])  : true
-		String exportUrl = attrs['exportUrl'] ?: grailsApplication.config.grails.de.iteratec.osm.report.chart.highchartsExportServerUrl
 		List<OsmChartAxis> yAxesLabels = attrs['highChartLabels']
         List annotations = attrs["annotations"]
 
@@ -106,26 +89,27 @@ class OsmChartTagLib {
 			title = "";
 		}
 
-		ChartingLibrary chartLibToUse = cookieBasedSettingsService.getChartingLibraryToUse()
-		log.debug("chartLibToUse while processing osm chart taglib=${chartLibToUse}")
-
-		if (chartLibToUse == ChartingLibrary.HIGHCHARTS){
-			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}"
-			def htmlCreater = new HighchartHtmlCreater()
-			out << htmlCreater.createChartHtmlMultipleYAxis(data, title, lineType, width, yAxisMin, yAxisMaxs, divId, false, measurementUnits,
-					xAxisMin, xAxisMax, markerEnabled, dataLabelsActivated, yAxisScalable, lineWidthGlobal, optimizeForExport, yAxesLabels,
-					highChartsTurboThreshold, openDatapointLinksInNewWindow, exportUrl, heightOfChart)
-		}else if (chartLibToUse == ChartingLibrary.RICKSHAW)
-		{
-			String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
-			def htmlCreater = new RickshawHtmlCreater()
-			out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, labelSummary, markerEnabled, annotations)
-		} else {
-			throw new IllegalArgumentException("Illegal charting library: ${chartLibToUse} not contained in available charting libraries: " +
-					"${grailsApplication.config.grails.de.iteratec.osm.report.chart.availableChartTagLibs}")
-		}
+        String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
+        def htmlCreater = new RickshawHtmlCreater()
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, labelSummary, markerEnabled, annotations)
 
 		return out.toString()
 	}
+
+    def csiMappingChart = { attrs, body ->
+
+        String chartIdentifier = attrs['chartIdentifier']
+        String bottomOffsetXAxis = attrs['bottomOffsetXAxis']
+        String yAxisRightOffset = attrs['yAxisRightOffset']
+        String chartBottomOffset = attrs['chartBottomOffset']
+        String yAxisTopOffset = attrs['yAxisTopOffset']
+        String bottomOffsetLegend = attrs['bottomOffsetLegend']
+
+        def htmlCreater = new RickshawHtmlCreater()
+        out << htmlCreater.generateCsiMappingsChartHtml(chartIdentifier, bottomOffsetXAxis, yAxisRightOffset,
+                chartBottomOffset, yAxisTopOffset, bottomOffsetLegend)
+
+        return out.toString()
+    }
 
 }
