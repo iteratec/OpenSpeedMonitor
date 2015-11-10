@@ -19,8 +19,8 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.d3Data.BarChartData
-import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.d3Data.ChartEntry
+import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
@@ -30,8 +30,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
-import de.iteratec.osm.report.UserspecificDashboard
-import de.iteratec.osm.report.UserspecificDashboardDiagramType
+import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
@@ -201,15 +200,15 @@ class CsiDashboardController {
      */
     Map<String, Object> delete() {
 
-        def userspecificDashboardInstance = UserspecificDashboard.get(params.id)
-        if (!userspecificDashboardInstance) {
+        def userspecificCSIDashboardInstance = UserspecificCsiDashboard.get(params.id)
+        if (!userspecificCSIDashboardInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
             redirect(action: "list")
             return
         }
 
         try {
-           userspecificDashboardInstance.delete(flush: true)
+           userspecificCSIDashboardInstance.delete(flush: true)
                 flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
                 redirect(action: "list")
         } catch (DataIntegrityViolationException e) {
@@ -720,27 +719,6 @@ class CsiDashboardController {
 
     /**
      * <p>
-    * Ajax service to confirm that dashboard name entered for saving custom dashboard was unique.
-    * </p>
-    *
-    * @param proposedDashboardName
-    *         The proposed Dashboard Name;
-    *         not <code>null</code>.
-    * @return nothing, immediately sends HTTP response codes to client.
-    */
-    def validateDashboardName(String proposedDashboardName) {
-        UserspecificDashboard newCustomDashboard = new UserspecificDashboard(dashboardName: proposedDashboardName)
-        if (!newCustomDashboard.validate()) {
-            response.sendError(302, 'dashboard by that name exists already')
-            return null
-        } else {
-            response.sendError(200, 'OK')
-            return null
-        }
-    }
-
-    /**
-     * <p>
     * Ajax service to validate and store custom dashboard settings.
     * </p>
     *
@@ -756,6 +734,14 @@ class CsiDashboardController {
     * @return nothing, immediately sends HTTP response codes to client.
     */
     def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
+
+        // Check if dashboardName is unique
+        def dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
+        if (dashboards) {
+            response.sendError(302, 'dashboard by that name exists already')
+            return null
+        }
+
         JSONObject dashboardValues = JSON.parse(values)
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
@@ -769,6 +755,7 @@ class CsiDashboardController {
         String selectedMeasuredEventIdsString = ""
         String selectedBrowsersString = ""
         String selectedLocationsString = ""
+
         dashboardValues.each { id, data ->
            def dataToAssign
            if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
@@ -810,11 +797,14 @@ class CsiDashboardController {
                        break
             }
         }
+
+        int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
+
         def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
             toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroup: dashboardValues.aggrGroup, selectedFolder: selectedFolder,
             selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
             selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
-            selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: dashboardValues.selectedTimeFrameInterval,
+            selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
             includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
 
         if (!cmd.validate()) {
@@ -824,12 +814,7 @@ class CsiDashboardController {
             return null
         } else {
            def username = springSecurityService.authentication.principal.getUsername()
-            UserspecificDashboard newCustomDashboard = new UserspecificDashboard(diagramType: UserspecificDashboardDiagramType.CSI, fromDate: fromDate, toDate: toDate, fromHour: cmd.fromHour,
-                fromMinute: cmd.fromMinute, toHour: cmd.toHour, toMinute: cmd.toMinute, aggrGroup: cmd.aggrGroup, selectedFolder: selectedFolderString, selectedPages: selectedPagesString,
-                selectedMeasuredEventIds: selectedMeasuredEventIdsString, selectedAllMeasuredEvents: cmd.selectedAllMeasuredEvents, selectedBrowsers: selectedBrowsersString,
-                selectedAllBrowsers: cmd.selectedAllBrowsers, selectedLocations: selectedLocationsString, selectedAllLocations: cmd.selectedAllLocations, debug: cmd.debug,
-                selectedTimeFrameInterval: cmd.selectedTimeFrameInterval, includeInterval: cmd.includeInterval, publiclyVisible: publiclyVisible, wideScreenDiagramMontage: wideScreenDiagramMontage, dashboardName: dashboardName, username: username,
-                setFromHour: cmd.setFromHour, setToHour: cmd.setToHour)
+            UserspecificCsiDashboard newCustomDashboard = new UserspecificCsiDashboard(cmd, selectedFolderString, selectedPagesString, selectedMeasuredEventIdsString, selectedBrowsersString, selectedLocationsString, publiclyVisible, wideScreenDiagramMontage, dashboardName, username)
            if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                response.sendError(500, 'save error')
                return null

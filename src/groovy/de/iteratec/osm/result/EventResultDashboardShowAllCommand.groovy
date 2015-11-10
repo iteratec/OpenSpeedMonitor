@@ -311,9 +311,9 @@ public class EventResultDashboardShowAllCommand {
 
         overwriteWarningAboutLongProcessingTime(nullable: true)
 
-        includeNativeConnectivity(nullable: false)
+        includeNativeConnectivity(nullable: true)
 
-        includeCustomConnectivity(nullable: false)
+        includeCustomConnectivity(nullable: true)
 
         customConnectivityName(nullable: true)
 
