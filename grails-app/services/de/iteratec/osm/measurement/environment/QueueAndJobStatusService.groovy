@@ -235,7 +235,7 @@ class QueueAndJobStatusService {
 
                         // Add jobs which are going to run in given interval to the list
                         // otherwise the job is added to the list of discounted jobs
-                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + loc.browser.name + ")", durationInSeconds: seconds)
+                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + loc.browser.name + ")", durationInSeconds: seconds, linkId: job.id)
                         if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
                             locationChartData.addJob(scheduleChartJob)
                         } else {

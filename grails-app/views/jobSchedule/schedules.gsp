@@ -131,7 +131,8 @@
                             ${location as grails.converters.JSON},
                             "${"ScheduleChart" + i + j}",
                             "${"duration-to-show" + i + j}",
-                            "${"show-overused-queues" + i + j}"
+                            "${"show-overused-queues" + i + j}",
+                            "<g:createLink controller="job" action="edit"/>"
                         )
                         $('#${"show-overused-queues" + i + j} button[value="on"]').click()
                     </g:if>
