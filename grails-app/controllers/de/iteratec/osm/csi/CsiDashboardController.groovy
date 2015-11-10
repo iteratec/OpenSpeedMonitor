@@ -104,10 +104,12 @@ class CsiDashboardController {
 
     String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
     public final static int MONDAY_WEEKSTART = 1
-    public final static List<String> AGGREGATOR_GROUP_VALUES = [AggregatorType.MEASURED_EVENT, DAILY_AGGR_GROUP_PAGE, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
-        AggregatorType.PAGE, DAILY_AGGR_GROUP_SHOP, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
-        AggregatorType.SHOP]
-    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event', 'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',]
+    public final
+    static List<String> AGGREGATOR_GROUP_VALUES = [AggregatorType.MEASURED_EVENT, DAILY_AGGR_GROUP_PAGE, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
+                                                   AggregatorType.PAGE, DAILY_AGGR_GROUP_SHOP, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
+                                                   AggregatorType.SHOP]
+    public final
+    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event', 'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',]
 
     /**
      * <p>
@@ -131,8 +133,7 @@ class CsiDashboardController {
      * @see <a href="http://tools.ietf.org/html/rfc2616#section-10.3.4"
      *      >http://tools.ietf.org/html/rfc2616#section-10.3.4</a>
      */
-    private void redirectWith303(String actionNameToRedirectTo)
-    {
+    private void redirectWith303(String actionNameToRedirectTo) {
         // There is a missing feature to do this:
         // http://jira.grails.org/browse/GRAILS-8829
 
@@ -141,7 +142,7 @@ class CsiDashboardController {
         String uri = grailsLinkGenerator.link(action: actionNameToRedirectTo)
         response.setStatus(303)
         response.setHeader("Location", uri)
-        render(status:303)
+        render(status: 303)
     }
 
     /**
@@ -170,8 +171,7 @@ class CsiDashboardController {
      * @see <a href="http://tools.ietf.org/html/rfc2616#section-10.3.4"
      *      >http://tools.ietf.org/html/rfc2616#section-10.3.4</a>
      */
-    private void redirectWith303(String actionNameToRedirectTo, Map urlParams)
-    {
+    private void redirectWith303(String actionNameToRedirectTo, Map urlParams) {
         // There is a missing feature to do this:
         // http://jira.grails.org/browse/GRAILS-8829
 
@@ -181,13 +181,13 @@ class CsiDashboardController {
         String uri = grailsLinkGenerator.link(action: actionNameToRedirectTo, params: paramsWithoutGrailsActionNameOfOldAction)
         response.setStatus(303)
         response.setHeader("Location", uri)
-        render(status:303)
+        render(status: 303)
     }
 
     /**
      * Redirects to {@link #showAll()}.
      *
-     * @return Nothing, redirects immediately.
+     * @return Nothing , redirects immediately.
      */
     Map<String, Object> index() {
         redirectWith303('showAll')
@@ -196,7 +196,7 @@ class CsiDashboardController {
     /**
      * deletes custom Dashboard
      *
-     * @return Nothing, redirects immediately.
+     * @return Nothing , redirects immediately.
      */
     Map<String, Object> delete() {
 
@@ -208,12 +208,12 @@ class CsiDashboardController {
         }
 
         try {
-           userspecificCSIDashboardInstance.delete(flush: true)
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-                redirect(action: "list")
+            userspecificCSIDashboardInstance.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+            redirect(action: "list")
         } catch (DataIntegrityViolationException e) {
-                flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-                redirect(action: "show", id: params.id)
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
+            redirect(action: "show", id: params.id)
         }
 
         redirectWith303('showAll')
@@ -228,33 +228,29 @@ class CsiDashboardController {
      *            not <code>null</code>.
      * @return A CSI model map to be used by the corresponding GSP,
      * 	       not <code>null</code> and never
-     *         {@linkplain Map#isEmpty() empty}.
+     * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
-        if( !ControllerUtils.isEmptyRequest(params) ) {
-            if(!cmd.validate() )
-            {
+        if (!ControllerUtils.isEmptyRequest(params)) {
+            if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
 
                 boolean warnAboutLongProcessingTimeInsteadOfShowingData = false
 
-                if(!cmd.overwriteWarningAboutLongProcessingTime)
-                {
+                if (!cmd.overwriteWarningAboutLongProcessingTime) {
                     int countOfSelectedEvents = cmd.selectedMeasuredEventIds.size()
-                    if(countOfSelectedEvents < 1)
-                    {
+                    if (countOfSelectedEvents < 1) {
                         // User checked: "Select all"
-                        countOfSelectedEvents = ((Collection)modelToRender.get('measuredEvents')).size()
+                        countOfSelectedEvents = ((Collection) modelToRender.get('measuredEvents')).size()
                     }
 
                     int selectedAggregationIntervallInMintues = MeasuredValueInterval.HOURLY
-                    switch(cmd.aggrGroup)
-                    {
+                    switch (cmd.aggrGroup) {
                         case AggregatorType.PAGE:
                         case DAILY_AGGR_GROUP_PAGE:
                             selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
@@ -268,21 +264,19 @@ class CsiDashboardController {
                     }
 
                     int countOfSelectedBrowser = cmd.selectedBrowsers.size()
-                    if( countOfSelectedBrowser < 1 )
-                    {
-                        countOfSelectedBrowser = ((List)modelToRender.get('browsers')).size()
+                    if (countOfSelectedBrowser < 1) {
+                        countOfSelectedBrowser = ((List) modelToRender.get('browsers')).size()
                     }
 
                     warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(
-                            fixTimeFrame( cmd.getSelectedTimeFrame(), selectedAggregationIntervallInMintues ),
+                            fixTimeFrame(cmd.getSelectedTimeFrame(), selectedAggregationIntervallInMintues),
                             selectedAggregationIntervallInMintues,
                             cmd.selectedFolder.size(),
                             cmd.selectedPages.size(),
                             countOfSelectedBrowser)
                 }
 
-                if( warnAboutLongProcessingTimeInsteadOfShowingData )
-                {
+                if (warnAboutLongProcessingTimeInsteadOfShowingData) {
                     modelToRender.put('warnAboutLongProcessingTime', true)
                 } else {
                     fillWithAproximateMeasuredValueData(modelToRender, cmd, true)
@@ -310,8 +304,7 @@ class CsiDashboardController {
      *         the graphs in {@link modelToRender} else, if set to
      *         <code>false</code> not.
      */
-    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph)
-    {
+    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph) {
         // TODO Test this: Structure and data...
 
         requiresArgumentNotNull('modelToRender', modelToRender)
@@ -325,22 +318,21 @@ class CsiDashboardController {
 
         MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams()
 
-        switch(cmd.aggrGroup)
-        {
+        switch (cmd.aggrGroup) {
             case AggregatorType.PAGE:
-                MeasuredValueInterval weeklyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+                MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
                 fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph)
                 break
             case DAILY_AGGR_GROUP_PAGE:
-                MeasuredValueInterval dailyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
+                MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
                 fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph)
                 break
             case AggregatorType.SHOP:
-                MeasuredValueInterval weeklyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+                MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
                 fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false)
                 break
             case DAILY_AGGR_GROUP_SHOP:
-                MeasuredValueInterval dailyInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
+                MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
                 fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false)
                 break
             default: // AggregatorType.MEASURED_EVENT
@@ -367,8 +359,7 @@ class CsiDashboardController {
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      */
-    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph)
-    {
+    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
@@ -380,10 +371,9 @@ class CsiDashboardController {
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
 
-        if( withTargetGraph )
-        {
+        if (withTargetGraph) {
             graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
-            resetFromDate.minusDays(1), resetToDate.plusDays(1)))
+                    resetFromDate.minusDays(1), resetToDate.plusDays(1)))
         }
 
         boolean includeCsTargetGraphs = false
@@ -416,13 +406,12 @@ class CsiDashboardController {
      *         not <code>null</code>.
      * @param queryParams
      *         The query parameters to find corresponding {@linkplain
-     *         MeasuredValue measured vales}.
+     * MeasuredValue measured vales}.
      * @param modelToRender
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.
      */
-    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams)
-    {
+    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY)
@@ -464,11 +453,10 @@ class CsiDashboardController {
     private void fillWithAnnotations(
             Map<String, Object> modelToRender,
             Interval timeFrame,
-            Collection<Long> selectedFolder)
-    {
+            Collection<Long> selectedFolder) {
         MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
-        AnnotationUtil.fillWithAnnotations(modelToRender,fixedTimeFrame, selectedFolder, eventService)
+        AnnotationUtil.fillWithAnnotations(modelToRender, fixedTimeFrame, selectedFolder, eventService)
     }
 
     /**
@@ -491,9 +479,9 @@ class CsiDashboardController {
      * @param measuredValuesQueryParams
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
-     *  @param withTargetGraph
+     * @param withTargetGraph
      *  		Whether or not to include {@link CsTargetGraph}s.
-     *  @param moveGraphsByOneWeek
+     * @param moveGraphsByOneWeek
      *  		Whether or not to move all {@link OsmChartPoint}s to the end of their interval (in default-CSI-dashboard this is the default-behaviour).
      */
     private void fillWithShopValuesAsHighChartMap(
@@ -502,8 +490,7 @@ class CsiDashboardController {
             MeasuredValueInterval interval,
             MvQueryParams measuredValuesQueryParams,
             boolean withTargetGraph,
-            boolean moveGraphsByOneWeek)
-    {
+            boolean moveGraphsByOneWeek) {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
@@ -514,10 +501,10 @@ class CsiDashboardController {
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
-        if(moveGraphsByOneWeek==true) {
+        if (moveGraphsByOneWeek == true) {
             moveDataPointsOneWeekForward(graphs)
-            resetFromDate=resetFromDate.plusWeeks(1)
-            resetToDate=resetToDate.plusWeeks(1)
+            resetFromDate = resetFromDate.plusWeeks(1)
+            resetToDate = resetToDate.plusWeeks(1)
         }
 
         Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
@@ -525,8 +512,7 @@ class CsiDashboardController {
         Integer rightOffset = oneDayOffset
         DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
 
-        if( withTargetGraph )
-        {
+        if (withTargetGraph) {
             graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
                     resetFromDateWithOffsetChange.minusDays(1), resetToDateWithOffsetChange.plusDays(1))
             )
@@ -564,8 +550,7 @@ class CsiDashboardController {
      * 			if true: moves the graph by one week (CSI-Default-View)
      */
     private void fillWithWeeklyShopValuesAsHighChartMap(
-            Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, boolean moveGraphsByOneWeek)
-    {
+            Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, boolean moveGraphsByOneWeek) {
         MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
         fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weekly, measuredValuesQueryParams, withTargetGraph, moveGraphsByOneWeek)
     }
@@ -587,14 +572,14 @@ class CsiDashboardController {
      *
      * @return A CSI model map to be used by the corresponding GSP,
      * 	       not <code>null</code> and never
-     *         {@linkplain Map#isEmpty() empty}.
+     * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showDefault() {
 
         DateTime toDate
-        if(params.includeInterval){
+        if (params.includeInterval) {
             toDate = new DateTime()
-        }else{
+        } else {
             toDate = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
         }
         DateTime fromDate = toDate.minusMonths(3)
@@ -605,8 +590,10 @@ class CsiDashboardController {
         MvQueryParams queryParams = new MvQueryParams()
 
         List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['otto.de_Desktop', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
-        Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll{namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)}
-        Set<Long> csiGroupIds = csiGroupsToShow.collect({it.id})
+        Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll {
+            namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)
+        }
+        Set<Long> csiGroupIds = csiGroupsToShow.collect({ it.id })
         queryParams.jobGroupIds.addAll(csiGroupIds)
 
         fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
@@ -620,7 +607,7 @@ class CsiDashboardController {
         modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', true)
-        modelToRender.put('debug', params.debug?true:false)
+        modelToRender.put('debug', params.debug ? true : false)
         modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
 
         return modelToRender
@@ -634,20 +621,20 @@ class CsiDashboardController {
      */
     private List<OsmChartGraph> moveDataPointsOneWeekForward(List<OsmChartGraph> graphs) {
 
-        List<OsmChartGraph> movedGraphs=[]
+        List<OsmChartGraph> movedGraphs = []
 
-        graphs.each {OsmChartGraph graph ->
+        graphs.each { OsmChartGraph graph ->
 
-            List<OsmChartPoint> oldList=graph.getPoints()
+            List<OsmChartPoint> oldList = graph.getPoints()
             graph.setPoints([])
 
-            oldList.each {OsmChartPoint point ->
+            oldList.each { OsmChartPoint point ->
 
-                DateTime time=new DateTime(point.time)
-                time=time.plusWeeks(1)
+                DateTime time = new DateTime(point.time)
+                time = time.plusWeeks(1)
 
-                OsmChartPoint movedPoint = new  OsmChartPoint(time: time.toDate().getTime(), measuredValue: point.measuredValue, countOfAggregatedResults: point.countOfAggregatedResults, sourceURL: point.sourceURL, testingAgent: point.testingAgent)
-                if(movedPoint.isValid())
+                OsmChartPoint movedPoint = new OsmChartPoint(time: time.toDate().getTime(), measuredValue: point.measuredValue, countOfAggregatedResults: point.countOfAggregatedResults, sourceURL: point.sourceURL, testingAgent: point.testingAgent)
+                if (movedPoint.isValid())
                     graph.getPoints().add(movedPoint)
             }
         }
@@ -661,7 +648,7 @@ class CsiDashboardController {
      * @see <a href="http://tools.ietf.org/html/rfc4180#section-2">http://tools.ietf.org/html/rfc4180#section-2</a> (2).
      */
     @Deprecated
-    private static final String CRLF = String.valueOf((char)13) + String.valueOf((char)10)
+    private static final String CRLF = String.valueOf((char) 13) + String.valueOf((char) 10)
 
     /**
      * The {@link DateTimeFormat} used for CSV export and table view.
@@ -686,15 +673,14 @@ class CsiDashboardController {
      * @param cmd
      *         The command with the users selections;
      *         not <code>null</code>.
-     * @return nothing, immediately renders a CSV to response' output stream.
+     * @return nothing , immediately renders a CSV to response' output stream.
      * @see <a href="http://tools.ietf.org/html/rfc4180">http://tools.ietf.org/html/rfc4180</a>
      */
     public Map<String, Object> csiValuesCsv(CsiDashboardShowAllCommand cmd) {
 
         Map<String, Object> modelToRender = new HashMap<String, Object>()
 
-        if( request.queryString && cmd.validate() )
-        {
+        if (request.queryString && cmd.validate()) {
             fillWithAproximateMeasuredValueData(modelToRender, cmd, false)
             cmd.copyRequestDataToViewModelMap(modelToRender)
         } else {
@@ -702,7 +688,7 @@ class CsiDashboardController {
             return
         }
 
-        String filename = modelToRender['aggrGroup'] + '_' + modelToRender['fromFormatted']  + '_to_' +  modelToRender['toFormatted'] + '.csv'
+        String filename = modelToRender['aggrGroup'] + '_' + modelToRender['fromFormatted'] + '_to_' + modelToRender['toFormatted'] + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename)
         response.setContentType("text/csv;header=present;charset=UTF-8")
@@ -719,21 +705,22 @@ class CsiDashboardController {
 
     /**
      * <p>
-    * Ajax service to validate and store custom dashboard settings.
-    * </p>
-    *
-    * @param values
-    *         The dashboard settings, JSON encoded;
-    *         not <code>null</code>.
-    * @param dashboardName
-    *         The proposed Dashboard Name;
-    *         not <code>null</code>.
-    * @param publiclyVisible
-    *         boolean value indicating if the custom dashboard should be visible to everyone or just its creator;
-    *         not <code>null</code>.
-    * @return nothing, immediately sends HTTP response codes to client.
-    */
-    def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
+     * Ajax service to validate and store custom dashboard settings.
+     * </p>
+     *
+     * @param values
+     *         The dashboard settings, JSON encoded;
+     *         not <code>null</code>.
+     * @return nothing , immediately sends HTTP response codes to client.
+     */
+    def validateAndSaveDashboardValues(String values) {
+
+        JSONObject dashboardValues = JSON.parse(values)
+
+        String dashboardName = dashboardValues.dashboardName
+        String username = springSecurityService.authentication.principal.getUsername()
+        String publiclyVisible = dashboardValues.publiclyVisible
+        String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Check if dashboardName is unique
         def dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
@@ -742,86 +729,44 @@ class CsiDashboardController {
             return null
         }
 
-        JSONObject dashboardValues = JSON.parse(values)
+        // Parse data for command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
         Collection<Long> selectedFolder = []
+        dashboardValues.selectedFolder.each { l -> selectedFolder.add(Long.parseLong(l)) }
         Collection<Long> selectedPages = []
+        dashboardValues.selectedPages.each { l -> selectedPages.add(Long.parseLong(l)) }
         Collection<Long> selectedMeasuredEventIds = []
+        dashboardValues.selectedMeasuredEventIds.each { l -> selectedMeasuredEventIds.add(Long.parseLong(l)) }
         Collection<Long> selectedBrowsers = []
+        dashboardValues.selectedBrowsers.each { l -> selectedBrowsers.add(Long.parseLong(l)) }
         Collection<Long> selectedLocations = []
-        String selectedFolderString = ""
-        String selectedPagesString = ""
-        String selectedMeasuredEventIdsString = ""
-        String selectedBrowsersString = ""
-        String selectedLocationsString = ""
-
-        dashboardValues.each { id, data ->
-           def dataToAssign
-           if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
-               dataToAssign = data.join(',')
-               dataToAssign = dataToAssign.replace( '"', '' )
-           } else {
-               dataToAssign = data
-           }
-            switch (id) {
-                   case ~/^selectedFolder$/:
-                       selectedFolderString = dataToAssign
-                       data.each() {
-                           selectedFolder.push(it)
-                       }
-                       break
-                   case ~/^selectedPages$/:
-                       selectedPagesString = dataToAssign
-                       data.each() {
-                           selectedPages.push(it)
-                       }
-                       break
-                   case ~/^selectedMeasuredEventIds$/:
-                       selectedMeasuredEventIdsString = dataToAssign
-                       data.each() {
-                           selectedMeasuredEventIds.push(it)
-                       }
-                       break
-                   case ~/^selectedBrowsers$/:
-                       selectedBrowsersString = dataToAssign
-                       data.each() {
-                           selectedBrowsers.push(it)
-                       }
-                       break
-                   case ~/^selectedLocations$/:
-                       selectedLocationsString = dataToAssign
-                       data.each() {
-                           selectedLocations.push(it)
-                       }
-                       break
-            }
-        }
-
+        dashboardValues.selectedLocations.each { l -> selectedLocations.add(Long.parseLong(l)) }
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
+        // Create command vor validation
         def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
-            toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroup: dashboardValues.aggrGroup, selectedFolder: selectedFolder,
-            selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
-            selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
-            selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
-            includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
+                toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroup: dashboardValues.aggrGroup, selectedFolder: selectedFolder,
+                selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
+                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
+                selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
+                includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
 
         if (!cmd.validate()) {
             //send errors
-            def errMsgList = cmd.errors.allErrors.collect{g.message([error : it])}
-            response.sendError(400, "rkrkrk" + errMsgList.toString() + "rkrkrk") // Apache Tomcat will output the response as part of (HTML) error page - 'rkrkrk' are the delimiters so the AJAX frontend can find the message
+            def errMsgList = cmd.errors.allErrors.collect { g.message([error: it]) }
+            response.sendError(400, "beginErrorMessage" + errMsgList.toString() + "endErrorMessage")
+            // Apache Tomcat will output the response as part of (HTML) error page
             return null
         } else {
-           def username = springSecurityService.authentication.principal.getUsername()
-            UserspecificCsiDashboard newCustomDashboard = new UserspecificCsiDashboard(cmd, selectedFolderString, selectedPagesString, selectedMeasuredEventIdsString, selectedBrowsersString, selectedLocationsString, publiclyVisible, wideScreenDiagramMontage, dashboardName, username)
-           if (!newCustomDashboard.save(failOnError: true, flush: true)) {
-               response.sendError(500, 'save error')
-               return null
-           } else {
-               response.sendError(200, 'OK')
-               return null
-           }
+            UserspecificCsiDashboard newCustomDashboard = new UserspecificCsiDashboard(cmd, publiclyVisible, wideScreenDiagramMontage, dashboardName, username)
+            if (!newCustomDashboard.save(failOnError: true, flush: true)) {
+                response.sendError(500, 'save error')
+                return null
+            } else {
+                response.sendError(200, 'OK')
+                return null
+            }
         }
     }
 
@@ -847,16 +792,14 @@ class CsiDashboardController {
      *
      * @throws IOException if write on {@code target} failed.
      */
-    private static void writeCSV(List<OsmChartGraph> source, Writer target, Locale localeForNumberFormat, boolean repeatCSITargetValueColumns) throws IOException
-    {
+    private
+    static void writeCSV(List<OsmChartGraph> source, Writer target, Locale localeForNumberFormat, boolean repeatCSITargetValueColumns) throws IOException {
         NumberFormat csvCSIValueFormat = NumberFormat.getNumberInstance(localeForNumberFormat)
 
         // Sort graph points by time
         TreeMapOfTreeMaps<Long, String, OsmChartPoint> pointsByGraphByTime = new TreeMapOfTreeMaps<Long, String, OsmChartPoint>()
-        for(OsmChartGraph eachCSIValueEntry : source)
-        {
-            for(OsmChartPoint eachPoint : eachCSIValueEntry.getPoints())
-            {
+        for (OsmChartGraph eachCSIValueEntry : source) {
+            for (OsmChartPoint eachPoint : eachCSIValueEntry.getPoints()) {
                 pointsByGraphByTime.getOrCreate(eachPoint.time).put(eachCSIValueEntry.getLabel(), eachPoint)
             }
         }
@@ -864,7 +807,7 @@ class CsiDashboardController {
         CsvListWriter csvWriter = new CsvListWriter(
                 target,
                 new CsvPreference.Builder(CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE).useEncoder(new DefaultCsvEncoder()).build()
-                )
+        )
 
         // Create CSV header:
         List<String> csvHeader = new LinkedList<String>()
@@ -873,11 +816,9 @@ class CsiDashboardController {
 
         List<String> graphLabelsInOrderOfHeader = new LinkedList<String>()
 
-        for(OsmChartGraph eachGraph : source)
-        {
+        for (OsmChartGraph eachGraph : source) {
             csvHeader.add(eachGraph.getLabel())
-            if(repeatCSITargetValueColumns)
-            {
+            if (repeatCSITargetValueColumns) {
                 csvHeader.add('Ziel-CSI') // TODO i18n?
             }
             csvHeader.add('Delta') // TODO i18n?
@@ -890,8 +831,7 @@ class CsiDashboardController {
         // The target graph:
         CsTargetGraph targetGraph = CsTargetGraph.list().get(0) // TODO Move DB access to DAO.
 
-        for(Map.Entry<Long, TreeMap<String, OsmChartPoint>> eachPointByGraphOfTime : pointsByGraphByTime)
-        {
+        for (Map.Entry<Long, TreeMap<String, OsmChartPoint>> eachPointByGraphOfTime : pointsByGraphByTime) {
             List<String> row = new LinkedList<String>()
 
             DateTime time = new DateTime(eachPointByGraphOfTime.getKey())
@@ -901,21 +841,17 @@ class CsiDashboardController {
 
             row.add(csvCSIValueFormat.format(targetValue))
 
-            for(String eachGraphLabel : graphLabelsInOrderOfHeader)
-            {
+            for (String eachGraphLabel : graphLabelsInOrderOfHeader) {
                 OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel)
-                if( point != null )
-                {
+                if (point != null) {
                     row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue)))
-                    if(repeatCSITargetValueColumns)
-                    {
+                    if (repeatCSITargetValueColumns) {
                         row.add(csvCSIValueFormat.format(roundDouble(targetValue)))
                     }
                     row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue - targetValue)))
                 } else {
                     row.add("")
-                    if(repeatCSITargetValueColumns)
-                    {
+                    if (repeatCSITargetValueColumns) {
                         row.add("")
                     }
                     row.add("")
@@ -936,8 +872,7 @@ class CsiDashboardController {
      * @return The rounded value.
      * @since IT-102
      */
-    static private double roundDouble(double valueToRound)
-    {
+    static private double roundDouble(double valueToRound) {
         return new BigDecimal(valueToRound).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
     }
 
@@ -957,8 +892,7 @@ class CsiDashboardController {
      *         further data. Subsequent calls will never return the same
      *         instance.
      */
-    public Map<String, Object> constructStaticViewDataOfShowAll()
-    {
+    public Map<String, Object> constructStaticViewDataOfShowAll() {
         Map<String, Object> result = [:]
 
         // AggregatorTypes
@@ -999,14 +933,13 @@ class CsiDashboardController {
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:
         Map<Long, Set<Long>> eventsOfPages = new HashMap<Long, Set<Long>>()
-        for(Page eachPage : pages)
-        {
+        for (Page eachPage : pages) {
             Set<Long> eventIds = new HashSet<Long>()
 
             Collection<Long> ids = measuredEvents.findResults {
-                it.testedPage.getId() == eachPage.getId() ? it.getId() : null }
-            if( !ids.isEmpty() )
-            {
+                it.testedPage.getId() == eachPage.getId() ? it.getId() : null
+            }
+            if (!ids.isEmpty()) {
                 eventIds.addAll(ids)
             }
 
@@ -1016,14 +949,13 @@ class CsiDashboardController {
 
         // --- Map<BrowserID, Set<LocationID>> for fast view filtering:
         Map<Long, Set<Long>> locationsOfBrowsers = new HashMap<Long, Set<Long>>()
-        for(Browser eachBrowser : browsers)
-        {
+        for (Browser eachBrowser : browsers) {
             Set<Long> locationIds = new HashSet<Long>()
 
             Collection<Long> ids = locations.findResults {
-                it.browser.getId() == eachBrowser.getId() ? it.getId() : null }
-            if( !ids.isEmpty() )
-            {
+                it.browser.getId() == eachBrowser.getId() ? it.getId() : null
+            }
+            if (!ids.isEmpty()) {
                 locationIds.addAll(ids)
             }
 
@@ -1036,7 +968,7 @@ class CsiDashboardController {
         return result
     }
 
-    def downloadBrowserWeights(){
+    def downloadBrowserWeights() {
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}browser_weights.csv")
@@ -1048,7 +980,8 @@ class CsiDashboardController {
         }
         response.outputStream << builder.toString()
     }
-    def downloadPageWeights(){
+
+    def downloadPageWeights() {
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}page_weights.csv")
@@ -1060,7 +993,8 @@ class CsiDashboardController {
         }
         response.outputStream << builder.toString()
     }
-    def downloadHourOfDayWeights(){
+
+    def downloadHourOfDayWeights() {
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}HourOfDays_weights.csv")
@@ -1073,6 +1007,7 @@ class CsiDashboardController {
         }
         response.outputStream << builder.toString()
     }
+
     def weights() {
         CsiDashboardController.log.info("params=$params")
         //		List<String> params.errorMessagesCsi instanceof String?[params.errorMessagesCsi]:params.errorMessagesCsi
@@ -1086,23 +1021,24 @@ class CsiDashboardController {
 
         // arrange treemap data
         TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
-        pageDaoService.findAll().each {p -> treemapData.addNode(new ChartEntry(name: p.name, weight: p.weight))}
+        pageDaoService.findAll().each { p -> treemapData.addNode(new ChartEntry(name: p.name, weight: p.weight)) }
         def treemapDataJSON = treemapData as JSON
 
         // arrange barchart data
         BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
-        HourOfDay.findAll().each {h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight))}
+        HourOfDay.findAll().each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
         def barChartJSON = barChartData as JSON
 
-        [browsers:browserDaoService.findAll(),
-            pages: pageDaoService.findAll(),
-            // FIXME Change to use a DAO
-            hoursOfDay: HourOfDay.findAll(),
-            errorMessagesCsi: params.list('errorMessagesCsi'),
-            treemapData: treemapDataJSON,
-            barchartData: barChartJSON]
+        [browsers        : browserDaoService.findAll(),
+         pages           : pageDaoService.findAll(),
+         // FIXME Change to use a DAO
+         hoursOfDay      : HourOfDay.findAll(),
+         errorMessagesCsi: params.list('errorMessagesCsi'),
+         treemapData     : treemapDataJSON,
+         barchartData    : barChartJSON]
     }
-    def uploadBrowserWeights(){
+
+    def uploadBrowserWeights() {
         MultipartFile csv = request.getFile('browserCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER, csv.getInputStream())
         if (!errorMessagesCsiValidation) {
@@ -1110,25 +1046,27 @@ class CsiDashboardController {
         }
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
         redirect(action: 'weights',
-        params: [errorMessagesCsi: errorMessagesCsiValidation]	)
+                params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
-    def uploadPageWeights(){
+
+    def uploadPageWeights() {
         MultipartFile csv = request.getFile('pageCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.PAGE, csv.getInputStream())
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream())
         }
         redirect(action: 'weights',
-        params: [errorMessagesCsi: errorMessagesCsiValidation])
+                params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
-    def uploadHourOfDayWeights(){
+
+    def uploadHourOfDayWeights() {
         MultipartFile csv = request.getFile('hourOfDayCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.HOUROFDAY, csv.getInputStream())
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream())
         }
         redirect(action: 'weights',
-        params: [errorMessagesCsi: errorMessagesCsiValidation])
+                params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
     /**
@@ -1159,12 +1097,11 @@ class CsiDashboardController {
             int selectedAggregationIntervallInMintues,
             int countOfSelectedSystems,
             int countOfSelectedPages,
-            int countOfSelectedBrowser)
-    {
+            int countOfSelectedBrowser) {
         int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes()
 
         long expectedCountOfGraphs = countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser
-        long expectedPointsOfEachGraph = Math.round( minutesInTimeFrame / selectedAggregationIntervallInMintues )
+        long expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / selectedAggregationIntervallInMintues)
         long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph
 
         return expectedTotalNumberOfPoints > 10000
@@ -1184,13 +1121,13 @@ class CsiDashboardController {
         Integer maxDays
         switch (interval.intervalInMinutes) {
             case MeasuredValueInterval.WEEKLY:
-                maxDays = 26*7
+                maxDays = 26 * 7
                 break
             case MeasuredValueInterval.DAILY:
-                maxDays = 6*7
+                maxDays = 6 * 7
                 break
             default:
-                maxDays = 2*7
+                maxDays = 2 * 7
                 break
         }
         return daysBetween.isGreaterThan(new Days(maxDays))
@@ -1200,7 +1137,7 @@ class CsiDashboardController {
      * Creates the CSV as String to be converted to HTML table by view. Thrown Exceptions get catched and an error-message is returned instead of csv-representation.
      * @return String-representation of data or an error-message if any {@link Exception} is thrown.
      */
-    private String formatForTable(List<OsmChartGraph> csiValueMap, boolean includeCsTargetGraphs){
+    private String formatForTable(List<OsmChartGraph> csiValueMap, boolean includeCsTargetGraphs) {
         String csvAsString
         try {
             csvAsString = tryToFormatForTable(csiValueMap, includeCsTargetGraphs)
@@ -1210,12 +1147,12 @@ class CsiDashboardController {
         }
         return csvAsString
     }
-    private String tryToFormatForTable(List<OsmChartGraph> csiValueMap, boolean includeCsTargetGraphs){
+
+    private String tryToFormatForTable(List<OsmChartGraph> csiValueMap, boolean includeCsTargetGraphs) {
         StringWriter writer = new StringWriter()
         writeCSV(csiValueMap, writer, RequestContextUtils.getLocale(request), true)
         String csvAsString = writer.toString()
-        if( csvAsString.endsWith('\n') )
-        {
+        if (csvAsString.endsWith('\n')) {
             csvAsString = csvAsString.substring(0, csvAsString.length() - 1)
         }
         return csvAsString

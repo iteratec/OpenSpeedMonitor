@@ -167,19 +167,18 @@
                 <g:actionSubmit
                         value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
                         action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;"/>
-                %{--Hidden Feature--}%
-                %{--<sec:ifLoggedIn>--}%
-                    %{--<sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">--}%
-                        %{--<a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"--}%
-                           %{--data-toggle="modal"--}%
-                           %{--style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>--}%
-                    %{--</sec:ifAnyGranted>--}%
-                %{--</sec:ifLoggedIn>--}%
-                %{--<g:if test="${params.id}">--}%
-                    %{--<g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">--}%
-                        %{--<g:render template="/_common/modals/deleteCustomDashboard"/>--}%
-                    %{--</g:if>--}%
-                %{--</g:if>--}%
+                <sec:ifLoggedIn>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                        <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
+                           data-toggle="modal"
+                           style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+                    </sec:ifAnyGranted>
+                </sec:ifLoggedIn>
+                <g:if test="${params.id}">
+                    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                        <g:render template="/_common/modals/deleteCustomDashboard"/>
+                    </g:if>
+                </g:if>
             </p>
             <g:if test="${exceedsTimeframeBoundary}">
                 <g:if test="${selectedInterval.intervalInMinutes == 60}">
