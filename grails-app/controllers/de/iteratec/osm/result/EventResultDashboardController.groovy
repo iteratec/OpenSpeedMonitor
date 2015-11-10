@@ -27,7 +27,6 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.UserspecificEventResultDashboard
-import de.iteratec.osm.report.UserspecificDashboardDiagramType
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.util.AnnotationUtil
