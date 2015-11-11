@@ -198,45 +198,42 @@ class EventResult implements CsiValue {
 
         testAgent(nullable: true)
 
-        connectivityProfile(nullable: true)
-        customConnectivityName(nullable: true)
+		connectivityProfile(nullable: true, validator: { currentProfile, eventResultInstance ->
 
-//		connectivityProfile(nullable: true, validator: { currentProfile, eventResultInstance ->
-//
-//            boolean notNullAndNothingElse =
-//                    currentProfile != null &&
-//                        eventResultInstance.customConnectivityName == null &&
-//                        eventResultInstance.noTrafficShapingAtAll == false
-//            boolean nullAndCustom =
-//                    currentProfile == null &&
-//                            eventResultInstance.customConnectivityName != null &&
-//                            eventResultInstance.noTrafficShapingAtAll == false
-//            boolean nullAndNative =
-//                    currentProfile == null &&
-//                            eventResultInstance.customConnectivityName == null &&
-//                            eventResultInstance.noTrafficShapingAtAll == true
-//
-//            return notNullAndNothingElse || nullAndCustom || nullAndNative;
-//
-//        })
-//		customConnectivityName(nullable: true, validator: { currentCustomName, eventResultInstance ->
-//
-//            boolean notNullAndNothingElse =
-//                    currentCustomName != null &&
-//                            eventResultInstance.noTrafficShapingAtAll == false &&
-//                            eventResultInstance.connectivityProfile == null
-//            boolean nullAndNative =
-//                    currentCustomName == null &&
-//                            eventResultInstance.noTrafficShapingAtAll == true &&
-//                            eventResultInstance.connectivityProfile == null
-//            boolean nullAndPredefined =
-//                    currentCustomName == null &&
-//                            eventResultInstance.noTrafficShapingAtAll == false &&
-//                            eventResultInstance.connectivityProfile != null
-//
-//            return notNullAndNothingElse || nullAndNative || nullAndPredefined
-//
-//        })
+            boolean notNullAndNothingElse =
+                    currentProfile != null &&
+                        eventResultInstance.customConnectivityName == null &&
+                        eventResultInstance.noTrafficShapingAtAll == false
+            boolean nullAndCustom =
+                    currentProfile == null &&
+                            eventResultInstance.customConnectivityName != null &&
+                            eventResultInstance.noTrafficShapingAtAll == false
+            boolean nullAndNative =
+                    currentProfile == null &&
+                            eventResultInstance.customConnectivityName == null &&
+                            eventResultInstance.noTrafficShapingAtAll == true
+
+            return notNullAndNothingElse || nullAndCustom || nullAndNative;
+
+        })
+		customConnectivityName(nullable: true, validator: { currentCustomName, eventResultInstance ->
+
+            boolean notNullAndNothingElse =
+                    currentCustomName != null &&
+                            eventResultInstance.noTrafficShapingAtAll == false &&
+                            eventResultInstance.connectivityProfile == null
+            boolean nullAndNative =
+                    currentCustomName == null &&
+                            eventResultInstance.noTrafficShapingAtAll == true &&
+                            eventResultInstance.connectivityProfile == null
+            boolean nullAndPredefined =
+                    currentCustomName == null &&
+                            eventResultInstance.noTrafficShapingAtAll == false &&
+                            eventResultInstance.connectivityProfile != null
+
+            return notNullAndNothingElse || nullAndNative || nullAndPredefined
+
+        })
 	}
 
 	static mapping = {
