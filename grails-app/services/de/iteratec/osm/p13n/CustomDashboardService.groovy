@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.p13n
 
-import de.iteratec.osm.report.UserspecificDashboard
+import de.iteratec.osm.report.UserspecificEventResultDashboard
 
 /**
  * CustomDashboardService
@@ -38,7 +38,7 @@ class CustomDashboardService {
      * @return nothing, immediately sends HTTP response codes to client.
      */
     def validateDashboardName(String proposedDashboardName) {
-        UserspecificDashboard newCustomDashboard = new UserspecificDashboard(dashboardName: proposedDashboardName)
+        UserspecificEventResultDashboard newCustomDashboard = new UserspecificEventResultDashboard(dashboardName: proposedDashboardName)
         if (!newCustomDashboard.validate()) {
             response.sendError(302, 'dashboard by that name exists already')
             return null

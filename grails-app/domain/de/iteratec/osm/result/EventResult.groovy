@@ -198,9 +198,6 @@ class EventResult implements CsiValue {
 
         testAgent(nullable: true)
 
-//        connectivityProfile(nullable: true)
-//        customConnectivityName(nullable: true)
-
 		connectivityProfile(nullable: true, validator: { currentProfile, eventResultInstance ->
 
             boolean notNullAndNothingElse =
@@ -252,6 +249,8 @@ class EventResult implements CsiValue {
 		medianValue(index: 'GetLimitedMedianEventResultsBy')
 		cachedView(index: 'GetLimitedMedianEventResultsBy')
         connectivityProfile(index: 'GetLimitedMedianEventResultsBy')
+
+        noTrafficShapingAtAll(defaultValue: false)
 	}
 
 	static transients = ['csiRelevant', 'osmConfigCacheService']

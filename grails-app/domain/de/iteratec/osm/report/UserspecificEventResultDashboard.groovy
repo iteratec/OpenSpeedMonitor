@@ -1,5 +1,3 @@
-
-
 /*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
@@ -19,31 +17,20 @@
 
 package de.iteratec.osm.report
 
+import grails.plugin.springsecurity.SpringSecurityUtils
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 import java.text.SimpleDateFormat
 
-import grails.plugin.springsecurity.SpringSecurityUtils
-
-
-
-
-
-public enum UserspecificDashboardDiagramType {
-    CSI,
-    EVENT,
-}
-
 /**
- * UserspecificDashboard
+ * UserspecificEventResultDashboard
  * A domain class describes the data object and it's mapping to the database
  */
-class UserspecificDashboard {
+class UserspecificEventResultDashboard {
 
     def springSecurityService
     public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
-
-    //display type
-    UserspecificDashboardDiagramType diagramType
 
     /**
      * if dashboard is visible to all or just to admins and to user that created it
@@ -81,8 +68,7 @@ class UserspecificDashboard {
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
-    String  fromHour
-    String  fromMinute
+    String fromHour
 
     /**
      * The selected end hour of date.
@@ -90,18 +76,6 @@ class UserspecificDashboard {
      * Please use {@link #getSelectedTimeFrame()}.
      */
     String toHour
-    String toMinute
-
-    /**
-     * The name of the {@link de.iteratec.osm.report.chart.AggregatorType}.
-     *
-     * @see de.iteratec.osm.report.chart.AggregatorType#getName()
-     * @see de.iteratec.osm.report.chart.AggregatorType#MEASURED_STEP
-     * @see de.iteratec.osm.report.chart.AggregatorType#PAGE
-     * @see de.iteratec.osm.report.chart.AggregatorType#PAGE_AND_BROWSER
-     * @see de.iteratec.osm.report.chart.AggregatorType#SHOP
-     */
-    String aggrGroup
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
@@ -208,19 +182,9 @@ class UserspecificDashboard {
     Boolean setToHour
 
     /**
-     * Whether or not current and not yet finished intervals should be loaded and displayed
-     */
-    Boolean includeInterval
-
-    /**
      * The time of the {@link MeasuredValueInterval}.
      */
     Integer selectedInterval
-
-    /**
-     * The Selected chart type (line or point)
-     */
-    Integer selectChartType;
 
     /**
      * Database name of the selected {@link AggregatorType}, selected by the user.
@@ -269,41 +233,39 @@ class UserspecificDashboard {
      */
     Boolean wideScreenDiagramMontage
 
+    Boolean includeNativeConnectivity
+    Boolean selectedAllConnectivityProfiles
+    String customConnectivityName
+    String selectedConnectivityProfiles
+    Boolean includeCustomConnectivity
+
     static mapping = {
     }
 
     //csi
     static constraints = {
-        dashboardName(nullable: true, unique:true)
-        diagramType(nullable: true)
+        dashboardName(nullable: true, unique: true)
         username(nullable: true)
         publiclyVisible(nullable: true)
         fromDate(nullable: true)
-        toDate(nullable:true)
+        toDate(nullable: true)
         fromHour(nullable: true)
         toHour(nullable: true)
-        aggrGroup(nullable:true)
-        selectedFolder(nullable:true)
-        selectedPages(nullable:true)
-        selectedMeasuredEventIds(nullable:true)
-        selectedBrowsers(nullable:true)
-        selectedLocations(nullable:true)
-        overwriteWarningAboutLongProcessingTime(nullable:true)
-        fromHour(nullable: true)
-        toHour(nullable: true)
-        selectedAggrGroupValuesCached(nullable:true)
+        selectedFolder(nullable: true)
+        selectedPages(nullable: true)
+        selectedMeasuredEventIds(nullable: true)
+        selectedBrowsers(nullable: true)
+        selectedLocations(nullable: true)
+        overwriteWarningAboutLongProcessingTime(nullable: true)
+        selectedAggrGroupValuesCached(nullable: true)
         selectedAllMeasuredEvents(nullable: true)
         selectedAllBrowsers(nullable: true)
         selectedAllLocations(nullable: true)
-        fromMinute(nullable: true)
-        toMinute(nullable: true)
         debug(nullable: true)
         selectedTimeFrameInterval(nullable: true)
         setFromHour(nullable: true)
         setToHour(nullable: true)
-        includeInterval(nullable: true)
         selectedInterval(nullable: true)
-        selectChartType(nullable: true)
         selectedAggrGroupValuesUnCached(nullable: true)
         trimBelowLoadTimes(nullable: true)
         trimAboveLoadTimes(nullable: true)
@@ -312,6 +274,97 @@ class UserspecificDashboard {
         trimBelowRequestSizes(nullable: true)
         trimAboveRequestSizes(nullable: true)
         wideScreenDiagramMontage(nullable: true)
+        includeNativeConnectivity(nullable: true)
+        selectedAllConnectivityProfiles(nullable: true)
+        customConnectivityName(nullable: true)
+        selectedConnectivityProfiles(nullable: true)
+        includeCustomConnectivity(nullable: true)
+    }
+
+    UserspecificEventResultDashboard(JSONObject dashboardValues, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage, String username) {
+
+        this.dashboardName = dashboardName
+        this.publiclyVisible = publiclyVisible
+        this.wideScreenDiagramMontage = wideScreenDiagramMontage
+        this.username = username
+
+        fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
+        toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
+        fromHour = dashboardValues.fromHour
+        toHour = dashboardValues.toHour
+        if (dashboardValues.selectedInterval) selectedInterval = Integer.parseInt(dashboardValues.selectedInterval)
+        if (dashboardValues.selectedTimeFrameInterval)selectedTimeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
+        selectedAllMeasuredEvents = dashboardValues.selectedAllMeasuredEvents
+        selectedAllBrowsers = dashboardValues.selectedAllBrowsers
+        selectedAllLocations = dashboardValues.selectedAllLocations
+        if (dashboardValues.trimBelowLoadTimes) trimBelowLoadTimes = Integer.parseInt(dashboardValues.trimBelowLoadTimes)
+        if (dashboardValues.trimBelowLoadTimes) trimAboveLoadTimes = Integer.parseInt(dashboardValues.trimAboveLoadTimes)
+        if (dashboardValues.trimBelowRequestCounts) trimBelowRequestCounts = Integer.parseInt(dashboardValues.trimBelowRequestCounts)
+        if (dashboardValues.trimAboveRequestCounts) trimAboveRequestCounts = Integer.parseInt(dashboardValues.trimAboveRequestCounts)
+        if (dashboardValues.trimBelowRequestSizes) trimBelowRequestSizes = Integer.parseInt(dashboardValues.trimBelowRequestSizes)
+        if (dashboardValues.trimAboveRequestSizes) trimAboveRequestSizes = Integer.parseInt(dashboardValues.trimAboveRequestSizes)
+        overwriteWarningAboutLongProcessingTime = dashboardValues.overwriteWarningAboutLongProcessingTime
+        debug = dashboardValues.debug
+        setFromHour = dashboardValues.setFromHour
+        setToHour = dashboardValues.setToHour
+        includeCustomConnectivity = dashboardValues.includeCustomConnectivity
+        includeNativeConnectivity = dashboardValues.includeNativeConnectivity
+        customConnectivityName = dashboardValues.customConnectivityName
+        selectedAllConnectivityProfiles = dashboardValues.selectedAllConnectivityProfiles
+
+        String selectedFolderString = ""
+        String selectedPagesString = ""
+        String selectedMeasuredEventIdsString = ""
+        String selectedBrowsersString = ""
+        String selectedLocationsString = ""
+        String selectedAggrGroupValuesCachedString = ""
+        String selectedAggrGroupValuesUnCachedString = ""
+        String selectedConnectivityProfilesString = ""
+
+        dashboardValues.each { id, data ->
+            def dataToAssign
+            if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
+                dataToAssign = data.join(',')
+                dataToAssign = dataToAssign.replace( '"', '' )
+            } else {
+                dataToAssign = data
+            }
+            switch (id) {
+                case ~/^selectedFolder$/:
+                    selectedFolderString = dataToAssign
+                    break
+                case ~/^selectedPages$/:
+                    selectedPagesString = dataToAssign
+                    break
+                case ~/^selectedMeasuredEventIds$/:
+                    selectedMeasuredEventIdsString = dataToAssign
+                    break
+                case ~/^selectedBrowsers$/:
+                    selectedBrowsersString = dataToAssign
+                    break
+                case ~/^selectedLocations$/:
+                    selectedLocationsString = dataToAssign
+                    break
+                case ~/^selectedAggrGroupValuesCached$/:
+                    selectedAggrGroupValuesCachedString = dataToAssign
+                    break
+                case ~/^selectedAggrGroupValuesUnCached$/:
+                    selectedAggrGroupValuesUnCachedString = dataToAssign
+                    break
+                case ~/^selectedConnectivityProfiles$/:
+                    selectedConnectivityProfilesString = dataToAssign
+                    break
+            }
+        }
+
+        selectedFolder = selectedFolderString
+        selectedPages = selectedPagesString
+        selectedMeasuredEventIds = selectedMeasuredEventIdsString
+        selectedBrowsers = selectedBrowsersString
+        selectedLocations = selectedLocationsString
+        selectedAggrGroupValuesCached = selectedAggrGroupValuesCachedString
+        selectedAggrGroupValuesUnCached = selectedAggrGroupValuesUnCachedString
+        selectedConnectivityProfiles = selectedConnectivityProfilesString
     }
 
     def isCurrentUserDashboardOwner(String dashboardId) {
@@ -319,7 +372,10 @@ class UserspecificDashboard {
             return true
         } else {
             // get owner name
-            UserspecificDashboard currentBoard = UserspecificDashboard.get(dashboardId)
+            UserspecificEventResultDashboard currentBoard = UserspecificEventResultDashboard.get(dashboardId)
+            if (!currentBoard) {
+                return false
+            }
             String boardCreator = currentBoard.username
             String currentUser = ""
             if (springSecurityService.isLoggedIn()) {
@@ -333,108 +389,137 @@ class UserspecificDashboard {
         }
     }
 
-    def getListOfAvailableDashboards(String diagramType) {
+    def getListOfAvailableDashboards() {
         List result = []
         List fullList = []
-        if (diagramType == "EVENT") {
-            fullList = UserspecificDashboard.findAllByDiagramType(UserspecificDashboardDiagramType.EVENT)
-        } else {
-            fullList = UserspecificDashboard.findAllByDiagramType(UserspecificDashboardDiagramType.CSI)
-        }
+        fullList = UserspecificEventResultDashboard.findAll()
+
         String currentUser = ""
         if (springSecurityService.isLoggedIn()) {
             currentUser = springSecurityService.authentication.principal.getUsername()
         }
-        for(board in fullList){
+        for (board in fullList) {
             if ((board.publiclyVisible == true) || (board.username == currentUser)) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
                 link += "&_setFromHour="
-                if (board.setFromHour != null) { link += "&setFromHour=on" }
+                if (board.setFromHour != null) {
+                    link += "&setFromHour=on"
+                }
                 link += "&from=" + SIMPLE_DATE_FORMAT.format(board.fromDate)
-                link += "&fromHour=" + board.fromHour.replace( ':', '%3A' )
+                link += "&fromHour=" + board.fromHour.replace(':', '%3A')
                 link += "&_setToHour="
-                if (board.setToHour != null) { link += "&setToHour=on" }
+                if (board.setToHour != null) {
+                    link += "&setToHour=on"
+                }
                 link += "&to=" + SIMPLE_DATE_FORMAT.format(board.toDate)
-                link += "&toHour=" + board.toHour.replace( ':', '%3A' )
+                link += "&toHour=" + board.toHour.replace(':', '%3A')
                 if ((board.selectedFolder != null) && (board.selectedFolder.size() > 0)) {
-                    for(item in board.selectedFolder.tokenize( ',' )){
+                    for (item in board.selectedFolder.tokenize(',')) {
                         link += "&selectedFolder=" + item
                     }
                 }
                 if ((board.selectedPages != null) && (board.selectedPages.size() > 0)) {
-                    for(item in board.selectedPages.tokenize( ',' )){
+                    for (item in board.selectedPages.tokenize(',')) {
                         link += "&selectedPages=" + item
                     }
                 }
                 link += "&_selectedAllBrowsers="
-                if (board.selectedAllBrowsers != null) { link += "&selectedAllBrowsers=on" }
+                if (board.selectedAllBrowsers != null) {
+                    link += "&selectedAllBrowsers=on"
+                }
                 link += "&_selectedAllMeasuredEvents="
-                if (board.selectedAllMeasuredEvents != null) { link += "&selectedAllMeasuredEvents=on" }
+                if (board.selectedAllMeasuredEvents != null) {
+                    link += "&selectedAllMeasuredEvents=on"
+                }
                 link += "&_selectedAllLocations="
-                if (board.selectedAllLocations != null) { link += "&selectedAllLocations=on" }
+                if (board.selectedAllLocations != null) {
+                    link += "&selectedAllLocations=on"
+                }
                 if ((board.selectedMeasuredEventIds != null) && (board.selectedMeasuredEventIds.size() > 0)) {
-                    for(item in board.selectedMeasuredEventIds.tokenize( ',' )){
+                    for (item in board.selectedMeasuredEventIds.tokenize(',')) {
                         link += "&selectedMeasuredEventIds=" + item
                     }
                 }
                 if ((board.selectedBrowsers != null) && (board.selectedBrowsers.size() > 0)) {
-                    for(item in board.selectedBrowsers.tokenize( ',' )){
+                    for (item in board.selectedBrowsers.tokenize(',')) {
                         link += "&selectedBrowsers=" + item
                     }
                 }
                 if ((board.selectedLocations != null) && (board.selectedLocations.size() > 0)) {
-                    for(item in board.selectedLocations.tokenize( ',' )){
+                    for (item in board.selectedLocations.tokenize(',')) {
                         link += "&selectedLocations=" + item
                     }
                 }
-                link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
+                link += "&_action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
                 if (board.wideScreenDiagramMontage == true) {
                     link += "&wideScreenDiagramMontage=on"
                 }
-                if (diagramType == "EVENT") {
-                    link += "&selectedInterval=" + board.selectedInterval
+                link += "&selectedInterval=" + board.selectedInterval
 
-                    if ((board.selectedAggrGroupValuesUnCached != null) && (board.selectedAggrGroupValuesUnCached.size() > 0)) {
-                        for(item in board.selectedAggrGroupValuesUnCached.tokenize( ',' )){
-                            link += "&selectedAggrGroupValuesUnCached=" + item
-                        }
+                if ((board.selectedAggrGroupValuesUnCached != null) && (board.selectedAggrGroupValuesUnCached.size() > 0)) {
+                    for (item in board.selectedAggrGroupValuesUnCached.tokenize(',')) {
+                        link += "&selectedAggrGroupValuesUnCached=" + item
                     }
-                    if ((board.selectedAggrGroupValuesCached != null) && (board.selectedAggrGroupValuesCached.size() > 0)) {
-                        for(item in board.selectedAggrGroupValuesCached.tokenize( ',' )){
-                            link += "&selectedAggrGroupValuesCached=" + item
-                        }
-                    }
-                    link += "&trimBelowLoadTimes="
-                    if (board.trimBelowLoadTimes != null) { link += board.trimBelowLoadTimes }
-                    link += "&trimAboveLoadTimes="
-                    if (board.trimAboveLoadTimes != null) { link += board.trimAboveLoadTimes }
-                    link += "&trimBelowRequestCounts="
-                    if (board.trimBelowRequestCounts != null) { link += board.trimBelowRequestCounts }
-                    link += "&trimAboveRequestCounts="
-                    if (board.trimAboveRequestCounts != null) { link += board.trimAboveRequestCounts }
-                    link += "&trimBelowRequestSizes="
-                    if (board.trimBelowRequestSizes != null) { link += board.trimBelowRequestSizes }
-                    link += "&trimAboveRequestSizes="
-                    if (board.trimAboveRequestSizes != null) { link += board.trimAboveRequestSizes }
-                } else {
-                    link += "&aggrGroup=" + board.aggrGroup
-                    if (board.includeInterval != null) { link += "&includeInterval=on" }
                 }
+                if ((board.selectedAggrGroupValuesCached != null) && (board.selectedAggrGroupValuesCached.size() > 0)) {
+                    for (item in board.selectedAggrGroupValuesCached.tokenize(',')) {
+                        link += "&selectedAggrGroupValuesCached=" + item
+                    }
+                }
+                link += "&trimBelowLoadTimes="
+                if (board.trimBelowLoadTimes != null) {
+                    link += board.trimBelowLoadTimes
+                }
+                link += "&trimAboveLoadTimes="
+                if (board.trimAboveLoadTimes != null) {
+                    link += board.trimAboveLoadTimes
+                }
+                link += "&trimBelowRequestCounts="
+                if (board.trimBelowRequestCounts != null) {
+                    link += board.trimBelowRequestCounts
+                }
+                link += "&trimAboveRequestCounts="
+                if (board.trimAboveRequestCounts != null) {
+                    link += board.trimAboveRequestCounts
+                }
+                link += "&trimBelowRequestSizes="
+                if (board.trimBelowRequestSizes != null) {
+                    link += board.trimBelowRequestSizes
+                }
+                link += "&trimAboveRequestSizes="
+                if (board.trimAboveRequestSizes != null) {
+                    link += board.trimAboveRequestSizes
+                }
+                if(board.includeNativeConnectivity == true) {
+                    link += "&includeNativeConnectivity=on"
+                }
+                link += "&selectedAllConnectivityProfiles="
+                if(board.selectedAllConnectivityProfiles == true) {
+                    link += "on"
+                }
+                link += "&customConnectivityName="
+                if(board.customConnectivityName != null){
+                    link += board.customConnectivityName
+                }
+                if ((board.selectedConnectivityProfiles != null) && (board.selectedConnectivityProfiles.size() > 0)) {
+                    for (item in board.selectedConnectivityProfiles.tokenize(',')) {
+                        link += "&selectedConnectivityProfiles=" + item
+                    }
+                }
+                link += "&includeCustomConnectivity="
+                if(board.includeCustomConnectivity == true) {
+                    link += "on"
+                }
+
+
+
                 result.add([dashboardName: board.dashboardName, link: link])
             }
         }
         return result
     }
-
-	/*
-	 * Methods of the Domain Class
-	 */
-//	@Override	// Override toString for a nicer / more descriptive UI
-//	public String toString() {
-//		return "${name}";
-//	}
 }
