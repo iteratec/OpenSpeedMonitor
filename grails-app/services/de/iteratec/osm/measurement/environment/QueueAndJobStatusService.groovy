@@ -221,13 +221,19 @@ class QueueAndJobStatusService {
         for (WebPageTestServer server : wptServer) {
             List<ScheduleChartData> serverChartData = new ArrayList<>()
 
-            Map<Location, Integer> locationsAndTesterCount = getActiveLocationsAndTesterCount(server)
+            Map<String, Integer> locationsAndTesterCount = getActiveLocationsAndTesterCount(server)
 
-            locationsAndTesterCount.each { loc, agentCount ->
-                ScheduleChartData locationChartData = new ScheduleChartData(name: loc.getLocation(), discountedJobsLabel: discountedJobsLabel, agentCount: agentCount)
+            locationsAndTesterCount.each { locString, agentCount ->
+                ScheduleChartData locationChartData = new ScheduleChartData(name: locString, discountedJobsLabel: discountedJobsLabel, agentCount: agentCount)
+
+                // collect all Jobs
+                List<Job> jobs = []
+                Location.findAllByWptServerAndLocation(server, locString).each {l ->
+                    jobs.addAll(Job.findAllByLocation(l))
+                }
 
                 // iterate over jobs
-                List<Job> jobs = Job.findAllByLocation(loc)
+//                List<Job> jobs = Job.findAllByLocation(loc)
                 jobs.each { job ->
                     if (job.active) {
                         ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);
@@ -235,7 +241,7 @@ class QueueAndJobStatusService {
 
                         // Add jobs which are going to run in given interval to the list
                         // otherwise the job is added to the list of discounted jobs
-                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + loc.browser.name + ")", durationInSeconds: seconds, linkId: job.id)
+                        ScheduleChartJob scheduleChartJob = new ScheduleChartJob(executionDates: jobService.getExecutionDatesInInterval(job, start, end), name: job.label, description: "(" + job.location.browser.name + ")", durationInSeconds: seconds, linkId: job.id)
                         if (scheduleChartJob.executionDates && !scheduleChartJob.executionDates.isEmpty()) {
                             locationChartData.addJob(scheduleChartJob)
                         } else {
@@ -258,14 +264,14 @@ class QueueAndJobStatusService {
      * @param wptServer the server
      * @return map , mapping a location to its tester count
      */
-    private Map<Location, Integer> getActiveLocationsAndTesterCount(WebPageTestServer wptServer) {
-        Map<Location, Integer> result = new HashMap<>();
+    private Map<String, Integer> getActiveLocationsAndTesterCount(WebPageTestServer wptServer) {
+        Map<String, Integer> result = new HashMap<>();
 
         GPathResult gPathResult = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptServer, 'getTesters.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
 
         gPathResult.data.location.each { locationTagInXml ->
             int agents = 0
-            Location currentLocation = Location.findByWptServerAndLocation(wptServer, locationTagInXml.id)
+            String currentLocation = locationTagInXml.id
 
             if (currentLocation) {
                 locationTagInXml.testers.tester.each { t ->
