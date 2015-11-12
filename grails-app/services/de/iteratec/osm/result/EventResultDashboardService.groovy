@@ -64,18 +64,6 @@ public class EventResultDashboardService {
     OsmChartProcessingService osmChartProcessingService
 
     /**
-     * LabelSummary
-     */
-    private String labelSummary;
-
-    String getLabelSummary() {
-        return (labelSummary == null)? "" : labelSummary;
-    }
-
-    void setLabelSummary(String labelSummary) {
-        this.labelSummary = labelSummary
-    }
-/**
      * The Grails engine to generate links.
      *
      * @see http://mrhaki.blogspot.ca/2012/01/grails-goodness-generate-links-outside.html
@@ -209,7 +197,7 @@ public class EventResultDashboardService {
         }
 
         Collection<EventResult> eventResults
-//        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
             eventResults = eventResultDaoService.getLimitedMedianEventResultsBy(
                     startDate,
                     endDate,
@@ -220,7 +208,7 @@ public class EventResultDashboardService {
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
-//        }
+        }
 
         return calculateResultMap(eventResults, aggregators, interval)
 
@@ -238,7 +226,7 @@ public class EventResultDashboardService {
      * @return
      */
     private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval) {
-        def calculatedResultMap
+        Map<String, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', IndentationDepth.ONE) {
             if (interval == MeasuredValueInterval.RAW) {
                 calculatedResultMap = calculateResultMapForRawData(aggregators, eventResults)
@@ -257,54 +245,6 @@ public class EventResultDashboardService {
             }
         }
         return chart
-    }
-
-    private List<OsmChartGraph> summarizeGraphs(List<OsmChartGraph> graphs) {
-
-        def summarizedLabelParts = [];
-
-        if (graphs.size > 1) {
-
-            def graph = graphs.get(0);
-            def temp = graph.label.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim());
-
-            def labelParts = [
-                    [ key: 'Messwert', value: temp[0] ]
-            ]
-
-            if(temp.size() == 5) {
-                labelParts.add([ key: 'Gruppe', value: temp[1] ]);
-                labelParts.add([ key: 'Event', value: temp[2] ]);
-                labelParts.add([ key: 'Location', value: temp[3] ]);
-                labelParts.add([ key: 'Connectivity', value: temp[4] ]);
-            }else if(temp.size() == 2) {
-                labelParts.add([ key: 'Identifier', value: temp[1] ]);
-            }
-
-            summarizedLabelParts = labelParts.findAll { part ->
-                graphs.every { it ->
-                    it.label.contains(part.value.trim());
-                }
-            }
-
-            graphs.every { it ->
-                summarizedLabelParts.each { part ->
-                    it.label = (it.label - part.value.trim());
-                    it.label = it.label.replaceAll("[|]\\s+[|]", "|");
-                }
-                it.label = it.label.replaceFirst("^\\s+[|]\\s+", "");
-                it.label = it.label.replaceFirst("\\s+[|]\\s+\$", "");
-            }
-
-            String summary = "";
-            summarizedLabelParts.each { part ->
-                String labelNewPart = "<b>" + part.key + "</b>: " + part.value;
-                summary == "" ? (summary = labelNewPart) : (summary += " | " + labelNewPart);
-            }
-            setLabelSummary(summary)
-        }
-
-        return graphs;
     }
 
     private Map<String, List<OsmChartPoint>> calculateResultMapForRawData(List<AggregatorType> aggregators, Collection<EventResult> eventResults) {
