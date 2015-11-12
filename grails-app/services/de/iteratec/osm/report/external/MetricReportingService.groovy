@@ -125,9 +125,7 @@ class MetricReportingService {
 
 					Double value=resultMeasuredValueService.getEventResultPropertyForCalculation(eachPath.getMeasurand(), result);
 					if (value!=null) {
-						if (eachPath.getMeasurand().getMeasurandGroup()==MeasurandGroup.PERCENTAGES) {
-							value = value * 100
-						}
+
 						String measurandName = i18nService.msg(
 								"de.iteratec.ispc.report.external.graphite.measurand.${eachPath.getMeasurand().getName()}", eachPath.getMeasurand().getName());
 						

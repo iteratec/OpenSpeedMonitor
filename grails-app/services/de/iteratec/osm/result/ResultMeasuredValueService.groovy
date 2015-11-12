@@ -48,7 +48,6 @@ class ResultMeasuredValueService {
 	 * <strong>Important:</strong> Update {@link #getEventResultPropertyForCalculation(AggregatorType, EventResult)}-Method
 	 * if you add an Aggregator. Otherwise it'll throw an IllegalArgumentException!
 	 */
-
 	private static final Map<CachedView, List<String>> AGGREGATORS=getAggregatorMap();
 
 	/**
@@ -224,6 +223,9 @@ class ResultMeasuredValueService {
 				throw new IllegalArgumentException("Can not find a EventResult property for "+aggType)
 				break;
 		}
+        if(aggType.measurandGroup == MeasurandGroup.PERCENTAGES){
+            returnVal *= 100
+        }
 		return returnVal;
 	}
 
