@@ -417,9 +417,9 @@ class LocationAndResultPersisterService implements iListener{
 		try{
 			log.debug("step=${step}")
 			log.debug("step.testedPage=${step.testedPage}")
-			Boolean validCsiMappingExist = timeToCsMappingService.validMappingsExistFor(step.testedPage)
-			log.debug("validCsiMappingExist=${validCsiMappingExist}")
-			if(validCsiMappingExist) {
+			Boolean validFrustrationsExist = timeToCsMappingService.validFrustrationsExistFor(step.testedPage)
+			log.debug("validFrustrationsExist=${validFrustrationsExist}")
+			if(validFrustrationsExist) {
 				result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage)
 			}
 		}catch(Exception e){
