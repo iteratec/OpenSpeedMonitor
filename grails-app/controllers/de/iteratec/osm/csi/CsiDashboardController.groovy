@@ -20,6 +20,8 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.d3Data.BarChartData
 import de.iteratec.osm.d3Data.ChartEntry
+import de.iteratec.osm.d3Data.MatrixViewData
+import de.iteratec.osm.d3Data.MatrixViewEntry
 import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -1018,6 +1020,16 @@ class CsiDashboardController {
         String weightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.weightLabel", "Gewichtung")
         String xAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.xAxisLabel", "Tageszeit")
         String yAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.yAxisLabel", "Gewichtung")
+        String matrixViewXLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.xLabel", "Browser")
+        String matrixViewYLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.yLabel", "Conn")
+        String matrixViewWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.weightLabel", "Weight")
+        String colorBrightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.colorBrightLabel", "less")
+        String colorDarkLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.colorDarkLabel", "more")
+
+        // arrange matrixViewData
+        MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel)
+        createDumpData(matrixViewData)
+        def matrixViewDataJSON = matrixViewData as JSON
 
         // arrange treemap data
         TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
@@ -1034,8 +1046,24 @@ class CsiDashboardController {
          // FIXME Change to use a DAO
          hoursOfDay      : HourOfDay.findAll(),
          errorMessagesCsi: params.list('errorMessagesCsi'),
+         matrixViewData  : matrixViewDataJSON,
          treemapData     : treemapDataJSON,
          barchartData    : barChartJSON]
+    }
+
+    void createDumpData(MatrixViewData matrixViewData) {
+        Random rand = new Random()
+
+        for(i in 1..100) {
+            String hName = "horizontal" + rand.nextInt(20)
+            String vName = "vertical" + rand.nextInt(10)
+            Double weight = (rand.nextDouble() + 0.01) * 20
+            weight *= 100
+            weight = Math.round(weight)
+            weight /= 100
+            matrixViewData.addEntry(new MatrixViewEntry(columnName: hName, rowName: vName, weight: weight))
+        }
+
     }
 
     def uploadBrowserWeights() {

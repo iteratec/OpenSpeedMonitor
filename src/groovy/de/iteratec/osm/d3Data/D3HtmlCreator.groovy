@@ -54,10 +54,27 @@ class D3HtmlCreator {
         StringWriter writer = new StringWriter()
             return writer << """<div class="row">
                                     <div class="span8" id="barChartSpan">
-                                        <svg class="chart" id="${chartIdentifier}" }></svg>
+                                        <svg class="chart" id="${chartIdentifier}"></svg>
                                     </div>
                                 </div>"""
     }
+
+    /**
+     * Creates container for de.iteratex.osm.d3data.MatrixViewData
+     */
+    def generateMatrixViewHtml = {chartIdentifier ->
+        StringWriter writer = new StringWriter()
+        return writer << """<div class="row">
+                                <div class="span8" id="${chartIdentifier}"></div>
+                                    <div id="tooltipMatrixView" class="hidden">
+                                    <p><strong id="columnName"></strong></p>
+                                    <p><strong id="rowName"></strong></p>
+                                    <p><span id="matrixWeight"></span></p>
+                                    </div>
+                            </div>
+                        """
+    }
+
 
     /**
      * Creates container for de.iteratec.osm.d3data.TreemapData
@@ -113,4 +130,5 @@ class D3HtmlCreator {
                                 </div>
                             </div>"""
     }
+
 }
