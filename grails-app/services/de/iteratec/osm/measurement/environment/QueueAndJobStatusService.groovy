@@ -247,14 +247,6 @@ class QueueAndJobStatusService {
                 serverChartData.add(locationChartData)
             }
 
-            // Trim location names
-            List<String> names = serverChartData*.name
-            trimNames(names);
-            for (int i = 0; i < serverChartData.size(); ++i) {
-                serverChartData[i].name = names[i]
-            }
-
-
             result.put(server, serverChartData)
         }
 
@@ -303,28 +295,5 @@ class QueueAndJobStatusService {
         }
 
         return result
-    }
-
-    /**
-     * Cuts equal beginnings of strings
-     *
-     * @param names a list of String to be trimmed
-     */
-    private void trimNames(List<String> names) {
-        if (names.size() <= 1)
-            return
-
-        boolean change = true
-
-        while (change) {
-            char letter = names[0].charAt(0)
-            if (names.every { it.charAt(0) == letter }) {
-                for (int i = 0; i < names.size(); ++i) {
-                    names[i] = names[i].substring(1)
-                }
-            } else {
-                change = false
-            }
-        }
     }
 }
