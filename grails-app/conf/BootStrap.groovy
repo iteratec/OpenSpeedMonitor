@@ -109,7 +109,9 @@ class BootStrap {
 			defaultMaxDownloadTimeInMinutes: 60,
 			minDocCompleteTimeInMillisecs: 250,
 			maxDocCompleteTimeInMillisecs: 180000,
-			maxDataStorageTimeInMonths: 13).save(failOnError: true)
+			maxDataStorageTimeInMonths: 13,
+            csiTransformation: CsiTransformation.BY_MAPPING
+        ).save(failOnError: true)
 	}
 	void initJobScheduling(){
 		log.info "initJobScheduling() OSM starts"

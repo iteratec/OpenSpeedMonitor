@@ -17,6 +17,8 @@
 
 package de.iteratec.osm
 
+import de.iteratec.osm.csi.CsiTransformation
+
 /**
  * Configuration of OpenSpeedMonitor to be changed at runtime.
  */
@@ -29,6 +31,7 @@ class OsmConfiguration {
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
+    static final CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
 
 
     /* Default (injected) attributes of GORM */
@@ -53,9 +56,12 @@ class OsmConfiguration {
     String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
     /** Maximum Number of months osm keeps results in database   */
     Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
+    /** Method of transformation from measured load time to percent of users which are satisfied by that load time used in the application. */
+    CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
 
     static mapping = {
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
+        csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
     }
 
 
@@ -68,5 +74,6 @@ class OsmConfiguration {
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS, min: -2147483648, max: 2147483647)
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST, maxSize: 255)
         maxDataStorageTimeInMonths(defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS, min: 0, max: 2147483647)
+        csiTransformation(defaultValue: CSI_TRANSFORMATION_TO_USE)
     }
 }

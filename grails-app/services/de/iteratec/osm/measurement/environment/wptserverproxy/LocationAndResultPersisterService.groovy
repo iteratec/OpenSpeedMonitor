@@ -417,11 +417,7 @@ class LocationAndResultPersisterService implements iListener{
 		try{
 			log.debug("step=${step}")
 			log.debug("step.testedPage=${step.testedPage}")
-			Boolean validFrustrationsExist = timeToCsMappingService.validFrustrationsExistFor(step.testedPage)
-			log.debug("validFrustrationsExist=${validFrustrationsExist}")
-			if(validFrustrationsExist) {
-				result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage)
-			}
+            result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage)
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}
