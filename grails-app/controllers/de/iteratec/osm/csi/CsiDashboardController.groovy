@@ -1029,6 +1029,8 @@ class CsiDashboardController {
         // arrange matrixViewData
         MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel)
         createDumpData(matrixViewData)
+        // use instead of dump data
+//        BrowserConnectivityWeight.findAll().each {matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))}
         def matrixViewDataJSON = matrixViewData as JSON
 
         // arrange treemap data
