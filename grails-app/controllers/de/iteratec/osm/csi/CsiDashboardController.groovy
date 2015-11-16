@@ -1028,9 +1028,7 @@ class CsiDashboardController {
 
         // arrange matrixViewData
         MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel)
-        createDumpData(matrixViewData)
-        // use instead of dump data
-//        BrowserConnectivityWeight.findAll().each {matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))}
+        BrowserConnectivityWeight.findAll().each {matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))}
         def matrixViewDataJSON = matrixViewData as JSON
 
         // arrange treemap data
@@ -1051,21 +1049,6 @@ class CsiDashboardController {
          matrixViewData  : matrixViewDataJSON,
          treemapData     : treemapDataJSON,
          barchartData    : barChartJSON]
-    }
-
-    void createDumpData(MatrixViewData matrixViewData) {
-        Random rand = new Random()
-
-        for(i in 1..100) {
-            String hName = "horizontal" + rand.nextInt(20)
-            String vName = "vertical" + rand.nextInt(10)
-            Double weight = (rand.nextDouble() + 0.01) * 20
-            weight *= 100
-            weight = Math.round(weight)
-            weight /= 100
-            matrixViewData.addEntry(new MatrixViewEntry(columnName: hName, rowName: vName, weight: weight))
-        }
-
     }
 
     def uploadBrowserWeights() {

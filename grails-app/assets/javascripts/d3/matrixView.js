@@ -79,7 +79,7 @@ function createMatrixView(data, chartDivIdentifier) {
             var currentrowName = data.rowNames[j];
 
             svg.append("g")
-                .attr("name", "" + currentHorizontalName + currentrowName)
+                .attr("name", "" + makeValidString(currentHorizontalName + currentrowName))
                 .append("rect")
                 .attr("x", xScale(currentHorizontalName) + tilePadding)
                 .attr("y", yScale(currentrowName) + tilePadding)
@@ -94,7 +94,7 @@ function createMatrixView(data, chartDivIdentifier) {
     for(var e = 0; e < data.entries.length; e++) {
         var entry = data.entries[e];
 
-        svg.select("[name=" + entry.columnName + entry.rowName + "]")
+        svg.select("[name=" + makeValidString(entry.columnName + entry.rowName) + "]")
             .attr("matrixWeight", entry.weight)
             .attr("columnName", entry.columnName)
             .attr("rowName", entry.rowName)
@@ -148,4 +148,17 @@ function createMatrixView(data, chartDivIdentifier) {
         .attr("x", (colorCalibration.length - 1) * 20)
         .attr("y", 40)
         .text(data.colorDarkLabel);
+}
+
+/**
+ * Deletes special characters and white spaces
+ * @param input
+ * @returns {*|string}
+ */
+function makeValidString(input) {
+    var result = input.trim();
+
+    result = result.replace(" ", "");
+    result = result.replace(/\.|\_|\#|\,/g, "");
+    return result;
 }
