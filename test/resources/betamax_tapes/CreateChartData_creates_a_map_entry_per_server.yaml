@@ -1,7 +1,7 @@
 !tape
 name: CreateChartData creates a map entry per server
 interactions:
-- recorded: 2015-10-30T14:21:19.940Z
+- recorded: 2015-11-16T08:05:47.639Z
   request:
     method: GET
     uri: http://dev.server01.wpt.iteratec.de/getTesters.php
@@ -17,15 +17,15 @@ interactions:
       Cache-Control: max-age=3600, public
       Content-Encoding: gzip
       Content-Type: text/xml
-      Date: Fri, 30 Oct 2015 14:21:19 GMT
-      Expires: Fri, 30 Oct 2015 15:21:19 GMT
+      Date: Mon, 16 Nov 2015 08:05:47 GMT
+      Expires: Mon, 16 Nov 2015 09:05:47 GMT
       Server: Apache/2.2.22 (Debian)
-      Set-Cookie: o=583908319f6884eded3a7bd46425d81d58904235; expires=Sat, 29-Oct-2016 14:21:19 GMT; path=/
+      Set-Cookie: o=85aa3a743a652bc010e20170cfb8bd07b7b73337; expires=Tue, 15-Nov-2016 08:05:47 GMT; path=/
       Vary: Accept-Encoding
       X-Powered-By: PHP/5.4.45-0+deb7u1
     body: !!binary |-
-      H4sIAAAAAAAAA9VWa2/aMBT9nl+B+Nw4dsIjSCbVNtGHtj7U0q3ql8lJLhA1S6LYdLBfv+uUQAgUtZRqmgT4Xvv6OJxz7Jgfz37FjSfIZZQm/SYjtNmAJEjDKBn3m3fDE9NtHnsG12WmVPMY5ARANdQ8g35TwUxZMxlvzmlMchj1m2NQQ5AK4UlRtraQxs1BZmkiAUOphJrKL2kInk0ptyp5OTjE9byrx3KsSA0eCiWwidNAKATHMAq9CBcVCgIzhCdzAupPArn5O0q63MJRg0MsMgmhx7hVhgZXz8+6jDRUEsJMVz0HBfbZYPhwObgxactkXZd0HGJ3SLe3QM6CSgG3MMXVAtvDhfAXATKvNivD3gUznk2YSyixHUa4VXYafJQDhJF89FjLIa5jc2vZg4iA4JGmKUykZzOHMMchPRc/R8ush59lxijVX27pCQY/vb7zMNGNwdPRKI4SDVlGWiY/TRVyxK1laPAgm3ptbukG/2Kep0gdwiyiFziOhVS6p2gN7k/lXKdFa3BrSby1EuNZbe/qaym8Hq7IvUP5Ijk726a803E0j29W/3w4uPmEkN8/X92blJkuRUGQTc34ygK1qu0+qE2t+aCNPmCus90GDmnb7g4XsB4idFxikxY7KhPmYsfRaqjNqsl77fAisYW29HUan5x8O78cvF3oBFQs/KrO70UsrRNdT9IE2gdHFeFFlER1U7Z77j5HEh4XrINO6mHTXblwu+3qxVXfbXXbDp9VPfMey1D2OsvUWLDXWPhxPbxI/SiGnyW95gvEbFb+N1TVHVIcpAsCq4fqB2+4qpFbB9oct+KXnCbjUxGL2fz2UKinaTqO4RJmU1nbbXSPndb2aTCi4Yi6ojOi/ur8Z2vnf71s9wuAbb4A/o276Iaz8C7GWns5a4/X9ZoBhsK3P8JYiPshhtW45vnNQ+tgT50m8/sM8kjcHgixvAh3Wn6kTCnDt+Bai4u2tbq0/wUSGlNnPwwAAA==
-- recorded: 2015-10-30T14:21:20.175Z
+      H4sIAAAAAAAAA9WWa2+bMBSGv/MronwuxgZCHMmh2qb0Iq0XtelW9ctkwCSoFBB22mS/fsc05ELSaGvTVpOS+Bz7+DV5/YBhh9OHtPUoSpnkWb9NEG63RBbmUZKN+u2b4ZFJ24e+wXSZKdUsFXIshGqpWSH6bSWmyprKdHNOa1yKuN8eCTUUUoE8qsrWFtK6pZBFnkkBoVRcTeS3PBK+jTGzVvJ6cAjr+Rf39ViVGiziikOT5iFXIA5hEvkJLMqVCM1IPJpjoX5nojSfkqzLLBg1mEh5IUXkk57nEWbVqcHU8/UuIi2XRWLqQ9VzUOmfDIZ354MrE7sm6VLkOcj2ULc3Vy/ClQJmQQorhrYPC8EvCBR+Y1YBvXN3fBsRijCyHYKYVXcaLC6FiBJ57xPXQbTXYdaiBxQFiCfaqiiTvk0cRBwH9Sh8DhZZDz6LjGCsv8zSEwx2fHnjQ6Ibg+VxnCaZlqwjvVVBnivwiFmL0GBhMfHhSnQDf7Esc7AOZObRDp9TLpXupdBbxQYLJnKmJ1etwazFBljLTXneef/i6Oj76fmgJkHXrOz/DhSq5ORkGwoedp3uK1A4HQ6uvoDkj68XtyYmJsWIanu1/UseGlXboWhMbUDRASgIdbYz4aCOTXcgQXqg4FFkI5cc1Amh0HGwHOqQ1eStbLxo7EdsdCZUyoPVfd4XOsnlOM9EZ++qPDpLsmQDSkw7r4ASnh3EA5J60HSXFG7Hrlm8yt1W2nZwtsrMW5Ah5O+Qabhgr7nw83J4lgdJKn7V9povGLNZ+f9Y1SCkeprODfyEJ6v2z93TzXHNH+QkGx3zlE9n1/tSPc7zUSrOxXQiN94GKMWvuNs6AQ5jHMWYci/GwfIMIGtnQLNs9yFANg+BzyFsw5WKKtclhH4oYWs0DHlgvwdloPsu9Gpd8/Tqzt3bVefZ7LYQZcKv96RYvyZ7bpAoU8roX3St+Wu4tXyl/wO1LeNPXQwAAA==
+- recorded: 2015-11-16T08:05:47.870Z
   request:
     method: GET
     uri: http://dev.server02.wpt.iteratec.de/getTesters.php
@@ -41,11 +41,11 @@ interactions:
       Cache-Control: max-age=3600, public
       Content-Encoding: gzip
       Content-Type: text/xml
-      Date: Fri, 30 Oct 2015 14:21:20 GMT
-      Expires: Fri, 30 Oct 2015 15:21:20 GMT
+      Date: Mon, 16 Nov 2015 08:05:47 GMT
+      Expires: Mon, 16 Nov 2015 09:05:47 GMT
       Server: Apache/2.2.22 (Debian)
-      Set-Cookie: o=cba7c532946e3dea9cd237b08c8ae47e57741cc3; expires=Sat, 29-Oct-2016 14:21:20 GMT; path=/
+      Set-Cookie: o=206aeb1ec502ea445ff65bec8897431adf9db648; expires=Tue, 15-Nov-2016 08:05:47 GMT; path=/
       Vary: Accept-Encoding
       X-Powered-By: PHP/5.4.45-0+deb7u1
     body: !!binary |-
-      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
+      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

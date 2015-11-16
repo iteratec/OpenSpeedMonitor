@@ -33,11 +33,8 @@ class QueueAndJobStatusServiceSpec extends Specification {
     public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
 
     public static final String WPTSERVER_URL = 'dev.server01.wpt.iteratec.de'
-    private static final String LOCATION_IDENTIFIER_SERVER1_HETZNER = 'iteratec-dev-hetzner-win7'
-    private static final String LOCATION_IDENTIFIER_SERVER1_NEXUS = 'iteratec-dev-GoogleNexus'
 
     public static final String WPTSERVER2_URL = 'dev.server02.wpt.iteratec.de'
-    private static final String LOCATION_IDENTIFIER_SERVER2_HETZNER = 'iteratec-dev-hetzner-64bit-ssd'
 
     QueueAndJobStatusService serviceUnderTest
 
@@ -76,8 +73,8 @@ class QueueAndJobStatusServiceSpec extends Specification {
         def resultMap = serviceUnderTest.createChartData(start, end)
 
         then:
-        resultMap.get(server1).size() == 2
-        resultMap.get(server2).size() == 1
+        resultMap.get(server1).size() == 11 // on 16.11.15 (saved in betamax tape)
+        resultMap.get(server2).size() == 8 // on 16.11.15 (saved in betamax tape)
     }
 
     private void mockServices() {
@@ -109,10 +106,6 @@ class QueueAndJobStatusServiceSpec extends Specification {
         TestDataUtil.createMeasuredValueIntervals()
         server1 = TestDataUtil.createWebPageTestServer(WPTSERVER_URL, WPTSERVER_URL, true, "http://${WPTSERVER_URL}/")
         server2 = TestDataUtil.createWebPageTestServer(WPTSERVER2_URL, WPTSERVER2_URL, true, "http://${WPTSERVER2_URL}/")
-        List<Browser> browsers = TestDataUtil.createBrowsersAndAliases()
-        TestDataUtil.createJobGroups()
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_HETZNER, browsers[0], true)
-        TestDataUtil.createLocation(server1, LOCATION_IDENTIFIER_SERVER1_NEXUS, browsers[0], true)
-        TestDataUtil.createLocation(server2, LOCATION_IDENTIFIER_SERVER2_HETZNER, browsers[1], true)
+
     }
 }
