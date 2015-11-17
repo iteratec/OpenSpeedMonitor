@@ -88,4 +88,36 @@ class MatrixViewDataSpec extends Specification {
         matrixViewData.rowNames.size() == 1
         matrixViewData.columnNames.size() == 2
     }
+
+    def "after adding rows an entry with same row does not create new row" () {
+        given:
+        MatrixViewData matrixViewData = new MatrixViewData()
+        Set<String> rows = new HashSet<>()
+        rows.add("Row1")
+        rows.add("Row2")
+        MatrixViewEntry entry = new MatrixViewEntry(columnName: "column1", rowName: "Row1")
+
+        when:
+        matrixViewData.addRows(rows)
+        matrixViewData.addEntry(entry)
+
+        then:
+        matrixViewData.rowNames.size() == 2
+    }
+
+    def "after adding columns an entry with same column does not create new column" () {
+        given:
+        MatrixViewData matrixViewData = new MatrixViewData()
+        Set<String> columns = new HashSet<>()
+        columns.add("Column1")
+        columns.add("Column2")
+        MatrixViewEntry entry = new MatrixViewEntry(columnName: "Column1", rowName: "Row1")
+
+        when:
+        matrixViewData.addColumns(columns)
+        matrixViewData.addEntry(entry)
+
+        then:
+        matrixViewData.columnNames.size() == 2
+    }
 }

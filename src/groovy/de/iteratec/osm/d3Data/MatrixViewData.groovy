@@ -19,6 +19,7 @@ class MatrixViewData {
     String weightLabel
     String colorDarkLabel
     String colorBrightLabel
+    String zeroWeightLabel
 
     MatrixViewData() {
         entries = new ArrayList<>()
@@ -35,6 +36,7 @@ class MatrixViewData {
         weightLabel = "weight Label"
         colorBrightLabel = "less"
         colorDarkLabel = "more"
+        zeroWeightLabel = "0"
     }
 
     /**
@@ -55,5 +57,21 @@ class MatrixViewData {
         }
 
         entries.add(entry)
+    }
+
+    /**
+     * Adds rows to the set of rows
+     * @param rows rows to add
+     */
+    void addRows(Set<String> rows) {
+        rowNames.addAll(rows)
+    }
+
+    /**
+     * Adds columns to the set of columns
+     * @param columns columns to add
+     */
+    void addColumns(Set<String> columns) {
+        columnNames.addAll(columns)
     }
 }

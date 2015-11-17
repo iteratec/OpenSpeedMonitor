@@ -96,12 +96,12 @@
                        placeholder="<g:message code="Job.list.filterByBrowser" default="Browser filtern"/>"
                        name="filters.filterByBrowser" value="${filters?.filterByBrowser}"/>
                 %{--Filter by JobSet--}%
-                <div class="span6 pull-right">
-                    <div class="span2">
+                <div class="span6 pull-right" style="margin: 0px; margin-right: 65px">
+                    <div class="span2" style="margin: 0px">
 
                         <div class="btn-group pull-left">
-                            <a id="jobSetButton" class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                                <g:message code="de.iteratec.osm.job.filterHeadline" default="Filter by JobSet" />
+                            <a id="jobSetButton" class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                                <g:message code="de.iteratec.osm.job.filterHeadline" default="Filter by JobSet"/>
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
@@ -142,7 +142,8 @@
             </div>
         </div>
 
-        <div class="controlribbon" style="border: 1px solid green width: 100%;">
+        <div class="controlribbon" style="border: 1px solid green width: 100%;vertical-align: middle;">
+
             <i class="fa fa-arrow-down"></i>
             <g:message code="de.iteratec.isj.job.selected"
                        default="Markierte Jobs"/>:&nbsp;
@@ -155,13 +156,15 @@
             <g:actionSubmit class="btn btn-info" action="execute"
                             value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
 
-            <g:field class="span2" type="text" name="jobSetName"
-                     placeholder="${message(code: 'de.iteratec.osm.job.savePlaceholder', default: 'placeholder')}"/>
-            <g:actionSubmit action="saveJobSet" class="btn btn-default" value="${message(code: 'de.iteratec.osm.job.jobSetSaveButton', default: 'save jobSet')}"/>
+            <span style="margin-left: 50px; vertical-align: middle;">
+                <g:field type="text" name="jobSetName" style="vertical-align: middle;margin-top: 10px;"
+                         placeholder="${message(code: 'de.iteratec.osm.job.savePlaceholder', default: 'placeholder')}"/>
+                <g:actionSubmit action="saveJobSet" class="btn btn-default"
+                                value="${message(code: 'de.iteratec.osm.job.jobSetSaveButton', default: 'save jobSet')}"/>
+            </span>
 
-            <span style="margin-left:100px;">
-                <a
-                        href="<g:createLink action="create"/>" class="btn btn-primary">
+            <span style="margin-left:50px;">
+                <a href="<g:createLink action="create"/>" class="btn btn-primary">
                     <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                 </a>
             </span>

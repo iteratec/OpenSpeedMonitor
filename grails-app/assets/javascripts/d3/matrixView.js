@@ -18,13 +18,10 @@ function createMatrixView(data, chartDivIdentifier) {
         height = data.rowNames.length * tileSize;
 
     // Define color scale
-    var colorCalibration = ["#F4C2C2","#F75D59","#FF2400","#E42217","#DC381F","#A40000", "#701C1C"];
+    var color = "#DC381F";
     var colorScale = d3.scale.linear()
-        .domain(d3.range(0, 1, 1.0 / (colorCalibration.length - 1)))
-        .range(colorCalibration);
-    var scaleForColorScale = d3.scale.linear()
         .domain([data.weightMin, data.weightMax])
-        .range([0,1]);
+        .range([0.2,1]);
 
     // does tooltip at mouse position
     var mousemove = function () {
@@ -73,19 +70,24 @@ function createMatrixView(data, chartDivIdentifier) {
 
     // create squares for each possible entry
     for(var i = 0; i < data.columnNames.length; i++) {
-        var currentHorizontalName = data.columnNames[i];
+        var currentColumnName = data.columnNames[i];
 
         for(var j = 0; j < data.rowNames.length; j++){
-            var currentrowName = data.rowNames[j];
+            var currentRowName = data.rowNames[j];
 
             svg.append("g")
-                .attr("name", "" + makeValidString(currentHorizontalName + currentrowName))
+                .attr("name", "" + makeValidString(currentColumnName + currentRowName))
                 .append("rect")
-                .attr("x", xScale(currentHorizontalName) + tilePadding)
-                .attr("y", yScale(currentrowName) + tilePadding)
+                .attr("x", xScale(currentColumnName) + tilePadding)
+                .attr("y", yScale(currentRowName) + tilePadding)
                 .attr("width", tileSize - 2*tilePadding)
                 .attr("height", tileSize - 2*tilePadding)
-                .style("fill", "#F2F2F2");
+                .style("fill", "#F6F6F6")
+                .attr("columnName", currentColumnName)
+                .attr("rowName", currentRowName)
+                .attr("matrixWeight", data.zeroWeightLabel)
+                .on("mousemove", mousemove)
+                .on("mouseout", mouseout);
         }
 
     }
@@ -95,13 +97,10 @@ function createMatrixView(data, chartDivIdentifier) {
         var entry = data.entries[e];
 
         svg.select("[name=" + makeValidString(entry.columnName + entry.rowName) + "]")
-            .attr("matrixWeight", entry.weight)
-            .attr("columnName", entry.columnName)
-            .attr("rowName", entry.rowName)
-            .on("mousemove", mousemove)
-            .on("mouseout", mouseout)
             .select("rect")
-            .style("fill", colorScale(scaleForColorScale(entry.weight)))
+            .attr("matrixWeight", entry.weight)
+            .style("fill", color)
+            .style("opacity", colorScale(entry.weight));
     }
 
     // draw axis
@@ -132,20 +131,21 @@ function createMatrixView(data, chartDivIdentifier) {
     var keyContainer = svg.append("g")
         .attr("transform", "translate(0," + height + ")");
 
-    for(var k = 1; k <= colorCalibration.length; k++) {
+    for(var k = 1; k <= 10; k++) {
         keyContainer.append("rect")
             .attr("x", k* 20)
             .attr("y", 10)
             .attr("width", 15)
             .attr("height", 15)
-            .style("fill", colorCalibration[k]);
+            .style("fill", color)
+            .style("opacity", k/10);
     }
 
     keyContainer.append("text")
         .attr("y", 40)
         .text(data.colorBrightLabel);
     keyContainer.append("text")
-        .attr("x", (colorCalibration.length - 1) * 20)
+        .attr("x", 9 * 20)
         .attr("y", 40)
         .text(data.colorDarkLabel);
 }
