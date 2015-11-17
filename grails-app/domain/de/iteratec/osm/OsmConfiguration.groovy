@@ -31,7 +31,7 @@ class OsmConfiguration {
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
-    static final CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
+    static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
 
 
     /* Default (injected) attributes of GORM */
