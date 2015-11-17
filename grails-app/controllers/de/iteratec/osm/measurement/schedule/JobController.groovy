@@ -425,7 +425,7 @@ class JobController {
 
                 JobSet jobSet = new JobSet(name: params.jobSetName)
                 selectedIds.each {
-                    jobSet.addJob(Job.get(it))
+                    jobSet.addToJobs(Job.get(it))
                 }
                 if (!jobSet.save(flush: true)) {
                     render(view: 'list', model: getListModel() << [selectedIds: selectedIds, filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetUniqueError", "unique")])

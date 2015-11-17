@@ -25,19 +25,10 @@ class JobSet {
 
     String name
 
-    Set<Job> jobs
-
+    Collection<Job> jobs = []
     static hasMany = [jobs : Job]
 
     static constraints = {
         name(unique: true)
-    }
-
-    JobSet() {
-        jobs = new HashSet<>()
-    }
-
-    void addJob(Job job) {
-        jobs.add(job)
     }
 }
