@@ -444,13 +444,16 @@ class ServiceMocker {
 	 * @param toReturnFromGetDatabaseDriverClassName
 	 * 		To be returned from method {@link de.iteratec.osm.ConfigService#getDatabaseDriverClassName()}.
 	 */
-	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes){
+	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes, CsiTransformation toReturnFromGetCsiTransformation){
 		def configServiceMock = mockFor(ConfigService, true)
 		configServiceMock.demand.getDatabaseDriverClassName(0..100){ ->
 			return toReturnFromGetDatabaseDriverClassName
 		}
 		configServiceMock.demand.getDefaultMaxDownloadTimeInMinutes(0..100){ ->
 			return toReturnFromGetDefaultMaxDownloadTimeInMinutes
+		}
+		configServiceMock.demand.getCsiTransformation(0..100){ ->
+			return toReturnFromGetCsiTransformation
 		}
 		serviceToMockIn.configService = configServiceMock.createMock()
 	}

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.persistence
 
+import de.iteratec.osm.csi.CsiTransformation
 import grails.test.mixin.*
 
 import static org.hamcrest.Matchers.*
@@ -48,34 +49,34 @@ class OsmDataSourceServiceSpec {
 	@Test
     void testGetRLikeSupport() {
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.apache.derby.jdbc.ClientDriver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'org.apache.derby.jdbc.ClientDriver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.hsqldb.jdbcDriver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'org.hsqldb.jdbcDriver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 
-		mocker.mockConfigService(serviceUnderTest, 'com.sybase.jdbc.SybDriver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'com.sybase.jdbc.SybDriver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.sqlite.JDBC', 60)
+		mocker.mockConfigService(serviceUnderTest, 'org.sqlite.JDBC', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 
-		mocker.mockConfigService(serviceUnderTest, 'org.postgresql.Driver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'org.postgresql.Driver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'com.microsoft.sqlserver.jdbc.SQLServerDriver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'com.microsoft.sqlserver.jdbc.SQLServerDriver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'org.h2.Driver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'org.h2.Driver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(false))
 		
-		mocker.mockConfigService(serviceUnderTest, 'com.mysql.jdbc.Driver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'com.mysql.jdbc.Driver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(true))
 		
-		mocker.mockConfigService(serviceUnderTest, 'oracle.jdbc.driver.OracleDriver', 60)
+		mocker.mockConfigService(serviceUnderTest, 'oracle.jdbc.driver.OracleDriver', 60, CsiTransformation.BY_RANK)
 		assertThat(serviceUnderTest.RLikeSupport, is(true))
 
-        mocker.mockConfigService(serviceUnderTest, 'com.p6spy.engine.spy.P6SpyDriver', 60)
+        mocker.mockConfigService(serviceUnderTest, 'com.p6spy.engine.spy.P6SpyDriver', 60, CsiTransformation.BY_RANK)
         assertThat(serviceUnderTest.RLikeSupport, is(true))
 
     }
