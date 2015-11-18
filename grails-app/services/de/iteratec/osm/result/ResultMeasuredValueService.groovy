@@ -223,9 +223,6 @@ class ResultMeasuredValueService {
 				throw new IllegalArgumentException("Can not find a EventResult property for "+aggType)
 				break;
 		}
-        if(aggType.measurandGroup == MeasurandGroup.PERCENTAGES && returnVal != null){
-            returnVal *= 100
-        }
 		return returnVal;
 	}
 
