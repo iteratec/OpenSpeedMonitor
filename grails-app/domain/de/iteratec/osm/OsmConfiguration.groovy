@@ -60,6 +60,12 @@ class OsmConfiguration {
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
 
     static mapping = {
+        detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
+        defaultMaxDownloadTimeInMinutes(defaultValue: DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES)
+        minDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS)
+        maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS)
+        initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
+        mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
     }
