@@ -37,6 +37,8 @@ class OsmChartProcessingService {
 
         if (graphs.size > 1) {
 
+            checkIfAllLabelsHaveEqualSectionCount(1,3, graphs)
+
             final List<String> graphLabelSectionKeys = [i18nService.msg('job.jobGroup.label', 'Job Group'),
                                        i18nService.msg('de.iteratec.osm.result.measured-event.label', 'Measured step'),
                                        i18nService.msg('job.location.label', 'Location')]
@@ -56,10 +58,13 @@ class OsmChartProcessingService {
         return new OsmRickshawChart(osmChartGraphs: graphs, osmChartGraphsCommonLabel: commonLabel)
     }
 
+
     OsmRickshawChart summarizeEventResultGraphs(List<OsmChartGraph> graphs) {
         String commonLabel = ""
 
         if(graphs.size() > 1) {
+
+            checkIfAllLabelsHaveEqualSectionCount(5,5, graphs)
 
             List<String> graphLabelSectionKeys = [i18nService.msg('de.iteratec.result.measurand.label', 'Measurand'),
                                  i18nService.msg('job.jobGroup.label', 'Job Group'),
@@ -80,6 +85,23 @@ class OsmChartProcessingService {
         }
 
         return new OsmRickshawChart(osmChartGraphs: graphs, osmChartGraphsCommonLabel: commonLabel)
+    }
+
+    void checkIfAllLabelsHaveEqualSectionCount(int min, int max, List<OsmChartGraph> graphs) {
+        // check if all equal
+        List <List> labels = splitGraphLabels(graphs)
+        int firstLabelSectionCount = labels[0].size()
+        if(!labels.every{label -> label.size() == firstLabelSectionCount}) {
+            IllegalArgumentException exception = new IllegalArgumentException("Labels have different section counts")
+            log.error("Illegal Argument", exception)
+            throw exception
+        }
+        //check if all in range
+        if(firstLabelSectionCount < min || firstLabelSectionCount > max) {
+            IllegalArgumentException exception = new IllegalArgumentException("Section count has to be in range [" + min + "," + max + "]")
+            log.error("Illegal Argument", exception)
+            throw exception
+        }
     }
 
     private List getLabelPartsToSummarize(List<OsmChartGraph> graphs, List<String> graphLabelSectionKeys) {
