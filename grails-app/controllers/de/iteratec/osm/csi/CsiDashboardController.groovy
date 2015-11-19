@@ -18,11 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.weighting.WeightFactor
-import de.iteratec.osm.d3Data.BarChartData
-import de.iteratec.osm.d3Data.ChartEntry
-import de.iteratec.osm.d3Data.MatrixViewData
-import de.iteratec.osm.d3Data.MatrixViewEntry
-import de.iteratec.osm.d3Data.TreemapData
+import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService

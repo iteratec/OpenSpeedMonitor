@@ -62,7 +62,7 @@ class ShopCsiService {
 		
 		if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
 		if (weightedCsiValues.size()>0) {
-			double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue) * 100
+			double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
 			double targetCsi = 100d
 			CsTargetGraph targetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
 			if (targetGraph) {
