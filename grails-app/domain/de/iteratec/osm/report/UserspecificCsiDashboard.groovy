@@ -236,14 +236,14 @@ class UserspecificCsiDashboard {
         wideScreenDiagramMontage(nullable: true)
     }
 
-    UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, String selectedFolderString, String selectedPagesString, String selectedMeasuredEventIdsString,
-                             String selectedBrowsersString, String selectedLocationsString, String publiclyVisible,
+    UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, String publiclyVisible,
                              String wideScreenDiagramMontage, String dashboardName, String username) {
         this.publiclyVisible = publiclyVisible
         this.wideScreenDiagramMontage = wideScreenDiagramMontage
         this.dashboardName = dashboardName
         this.username = username
 
+        // Get data from command
         debug = cmd.debug
         fromDate = cmd.from
         toDate = cmd.to
@@ -254,10 +254,31 @@ class UserspecificCsiDashboard {
         includeInterval = cmd.includeInterval
         setFromHour = cmd.setFromHour
         setToHour = cmd.setToHour
-
         selectedAllMeasuredEvents = cmd.selectedAllMeasuredEvents
         selectedAllBrowsers = cmd.selectedAllBrowsers
         selectedAllLocations = cmd.selectedAllLocations
+
+        // Create strings for db
+        String selectedFolderString = ""
+        String selectedPagesString = ""
+        String selectedMeasuredEventIdsString = ""
+        String selectedBrowsersString = ""
+        String selectedLocationsString = ""
+
+        // generate Strings for db
+        cmd.selectedFolder.each {f -> selectedFolderString += f + ","}
+        // trim last comma
+        if(selectedFolderString.length() > 0) selectedFolderString = selectedFolderString.substring(0, selectedFolderString.length()-1)
+
+        cmd.selectedPages.each {f -> selectedPagesString += f + ","}
+        if(selectedPagesString.length() > 0) selectedPagesString = selectedPagesString.substring(0, selectedPagesString.length()-1)
+        cmd.selectedMeasuredEventIds.each {f -> selectedMeasuredEventIdsString += f + ","}
+        if(selectedMeasuredEventIdsString.length() > 0) selectedMeasuredEventIdsString = selectedMeasuredEventIdsString.substring(0, selectedMeasuredEventIdsString.length()-1)
+        cmd.selectedBrowsers.each {f -> selectedBrowsersString += f + ","}
+        if(selectedBrowsersString.length() > 0) selectedBrowsersString = selectedBrowsersString.substring(0, selectedBrowsersString.length()-1)
+        cmd.selectedLocations.each {f -> selectedLocationsString += f + ","}
+        if(selectedLocationsString.length() > 0) selectedLocationsString = selectedLocationsString.substring(0, selectedLocationsString.length()-1)
+
         selectedFolder = selectedFolderString
         selectedPages = selectedPagesString
         selectedMeasuredEventIds = selectedMeasuredEventIdsString
@@ -265,7 +286,12 @@ class UserspecificCsiDashboard {
         selectedLocations = selectedLocationsString
     }
 
-    def isCurrentUserDashboardOwner(String dashboardId) {
+    /**
+     * Checks if the currentUser is admin or creator of the given dashboard
+     * @param dashboardId the dashboard to check
+     * @return true if currentUser is admin or creator, false otherwise
+     */
+    boolean isCurrentUserDashboardOwner(String dashboardId) {
         if (SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN")) {
             return true
         } else {

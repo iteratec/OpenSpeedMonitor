@@ -208,7 +208,8 @@ class CustomerSatisfactionHighChartService {
 	}
 
     double formatPercentage(value){
-        BigDecimal valueForRounding = new BigDecimal(value.value*100)
+//		todomarcus hier hab ich was gemacht
+        BigDecimal valueForRounding = new BigDecimal(value.value)
         return valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
     }
     void sortPointsInAllGraphsByTime(List<OsmChartGraph> graphs){

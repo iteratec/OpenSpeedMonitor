@@ -52,6 +52,13 @@ class D3ChartTagLib {
         return out.toString()
     }
 
+    def matrixView = {attrs, body ->
+        D3HtmlCreator htmlCreator = new D3HtmlCreator()
+        out << htmlCreator.generateMatrixViewHtml(attrs['chartIdentifier'])
+
+        return out.toString()
+    }
+
     def scheduleChart = {attrs, body ->
         String unit1 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnit1", "hour")
         String unit2 = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.radioButtonUnitMore", "hours")

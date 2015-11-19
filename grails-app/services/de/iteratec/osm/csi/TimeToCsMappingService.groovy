@@ -17,25 +17,55 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
+
 class TimeToCsMappingService {
 	
 	TimeToCsMappingCacheService timeToCsMappingCacheService
+    ConfigService configService
 	
 	/**
-	 * Uses database-table with frustrating load times of user-investigation to calculate customer satisfaction of given load time for given page.
+	 * Calculates customer satisfaction of given load time for given page.
 	 * @param docReadyTime
 	 * @param Page page
-	 * @return Calculated customer-satisfaction or null if page is undefined.
+	 * @return Calculated customer-satisfaction or null if page is undefined or no calculation specification exists for it.
 	 */
 	public Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page){
-		if (page.isUndefinedPage()) {
+
+		if (page.isUndefinedPage() || noTransformationPossibleFor(page)) {
 			return null;
 		}else{
-			return getCustomerSatisfactionPercentRank(docReadyTimeInMilliSecs, page)
+
+			return transformLoadTime(docReadyTimeInMilliSecs, page)
+
 		}
 	}
-	
-	/**
+
+    private double transformLoadTime(int docReadyTimeInMilliSecs, Page page) {
+        Double cs
+        CsiTransformation csiTransformation = configService.getCsiTransformation()
+        if (csiTransformation == CsiTransformation.BY_MAPPING) {
+            cs = getCustomerSatisfactionInPercentViaMapping(docReadyTimeInMilliSecs, page)
+        } else if (csiTransformation == CsiTransformation.BY_RANK) {
+            cs = getCustomerSatisfactionPercentRank(docReadyTimeInMilliSecs, page)
+        } else {
+            throw new IllegalStateException("No valid Csi transformation configured in OSM Configuration: ${csiTransformation}")
+        }
+        return cs
+    }
+
+    private boolean noTransformationPossibleFor(Page page) {
+        Boolean notPossible = true
+        CsiTransformation csiTransformation = configService.getCsiTransformation()
+        if (csiTransformation == CsiTransformation.BY_RANK && validFrustrationsExistFor(page)) {
+            notPossible = false
+        } else if (csiTransformation == CsiTransformation.BY_MAPPING && validMappingsExistFor(page)) {
+            notPossible = false
+        }
+        return notPossible
+    }
+
+    /**
 	 * <p>
 	 * Alternative approach to translate the load-time of a specific page into a customer satisfaction.
 	 * Uses database-table with time to csi mappings
@@ -83,7 +113,8 @@ class TimeToCsMappingService {
 				throw new IllegalArgumentException("Percentrank couldn't be calculated for Page '${page.name}'")
 			}
 			rank = smaller / (smaller + bigger)
-			return 1 - rank
+//			TODOmarcus hier hab ich was gemacht
+			return (1 - rank) * 100
 		}else{
 			throw new IllegalArgumentException("No customerFrustrationLoadtimes found for Page '${page.name}'")
 		}
@@ -98,6 +129,8 @@ class TimeToCsMappingService {
 	public List<Integer> getCachedFrustrations(Page page){
 		return timeToCsMappingCacheService.getCustomerFrustrations(page)
 	}
+
+    public Boolean can
 	
 	/**
 	 * Checks whether more than one different frustration timings exist for given {@link Page} page.

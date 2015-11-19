@@ -368,7 +368,14 @@ class RestApiController {
 
 		SystemCSI systemCsiToReturn
 		try {
-			systemCsiToReturn = shopCsiService.retrieveSystemCsiByRawData(startDateTimeInclusive, endDateTimeInclusive, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+
+			systemCsiToReturn = shopCsiService.retrieveSystemCsiByRawData(
+                    startDateTimeInclusive,
+                    endDateTimeInclusive,
+                    queryParams,
+                    [WeightFactor.PAGE, WeightFactor.BROWSER] as Set
+            )
+
 		} catch (IllegalArgumentException e) {
 			response.setContentType('text/plain;charset=UTF-8');
 			response.status=404; // NOT FOUND (send Error does not work probably with Grails, it would render the default error page. So we use the deprecated setter.)

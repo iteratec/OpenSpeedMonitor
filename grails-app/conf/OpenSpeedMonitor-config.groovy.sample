@@ -32,8 +32,6 @@ grails.de.iteratec.osm.report.chart.highchartsExportServerUrl = 'http://export.h
 environments {
 	development {
 		dataSource {
-			dbCreate = "update"// one of 'create', 'create-drop', 'update', 'validate', ''
-
 			/**
 			* You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
 			* So you can see all prepared sql statements hibernate creates and fires against your data
@@ -64,7 +62,6 @@ environments {
 	production {
 		grails.serverURL = "https://[base-url-of-your-prod-osm-instance]"
 		dataSource {
-			dbCreate = "update"// one of 'create', 'create-drop', 'update', 'validate', ''
 			url = "jdbc:mysql://localhost/[your-prod-mysql-scheme]"
 			username = "[your-prod-mysql-user]"
 			password = "[password-of-your-prod-mysql-user]"

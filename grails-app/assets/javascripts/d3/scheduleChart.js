@@ -17,7 +17,7 @@
  * @param htmlIdOfDurationToShowDiv HTML id of the div with duration toggle buttons
  * @param htmlIdOfShowOverusedDiv HTML id of the div with show overused toggle buttons
  */
-function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfShowOverusedDiv) {
+function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfShowOverusedDiv, linkToEditPage) {
 
     var data = rawdata;
 
@@ -134,7 +134,8 @@ function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfSho
         .call(d3.svg.axis().scale(yScale).orient("left"));
     locContainer.selectAll(".y.axis .tick").each(function (d) {
         d3.select(this).select("text")
-            .text(jobNamesTrimmed[d]);
+            .text(jobNamesTrimmed[d])
+            .on("click", function(d){window.open(linkToEditPage + "/" + jobNamesAndDescriptions[d].linkId)});
     });
     locContainer.selectAll(".y.axis .tick").each(function (d) {
         var node = d3.select(this)
@@ -143,7 +144,8 @@ function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfSho
             .attr("y", 15)
             .attr("dy", ".32em")
             .style("text-anchor", "end")
-            .text(jobNamesAndDescriptions[d].description);
+            .text(jobNamesAndDescriptions[d].description)
+            .on("click", function(d){window.open(linkToEditPage + "/" + jobNamesAndDescriptions[d].linkId)});
     });
     // Vertical border on the right-hand side
     locContainer.append("rect")
@@ -362,14 +364,17 @@ function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfSho
 }
 
 /**
- * Returns the job names and their description
+ * Returns the job names and their description and their id
  * @param locations the location to iterate over
  * @returns {object} with form {name: String, description: String}
  */
 function getJobNames(location) {
     var jobNames = [];
     for (var j = 0; j < location.jobs.length; j++) {
-        jobNames.push({name: location.jobs[j].name, description: location.jobs[j].description});
+        var job = location.jobs[j];
+        var linkId = parseInt(job.linkId);
+        jobNames.push({name: job.name, description: job.description, linkId: linkId});
+        console.log(linkId)
     }
     return jobNames;
 }

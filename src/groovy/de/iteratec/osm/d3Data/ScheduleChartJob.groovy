@@ -12,11 +12,13 @@ class ScheduleChartJob {
     String description
     List<DateTime> executionDates
     int durationInSeconds
+    long linkId
 
     ScheduleChartJob() {
         name = "Job"
         description = "description"
         executionDates = new ArrayList<>()
         durationInSeconds = 60
+        linkId = 0
     }
 }

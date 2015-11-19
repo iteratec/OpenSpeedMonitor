@@ -179,15 +179,15 @@ class EventResultDashboardController {
      * @param values
      *         The dashboard settings, JSON encoded;
      *         not <code>null</code>.
-     * @param dashboardName
-     *         The proposed Dashboard Name;
-     *         not <code>null</code>.
-     * @param publiclyVisible
-     *         boolean value indicating if the custom dashboard should be visible to everyone or just its creator;
-     *         not <code>null</code>.
-     * @return nothing , immediately sends HTTP response codes to client.
      */
-    def validateAndSaveDashboardValues(String values, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage) {
+    def validateAndSaveDashboardValues(String values) {
+
+        JSONObject dashboardValues = JSON.parse(values)
+
+        String dashboardName = dashboardValues.dashboardName
+        String username = springSecurityService.authentication.principal.getUsername()
+        String publiclyVisible = dashboardValues.publiclyVisible
+        String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Check if name is unique
         def dashboards = UserspecificEventResultDashboard.findAllByDashboardName(dashboardName)
@@ -196,71 +196,28 @@ class EventResultDashboardController {
             return null
         }
 
-        JSONObject dashboardValues = JSON.parse(values)
-
+        // Parse JSON Data for Command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
         Collection<Long> selectedFolder = []
+        dashboardValues.selectedFolder.each { l -> selectedFolder.add(Long.parseLong(l)) }
         Collection<Long> selectedPages = []
+        dashboardValues.selectedPages.each { l -> selectedPages.add(Long.parseLong(l)) }
         Collection<Long> selectedMeasuredEventIds = []
+        dashboardValues.selectedMeasuredEventIds.each { l -> selectedMeasuredEventIds.add(Long.parseLong(l)) }
         Collection<Long> selectedBrowsers = []
+        dashboardValues.selectedBrowsers.each { l -> selectedBrowsers.add(Long.parseLong(l)) }
         Collection<Long> selectedLocations = []
+        dashboardValues.selectedLocations.each { l -> selectedLocations.add(Long.parseLong(l)) }
         Collection<String> selectedAggrGroupValuesCached = []
+        dashboardValues.selectedAggrGroupValuesCached.each { l -> selectedAggrGroupValuesCached.add(l) }
         Collection<String> selectedAggrGroupValuesUnCached = []
+        dashboardValues.selectedAggrGroupValuesUnCached.each { l -> selectedAggrGroupValuesUnCached.add(l) }
         Collection<Long> selectedConnectivityProfiles = []
+        dashboardValues.selectedConnectivityProfiles.each { l -> selectedConnectivityProfiles.add(Long.parseLong(l)) }
 
-        dashboardValues.each { id, data ->
-            def dataToAssign
-            if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
-                dataToAssign = data.join(',')
-                dataToAssign = dataToAssign.replace('"', '')
-            } else {
-                dataToAssign = data
-            }
-            switch (id) {
-                case ~/^selectedFolder$/:
-                    data.each() {
-                        selectedFolder.push(it)
-                    }
-                    break
-                case ~/^selectedPages$/:
-                    data.each() {
-                        selectedPages.push(it)
-                    }
-                    break
-                case ~/^selectedMeasuredEventIds$/:
-                    data.each() {
-                        selectedMeasuredEventIds.push(it)
-                    }
-                    break
-                case ~/^selectedBrowsers$/:
-                    data.each() {
-                        selectedBrowsers.push(it)
-                    }
-                    break
-                case ~/^selectedLocations$/:
-                    data.each() {
-                        selectedLocations.push(it)
-                    }
-                    break
-                case ~/^selectedAggrGroupValuesCached$/:
-                    data.each() {
-                        selectedAggrGroupValuesCached.push(it)
-                    }
-                    break
-                case ~/^selectedAggrGroupValuesUnCached$/:
-                    data.each() {
-                        selectedAggrGroupValuesUnCached.push(it)
-                    }
-                    break
-                case ~/^selectedConnectivityProfiles$/:
-                    data.each() {
-                        selectedConnectivityProfiles.push(it)
-                    }
-                    break
-            }
-        }
-        def cmd = new EventResultDashboardShowAllCommand(
+        // Create cmd for validation
+        EventResultDashboardShowAllCommand cmd = new EventResultDashboardShowAllCommand(
                 from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, toHour: dashboardValues.toHour, aggrGroup: dashboardValues.aggrGroup,
                 selectedFolder: selectedFolder, selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: dashboardValues.selectedAllLocations,
@@ -269,68 +226,30 @@ class EventResultDashboardController {
                 includeCustomConnectivity: dashboardValues.includeCustomConnectivity, includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
                 selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles)
 
-        if (dashboardValues.selectedInterval != null) {
-            if (dashboardValues.selectedInterval != "") {
-                cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()
-            }
-        }
-        if (dashboardValues.selectedTimeFrameInterval != null) {
-            if (dashboardValues.selectedTimeFrameInterval != "") {
-                cmd.selectedTimeFrameInterval = dashboardValues.selectedTimeFrameInterval.toInteger()
-            }
-        }
-        if (dashboardValues.selectChartType != null) {
-            if (dashboardValues.selectChartType != "") {
-                cmd.selectChartType = dashboardValues.selectChartType.toInteger()
-            }
-        }
-        if (dashboardValues.trimAboveRequestSizes != null) {
-            if (dashboardValues.trimAboveRequestSizes != "") {
-                cmd.trimAboveRequestSizes = dashboardValues.trimAboveRequestSizes.toInteger()
-            }
-        }
-        if (dashboardValues.trimBelowRequestSizes != null) {
-            if (dashboardValues.trimBelowRequestSizes != "") {
-                cmd.trimBelowRequestSizes = dashboardValues.trimBelowRequestSizes.toInteger()
-            }
-        }
-        if (dashboardValues.trimAboveRequestCounts != null) {
-            if (dashboardValues.trimAboveRequestCounts != "") {
-                cmd.trimAboveRequestCounts = dashboardValues.trimAboveRequestCounts.toInteger()
-            }
-        }
-        if (dashboardValues.trimBelowRequestCounts != null) {
-            if (dashboardValues.trimBelowRequestCounts != "") {
-                cmd.trimBelowRequestCounts = dashboardValues.trimBelowRequestCounts.toInteger()
-            }
-        }
-        if (dashboardValues.trimAboveLoadTimes != null) {
-            if (dashboardValues.trimAboveLoadTimes != "") {
-                cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes.toInteger()
-            }
-        }
-        if (dashboardValues.trimBelowLoadTimes != null) {
-            if (dashboardValues.trimBelowLoadTimes != "") {
-                cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()
-            }
-        }
+        // Parse IntegerValues if they exist
+        if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()
+        if (dashboardValues.selectedTimeFrameInterval) cmd.selectedTimeFrameInterval = dashboardValues.selectedTimeFrameInterval.toInteger()
+        if (dashboardValues.selectChartType) cmd.selectChartType = dashboardValues.selectChartType.toInteger()
+        if (dashboardValues.trimAboveRequestSizes) cmd.trimAboveRequestSizes = dashboardValues.trimAboveRequestSizes.toInteger()
+        if (dashboardValues.trimBelowRequestSizes) cmd.trimBelowRequestSizes = dashboardValues.trimBelowRequestSizes.toInteger()
+        if (dashboardValues.trimAboveRequestCounts) cmd.trimAboveRequestCounts = dashboardValues.trimAboveRequestCounts.toInteger()
+        if (dashboardValues.trimBelowRequestCounts) cmd.trimBelowRequestCounts = dashboardValues.trimBelowRequestCounts.toInteger()
+        if (dashboardValues.trimAboveLoadTimes) cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes.toInteger()
+        if (dashboardValues.trimBelowLoadTimes) cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()
+
+        // Check validation and send errors if needed
         if (!cmd.validate()) {
             //send errors
             def errMsgList = cmd.errors.allErrors.collect { g.message([error: it]) }
-            response.sendError(400, "rkrkrk" + errMsgList.toString() + "rkrkrk")
-            // Apache Tomcat will output the response as part of (HTML) error page - 'rkrkrk' are the delimiters so the AJAX frontend can find the message
-            return null
+            response.sendError(400, "beginErrorMessage" + errMsgList.toString() + "endErrorMessage")
+            // Apache Tomcat will output the response as part of (HTML) error page
         } else {
-            def username = springSecurityService.authentication.principal.getUsername()
-
-            UserspecificEventResultDashboard newCustomDashboard = new UserspecificEventResultDashboard(dashboardValues, dashboardName, publiclyVisible, wideScreenDiagramMontage, username)
+            UserspecificEventResultDashboard newCustomDashboard = new UserspecificEventResultDashboard(cmd, dashboardName, publiclyVisible, wideScreenDiagramMontage, username)
 
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
-                return null
             } else {
                 response.sendError(200, 'OK')
-                return null
             }
         }
     }

@@ -78,7 +78,8 @@ class WeightingService {
 	
 	/**
 	 * <p>
-	 * Groups the list of {@link WeightedCsiValue}s toFlatten by unique weights. For each unique weight, a new {@link WeightedCsiValue} is created with the unique weight as weight and the average of all
+	 * Groups the list of {@link WeightedCsiValue}s toFlatten by unique weights. For each unique weight, a
+     * new {@link WeightedCsiValue} is created with the unique weight as weight and the average of all
 	 * {@link WeightedCsiValue}s of that weight as value.   
 	 * </p>
 	 * @param toFlatten

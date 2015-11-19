@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report
 
+import de.iteratec.osm.result.EventResultDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -281,37 +282,47 @@ class UserspecificEventResultDashboard {
         includeCustomConnectivity(nullable: true)
     }
 
-    UserspecificEventResultDashboard(JSONObject dashboardValues, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage, String username) {
+    /**
+     * Creates Userspecific Dashboard from EventResultDashbordShowAllCommand
+     * @param cmd the command the set values
+     * @param dashboardName a unique name for the dashboard
+     * @param publiclyVisible true if the dashboard should be visible for all
+     * @param wideScreenDiagramMontage true if there should be optimisation for wideScreen
+     * @param username the creator of the dashboard
+     */
+    UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage, String username) {
 
         this.dashboardName = dashboardName
         this.publiclyVisible = publiclyVisible
         this.wideScreenDiagramMontage = wideScreenDiagramMontage
         this.username = username
 
-        fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
-        toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
-        fromHour = dashboardValues.fromHour
-        toHour = dashboardValues.toHour
-        if (dashboardValues.selectedInterval) selectedInterval = Integer.parseInt(dashboardValues.selectedInterval)
-        if (dashboardValues.selectedTimeFrameInterval)selectedTimeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
-        selectedAllMeasuredEvents = dashboardValues.selectedAllMeasuredEvents
-        selectedAllBrowsers = dashboardValues.selectedAllBrowsers
-        selectedAllLocations = dashboardValues.selectedAllLocations
-        if (dashboardValues.trimBelowLoadTimes) trimBelowLoadTimes = Integer.parseInt(dashboardValues.trimBelowLoadTimes)
-        if (dashboardValues.trimBelowLoadTimes) trimAboveLoadTimes = Integer.parseInt(dashboardValues.trimAboveLoadTimes)
-        if (dashboardValues.trimBelowRequestCounts) trimBelowRequestCounts = Integer.parseInt(dashboardValues.trimBelowRequestCounts)
-        if (dashboardValues.trimAboveRequestCounts) trimAboveRequestCounts = Integer.parseInt(dashboardValues.trimAboveRequestCounts)
-        if (dashboardValues.trimBelowRequestSizes) trimBelowRequestSizes = Integer.parseInt(dashboardValues.trimBelowRequestSizes)
-        if (dashboardValues.trimAboveRequestSizes) trimAboveRequestSizes = Integer.parseInt(dashboardValues.trimAboveRequestSizes)
-        overwriteWarningAboutLongProcessingTime = dashboardValues.overwriteWarningAboutLongProcessingTime
-        debug = dashboardValues.debug
-        setFromHour = dashboardValues.setFromHour
-        setToHour = dashboardValues.setToHour
-        includeCustomConnectivity = dashboardValues.includeCustomConnectivity
-        includeNativeConnectivity = dashboardValues.includeNativeConnectivity
-        customConnectivityName = dashboardValues.customConnectivityName
-        selectedAllConnectivityProfiles = dashboardValues.selectedAllConnectivityProfiles
+        // Get Data from command
+        fromDate = cmd.from
+        toDate = cmd.to
+        fromHour = cmd.fromHour
+        toHour = cmd.toHour
+        selectedInterval = cmd.selectedInterval
+        selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
+        selectedAllMeasuredEvents = cmd.selectedAllMeasuredEvents
+        selectedAllBrowsers = cmd.selectedAllBrowsers
+        selectedAllLocations = cmd.selectedAllLocations
+        trimBelowLoadTimes = cmd.trimBelowLoadTimes
+        trimAboveLoadTimes = cmd.trimAboveLoadTimes
+        trimBelowRequestCounts = cmd.trimBelowRequestCounts
+        trimAboveRequestCounts = cmd.trimAboveRequestCounts
+        trimBelowRequestSizes = cmd.trimBelowRequestSizes
+        trimAboveRequestSizes = cmd.trimAboveRequestSizes
+        overwriteWarningAboutLongProcessingTime = cmd.overwriteWarningAboutLongProcessingTime
+        debug = cmd.debug
+        setFromHour = cmd.setFromHour
+        setToHour = cmd.setToHour
+        includeCustomConnectivity = cmd.includeCustomConnectivity
+        includeNativeConnectivity = cmd.includeNativeConnectivity
+        customConnectivityName = cmd.customConnectivityName
+        selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
 
+        // generate Strings for db
         String selectedFolderString = ""
         String selectedPagesString = ""
         String selectedMeasuredEventIdsString = ""
@@ -321,41 +332,24 @@ class UserspecificEventResultDashboard {
         String selectedAggrGroupValuesUnCachedString = ""
         String selectedConnectivityProfilesString = ""
 
-        dashboardValues.each { id, data ->
-            def dataToAssign
-            if (data instanceof org.codehaus.groovy.grails.web.json.JSONArray) {
-                dataToAssign = data.join(',')
-                dataToAssign = dataToAssign.replace( '"', '' )
-            } else {
-                dataToAssign = data
-            }
-            switch (id) {
-                case ~/^selectedFolder$/:
-                    selectedFolderString = dataToAssign
-                    break
-                case ~/^selectedPages$/:
-                    selectedPagesString = dataToAssign
-                    break
-                case ~/^selectedMeasuredEventIds$/:
-                    selectedMeasuredEventIdsString = dataToAssign
-                    break
-                case ~/^selectedBrowsers$/:
-                    selectedBrowsersString = dataToAssign
-                    break
-                case ~/^selectedLocations$/:
-                    selectedLocationsString = dataToAssign
-                    break
-                case ~/^selectedAggrGroupValuesCached$/:
-                    selectedAggrGroupValuesCachedString = dataToAssign
-                    break
-                case ~/^selectedAggrGroupValuesUnCached$/:
-                    selectedAggrGroupValuesUnCachedString = dataToAssign
-                    break
-                case ~/^selectedConnectivityProfiles$/:
-                    selectedConnectivityProfilesString = dataToAssign
-                    break
-            }
-        }
+        // generate Strings for db
+        cmd.selectedFolder.each {f -> selectedFolderString += f + ","}
+        // trim last comma
+        if(selectedFolderString.length() > 0) selectedFolderString = selectedFolderString.substring(0, selectedFolderString.length()-1)
+        cmd.selectedPages.each {p -> selectedPagesString += p + ","}
+        if(selectedPagesString.length() > 0) selectedPagesString = selectedPagesString.substring(0, selectedPagesString.length()-1)
+        cmd.selectedMeasuredEventIds.each {m -> selectedMeasuredEventIdsString += m + ","}
+        if(selectedMeasuredEventIdsString.length() > 0) selectedMeasuredEventIdsString = selectedMeasuredEventIdsString.substring(0, selectedMeasuredEventIdsString.length()-1)
+        cmd.selectedBrowsers.each {b -> selectedBrowsersString += b + ","}
+        if(selectedBrowsersString.length() > 0) selectedBrowsersString = selectedBrowsersString.substring(0, selectedBrowsersString.length()-1)
+        cmd.selectedLocations.each {l -> selectedLocationsString += l + ","}
+        if(selectedLocationsString.length() > 0) selectedLocationsString = selectedLocationsString.substring(0, selectedLocationsString.length()-1)
+        cmd.selectedAggrGroupValuesCached.each {a -> selectedAggrGroupValuesCachedString += a + ","}
+        if(selectedAggrGroupValuesCachedString.length() > 0) selectedAggrGroupValuesCachedString = selectedAggrGroupValuesCachedString.substring(0, selectedAggrGroupValuesCachedString.length()-1)
+        cmd.selectedAggrGroupValuesUnCached.each {a -> selectedAggrGroupValuesUnCachedString += a + ","}
+        if(selectedAggrGroupValuesUnCachedString.length() > 0) selectedAggrGroupValuesUnCachedString = selectedAggrGroupValuesUnCachedString.substring(0, selectedAggrGroupValuesUnCachedString.length()-1)
+        cmd.selectedConnectivityProfiles.each {p -> selectedConnectivityProfilesString += p + ","}
+        if(selectedConnectivityProfilesString.length() > 0) selectedConnectivityProfilesString = selectedConnectivityProfilesString.substring(0, selectedConnectivityProfilesString.length()-1)
 
         selectedFolder = selectedFolderString
         selectedPages = selectedPagesString
@@ -367,7 +361,12 @@ class UserspecificEventResultDashboard {
         selectedConnectivityProfiles = selectedConnectivityProfilesString
     }
 
-    def isCurrentUserDashboardOwner(String dashboardId) {
+    /**
+     * Checks if the currentUser is admin or creator of the given dashboard
+     * @param dashboardId the dashboard to check
+     * @return true if currentUser is admin or creator, false otherwise
+     */
+    boolean isCurrentUserDashboardOwner(String dashboardId) {
         if (SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN")) {
             return true
         } else {
@@ -388,6 +387,7 @@ class UserspecificEventResultDashboard {
             }
         }
     }
+
 
     def getListOfAvailableDashboards() {
         List result = []

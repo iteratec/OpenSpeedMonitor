@@ -37,95 +37,108 @@ class OsmChartProcessingService {
 
         if (graphs.size > 1) {
 
-            def labelPartsToSummarize = [];
+            checkIfAllLabelsHaveEqualSectionCount(1,3, graphs)
 
-            def firstGraph = graphs.get(0);
-            def tokenizedFirstGraphLabel = firstGraph.label.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim());
+            final List<String> graphLabelSectionKeys = [i18nService.msg('job.jobGroup.label', 'Job Group'),
+                                       i18nService.msg('de.iteratec.osm.result.measured-event.label', 'Measured step'),
+                                       i18nService.msg('job.location.label', 'Location')]
 
-            def labelParts = []
+            List labelPartsToSummarize = getLabelPartsToSummarize(graphs, graphLabelSectionKeys)
 
-            if(tokenizedFirstGraphLabel.size() >= 1)
-                labelParts.add([
-                        key: i18nService.msg('job.jobGroup.label', 'Job Group'),
-                        value: tokenizedFirstGraphLabel[0].trim() ]);
-            if(tokenizedFirstGraphLabel.size() >= 2)
-                labelParts.add([
-                        key: i18nService.msg('de.iteratec.osm.result.measured-event.label', 'Measured step'),
-                        value: tokenizedFirstGraphLabel[1].trim() ]);
-            if(tokenizedFirstGraphLabel.size() >= 3)
-                labelParts.add([
-                        key: i18nService.msg('job.location.label', 'Location'),
-                        value: tokenizedFirstGraphLabel[2].trim() ]);
+            if (labelPartsToSummarize.size() > 0) {
 
-            labelPartsToSummarize = labelParts.findAll { part ->
-                graphs.every { it ->
-                    it.label.contains(part.value.trim());
+                graphs.each { it ->
+                    removeCommonPartsFromLabel(it, labelPartsToSummarize)
                 }
-            }
+                commonLabel = createCommonLabel(labelPartsToSummarize)
 
-            graphs.each { it ->
-                removeCommonPartsFromLabel(it, labelPartsToSummarize)
-            }
-            labelPartsToSummarize.each { part ->
-                String labelNewPart = "<b>" + part.key + "</b>: " + part.value;
-                commonLabel == "" ? (commonLabel = labelNewPart) : (commonLabel += " | " + labelNewPart);
             }
         }
 
         return new OsmRickshawChart(osmChartGraphs: graphs, osmChartGraphsCommonLabel: commonLabel)
     }
 
+
     OsmRickshawChart summarizeEventResultGraphs(List<OsmChartGraph> graphs) {
+        String commonLabel = ""
 
-        List<Map> labelPartsToSummarize = [];
-        String summary = "";
+        if(graphs.size() > 1) {
 
-        if (graphs.size > 1) {
+            checkIfAllLabelsHaveEqualSectionCount(5,5, graphs)
 
-            OsmChartGraph firstGraph = graphs.get(0);
-            List<String> tokenizedFirstGraphLabel = firstGraph.label.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim());
+            List<String> graphLabelSectionKeys = [i18nService.msg('de.iteratec.result.measurand.label', 'Measurand'),
+                                 i18nService.msg('job.jobGroup.label', 'Job Group'),
+                                 i18nService.msg('de.iteratec.osm.result.measured-event.label', 'Measured step'),
+                                 i18nService.msg('job.location.label', 'Location'),
+                                 i18nService.msg('de.iteratec.osm.result.connectivity.label', 'Connectivity')]
 
-            List<Map> labelParts = [
-                    [ key: i18nService.msg('de.iteratec.result.measurand.label', 'Measurand'),
-                      value: tokenizedFirstGraphLabel[0].trim() ]
-            ]
+            List labelPartsToSummarize = getLabelPartsToSummarize(graphs, graphLabelSectionKeys)
 
-            if(tokenizedFirstGraphLabel.size() == 5) {
-                labelParts.add([
-                        key: i18nService.msg('job.jobGroup.label', 'Job Group'),
-                        value: tokenizedFirstGraphLabel[1].trim() ]);
-                labelParts.add([
-                        key: i18nService.msg('de.iteratec.osm.result.measured-event.label', 'Measured step'),
-                        value: tokenizedFirstGraphLabel[2].trim() ]);
-                labelParts.add([
-                        key: i18nService.msg('job.location.label', 'Location'),
-                        value: tokenizedFirstGraphLabel[3].trim() ]);
-                labelParts.add([
-                        key: i18nService.msg('de.iteratec.osm.result.connectivity.label', 'Connectivity'),
-                        value: tokenizedFirstGraphLabel[4].trim() ]);
-            }else if(tokenizedFirstGraphLabel.size() == 2) {
-                labelParts.add([
-                        key: 'Identifier',
-                        value: tokenizedFirstGraphLabel[1].trim() ]);
-            }
+            if (labelPartsToSummarize.size() > 0) {
 
-            labelPartsToSummarize = labelParts.findAll { part ->
-                graphs.every { it ->
-                    it.label.contains(part.value.trim());
+                graphs.each { it ->
+                    removeCommonPartsFromLabel(it, labelPartsToSummarize)
                 }
-            }
+                commonLabel = createCommonLabel(labelPartsToSummarize)
 
-            graphs.each { it ->
-                removeCommonPartsFromLabel(it, labelPartsToSummarize)
-            }
-
-            labelPartsToSummarize.each { part ->
-                String labelNewPart = "<b>" + part.key + "</b>: " + part.value;
-                summary == "" ? (summary = labelNewPart) : (summary += " | " + labelNewPart);
             }
         }
 
-        return new OsmRickshawChart(osmChartGraphs: graphs, osmChartGraphsCommonLabel: summary)
+        return new OsmRickshawChart(osmChartGraphs: graphs, osmChartGraphsCommonLabel: commonLabel)
+    }
+
+    void checkIfAllLabelsHaveEqualSectionCount(int min, int max, List<OsmChartGraph> graphs) {
+        // check if all equal
+        List <List> labels = splitGraphLabels(graphs)
+        int firstLabelSectionCount = labels[0].size()
+        if(!labels.every{label -> label.size() == firstLabelSectionCount}) {
+            IllegalArgumentException exception = new IllegalArgumentException("Labels have different section counts")
+            log.error("Illegal Argument", exception)
+            throw exception
+        }
+        //check if all in range
+        if(firstLabelSectionCount < min || firstLabelSectionCount > max) {
+            IllegalArgumentException exception = new IllegalArgumentException("Section count has to be in range [" + min + "," + max + "]")
+            log.error("Illegal Argument", exception)
+            throw exception
+        }
+    }
+
+    private List getLabelPartsToSummarize(List<OsmChartGraph> graphs, List<String> graphLabelSectionKeys) {
+
+        List<List<String>> tokenizedLabelsOfAllGraphs = splitGraphLabels(graphs)
+
+        List labelPartsToSummarize = []
+
+        tokenizedLabelsOfAllGraphs[0].size().times { labelSectionIndex ->
+
+            String currentLabelSection = tokenizedLabelsOfAllGraphs[0][labelSectionIndex]
+
+            // check if all label parts[i] are equal
+            boolean allValuesEqual = tokenizedLabelsOfAllGraphs.every { label -> label[labelSectionIndex] == currentLabelSection }
+
+            // if so they can be trimmed
+            if (allValuesEqual) {
+                labelPartsToSummarize.add([key: graphLabelSectionKeys[labelSectionIndex], value: currentLabelSection])
+            }
+
+        }
+        return labelPartsToSummarize
+    }
+
+    private String createCommonLabel(ArrayList labelPartsToSummarize) {
+        String commonLabel = ''
+        labelPartsToSummarize.each { part ->
+            String labelNewPart = "<b>" + part.key + "</b>: " + part.value.trim();
+            commonLabel == "" ? (commonLabel = labelNewPart) : (commonLabel += " | " + labelNewPart);
+
+        }
+        return commonLabel
+    }
+
+    private List splitGraphLabels(List<OsmChartGraph> graphs) {
+        List<List<String>> allTokenizedLabels = graphs*.label*.tokenize(HIGHCHART_LEGEND_DELIMITTER.trim())
+        return allTokenizedLabels
     }
 
     private void removeCommonPartsFromLabel(OsmChartGraph graph, List<Map> labelPartsToSummarize) {

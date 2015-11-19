@@ -141,6 +141,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 '/login/**'                                   : ["permitAll"],
 '/logout/**'                                  : ["permitAll"],
 '/job/list'                                   : ["permitAll"],
+'/job/saveJobSet'                             : ["permitAll"],
 '/job/getRunningAndRecentlyFinishedJobs'      : ["permitAll"],
 '/job/nextExecution'                          : ["permitAll"],
 '/job/getLastRun'                             : ["permitAll"],
@@ -191,6 +192,8 @@ grails.assets.minifyCss = true
 
 grails.i18n.locales = ['en','de']
 
+grails.plugin.databasemigration.updateOnStart = true
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
 
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -234,7 +237,6 @@ environments {
 //            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
 //            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
 //            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
-//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.jmx'
 //			identifiersToLogExplicitlyFor.addAll(grailsApplication.serviceClasses.collect {"grails.app.services.${it.fullName}"})
 //			identifiersToLogExplicitlyFor.addAll(grailsApplication.controllerClasses.collect {"grails.app.controllers.${it.fullName}"})
 
@@ -362,7 +364,6 @@ environments {
 //            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
 //            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
 //            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
-//            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.jmx'
             //			identifiersToLogExplicitlyFor.addAll(grailsApplication.serviceClasses.collect {"grails.app.services.${it.fullName}"})
             //			identifiersToLogExplicitlyFor.addAll(grailsApplication.controllerClasses.collect {"grails.app.controllers.${it.fullName}"})
 

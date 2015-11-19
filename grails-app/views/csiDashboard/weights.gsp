@@ -4,6 +4,21 @@
     <meta name="layout" content="kickstart_osm"/>
     <title>CSI CheckDashboard</title>
     <style>
+    %{--Styles for MatrixView--}%
+    .xAxisMatrix path,
+    .xAxisMatrix line,
+    .yAxisMatrix path,
+    .yAxisMatrix line {
+        fill: none;
+        shape-rendering: inherit;
+    }
+    .xAxisMatrix text,
+    .yAxisMatrix text {
+        font-size: 12px;
+    }
+    .matrixViewAxisLabel {
+        font-weight: bold;
+    }
     %{--Styles for BarChart--}%
     .barRect {
         fill: steelblue;
@@ -57,6 +72,8 @@
         margin-left: 15px;
 
     }
+
+    #tooltipMatrixView,
     #tooltip {
         position: absolute;
         width: auto;
@@ -71,9 +88,11 @@
         box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
         pointer-events: none;
     }
+    #tooltipMatrixView.hidden,
     #tooltip.hidden {
         display: none;
     }
+    #tooltipMatrixView p,
     #tooltip p {
         margin: 0;
         font-family: sans-serif;
@@ -97,6 +116,10 @@
 <section id="list" class="first">
 
     <h4><g:message code="de.iteratec.isocsi.browser_weight" default="Browser"/></h4>
+    %{-- Begin diagram view--}%
+    <iteratec:matrixView
+            chartIdentifier="browserConnectivityMatrixView"/>
+    %{--End diagram View--}%
     <table class="table table-bordered">
         <tbody>
         <tr>
@@ -205,6 +228,7 @@
     </sec:ifAllGranted>
 </section>
 <content tag="include.bottom">
+    <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
     <asset:script type="text/javascript">
@@ -217,8 +241,9 @@
         $('input[id=theHourOfDayCsvFile]').change(function() {
             $('#theHourOfDayCsvFileTwitter').val($(this).val());
         });
-        createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap")
-                createBarChart(1000, 750, ${barchartData},"clocks", "hoursOfDayBarchart")
+        createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
+        createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
+                createBarChart(1000, 750, ${barchartData},"clocks", "hoursOfDayBarchart");
     </asset:script>
 </content>
 </body>

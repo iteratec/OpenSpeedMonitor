@@ -16,6 +16,9 @@
 */
 
 package de.iteratec.osm
+
+import de.iteratec.osm.csi.CsiTransformation
+
 /**
  * ConfigService
  * Delivers application-wide configurations from backend.
@@ -107,6 +110,14 @@ class ConfigService {
 	Boolean isDatabaseCleanupEnabled(){
 		return inMemoryConfigService.isDatabaseCleanupEnabled()
 	}
+
+    /**
+     * Get method load times should be calculated to percent of
+     * users which are satisfied by that load time.
+     */
+    CsiTransformation getCsiTransformation(){
+        return (CsiTransformation)retrieveConfigValue('csiTransformation')
+    }
 
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()

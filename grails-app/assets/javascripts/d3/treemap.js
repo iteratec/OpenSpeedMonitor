@@ -44,7 +44,7 @@ function createTreemap(altWidth, altHeight, data, design, id) {
     var selector = "[id=" + id + "]";
     var container = d3.select(selector);
     // Defines the margins and the size of the treemap
-    var margin = {top: 10, right: 0, bottom: 10, left: 0},
+    var margin = {top: 10, right: 0, bottom: 10, left: 50},
         width = rawWidth - margin.left - margin.right,
         height = rawHeight - margin.top - margin.bottom;
 

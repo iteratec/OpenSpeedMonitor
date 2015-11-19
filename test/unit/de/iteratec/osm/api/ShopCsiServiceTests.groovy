@@ -92,7 +92,7 @@ class ShopCsiServiceTests {
 		
 		//assertions
 		assertNotNull(systemCsi)
-		assertEquals(12d * 100, systemCsi.csiValueAsPercentage, DELTA)
+		assertEquals(12d, systemCsi.csiValueAsPercentage, DELTA)
 		assertEquals(expectedTargetCsi, systemCsi.targetCsiAsPercentage, DELTA)
 		assertEquals(systemCsi.csiValueAsPercentage - expectedTargetCsi, systemCsi.delta,  DELTA)
 		assertEquals(3, systemCsi.countOfMeasurings)
@@ -132,7 +132,7 @@ class ShopCsiServiceTests {
 		//assertions
 		assertNotNull(systemCsi)
 		assertEquals(
-			(((valueFirstMv * pageWeightFirstMv * browserWeightFirstMv) + (valueSecondMv * pageWeightSecondMv * browserWeightSecondMv) + (valueThirdMv * pageWeightThirdMv * browserWeightThirdMv)) / sumOfAllWeights) * 100, 
+			(((valueFirstMv * pageWeightFirstMv * browserWeightFirstMv) + (valueSecondMv * pageWeightSecondMv * browserWeightSecondMv) + (valueThirdMv * pageWeightThirdMv * browserWeightThirdMv)) / sumOfAllWeights),
 			systemCsi.csiValueAsPercentage, 
 			DELTA)
 		assertEquals(expectedTargetCsi, systemCsi.targetCsiAsPercentage, DELTA)

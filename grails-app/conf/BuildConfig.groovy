@@ -118,7 +118,6 @@ grails.project.dependency.resolution = {
 			':spring-security-core:2.0-RC5',
 			':quartz:1.0.1',
 			':rest:0.8',
-			':jmx:0.9',
 			':taggable:1.1.0',
 			':cookie:1.0.1',
             ':codenarc:0.22',

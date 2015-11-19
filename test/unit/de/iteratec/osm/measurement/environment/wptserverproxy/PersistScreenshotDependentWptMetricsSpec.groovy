@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.csi.CsiTransformation
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -107,7 +108,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void createMocksCommonForAllTests() {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
-        mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60)
+        mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
         serviceUnderTest.pageService = new PageService()
         mocker.mockMeasuredValueTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->

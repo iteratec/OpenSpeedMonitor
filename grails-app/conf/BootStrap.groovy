@@ -37,6 +37,7 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.I18nService
 import grails.util.Environment
 import org.joda.time.DateTime
+import de.iteratec.osm.csi.CsiTransformation
 
 import static de.iteratec.osm.util.Constants.DEFAULT_CSI_MAPPINGS
 
@@ -109,7 +110,9 @@ class BootStrap {
 			defaultMaxDownloadTimeInMinutes: 60,
 			minDocCompleteTimeInMillisecs: 250,
 			maxDocCompleteTimeInMillisecs: 180000,
-			maxDataStorageTimeInMonths: 13).save(failOnError: true)
+			maxDataStorageTimeInMonths: 13,
+            csiTransformation: CsiTransformation.BY_MAPPING
+        ).save(failOnError: true)
 	}
 	void initJobScheduling(){
 		log.info "initJobScheduling() OSM starts"

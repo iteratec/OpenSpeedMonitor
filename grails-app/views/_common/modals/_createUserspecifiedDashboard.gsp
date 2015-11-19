@@ -86,8 +86,8 @@
 
         hideMessages()
 
-        var dashboardName = document.getElementById("dashboardNameFromModal");
-        if (dashboardName.value.trim() !== "") {
+        var dashboardName = document.getElementById("dashboardNameFromModal").value;
+        if (dashboardName.trim() !== "") {
 
             var spinner = startSpinner(document.getElementById('spinner-position'));
 
@@ -116,12 +116,17 @@
                 objectData[this.name] = value;
               }
             });
+
+            objectData["dashboardName"] = dashboardName;
+            objectData["publiclyVisible"] = document.getElementById("publiclyVisibleFromModal").checked;
+            objectData["wideScreenDiagramMontage"] = document.getElementById("wideScreenDiagramMontage").checked;
+
             json_data = JSON.stringify(objectData);
 
             $.ajax({
                 type: 'POST',
                 url: '${createLink(action: 'validateAndSaveDashboardValues', absolute: true)}',
-                data: { values: json_data, dashboardName: document.getElementById("dashboardNameFromModal").value, publiclyVisible: document.getElementById("publiclyVisibleFromModal").checked, wideScreenDiagramMontage: document.getElementById("wideScreenDiagramMontage").checked },
+                data: { values: json_data},
                 statusCode: {
                     200: function (response) {
                         $("#saveDashboardSuccessDiv").show();
@@ -130,7 +135,7 @@
                     },
                     400: function (response) {
                         $("#saveDashboardErrorDiv").show();
-                        var re = /(.*rkrkrk\[)(.*)(\]rkrkrk.*)/;
+                        var re = /(.*beginErrorMessage\[)(.*)(\]endErrorMessage.*)/;
                         var newtext = response.responseText.replace(re, "$2");
                         newtext = newtext.replace(/, /g, '<br/>');
                         newtext = newtext.replace(/&amp;/g, '&');
