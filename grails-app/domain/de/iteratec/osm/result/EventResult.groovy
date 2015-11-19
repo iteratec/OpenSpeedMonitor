@@ -181,7 +181,7 @@ class EventResult implements CsiValue {
 		loadTimeInMillisecs(nullable: true)
 		startRenderInMillisecs(nullable: true)
 		customerSatisfactionInPercent(nullable: true)
-		speedIndex()
+		speedIndex(nullable: true)
 		visuallyCompleteInMillisecs(nullable: true)
 
 		downloadAttempts(nullable: true)

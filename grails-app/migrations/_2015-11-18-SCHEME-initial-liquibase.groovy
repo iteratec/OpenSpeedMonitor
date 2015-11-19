@@ -1,6 +1,6 @@
 databaseChangeLog = {
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-1") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-1") {
 		createTable(tableName: "aggregator_type") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "aggregator_tyPK")
@@ -20,7 +20,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-2") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-2") {
 		createTable(tableName: "api_key") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "api_keyPK")
@@ -62,7 +62,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-3") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-3") {
 		createTable(tableName: "batch_activity") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "batch_activitPK")
@@ -122,7 +122,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-4") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-4") {
 		createTable(tableName: "browser") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "browserPK")
@@ -142,7 +142,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-5") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-5") {
 		createTable(tableName: "browser_alias") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "browser_aliasPK")
@@ -162,7 +162,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-6") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-6") {
 		createTable(tableName: "browser_connectivity_weight") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "browser_connePK")
@@ -186,7 +186,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-7") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-7") {
 		createTable(tableName: "connectivity_profile") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "connectivity_PK")
@@ -222,7 +222,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-8") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-8") {
 		createTable(tableName: "cs_target_graph") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "cs_target_graPK")
@@ -252,7 +252,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-9") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-9") {
 		createTable(tableName: "cs_target_value") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "cs_target_valPK")
@@ -272,7 +272,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-10") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-10") {
 		createTable(tableName: "customer_frustration") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "customer_frusPK")
@@ -296,7 +296,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-11") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-11") {
 		createTable(tableName: "default_time_to_cs_mapping") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "default_time_PK")
@@ -320,7 +320,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-12") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-12") {
 		createTable(tableName: "event") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "eventPK")
@@ -346,7 +346,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-13") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-13") {
 		createTable(tableName: "event_job_group") {
 			column(name: "event_job_groups_id", type: "bigint")
 
@@ -354,7 +354,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-14") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-14") {
 		createTable(tableName: "event_result") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "event_resultPK")
@@ -432,7 +432,9 @@ databaseChangeLog = {
 				constraints(nullable: "false")
 			}
 
-			column(name: "speed_index", type: "integer")
+			column(name: "speed_index", type: "integer") {
+				constraints(nullable: "false")
+			}
 
 			column(name: "start_render_in_millisecs", type: "integer")
 
@@ -454,7 +456,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-15") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-15") {
 		createTable(tableName: "graphite_event_source_path") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "graphite_evenPK")
@@ -472,7 +474,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-16") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-16") {
 		createTable(tableName: "graphite_event_source_path_job_group") {
 			column(name: "graphite_event_source_path_job_groups_id", type: "bigint")
 
@@ -480,7 +482,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-17") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-17") {
 		createTable(tableName: "graphite_path") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "graphite_pathPK")
@@ -500,7 +502,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-18") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-18") {
 		createTable(tableName: "graphite_server") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "graphite_servPK")
@@ -532,7 +534,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-19") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-19") {
 		createTable(tableName: "graphite_server_graphite_event_source_path") {
 			column(name: "graphite_server_graphite_event_source_paths_id", type: "bigint")
 
@@ -540,7 +542,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-20") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-20") {
 		createTable(tableName: "graphite_server_graphite_path") {
 			column(name: "graphite_server_graphite_paths_id", type: "bigint")
 
@@ -548,7 +550,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-21") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-21") {
 		createTable(tableName: "hour_of_day") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "hour_of_dayPK")
@@ -568,7 +570,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-22") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-22") {
 		createTable(tableName: "http_archive") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "http_archivePK")
@@ -586,7 +588,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-23") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-23") {
 		createTable(tableName: "job") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "jobPK")
@@ -714,7 +716,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-24") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-24") {
 		createTable(tableName: "job_group") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "job_groupPK")
@@ -734,7 +736,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-25") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-25") {
 		createTable(tableName: "job_group_graphite_server") {
 			column(name: "job_group_graphite_servers_id", type: "bigint")
 
@@ -742,7 +744,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-26") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-26") {
 		createTable(tableName: "job_result") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "job_resultPK")
@@ -852,7 +854,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-27") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-27") {
 		createTable(tableName: "job_set") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "job_setPK")
@@ -868,7 +870,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-28") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-28") {
 		createTable(tableName: "job_set_job") {
 			column(name: "job_set_jobs_id", type: "bigint")
 
@@ -876,7 +878,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-29") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-29") {
 		createTable(tableName: "job_variables") {
 			column(name: "variables", type: "bigint")
 
@@ -888,7 +890,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-30") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-30") {
 		createTable(tableName: "location") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "locationPK")
@@ -954,7 +956,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-31") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-31") {
 		createTable(tableName: "measured_event") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_evenPK")
@@ -974,7 +976,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-32") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-32") {
 		createTable(tableName: "measured_value") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK")
@@ -1012,7 +1014,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-33") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-33") {
 		createTable(tableName: "measured_value_interval") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK")
@@ -1032,7 +1034,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-34") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-34") {
 		createTable(tableName: "measured_value_update_event") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK")
@@ -1056,7 +1058,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-35") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-35") {
 		createTable(tableName: "osm_configuration") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "osm_configuraPK")
@@ -1108,7 +1110,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-36") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-36") {
 		createTable(tableName: "page") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "pagePK")
@@ -1128,7 +1130,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-37") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-37") {
 		createTable(tableName: "role") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "rolePK")
@@ -1144,7 +1146,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-38") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-38") {
 		createTable(tableName: "script") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "scriptPK")
@@ -1180,7 +1182,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-39") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-39") {
 		createTable(tableName: "script_page") {
 			column(name: "script_tested_pages_id", type: "bigint")
 
@@ -1190,7 +1192,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-40") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-40") {
 		createTable(tableName: "tag_links") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "tag_linksPK")
@@ -1214,7 +1216,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-41") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-41") {
 		createTable(tableName: "tags") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "tagsPK")
@@ -1230,7 +1232,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-42") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-42") {
 		createTable(tableName: "time_to_cs_mapping") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "time_to_cs_maPK")
@@ -1258,7 +1260,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-43") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-43") {
 		createTable(tableName: "user") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userPK")
@@ -1294,7 +1296,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-44") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-44") {
 		createTable(tableName: "user_role") {
 			column(name: "role_id", type: "bigint") {
 				constraints(nullable: "false")
@@ -1306,7 +1308,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-45") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-45") {
 		createTable(tableName: "userspecific_csi_dashboard") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userspecific_PK")
@@ -1374,7 +1376,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-46") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-46") {
 		createTable(tableName: "userspecific_event_result_dashboard") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userspecific_PK")
@@ -1458,7 +1460,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-47") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-47") {
 		createTable(tableName: "waterfall_entry") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "waterfall_entPK")
@@ -1554,7 +1556,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-48") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-48") {
 		createTable(tableName: "web_page_test_server") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "web_page_testPK")
@@ -1596,7 +1598,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-49") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-49") {
 		createTable(tableName: "web_performance_waterfall") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
 				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "web_performanPK")
@@ -1654,7 +1656,7 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-50") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-50") {
 		createTable(tableName: "web_performance_waterfall_waterfall_entry") {
 			column(name: "web_performance_waterfall_waterfall_entries_id", type: "bigint")
 
@@ -1662,101 +1664,101 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-51") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-51") {
 		addPrimaryKey(columnNames: "role_id, user_id", constraintName: "user_rolePK", tableName: "user_role")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-93") {
-		createIndex(indexName: "name_uniq_1447946152016", tableName: "aggregator_type", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-93") {
+		createIndex(indexName: "name_uniq_1447840366442", tableName: "aggregator_type", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-94") {
-		createIndex(indexName: "name_uniq_1447946152025", tableName: "browser", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-94") {
+		createIndex(indexName: "name_uniq_1447840366455", tableName: "browser", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-95") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-95") {
 		createIndex(indexName: "FKA552267921FF13B0", tableName: "browser_alias") {
 			column(name: "browser_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-96") {
-		createIndex(indexName: "alias_uniq_1447946152026", tableName: "browser_alias", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-96") {
+		createIndex(indexName: "alias_uniq_1447840366455", tableName: "browser_alias", unique: "true") {
 			column(name: "alias")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-97") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-97") {
 		createIndex(indexName: "FK214D5E6921FF13B0", tableName: "browser_connectivity_weight") {
 			column(name: "browser_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-98") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-98") {
 		createIndex(indexName: "FK214D5E6948295CD", tableName: "browser_connectivity_weight") {
 			column(name: "connectivity_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-99") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-99") {
 		createIndex(indexName: "FKACA5788F81E39E01", tableName: "cs_target_graph") {
 			column(name: "point_one_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-100") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-100") {
 		createIndex(indexName: "FKACA5788F8AEF385B", tableName: "cs_target_graph") {
 			column(name: "point_two_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-101") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-101") {
 		createIndex(indexName: "FKF51108AC73976C8C", tableName: "customer_frustration") {
 			column(name: "page_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-102") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-102") {
 		createIndex(indexName: "FK6DCCE81848E56BA7", tableName: "event_job_group") {
 			column(name: "job_group_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-103") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-103") {
 		createIndex(indexName: "FK6DCCE818826DED2C", tableName: "event_job_group") {
 			column(name: "event_job_groups_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-104") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-104") {
 		createIndex(indexName: "FK3CA811623AA7BDEF", tableName: "event_result") {
 			column(name: "web_performance_waterfall_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-105") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-105") {
 		createIndex(indexName: "FK3CA8116263699C23", tableName: "event_result") {
 			column(name: "connectivity_profile_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-106") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-106") {
 		createIndex(indexName: "FK3CA81162CD0C7439", tableName: "event_result") {
 			column(name: "measured_event_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-107") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-107") {
 		createIndex(indexName: "FK3CA81162F0C41D41", tableName: "event_result") {
 			column(name: "job_result_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-108") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-108") {
 		createIndex(indexName: "GetLimitedMedianEventResultsBy", tableName: "event_result") {
 			column(name: "cached_view")
 
@@ -1770,37 +1772,37 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-109") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-109") {
 		createIndex(indexName: "jobResultDate_and_jobResultJobConfigId_idx", tableName: "event_result") {
 			column(name: "job_result_job_config_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-110") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-110") {
 		createIndex(indexName: "wJRD_and_wJRJCId_and_mV_and_cV_idx", tableName: "event_result") {
 			column(name: "job_result_job_config_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-111") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-111") {
 		createIndex(indexName: "FK6A94D76F1B04519E", tableName: "graphite_event_source_path_job_group") {
 			column(name: "graphite_event_source_path_job_groups_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-112") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-112") {
 		createIndex(indexName: "FK6A94D76F48E56BA7", tableName: "graphite_event_source_path_job_group") {
 			column(name: "job_group_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-113") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-113") {
 		createIndex(indexName: "FK2FE067F8103BD51A", tableName: "graphite_path") {
 			column(name: "measurand_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-114") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-114") {
 		createIndex(indexName: "unique_server_adress", tableName: "graphite_server", unique: "true") {
 			column(name: "port")
 
@@ -1808,103 +1810,103 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-115") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-115") {
 		createIndex(indexName: "FK66653A3AC5F66B1", tableName: "graphite_server_graphite_event_source_path") {
 			column(name: "graphite_event_source_path_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-116") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-116") {
 		createIndex(indexName: "FK66653A3AE190E8F6", tableName: "graphite_server_graphite_event_source_path") {
 			column(name: "graphite_server_graphite_event_source_paths_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-117") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-117") {
 		createIndex(indexName: "FKBDE6F5CF259A1B79", tableName: "graphite_server_graphite_path") {
 			column(name: "graphite_path_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-118") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-118") {
 		createIndex(indexName: "FKBDE6F5CFE3F0D20B", tableName: "graphite_server_graphite_path") {
 			column(name: "graphite_server_graphite_paths_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-119") {
-		createIndex(indexName: "full_hour_uniq_1447946152077", tableName: "hour_of_day", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-119") {
+		createIndex(indexName: "full_hour_uniq_1447840366484", tableName: "hour_of_day", unique: "true") {
 			column(name: "full_hour")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-120") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-120") {
 		createIndex(indexName: "FK86FC880BF0C41D41", tableName: "http_archive") {
 			column(name: "job_result_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-121") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-121") {
 		createIndex(indexName: "FK19BBD48E56BA7", tableName: "job") {
 			column(name: "job_group_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-122") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-122") {
 		createIndex(indexName: "FK19BBD63699C23", tableName: "job") {
 			column(name: "connectivity_profile_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-123") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-123") {
 		createIndex(indexName: "FK19BBD984F552E", tableName: "job") {
 			column(name: "script_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-124") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-124") {
 		createIndex(indexName: "FK19BBDC7666564", tableName: "job") {
 			column(name: "location_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-125") {
-		createIndex(indexName: "label_uniq_1447946152079", tableName: "job", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-125") {
+		createIndex(indexName: "label_uniq_1447840366487", tableName: "job", unique: "true") {
 			column(name: "label")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-126") {
-		createIndex(indexName: "name_uniq_1447946152081", tableName: "job_group", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-126") {
+		createIndex(indexName: "name_uniq_1447840366489", tableName: "job_group", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-127") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-127") {
 		createIndex(indexName: "FK4CA1B9942DF50285", tableName: "job_group_graphite_server") {
 			column(name: "job_group_graphite_servers_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-128") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-128") {
 		createIndex(indexName: "FK4CA1B994379962F9", tableName: "job_group_graphite_server") {
 			column(name: "graphite_server_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-129") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-129") {
 		createIndex(indexName: "FK9E05EADFBD7A3DD2", tableName: "job_result") {
 			column(name: "job_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-130") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-130") {
 		createIndex(indexName: "date_idx", tableName: "job_result") {
 			column(name: "date")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-131") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-131") {
 		createIndex(indexName: "testId_and_jobConfigLabel_idx", tableName: "job_result") {
 			column(name: "job_config_label")
 
@@ -1912,37 +1914,37 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-132") {
-		createIndex(indexName: "name_uniq_1447946152084", tableName: "job_set", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-132") {
+		createIndex(indexName: "name_uniq_1447840366494", tableName: "job_set", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-133") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-133") {
 		createIndex(indexName: "FK57A1BBDE53EF1C72", tableName: "job_set_job") {
 			column(name: "job_set_jobs_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-134") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-134") {
 		createIndex(indexName: "FK57A1BBDEBD7A3DD2", tableName: "job_set_job") {
 			column(name: "job_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-135") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-135") {
 		createIndex(indexName: "FK714F9FB521FF13B0", tableName: "location") {
 			column(name: "browser_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-136") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-136") {
 		createIndex(indexName: "FK714F9FB530E63F61", tableName: "location") {
 			column(name: "wpt_server_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-137") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-137") {
 		createIndex(indexName: "unique_unique_identifier_for_server", tableName: "location", unique: "true") {
 			column(name: "browser_id")
 
@@ -1952,31 +1954,31 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-138") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-138") {
 		createIndex(indexName: "FKBDF2FE1AA7B46FE", tableName: "measured_event") {
 			column(name: "tested_page_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-139") {
-		createIndex(indexName: "name_uniq_1447946152086", tableName: "measured_event", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-139") {
+		createIndex(indexName: "name_uniq_1447840366496", tableName: "measured_event", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-140") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-140") {
 		createIndex(indexName: "FKCC54EB8154D6F18", tableName: "measured_value") {
 			column(name: "interval_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-141") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-141") {
 		createIndex(indexName: "FKCC54EB877896741", tableName: "measured_value") {
 			column(name: "aggregator_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-142") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-142") {
 		createIndex(indexName: "started_and_iVal_and_aggr_and_tag_idx", tableName: "measured_value") {
 			column(name: "aggregator_id")
 
@@ -1988,251 +1990,251 @@ databaseChangeLog = {
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-143") {
-		createIndex(indexName: "name_uniq_1447946152089", tableName: "page", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-143") {
+		createIndex(indexName: "name_uniq_1447840366500", tableName: "page", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-144") {
-		createIndex(indexName: "authority_uniq_1447946152090", tableName: "role", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-144") {
+		createIndex(indexName: "authority_uniq_1447840366501", tableName: "role", unique: "true") {
 			column(name: "authority")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-145") {
-		createIndex(indexName: "label_uniq_1447946152090", tableName: "script", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-145") {
+		createIndex(indexName: "label_uniq_1447840366502", tableName: "script", unique: "true") {
 			column(name: "label")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-146") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-146") {
 		createIndex(indexName: "FKED13118373976C8C", tableName: "script_page") {
 			column(name: "page_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-147") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-147") {
 		createIndex(indexName: "FK7C35D6D45A3B441D", tableName: "tag_links") {
 			column(name: "tag_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-148") {
-		createIndex(indexName: "name_uniq_1447946152091", tableName: "tags", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-148") {
+		createIndex(indexName: "name_uniq_1447840366503", tableName: "tags", unique: "true") {
 			column(name: "name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-149") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-149") {
 		createIndex(indexName: "FKF3A5125173976C8C", tableName: "time_to_cs_mapping") {
 			column(name: "page_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-150") {
-		createIndex(indexName: "username_uniq_1447946152092", tableName: "user", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-150") {
+		createIndex(indexName: "username_uniq_1447840366505", tableName: "user", unique: "true") {
 			column(name: "username")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-151") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-151") {
 		createIndex(indexName: "FK143BF46A6DDCBBCB", tableName: "user_role") {
 			column(name: "user_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-152") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-152") {
 		createIndex(indexName: "FK143BF46AC8B1F7EB", tableName: "user_role") {
 			column(name: "role_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-153") {
-		createIndex(indexName: "dashboard_name_uniq_1447946152093", tableName: "userspecific_csi_dashboard", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-153") {
+		createIndex(indexName: "dashboard_name_uniq_1447840366506", tableName: "userspecific_csi_dashboard", unique: "true") {
 			column(name: "dashboard_name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-154") {
-		createIndex(indexName: "dashboard_name_uniq_1447946152096", tableName: "userspecific_event_result_dashboard", unique: "true") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-154") {
+		createIndex(indexName: "dashboard_name_uniq_1447840366508", tableName: "userspecific_event_result_dashboard", unique: "true") {
 			column(name: "dashboard_name")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-155") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-155") {
 		createIndex(indexName: "FK297D11DE57993D8B", tableName: "web_performance_waterfall_waterfall_entry") {
 			column(name: "web_performance_waterfall_waterfall_entries_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-156") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-156") {
 		createIndex(indexName: "FK297D11DE903CE91E", tableName: "web_performance_waterfall_waterfall_entry") {
 			column(name: "waterfall_entry_id")
 		}
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-52") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-52") {
 		addForeignKeyConstraint(baseColumnNames: "browser_id", baseTableName: "browser_alias", constraintName: "FKA552267921FF13B0", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "browser", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-53") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-53") {
 		addForeignKeyConstraint(baseColumnNames: "browser_id", baseTableName: "browser_connectivity_weight", constraintName: "FK214D5E6921FF13B0", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "browser", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-54") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-54") {
 		addForeignKeyConstraint(baseColumnNames: "connectivity_id", baseTableName: "browser_connectivity_weight", constraintName: "FK214D5E6948295CD", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "connectivity_profile", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-55") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-55") {
 		addForeignKeyConstraint(baseColumnNames: "point_one_id", baseTableName: "cs_target_graph", constraintName: "FKACA5788F81E39E01", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "cs_target_value", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-56") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-56") {
 		addForeignKeyConstraint(baseColumnNames: "point_two_id", baseTableName: "cs_target_graph", constraintName: "FKACA5788F8AEF385B", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "cs_target_value", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-57") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-57") {
 		addForeignKeyConstraint(baseColumnNames: "page_id", baseTableName: "customer_frustration", constraintName: "FKF51108AC73976C8C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "page", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-58") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-58") {
 		addForeignKeyConstraint(baseColumnNames: "event_job_groups_id", baseTableName: "event_job_group", constraintName: "FK6DCCE818826DED2C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "event", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-59") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-59") {
 		addForeignKeyConstraint(baseColumnNames: "job_group_id", baseTableName: "event_job_group", constraintName: "FK6DCCE81848E56BA7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-60") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-60") {
 		addForeignKeyConstraint(baseColumnNames: "connectivity_profile_id", baseTableName: "event_result", constraintName: "FK3CA8116263699C23", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "connectivity_profile", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-61") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-61") {
 		addForeignKeyConstraint(baseColumnNames: "job_result_id", baseTableName: "event_result", constraintName: "FK3CA81162F0C41D41", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_result", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-62") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-62") {
 		addForeignKeyConstraint(baseColumnNames: "measured_event_id", baseTableName: "event_result", constraintName: "FK3CA81162CD0C7439", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "measured_event", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-63") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-63") {
 		addForeignKeyConstraint(baseColumnNames: "web_performance_waterfall_id", baseTableName: "event_result", constraintName: "FK3CA811623AA7BDEF", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "web_performance_waterfall", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-64") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-64") {
 		addForeignKeyConstraint(baseColumnNames: "graphite_event_source_path_job_groups_id", baseTableName: "graphite_event_source_path_job_group", constraintName: "FK6A94D76F1B04519E", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_event_source_path", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-65") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-65") {
 		addForeignKeyConstraint(baseColumnNames: "job_group_id", baseTableName: "graphite_event_source_path_job_group", constraintName: "FK6A94D76F48E56BA7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-66") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-66") {
 		addForeignKeyConstraint(baseColumnNames: "measurand_id", baseTableName: "graphite_path", constraintName: "FK2FE067F8103BD51A", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "aggregator_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-67") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-67") {
 		addForeignKeyConstraint(baseColumnNames: "graphite_event_source_path_id", baseTableName: "graphite_server_graphite_event_source_path", constraintName: "FK66653A3AC5F66B1", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_event_source_path", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-68") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-68") {
 		addForeignKeyConstraint(baseColumnNames: "graphite_server_graphite_event_source_paths_id", baseTableName: "graphite_server_graphite_event_source_path", constraintName: "FK66653A3AE190E8F6", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_server", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-69") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-69") {
 		addForeignKeyConstraint(baseColumnNames: "graphite_path_id", baseTableName: "graphite_server_graphite_path", constraintName: "FKBDE6F5CF259A1B79", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_path", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-70") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-70") {
 		addForeignKeyConstraint(baseColumnNames: "graphite_server_graphite_paths_id", baseTableName: "graphite_server_graphite_path", constraintName: "FKBDE6F5CFE3F0D20B", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_server", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-71") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-71") {
 		addForeignKeyConstraint(baseColumnNames: "job_result_id", baseTableName: "http_archive", constraintName: "FK86FC880BF0C41D41", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_result", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-72") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-72") {
 		addForeignKeyConstraint(baseColumnNames: "connectivity_profile_id", baseTableName: "job", constraintName: "FK19BBD63699C23", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "connectivity_profile", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-73") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-73") {
 		addForeignKeyConstraint(baseColumnNames: "job_group_id", baseTableName: "job", constraintName: "FK19BBD48E56BA7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-74") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-74") {
 		addForeignKeyConstraint(baseColumnNames: "location_id", baseTableName: "job", constraintName: "FK19BBDC7666564", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "location", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-75") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-75") {
 		addForeignKeyConstraint(baseColumnNames: "script_id", baseTableName: "job", constraintName: "FK19BBD984F552E", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "script", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-76") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-76") {
 		addForeignKeyConstraint(baseColumnNames: "graphite_server_id", baseTableName: "job_group_graphite_server", constraintName: "FK4CA1B994379962F9", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_server", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-77") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-77") {
 		addForeignKeyConstraint(baseColumnNames: "job_group_graphite_servers_id", baseTableName: "job_group_graphite_server", constraintName: "FK4CA1B9942DF50285", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-78") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-78") {
 		addForeignKeyConstraint(baseColumnNames: "job_id", baseTableName: "job_result", constraintName: "FK9E05EADFBD7A3DD2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-79") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-79") {
 		addForeignKeyConstraint(baseColumnNames: "job_id", baseTableName: "job_set_job", constraintName: "FK57A1BBDEBD7A3DD2", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-80") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-80") {
 		addForeignKeyConstraint(baseColumnNames: "job_set_jobs_id", baseTableName: "job_set_job", constraintName: "FK57A1BBDE53EF1C72", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_set", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-81") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-81") {
 		addForeignKeyConstraint(baseColumnNames: "browser_id", baseTableName: "location", constraintName: "FK714F9FB521FF13B0", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "browser", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-82") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-82") {
 		addForeignKeyConstraint(baseColumnNames: "wpt_server_id", baseTableName: "location", constraintName: "FK714F9FB530E63F61", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "web_page_test_server", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-83") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-83") {
 		addForeignKeyConstraint(baseColumnNames: "tested_page_id", baseTableName: "measured_event", constraintName: "FKBDF2FE1AA7B46FE", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "page", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-84") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-84") {
 		addForeignKeyConstraint(baseColumnNames: "aggregator_id", baseTableName: "measured_value", constraintName: "FKCC54EB877896741", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "aggregator_type", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-85") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-85") {
 		addForeignKeyConstraint(baseColumnNames: "interval_id", baseTableName: "measured_value", constraintName: "FKCC54EB8154D6F18", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "measured_value_interval", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-86") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-86") {
 		addForeignKeyConstraint(baseColumnNames: "page_id", baseTableName: "script_page", constraintName: "FKED13118373976C8C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "page", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-87") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-87") {
 		addForeignKeyConstraint(baseColumnNames: "tag_id", baseTableName: "tag_links", constraintName: "FK7C35D6D45A3B441D", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "tags", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-88") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-88") {
 		addForeignKeyConstraint(baseColumnNames: "page_id", baseTableName: "time_to_cs_mapping", constraintName: "FKF3A5125173976C8C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "page", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-89") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-89") {
 		addForeignKeyConstraint(baseColumnNames: "role_id", baseTableName: "user_role", constraintName: "FK143BF46AC8B1F7EB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "role", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-90") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-90") {
 		addForeignKeyConstraint(baseColumnNames: "user_id", baseTableName: "user_role", constraintName: "FK143BF46A6DDCBBCB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "user", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-91") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-91") {
 		addForeignKeyConstraint(baseColumnNames: "waterfall_entry_id", baseTableName: "web_performance_waterfall_waterfall_entry", constraintName: "FK297D11DE903CE91E", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "waterfall_entry", referencesUniqueColumn: "false")
 	}
 
-	changeSet(author: "nkuhn (generated)", id: "1447946152150-92") {
+	changeSet(author: "nkuhn (generated)", id: "1447840366560-92") {
 		addForeignKeyConstraint(baseColumnNames: "web_performance_waterfall_waterfall_entries_id", baseTableName: "web_performance_waterfall_waterfall_entry", constraintName: "FK297D11DE57993D8B", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "web_performance_waterfall", referencesUniqueColumn: "false")
 	}
 }
