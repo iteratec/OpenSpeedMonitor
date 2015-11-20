@@ -51,7 +51,8 @@
                                      'MeasuredEventController',
                                      'OsmConfigurationController',
                                      'PageController',
-                                     'UserspecificDashboardController',
+                                     'UserspecificCsiDashboardController',
+                                     'UserspecificEventResultDashboardController',
                                      'WebPageTestServerController'].contains(c?.fullName?.substring(c?.fullName?.lastIndexOf('.') + 1))}">
                                     <li class="controller"><g:link
                                             controller="${c.logicalPropertyName}">${c?.fullName?.substring(c?.fullName?.lastIndexOf('.') + 1)}</g:link></li>

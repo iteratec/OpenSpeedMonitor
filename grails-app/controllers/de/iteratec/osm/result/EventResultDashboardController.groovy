@@ -209,10 +209,29 @@ class EventResultDashboardController {
         dashboardValues.selectedBrowsers.each { l -> selectedBrowsers.add(Long.parseLong(l)) }
         Collection<Long> selectedLocations = []
         dashboardValues.selectedLocations.each { l -> selectedLocations.add(Long.parseLong(l)) }
+
         Collection<String> selectedAggrGroupValuesCached = []
-        dashboardValues.selectedAggrGroupValuesCached.each { l -> selectedAggrGroupValuesCached.add(l) }
+        // String or List<String>
+        def valuesCached = dashboardValues.selectedAggrGroupValuesCached
+        if (valuesCached) {
+            if (valuesCached.class == String) {
+                selectedAggrGroupValuesCached.add(valuesCached)
+            } else {
+                valuesCached.each { l -> selectedAggrGroupValuesCached.add(l) }
+            }
+        }
+
         Collection<String> selectedAggrGroupValuesUnCached = []
-        dashboardValues.selectedAggrGroupValuesUnCached.each { l -> selectedAggrGroupValuesUnCached.add(l) }
+        // String or List<String>
+        def valuesUnCached = dashboardValues.selectedAggrGroupValuesUnCached
+        if (valuesUnCached) {
+            if (valuesUnCached.class == String) {
+                selectedAggrGroupValuesUnCached.add(valuesUnCached)
+            } else {
+                valuesUnCached.each { l -> selectedAggrGroupValuesUnCached.add(l) }
+            }
+        }
+
         Collection<Long> selectedConnectivityProfiles = []
         dashboardValues.selectedConnectivityProfiles.each { l -> selectedConnectivityProfiles.add(Long.parseLong(l)) }
 
