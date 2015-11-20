@@ -11,7 +11,7 @@ function createMatrixView(data, chartDivIdentifier) {
     var divWidth = parseInt(div.style("width"), 10);
 
     // Define margins, width and height
-    var margin = {top: 100, right: 100, bottom: 50, left: 100},
+    var margin = {top: 150, right: 100, bottom: 50, left: 100},
         width = divWidth - margin.right,
         tileSize = width / data.columnNames.length,
         tilePadding = 3,
@@ -111,7 +111,7 @@ function createMatrixView(data, chartDivIdentifier) {
         .attr("dx", ".5em")
         .attr("dy", "1em")
         .style("text-anchor", "start")
-        .attr("transform", "rotate(-90)" );
+        .attr("transform", "rotate(-45)" );
     svg.append("g")
         .attr("class", "yAxisMatrix")
         .call(yAxis);
