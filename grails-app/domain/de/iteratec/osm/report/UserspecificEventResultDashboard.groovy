@@ -452,7 +452,7 @@ class UserspecificEventResultDashboard {
                         link += "&selectedLocations=" + item
                     }
                 }
-                link += "&_action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
+                link += "&action_showAll=Show&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
                 if (board.wideScreenDiagramMontage == true) {
@@ -494,12 +494,13 @@ class UserspecificEventResultDashboard {
                 if (board.trimAboveRequestSizes != null) {
                     link += board.trimAboveRequestSizes
                 }
+                link += "&_includeNativeConnectivity="
                 if(board.includeNativeConnectivity == true) {
                     link += "&includeNativeConnectivity=on"
                 }
-                link += "&selectedAllConnectivityProfiles="
+                link += "&_selectedAllConnectivityProfiles="
                 if(board.selectedAllConnectivityProfiles == true) {
-                    link += "on"
+                    link += "&selectedAllConnectivityProfiles=on"
                 }
                 link += "&customConnectivityName="
                 if(board.customConnectivityName != null){
@@ -510,9 +511,9 @@ class UserspecificEventResultDashboard {
                         link += "&selectedConnectivityProfiles=" + item
                     }
                 }
-                link += "&includeCustomConnectivity="
+                link += "&_includeCustomConnectivity="
                 if(board.includeCustomConnectivity == true) {
-                    link += "on"
+                    link += "&includeCustomConnectivity=on"
                 }
 
 
