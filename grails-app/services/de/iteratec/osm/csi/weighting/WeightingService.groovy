@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi.weighting
 
+import de.iteratec.osm.csi.BrowserConnectivityWeight
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.transaction.Transactional
 
 import org.joda.time.DateTime
@@ -135,6 +137,19 @@ class WeightingService {
 				return 0
 			}else{
 				weight *= browser.weight
+			}
+		}
+		if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
+			Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
+			ConnectivityProfile connectivityProfile = csiValue.retrieveConnectivityProfile()
+			if(browser == null || connectivityProfile == null) {
+				return 0
+			}else {
+				Double browserConnectivityWeight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivityProfile).weight
+				if(browserConnectivityWeight == null || browserConnectivityWeight <= 0) {
+					return 0
+				}
+				weight *= browserConnectivityWeight
 			}
 		}
 		if (weightFactors.contains(WeightFactor.PAGE)) {

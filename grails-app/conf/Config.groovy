@@ -117,54 +117,55 @@ grails.plugin.springsecurity.interceptUrlMap = [
 //////////////////////////////////////////////////////////////////
 //free for all (even guests not logged in)
 //////////////////////////////////////////////////////////////////
-'/static/**'                                  : ["permitAll"],
-'/static/*'                                   : ["permitAll"],
-'/css/**'                                     : ["permitAll"],
-'/js/**'                                      : ["permitAll"],
-'/images/**'                                  : ["permitAll"],
-'/less/**'                                    : ["permitAll"],
-'/'                                           : ["permitAll"],
-'/proxy/**'                                   : ["permitAll"],
-'/wptProxy/**'                                : ["permitAll"],
-'/csiDashboard/index'                         : ["permitAll"],
-'/csiDashboard/showAll'                       : ["permitAll"],
-'/csiDashboard/csiValuesCsv'                  : ["permitAll"],
-'/csiDashboard/showDefault'                   : ["permitAll"],
-'/csiDashboard/weights'                       : ["permitAll"],
-'/csiDashboard/downloadBrowserWeights'        : ["permitAll"],
-'/csiDashboard/downloadPageWeights'           : ["permitAll"],
-'/csiDashboard/downloadHourOfDayWeights'      : ["permitAll"],
-'/eventResultDashboard/**'                    : ["permitAll"],
-'/tabularResultPresentation/**'                             : ["permitAll"],
-'/highchartPointDetails/**'                   : ["permitAll"],
-'/rest/**'                                    : ["permitAll"],
-'/login/**'                                   : ["permitAll"],
-'/logout/**'                                  : ["permitAll"],
-'/job/list'                                   : ["permitAll"],
-'/job/saveJobSet'                             : ["permitAll"],
-'/job/getRunningAndRecentlyFinishedJobs'      : ["permitAll"],
-'/job/nextExecution'                          : ["permitAll"],
-'/job/getLastRun'                             : ["permitAll"],
-'/script/list'                                : ["permitAll"],
-'/queueStatus/list'                           : ["permitAll"],
-'/queueStatus/refresh'                        : ["permitAll"],
-'/jobSchedule/schedules'                      : ["permitAll"],
-'/connectivityProfile/list'                   : ["permitAll"],
-'/about'                                      : ["permitAll"],
-'/cookie/**'                                  : ["permitAll"],
-'/csiDashboard/storeCustomDashboard'          : ["permitAll"],
-'/csiDashboard/validateDashboardName'         : ["permitAll"],
-'/csiDashboard/validateAndSaveDashboardValues': ["permitAll"],
-'/i18n/getAllMessages'                        : ["permitAll"],
+'/static/**'                                      : ["permitAll"],
+'/static/*'                                       : ["permitAll"],
+'/css/**'                                         : ["permitAll"],
+'/js/**'                                          : ["permitAll"],
+'/images/**'                                      : ["permitAll"],
+'/less/**'                                        : ["permitAll"],
+'/'                                               : ["permitAll"],
+'/proxy/**'                                       : ["permitAll"],
+'/wptProxy/**'                                    : ["permitAll"],
+'/csiDashboard/index'                             : ["permitAll"],
+'/csiDashboard/showAll'                           : ["permitAll"],
+'/csiDashboard/csiValuesCsv'                      : ["permitAll"],
+'/csiDashboard/showDefault'                       : ["permitAll"],
+'/csiDashboard/weights'                           : ["permitAll"],
+'/csiDashboard/downloadBrowserWeights'            : ["permitAll"],
+'/csiDashboard/downloadPageWeights'               : ["permitAll"],
+'/csiDashboard/downloadHourOfDayWeights'          : ["permitAll"],
+'/csiDashboard/downloadBrowserConnectivityWeights': ["permitAll"],
+'/eventResultDashboard/**'                        : ["permitAll"],
+'/tabularResultPresentation/**'                   : ["permitAll"],
+'/highchartPointDetails/**'                       : ["permitAll"],
+'/rest/**'                                        : ["permitAll"],
+'/login/**'                                       : ["permitAll"],
+'/logout/**'                                      : ["permitAll"],
+'/job/list'                                       : ["permitAll"],
+'/job/saveJobSet'                                 : ["permitAll"],
+'/job/getRunningAndRecentlyFinishedJobs'          : ["permitAll"],
+'/job/nextExecution'                              : ["permitAll"],
+'/job/getLastRun'                                 : ["permitAll"],
+'/script/list'                                    : ["permitAll"],
+'/queueStatus/list'                               : ["permitAll"],
+'/queueStatus/refresh'                            : ["permitAll"],
+'/jobSchedule/schedules'                          : ["permitAll"],
+'/connectivityProfile/list'                       : ["permitAll"],
+'/about'                                          : ["permitAll"],
+'/cookie/**'                                      : ["permitAll"],
+'/csiDashboard/storeCustomDashboard'              : ["permitAll"],
+'/csiDashboard/validateDashboardName'             : ["permitAll"],
+'/csiDashboard/validateAndSaveDashboardValues'    : ["permitAll"],
+'/i18n/getAllMessages'                            : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////
-'/console/**'                                 : ['ROLE_SUPER_ADMIN'],
-'/apiKey/**'                                  : ['ROLE_SUPER_ADMIN'],
+'/console/**'                                     : ['ROLE_SUPER_ADMIN'],
+'/apiKey/**'                                      : ['ROLE_SUPER_ADMIN'],
 //////////////////////////////////////////////////////////////////
 //ADMIN or SUPER_ADMIN log in
 //////////////////////////////////////////////////////////////////
-'/**'                                         : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
+'/**'                                             : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
 ]
 
 /*
@@ -190,7 +191,7 @@ grails.assets.excludes = ["openspeedmonitor.less"]
 grails.assets.minifyJs = true
 grails.assets.minifyCss = true
 
-grails.i18n.locales = ['en','de']
+grails.i18n.locales = ['en', 'de']
 
 grails.plugin.databasemigration.updateOnStart = true
 grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
@@ -207,9 +208,10 @@ environments {
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
         grails.plugin.console.enabled = true
-        grails.plugin.console.fileStore.remote.enabled = false // Whether to include the remote file store functionality. Default is true.
+        grails.plugin.console.fileStore.remote.enabled = false
+        // Whether to include the remote file store functionality. Default is true.
 
-        grails.assets.bundle=true
+        grails.assets.bundle = true
 
         log4j = {
 

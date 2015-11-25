@@ -452,7 +452,7 @@ class UserspecificEventResultDashboard {
                         link += "&selectedLocations=" + item
                     }
                 }
-                link += "&action_showAll=Show&overwriteWarningAboutLongProcessingTime=on"
+                link += "&action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
                 if (board.wideScreenDiagramMontage == true) {

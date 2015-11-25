@@ -113,7 +113,6 @@ class TimeToCsMappingService {
 				throw new IllegalArgumentException("Percentrank couldn't be calculated for Page '${page.name}'")
 			}
 			rank = smaller / (smaller + bigger)
-//			TODOmarcus hier hab ich was gemacht
 			return (1 - rank) * 100
 		}else{
 			throw new IllegalArgumentException("No customerFrustrationLoadtimes found for Page '${page.name}'")

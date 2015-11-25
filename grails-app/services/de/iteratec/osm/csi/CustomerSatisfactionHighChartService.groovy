@@ -208,7 +208,6 @@ class CustomerSatisfactionHighChartService {
 	}
 
     double formatPercentage(value){
-//		todomarcus hier hab ich was gemacht
         BigDecimal valueForRounding = new BigDecimal(value.value)
         return valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
     }

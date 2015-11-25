@@ -23,5 +23,5 @@ package de.iteratec.osm.csi.weighting;
  *
  */
 public enum WeightFactor {
-	PAGE, HOUROFDAY, BROWSER
+	PAGE, HOUROFDAY, BROWSER, BROWSER_CONNECTIVITY_COMBINATION
 }

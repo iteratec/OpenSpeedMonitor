@@ -115,11 +115,37 @@
 </div>
 <section id="list" class="first">
 
-    <h4><g:message code="de.iteratec.isocsi.browser_weight" default="Browser"/></h4>
+    <g:if test="${errorMessagesCsi}">
+        <ul>
+            <g:each var="errMessage" in="${errorMessagesCsi ?}"><li class="text-error">${errMessage}</li></g:each>
+        </ul>
+    </g:if>
+
+    <h4><g:message code="de.iteratec.isocsi.browser_connectivity_weight" default="BrowserConnectivity"/></h4>
+    <br/>
     %{-- Begin diagram view--}%
     <iteratec:matrixView
             chartIdentifier="browserConnectivityMatrixView"/>
     %{--End diagram View--}%
+    <g:link action="downloadBrowserConnectivityWeights"><g:message code="de.iteratec.isocsi.csi.csvdownload"
+                                                       default="CSV-Download"/></g:link>
+
+    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+        <g:uploadForm action="uploadBrowserConnectivityWeights">
+            <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv" style="display:none">
+
+            <div class="input-append">
+                <label><g:message code="de.iteratec.ism.label.upload_new_browser_connectivity_weights"
+                                  default="Neue Browser-Verbindung-Gewichtung hochladen (csv)"/></label>
+                <input id="theBrowserConnectivityCsvFileTwitter" class="input-large" type="text">
+                <a class="btn" onclick="$('input[id=theBrowserConnectivityCsvFile]').click();"><g:message
+                        code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/></a>
+                <button type="submit" class="btn"><g:message code="de.iteratec.isocsi.upload_file"
+                                                             default="Hochladen"/></button>
+            </div>
+        </g:uploadForm>
+    </sec:ifAllGranted>
+    <h4><g:message code="de.iteratec.isocsi.browser_weight" default="Browser"/></h4>
     <table class="table table-bordered">
         <tbody>
         <tr>
@@ -140,11 +166,7 @@
     </table>
     <g:link action="downloadBrowserWeights"><g:message code="de.iteratec.isocsi.csi.csvdownload"
                                                        default="CSV-Download"/></g:link>
-    <g:if test="${errorMessagesCsi}">
-        <ul>
-            <g:each var="errMessage" in="${errorMessagesCsi ?}"><li class="text-error">${errMessage}</li></g:each>
-        </ul>
-    </g:if>
+
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
         <g:uploadForm action="uploadBrowserWeights">
             <input id="theBrowserCsvFile" type="file" name="browserCsv" style="display:none">
@@ -232,6 +254,9 @@
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
     <asset:script type="text/javascript">
+        $('input[id=theBrowserConnectivityCsvFile]').change(function() {
+            $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
+        });
         $('input[id=theBrowserCsvFile]').change(function() {
             $('#theBrowserCsvFileTwitter').val($(this).val());
         });

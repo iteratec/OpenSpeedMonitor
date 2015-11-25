@@ -980,6 +980,19 @@ class CsiDashboardController {
         response.outputStream << builder.toString()
     }
 
+    def downloadBrowserConnectivityWeights() {
+        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
+        response.setHeader("Content-disposition",
+                "attachment; filename=${dtFormater.print(new DateTime())}browser_connectivity_weights.csv")
+        response.contentType = "text/csv"
+        StringBuilder builder = new StringBuilder()
+        builder.append('browser;connectivity;weight\n')
+        BrowserConnectivityWeight.findAll().each {
+            builder.append("${it.browser.name};${it.connectivity.name};${it.weight}\n")
+        }
+        response.outputStream << builder.toString()
+    }
+
     def downloadPageWeights() {
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
@@ -1056,6 +1069,17 @@ class CsiDashboardController {
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER, csv.getInputStream())
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER, csv.getInputStream())
+        }
+        CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
+        redirect(action: 'weights',
+                params: [errorMessagesCsi: errorMessagesCsiValidation])
+    }
+
+    def uploadBrowserConnectivityWeights() {
+        MultipartFile csv = request.getFile('browserConnectivityCsv')
+        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
+        if (!errorMessagesCsiValidation) {
+            customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
         }
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
         redirect(action: 'weights',

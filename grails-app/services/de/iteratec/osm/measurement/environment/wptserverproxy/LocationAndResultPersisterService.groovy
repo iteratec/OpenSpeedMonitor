@@ -332,8 +332,6 @@ class LocationAndResultPersisterService implements iListener{
 		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, 
 		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor) {
 
-		jobRun.getJob().getConnectivityProfile()
-
 		EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
         result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)

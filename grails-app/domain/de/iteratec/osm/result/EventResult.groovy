@@ -282,6 +282,11 @@ class EventResult implements CsiValue {
 	}
 
 	@Override
+	ConnectivityProfile retrieveConnectivityProfile() {
+		return this.connectivityProfile
+	}
+
+	@Override
 	public List<Long> retrieveUnderlyingEventResultIds() {
 		return [this.id]
 	}
