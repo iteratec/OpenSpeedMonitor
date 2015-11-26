@@ -237,20 +237,14 @@ class EventResult implements CsiValue {
 	}
 
 	static mapping = {
-		jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
+
+		jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx,GetLimitedMedianEventResultsBy')
 		jobResultJobConfigId(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		medianValue(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		cachedView(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
-		tag(index: 'EventResultTagIndex')
-
-
-		jobResultDate(index: 'GetLimitedMedianEventResultsBy')
-		tag(index: 'GetLimitedMedianEventResultsBy')
-		medianValue(index: 'GetLimitedMedianEventResultsBy')
-		cachedView(index: 'GetLimitedMedianEventResultsBy')
-        connectivityProfile(index: 'GetLimitedMedianEventResultsBy')
 
         noTrafficShapingAtAll(defaultValue: false)
+
 	}
 
 	static transients = ['csiRelevant', 'osmConfigCacheService']

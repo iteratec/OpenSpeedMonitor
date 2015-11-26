@@ -250,6 +250,7 @@ class Job implements Taggable {
         noTrafficShapingAtAll defaultValue: false
         customConnectivityProfile defaultValue: false
         persistNonMedianResults defaultValue: '1'
+        label(index: 'label_idx')
     }
 
     def beforeValidate() {
