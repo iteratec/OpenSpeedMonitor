@@ -102,11 +102,10 @@ class MeasuredValue implements CsiValue {
     }
     static mapping = {
         resultIds(type: 'text')
-        started(index: 'started_and_iVal_and_aggr_and_tag_idx')
-        interval(index: 'started_and_iVal_and_aggr_and_tag_idx')
-        aggregator(index: 'started_and_iVal_and_aggr_and_tag_idx')
-        tag(index: 'started_and_iVal_and_aggr_and_tag_idx')
-        closedAndCalculated(defaultValue: false)
+        closedAndCalculated(defaultValue: false, index: 'closedAndCalculated_and_started_idx')
+        started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx')
+        interval(index: 'started_and_iVal_and_aggr_idx')
+        aggregator(index: 'started_and_iVal_and_aggr_idx')
     }
 
     /**

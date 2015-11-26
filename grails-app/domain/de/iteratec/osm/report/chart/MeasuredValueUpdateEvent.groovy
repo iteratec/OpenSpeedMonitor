@@ -67,6 +67,7 @@ class MeasuredValueUpdateEvent {
 	
 	
     static mapping = {
+        measuredValueId(index: 'measuredValueId_idx')
     }
     
 	static constraints = {
