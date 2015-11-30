@@ -392,7 +392,7 @@ class UserspecificEventResultDashboard {
     def getListOfAvailableDashboards() {
         List result = []
         List fullList = []
-        fullList = UserspecificEventResultDashboard.findAll()
+        fullList = UserspecificEventResultDashboard.findAll().sort{it.dashboardName}
 
         String currentUser = ""
         if (springSecurityService.isLoggedIn()) {

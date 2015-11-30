@@ -316,7 +316,7 @@ class UserspecificCsiDashboard {
     def getListOfAvailableDashboards() {
         List result = []
         List fullList = []
-        fullList = UserspecificCsiDashboard.findAll()
+        fullList = UserspecificCsiDashboard.findAll().sort {it.dashboardName}
 
         String currentUser = ""
         if (springSecurityService.isLoggedIn()) {
