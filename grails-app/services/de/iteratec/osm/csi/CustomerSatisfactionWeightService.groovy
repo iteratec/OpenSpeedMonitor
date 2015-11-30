@@ -114,6 +114,9 @@ class CustomerSatisfactionWeightService {
                     correct = false
                 }
             }
+            else {
+                log.error("Validation for class " + classes[i] + " not implemented yet")
+            }
         }
 
         return correct

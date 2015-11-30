@@ -131,14 +131,6 @@ class WeightingService {
 				weight *= hourofdayWeight
 			}
 		}
-		if (weightFactors.contains(WeightFactor.BROWSER)) {
-			Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
-			if (browser == null || browser.weight == null || browser.weight <= 0) {
-				return 0
-			}else{
-				weight *= browser.weight
-			}
-		}
 		if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
 			Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
 			ConnectivityProfile connectivityProfile = csiValue.retrieveConnectivityProfile()
