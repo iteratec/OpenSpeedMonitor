@@ -145,68 +145,13 @@
             </div>
         </g:uploadForm>
     </sec:ifAllGranted>
-    <h4><g:message code="de.iteratec.isocsi.browser_weight" default="Browser"/></h4>
-    <table class="table table-bordered">
-        <tbody>
-        <tr>
-            <td class="text-info"><strong><g:message code="de.iteratec.isocsi.browser_weight"
-                                                     default="Browser"/></strong></td>
-            <g:each var="browser" in="${browsers ?}">
-                <td>${browser.name}</td>
-            </g:each>
-        </tr>
-        <tr>
-            <td class="text-info"><strong><g:message code="de.iteratec.isocsi.weight" default="Gewichtung"/></strong>
-            </td>
-            <g:each var="browser" in="${browsers ?}">
-                <td>${browser.weight}</td>
-            </g:each>
-        </tr>
-        </tbody>
-    </table>
-    <g:link action="downloadBrowserWeights"><g:message code="de.iteratec.isocsi.csi.csvdownload"
-                                                       default="CSV-Download"/></g:link>
-
-    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-        <g:uploadForm action="uploadBrowserWeights">
-            <input id="theBrowserCsvFile" type="file" name="browserCsv" style="display:none">
-
-            <div class="input-append">
-                <label><g:message code="de.iteratec.ism.label.upload_new_browser_weights"
-                                  default="Neue Browser-Gewichtung hochladen (csv)"/></label>
-                <input id="theBrowserCsvFileTwitter" class="input-large" type="text">
-                <a class="btn" onclick="$('input[id=theBrowserCsvFile]').click();"><g:message
-                        code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/></a>
-                <button type="submit" class="btn"><g:message code="de.iteratec.isocsi.upload_file"
-                                                             default="Hochladen"/></button>
-            </div>
-        </g:uploadForm>
-    </sec:ifAllGranted>
     <hr/>
     <h4><g:message code="de.iteratec.isocsi.page_weight" default="Page"/></h4>
     %{-- Begin diagram view--}%
     <iteratec:treemap
             chartIdentifier="pageWeightTreemap"/>
     %{--End diagram View--}%
-    <table class="table table-bordered">
-        <tbody>
-        <tr>
-            <td class="text-info"><strong><g:message code="de.iteratec.isocsi.page_weight" default="Page"/></strong>
-            </td>
-            <g:each var="page" in="${pages ?}">
-                <td>${page.name}</td>
-            </g:each>
-        </tr>
-        <tr>
-            <td class="text-info"><strong><g:message code="de.iteratec.isocsi.weight" default="Gewichtung"/></strong>
-            </td>
-            <g:each var="page" in="${pages ?}">
-                <td>${page.weight}</td>
-            </g:each>
-        </tr>
-        </tbody>
-    </table>
-    <g:link action="downloadPageWeights"><g:message code="de.iteratec.isocsi.csi.csvdownload"
+        <g:link action="downloadPageWeights"><g:message code="de.iteratec.isocsi.csi.csvdownload"
                                                     default="CSV-Download"/></g:link>
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
         <g:uploadForm action="uploadPageWeights">

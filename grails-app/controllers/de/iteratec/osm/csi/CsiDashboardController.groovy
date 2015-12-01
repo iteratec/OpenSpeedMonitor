@@ -1054,25 +1054,10 @@ class CsiDashboardController {
         HourOfDay.findAll().each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
         def barChartJSON = barChartData as JSON
 
-        [browsers        : browserDaoService.findAll(),
-         pages           : pageDaoService.findAll(),
-         // FIXME Change to use a DAO
-         hoursOfDay      : HourOfDay.findAll(),
-         errorMessagesCsi: params.list('errorMessagesCsi'),
+        [errorMessagesCsi: params.list('errorMessagesCsi'),
          matrixViewData  : matrixViewDataJSON,
          treemapData     : treemapDataJSON,
          barchartData    : barChartJSON]
-    }
-
-    def uploadBrowserWeights() {
-        MultipartFile csv = request.getFile('browserCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER, csv.getInputStream())
-        }
-        CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
     def uploadBrowserConnectivityWeights() {
