@@ -159,6 +159,6 @@ function makeValidString(input) {
     var result = input.trim();
 
     result = result.replace(" ", "");
-    result = result.replace(/\.|\_|\#|\,/g, "");
+    result = result.replace(/\.|\_|\#|\,|\-|\s/g, "");
     return result;
 }

@@ -987,9 +987,17 @@ class CsiDashboardController {
         response.contentType = "text/csv"
         StringBuilder builder = new StringBuilder()
         builder.append('browser;connectivity;weight\n')
-        BrowserConnectivityWeight.findAll().each {
-            builder.append("${it.browser.name};${it.connectivity.name};${it.weight}\n")
+        Browser.findAll().each {browser ->
+            ConnectivityProfile.findAll().each { connectivity ->
+                BrowserConnectivityWeight weight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivity)
+                if(weight) {
+                    builder.append("${browser.name};${connectivity.name};${weight.weight}\n")
+                } else {
+                    builder.append("${browser.name};${connectivity.name};\n")
+                }
+            }
         }
+
         response.outputStream << builder.toString()
     }
 

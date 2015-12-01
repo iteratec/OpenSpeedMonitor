@@ -101,8 +101,6 @@ class CustomerSatisfactionWeightService {
         boolean correct = true
         List tokenized = line.tokenize(";")
 
-        if (tokenized.size() != columnCount)
-            correct = false
 
         for (int i = 0; i < classes.size(); i++) {
             if (classes[i] == String.class) {
@@ -110,11 +108,10 @@ class CustomerSatisfactionWeightService {
                     correct = false
                 }
             } else if (classes[i] == Double.class || classes[i] == Float.class) {
-                if (!tokenized[i].isNumber()) {
+                if (tokenized[i] && !tokenized[i].isNumber()) {
                     correct = false
                 }
-            }
-            else {
+            } else {
                 log.error("Validation for class " + classes[i] + " not implemented yet")
             }
         }
@@ -156,16 +153,16 @@ class CustomerSatisfactionWeightService {
         List<String> errorMessages = []
 
         // exclude header row
-        for(int i = 1; i < lines.size(); ++i) {
+        for (int i = 1; i < lines.size(); ++i) {
             List<String> tokenize = lines[i].tokenize(';')
 
             Browser browser = Browser.findByName(tokenize[0])
             ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(tokenize[1])
 
-            if(browser == null) {
+            if (browser == null) {
                 errorMessages.add(i18nService.msg("de.iteratec.osm.csi.csvErrors.browserDoesNotExist", "browser nicht vorhanden", [tokenize[0]]))
             }
-            if(connectivityProfile == null) {
+            if (connectivityProfile == null) {
                 errorMessages.add(i18nService.msg("de.iteratec.osm.csi.csvErrors.connectivityDoesNotExist", "verbindung nicht vorhanden", [tokenize[1]]))
             }
         }
@@ -230,13 +227,17 @@ class CustomerSatisfactionWeightService {
                 ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(tokenized[1])
 
                 BrowserConnectivityWeight browserConnectivityWeight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivityProfile)
-                if (browserConnectivityWeight) {
-                    log.info("update browser-connectivity-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${tokenized[2]}")
-                    browserConnectivityWeight.weight = Double.valueOf(tokenized[2])
-                    browser.save(failOnError: true)
-                } else {
-                    log.info("save new browser-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${tokenized[2]}")
-                    new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(tokenized[2])).save(failOnError: true)
+
+                if (tokenized[2]) {
+                    double newWeight = Double.parseDouble(tokenized[2])
+                    if (browserConnectivityWeight) {
+                        log.info("update browser-connectivity-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
+                        browserConnectivityWeight.weight = Double.valueOf(newWeight)
+                        browser.save(failOnError: true)
+                    } else {
+                        log.info("save new browser-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
+                        new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(newWeight)).save(failOnError: true)
+                    }
                 }
             }
             lineCounter++

@@ -62,7 +62,7 @@ class CustomerSatisfactionWeightServiceTests {
         File csvFalse = new File("test/resources/CsiData/BROWSER_weights_should_fail.csv")
         List<String> errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.BROWSER, new FileInputStream(csvFalse))
         assertNotNull(errorMessages)
-        assertEquals(2, errorMessages.size())
+        assertEquals(1, errorMessages.size())
 
         csvFalse = new File("test/resources/CsiData/PAGE_weights_should_fail.csv")
         errorMessages = serviceUnderTest.validateWeightCsv(WeightFactor.PAGE, new FileInputStream(csvFalse))
