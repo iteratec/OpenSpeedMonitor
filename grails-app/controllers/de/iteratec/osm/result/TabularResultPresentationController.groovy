@@ -90,7 +90,6 @@ class TabularResultPresentationController {
                 if (cmd instanceof ListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
                             ((ListResultsCommand)cmd).createMvQueryParams(),
-                            ((ListResultsCommand)cmd),
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
