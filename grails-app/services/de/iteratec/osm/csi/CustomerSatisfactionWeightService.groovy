@@ -238,6 +238,10 @@ class CustomerSatisfactionWeightService {
                         log.info("save new browser-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
                         new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(newWeight)).save(failOnError: true)
                     }
+                } else {
+                    if(browserConnectivityWeight) {
+                        browserConnectivityWeight.delete(flush: true)
+                    }
                 }
             }
             lineCounter++

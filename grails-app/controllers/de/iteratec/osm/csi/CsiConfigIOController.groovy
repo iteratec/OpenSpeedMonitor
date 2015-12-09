@@ -122,7 +122,8 @@ class CsiConfigIOController {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER, csv.getInputStream())
         }
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
-        redirect(action: 'weights',
+        redirect(controller: 'CsiDashboard',
+                action: 'weights',
                 params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
@@ -133,7 +134,8 @@ class CsiConfigIOController {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
         }
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
-        redirect(action: 'weights',
+        redirect(controller: 'CsiDashboard',
+                action: 'weights',
                 params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
@@ -143,7 +145,8 @@ class CsiConfigIOController {
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream())
         }
-        redirect(action: 'weights',
+        redirect(controller: 'CsiDashboard',
+                action: 'weights',
                 params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
@@ -153,7 +156,8 @@ class CsiConfigIOController {
         if (!errorMessagesCsiValidation) {
             customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream())
         }
-        redirect(action: 'weights',
+        redirect(controller: 'CsiDashboard',
+                action: 'weights',
                 params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
