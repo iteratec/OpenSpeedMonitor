@@ -15,9 +15,13 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.csi
+package de.iteratec.osm.csi.transformation
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.CsiTransformation
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
 
 class TimeToCsMappingService {
 	
@@ -129,8 +133,6 @@ class TimeToCsMappingService {
 		return timeToCsMappingCacheService.getCustomerFrustrations(page)
 	}
 
-    public Boolean can
-	
 	/**
 	 * Checks whether more than one different frustration timings exist for given {@link Page} page.
 	 * @param page

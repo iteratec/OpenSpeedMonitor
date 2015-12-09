@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.csi
+package de.iteratec.osm
 
 import org.joda.time.DateTime
 import org.joda.time.Duration

@@ -50,3 +50,7 @@ testorder*.txt
 
 #ignore  dataSource-Config
 OpenSpeedMonitor-config.groovy
+
+test/resources/CsiData/TimeToCsMapping/private_timeToCsMappings.csv
+test/resources/CsiData/TimeToCsMapping/private_expectedValues.csv
+test/resources/CsiData/TimeToCsMapping/private_customerFrustrations.csv

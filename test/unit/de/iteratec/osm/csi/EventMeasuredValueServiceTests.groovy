@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfigCacheService
+
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
 import grails.test.mixin.*

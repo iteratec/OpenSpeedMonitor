@@ -17,17 +17,13 @@
 
 package de.iteratec.osm.api
 
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.api.json.JSONLocationBox
-import de.iteratec.osm.api.json.JSONNameBox
 import de.iteratec.osm.api.json.Result
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.Job
@@ -42,15 +38,12 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
-import org.codehaus.groovy.grails.web.json.JSONArray
-import org.joda.time.format.DateTimeFormat
 
 import javax.persistence.NoResultException
 

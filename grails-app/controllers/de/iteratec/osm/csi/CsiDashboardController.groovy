@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.weighting.WeightFactor
+import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -50,7 +50,6 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -79,7 +78,6 @@ class CsiDashboardController {
     I18nService i18nService
 
     EventResultService eventResultService
-    CustomerSatisfactionWeightService customerSatisfactionWeightService
     CustomerSatisfactionHighChartService customerSatisfactionHighChartService
     CsiHelperService csiHelperService
     MeasuredValueUtilService measuredValueUtilService
@@ -87,6 +85,8 @@ class CsiDashboardController {
     EventService eventService
     def springSecurityService
     ConnectivityProfileDaoService connectivityProfileDaoService
+    DefaultTimeToCsMappingService defaultTimeToCsMappingService
+
     /**
      * The Grails engine to generate links.
      *
@@ -967,70 +967,8 @@ class CsiDashboardController {
         return result
     }
 
-    def downloadBrowserWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}browser_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('name;weight\n')
-        browserDaoService.findAll().each {
-            builder.append("${it.name};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
-
-    def downloadBrowserConnectivityWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}browser_connectivity_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('browser;connectivity;weight\n')
-        Browser.findAll().each {browser ->
-            ConnectivityProfile.findAll().each { connectivity ->
-                BrowserConnectivityWeight weight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivity)
-                if(weight) {
-                    builder.append("${browser.name};${connectivity.name};${weight.weight}\n")
-                } else {
-                    builder.append("${browser.name};${connectivity.name};\n")
-                }
-            }
-        }
-
-        response.outputStream << builder.toString()
-    }
-
-    def downloadPageWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}page_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('name;weight\n')
-        pageDaoService.findAll().each {
-            builder.append("${it.name};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
-
-    def downloadHourOfDayWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}HourOfDays_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('fullHour;weight\n')
-        // FIXME Change to use a DAO
-        HourOfDay.list().each {
-            builder.append("${it.fullHour};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
-
     def weights() {
-        CsiDashboardController.log.info("params=$params")
-        //		List<String> params.errorMessagesCsi instanceof String?[params.errorMessagesCsi]:params.errorMessagesCsi
+        log.debug("params=$params")
 
         //Labels for charts
         String zeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.zeroWeightLabel", "Pages ohne Gewichtung")
@@ -1062,41 +1000,13 @@ class CsiDashboardController {
         HourOfDay.findAll().each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
         def barChartJSON = barChartData as JSON
 
+        MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
+
         [errorMessagesCsi: params.list('errorMessagesCsi'),
          matrixViewData  : matrixViewDataJSON,
          treemapData     : treemapDataJSON,
-         barchartData    : barChartJSON]
-    }
-
-    def uploadBrowserConnectivityWeights() {
-        MultipartFile csv = request.getFile('browserConnectivityCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
-        }
-        CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
-    }
-
-    def uploadPageWeights() {
-        MultipartFile csv = request.getFile('pageCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.PAGE, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream())
-        }
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
-    }
-
-    def uploadHourOfDayWeights() {
-        MultipartFile csv = request.getFile('hourOfDayCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.HOUROFDAY, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream())
-        }
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
+         barchartData    : barChartJSON,
+         defaultTimeToCsMappings: defaultTimeToCsMappingsChart as JSON]
     }
 
     /**
