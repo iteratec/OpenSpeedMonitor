@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfigCacheService
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.MeasuredValueDaoService

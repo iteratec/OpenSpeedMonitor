@@ -28,7 +28,7 @@ import org.springframework.transaction.TransactionStatus
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location

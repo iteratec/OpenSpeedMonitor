@@ -114,11 +114,6 @@
             </li>
 
             <div class="btn-group">
-                <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                               default="Dashboard-Ansicht ausw&auml;hlen"/>
-                    <span class="caret"></span>
-                </a>
                 <ul class="dropdown-menu">
                     <g:set var="availableDashboards"
                            value="${userspecificCSIDashboardService.getListOfAvailableDashboards()}"/>
@@ -146,8 +141,8 @@
                         code="de.iteratec.isocsi.csi.linktext.staticDashboard" default="Statische Ansicht"/></g:link>
             </li>
             <li class="controller ${actionName.equals('weights') ? 'active' : ''}">
-                <g:link controller="csiDashboard" action="weights"><i class="fa fa-tasks"></i> <g:message
-                        code="de.iteratec.isocsi.weight" default="Gewichtung"/></g:link>
+                <g:link controller="csiDashboard" action="weights"><i class="fa fa-gears"></i> <g:message
+                        code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>
             </li>
         </g:elseif>
     </ul>

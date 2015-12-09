@@ -15,9 +15,15 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.csi
+package de.iteratec.osm.csi.transformation
 
+import de.iteratec.osm.csi.DefaultTimeToCsMapping
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.d3Data.MultiLineChart
+import de.iteratec.osm.d3Data.MultiLineChartLineData
 import de.iteratec.osm.report.chart.RickshawHtmlCreater
+import de.iteratec.osm.util.I18nService
 
 /**
  * DefaultTimeToCsMappingService
@@ -28,6 +34,7 @@ class DefaultTimeToCsMappingService {
     static transactional = false
 
     TimeToCsMappingCacheService timeToCsMappingCacheService
+    I18nService i18nService
 
     List<DefaultTimeToCsMapping> getAll() {
         return DefaultTimeToCsMapping.list()
@@ -71,5 +78,26 @@ class DefaultTimeToCsMappingService {
 
     def translateDefaultMappingsToJson(List<DefaultTimeToCsMapping> mappings){
         return new RickshawHtmlCreater().transformCSIMappingData(mappings)
+    }
+
+    MultiLineChart getDefaultMappingsAsChart(int maxLoadTime) {
+        String xLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.xAxisLabel", "ms")
+        String yLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.yAxisLabel", "Kundenzufriedenheit in %")
+        MultiLineChart multiLineChart = new MultiLineChart(xLabel: xLabel, yLabel: yLabel)
+
+        List<DefaultTimeToCsMapping> defaultTimeToCsMappings = getAll().findAll { it.loadTimeInMilliSecs <= maxLoadTime }
+        Map<String, MultiLineChartLineData> map = new HashMap<>()
+
+        defaultTimeToCsMappings.each { entry ->
+            if (!map.containsKey(entry.name)) {
+                map.put(entry.name, new MultiLineChartLineData(name: entry.name))
+            }
+            map.get(entry.name).addDataPoint(entry.loadTimeInMilliSecs, entry.customerSatisfactionInPercent)
+        }
+
+        // sort and add
+        map.values().sort{a,b -> a.name.compareTo(b.name)}.each{e -> multiLineChart.addLine(e)}
+
+        return multiLineChart
     }
 }

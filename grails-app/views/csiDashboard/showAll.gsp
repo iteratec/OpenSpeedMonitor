@@ -48,6 +48,16 @@
 <body>
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
+<%-- user specific dashboards --%>
+<div class="row">
+    <div class="span12">
+        <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+            <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                       default="Dashboard-Ansicht ausw&auml;hlen"/>
+            <span class="caret"></span>
+        </a>
+    </div>
+</div>
 <%-- Überschrift --%>
 <div class="row">
     <div class="span12">

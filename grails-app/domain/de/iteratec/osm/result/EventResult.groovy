@@ -19,7 +19,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
-import de.iteratec.osm.csi.OsmConfigCacheService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 
 

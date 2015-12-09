@@ -18,11 +18,14 @@
 package de.iteratec.osm.util
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
+import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
@@ -398,13 +401,13 @@ class ServiceMocker {
 	}
 
 	/**
-	 * Mocks methods of {@link de.iteratec.osm.csi.TimeToCsMappingCacheService}.
+	 * Mocks methods of {@link de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService}.
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param timeToCsMappings
-	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getMappings()}.
+	 * 		To be returned from method {@link de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService#getMappings()}.
 	 * @param frustrations
-	 * 		To be returned from method {@link de.iteratec.osm.csi.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
+	 * 		To be returned from method {@link de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
 	 */
 	void mockTimeToCsMappingService(serviceToMockIn, timeToCsMappings, frustrations){
 		def timeToCsMappingCacheService = mockFor(TimeToCsMappingCacheService)
@@ -419,7 +422,7 @@ class ServiceMocker {
 		serviceToMockIn.timeToCsMappingCacheService = timeToCsMappingCacheService.createMock()
 	}
 	/**
-	 * Mocks methods of {@link de.iteratec.osm.csi.TimeToCsMappingService}. The methods do not deliver
+	 * Mocks methods of {@link de.iteratec.osm.csi.transformation.TimeToCsMappingService}. The methods do not deliver
 	 * sensible return values. Using tests should not depend on these values!
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
