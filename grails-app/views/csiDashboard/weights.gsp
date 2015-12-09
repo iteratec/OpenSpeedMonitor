@@ -130,8 +130,8 @@
 <div class="row">
     <div class="span12">
         <div class="btn-group" data-toggle="buttons-radio">
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping" onclick="$('#csi-mapping').show();$('#csi-weights').hide();">Mapping CSI</button>
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights" onclick="$('#csi-mapping').hide();$('#csi-weights').show();">Gewichtung CSI</button>
+            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping" onclick="$('#csi-mapping').show();$('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton" default="Weights CSI"/></button>
+            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights" onclick="$('#csi-mapping').hide();$('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton" default="Mapping CSI"/></button>
         </div>
     </div>
 </div>
