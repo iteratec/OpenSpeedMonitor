@@ -409,10 +409,10 @@ class ServiceMocker {
 	void mockTimeToCsMappingService(serviceToMockIn, timeToCsMappings, frustrations){
 		def timeToCsMappingCacheService = mockFor(TimeToCsMappingCacheService)
 
-		timeToCsMappingCacheService.demand.getMappingsFor(0..25) {Page page ->
+		timeToCsMappingCacheService.demand.getMappingsFor(0..100000) {Page page ->
 			return timeToCsMappings
 		}
-		timeToCsMappingCacheService.demand.getCustomerFrustrations(0..25) {Page page ->
+		timeToCsMappingCacheService.demand.getCustomerFrustrations(0..100000) {Page page ->
 			return frustrations
 		}
 		

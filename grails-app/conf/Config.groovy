@@ -33,7 +33,7 @@ grails.databinding.dateFormats = [
  * 	in the classpath in ConfigSlurper format
  */
 if (System.properties["osm_config_location"]) {
-    log.info('system property for external configuration found')
+    log.info('sytem property for external configuration found')
     grails.config.locations = ["file:" + System.properties["osm_config_location"]]
 } else {
     grails.config.locations = [
