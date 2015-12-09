@@ -21,7 +21,9 @@ package de.iteratec.osm.csi
 class HourOfDay {
 	int fullHour
 	Double weight
-	
+
+	static belongsTo = [CsiConfiguration]
+
 	static constraints = {
 		fullHour(unique:true, min:0, max:23)
 	}
