@@ -26,6 +26,8 @@ class PageWeight {
     Page page
     double weight
 
+    static belongsTo = [CsiConfiguration]
+
     static mapping = {
     }
 
