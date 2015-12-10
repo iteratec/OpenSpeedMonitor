@@ -111,6 +111,9 @@ class TimeToCsMappingService {
 		Integer smaller
 		Integer bigger
 		if(frustrationLoadtimesForPage){
+            log.debug("getCustomerSatisfactionPercentRank: page=${page}")
+            log.debug("getCustomerSatisfactionPercentRank: class of frustration load times=${frustrationLoadtimesForPage.getClass()}")
+            log.debug("getCustomerSatisfactionPercentRank: count of frustration load times=${frustrationLoadtimesForPage.size()}")
 			smaller = frustrationLoadtimesForPage.findAll{it<docReadyTimeInMilliSecs}.size() 
 			bigger = frustrationLoadtimesForPage.findAll{it>docReadyTimeInMilliSecs}.size()
 			if (smaller+bigger==0) {
@@ -139,7 +142,7 @@ class TimeToCsMappingService {
 	 * @return true if more than one different frustration timings exist for given {@link Page} page. false otherwise. false if page is null or undefinde page, too.
 	 */
 	public Boolean validFrustrationsExistFor(Page page){
-		return isValid(page) && getCachedFrustrations(page).unique().size()>1
+		return isValid(page) && getCachedFrustrations(page).unique(false).size()>1
 	}
 
     public Boolean validMappingsExistFor(Page page){

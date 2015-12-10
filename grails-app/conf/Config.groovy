@@ -271,7 +271,7 @@ environments {
                         fileName: "logs/${appNameForLog4jConfig}Details.log",
                         layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         maxFileSize: '20MB',
-                        maxBackupIndex: 5,
+                        maxBackupIndex: 10,
                         threshold: org.apache.log4j.Level.DEBUG
                 )
                 appender rollingFileAppender
