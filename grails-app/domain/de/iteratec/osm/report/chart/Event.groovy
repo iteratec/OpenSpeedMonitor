@@ -48,7 +48,7 @@ class Event {
     def beforeValidate() {
         //
         shortName = removeCharacter(shortName)
-        description = removeCharacter(shortName)
+        description = removeCharacter(description)
     }
     /**
      * Remove all html tags, because we don't want arbitrary links to get injected into the gui of osm.

@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import grails.converters.JSON
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -61,7 +62,7 @@ class CsiConfigIOController {
         Browser.findAll().each { browser ->
             ConnectivityProfile.findAll().each { connectivity ->
                 BrowserConnectivityWeight weight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivity)
-                if(weight) {
+                if (weight) {
                     builder.append("${browser.name};${connectivity.name};${weight.weight}\n")
                 } else {
                     builder.append("${browser.name};${connectivity.name};\n")
@@ -99,7 +100,7 @@ class CsiConfigIOController {
         response.outputStream << builder.toString()
     }
 
-    def downloadDefaultTimeToCsMappings(){
+    def downloadDefaultTimeToCsMappings() {
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}defaultTimeToCsMappings.csv")
@@ -124,7 +125,8 @@ class CsiConfigIOController {
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
         redirect(controller: 'CsiDashboard',
                 action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
+                params: [errorMessagesCsi: errorMessagesCsiValidation,
+                         showCsiWeights  : true])
     }
 
     def uploadBrowserConnectivityWeights() {
@@ -136,7 +138,8 @@ class CsiConfigIOController {
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
         redirect(controller: 'CsiDashboard',
                 action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
+                params: [errorMessagesCsi: errorMessagesCsiValidation,
+                         showCsiWeights  : true])
     }
 
     def uploadPageWeights() {
@@ -147,7 +150,8 @@ class CsiConfigIOController {
         }
         redirect(controller: 'CsiDashboard',
                 action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
+                params: [errorMessagesCsi: errorMessagesCsiValidation,
+                         showCsiWeights  : true])
     }
 
     def uploadHourOfDayWeights() {
@@ -158,11 +162,26 @@ class CsiConfigIOController {
         }
         redirect(controller: 'CsiDashboard',
                 action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
+                params: [errorMessagesCsi: errorMessagesCsiValidation,
+                         showCsiWeights  : true])
     }
 
-    def uploadDefaultTimeToCsMappings(){
-        
+    def uploadDefaultTimeToCsMappings() {
+        MultipartFile csv = request.getFile('defaultTimeToCsMappingCsv')
+        customerSatisfactionWeightService.persistNewDefaultMapping(csv.inputStream)
+
+        redirect(controller: 'CsiDashboard',
+                action: 'weights')
+    }
+
+    def getNamesOfDefaultCsiMappings() {
+        Set<String> names = DefaultTimeToCsMapping.withCriteria {
+            projections {
+                distinct("name")
+            }
+        }
+
+        render names as JSON
     }
 
 }

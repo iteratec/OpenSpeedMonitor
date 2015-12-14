@@ -28,10 +28,18 @@
 //= require_self
 function PostLoaded(dataFromGsp){
 
-    this.i18n_duplicatePrompt = dataFromGsp.i18n_duplicatePrompt
-    this.i18n_duplicateSuffix = dataFromGsp.i18n_duplicateSuffix
-    this.deletionConfirmMessage = dataFromGsp.deletionConfirmMessage
-    this.idOfItemToDelete = dataFromGsp.idOfItemToDelete
+    this.i18n_duplicatePrompt = dataFromGsp.i18n_duplicatePrompt;
+    this.i18n_duplicateSuffix = dataFromGsp.i18n_duplicateSuffix;
+    this.deletionConfirmMessage = dataFromGsp.deletionConfirmMessage;
+    this.idOfItemToDelete = dataFromGsp.idOfItemToDelete;
+    this.getNamesOfDefaultMappings = dataFromGsp.getNamesOfDefaultMappings;
+    this.overwritingWarning = dataFromGsp.overwritingWaring;
+    this.loadTimeIntegerError = dataFromGsp.loadTimeIntegerError;
+    this.customerFrustrationDoubleError = dataFromGsp.customerFrustrationDoubleError;
+    this.defaultMappingFormatError = dataFromGsp.defaultMappingFormatError;
+    this.defaultMappingNotAllvaluesError = dataFromGsp.defaultMappingNotAllvaluesError;
+    this.customerSatisfactionNotInPercentError = dataFromGsp.customerSatisfactionNotInPercentError;
+    this.percentagesBetween0And1Error = dataFromGsp.percentagesBetween0And1Error;
 
     this.postloadInit = function(){
 

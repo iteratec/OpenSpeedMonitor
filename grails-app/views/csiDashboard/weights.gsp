@@ -5,121 +5,136 @@
     <title>CSI CheckDashboard</title>
     <style>
     %{--Styles for MatrixView--}%
-        .xAxisMatrix path,
-        .xAxisMatrix line,
-        .yAxisMatrix path,
-        .yAxisMatrix line {
-            fill: none;
-            shape-rendering: inherit;
-        }
-        .xAxisMatrix text,
-        .yAxisMatrix text {
-            font-size: 12px;
-        }
-        .matrixViewAxisLabel {
-            font-weight: bold;
-        }
+    .xAxisMatrix path,
+    .xAxisMatrix line,
+    .yAxisMatrix path,
+    .yAxisMatrix line {
+        fill: none;
+        shape-rendering: inherit;
+    }
+
+    .xAxisMatrix text,
+    .yAxisMatrix text {
+        font-size: 12px;
+    }
+
+    .matrixViewAxisLabel {
+        font-weight: bold;
+    }
+
     %{--Styles for BarChart--}%
-        .barRect {
-            fill: steelblue;
-        }
-        .barRect:hover {
-            fill: orange;
-        }
-        .chart .axisLabel {
-            fill: black;
-            text-anchor: end;
-            font-weight: bold;
-        }
-        .xAxis path,
-        .xAxis line,
-        .yAxis path,
-        .yAxis line {
-            fill: none;
-            stroke: black;
-            shape-rendering: inherit;
-        }
+    .barRect {
+        fill: steelblue;
+    }
 
-        /*Styles for the clocks*/
-        svg.clock {
-            stroke-linecap: round;
-        }
-        .minutetick.face {
-            stroke-width: 1;
-        }
-        .hand {
-            stroke: #336;
-            stroke-width: 2;
-        }
-        .clockBorder {
-            fill: #e1e1e1;
-            stroke: black;
-        }
+    .barRect:hover {
+        fill: orange;
+    }
 
-        /*Styles for Treemap*/
-        .node {
-            overflow: hidden;
-            position: absolute;
-        }
+    .chart .axisLabel {
+        fill: black;
+        text-anchor: end;
+        font-weight: bold;
+    }
 
-        .browserText {
-            fill: black;
-            font-weight: bold;
-            stroke-width: 0px;
-        }
+    .xAxis path,
+    .xAxis line,
+    .yAxis path,
+    .yAxis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: inherit;
+    }
 
-        .filterBox li {
-            margin-left: 15px;
+    /*Styles for the clocks*/
+    svg.clock {
+        stroke-linecap: round;
+    }
 
-        }
+    .minutetick.face {
+        stroke-width: 1;
+    }
 
-        #tooltipMatrixView,
-        #tooltip {
-            position: absolute;
-            width: auto;
-            height: auto;
-            padding: 10px;
-            background-color: white;
-            -webkit-border-radius: 10px;
-            -moz-border-radius: 10px;
-            border-radius: 10px;
-            -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-            -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-            pointer-events: none;
-        }
-        #tooltipMatrixView.hidden,
-        #tooltip.hidden {
-            display: none;
-        }
-        #tooltipMatrixView p,
-        #tooltip p {
-            margin: 0;
-            font-family: sans-serif;
-            font-size: 16px;
-            line-height: 20px;
-        }
-        %{--Styles for multi line chart--}%
-        .axis path,
-        .axis line {
-            fill: none;
-            stroke: black;
-            shape-rendering: crisp-edges ;
-        }
-        .line {
-            fill: none;
-            stroke-width: 2px;
-        }
-        .verticalLine,
-        .horizontalLine {
-            opacity: 0.3;
-            stroke-dasharray: 3,3;
-            stroke: blue;
-        }
-        .xTextContainer,
-        .tooltipTextContainer{
-            opacity: 0.5;
-        }
+    .hand {
+        stroke: #336;
+        stroke-width: 2;
+    }
+
+    .clockBorder {
+        fill: #e1e1e1;
+        stroke: black;
+    }
+
+    /*Styles for Treemap*/
+    .node {
+        overflow: hidden;
+        position: absolute;
+    }
+
+    .browserText {
+        fill: black;
+        font-weight: bold;
+        stroke-width: 0px;
+    }
+
+    .filterBox li {
+        margin-left: 15px;
+
+    }
+
+    #tooltipMatrixView,
+    #tooltip {
+        position: absolute;
+        width: auto;
+        height: auto;
+        padding: 10px;
+        background-color: white;
+        -webkit-border-radius: 10px;
+        -moz-border-radius: 10px;
+        border-radius: 10px;
+        -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+    }
+
+    #tooltipMatrixView.hidden,
+    #tooltip.hidden {
+        display: none;
+    }
+
+    #tooltipMatrixView p,
+    #tooltip p {
+        margin: 0;
+        font-family: sans-serif;
+        font-size: 16px;
+        line-height: 20px;
+    }
+
+    %{--Styles for multi line chart--}%
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crisp-edges;
+    }
+
+    .line {
+        fill: none;
+        stroke-width: 2px;
+    }
+
+    .verticalLine,
+    .horizontalLine {
+        opacity: 0.3;
+        stroke-dasharray: 3, 3;
+        stroke: blue;
+    }
+
+    .xTextContainer,
+    .tooltipTextContainer {
+        opacity: 0.5;
+    }
     </style>
 </head>
 
@@ -130,8 +145,12 @@
 <div class="row">
     <div class="span12">
         <div class="btn-group" data-toggle="buttons-radio">
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping" onclick="$('#csi-mapping').show();$('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton" default="Weights CSI"/></button>
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights" onclick="$('#csi-mapping').hide();$('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton" default="Mapping CSI"/></button>
+            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping" onclick="$('#csi-mapping').show();
+            $('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton"
+                                                  default="Weights CSI"/></button>
+            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights" onclick="$('#csi-mapping').hide();
+            $('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton"
+                                                  default="Mapping CSI"/></button>
         </div>
     </div>
 </div>
@@ -148,10 +167,14 @@
 
     <hr/>
 
-    <h3>
-        <span class="muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
-        <g:message code="de.iteratec.isocsi.browser_connectivity_weight" default="BrowserConnectivity"/>
-    </h3>
+    <div class="row">
+        <div class="span12">
+            <h3>
+                <span class="muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
+                <g:message code="de.iteratec.isocsi.browser_connectivity_weight" default="BrowserConnectivity"/>
+            </h3>
+        </div>
+    </div>
     <g:link controller="csiConfigIO" action="downloadBrowserConnectivityWeights">
         <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
     </g:link>
@@ -194,7 +217,7 @@
             <div class="input-append">
                 <label>
                     <g:message code="de.iteratec.ism.label.upload_new_page_weights"
-                                  default="Neue Page-Gewichtung hochladen (csv)"/>
+                               default="Neue Page-Gewichtung hochladen (csv)"/>
                 </label>
                 <input id="thePageCsvFileTwitter" class="input-large" type="text">
                 <a class="btn" onclick="$('input[id=thePageCsvFile]').click();">
@@ -226,7 +249,7 @@
             <div class="input-append">
                 <label>
                     <g:message code="de.iteratec.ism.label.upload_new_hourofday_weights"
-                                  default="Neue Tageszeit-Gewichtung hochladen (csv)"/>
+                               default="Neue Tageszeit-Gewichtung hochladen (csv)"/>
                 </label>
                 <input id="theHourOfDayCsvFileTwitter" class="input-large" type="text">
                 <a class="btn" onclick="$('input[id=theHourOfDayCsvFile]').click();">
@@ -247,68 +270,83 @@
 
 <%-- csi mapping ---------------------------------------------------------------------------%>
 
-<div id="csi-mapping">
-    <div class="row">
-        <div class="span12">
-            <h3>
-                <span class="muted"><g:message code="de.iteratec.osm.csi.mapping.label" default="Mapping"/>:&nbsp;</span>
-                <g:message code="de.iteratec.osm.csi.configuration.mapping.heading" default="Mapping Load time&nbsp;&rArr;&nbsp;Customer satisfaction"/>
-            </h3>
-        </div>
+<div id="csi-mapping"></div>
+
+<div class="alert" id="warnAboutOverwritingBox">
+    <strong><g:message
+            code="de.iteratec.osm.defaults.confirmationMessage"/></strong>
+
+    <p id="warningsOverwriting">
+    </p>
+
+</div>
+
+<div class="alert alert-error" id="errorBoxDefaultMappingCsv">
+    <strong><g:message
+            code="de.iteratec.osm.csi.csvErrors.title"/></strong>
+
+    <p id="defaultMappingCsvErrors">
+    </p>
+
+</div>
+<hr/>
+
+<div class="row">
+    <div class="span12">
+        <h3>
+            <span class="muted"><g:message code="de.iteratec.osm.csi.mapping.label"
+                                           default="Mapping"/>:&nbsp;</span>
+            <g:message code="de.iteratec.osm.csi.configuration.mapping.heading"
+                       default="Mapping Load time&nbsp;&rArr;&nbsp;Customer satisfaction"/>
+        </h3>
     </div>
+</div>
+<div id="spinner-position"></div>
+<div class="row">
+    <div class="span12">
+        <g:link controller="csiConfigIO" action="downloadDefaultTimeToCsMappings">
+            <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
+        </g:link>
+        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+            <g:uploadForm controller="csiConfigIO" action="uploadDefaultTimeToCsMappings">
+                <input id="defaultTimeToCsMappingCsvFile" type="file" name="defaultTimeToCsMappingCsv"
+                       style="display:none">
 
-    %{--TODO: Implement visualisation of csi mapping by page (for complete csi configuration)--}%
+                <div class="input-append">
+                    <label>
+                        <g:message code="de.iteratec.ism.label.upload_new_hourofday_weights"
+                                   default="Neue Tageszeit-Gewichtung hochladen (csv)"/>
+                    </label>
+                    <input id="defaultTimeToCsMappingCsvFileVisible" class="input-large" type="text">
+                    <a class="btn" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
+                        <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
+                    </a>
+                    <button type="submit" class="btn" id="defaultMappingUploadButton" onclick="showSpinner()">
+                        <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
+                    </button>
+                </div>
+            </g:uploadForm>
+        </sec:ifAllGranted>
+    </div>
+</div>
 
-    %{--<div class="row">--}%
-        %{--<div class="span12">--}%
-            %{--<h4 class="text-info"><g:message code="de.iteratec.osm.csi.weights.per-page.label" default="Per Page"/></h4>--}%
-        %{--</div>--}%
-    %{--</div>--}%
-    %{--<g:render template="/chart/csi-mappings"--}%
-              %{--model="${['chartData': defaultTimeToCsMappings, 'chartIdentifier': 'csi_mappings_pages',--}%
-                        %{--'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,--}%
-                        %{--'yAxisTopOffset': 8, 'bottomOffsetLegend': 220, 'modal': true]}" />--}%
-
-    <div class="row">
-        <div class="span12">
-            <span class="inline">
-                <span class="text-info">
-                    <strong><g:message code="de.iteratec.osm.default.heading" default="Defaults"/></strong>
-                </span>
-                &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.explanation" default="These Mappings can be assigned to pages"/>
+<div class="row">
+    <div class="span12">
+        <span class="inline">
+            <span class="text-info">
+                <strong><g:message code="de.iteratec.osm.default.heading" default="Defaults"/></strong>
             </span>
-        </div>
+            &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.explanation"
+                                    default="These Mappings can be assigned to pages"/>
+        </span>
     </div>
-    <g:render template="/chart/csi-mappings"
-              model="${['chartData': defaultTimeToCsMappings, 'chartIdentifier': 'default_csi_mappings',
-                        'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                        'yAxisTopOffset': 8, 'bottomOffsetLegend': 220, 'modal': true]}" />
-    <div class="row">
-        <div class="span12">
-            <g:link controller="csiConfigIO" action="downloadDefaultTimeToCsMappings">
-                <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-            </g:link>
-            <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-                <g:uploadForm controller="csiConfigIO" action="uploadDefaultTimeToCsMappings">
-                    <input id="defaultTimeToCsMappingCsvFile" type="file" name="defaultTimeToCsMappingCsv" style="display:none">
+</div>
 
-                    <div class="input-append">
-                        <label>
-                            <g:message code="de.iteratec.ism.label.upload_new_hourofday_weights"
-                                          default="Neue Tageszeit-Gewichtung hochladen (csv)"/>
-                        </label>
-                        <input id="defaultTimeToCsMappingCsvFileVisible" class="input-large" type="text">
-                        <a class="btn" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
-                            <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
-                        </a>
-                        <button type="submit" class="btn">
-                            <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
-                        </button>
-                    </div>
-                </g:uploadForm>
-            </sec:ifAllGranted>
-        </div>
-    </div>
+<g:render template="/chart/csi-mappings"
+          model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': 'default_csi_mappings',
+                    'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                    'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+
 </div>
 
 <%-- include bottom ---------------------------------------------------------------------------%>
@@ -317,6 +355,7 @@
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
+    <asset:javascript src="csidashboard/defaultMappingCsvValidator.js"/>
     <asset:script type="text/javascript">
 
         var registerEventHandlersForFileUploadControls = function(){
@@ -358,9 +397,52 @@
             createBarChart(1000, 750, ${barchartData},"clocks", "hoursOfDayBarchart");
 
             registerEventHandlers();
-            $("#btn-csi-mapping").click();
+
+            $("#warnAboutOverwritingBox").hide();
+            $("#errorBoxDefaultMappingCsv").hide();
+            $("#defaultMappingUploadButton").prop("disabled", true);
+            if(${showCsiWeights}) {
+                $("#btn-csi-weights").click();
+            } else {
+                $("#btn-csi-mapping").click();
+            }
 
         });
+
+        $('#defaultTimeToCsMappingCsvFile').bind('change', function() {
+            $("#warnAboutOverwritingBox").hide();
+            $("#errorBoxDefaultMappingCsv").hide();
+            $("#defaultMappingUploadButton").prop("disabled", true);
+
+            validateDefaultMappingCsv(this.files[0])
+        });
+
+        function showSpinner () {
+            var spinner = startSpinner(document.getElementById('spinner-position'));
+            return true;
+        }
+
+         function startSpinner(spinnerElement){
+            var opts = {
+                lines: 15, // The number of lines to draw
+                length: 20, // The length of each line
+                width: 10, // The line thickness
+                radius: 30, // The radius of the inner circle
+                corners: 1, // Corner roundness (0..1)
+                rotate: 0, // The rotation offset
+                direction: 1, // 1: clockwise, -1: counterclockwise
+                color: '#000', // #rgb or #rrggbb or array of colors
+                speed: 1, // Rounds per second
+                trail: 60, // Afterglow percentage
+                shadow: true, // Whether to render a shadow
+                hwaccel: false, // Whether to use hardware acceleration
+                className: 'spinner', // The CSS class to assign to the spinner
+                zIndex: 2e9, // The z-index (defaults to 2000000000)
+                top: '50%', // Top position relative to parent in px
+                left: '50%' // Left position relative to parent in px
+            };
+        return new Spinner(opts).spin(spinnerElement);
+        }
 
     </asset:script>
 </content>

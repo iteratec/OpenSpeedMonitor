@@ -987,7 +987,9 @@ class CsiDashboardController {
         MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel, zeroWeightLabel: matrixZeroWeightLabel)
         matrixViewData.addColumns(Browser.findAll()*.name as Set)
         matrixViewData.addRows(ConnectivityProfile.findAll()*.name as Set)
-        BrowserConnectivityWeight.findAll().each {matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))}
+        BrowserConnectivityWeight.findAll().each {
+            matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))
+        }
         def matrixViewDataJSON = matrixViewData as JSON
 
         // arrange treemap data
@@ -1002,10 +1004,13 @@ class CsiDashboardController {
 
         MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
 
-        [errorMessagesCsi: params.list('errorMessagesCsi'),
-         matrixViewData  : matrixViewDataJSON,
-         treemapData     : treemapDataJSON,
-         barchartData    : barChartJSON,
+        [errorMessagesCsi       : params.list('errorMessagesCsi'),
+         showCsiWeights         : params.get('showCsiWeights') ?: false,
+         mappingsToOverwrite    : params.list('mappingsToOverwrite'),
+         csvFileAsList          : params.list('csvFileAsList'),
+         matrixViewData         : matrixViewDataJSON,
+         treemapData            : treemapDataJSON,
+         barchartData           : barChartJSON,
          defaultTimeToCsMappings: defaultTimeToCsMappingsChart as JSON]
     }
 
