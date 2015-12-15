@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
+import groovy.json.StringEscapeUtils
 
 /**
  * Represents an arbitrary event to be shown in dashboard diagrams as vertical lines with info text as hover info.
@@ -46,7 +47,6 @@ class Event {
     }
 
     def beforeValidate() {
-        //
         shortName = removeCharacter(shortName)
         description = removeCharacter(description)
     }
@@ -60,8 +60,6 @@ class Event {
         if(str != null){
             str = str.replaceAll(/<!--.*?-->/, '')
                     .replaceAll(/<.*?>/, '')
-                    .replaceAll("'","")
-                    .replaceAll("\n","")
         }
         return str
     }
