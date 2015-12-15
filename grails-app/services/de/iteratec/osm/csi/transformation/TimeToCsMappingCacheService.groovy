@@ -51,13 +51,27 @@ class TimeToCsMappingCacheService {
 
 	public List<Integer> getCustomerFrustrations(Page page){
 		Duration durationSinceLastFetch = new Duration(lastFetchOfFrustrations.getMillis(), new DateTime().getMillis())
-		if (log.infoEnabled) {
-			log.info("lastFetchOfFrustrations=$lastFetchOfFrustrations")
-			log.info("durationSinceLastFetch=$durationSinceLastFetch")
-		}
-		if(!frustrations || durationSinceLastFetch.getStandardHours()>fetchingFrustrationsFrequencyInHours){
+
+        log.info("lastFetchOfFrustrations=$lastFetchOfFrustrations")
+        log.info("durationSinceLastFetch=$durationSinceLastFetch")
+
+        if (frustrations != null){
+            log.debug("begin of getCustomerFrustrations: frustrations.getClass()=${frustrations.getClass()}")
+            logFrustrationEntries()
+        }
+        log.debug("fetchingFrustrationsFrequencyInHours=${fetchingFrustrationsFrequencyInHours}")
+        log.debug("durationSinceLastFetch.getStandardHours()=${durationSinceLastFetch.getStandardHours()}")
+
+
+        boolean fetchNecessary = !frustrations ||
+                durationSinceLastFetch.getStandardHours() > fetchingFrustrationsFrequencyInHours
+        log.debug("fetchNecessary=${fetchNecessary}")
+
+        if(fetchNecessary){
 			fetchFrustrations()
 		}
+
+        log.debug("end of getCustomerFrustrations: frustrations=${frustrations}")
 		return frustrations[page.name]
 	}
 
@@ -113,20 +127,41 @@ class TimeToCsMappingCacheService {
     }
 	
 	private fetchFrustrations(){
+
 		frustrations = [:].withDefault {[]}
-		def query = CustomerFrustration.where {
+        Map<String, List<Integer>> fetchedFrustrations = [:].withDefault {[]}
+
+        log.debug("after reset/initialization of frustrations map: frustrations.getClass()=${frustrations.getClass()}")
+        log.debug("after reset/initialization of frustrations map: frustrations=${frustrations}")
+
+        def query = CustomerFrustration.where {
 			investigationVersion >= max(investigationVersion)//bug in grails 2.1.1: == doesn't work with subqueries
 		  }
 		List<CustomerFrustration> frustrationsWithMaxVersion = query.findAll()
+        log.debug("all frustrations from db: frustrationsWithMaxVersion.size()=${frustrationsWithMaxVersion.size()}")
+        log.debug("all frustrations from db: frustrationsWithMaxVersion=${frustrationsWithMaxVersion}")
+
 		frustrationsWithMaxVersion.each{
-			frustrations[it.page.name].add(it.loadTimeInMilliSecs)
+            log.debug("add ${it.loadTimeInMilliSecs} for page '${it.page.name}'")
+            fetchedFrustrations[it.page.name].add(it.loadTimeInMilliSecs)
 		}
-		lastFetchOfFrustrations = new DateTime()
+        fetchedFrustrations.each {pageName,frustrationTimes->
+            frustrations[pageName] = Collections.unmodifiableList(frustrationTimes)
+        }
+
+        DateTime now = new DateTime()
+        log.debug("set lastFetchOfFrustrations to '${now}'")
+        lastFetchOfFrustrations = now
 		if(log.debugEnabled){
-			log.debug "fetching of CustomerFrustrations..."
-			frustrations.each{entry ->
-				log.debug "page=${entry.key}, list of frustration-loadtimes=${entry.value}"
-			}
+			log.debug "end of fetching of CustomerFrustrations:"
+			logFrustrationEntries()
 		}
 	}
+
+    private logFrustrationEntries(){
+        frustrations.each{entry ->
+            log.debug "page=${entry.key}\nclass of page=${entry.key.getClass()}\nclass of frustrations collection=${entry.value.getClass()}" +
+                    "\ncount=${entry.value.size()}\nlist of frustration-loadtimes=${entry.value}"
+        }
+    }
 }

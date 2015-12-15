@@ -1,0 +1,11 @@
+name;loadTimeInMilliSecs;customerSatisfactionInPercent
+default1;0;100.0
+default1;200;75.0
+default1;500;30.5
+default2;0;95.0
+default2;200;80.3
+default2;500;12.0
+default3;0;100.0
+default3;200;79.9
+default3;500;50.0
+default3;1000;5.0

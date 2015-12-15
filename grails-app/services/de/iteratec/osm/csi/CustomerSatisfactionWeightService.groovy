@@ -238,6 +238,10 @@ class CustomerSatisfactionWeightService {
                         log.info("save new browser-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
                         new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(newWeight)).save(failOnError: true)
                     }
+                } else {
+                    if (browserConnectivityWeight) {
+                        browserConnectivityWeight.delete(flush: true)
+                    }
                 }
             }
             lineCounter++
@@ -282,5 +286,23 @@ class CustomerSatisfactionWeightService {
         }
     }
 
-
+    void persistNewDefaultMapping(InputStream csv) {
+        Integer lineCounter = 0
+        csv.eachLine {line ->
+            if (lineCounter > 0) {
+                List tokenized = line.tokenize(";")
+                String name = tokenized[0]
+                int loadTimeInMs = Integer.parseInt(tokenized[1])
+                double customerSatisfation = Double.parseDouble(tokenized[2])
+                DefaultTimeToCsMapping mapping = DefaultTimeToCsMapping.findByNameAndLoadTimeInMilliSecs(name, loadTimeInMs)
+                if(mapping) {
+                    mapping.customerSatisfactionInPercent = customerSatisfation
+                    mapping.save(failOnError: true)
+                } else {
+                    new DefaultTimeToCsMapping(name: name, loadTimeInMilliSecs: loadTimeInMs, customerSatisfactionInPercent: customerSatisfation).save(failOnError: true)
+                }
+            }
+            lineCounter++;
+        }
+    }
 }

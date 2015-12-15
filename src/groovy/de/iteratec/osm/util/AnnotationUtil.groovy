@@ -37,7 +37,8 @@ class AnnotationUtil {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
             Date date = dateFormat.parse("$item.eventDate");
             long unixTime = (long)date.getTime()/1000;
-            String description = item.description.replaceAll("(\r\n|\n)", "<br />");
+            String description = (item.description)?:""
+            description = description.replaceAll("(\r\n|\n)", "<br />");
             annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$description'}")
         }
         modelToRender.put('annotations', annotations)

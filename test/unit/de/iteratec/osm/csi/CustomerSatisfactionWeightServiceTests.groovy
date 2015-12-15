@@ -31,7 +31,7 @@ import org.junit.Test
  * Test-suite of {@link CustomerSatisfactionWeightService}.
  */
 @TestFor(CustomerSatisfactionWeightService)
-@Mock([Page, Browser, HourOfDay, BrowserConnectivityWeight, ConnectivityProfile])
+@Mock([Page, Browser, HourOfDay, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping])
 class CustomerSatisfactionWeightServiceTests {
 
     CustomerSatisfactionWeightService serviceUnderTest
@@ -139,6 +139,16 @@ class CustomerSatisfactionWeightServiceTests {
         csvStream = new FileInputStream(csv)
         serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream)
         assertEquals(browserConnectivityWeights, BrowserConnectivityWeight.findAll().size())
+    }
+
+    @Test
+    void testPersistMappingCsv() {
+        int defaultMappingSizeBeforePersist = DefaultTimeToCsMapping.findAll().size()
+        File csv = new File("test/resources/CsiData/DefaultMappings.csv")
+        InputStream csvStream = new FileInputStream(csv)
+        serviceUnderTest.persistNewDefaultMapping(csvStream);
+
+        assertTrue(DefaultTimeToCsMapping.findAll().size() > defaultMappingSizeBeforePersist)
     }
 
     private void createSomeBroserAndConnectivites() {

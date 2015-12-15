@@ -83,6 +83,18 @@ class ConnectivityProfileController {
     }
 
     def save() {
+        def connectivityProfile = new ConnectivityProfile(params)
+        connectivityProfile.active = true
+        if (!connectivityProfile.save(flush: true)) {
+            render(view: 'create', model: [connectivityProfileInstance: connectivityProfile])
+        } else{
+            def flashMessageArgs = [message(code: 'connectivityProfile.label', default: 'Connection'), connectivityProfile.name]
+            flash.message = message(code: 'default.created.message', args: flashMessageArgs)
+            redirect(action: "list")
+        }
+    }
+
+    def update() {
 
         // Deactivate previous version
         def connectivityProfileInstance = ConnectivityProfile.get(params.id)

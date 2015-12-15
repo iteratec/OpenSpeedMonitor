@@ -2,7 +2,7 @@
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <%
-    def userspecificDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificEventResultDashboard').newInstance()
+    def userspecificEventResultDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificEventResultDashboard').newInstance()
 %>
 <html>
 <head>
@@ -18,6 +18,39 @@
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
 
+<%-- userspecific dashboards --%>
+<div class="row">
+    <div class="span12">
+        <div class="btn-toolbar" style="margin: 0;">
+            <div class="btn-group">
+                <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                               default="Dashboard-Ansicht ausw&auml;hlen"/>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" id="customDashBoardSelection">
+                    <g:set var="availableDashboards"
+                           value="${userspecificEventResultDashboardService.getListOfAvailableDashboards()}"/>
+                    <g:if test="${availableDashboards.size() > 0}">
+                        <g:each in="${availableDashboards}" var="availableDashboard">
+                            <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
+                        </g:each>
+                    </g:if>
+                    <g:else>
+                        <g:set var="anchorDashboardCreation" value="#"/>
+                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                            <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
+                        </sec:ifAnyGranted>
+                        <li><a href="${anchorDashboardCreation}"><g:message
+                                code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                                default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
+                    </g:else>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
 <div class="row">
     <div class="span12">
         <g:if test="${command}">
@@ -335,7 +368,7 @@
                                         </sec:ifAnyGranted>
                                     </sec:ifLoggedIn>
                                     <g:if test="${params.id}">
-                                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                                        <g:if test="${userspecificEventResultDashboardService.isCurrentUserDashboardOwner(params.bid)}">
                                             <g:render template="/_common/modals/deleteCustomDashboard"/>
 
                                         </g:if>

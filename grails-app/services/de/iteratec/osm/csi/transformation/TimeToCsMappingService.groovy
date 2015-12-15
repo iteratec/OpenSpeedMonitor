@@ -80,18 +80,31 @@ class TimeToCsMappingService {
 	 */
 	public Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page){
         List<TimeToCsMapping> mappingsForPage = timeToCsMappingCacheService.getMappingsFor(page)
-		
-		Integer lowerHundredthMillisecs = Math.floor((docReadyTimeInMilliSecs/100))*100
-        Integer upperHundredthMillisecs = lowerHundredthMillisecs + 100
-		Integer diffDocreadyToLowerHundredthSec = docReadyTimeInMilliSecs-lowerHundredthMillisecs
-		Double upperCs = lowerHundredthMillisecs == 0 ? 100 : lowerHundredthMillisecs > 20000 ? 0 :
-                mappingsForPage.find {it.loadTimeInMilliSecs == lowerHundredthMillisecs}.customerSatisfaction
-		Double lowerCs = upperHundredthMillisecs == 0 ? 100 : upperHundredthMillisecs > 20000 ? 0 :
-                mappingsForPage.find {it.loadTimeInMilliSecs == upperHundredthMillisecs}.customerSatisfaction
+
+        Integer loadtimeIncrement = 50
+        Integer loadtimeNoUserWouldAccept = 20000
+        Integer noOneIsSatisfied = 0
+        Integer everybodyIsSatisfied = 100
+
+		Integer lower50thMillisecs = Math.floor( docReadyTimeInMilliSecs/loadtimeIncrement ) * loadtimeIncrement
+        Integer upper50thMillisecs = lower50thMillisecs + loadtimeIncrement
+		Integer diffDocreadyToLowerHundredthSec = docReadyTimeInMilliSecs-lower50thMillisecs
+
+		Double upperCs = lower50thMillisecs == 0 ?
+                everybodyIsSatisfied :
+                lower50thMillisecs > loadtimeNoUserWouldAccept ?
+                        noOneIsSatisfied :
+                        mappingsForPage.find {it.loadTimeInMilliSecs == lower50thMillisecs}.customerSatisfaction
+		Double lowerCs = upper50thMillisecs == 0 ?
+                everybodyIsSatisfied :
+                upper50thMillisecs > loadtimeNoUserWouldAccept ?
+                    noOneIsSatisfied :
+                    mappingsForPage.find {it.loadTimeInMilliSecs == upper50thMillisecs}.customerSatisfaction
 		
 		Double customerSatisfaction
 		if (upperCs!=null && lowerCs!=null && upperCs>=lowerCs) {
-			customerSatisfaction = lowerCs+(upperCs-lowerCs)*((100-diffDocreadyToLowerHundredthSec)/100)
+            Double fractionOfUpperCs = (upperCs - lowerCs) * ((loadtimeIncrement - diffDocreadyToLowerHundredthSec) / loadtimeIncrement)
+            customerSatisfaction = lowerCs + fractionOfUpperCs
 		}
 		if (log.infoEnabled) {
 			log.info("customerSatisfaction=$customerSatisfaction")
@@ -111,6 +124,9 @@ class TimeToCsMappingService {
 		Integer smaller
 		Integer bigger
 		if(frustrationLoadtimesForPage){
+            log.debug("getCustomerSatisfactionPercentRank: page=${page}")
+            log.debug("getCustomerSatisfactionPercentRank: class of frustration load times=${frustrationLoadtimesForPage.getClass()}")
+            log.debug("getCustomerSatisfactionPercentRank: count of frustration load times=${frustrationLoadtimesForPage.size()}")
 			smaller = frustrationLoadtimesForPage.findAll{it<docReadyTimeInMilliSecs}.size() 
 			bigger = frustrationLoadtimesForPage.findAll{it>docReadyTimeInMilliSecs}.size()
 			if (smaller+bigger==0) {
@@ -139,7 +155,7 @@ class TimeToCsMappingService {
 	 * @return true if more than one different frustration timings exist for given {@link Page} page. false otherwise. false if page is null or undefinde page, too.
 	 */
 	public Boolean validFrustrationsExistFor(Page page){
-		return isValid(page) && getCachedFrustrations(page).unique().size()>1
+		return isValid(page) && getCachedFrustrations(page).unique(false).size()>1
 	}
 
     public Boolean validMappingsExistFor(Page page){
