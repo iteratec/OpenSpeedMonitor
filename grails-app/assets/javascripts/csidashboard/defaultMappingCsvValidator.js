@@ -28,22 +28,21 @@ function validate(csv) {
     var nameLoadTimesMap = {};
     var allCustomerSatisfactions = [];
     var errorList = [];
+    // Get I18N error messages
+    var formatError = POSTLOADED.defaultMappingFormatError;
+    var intError = POSTLOADED.loadTimeIntegerError;
+    var doubleError = POSTLOADED.customerFrustrationDoubleError;
+    var notEveryValueError = POSTLOADED.defaultMappingNotAllvaluesError;
+    var customerSatisfactionNotInPercentError = POSTLOADED.customerSatisfactionNotInPercentError;
+    var percentagesBetween0And1Error = POSTLOADED.percentagesBetween0And1Error;
 
     for (var i = 1; i < allTextLines.length; i++) {
-        // Get I18N error messages
-        var formatError = POSTLOADED.defaultMappingFormatError;
-        var intError = POSTLOADED.loadTimeIntegerError;
-        var doubleError = POSTLOADED.customerFrustrationDoubleError;
-        var notEveryValueError = POSTLOADED.defaultMappingNotAllvaluesError;
-        var customerSatisfactionNotInPercentError = POSTLOADED.customerSatisfactionNotInPercentError;
-        var percentagesBetween0And1Error = POSTLOADED.percentagesBetween0And1Error;
-
         // exclude empty lines
         if (allTextLines[i] == "") {
             continue;
         }
 
-        // get data
+        // get data for this row
         var data = allTextLines[i].split(';');
         var name = data[0];
         var loadTimeInMs = parseInt(data[1]);
@@ -55,20 +54,17 @@ function validate(csv) {
         }
 
         // regEx for integer and double
-        var intRegex = /[0-9]+/;
-        var doubleRegex = /[0-9]+(\.[0-9]+)?/;
+        var intRegex = /^[0-9]+$/;
+        var doubleRegex = /^[0-9]+(\.[0-9]+)?$/;
 
         // check correct types
-        if (!data[1].match(intRegex)) {
-            if (errorList.indexOf(intError) < 0) {
-                errorList.push(intError)
-            }
+        if (!data[1].match(intRegex) && errorList.indexOf(intError) < 0) {
+            errorList.push(intError)
         }
-        if (!data[2].match(doubleRegex)) {
-            if (errorList.indexOf(doubleError) < 0) {
-                errorList.push(doubleError)
-            }
+        if (!data[2].match(doubleRegex) && errorList.indexOf(doubleError) < 0) {
+            errorList.push(doubleError)
         }
+
         if ((typeof name !== 'string') || loadTimeInMs == NaN || customerSatisfaction == NaN) {
             if (errorList.indexOf(formatError) < 0) {
                 errorList.push(formatError);
@@ -147,25 +143,9 @@ function checkForNeedToOverwrite(csv) {
  * @param csv the csv file
  */
 function checkOverwrite(names, csv) {
-    var allTextLines = csv.split(/\r\n|\n/);
-    // get all Names in csv
-    for (var i = 0; i < allTextLines.length; i++) {
-        allTextLines[i] = allTextLines[i].replace(/;(.*)/g, '');
-    }
-    var warning = false;
-    var existingNames = [];
+    var existingNames = searchForNamesInCsv(names, csv);
 
-    for (var x in names) {
-        var name = names[x];
-        if (allTextLines.indexOf(name) >= 0) {
-            warning = true;
-            if (existingNames.indexOf(name) < 0) {
-                existingNames.push(name);
-            }
-        }
-    }
-
-    if (warning) {
+    if (existingNames.length > 0) {
         $("#warnAboutOverwritingBox").show();
         $("#warningsOverwriting").text("");
         for (var y in existingNames) {
@@ -174,6 +154,27 @@ function checkOverwrite(names, csv) {
         }
     }
     $("#defaultMappingUploadButton").prop("disabled", false);
+}
+
+function searchForNamesInCsv(names, csv) {
+    var allTextLines = csv.split(/\r\n|\n/);
+    // get all Names in csv
+    for (var i = 0; i < allTextLines.length; i++) {
+        allTextLines[i] = allTextLines[i].replace(/;(.*)/g, '');
+    }
+
+    var existingNames = [];
+
+    for (var x in names) {
+        var name = names[x];
+        if (allTextLines.indexOf(name) >= 0) {
+            if (existingNames.indexOf(name) < 0) {
+                existingNames.push(name);
+            }
+        }
+    }
+
+    return existingNames;
 }
 
 /**

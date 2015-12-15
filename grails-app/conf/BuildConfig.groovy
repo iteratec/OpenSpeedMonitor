@@ -24,22 +24,22 @@ grails.project.source.level = 1.6
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
 
 grails.project.fork = [
-    // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
-    // compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
-    // configure settings for the test-app JVM, uses the daemon by default
-    test: [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256, daemon:true],
-    // configure settings for the run-app JVM
-    run: [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256, forkReserve:false],
-    // configure settings for the run-war JVM
-    war: [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256, forkReserve:false],
-    // configure settings for the Console UI JVM
-    console: [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256]
+        // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
+        // compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+        // configure settings for the test-app JVM, uses the daemon by default
+        test   : [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256, daemon: true],
+        // configure settings for the run-app JVM
+        run    : [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256, forkReserve: false],
+        // configure settings for the run-war JVM
+        war    : [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256, forkReserve: false],
+        // configure settings for the Console UI JVM
+        console: [maxMemory: 2048, minMemory: 256, debug: false, maxPerm: 256]
 ]
 // in intellij a grails bug inhibits test runs in forked mode, so we disabled it
 // see http://codedevstuff.blogspot.de/2014/03/run-forked-tests-in-grails-on-intellij.html
 grails.project.fork = [
-		test: false,
-		run: false
+        test: false,
+        run : false
 ]
 
 grails.project.dependency.resolver = "maven" // or ivy
@@ -74,75 +74,77 @@ grails.project.dependency.resolution = {
     }
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-		runtime(
-			'mysql:mysql-connector-java:5.1.26',
-			'net.sf.supercsv:super-csv:2.1.0'
-		)
-		compile (
-			'org.mockito:mockito-all:1.9.5',
-			'net.sf.supercsv:super-csv:2.1.0',
-            'p6spy:p6spy:2.1.4',
-		)
-		build (
-			'net.sf.supercsv:super-csv:2.1.0',
-			'org.yaml:snakeyaml:1.10'//To fix betamax tests, see https://github.com/robfletcher/betamax/issues/153
-		)
-		 test (
-			'org.mockito:mockito-all:1.9.5',
-			'org.hamcrest:hamcrest-all:1.3',
-			'co.freeside:betamax:1.1.2',
-            'net.sourceforge.nekohtml:nekohtml:1.9.14'
-		)
+        runtime(
+                'mysql:mysql-connector-java:5.1.26',
+                'net.sf.supercsv:super-csv:2.1.0'
+        )
+        compile(
+                'org.mockito:mockito-all:1.9.5',
+                'net.sf.supercsv:super-csv:2.1.0',
+                'p6spy:p6spy:2.1.4',
+        )
+        build(
+                'net.sf.supercsv:super-csv:2.1.0',
+                'org.yaml:snakeyaml:1.10'//To fix betamax tests, see https://github.com/robfletcher/betamax/issues/153
+        )
+        test(
+                'org.mockito:mockito-all:1.9.5',
+                'org.hamcrest:hamcrest-all:1.3',
+                'co.freeside:betamax:1.1.2',
+                'net.sourceforge.nekohtml:nekohtml:1.9.14'
+        )
     }
 
-	plugins {
-		//runtime//////////////////////////////////////////////////////////////////
-		runtime (
-			':twitter-bootstrap:2.3.2.2',
-			":hibernate:3.6.10.19",
-			":jquery:1.11.1",
-			":database-migration:1.4.0",
-			":quartz:1.0.1",
-			":console:1.5.1",
-			":font-awesome-resources:4.2.0.0"
-		)
-		//build//////////////////////////////////////////////////////////////////
-		build (
-			":tomcat:7.0.52.1",
-			":release:3.0.1"
-		)
+    plugins {
+        //runtime//////////////////////////////////////////////////////////////////
+        runtime(
+                ':twitter-bootstrap:2.3.2.2',
+                ":hibernate:3.6.10.19",
+                ":jquery:1.11.1",
+                ":database-migration:1.4.0",
+                ":quartz:1.0.1",
+                ":console:1.5.1",
+                ":font-awesome-resources:4.2.0.0"
+        )
+        //build//////////////////////////////////////////////////////////////////
+        build(
+                ":tomcat:7.0.52.1",
+                ":release:3.0.1"
+        )
         //compile//////////////////////////////////////////////////////////////////
-		compile (
-			":joda-time:1.5",
-			':scaffolding:2.1.0',
-			':spring-security-core:2.0-RC5',
-			':quartz:1.0.1',
-			':rest:0.8',
-			':taggable:1.1.0',
-			':cookie:1.0.1',
-            ':codenarc:0.22',
-			":asset-pipeline:2.3.9",
-			":less-asset-pipeline:2.3.0"
-		)
-		compile( ':jquery-ui:1.10.4'){
-			excludes "jquery"
-		}
+        compile(
+                ":joda-time:1.5",
+                ':scaffolding:2.1.0',
+                ':spring-security-core:2.0-RC5',
+                ':quartz:1.0.1',
+                ':rest:0.8',
+                ':taggable:1.1.0',
+                ':cookie:1.0.1',
+                ':codenarc:0.22',
+                ":asset-pipeline:2.3.9",
+                ":less-asset-pipeline:2.3.0"
+        )
+        compile(':jquery-ui:1.10.4') {
+            excludes "jquery"
+        }
 //		provided ":less-asset-pipeline:2.3.0"
         //test//////////////////////////////////////////////////////////////////
         test ":code-coverage:2.0.3-3"
-	}
+        test ':karma-test-runner:0.2.4'
+    }
 
-	codenarc {
-	    processTestUnit = false
-	    processTestIntegration = false
-	    propertiesFile = 'codenarc.properties'
-	    ruleSetFiles = "file:grails-app/conf/CodeNarcRules.groovy"
-	    reports = {
-	        RedisReport('xml') {                    // The report name "MyXmlReport" is user-defined; Report type is 'xml'
-	            outputFile = 'target/codenarc.xml'  // Set the 'outputFile' property of the (XML) Report
-	            title = 'Grails Redis Plugin'             // Set the 'title' property of the (XML) Report
-	        }
-		}
-	}
+    codenarc {
+        processTestUnit = false
+        processTestIntegration = false
+        propertiesFile = 'codenarc.properties'
+        ruleSetFiles = "file:grails-app/conf/CodeNarcRules.groovy"
+        reports = {
+            RedisReport('xml') {
+                // The report name "MyXmlReport" is user-defined; Report type is 'xml'
+                outputFile = 'target/codenarc.xml'  // Set the 'outputFile' property of the (XML) Report
+                title = 'Grails Redis Plugin'             // Set the 'title' property of the (XML) Report
+            }
+        }
+    }
 
 }
