@@ -17,7 +17,7 @@ function validateDefaultMappingCsv(file) {
  * A csv file for DefaultMappings is correct if:
  *  - all rows have three entries
  *  - all rows have the format {String;Integer;Double}
- *  - for each name there are values between 0 and 20000ms in 50ms steps
+ *  - for each name there are values between 0 and 20000ms in 20ms steps
  *  - customer satisfactions are between 0 and 100
  *  - at least one customer satisfaction has to be above 1 (to prevent the user from using values between 0 and 1 as percentages)
  * @param csv the csv file for validation
@@ -82,15 +82,15 @@ function validate(csv) {
         allCustomerSatisfactions.push(customerSatisfaction);
     }
 
-    // check if there are values for each name between 0 and 20000ms in 50 ms steps
+    // check if there are values for each name between 0 and 20000ms in 20 ms steps
     for (var name in nameLoadTimesMap) {
         var loadTimes = nameLoadTimesMap[name];
 
-        if (loadTimes.length > 401 && errorList.indexOf(notEveryValueError) < 0) {
+        if (loadTimes.length > (20000 / 20 + 1) && errorList.indexOf(notEveryValueError) < 0) {
             errorList.push(notEveryValueError)
         }
 
-        for (var j = 0; j <= 20000; j += 50) {
+        for (var j = 0; j <= 20000; j += 20) {
             if (loadTimes.indexOf(j) < 0 && errorList.indexOf(notEveryValueError) < 0) {
                 errorList.push(notEveryValueError)
             }

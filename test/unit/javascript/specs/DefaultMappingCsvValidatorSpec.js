@@ -13,7 +13,7 @@ describe("validate csv", function () {
     it("correct csv file return no error message", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             csv += "Default1;" + i + ";50.0\n";
         }
 
@@ -24,7 +24,7 @@ describe("validate csv", function () {
     it("percentages in ragen of 0 and 1 should resolve in error", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             // returns number between 0 and 1
             csv += "Default1;" + i + ";" + 0.5 + "\n";
         }
@@ -37,7 +37,7 @@ describe("validate csv", function () {
     it("customer satisfaction not in range of 0 and 100 should resolve in error", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             // returns number between 0 and 1
             csv += "Default1;" + i + ";" + 150 + "\n";
         }
@@ -50,7 +50,7 @@ describe("validate csv", function () {
     it("negative customer satisfaction should resolve in error", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             // returns number between 0 and 1
             csv += "Default1;" + i + ";" + -10 + "\n";
         }
@@ -65,7 +65,7 @@ describe("validate csv", function () {
     it("customer satisfaction not as double should resolve in error", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             // returns number between 0 and 1
             csv += "Default1;" + i + ";" + "10.5.5" + "\n";
         }
@@ -78,7 +78,7 @@ describe("validate csv", function () {
     it("load time not as integer should resolve in error", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             // returns number between 0 and 1
             csv += "Default1;" + i + "a;" + "10.5" + "\n";
         }
@@ -91,7 +91,7 @@ describe("validate csv", function () {
     it("csv does not contain values between 0 and 20000 in 50ms steps resolve in error", function () {
         // create csv string
         var csv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 200; i += 50) {
+        for (var i = 0; i <= 200; i += 20) {
             csv += "Default1;" + i + ";50.0\n";
         }
 
@@ -101,24 +101,24 @@ describe("validate csv", function () {
     });
 });
 
-describe("searchForNamesInCsv", function() {
+describe("searchForNamesInCsv", function () {
     var correctCsv = "";
 
-    beforeEach(function() {
+    beforeEach(function () {
         correctCsv = "name;loadTimeInMilliSecs;customerSatisfactionInPercent\n";
-        for (var i = 0; i <= 20000; i += 50) {
+        for (var i = 0; i <= 20000; i += 20) {
             correctCsv += "Default1;" + i + ";50.0\n";
         }
     });
 
-    it("name already in csv", function() {
+    it("name already in csv", function () {
         var names = ["Default1", "Default2"];
         var existingNames = searchForNamesInCsv(names, correctCsv);
         expect(existingNames.length).toBe(1);
         expect(existingNames[0]).toBe("Default1");
     });
 
-    it("name not in csv", function() {
+    it("name not in csv", function () {
         var names = ["Default2"];
         var existingNames = searchForNamesInCsv(names, correctCsv);
         expect(existingNames.length).toBe(0);
