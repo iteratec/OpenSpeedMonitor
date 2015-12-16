@@ -81,29 +81,29 @@ class TimeToCsMappingService {
 	public Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page){
         List<TimeToCsMapping> mappingsForPage = timeToCsMappingCacheService.getMappingsFor(page)
 
-        Integer loadtimeIncrement = 50
+        Integer loadtimeIncrement = 20
         Integer loadtimeNoUserWouldAccept = 20000
         Integer noOneIsSatisfied = 0
         Integer everybodyIsSatisfied = 100
 
-		Integer lower50thMillisecs = Math.floor( docReadyTimeInMilliSecs/loadtimeIncrement ) * loadtimeIncrement
-        Integer upper50thMillisecs = lower50thMillisecs + loadtimeIncrement
-		Integer diffDocreadyToLowerHundredthSec = docReadyTimeInMilliSecs-lower50thMillisecs
+		Integer lowerIncrementBoundaryMillisecs = Math.floor( docReadyTimeInMilliSecs/loadtimeIncrement ) * loadtimeIncrement
+        Integer upperIncrementBoundaryMillisecs =  lowerIncrementBoundaryMillisecs + loadtimeIncrement
+		Integer diffDocreadyToLowerIncrementBoundary = docReadyTimeInMilliSecs- lowerIncrementBoundaryMillisecs
 
-		Double upperCs = lower50thMillisecs == 0 ?
+		Double upperCs =  lowerIncrementBoundaryMillisecs == 0 ?
                 everybodyIsSatisfied :
-                lower50thMillisecs > loadtimeNoUserWouldAccept ?
+                 lowerIncrementBoundaryMillisecs > loadtimeNoUserWouldAccept ?
                         noOneIsSatisfied :
-                        mappingsForPage.find {it.loadTimeInMilliSecs == lower50thMillisecs}.customerSatisfaction
-		Double lowerCs = upper50thMillisecs == 0 ?
+                        mappingsForPage.find {it.loadTimeInMilliSecs ==  lowerIncrementBoundaryMillisecs}.customerSatisfaction
+		Double lowerCs = upperIncrementBoundaryMillisecs == 0 ?
                 everybodyIsSatisfied :
-                upper50thMillisecs > loadtimeNoUserWouldAccept ?
+                upperIncrementBoundaryMillisecs > loadtimeNoUserWouldAccept ?
                     noOneIsSatisfied :
-                    mappingsForPage.find {it.loadTimeInMilliSecs == upper50thMillisecs}.customerSatisfaction
+                    mappingsForPage.find {it.loadTimeInMilliSecs == upperIncrementBoundaryMillisecs}.customerSatisfaction
 		
 		Double customerSatisfaction
 		if (upperCs!=null && lowerCs!=null && upperCs>=lowerCs) {
-            Double fractionOfUpperCs = (upperCs - lowerCs) * ((loadtimeIncrement - diffDocreadyToLowerHundredthSec) / loadtimeIncrement)
+            Double fractionOfUpperCs = (upperCs - lowerCs) * ((loadtimeIncrement - diffDocreadyToLowerIncrementBoundary) / loadtimeIncrement)
             customerSatisfaction = lowerCs + fractionOfUpperCs
 		}
 		if (log.infoEnabled) {
