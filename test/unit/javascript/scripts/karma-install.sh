@@ -13,3 +13,4 @@ npm install karma-jasmine@2_0 -g
 npm install karma-remote-reporter -g
 npm install karma-phantomjs-launcher -g
 npm install karma-cli -g
+npm install karma-junit-reporter -g
