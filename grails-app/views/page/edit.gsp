@@ -7,7 +7,7 @@
         <meta name="layout" content="kickstart" />
         <g:set var="entityName" value="${message(code: 'page.label', default: 'Page')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
-        <asset:stylesheet>
+        <style>
         %{--Styles for multi line chart--}%
             .axis path,
             .axis line {
@@ -29,7 +29,7 @@
             .tooltipTextContainer{
                 opacity: 0.5;
             }
-        </asset:stylesheet>
+        </style>
     </head>
 
     <body>
