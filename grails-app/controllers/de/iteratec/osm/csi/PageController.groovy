@@ -245,7 +245,7 @@ class PageController {
 
             defaultTimeToCsMappings.each { entry ->
                 if (!map.containsKey(entry.name)) {
-                    map.put(entry.name, new MultiLineChartLineData(name: entry.name))
+                    map.put(entry.name, new MultiLineChartLineData(name: entry.name, id:entry.id))
                 }
                 map.get(entry.name).addDataPoint(entry.loadTimeInMilliSecs, entry.customerSatisfactionInPercent)
             }

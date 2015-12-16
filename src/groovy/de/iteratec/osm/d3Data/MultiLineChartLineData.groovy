@@ -9,6 +9,7 @@ class MultiLineChartLineData {
     List<Double> xPoints
     List<Double> yPoints
     String name
+    long id
 
     MultiLineChartLineData() {
         name = "Line"

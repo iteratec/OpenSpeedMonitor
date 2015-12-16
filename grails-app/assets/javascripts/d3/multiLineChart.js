@@ -4,6 +4,11 @@
  * @param chartDivIdentifier a unique identifer for the chart div
  */
 function createMultiLineGraph(data, chartDivIdentifier) {
+    idMap = {};
+    data.lines.forEach(function (el,i,a) {
+        idMap[el.name] = el.id;
+    });
+
     //pick div and set width
     var div = d3.select("#" + chartDivIdentifier);
     var divWidth = parseInt(div.style("width"), 10);
@@ -33,7 +38,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .range([height, 0]);
 
     // Color Scale
-    var colorScale = d3.scale.category20c();
+    colorScale = d3.scale.category20c();
 
     // Define axis
     var xAxis = d3.svg.axis()
@@ -86,6 +91,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
     var oneLineData = lines.map(function (line) {
         return {
             name: line.name,
+            id:line.id,
             values: line.xPoints.map(function (d, i) {
                 return {xValue: line.xPoints[i], yValue: line.yPoints[i]}
             })
@@ -97,6 +103,9 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .data(oneLineData)
         .enter()
         .append("g")
+        .attr("id", function (d){
+            return "line_"+d.id
+        })
         .attr("class", "oneLine");
     oneLine.append("path")
         .attr("class", "line")
@@ -253,4 +262,28 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         xTextContainer.select("text")
             .text(lines[closestLineIndex].xPoints[closestPointIndex]);
     }
+}
+
+/**
+ * Fades all non selected lines to grey. If this name is not defined, this method will just return.
+ * If the name is null or empty this method will give every path it's origin color.
+ * @param name
+ */
+function highlightLine(name){
+    var chosenOne =  d3.select("#line_"+idMap[name]);
+    //If this is null, the element doesn't exist and we stop
+    if(chosenOne[0] == null) return;
+
+    var allLines = d3.selectAll(".oneLine").select(".line");
+    var colorFunction;
+        if(name == "" || name == null){
+        colorFunction = function(d){return colorScale(d.name)};
+    } else{
+       colorFunction = function(d) {return "grey"};
+    }
+    allLines.transition().duration(500).style("stroke", colorFunction);
+
+    //We add another transition, with zero ms, to stop the grey transition
+    //for our selected element and change the color to its origin
+    chosenOne.select(".line").transition().duration(0).style("stroke",colorScale(name));
 }
