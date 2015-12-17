@@ -21,8 +21,9 @@ This is a dialog to choose from different default csi mappings.
             <label for="selectedDefaultMapping">
                 <g:message code="de.iteratec.osm.csi.mapping.demand" args="${pageInstance}" default="Choose one of the following mappings for the page {0}"/>:
             </label>
-            <g:select from="${defaultMappings*.name.unique()}" name="selectedDefaultMapping" onchange="highlightLine(this.value)"></g:select>
-            <a href="#" class="btn btn-primary" onclick="copyDefaultMappingToPageAsynchronously()">
+            <g:select from="${defaultMappings*.name.unique()}" name="selectedDefaultMapping" onchange="handleMappingSelect(this.value)" noSelection="${[null:message(code:'de.iteratec.osm.csi.mapping.select.default')]}">
+            </g:select>
+            <a href="#" class="btn btn-primary"  disabled="true" id="applyMapping">
                 <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
             </a>
         </g:form>

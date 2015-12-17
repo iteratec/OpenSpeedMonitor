@@ -4,6 +4,8 @@
  * @param chartDivIdentifier a unique identifer for the chart div
  */
 function createMultiLineGraph(data, chartDivIdentifier) {
+    //Since we get our data unified and without ids, we create a map where each name get's an id.
+    //If we do visual changes we can rely on this ids to get the right line. The global declaration is explicit.
     idMap = {};
     data.lines.forEach(function (el,i,a) {
         idMap[el.name] = el.id;
@@ -265,25 +267,39 @@ function createMultiLineGraph(data, chartDivIdentifier) {
 }
 
 /**
+ * Enables the aplly button, if a value was selected or disables it, if there was noe value selected
+ * @param selectedValue
+ */
+function handleMappingSelect(selectedValue){
+    highlightLine(selectedValue);
+    var mappingButton =  d3.select("#applyMapping");
+    if(selectedValue=="null"){
+        mappingButton.attr("disabled",true);
+        mappingButton.attr("onClick",null);
+    }else{
+        mappingButton.attr("disabled",null);
+        mappingButton.attr("onClick","copyDefaultMappingToPageAsynchronously()");
+    }
+}
+
+/**
  * Fades all non selected lines to grey. If this name is not defined, this method will just return.
  * If the name is null or empty this method will give every path it's origin color.
  * @param name
  */
 function highlightLine(name){
     var chosenOne =  d3.select("#line_"+idMap[name]);
-    //If this is null, the element doesn't exist and we stop
-    if(chosenOne[0] == null) return;
 
     var allLines = d3.selectAll(".oneLine").select(".line");
     var colorFunction;
-        if(name == "" || name == null){
+        if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};
     } else{
        colorFunction = function(d) {return "grey"};
     }
     allLines.transition().duration(500).style("stroke", colorFunction);
 
-    //We add another transition, with zero ms, to stop the grey transition
-    //for our selected element and change the color to its origin
-    chosenOne.select(".line").transition().duration(0).style("stroke",colorScale(name));
+    //If there is a grey transition running, this will stop it for
+    //our chosen one and start a transition to it's origin color
+    chosenOne.select(".line").transition().duration(500).style("stroke",colorScale(name));
 }
