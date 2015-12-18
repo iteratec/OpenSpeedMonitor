@@ -100,4 +100,21 @@ class DefaultTimeToCsMappingService {
 
         return multiLineChart
     }
+
+    /**
+     * Deletes all DefaultTimeToCsMapping entries with the given name.
+     * If this name doesn't exist, this method will fail
+     * @param name
+     * @throws IllegalArgumentException
+     */
+    void deleteDefaultTimeToCsMapping(String name){
+        List<DefaultTimeToCsMapping> mappings = DefaultTimeToCsMapping.findAllByName(name)
+        if (mappings.size() == 0)
+            throw new IllegalArgumentException("No default csi mapping with name ${name} exists!")
+
+        DefaultTimeToCsMapping.withTransaction {
+            mappings*.delete()
+        }
+        log.info("${DefaultTimeToCsMapping.getSimpleName()} $name deleted")
+    }
 }
