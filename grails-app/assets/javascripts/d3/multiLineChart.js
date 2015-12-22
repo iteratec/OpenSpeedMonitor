@@ -295,11 +295,12 @@ function highlightLine(name){
         if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};
     } else{
-       colorFunction = function(d) {return "DBDBDB"};
+       colorFunction = function() {return "DBDBDB"};
     }
-    allLines.transition().duration(500).style("stroke", colorFunction);
-
-    //If there is a grey transition running, this will stop it for
+    allLines.transition().duration(500).style("stroke", colorFunction).style("stroke-width",2);
+    //re-append line so it won't be hidden by other lines
+    chosenOne.node().parentNode.appendChild(chosenOne.node());
+    //If there is a transition running, this will stop it for
     //our chosen one and start a transition to it's origin color
-    chosenOne.select(".line").transition().duration(500).style("stroke",colorScale(name));
+    chosenOne.select(".line").transition().duration(500).style("stroke",colorScale(name)).style("stroke-width",5);
 }
