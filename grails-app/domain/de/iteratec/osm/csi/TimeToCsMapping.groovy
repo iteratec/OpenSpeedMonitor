@@ -24,6 +24,8 @@ class TimeToCsMapping implements RickshawTransformableCsMapping {
 	/** each investigation of customer satisfaction with different load-times will provide a new set of TimeToCiMapping's */
 	Integer mappingVersion
 
+    static belongsTo = [CsiConfiguration]
+
     static constraints = {
 		page()
 		loadTimeInMilliSecs()

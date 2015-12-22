@@ -18,13 +18,16 @@
 package de.iteratec.osm.csi
 
 
-class HourOfDay {
-	int fullHour
-	Double weight
+import grails.test.mixin.*
+import org.junit.*
 
-	static belongsTo = [CsiConfiguration]
+/**
+ * See the API for {@link grails.test.mixin.domain.DomainClassUnitTestMixin} for usage instructions
+ */
+@TestFor(PageWeight)
+class PageWeightSpec {
 
-	static constraints = {
-		fullHour(unique:true, min:0, max:23)
-	}
+    void testSomething() {
+        fail "Implement me"
+    }
 }

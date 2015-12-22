@@ -18,13 +18,25 @@
 package de.iteratec.osm.csi
 
 
-class HourOfDay {
-	int fullHour
-	Double weight
+class CsiConfiguration {
 
-	static belongsTo = [CsiConfiguration]
+    String label
+    String description
+    List<HourOfDay> hourOfDays = []
+    List<BrowserConnectivityWeight> browserConnectivityWeights = []
+    List<PageWeight> pageWeights = []
+    List<TimeToCsMapping> timeToCsMappings = []
 
-	static constraints = {
-		fullHour(unique:true, min:0, max:23)
-	}
+    static hasMany = [hourOfDays:HourOfDay, browserConnectivityWeights:BrowserConnectivityWeight,
+                      pageWeights:PageWeight, timeToCsMappings:TimeToCsMapping]
+
+
+    static mapping = {
+        description type: 'text'
+    }
+
+    static constraints = {
+        label unique: true
+        description nullable: true
+    }
 }

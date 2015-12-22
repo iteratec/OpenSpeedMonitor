@@ -17,14 +17,21 @@
 
 package de.iteratec.osm.csi
 
+/**
+ * PageWeight
+ * A domain class describes the data object and it's mapping to the database
+ */
+class PageWeight {
 
-class HourOfDay {
-	int fullHour
-	Double weight
+    Page page
+    double weight
 
-	static belongsTo = [CsiConfiguration]
+    static belongsTo = [CsiConfiguration]
 
-	static constraints = {
-		fullHour(unique:true, min:0, max:23)
-	}
+    static mapping = {
+    }
+
+    static constraints = {
+    }
+
 }
