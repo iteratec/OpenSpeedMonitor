@@ -295,7 +295,7 @@ function highlightLine(name){
         if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};
     } else{
-       colorFunction = function(d) {return "grey"};
+       colorFunction = function(d) {return "DBDBDB"};
     }
     allLines.transition().duration(500).style("stroke", colorFunction);
 
