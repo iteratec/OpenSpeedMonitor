@@ -105,11 +105,16 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <g:each in="${jobSets}" var="jobSet">
-                                    <li><a id="${jobSet.name}" href="#"
-                                           onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>
-                                    </li>
-                                </g:each>
+                                <g:if test="${jobSets.size > 0}">
+                                    <g:each in="${jobSets}" var="jobSet">
+                                        <li><a id="${jobSet.name}" href="#"
+                                               onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>
+                                        </li>
+                                    </g:each>
+                                </g:if>
+                                <g:else>
+                                    <li><g:message code="de.iteratec.osm.job.filterNoJobSet" default="Kein JobSet"/> </li>
+                                </g:else>
                             </ul>
                         </div>
                         <a class="close pull-left" href="#"

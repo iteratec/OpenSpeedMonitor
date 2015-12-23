@@ -39,8 +39,6 @@ import grails.util.Environment
 import org.joda.time.DateTime
 import de.iteratec.osm.csi.CsiTransformation
 
-import static de.iteratec.osm.util.Constants.DEFAULT_CSI_MAPPINGS
-
 class BootStrap {
 
     EventMeasuredValueService eventMeasuredValueService

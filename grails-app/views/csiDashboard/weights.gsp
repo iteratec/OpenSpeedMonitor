@@ -144,13 +144,36 @@
 
 <div class="row">
     <div class="span12">
+        <div class="btn-group pull-left">
+            <a id="csiConfigurationSelectButton" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown"
+               href="#">
+                <g:message code="de.iteratec.osm.csiConfiguration.selectButton" default="Csi Configuration"/>
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <g:each in="${csiConfigurations}" var="conf">
+                    <li><a id="button_${conf}" href="#" onclick="changeCsiConfiguration()">${conf}</a>
+                        %{--onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>--}%
+                    </li>
+                </g:each>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="span12">
         <div class="btn-group" data-toggle="buttons-radio">
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping" onclick="$('#csi-mapping').show();
-            $('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton"
-                                                  default="Weights CSI"/></button>
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights" onclick="$('#csi-mapping').hide();
-            $('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton"
-                                                  default="Mapping CSI"/></button>
+            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping"
+                    onclick="$('#csi-mapping').show();
+                    $('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton"
+                                                          default="Weights CSI"/></button>
+            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights"
+                    onclick="$('#csi-mapping').hide();
+                    $('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton"
+                                                          default="Mapping CSI"/></button>
         </div>
     </div>
 </div>
@@ -165,7 +188,7 @@
         </ul>
     </g:if>
 
-    <hr/>
+    <br/>
 
     <div class="row">
         <div class="span12">
@@ -181,7 +204,8 @@
 
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
         <g:uploadForm controller="csiConfigIO" action="uploadBrowserConnectivityWeights">
-            <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv" style="display:none">
+            <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv"
+                   style="display:none">
 
             <div class="input-append">
                 <label><g:message code="de.iteratec.ism.label.upload_new_browser_connectivity_weights"
@@ -289,7 +313,7 @@
     </p>
 
 </div>
-<hr/>
+<br/>
 
 <div class="row">
     <div class="span12">
@@ -301,7 +325,9 @@
         </h3>
     </div>
 </div>
+
 <div id="spinner-position"></div>
+
 <div class="row">
     <div class="span12">
         <g:link controller="csiConfigIO" action="downloadDefaultTimeToCsMappings">
@@ -347,7 +373,25 @@
                     'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                     'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
 
+
+%{--Todomarcus IT-720--}%
+<div class="row">
+    <div class="span12">
+        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+            <div class="btn-group">
+                <button type="button" class="btn btn-small btn-primary" id="btn-save-csi-configuration">
+                    <g:message code="de.iteratec.osm.csiConfiguration.saveAs" default="Save as"/></button>
+
+                <button type="button" class="btn btn-small btn-danger" id="btn-delete-csi-configuration">
+                    <g:message code="de.iteratec.osm.csiConfiguration.deleteCsiConfiguration"
+                               args="${[selectedCsiConfiguration]}"
+                               default="Save as"/></button>
+            </div>
+        </sec:ifAnyGranted>
+    </div>
 </div>
+</div>
+
 
 <%-- include bottom ---------------------------------------------------------------------------%>
 
@@ -391,6 +435,10 @@
         };
 
         $(document).ready(function(){
+    %{--todomarcus temp--}%
+        var test = ${selectedCsiConfiguration};
+        console.log(test);
+        $('#csiConfigurationSelectButton').html("Csi Configuration: " + ${selectedCsiConfiguration} + ' <span class="caret"></span>');
 
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");

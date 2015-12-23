@@ -1003,15 +1003,20 @@ class CsiDashboardController {
         def barChartJSON = barChartData as JSON
 
         MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
+        String selectedCsiConfiguration = "\'Default\'"
 
-        [errorMessagesCsi       : params.list('errorMessagesCsi'),
-         showCsiWeights         : params.get('showCsiWeights') ?: false,
-         mappingsToOverwrite    : params.list('mappingsToOverwrite'),
-         csvFileAsList          : params.list('csvFileAsList'),
-         matrixViewData         : matrixViewDataJSON,
-         treemapData            : treemapDataJSON,
-         barchartData           : barChartJSON,
-         defaultTimeToCsMappings: defaultTimeToCsMappingsChart as JSON]
+        // todomarcus temp
+        List<String> csi_configurations = ["Default", "Config1"]
+
+        [errorMessagesCsi        : params.list('errorMessagesCsi'),
+         showCsiWeights          : params.get('showCsiWeights') ?: false,
+         mappingsToOverwrite     : params.list('mappingsToOverwrite'),
+         csiConfigurations       : csi_configurations,
+         selectedCsiConfiguration: selectedCsiConfiguration,
+         matrixViewData          : matrixViewDataJSON,
+         treemapData             : treemapDataJSON,
+         barchartData            : barChartJSON,
+         defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON]
     }
 
     /**
@@ -1054,6 +1059,7 @@ class CsiDashboardController {
 
     /**
      * Checks if hours between given fromDate and toDate is greater than 4 months.
+     *
      *
      * @param fromDate TODO Doc: Inclusive? Eclusive?
      * @param toDate TODO Doc: Inclusive? Eclusive?

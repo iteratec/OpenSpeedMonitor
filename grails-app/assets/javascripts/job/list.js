@@ -124,7 +124,6 @@ JobStatusUpdater = function() {
 	}
 }();
 
-//TODO IT-703
 function filterJobSet(selectedJobSetName, selectedJobSetJobs) {
 	setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs', selectedJobSetJobs);
 	setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetName', selectedJobSetName);
