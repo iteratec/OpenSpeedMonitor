@@ -7,4 +7,8 @@ databaseChangeLog = {
 	include file: '2015-12-15-SCHEME-measured-value-and-connectivity-profile.groovy'
     include file: '2015-12-16-DATA-delete-invalid-default-csi-mappings.groovy'
     include file: '2015-12-22-DATA-delete-measured-value-update-events.groovy'
+
+	include file: '2015-12-23-SCHEME-day-class-with-hoursOfDay.groovy'
+
+	include file: '2015-12-23-SCHEME-replaced-hourOfDays-with-day-in-CsiConfiguration.groovy'
 }

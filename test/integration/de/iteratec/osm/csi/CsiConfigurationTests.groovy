@@ -21,7 +21,10 @@ class CsiConfigurationTests extends IntegrationSpec {
             browser.addToBrowserAliases(browserAlias)
             browser.save(flush: true)
             browserAlias.save(flush: true)
-            HourOfDay hourOfDay = new HourOfDay(fullHour: 1, weight: 0.5).save(failOnError: true)
+            Day day = new Day(name:"a good day")
+            (0..23).each{
+                day.addToHoursOfDay(new HourOfDay(fullHour: it, weight: 1, ).save(failOnError: true))
+            }
             PageWeight pageWeight = new PageWeight(page: page, weight: 0.5).save(failOnError: true)
             TimeToCsMapping timeToCsMapping = new TimeToCsMapping(page: page, loadTimeInMilliSecs: 100, customerSatisfaction: 0.5, mappingVersion: 100 ).save(failOnError: true)
             CsiConfiguration csiConfiguration = new CsiConfiguration(label: "csiConfig", description: "some information")
@@ -31,14 +34,14 @@ class CsiConfigurationTests extends IntegrationSpec {
             csiConfiguration.addToBrowserConnectivityWeights(browserConnectivityWeight)
             csiConfiguration.addToPageWeights(pageWeight)
             csiConfiguration.addToTimeToCsMappings(timeToCsMapping)
-            csiConfiguration.addToHourOfDays(hourOfDay)
+            csiConfiguration.day = day
             csiConfiguration.save(failOnError: true)
         when: "We delete this CsiConfiguration"
             csiConfiguration.delete()
         then: "There should be no child elements left"
             CsiConfiguration.count == 0
-            HourOfDay.count == 0
             PageWeight.count == 0
+            Day.count == 0
             TimeToCsMapping.count == 0
             BrowserConnectivityWeight.count == 0
     }

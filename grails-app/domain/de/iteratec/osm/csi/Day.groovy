@@ -17,26 +17,30 @@
 
 package de.iteratec.osm.csi
 
+/**
+ * Day
+ * A domain class describes the data object and it's mapping to the database
+ */
+class Day {
 
-class CsiConfiguration {
+    static hasMany = [hoursOfDay:HourOfDay]
+    String name
 
-    String label
-    String description
-    Day day
-    List<BrowserConnectivityWeight> browserConnectivityWeights = []
-    List<PageWeight> pageWeights = []
-    List<TimeToCsMapping> timeToCsMappings = []
-
-    static hasMany = [browserConnectivityWeights:BrowserConnectivityWeight,
-                      pageWeights:PageWeight, timeToCsMappings:TimeToCsMapping]
-
-
+    static belongsTo = [CsiConfiguration]
     static mapping = {
-        description type: 'text'
     }
 
     static constraints = {
-        label unique: true
-        description nullable: true
+        //Check if we got unique hours and 24 hours
+        hoursOfDay validator: { hours, obj ->
+            HashSet set = new HashSet()
+            hours.each {
+                if(set.add(it.fullHour)){
+                    return false
+                }
+            }
+            return set.size() == 24
+        }
     }
+
 }
