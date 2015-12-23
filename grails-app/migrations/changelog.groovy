@@ -6,4 +6,5 @@ databaseChangeLog = {
 	include file: '2015-12-09-SCHEME-csi-configuration.groovy'
 	include file: '2015-12-15-SCHEME-measured-value-and-connectivity-profile.groovy'
     include file: '2015-12-16-DATA-delete-invalid-default-csi-mappings.groovy'
+    include file: '2015-12-22-DATA-delete-measured-value-update-events.groovy'
 }

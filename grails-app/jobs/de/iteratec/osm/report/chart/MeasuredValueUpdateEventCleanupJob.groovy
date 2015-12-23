@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.MvUpdateEventCleanupService;
 
 /**
@@ -35,5 +34,6 @@ class MeasuredValueUpdateEventCleanupJob {
     }
     def execute() {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300, createBatchActivity)
+        mvUpdateEventCleanupService.deleteUpdateEventsForClosedMVs()
     }
 }
