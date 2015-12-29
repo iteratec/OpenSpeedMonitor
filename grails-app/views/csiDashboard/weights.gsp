@@ -147,12 +147,12 @@
         <div class="btn-group pull-left">
             <a id="csiConfigurationSelectButton" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown"
                href="#">
-                <g:message code="de.iteratec.osm.csiConfiguration.selectButton" default="Csi Configuration"/>
+                ${selectedCsiConfiguration}
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
                 <g:each in="${csiConfigurations}" var="conf">
-                    <li><a id="button_${conf}" href="#" onclick="changeCsiConfiguration()">${conf}</a>
+                    <li><a id="button_${conf}" onclick="changeCsiConfiguration(this.getAttribute('value'))" value="${conf[0]}">${conf[1]}</a>
                         %{--onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>--}%
                     </li>
                 </g:each>
@@ -435,11 +435,6 @@
         };
 
         $(document).ready(function(){
-    %{--todomarcus temp--}%
-        var test = ${selectedCsiConfiguration};
-        console.log(test);
-        $('#csiConfigurationSelectButton').html("Csi Configuration: " + ${selectedCsiConfiguration} + ' <span class="caret"></span>');
-
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
             createBarChart(1000, 750, ${barchartData},"clocks", "hoursOfDayBarchart");
@@ -490,6 +485,10 @@
                 left: '50%' // Left position relative to parent in px
             };
         return new Spinner(opts).spin(spinnerElement);
+        }
+
+        function changeCsiConfiguration(id){
+                window.location.href="http://localhost:8080/OpenSpeedMonitor/csiDashboard/weights/"+id;
         }
 
     </asset:script>

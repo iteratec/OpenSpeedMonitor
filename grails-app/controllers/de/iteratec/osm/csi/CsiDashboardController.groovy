@@ -968,7 +968,21 @@ class CsiDashboardController {
     }
 
     def weights() {
-        log.debug("params=$params")
+        CsiConfiguration config
+        if(params.id){
+            config = CsiConfiguration.findById(params.id)
+        } else{//There was no id defined
+            config = CsiConfiguration.findByLabel("Default")
+            if(!config){//The Default Config is missing
+                config = CsiConfiguration.findByIdGreaterThan(-1)
+            }
+        }
+        if(!config){//There is no Config at all or the id doesn't exists, redirect to create one
+            //TODO redirect to a create page
+            render ":("
+            return
+        }
+        log.debug(config.label)
 
         //Labels for charts
         String zeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.zeroWeightLabel", "Pages ohne Gewichtung")
@@ -987,26 +1001,27 @@ class CsiDashboardController {
         MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel, zeroWeightLabel: matrixZeroWeightLabel)
         matrixViewData.addColumns(Browser.findAll()*.name as Set)
         matrixViewData.addRows(ConnectivityProfile.findAll()*.name as Set)
-        BrowserConnectivityWeight.findAll().each {
+        config.browserConnectivityWeights.each {
             matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))
         }
         def matrixViewDataJSON = matrixViewData as JSON
 
         // arrange treemap data
         TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
-        pageDaoService.findAll().each { p -> treemapData.addNode(new ChartEntry(name: p.name, weight: p.weight)) }
+        config.pageWeights.each { pageWeight -> treemapData.addNode(new ChartEntry(name: pageWeight.page.name, weight: pageWeight.weight)) }
         def treemapDataJSON = treemapData as JSON
 
         // arrange barchart data
         BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
-        HourOfDay.findAll().each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
+        config.day.hoursOfDay.sort{a,b->a.fullHour-b.fullHour}.each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
         def barChartJSON = barChartData as JSON
 
         MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
-        String selectedCsiConfiguration = "\'Default\'"
+        String selectedCsiConfiguration = config.label
 
         // todomarcus temp
-        List<String> csi_configurations = ["Default", "Config1"]
+        List csi_configurations = []
+        CsiConfiguration.list().each {csi_configurations << [it.id,it.label]}
 
         [errorMessagesCsi        : params.list('errorMessagesCsi'),
          showCsiWeights          : params.get('showCsiWeights') ?: false,
