@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
 
 public enum JobGroupType {
@@ -27,7 +28,7 @@ public enum JobGroupType {
     /**
      * To group results of several (not csi relevant) jobs that belong together. For more convenient selection in osm-dashboards.
      */
-    RAW_DATA_SELECTION,
+            RAW_DATA_SELECTION,
 }
 
 /**
@@ -47,16 +48,21 @@ class JobGroup {
 
     JobGroupType groupType
 
+    CsiConfiguration csiConfiguration
+
     /**
      * Graphite-Servers to which results of this JobGroup should be sent.
      */
     Collection<GraphiteServer> graphiteServers = []
-    static hasMany = [graphiteServers:GraphiteServer]
+    static hasMany = [graphiteServers: GraphiteServer]
 
     static constraints = {
         name(unique: true, maxSize: 255)
         groupType(maxSize: 255)
         graphiteServers()
+        csiConfiguration(nullable: true, validator: {
+            (groupType != JobGroupType.CSI_AGGREGATION) || (csiConfiguration != null)
+        })
     }
 
     @Override

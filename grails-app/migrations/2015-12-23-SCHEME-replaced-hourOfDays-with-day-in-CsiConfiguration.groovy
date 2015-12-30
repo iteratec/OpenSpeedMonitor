@@ -9,7 +9,7 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "bwo (generated)", id: "1450880600666-2") {
-		dropForeignKeyConstraint(baseTableName: "csi_configuration_hour_of_day", baseTableSchemaName: "osm", constraintName: "FKD71CD360A33A543A")
+		dropForeignKeyConstraint(baseTableName: "csi_configuration_hour_of_day", constraintName: "FKD71CD360A33A543A")
 	}
 
 	changeSet(author: "bwo (generated)", id: "1450880600666-4") {

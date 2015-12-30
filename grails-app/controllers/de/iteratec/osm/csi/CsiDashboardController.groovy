@@ -1019,7 +1019,6 @@ class CsiDashboardController {
         MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
         String selectedCsiConfiguration = config.label
 
-        // todomarcus temp
         List csi_configurations = []
         CsiConfiguration.list().each {csi_configurations << [it.id,it.label]}
 
