@@ -178,7 +178,7 @@ N<div class="row">
                 <button type="button" class="btn btn-small btn-danger" id="btn-delete-csi-configuration">
                     <g:message code="de.iteratec.osm.csiConfiguration.deleteCsiConfiguration"
                                args="${[selectedCsiConfiguration]}"
-                               default="Save as"/></button>
+                               default="Delete"/></button>
             </div>
         </sec:ifAnyGranted>
     </div>

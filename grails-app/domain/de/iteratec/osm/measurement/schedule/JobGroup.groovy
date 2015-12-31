@@ -60,9 +60,7 @@ class JobGroup {
         name(unique: true, maxSize: 255)
         groupType(maxSize: 255)
         graphiteServers()
-        csiConfiguration(nullable: true, validator: {
-            (groupType != JobGroupType.CSI_AGGREGATION) || (csiConfiguration != null)
-        })
+        csiConfiguration(nullable: true)
     }
 
     @Override
