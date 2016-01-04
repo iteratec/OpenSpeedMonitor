@@ -5,4 +5,5 @@ databaseChangeLog = {
     include file: '2015-11-26-SCHEME-optimizing-indices.groovy'
 	include file: '2015-12-15-SCHEME-measured-value-and-connectivity-profile.groovy'
     include file: '2015-12-16-DATA-delete-invalid-default-csi-mappings.groovy'
+    include file: '2016-01-04-DATA-create-initial-browser-connectivity-weights.groovy'
 }
