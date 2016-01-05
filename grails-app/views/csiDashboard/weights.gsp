@@ -281,7 +281,7 @@ N<div class="row">
         }
 
         function changeCsiConfiguration(id){
-                window.location.href="http://localhost:8080/OpenSpeedMonitor/csiDashboard/weights/"+id;
+                window.location.href="<g:createLink action="weights" absolute="true"/>/"+id;
         }
 
     </asset:script>
