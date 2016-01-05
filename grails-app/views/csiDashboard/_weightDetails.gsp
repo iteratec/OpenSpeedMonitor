@@ -115,8 +115,8 @@
 
                 <div class="input-append">
                     <label>
-                        <g:message code="de.iteratec.ism.label.upload_new_hourofday_weights"
-                                   default="Neue Tageszeit-Gewichtung hochladen (csv)"/>
+                        <g:message code="de.iteratec.ism.label.upload_default_mappings"
+                                   default="Neue Default-Mappings hochladen (CSV)"/>
                     </label>
                     <input id="theHourOfDayCsvFileTwitter" class="input-large" type="text">
                     <a class="btn" onclick="$('input[id=theHourOfDayCsvFile]').click();">
@@ -185,8 +185,8 @@
 
                         <div class="input-append">
                             <label>
-                                <g:message code="de.iteratec.ism.label.upload_new_hourofday_weights"
-                                           default="Neue Tageszeit-Gewichtung hochladen (csv)"/>
+                                <g:message code="de.iteratec.ism.label.upload_default_mappings"
+                                           default="Neue Default-Mappings hochladen (CSV)"/>
                             </label>
                             <input id="defaultTimeToCsMappingCsvFileVisible" class="input-large" type="text">
                             <a class="btn" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
@@ -246,7 +246,4 @@
               model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': 'default_csi_mappings',
                         'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
-
-
-
 </div>
