@@ -41,6 +41,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
+import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -1121,6 +1122,11 @@ class CsiDashboardController {
             csvAsString = csvAsString.substring(0, csvAsString.length() - 1)
         }
         return csvAsString
+    }
+    @Secured(['ROLE_SUPER_ADMIN'])
+    def deleteDefaultCsiMapping(String name){
+        defaultTimeToCsMappingService.deleteDefaultTimeToCsMapping(name)
+        render ""
     }
 
 }

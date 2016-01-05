@@ -1,3 +1,4 @@
+<%@ page import="grails.converters.JSON" %>
 <div class="row">
     <div class="span12">
         <div class="btn-group" data-toggle="buttons-radio">
@@ -211,6 +212,34 @@
                                         default="These Mappings can be assigned to pages"/>
             </span>
         </div>
+    </div>
+    <div>
+       <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect{it.name}}"
+                      name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
+                      noSelection="${[null:message(code:'de.iteratec.osm.csi.mapping.select.default')]}"/>
+            <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true" id="btn-delete-default">
+            <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
+                       default="Delete Default Mapping"/> </button>
+            <g:javascript>
+                function defaultSelectChange(value){
+                    $('#btn-delete-default').prop('disabled', $('#select-default').val()=="null");
+                    handleMappingSelect(value);
+                }
+                function deleteDefault(){
+                    $('#btn-delete-default').prop('disabled', true);
+                    $.post( "<g:createLink action="deleteDefaultCsiMapping" absolute="true"/>", {"name":$('#select-default').val()})
+                      .done(function( data ) {
+                            window.location.reload();
+                      });
+                }
+            </g:javascript>
+           <style>
+               #select-default{
+                   margin-top:10px;
+               }
+           </style>
+        </sec:ifAllGranted>
     </div>
 
     <g:render template="/chart/csi-mappings"
