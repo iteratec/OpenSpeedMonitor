@@ -17,21 +17,22 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-
-import static org.junit.Assert.assertEquals
-import grails.test.mixin.*
-
-import org.joda.time.DateTime
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.util.PerformanceLoggingService
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.joda.time.DateTime
+
+import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
 @Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser])
@@ -54,6 +55,7 @@ class WeightingServiceTests {
         //mocks
         mockCustomerSatisfactionWeightService()
         mockMeasuredValueTagService()
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
     }
 
     void tearDown() {
@@ -67,10 +69,10 @@ class WeightingServiceTests {
         CsiValue measuredValue = new MeasuredValue()
 
         //test for EventResult
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResult, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResult, weightFactors, BrowserConnectivityWeight.list())
         assertEquals(1d, deliveredWeight, DELTA)
         //test for MeasuredValue
-        deliveredWeight = serviceUnderTest.getWeight(measuredValue, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValue, weightFactors, BrowserConnectivityWeight.list())
         assertEquals(1d, deliveredWeight, DELTA)
 
     }
@@ -84,24 +86,24 @@ class WeightingServiceTests {
         CsiValue measuredValueFiveAClockPm = new MeasuredValue(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
 
         //test for EventResults
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultTwoAClockAm, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResultTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         double expectedWeight = 0.2d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(eventResultFiveAClockPm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultFiveAClockPm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 7.3d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.2d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueFiveAClockPm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueFiveAClockPm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 7.3d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for not getting correct hourofday
         mockCustomerSatisfactionWeightServiceToDeliverWrongHoursofDay()
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -112,29 +114,34 @@ class WeightingServiceTests {
 
         ConnectivityProfile connectivityProfile = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
         ConnectivityProfile connectivityProfile70 = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.5d)
-        BrowserConnectivityWeight browserConnectivityWeight70 = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.7d)
-        browserConnectivityWeight.save()
-        BrowserConnectivityWeight.metaClass.'static'.findByBrowserAndConnectivity = { browser, conn ->
-            if (conn == connectivityProfile70) return browserConnectivityWeight70 else return browserConnectivityWeight }
+//        BrowserConnectivityWeight.metaClass.'static'.findByBrowserAndConnectivity = { browser, conn ->
+//            if (conn == connectivityProfile70) return browserConnectivityWeight70 else return browserConnectivityWeight }
         CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile)
         CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile70)
         CsiValue measuredValueBrowserWeightOfFiftyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile)
         CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile70)
+        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(
+                connectivityProfile: connectivityProfile,
+                browser: serviceUnderTest.measuredValueTagService.findBrowserOfHourlyEventTag(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT),
+                weight: 0.5d)
+        BrowserConnectivityWeight browserConnectivityWeight70 = new BrowserConnectivityWeight(
+                connectivityProfile: connectivityProfile70,
+                browser: serviceUnderTest.measuredValueTagService.findBrowserOfHourlyEventTag(TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT),
+                weight: 0.7d)
 
         //test for EventResults
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors, [browserConnectivityWeight, browserConnectivityWeight70])
         double expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors, [browserConnectivityWeight, browserConnectivityWeight70])
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors, [browserConnectivityWeight, browserConnectivityWeight70])
         expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors, [browserConnectivityWeight, browserConnectivityWeight70])
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -148,18 +155,18 @@ class WeightingServiceTests {
         CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
 
         //test for EventResults
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors, BrowserConnectivityWeight.list())
         double expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -174,14 +181,14 @@ class WeightingServiceTests {
         CsiValue eventResultWeightSeventyFivePm = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(), connectivityProfile: connectivityProfile)
 
         //test with all three WeightFactors
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultWeightFiftyTwoAm, [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResultWeightFiftyTwoAm, [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, BrowserConnectivityWeight.list())
         double expectedHourofdayWeight = 0.2d
         double expectedBrowserConnectivityWeight = 0.5d
         double expectedPageWeight = 0.5d
         double expectedWeight = expectedHourofdayWeight * expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, BrowserConnectivityWeight.list())
         expectedHourofdayWeight = 7.3d
         expectedBrowserConnectivityWeight = 0.5d
         expectedPageWeight = 0.7d
@@ -189,13 +196,13 @@ class WeightingServiceTests {
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test with two weightFactors
-        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, BrowserConnectivityWeight.list())
         expectedBrowserConnectivityWeight = 0.5d
         expectedPageWeight = 0.7d
         expectedWeight = expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, BrowserConnectivityWeight.list())
         expectedHourofdayWeight = 7.3d
         expectedBrowserConnectivityWeight = 0.5d
         expectedWeight = expectedHourofdayWeight * expectedBrowserConnectivityWeight

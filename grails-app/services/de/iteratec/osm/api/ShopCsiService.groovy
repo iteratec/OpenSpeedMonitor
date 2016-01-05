@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 
 import org.joda.time.DateTime
@@ -39,6 +40,7 @@ class ShopCsiService {
 	WeightingService weightingService
 	MeanCalcService meanCalcService
 	CsTargetGraphDaoService csTargetGraphDaoService
+    PerformanceLoggingService performanceLoggingService
 
 	/**
 	 * <p>
@@ -52,30 +54,42 @@ class ShopCsiService {
 	 * @return Customer satisfaction index (CSI) for a hole system.
 	 */
     public SystemCSI retrieveSystemCsiByRawData(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
-		
-		List<EventResult> eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(start.toDate(), end.toDate(), [CachedView.UNCACHED], queryParams)
-		if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${eventResults.size()} EventResults building database for calculation.")}
-		List<WeightedCsiValue> weightedCsiValues = []
-		if (eventResults.size() > 0) {
-			weightedCsiValues = weightingService.getWeightedCsiValues(eventResults, weightFactors)
-		}
-		
-		if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
-		if (weightedCsiValues.size()>0) {
-			double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
-			double targetCsi = 100d
-			CsTargetGraph targetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
-			if (targetGraph) {
-				targetCsi = targetGraph.getPercentOfDate(end)
-			}
-			return new SystemCSI(
-				csiValueAsPercentage: weightedValueAsPercentage,
-				targetCsiAsPercentage:  targetCsi,
-				delta: weightedValueAsPercentage - targetCsi,
-				countOfMeasurings: weightedCsiValues*.underlyingEventResultIds.flatten().size()
-				) 
-		}else{
-			throw new IllegalArgumentException("For the following query-params a system-csi couldn't be calculated: ${queryParams}")
-		}
+
+        List<EventResult> eventResults
+		performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] get event results', PerformanceLoggingService.IndentationDepth.ONE){
+            eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(start.toDate(), end.toDate(), [CachedView.UNCACHED], queryParams)
+        }
+
+        if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${eventResults.size()} EventResults building database for calculation.")}
+        List<WeightedCsiValue> weightedCsiValues = []
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] weight event results', PerformanceLoggingService.IndentationDepth.ONE){
+            if (eventResults.size() > 0) {
+                weightedCsiValues = weightingService.getWeightedCsiValues(eventResults, weightFactors)
+            }
+        }
+
+        SystemCSI systemCSI
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] calculate weighted mean and prepare return value', PerformanceLoggingService.IndentationDepth.ONE){
+            if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
+            if (weightedCsiValues.size()>0) {
+                double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+                double targetCsi = 100d
+                CsTargetGraph targetGraph = csTargetGraphDaoService.getActualCsTargetGraph()
+                if (targetGraph) {
+                    targetCsi = targetGraph.getPercentOfDate(end)
+                }
+                systemCSI = new SystemCSI(
+                        csiValueAsPercentage: weightedValueAsPercentage,
+                        targetCsiAsPercentage:  targetCsi,
+                        delta: weightedValueAsPercentage - targetCsi,
+                        countOfMeasurings: weightedCsiValues*.underlyingEventResultIds.flatten().size()
+                )
+            }else{
+                throw new IllegalArgumentException("For the following query-params a system-csi couldn't be calculated: ${queryParams}")
+            }
+        }
+
+        return systemCSI
+
 	}
 }
