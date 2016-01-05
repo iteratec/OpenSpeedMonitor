@@ -335,7 +335,8 @@ class BootStrap {
         if (DefaultTimeToCsMapping.list().size() == 0) {
 
             Map indexToMappingName = [1: '1 - impatient', 2: '2', 3: '3', 4: '4', 5: '5 - patient']
-            File csvFile = new File("grails-app/conf/Default_CSI_Mappings.csv")
+            String pathToCsiMappingCsv = 'resources/Default_CSI_Mappings.csv'
+            File csvFile = grailsApplication.mainContext.getResource("classpath:$pathToCsiMappingCsv").file
             int lineCounter = 0
             new FileInputStream(csvFile).eachLine { line ->
                 // exclude header
