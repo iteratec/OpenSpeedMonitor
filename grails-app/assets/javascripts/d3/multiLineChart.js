@@ -270,9 +270,9 @@ function createMultiLineGraph(data, chartDivIdentifier) {
  * Enables the aplly button, if a value was selected or disables it, if there was noe value selected
  * @param selectedValue
  */
-function handleMappingSelect(selectedValue){
-    highlightLine(selectedValue);
-    var mappingButton =  d3.select("#applyMapping");
+function handleMappingSelect(selectedValue, chartIdentifier){
+    highlightLine(selectedValue, chartIdentifier);
+    var mappingButton =  d3.select(chartIdentifier).select("#applyMapping");
     if(selectedValue=="null"){
         mappingButton.attr("disabled",true);
         mappingButton.attr("onClick",null);
@@ -286,12 +286,13 @@ function handleMappingSelect(selectedValue){
  * Fades all non selected lines to grey. If this name is not defined, this method will just return.
  * If the name is null or empty this method will give every path it's origin color.
  * @param name
+ * @param chartIdentifier div of the chart
  */
-function highlightLine(name){
-    var chosenOne =  d3.select("#line_"+idMap[name]);
+function highlightLine(name, chartIdentifier){
+    var chosenOne =  d3.select(chartIdentifier).select("#line_"+idMap[name]);
 
     //fade out all lines or set them to their orign color
-    var allLines = d3.selectAll(".oneLine").select(".line");
+    var allLines = d3.select(chartIdentifier).selectAll(".oneLine").select(".line");
     var colorFunction;
     if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};

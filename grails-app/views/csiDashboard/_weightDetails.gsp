@@ -214,6 +214,7 @@
         </div>
     </div>
     <div>
+        <g:set var="defaultIdentifier" value='default_csi_mappings'/>
        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect{it.name}}"
                       name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
@@ -224,7 +225,7 @@
             <g:javascript>
                 function defaultSelectChange(value){
                     $('#btn-delete-default').prop('disabled', $('#select-default').val()=="null");
-                    handleMappingSelect(value);
+                    handleMappingSelect(value,${defaultIdentifier});
                 }
                 function deleteDefault(){
                     $('#btn-delete-default').prop('disabled', true);
@@ -243,7 +244,7 @@
     </div>
 
     <g:render template="/chart/csi-mappings"
-              model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': 'default_csi_mappings',
+              model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
                         'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
 </div>
