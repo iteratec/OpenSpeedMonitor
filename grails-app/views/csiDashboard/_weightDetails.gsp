@@ -225,7 +225,7 @@
             <g:javascript>
                 function defaultSelectChange(value){
                     $('#btn-delete-default').prop('disabled', $('#select-default').val()=="null");
-                    handleMappingSelect(value,${defaultIdentifier});
+                    handleMappingSelect(value,"${defaultIdentifier}");
                 }
                 function deleteDefault(){
                     $('#btn-delete-default').prop('disabled', true);

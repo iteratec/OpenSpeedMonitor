@@ -293,7 +293,6 @@ function highlightLine(name, chartIdentifier){
     var chosenOne =  d3.select("#"+chartIdentifier).select("#line_"+idMap[name]);
     //fade out all lines or set them to their orign color
     var allLines = d3.select("#"+chartIdentifier).selectAll(".oneLine").select(".line");
-    console.log(allLines);
     var colorFunction;
     if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};
