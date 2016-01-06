@@ -269,6 +269,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
 /**
  * Enables the aplly button, if a value was selected or disables it, if there was noe value selected
  * @param selectedValue
+ * @param chartIdentifier
  */
 function handleMappingSelect(selectedValue, chartIdentifier){
     highlightLine(selectedValue, chartIdentifier);
@@ -289,10 +290,10 @@ function handleMappingSelect(selectedValue, chartIdentifier){
  * @param chartIdentifier div of the chart
  */
 function highlightLine(name, chartIdentifier){
-    var chosenOne =  d3.select(chartIdentifier).select("#line_"+idMap[name]);
-
+    var chosenOne =  d3.select("#"+chartIdentifier).select("#line_"+idMap[name]);
     //fade out all lines or set them to their orign color
-    var allLines = d3.select(chartIdentifier).selectAll(".oneLine").select(".line");
+    var allLines = d3.select("#"+chartIdentifier).selectAll(".oneLine").select(".line");
+    console.log(allLines);
     var colorFunction;
     if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};
