@@ -299,9 +299,10 @@ function handleDiagramKeyMouseLeave(chartDivIdentifier, idMap, colorScale){
 }
 
 function handleDiagramKeyClick(name, chartDivIdentifier, idMap){
-    d3.select("#"+chartDivIdentifier).selectAll(".oneLine").attr("chosen", false);
     var chosen = d3.select("#"+chartDivIdentifier).select("#line_"+ idMap[name]);
-    chosen.attr("chosen", chosen.attr("chosen") != "true");
+    var bool = chosen.attr("chosen") === "false";
+    d3.select("#"+chartDivIdentifier).selectAll(".oneLine").attr("chosen", false);
+    chosen.attr("chosen", bool);
 }
 
 
