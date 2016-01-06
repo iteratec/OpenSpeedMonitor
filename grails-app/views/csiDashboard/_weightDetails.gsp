@@ -210,14 +210,9 @@
     </div>
 
     <div>
-<<<<<<< Updated upstream
         <g:set var="defaultIdentifier" value='default_csi_mappings'/>
        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect{it.name}}"
-=======
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect { it.name }}"
->>>>>>> Stashed changes
                       name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
                       noSelection="${[null: message(code: 'de.iteratec.osm.csi.mapping.select.default')]}"/>
             <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
