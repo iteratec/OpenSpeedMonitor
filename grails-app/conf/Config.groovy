@@ -131,6 +131,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 '/csiDashboard/csiValuesCsv'                        : ["permitAll"],
 '/csiDashboard/showDefault'                         : ["permitAll"],
 '/csiDashboard/weights'                             : ["permitAll"],
+'/csiDashboard/weights/**'                          : ["permitAll"],
 '/csiConfigIO/downloadBrowserWeights'               : ["permitAll"],
 '/csiConfigIO/downloadPageWeights'                  : ["permitAll"],
 '/csiConfigIO/downloadHourOfDayWeights'             : ["permitAll"],

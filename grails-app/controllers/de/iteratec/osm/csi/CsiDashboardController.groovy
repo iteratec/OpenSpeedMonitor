@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -88,6 +89,7 @@ class CsiDashboardController {
     def springSecurityService
     ConnectivityProfileDaoService connectivityProfileDaoService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
+    TimeToCsMappingService timeToCsMappingService
 
     /**
      * The Grails engine to generate links.
@@ -984,6 +986,7 @@ class CsiDashboardController {
             render ":("
             return
         }
+        String selectedCsiConfigurationLabel = config.label
         log.debug(config.label)
 
         //Labels for charts
@@ -1018,8 +1021,14 @@ class CsiDashboardController {
         config.day.hoursOfDay.sort { a, b -> a.fullHour - b.fullHour }.each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
         def barChartJSON = barChartData as JSON
 
+        // arrange default time to cs mapping chart data
         MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
-        String selectedCsiConfiguration = config.label
+
+        // arrange page time to cs mapping chart data
+        MultiLineChart pageTimeToCsMappingsChart
+        if (config.timeToCsMappings) {
+            pageTimeToCsMappingsChart = timeToCsMappingService.getPageMappingsAsChart(10000, config)
+        }
 
         List csi_configurations = []
         CsiConfiguration.list().each { csi_configurations << [it.id, it.label] }
@@ -1028,15 +1037,16 @@ class CsiDashboardController {
          showCsiWeights          : params.get('showCsiWeights') ?: false,
          mappingsToOverwrite     : params.list('mappingsToOverwrite'),
          csiConfigurations       : csi_configurations,
-         selectedCsiConfiguration: selectedCsiConfiguration,
+         selectedCsiConfiguration: selectedCsiConfigurationLabel,
          matrixViewData          : matrixViewDataJSON,
          treemapData             : treemapDataJSON,
          barchartData            : barChartJSON,
-         defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON]
+         defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
+         pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON]
     }
 
     def saveCopy() {
-        if(CsiConfiguration.findByLabel(params.label)) {
+        if (CsiConfiguration.findByLabel(params.label)) {
             throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
         }
 
@@ -1050,14 +1060,14 @@ class CsiDashboardController {
     }
 
     def deleteCsiConfiguration() {
-        if(CsiConfiguration.count <= 1) {
+        if (CsiConfiguration.count <= 1) {
             throw new IllegalStateException("There has to be a csiConfiguration left after deleting")
         }
 
         CsiConfiguration configToDelete = CsiConfiguration.findByLabel(params.label)
 
         List<JobGroup> jobGroupsUsingCsiConfigurationToDelete = JobGroup.findAllByCsiConfiguration(configToDelete)
-        jobGroupsUsingCsiConfigurationToDelete.each {group ->
+        jobGroupsUsingCsiConfigurationToDelete.each { group ->
             group.csiConfiguration = null
             group.save()
         }
@@ -1070,13 +1080,13 @@ class CsiDashboardController {
      * You are allowed to delete a csi configuration only if
      *  there is at least one other csiConfiguration left after deleting
      *
-     *  @param csiConfigurationLabel the label of the csiConfiguration to Delete
+     * @param csiConfigurationLabel the label of the csiConfiguration to Delete
      */
     def validateDeletion(String csiConfigurationLabel) {
         int csiConfigurationCount = CsiConfiguration.count()
         List<String> errorMessages = new ArrayList<>()
 
-        if(csiConfigurationCount <= 1) {
+        if (csiConfigurationCount <= 1) {
             errorMessages.add(i18nService.msg("de.iteratec.osm.csiConfiguration.deleteLastCsiConfigurationError", "es muessen mindenst zwei CsiConfigurations vorhanden sein"))
         }
 
@@ -1183,8 +1193,9 @@ class CsiDashboardController {
         }
         return csvAsString
     }
+
     @Secured(['ROLE_SUPER_ADMIN'])
-    def deleteDefaultCsiMapping(String name){
+    def deleteDefaultCsiMapping(String name) {
         defaultTimeToCsMappingService.deleteDefaultTimeToCsMapping(name)
         render ""
     }

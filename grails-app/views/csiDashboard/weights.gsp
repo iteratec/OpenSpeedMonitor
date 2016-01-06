@@ -164,7 +164,6 @@
                 <g:each in="${csiConfigurations}" var="conf">
                     <li><a id="button_${conf}" onclick="changeCsiConfiguration(this.getAttribute('value'))"
                            value="${conf[0]}">${conf[1]}</a>
-                        %{--onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>--}%
                     </li>
                 </g:each>
             </ul>
@@ -181,6 +180,7 @@
 <div class="row">
     <div class="span12">
         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+            <hr>
             <div class="btn-group">
                 <g:form method="post" role="form" class="form-horizontal">
                     <g:hiddenField name="sourceCsiConfigLabel" value="${selectedCsiConfiguration}"/>

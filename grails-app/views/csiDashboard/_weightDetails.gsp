@@ -172,6 +172,84 @@
         </div>
     </div>
 
+
+    %{--Page Mappings--}%
+    <div class="row">
+        <div class="span12">
+            <span class="inline">
+                <span class="text-info">
+                    <strong><g:message code="de.iteratec.osm.csiConfiguration.pageMappingsHeadline" default="PageMappings"/></strong>
+                </span>
+                &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.pageMappingsExplanation"
+                                        default="These Mappings are assigned to pages"/>
+            </span>
+        </div>
+    </div>
+    <g:if test="${pageTimeToCsMappings}">
+        <g:render template="/chart/csi-mappings"
+                  model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
+                            'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                            'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+    </g:if>
+    <g:else>
+        <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden." /></h5>
+    </g:else>
+
+
+%{--Default Mappings--}%
+    <div class="row">
+        <div class="span12">
+            <span class="inline">
+                <span class="text-info">
+                    <strong><g:message code="de.iteratec.osm.default.heading" default="Defaults"/></strong>
+                </span>
+                &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.explanation"
+                                        default="These Mappings can be assigned to pages"/>
+            </span>
+        </div>
+    </div>
+
+    <div>
+<<<<<<< Updated upstream
+        <g:set var="defaultIdentifier" value='default_csi_mappings'/>
+       <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect{it.name}}"
+=======
+        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect { it.name }}"
+>>>>>>> Stashed changes
+                      name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
+                      noSelection="${[null: message(code: 'de.iteratec.osm.csi.mapping.select.default')]}"/>
+            <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
+                    id="btn-delete-default">
+                <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
+                           default="Delete Default Mapping"/></button>
+            <g:javascript>
+                function defaultSelectChange(value){
+                    $('#btn-delete-default').prop('disabled', $('#select-default').val()=="null");
+                    handleMappingSelect(value,"${defaultIdentifier}");
+                }
+                function deleteDefault(){
+                    $('#btn-delete-default').prop('disabled', true);
+                    $.post( "<g:createLink action="deleteDefaultCsiMapping" absolute="true"/>", {"name":$('#select-default').val()})
+                      .done(function( data ) {
+                            window.location.reload();
+                      });
+                }
+            </g:javascript>
+            <style>
+            #select-default {
+                margin-top: 10px;
+            }
+            </style>
+        </sec:ifAllGranted>
+    </div>
+
+    <g:render template="/chart/csi-mappings"
+              model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
+                        'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                        'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+
     <g:if test="${!readOnly}">
         <div class="row">
             <div class="span12">
@@ -200,51 +278,5 @@
                 </sec:ifAllGranted>
             </div>
         </div>
-
     </g:if>
-    <div class="row">
-        <div class="span12">
-            <span class="inline">
-                <span class="text-info">
-                    <strong><g:message code="de.iteratec.osm.default.heading" default="Defaults"/></strong>
-                </span>
-                &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.explanation"
-                                        default="These Mappings can be assigned to pages"/>
-            </span>
-        </div>
-    </div>
-    <div>
-        <g:set var="defaultIdentifier" value='default_csi_mappings'/>
-       <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect{it.name}}"
-                      name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
-                      noSelection="${[null:message(code:'de.iteratec.osm.csi.mapping.select.default')]}"/>
-            <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true" id="btn-delete-default">
-            <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
-                       default="Delete Default Mapping"/> </button>
-            <g:javascript>
-                function defaultSelectChange(value){
-                    $('#btn-delete-default').prop('disabled', $('#select-default').val()=="null");
-                    handleMappingSelect(value,"${defaultIdentifier}");
-                }
-                function deleteDefault(){
-                    $('#btn-delete-default').prop('disabled', true);
-                    $.post( "<g:createLink action="deleteDefaultCsiMapping" absolute="true"/>", {"name":$('#select-default').val()})
-                      .done(function( data ) {
-                            window.location.reload();
-                      });
-                }
-            </g:javascript>
-           <style>
-               #select-default{
-                   margin-top:10px;
-               }
-           </style>
-        </sec:ifAllGranted>
-    </div>
-
-    <g:render template="/chart/csi-mappings"
-              model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
-                        'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                        'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
 </div>
