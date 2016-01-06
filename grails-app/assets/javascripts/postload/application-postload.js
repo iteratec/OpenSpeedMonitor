@@ -40,6 +40,8 @@ function PostLoaded(dataFromGsp){
     this.defaultMappingNotAllvaluesError = dataFromGsp.defaultMappingNotAllvaluesError;
     this.customerSatisfactionNotInPercentError = dataFromGsp.customerSatisfactionNotInPercentError;
     this.percentagesBetween0And1Error = dataFromGsp.percentagesBetween0And1Error;
+    this.validateDeletionOfCsiConfiguration = dataFromGsp.validateDeletionOfCsiConfiguration;
+    this.getJobGroupsUsingCsiConfiguration = dataFromGsp.getJobGroupsUsingCsiConfiguration;
 
     this.postloadInit = function(){
 

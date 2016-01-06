@@ -23,7 +23,7 @@ package de.iteratec.osm.csi
  */
 class Day {
 
-    static hasMany = [hoursOfDay:HourOfDay]
+    static hasMany = [hoursOfDay: HourOfDay]
     String name
 
     static belongsTo = [CsiConfiguration]
@@ -35,7 +35,7 @@ class Day {
         hoursOfDay validator: { hours, obj ->
             HashSet set = new HashSet()
             hours.each {
-                if(set.add(it.fullHour)){
+                if (set.add(it.fullHour)) {
                     return false
                 }
             }
@@ -43,4 +43,13 @@ class Day {
         }
     }
 
+    static Day copyDay(Day source) {
+        Day toReturn = new Day(name: source.name)
+
+        source.hoursOfDay.each {
+            toReturn.addToHoursOfDay(HourOfDay.copyHourOfDay(it))
+        }
+
+        return toReturn
+    }
 }

@@ -39,4 +39,27 @@ class CsiConfiguration {
         label unique: true
         description nullable: true
     }
+
+    static CsiConfiguration copyConfiguration(CsiConfiguration source) {
+        CsiConfiguration configToReturn = new CsiConfiguration()
+        configToReturn.with {
+            label = source.label
+            description = source.description
+            day = Day.copyDay(source.day)
+        }
+
+        source.browserConnectivityWeights.each {
+            configToReturn.addToBrowserConnectivityWeights(BrowserConnectivityWeight.copyBrowserConnectivityWeight(it))
+        }
+
+        source.pageWeights.each {
+            configToReturn.addToPageWeights(PageWeight.copyPageWeight(it))
+        }
+
+        source.timeToCsMappings.each {
+            configToReturn.addToTimeToCsMappings(TimeToCsMapping.copyTimeToCsMapping(it))
+        }
+
+        return configToReturn
+    }
 }

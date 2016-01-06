@@ -37,4 +37,8 @@ class BrowserConnectivityWeight {
         connectivity()
         weight()
     }
+
+    static BrowserConnectivityWeight copyBrowserConnectivityWeight(BrowserConnectivityWeight source) {
+        return new BrowserConnectivityWeight(browser: source.browser, connectivity: source.connectivity, weight: source.weight)
+    }
 }

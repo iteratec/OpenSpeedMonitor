@@ -17,7 +17,9 @@
                 defaultMappingFormatError: '${message(code: 'de.iteratec.osm.csi.csvErrors.defaultMappingFormatError')}',
                 defaultMappingNotAllvaluesError: '${message(code: 'de.iteratec.osm.csi.csvErrors.defaultMappingNotAllvaluesError')}',
                 customerSatisfactionNotInPercentError:'${message(code: 'de.iteratec.osm.csi.csvErrors.customerSatisfactionNotInPercentError')}',
-                percentagesBetween0And1Error: '${message(code: 'de.iteratec.osm.csi.csvErrors.percentagesBetween0And1Error')}'
+                percentagesBetween0And1Error: '${message(code: 'de.iteratec.osm.csi.csvErrors.percentagesBetween0And1Error')}',
+                validateDeletionOfCsiConfiguration: '${createLink(controller: 'csiDashboard', action: 'validateDeletion', absolute: true)}',
+                getJobGroupsUsingCsiConfiguration: '${createLink(controller: 'csiDashboard', action: 'getJobGroupsUsingCsiConfiguration', absolute: true)}'
             });
         });
 

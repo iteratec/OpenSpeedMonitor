@@ -142,6 +142,16 @@
 <%-- main menu ---------------------------------------------------------------------------%>
 <g:render template="/layouts/mainMenu"/>
 
+%{--container for errors --}%
+<div class="alert alert-error" id="errorDeletingCsiConfiguration">
+    <strong><g:message
+            code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/></strong>
+
+    <p id="deletingCsiConfiguratioinErrors">
+    </p>
+
+</div>
+
 <div class="row">
     <div class="span12">
         <div class="btn-group pull-left">
@@ -168,21 +178,30 @@
                                            errorMessagesCsi       : errorMessagesCsi,
                                            defaultTimeToCsMappings: defaultTimeToCsMappings]"></g:render>
 
-N<div class="row">
+<div class="row">
     <div class="span12">
         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
             <div class="btn-group">
-                <button type="button" class="btn btn-small btn-primary" id="btn-save-csi-configuration">
-                    <g:message code="de.iteratec.osm.csiConfiguration.saveAs" default="Save as"/></button>
+                <g:form method="post" role="form" class="form-horizontal">
+                    <g:hiddenField name="sourceCsiConfigLabel" value="${selectedCsiConfiguration}"/>
+                    <g:hiddenField name="label" value="${selectedCsiConfiguration}"/>
 
-                <button type="button" class="btn btn-small btn-danger" id="btn-delete-csi-configuration">
-                    <g:message code="de.iteratec.osm.csiConfiguration.deleteCsiConfiguration"
-                               args="${[selectedCsiConfiguration]}"
-                               default="Delete"/></button>
+                    <g:actionSubmit class="btn btn-small btn-primary"
+                                    value="${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Copy')}"
+                                    onclick="return createCsiConfiguration('${message(code: 'de.iteratec.osm.csiConfiguration.nameAlreadyExists', default: 'name already exists')}')"
+                                    action="saveCopy"/>
+
+                    <g:actionSubmit class="btn btn-small btn-danger"
+                                    value="${message(code: 'de.iteratec.osm.csiConfiguration.deleteCsiConfiguration', args: [selectedCsiConfiguration], default: 'Delete')}"
+                                    action="deleteCsiConfiguration"
+                                    onclick="return validateDeleting('${selectedCsiConfiguration}',
+                                    '${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete', args: [selectedCsiConfiguration], default: 'delete?')}',
+                                    '${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning', default: 'Overwriting')}')"/>
+
+                </g:form>
             </div>
         </sec:ifAnyGranted>
     </div>
-</div>
 </div>
 
 
@@ -193,51 +212,53 @@ N<div class="row">
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
     <asset:javascript src="csidashboard/defaultMappingCsvValidator.js"/>
+    <asset:javascript src="csidashboard/deleteCsiConfigValidation.js"/>
     <asset:script type="text/javascript">
 
-        var registerEventHandlersForFileUploadControls = function(){
-            $('input[id=theBrowserConnectivityCsvFile]').change(function() {
+        var registerEventHandlersForFileUploadControls = function () {
+            $('input[id=theBrowserConnectivityCsvFile]').change(function () {
                 $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
             });
-            $('input[id=theBrowserCsvFile]').change(function() {
+            $('input[id=theBrowserCsvFile]').change(function () {
                 $('#theBrowserCsvFileTwitter').val($(this).val());
             });
-            $('input[id=thePageCsvFile]').change(function() {
+            $('input[id=thePageCsvFile]').change(function () {
                 $('#thePageCsvFileTwitter').val($(this).val());
             });
-            $('input[id=theHourOfDayCsvFile]').change(function() {
+            $('input[id=theHourOfDayCsvFile]').change(function () {
                 $('#theHourOfDayCsvFileTwitter').val($(this).val());
             });
-            $('input[id=defaultTimeToCsMappingCsvFile]').change(function() {
+            $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
                 $('#defaultTimeToCsMappingCsvFileVisible').val($(this).val());
             });
         };
-        var registerEventHandlers = function(){
+        var registerEventHandlers = function () {
 
             registerEventHandlersForFileUploadControls();
 
-            $("#btn-csi-mapping").click(function(){
+            $("#btn-csi-mapping").click(function () {
                 $('#csi-mapping').show();
                 $('#csi-weights').hide();
             });
-            $("#btn-csi-weights").click(function(){
+            $("#btn-csi-weights").click(function () {
                 $('#csi-mapping').hide();
                 $('#csi-weights').show();
             });
 
         };
 
-        $(document).ready(function(){
+        $(document).ready(function () {
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
-            createBarChart(1000, 750, ${barchartData},"clocks", "hoursOfDayBarchart");
+            createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
 
             registerEventHandlers();
 
+            $("#errorDeletingCsiConfiguration").hide();
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
-            if(${showCsiWeights}) {
+            if (${showCsiWeights}) {
                 $("#btn-csi-weights").click();
             } else {
                 $("#btn-csi-mapping").click();
@@ -245,7 +266,7 @@ N<div class="row">
 
         });
 
-        $('#defaultTimeToCsMappingCsvFile').bind('change', function() {
+        $('#defaultTimeToCsMappingCsvFile').bind('change', function () {
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
@@ -253,12 +274,12 @@ N<div class="row">
             validateDefaultMappingCsv(this.files[0])
         });
 
-        function showSpinner () {
+        function showSpinner() {
             var spinner = startSpinner(document.getElementById('spinner-position'));
             return true;
         }
 
-         function startSpinner(spinnerElement){
+        function startSpinner(spinnerElement) {
             var opts = {
                 lines: 15, // The number of lines to draw
                 length: 20, // The length of each line
@@ -277,11 +298,35 @@ N<div class="row">
                 top: '50%', // Top position relative to parent in px
                 left: '50%' // Left position relative to parent in px
             };
-        return new Spinner(opts).spin(spinnerElement);
+            return new Spinner(opts).spin(spinnerElement);
         }
 
-        function changeCsiConfiguration(id){
-                window.location.href="<g:createLink action="weights" absolute="true"/>/"+id;
+        function changeCsiConfiguration(id) {
+            window.location.href = "http://localhost:8080/OpenSpeedMonitor/csiDashboard/weights/" + id;
+        }
+
+        function validateDeleting(label, sureDeleteMessage, overwriteWarningMessage) {
+            $("#errorDeletingCsiConfiguration").hide();
+
+            return validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage);
+        }
+
+        function createCsiConfiguration(nameExistsErrorMessage) {
+            var creatingOkay = POSTLOADED.promptForDuplicateName();
+            var input = $('input#label').val();
+
+            var csiConfiguration = ${csiConfigurations as grails.converters.JSON};
+
+            for (var i = 0; i < csiConfiguration.length; i++) {
+                var config = csiConfiguration[i];
+                var configName = config[1];
+                if (configName == input) {
+                    alert(nameExistsErrorMessage);
+                    creatingOkay = false;
+                }
+            }
+
+            return creatingOkay;
         }
 
     </asset:script>

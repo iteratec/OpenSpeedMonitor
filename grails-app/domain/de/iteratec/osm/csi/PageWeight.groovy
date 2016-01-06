@@ -34,4 +34,7 @@ class PageWeight {
     static constraints = {
     }
 
+    static PageWeight copyPageWeight(PageWeight source) {
+        return new PageWeight(page: source.page, weight: source.weight)
+    }
 }
