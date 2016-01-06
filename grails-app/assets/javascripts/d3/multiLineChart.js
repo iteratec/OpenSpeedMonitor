@@ -8,7 +8,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
     //If we do visual changes we can rely on this ids to get the right line. The global declaration is explicit.
     idMap = {};
     data.lines.forEach(function (el,i,a) {
-        idMap[el.name] = el.id;
+        idMap[el.name] = i;
     });
 
     //pick div and set width
@@ -93,7 +93,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
     var oneLineData = lines.map(function (line) {
         return {
             name: line.name,
-            id:line.id,
+            id:idMap[line.name],
             values: line.xPoints.map(function (d, i) {
                 return {xValue: line.xPoints[i], yValue: line.yPoints[i]}
             })
@@ -290,17 +290,22 @@ function handleMappingSelect(selectedValue){
 function highlightLine(name){
     var chosenOne =  d3.select("#line_"+idMap[name]);
 
+    //fade out all lines or set them to their orign color
     var allLines = d3.selectAll(".oneLine").select(".line");
     var colorFunction;
-        if(name == "" || name == null || name == "null"){
+    if(name == "" || name == null || name == "null"){
         colorFunction = function(d){return colorScale(d.name)};
     } else{
-       colorFunction = function() {return "DBDBDB"};
+       colorFunction = function() {return "#DBDBDB"};
     }
     allLines.transition().duration(500).style("stroke", colorFunction).style("stroke-width",2);
-    //re-append line so it won't be hidden by other lines
-    chosenOne.node().parentNode.appendChild(chosenOne.node());
-    //If there is a transition running, this will stop it for
-    //our chosen one and start a transition to it's origin color
-    chosenOne.select(".line").transition().duration(500).style("stroke",colorScale(name)).style("stroke-width",5);
+
+    if(chosenOne[0][0] != null){
+        //re-append line so it won't be hidden by other lines
+        chosenOne.node().parentNode.appendChild(chosenOne.node());
+        //If there is a transition running, this will stop it for
+        //our chosen one and start a transition to it's origin color
+        chosenOne.select(".line").transition().duration(500).style("stroke",colorScale(name)).style("stroke-width",5);
+    }
+
 }
