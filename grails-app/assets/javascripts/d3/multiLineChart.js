@@ -5,8 +5,8 @@
  */
 function createMultiLineGraph(data, chartDivIdentifier) {
     //Since we get our data unified and without ids, we create a map where each name get's an id.
-    //If we do visual changes we can rely on this ids to get the right line. The global declaration is explicit.
-    idMap = {};
+    //If we do visual changes we can rely on this ids to get the right line.
+    var idMap = {};
     data.lines.forEach(function (el,i,a) {
         idMap[el.name] = i;
     });
@@ -40,7 +40,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .range([height, 0]);
 
     // Color Scale
-    colorScale = d3.scale.category20c();
+    var colorScale = d3.scale.category20c();
 
     // Define axis
     var xAxis = d3.svg.axis()
@@ -108,6 +108,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .attr("id", function (d){
             return "line_"+d.id
         })
+        .attr("chosen", false)
         .attr("class", "oneLine");
     oneLine.append("path")
         .attr("class", "line")
@@ -131,6 +132,8 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .enter()
         .append("g")
         .attr("class", "diagramKey");
+
+
     diagramKey.append("rect")
         .attr("x", 5)
         .attr("y", function (d, i) {
@@ -150,6 +153,26 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .text(function (d) {
             return d.name;
         });
+
+    var maxWidth = -1;
+    var maxHeight = -1;
+    diagramKey.each(function(d){
+        var currentWidth= d3.select(this).node().getBBox().width;
+        if(currentWidth>maxWidth) maxWidth=currentWidth;
+        var currentHeight= d3.select(this).node().getBBox().height;
+        if(currentHeight>maxHeight) maxHeight=currentHeight;
+    });
+    diagramKey.append("rect")
+        .attr("width", maxWidth+5)
+        .attr("height", 12)
+        .style("opacity", 0)
+        .style("cursor", "pointer")
+        .attr("y", function (d, i) {
+            return (i) * 12
+        })
+        .on("mouseenter", function(d){highlightLine(d.name,chartDivIdentifier, idMap, colorScale)})
+        .on("mouseleave", function(){handleDiagramKeyMouseLeave(chartDivIdentifier, idMap, colorScale)})
+        .on("click", function(d){handleDiagramKeyClick(d.name,chartDivIdentifier, idMap, colorScale)});
 
     // Labels for Axis
     svg.append("text")
@@ -266,6 +289,22 @@ function createMultiLineGraph(data, chartDivIdentifier) {
     }
 }
 
+function handleDiagramKeyMouseLeave(chartDivIdentifier, idMap, colorScale){
+    var chosen = d3.select("#"+chartDivIdentifier).select("[chosen=true]");
+    if(chosen[0][0] == null){
+        highlightLine(null, chartDivIdentifier, idMap, colorScale);
+    } else{
+        highlightLine(chosen.datum().name, chartDivIdentifier, idMap, colorScale);
+    }
+}
+
+function handleDiagramKeyClick(name, chartDivIdentifier, idMap){
+    d3.select("#"+chartDivIdentifier).selectAll(".oneLine").attr("chosen", false);
+    var chosen = d3.select("#"+chartDivIdentifier).select("#line_"+ idMap[name]);
+    chosen.attr("chosen", chosen.attr("chosen") != "true");
+}
+
+
 /**
  * Enables the aplly button, if a value was selected or disables it, if there was noe value selected
  * @param selectedValue
@@ -288,10 +327,12 @@ function handleMappingSelect(selectedValue, chartIdentifier){
  * If the name is null or empty this method will give every path it's origin color.
  * @param name
  * @param chartIdentifier div of the chart
+ * @param idMap a map where every name is mapped on a id
+ * @param colorScale colorScale for the graph
  */
-function highlightLine(name, chartIdentifier){
+function highlightLine(name, chartIdentifier, idMap, colorScale){
     var chosenOne =  d3.select("#"+chartIdentifier).select("#line_"+idMap[name]);
-    //fade out all lines or set them to their orign color
+    //fade out all lines or set them to their origin color
     var allLines = d3.select("#"+chartIdentifier).selectAll(".oneLine").select(".line");
     var colorFunction;
     if(name == "" || name == null || name == "null"){
@@ -299,14 +340,13 @@ function highlightLine(name, chartIdentifier){
     } else{
        colorFunction = function() {return "#DBDBDB"};
     }
-    allLines.transition().duration(500).style("stroke", colorFunction).style("stroke-width",2);
+    allLines.transition().duration(250).style("stroke", colorFunction).style("stroke-width",2);
 
     if(chosenOne[0][0] != null){
         //re-append line so it won't be hidden by other lines
         chosenOne.node().parentNode.appendChild(chosenOne.node());
         //If there is a transition running, this will stop it for
         //our chosen one and start a transition to it's origin color
-        chosenOne.select(".line").transition().duration(500).style("stroke",colorScale(name)).style("stroke-width",5);
+        chosenOne.select(".line").transition().duration(250).style("stroke",colorScale(name)).style("stroke-width",5);
     }
-
 }
