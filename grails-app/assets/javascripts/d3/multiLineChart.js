@@ -131,6 +131,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .data(lines)
         .enter()
         .append("g")
+        .attr("name",function(d){return "diagramKey_"+ idMap[d.name]})
         .attr("class", "diagramKey");
 
 
@@ -170,7 +171,7 @@ function createMultiLineGraph(data, chartDivIdentifier) {
         .attr("y", function (d, i) {
             return (i) * 12
         })
-        .on("mouseenter", function(d){highlightLine(d.name,chartDivIdentifier, idMap, colorScale)})
+        .on("mouseenter", function(d){handleDiagramKeyMouseEnter(d,chartDivIdentifier, idMap, colorScale)})
         .on("mouseleave", function(){handleDiagramKeyMouseLeave(chartDivIdentifier, idMap, colorScale)})
         .on("click", function(d){handleDiagramKeyClick(d.name,chartDivIdentifier, idMap, colorScale)});
 
@@ -289,12 +290,26 @@ function createMultiLineGraph(data, chartDivIdentifier) {
     }
 }
 
+function handleDiagramKeyMouseEnter(d,chartDivIdentifier, idMap, colorScale){
+    highlightLine(d.name,chartDivIdentifier, idMap, colorScale);
+    var hover = makeSingleTextBlack(chartDivIdentifier, idMap[d.name]);
+    var chosen = getChosenLine(chartDivIdentifier);
+    if(chosen[0][0] == null){
+        hover.style("font-weight", "bold");
+    }
+
+}
+
 function handleDiagramKeyMouseLeave(chartDivIdentifier, idMap, colorScale){
-    var chosen = d3.select("#"+chartDivIdentifier).select("[chosen=true]");
+    var chosen = getChosenLine(chartDivIdentifier);
+    selectAllDiagramKeysTexts(chartDivIdentifier).style("font-weight", "normal");
     if(chosen[0][0] == null){
         highlightLine(null, chartDivIdentifier, idMap, colorScale);
+        makeTextBlack(chartDivIdentifier);
     } else{
         highlightLine(chosen.datum().name, chartDivIdentifier, idMap, colorScale);
+        makeTextGrey(chartDivIdentifier);
+        makeSingleTextBlack(chartDivIdentifier,idMap[chosen.datum().name]).style("font-weight", "bold");
     }
 }
 
@@ -303,6 +318,62 @@ function handleDiagramKeyClick(name, chartDivIdentifier, idMap){
     var bool = chosen.attr("chosen") === "false";
     d3.select("#"+chartDivIdentifier).selectAll(".oneLine").attr("chosen", false);
     chosen.attr("chosen", bool);
+    if(!bool){
+        makeTextBlack(chartDivIdentifier);
+    } else{
+        makeTextGrey(chartDivIdentifier);
+        makeSingleTextBlack(chartDivIdentifier,idMap[chosen.datum().name]).style("font-weight", "bold");
+    }
+}
+
+/**
+ * Selects the chosen line
+ * @param chartDivIdentifier
+ * @returns {*}
+ */
+function getChosenLine(chartDivIdentifier){
+    return d3.select("#"+chartDivIdentifier).select("[chosen=true]");
+}
+
+/**
+ * Change the color of a specific diagram key to black. The changed object will be returned.
+ * @param chartDivIdentifier
+ * @param name
+ * @returns {*}
+ */
+function makeSingleTextBlack(chartDivIdentifier, name){
+    return d3.select("#"+chartDivIdentifier).select("[name=diagramKey_"+name+"]").select("text").attr("fill", "black");
+}
+
+/**
+ * Change the color of every diagram key within the given chartDivIdentifier to a specified grey
+ * @param chartDivIdentifier
+ */
+function makeTextGrey(chartDivIdentifier){
+    colorAllDiagramKeys(chartDivIdentifier,"#DBDBDB");
+}
+/**
+ * Change the color of every diagram key within the given chartDivIdentifier to black
+ * @param chartDivIdentifier
+ */
+function makeTextBlack(chartDivIdentifier){
+   colorAllDiagramKeys(chartDivIdentifier,"black");
+}
+/**
+ * Change the color of every diagram key within the given chartDivIdentifier to a specified color
+ * @param chartDivIdentifier
+ * @param color
+ */
+function colorAllDiagramKeys(chartDivIdentifier, color){
+    selectAllDiagramKeysTexts(chartDivIdentifier).attr("fill",color);
+}
+/**
+ * Selects all texts from all diagram key whichs belongs to the given chartDivIdentifier
+ * @param chartDivIdentifier
+ * @returns {*}
+ */
+function selectAllDiagramKeysTexts(chartDivIdentifier){
+    return d3.select("#"+chartDivIdentifier).selectAll(".diagramKey").selectAll("text");
 }
 
 
