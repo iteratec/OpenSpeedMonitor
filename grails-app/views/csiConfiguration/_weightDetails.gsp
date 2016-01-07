@@ -209,42 +209,48 @@
             </span>
         </div>
     </div>
-
-    <div>
-        <g:set var="defaultIdentifier" value='default_csi_mappings'/>
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect { it.name }}"
-                      name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
-                      noSelection="${[null: message(code: 'de.iteratec.osm.csi.mapping.select.default')]}"/>
-            <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
-                    id="btn-delete-default">
-                <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
-                           default="Delete Default Mapping"/></button>
-            <g:javascript>
-                function defaultSelectChange(value){
-                    $('#btn-delete-default').prop('disabled', $('#select-default').val()=="null");
-                    handleMappingSelect(value,"${defaultIdentifier}");
-                }
-                function deleteDefault(){
-                    $('#btn-delete-default').prop('disabled', true);
-                    $.post( "<g:createLink action="deleteDefaultCsiMapping" absolute="true"/>", {"name":$('#select-default').val()})
-                      .done(function( data ) {
-                            window.location.reload();
-                      });
-                }
-            </g:javascript>
-            <style>
-            #select-default {
-                margin-top: 10px;
-            }
-            </style>
-        </sec:ifAllGranted>
-    </div>
-
+    <g:set var="defaultIdentifier" value='default_csi_mappings'/>
     <g:render template="/chart/csi-mappings"
               model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
                         'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+
+    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+        <div class="span6" id="defaultMultilineGraphButtonLine">
+            <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
+                    id="btn-delete-default">
+                <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
+                           default="Delete Default Mapping"/></button>
+                <asset:script type="text/javascript">
+
+                $(document).ready(function(){
+                        $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
+                });
+                function defaultSelectChange(){
+                    var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
+                    $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
+                }
+                function deleteDefault(){
+                    $('#btn-delete-default').prop('disabled', true);
+                    var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
+                    if(possibleChosen[0] != null){
+                        $.post( "<g:createLink action="deleteDefaultCsiMapping" absolute="true"/>", {"name":possibleChosen.datum().name})
+                          .done(function( data ) {
+                                window.location.reload();
+                          });
+                    }
+
+
+
+                }
+            </asset:script>
+        </div>
+        <style>
+        #select-default {
+            margin-top: 10px;
+        }
+        </style>
+    </sec:ifAllGranted>
 
     <g:if test="${!readOnly}">
         <div class="row">
@@ -276,3 +282,9 @@
         </div>
     </g:if>
 </div>
+<style>
+#defaultMultilineGraphButtonLine{
+    margin-top: -30px;
+    margin-bottom: 30px;
+}
+</style>
