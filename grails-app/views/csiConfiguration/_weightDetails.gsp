@@ -217,18 +217,22 @@
 
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
         <div class="span6" id="defaultMultilineGraphButtonLine">
-            <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
-                    id="btn-delete-default">
-                <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
-                           default="Delete Default Mapping"/></button>
+                <button type="button" class="btn btn-small btn-primary"  disabled="true"
+                        id="btn-apply-mapping">
+                    <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
+                               default="Delete Default Mapping"/></button>
+                <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
+                        id="btn-delete-default">
+                    <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
+                               default="Delete Default Mapping"/></button>
                 <asset:script type="text/javascript">
-
                 $(document).ready(function(){
                         $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
                 });
                 function defaultSelectChange(){
                     var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
                     $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
+                    $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
                 }
                 function deleteDefault(){
                     $('#btn-delete-default').prop('disabled', true);
