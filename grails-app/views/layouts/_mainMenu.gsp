@@ -4,6 +4,7 @@
 <g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation')}"><g:set
         var="mainTab" value="results"/></g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
+<g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -87,8 +88,8 @@
                 <g:link controller="csiDashboard" action="showDefault"><i class="fa fa-picture-o"></i> <g:message
                         code="de.iteratec.isocsi.csi.linktext.staticDashboard" default="Statische Ansicht"/></g:link>
             </li>
-            <li class="controller ${actionName.equals('weights') ? 'active' : ''}">
-                <g:link controller="csiDashboard" action="weights"><i class="fa fa-gears"></i> <g:message
+            <li class="controller ${actionName.equals('configurations') ? 'active' : ''}">
+                <g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
                         code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>
             </li>
         </g:elseif>

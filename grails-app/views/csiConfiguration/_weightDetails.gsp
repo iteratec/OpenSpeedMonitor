@@ -178,7 +178,8 @@
         <div class="span12">
             <span class="inline">
                 <span class="text-info">
-                    <strong><g:message code="de.iteratec.osm.csiConfiguration.pageMappingsHeadline" default="PageMappings"/></strong>
+                    <strong><g:message code="de.iteratec.osm.csiConfiguration.pageMappingsHeadline"
+                                       default="PageMappings"/></strong>
                 </span>
                 &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.pageMappingsExplanation"
                                         default="These Mappings are assigned to pages"/>
@@ -192,11 +193,11 @@
                             'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
     </g:if>
     <g:else>
-        <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden." /></h5>
+        <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden."/></h5>
     </g:else>
 
-
-%{--Default Mappings--}%
+    <br/>
+    %{--Default Mappings--}%
     <div class="row">
         <div class="span12">
             <span class="inline">
@@ -211,8 +212,8 @@
 
     <div>
         <g:set var="defaultIdentifier" value='default_csi_mappings'/>
-       <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect{it.name}}"
+        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+            <g:select from="${JSON.parse(defaultTimeToCsMappings.toString()).lines.collect { it.name }}"
                       name="selectedDefaultMapping" id="select-default" onchange="defaultSelectChange(this.value)"
                       noSelection="${[null: message(code: 'de.iteratec.osm.csi.mapping.select.default')]}"/>
             <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"

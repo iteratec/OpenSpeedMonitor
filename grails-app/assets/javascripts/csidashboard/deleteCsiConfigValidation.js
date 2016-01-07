@@ -9,7 +9,6 @@ function validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage) {
         type: 'POST',
         dataType: "json",
         async: false,
-        data: {csiConfigurationLabel: label},
         url: POSTLOADED.validateDeletionOfCsiConfiguration,
         success: function (response) {
             if(response.errorMessages.length > 0) {

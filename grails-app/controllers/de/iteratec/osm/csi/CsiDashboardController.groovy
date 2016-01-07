@@ -19,15 +19,12 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
@@ -43,7 +40,6 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -971,139 +967,6 @@ class CsiDashboardController {
         return result
     }
 
-    def weights() {
-        CsiConfiguration config
-        if (params.id) {
-            config = CsiConfiguration.findById(params.id)
-        } else {//There was no id defined
-            config = CsiConfiguration.findByLabel("Default")
-            if (!config) {//The Default Config is missing
-                config = CsiConfiguration.findByIdGreaterThan(-1)
-            }
-        }
-        if (!config) {//There is no Config at all or the id doesn't exists, redirect to create one
-            //TODO redirect to a create page
-            render ":("
-            return
-        }
-        String selectedCsiConfigurationLabel = config.label
-        log.debug(config.label)
-
-        //Labels for charts
-        String zeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.zeroWeightLabel", "Pages ohne Gewichtung")
-        String dataLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.dataLabel", "Page")
-        String weightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.weightLabel", "Gewichtung")
-        String xAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.xAxisLabel", "Tageszeit")
-        String yAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.yAxisLabel", "Gewichtung")
-        String matrixViewXLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.xLabel", "Browser")
-        String matrixViewYLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.yLabel", "Conn")
-        String matrixViewWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.weightLabel", "Weight")
-        String colorBrightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.colorBrightLabel", "less")
-        String colorDarkLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.colorDarkLabel", "more")
-        String matrixZeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.zeroWeightLabel", "Im CSI nicht berücksichtigt")
-
-        // arrange matrixViewData
-        MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel, zeroWeightLabel: matrixZeroWeightLabel)
-        matrixViewData.addColumns(Browser.findAll()*.name as Set)
-        matrixViewData.addRows(ConnectivityProfile.findAll()*.name as Set)
-        config.browserConnectivityWeights.each {
-            matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))
-        }
-        def matrixViewDataJSON = matrixViewData as JSON
-
-        // arrange treemap data
-        TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
-        config.pageWeights.each { pageWeight -> treemapData.addNode(new ChartEntry(name: pageWeight.page.name, weight: pageWeight.weight)) }
-        def treemapDataJSON = treemapData as JSON
-
-        // arrange barchart data
-        BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
-        config.day.hoursOfDay.sort { a, b -> a.fullHour - b.fullHour }.each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
-        def barChartJSON = barChartData as JSON
-
-        // arrange default time to cs mapping chart data
-        MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
-
-        // arrange page time to cs mapping chart data
-        MultiLineChart pageTimeToCsMappingsChart
-        if (config.timeToCsMappings) {
-            pageTimeToCsMappingsChart = timeToCsMappingService.getPageMappingsAsChart(10000, config)
-        }
-
-        List csi_configurations = []
-        CsiConfiguration.list().each { csi_configurations << [it.id, it.label] }
-
-        [errorMessagesCsi        : params.list('errorMessagesCsi'),
-         showCsiWeights          : params.get('showCsiWeights') ?: false,
-         mappingsToOverwrite     : params.list('mappingsToOverwrite'),
-         csiConfigurations       : csi_configurations,
-         selectedCsiConfiguration: selectedCsiConfigurationLabel,
-         matrixViewData          : matrixViewDataJSON,
-         treemapData             : treemapDataJSON,
-         barchartData            : barChartJSON,
-         defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
-         pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON]
-    }
-
-    def saveCopy() {
-        if (CsiConfiguration.findByLabel(params.label)) {
-            throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
-        }
-
-        CsiConfiguration sourceConfig = CsiConfiguration.findByLabel(params.sourceCsiConfigLabel)
-
-        CsiConfiguration newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
-        newCsiConfig.label = params.label
-        newCsiConfig.save(failOnError: true, flush: true)
-
-        redirect(action: 'weights', params: [id: newCsiConfig.id])
-    }
-
-    def deleteCsiConfiguration() {
-        if (CsiConfiguration.count <= 1) {
-            throw new IllegalStateException("There has to be a csiConfiguration left after deleting")
-        }
-
-        CsiConfiguration configToDelete = CsiConfiguration.findByLabel(params.label)
-
-        List<JobGroup> jobGroupsUsingCsiConfigurationToDelete = JobGroup.findAllByCsiConfiguration(configToDelete)
-        jobGroupsUsingCsiConfigurationToDelete.each { group ->
-            group.csiConfiguration = null
-            group.save()
-        }
-
-        configToDelete.delete()
-        redirect(action: 'weights')
-    }
-
-    /**
-     * You are allowed to delete a csi configuration only if
-     *  there is at least one other csiConfiguration left after deleting
-     *
-     * @param csiConfigurationLabel the label of the csiConfiguration to Delete
-     */
-    def validateDeletion(String csiConfigurationLabel) {
-        int csiConfigurationCount = CsiConfiguration.count()
-        List<String> errorMessages = new ArrayList<>()
-
-        if (csiConfigurationCount <= 1) {
-            errorMessages.add(i18nService.msg("de.iteratec.osm.csiConfiguration.deleteLastCsiConfigurationError", "es muessen mindenst zwei CsiConfigurations vorhanden sein"))
-        }
-
-        def jsonResponse = [errorMessages: errorMessages]
-        render jsonResponse as JSON
-    }
-
-    def getJobGroupsUsingCsiConfiguration(String csiConfigurationLabel) {
-        CsiConfiguration conf = CsiConfiguration.findByLabel(csiConfigurationLabel)
-
-        List<JobGroup> jobGroupsUsingCsiConfiguration = JobGroup.findAllByCsiConfiguration(conf)
-        List<String> jobGroupNames = jobGroupsUsingCsiConfiguration*.name
-
-        def jsonResponse = [jobGroupNames: jobGroupNames]
-        render jsonResponse as JSON
-    }
-
     /**
      * <p>
      * Tests weather the UI should warn the user about an expected long
@@ -1193,11 +1056,4 @@ class CsiDashboardController {
         }
         return csvAsString
     }
-
-    @Secured(['ROLE_SUPER_ADMIN'])
-    def deleteDefaultCsiMapping(String name) {
-        defaultTimeToCsMappingService.deleteDefaultTimeToCsMapping(name)
-        render ""
-    }
-
 }

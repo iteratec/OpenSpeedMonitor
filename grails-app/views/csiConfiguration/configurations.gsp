@@ -175,7 +175,7 @@
 
 <g:render template="weightDetails" model="[readOnly               : false,
                                            errorMessagesCsi       : errorMessagesCsi,
-                                           defaultTimeToCsMappings: defaultTimeToCsMappings]"></g:render>
+                                           defaultTimeToCsMappings: defaultTimeToCsMappings]" />
 
 <div class="row">
     <div class="span12">
@@ -302,7 +302,7 @@
         }
 
         function changeCsiConfiguration(id) {
-            window.location.href = "http://localhost:8080/OpenSpeedMonitor/csiDashboard/weights/" + id;
+            window.location.href="<g:createLink action="configurations" absolute="true"/>/"+id;
         }
 
         function validateDeleting(label, sureDeleteMessage, overwriteWarningMessage) {
