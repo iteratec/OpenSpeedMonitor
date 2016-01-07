@@ -54,7 +54,7 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
         createGraph();
 	}
 
-    scrollToChartbox(390);
+    scrollToChartbox(-120);
 }
 /**
  * show or hide filter-elements, depending on aggregator type
