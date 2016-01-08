@@ -14,11 +14,9 @@
 * See the License for the specific language governing permissions and 
 * limitations under the License.
 */
-
-
-
-
 package de.iteratec.osm.api
+
+import de.iteratec.osm.util.PerformanceLoggingService
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
@@ -53,9 +51,7 @@ class ShopCsiServiceTests {
 
     void setUp() {
 		serviceUnderTest = service
-		serviceUnderTest.meanCalcService = new MeanCalcService()
-		mockEventResultDaoService()
-		mockCsTargetGraphDaoService()
+        mocksCommonToAllTests()
     }
 
     void tearDown() {
@@ -142,6 +138,13 @@ class ShopCsiServiceTests {
 	}
 	
 	//mocks//////////////////////////////////////////////////////////////////////////////
+
+    private mocksCommonToAllTests(){
+        serviceUnderTest.meanCalcService = new MeanCalcService()
+        mockEventResultDaoService()
+        mockCsTargetGraphDaoService()
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+    }
 	
 	/**
 	 * Mocks methods of {@link EventResultDaoService}.
