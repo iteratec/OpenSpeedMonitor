@@ -17,24 +17,26 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-
-import static org.junit.Assert.assertEquals
-import grails.test.mixin.*
-
-import org.joda.time.DateTime
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.util.PerformanceLoggingService
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.joda.time.DateTime
+import org.junit.Before
+
+import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
-@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser])
+@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile])
 class WeightingServiceTests {
 
     WeightingService serviceUnderTest
@@ -43,17 +45,17 @@ class WeightingServiceTests {
     private static final DateTime SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM = new DateTime(2014, 1, 1, 17, 43, 56)
     private static final String TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT = 'browserWeightedFiftyPercent'
     private static final String TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT = 'browserWeightedSeventyPercent'
+    private Page page_50
+    private Page page_70
+    private Browser browserToReturn_50
+    private Browser browserToReturn_70
 
 
+    @Before
     void setUp() {
         serviceUnderTest = service
-        // into the domain EventResult injected service csiConfigCacheService would be null so we have to use metaclass to implement isCsiRelevant()-method for tests
-        EventResult.metaClass.isCsiRelevant = { ->
-            return true
-        }
-        //mocks
-        mockCustomerSatisfactionWeightService()
-        mockMeasuredValueTagService()
+        mocksCommonToAllTests()
+        createTestdataCommonToAllTests()
     }
 
     void tearDown() {
@@ -67,10 +69,10 @@ class WeightingServiceTests {
         CsiValue measuredValue = new MeasuredValue()
 
         //test for EventResult
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResult, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResult, weightFactors, BrowserConnectivityWeight.list())
         assertEquals(1d, deliveredWeight, DELTA)
         //test for MeasuredValue
-        deliveredWeight = serviceUnderTest.getWeight(measuredValue, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValue, weightFactors, BrowserConnectivityWeight.list())
         assertEquals(1d, deliveredWeight, DELTA)
 
     }
@@ -84,24 +86,24 @@ class WeightingServiceTests {
         CsiValue measuredValueFiveAClockPm = new MeasuredValue(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
 
         //test for EventResults
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultTwoAClockAm, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResultTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         double expectedWeight = 0.2d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(eventResultFiveAClockPm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultFiveAClockPm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 7.3d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.2d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueFiveAClockPm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueFiveAClockPm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 7.3d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for not getting correct hourofday
         mockCustomerSatisfactionWeightServiceToDeliverWrongHoursofDay()
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -110,31 +112,51 @@ class WeightingServiceTests {
         // test specific data
         Set<WeightFactor> weightFactors = [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set
 
-        ConnectivityProfile connectivityProfile = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
-        ConnectivityProfile connectivityProfile70 = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.5d)
-        BrowserConnectivityWeight browserConnectivityWeight70 = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.7d)
-        browserConnectivityWeight.save()
-        BrowserConnectivityWeight.metaClass.'static'.findByBrowserAndConnectivity = { browser, conn ->
-            if (conn == connectivityProfile70) return browserConnectivityWeight70 else return browserConnectivityWeight }
-        CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile)
-        CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile70)
-        CsiValue measuredValueBrowserWeightOfFiftyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile)
-        CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile70)
+        ConnectivityProfile.metaClass.toString = {-> return delegate.name }
+        ConnectivityProfile connectivityProfile_50 = new ConnectivityProfile(
+                name: "conn_50", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0
+        )
+        ConnectivityProfile connectivityProfile_70 = new ConnectivityProfile(
+                name: "conn_70", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0
+        )
+
+        CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
+        CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
+        CsiValue measuredValueBrowserWeightOfFiftyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
+        CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
+
+
+        BrowserConnectivityWeight browserConnectivityWeight_50 = new BrowserConnectivityWeight(
+                connectivity: connectivityProfile_50,
+                browser: this.browserToReturn_50,
+                weight: 0.5d)
+        BrowserConnectivityWeight browserConnectivityWeight_70 = new BrowserConnectivityWeight(
+                connectivity: connectivityProfile_50,
+                browser: this.browserToReturn_70,
+                weight: 0.7d)
+
+        //test specific mocks
+        mockMeasuredValueTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
 
         //test for EventResults
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(
+                eventResultBrowserWeightOfFiftyPercent, weightFactors, [browserConnectivityWeight_50, browserConnectivityWeight_70]
+        )
+        //assertions
         double expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors, [browserConnectivityWeight_50, browserConnectivityWeight_70])
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(
+                measuredValueBrowserWeightOfFiftyPercent, weightFactors, [browserConnectivityWeight_50, browserConnectivityWeight_70]
+        )
+        //assertions
         expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors, [browserConnectivityWeight_50, browserConnectivityWeight_70])
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -147,57 +169,92 @@ class WeightingServiceTests {
         CsiValue measuredValueBrowserWeightOfFiftyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
         CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
 
+        //test specific mocks
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+
         //test for EventResults
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors)
+        Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors, BrowserConnectivityWeight.list())
         double expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfSeventyPercent, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors)
+        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
 
     void testGetWeightWithMultipleWeightFactorsForEventResults() {
         // test specific data
-        ConnectivityProfile connectivityProfile = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.5d)
-        browserConnectivityWeight.save()
-        BrowserConnectivityWeight.metaClass.'static'.findByBrowserAndConnectivity = { browser, conn -> browserConnectivityWeight }
-        CsiValue eventResultWeightFiftyTwoAm = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, jobResultDate: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(), connectivityProfile: connectivityProfile)
-        CsiValue eventResultWeightSeventyFivePm = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(), connectivityProfile: connectivityProfile)
+        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile("conn")
+        new BrowserConnectivityWeight(
+                connectivity: connectivityProfile, browser: this.browserToReturn_50, weight: 0.5d
+        ).save(failOnError: true)
+        new BrowserConnectivityWeight(
+                connectivity: connectivityProfile, browser: this.browserToReturn_70, weight: 0.7d
+        ).save(failOnError: true)
+        CsiValue eventResultWeightFiftyTwoAm =
+                new EventResult(
+                        tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
+                        jobResultDate: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                        connectivityProfile: connectivityProfile
+                )
+        CsiValue eventResultWeightSeventyFivePm =
+                new EventResult(
+                        tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
+                        jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
+                        connectivityProfile: connectivityProfile
+                )
+
+        //test specific mocks
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         //test with all three WeightFactors
-        Double deliveredWeight = serviceUnderTest.getWeight(eventResultWeightFiftyTwoAm, [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        Double deliveredWeight = serviceUnderTest.getWeight(
+                eventResultWeightFiftyTwoAm,
+                [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set,
+                BrowserConnectivityWeight.list()
+        )
         double expectedHourofdayWeight = 0.2d
         double expectedBrowserConnectivityWeight = 0.5d
         double expectedPageWeight = 0.5d
         double expectedWeight = expectedHourofdayWeight * expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        deliveredWeight = serviceUnderTest.getWeight(
+                eventResultWeightSeventyFivePm,
+                [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set,
+                BrowserConnectivityWeight.list()
+        )
         expectedHourofdayWeight = 7.3d
-        expectedBrowserConnectivityWeight = 0.5d
+        expectedBrowserConnectivityWeight = 0.7d
         expectedPageWeight = 0.7d
         expectedWeight = expectedHourofdayWeight * expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
         //test with two weightFactors
-        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
-        expectedBrowserConnectivityWeight = 0.5d
+        deliveredWeight = serviceUnderTest.getWeight(
+                eventResultWeightSeventyFivePm,
+                [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set,
+                BrowserConnectivityWeight.list()
+        )
+        expectedBrowserConnectivityWeight = 0.7d
         expectedPageWeight = 0.7d
         expectedWeight = expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        deliveredWeight = serviceUnderTest.getWeight(eventResultWeightSeventyFivePm, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+        deliveredWeight = serviceUnderTest.getWeight(
+                eventResultWeightSeventyFivePm,
+                [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set,
+                BrowserConnectivityWeight.list()
+        )
         expectedHourofdayWeight = 7.3d
-        expectedBrowserConnectivityWeight = 0.5d
+        expectedBrowserConnectivityWeight = 0.7d
         expectedWeight = expectedHourofdayWeight * expectedBrowserConnectivityWeight
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
@@ -207,11 +264,16 @@ class WeightingServiceTests {
         // test specific data
         ConnectivityProfile connectivityProfile = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
         ConnectivityProfile connectivityProfile70 = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.5d)
-        BrowserConnectivityWeight browserConnectivityWeight70 = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.7d)
-        browserConnectivityWeight.save()
-        BrowserConnectivityWeight.metaClass.'static'.findByBrowserAndConnectivity = { browser, conn ->
-            if(conn == connectivityProfile70) return browserConnectivityWeight70 else return browserConnectivityWeight }
+        Browser browserToReturn_50 = new Browser(name: "null")
+        Browser browserToReturn_70 = new Browser(name: "null")
+        BrowserConnectivityWeight browserConnectivityWeight =
+                new BrowserConnectivityWeight(
+                        connectivity: connectivityProfile, browser: browserToReturn_50, weight: 0.5d
+                ).save()
+        BrowserConnectivityWeight browserConnectivityWeight70 =
+                new BrowserConnectivityWeight(
+                        connectivity: connectivityProfile, browser: browserToReturn_70, weight: 0.7d
+                ).save()
         CsiValue eventResultWeightFiftyTwoAm = new EventResult(
                 id: 1l,
                 customerSatisfactionInPercent: 10d,
@@ -233,6 +295,10 @@ class WeightingServiceTests {
         eventResultWeightSeventyFivePm.metaClass.isCsiRelevant = { ->
             return true
         }
+
+        //test specific mocks
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, this.page_50, this.page_70)
+
         //tests with all three WeightFactors
 
         List<WeightedCsiValue> weightedValues = serviceUnderTest.getWeightedCsiValues(
@@ -338,31 +404,39 @@ class WeightingServiceTests {
     }
 
     void testGetWeightedCsiValuesFromMeasuredValues() {
+
         // test specific data
-        ConnectivityProfile connectivityProfile = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
-        BrowserConnectivityWeight browserConnectivityWeight = new BrowserConnectivityWeight(connectivityProfile: connectivityProfile, browser: new Browser(name: "null"), weight: 0.5d)
-        browserConnectivityWeight.save()
-        BrowserConnectivityWeight.metaClass.'static'.findByBrowserAndConnectivity = { browser, conn -> browserConnectivityWeight }
+        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile("conn")
+        new BrowserConnectivityWeight(
+                    connectivity: connectivityProfile, browser: this.browserToReturn_50, weight: 0.5d
+        ).save(failOnError: true)
+        new BrowserConnectivityWeight(
+                connectivity: connectivityProfile, browser: this.browserToReturn_70, weight: 0.7d
+        ).save(failOnError: true)
 
         MeasuredValue measuredValueWeightFiftyTwoAm = new MeasuredValue(
-                value: 10d,
-                tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
-                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
-                connectivityProfile: connectivityProfile
-        ).save(validate: false)
+            value: 10d,
+            tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
+            started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+            connectivityProfile: connectivityProfile
+        )
         measuredValueWeightFiftyTwoAm.addAllToResultIds([1l, 2l, 3l])
+        measuredValueWeightFiftyTwoAm.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValueWeightFiftyTwoAm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         MeasuredValue measuredValueWeightSeventyFivePm = new MeasuredValue(
-                value: 20d,
-                tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
-                started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
-                connectivityProfile: connectivityProfile
-        ).save(validate: false)
+            value: 20d,
+            tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
+            started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
+            connectivityProfile: connectivityProfile
+        )
         measuredValueWeightSeventyFivePm.addAllToResultIds([4l, 5l, 6l])
+        measuredValueWeightSeventyFivePm.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValueWeightSeventyFivePm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
-        //tests with all three WeightFactors
+        //test specific mocks
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
+        //tests with all three WeightFactors
         List<WeightedCsiValue> weightedValues = serviceUnderTest.getWeightedCsiValues(
                 [measuredValueWeightFiftyTwoAm, measuredValueWeightSeventyFivePm],
                 [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
@@ -378,7 +452,7 @@ class WeightingServiceTests {
         }.size())
 
         expectedHourofdayWeight = 7.3d
-        expectedBrowserConnectivityWeight = 0.5d
+        expectedBrowserConnectivityWeight = 0.7d
         expectedPageWeight = 0.7d
         expectedWeight = expectedHourofdayWeight * expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(1, weightedValues.findAll {
@@ -422,7 +496,7 @@ class WeightingServiceTests {
             it.underlyingEventResultIds.equals([1l, 2l, 3l]) && it.weightedValue.getValue().equals(10d) && it.weightedValue.getWeight().equals(expectedWeight)
         }.size())
 
-        expectedBrowserConnectivityWeight = 0.5d
+        expectedBrowserConnectivityWeight = 0.7d
         expectedPageWeight = 0.7d
         expectedWeight = expectedBrowserConnectivityWeight * expectedPageWeight
         assertEquals(1, weightedValues.findAll {
@@ -505,7 +579,20 @@ class WeightingServiceTests {
         assertEquals((100 + 101) / 2, ofThirdWeight[0].weightedValue.value, DELTA)
     }
 
-    //mocking inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private void mocksCommonToAllTests(){
+        mockCustomerSatisfactionWeightService()
+        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        // into the domain EventResult injected service csiConfigCacheService would be null so we have to use metaclass to implement isCsiRelevant()-method for tests
+        EventResult.metaClass.isCsiRelevant = { ->
+            return true
+        }
+    }
+    private createTestdataCommonToAllTests(){
+        page_50 = new Page(name: 'page_50', weight: 0.5d)
+        page_70 = new Page(name: 'page_70', weight: 0.7d)
+        browserToReturn_50 = new Browser(name: 'browser_50', weight: 0.5d)
+        browserToReturn_70 = new Browser(name: 'browser_70', weight: 0.7d)
+    }
 
     /**
      * Mocks used methods of {@link CustomerSatisfactionWeightService}.
@@ -584,27 +671,27 @@ class WeightingServiceTests {
     /**
      * Mocks used methods of {@link MeasuredValueTagService}.
      */
-    private void mockMeasuredValueTagService() {
+    private void mockMeasuredValueTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
         def measuredValueTagService = mockFor(MeasuredValueTagService, true)
         measuredValueTagService.demand.findBrowserOfHourlyEventTag(0..10000) { String hourlyEventMvTag ->
-            Browser toReturn = new Browser(weight: 0d)
+            Browser browser
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
-                toReturn.setWeight(0.5d)
+                browser = browserToReturn_50
             }
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)) {
-                toReturn.setWeight(0.7d)
+                browser = browserToReturn_70
             }
-            return toReturn
+            return browser
         }
         measuredValueTagService.demand.findPageOfWeeklyPageTag(0..10000) { String hourlyEventMvTag ->
-            Page toReturn = new Page(weight: 0d)
+            Page page
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
-                toReturn.setWeight(0.5d)
+                page = pageToReturn_50
             }
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)) {
-                toReturn.setWeight(0.7d)
+                page = pageToReturn_70
             }
-            return toReturn
+            return page
         }
         serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock();
     }

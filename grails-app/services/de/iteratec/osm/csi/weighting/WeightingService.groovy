@@ -19,6 +19,7 @@ package de.iteratec.osm.csi.weighting
 
 import de.iteratec.osm.csi.BrowserConnectivityWeight
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 
 import org.joda.time.DateTime
@@ -41,6 +42,7 @@ class WeightingService {
 	
 	MeasuredValueTagService measuredValueTagService
 	CustomerSatisfactionWeightService customerSatisfactionWeightService
+    PerformanceLoggingService performanceLoggingService
 	
 	/**
 	 * Weights all csiValues respective given weightFactors. Delivers a list of all {@link de.iteratec.osm.csi.weighting.WeightedCsiValue}s.
@@ -53,21 +55,34 @@ class WeightingService {
 		Double value = 0
 		Double weight = 0
 		List<Long> underlyingResultIds = []
-		
-		csiValues.each {CsiValue csiValue ->
-			if (csiValue.isCsiRelevant()) {
-				
-				value = csiValue.retrieveValue()
-				weight = getWeight(csiValue, weightFactors)
-				underlyingResultIds = csiValue.retrieveUnderlyingEventResultIds()
-				
-				if (value != null && weight != null && weight > 0) {
-					addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
-				}	
-				
-			}
-		}
-		return flattenWeightedCsiValues(weightedCsiValues)
+
+        List<BrowserConnectivityWeight> browserConnectivityWeights
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] get BCWs', PerformanceLoggingService.IndentationDepth.TWO){
+            browserConnectivityWeights = BrowserConnectivityWeight.list()
+        }
+
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO){
+            csiValues.each {CsiValue csiValue ->
+                if (csiValue.isCsiRelevant()) {
+
+                    value = csiValue.retrieveValue()
+                    weight = getWeight(csiValue, weightFactors, browserConnectivityWeights)
+                    underlyingResultIds = csiValue.retrieveUnderlyingEventResultIds()
+
+                    if (value != null && weight != null && weight > 0) {
+                        addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
+                    }
+
+                }
+            }
+        }
+
+        List<WeightedCsiValue> flattened
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO){
+            flattened = flattenWeightedCsiValues(weightedCsiValues)
+        }
+
+		return flattened
     }
 	
 	void addNewWeightedValue(List<WeightedCsiValue> weightedCsiValues, Double value, Double weight, List<Long> underlyingResultIds){
@@ -113,52 +128,146 @@ class WeightingService {
 	 * 						Value to get Weight for. Should not be null.
 	 * @param weightFactors
 	 * 						{@link Set} of {@link WeightFactor}s. The csiValue is weighted respective all of the factors in this set.
-	 * 						This set should not be null. If it is empty the csiValue's weight is 1. 
+	 * 						This set should not be null. If it is empty the csiValue's weight is 1.
+     * @param browserConnectivityWeights
+     *                      List of browserConnectivityWeights which are necessary if {@link WeightFactor#BROWSER_CONNECTIVITY_COMBINATION} is included.
 	 * @return
 	 */
-	public Double getWeight(CsiValue csiValue, Set<WeightFactor> weightFactors){
+	public Double getWeight(CsiValue csiValue, Set<WeightFactor> weightFactors, List<BrowserConnectivityWeight> browserConnectivityWeights){
 		
 		Contract.requiresArgumentNotNull("csiValue", csiValue)
 		Contract.requiresArgumentNotNull("weightFactors", weightFactors)
 		
 		Double weight = 1
-		
-		if (weightFactors.contains(WeightFactor.HOUROFDAY)) {
-			Double hourofdayWeight = getHourlyWeightFrom(csiValue.retrieveDate())
-			if (hourofdayWeight == null || hourofdayWeight <= 0) {
-				return 0
-			}else{
-				weight *= hourofdayWeight
-			}
-		}
-		if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
-			Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
-			ConnectivityProfile connectivityProfile = csiValue.retrieveConnectivityProfile()
-			if(browser == null || connectivityProfile == null) {
-				return 0
-			}else {
-				Double browserConnectivityWeight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivityProfile).weight
-				if(browserConnectivityWeight == null || browserConnectivityWeight <= 0) {
-					return 0
-				}
-				weight *= browserConnectivityWeight
-			}
-		}
-		if (weightFactors.contains(WeightFactor.PAGE)) {
-			Page page = csiValue.retrieveTag().split(';').size() == 5 ?
-			 	measuredValueTagService.findPageOfHourlyEventTag(csiValue.retrieveTag()):
-				 measuredValueTagService.findPageOfWeeklyPageTag(csiValue.retrieveTag())
-			if (page == null || page.weight == null || page.weight <= 0) {
-				return 0
-			}else{
-				weight *= page.weight
-			}
-		}
-		
+
+        if (weightFactors.contains(WeightFactor.HOUROFDAY)) {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] HOUROFDAY', PerformanceLoggingService.IndentationDepth.THREE){
+                weight *= getHourOfDayWeight(csiValue)
+            }
+            if (weight == 0d){
+                return weight
+            }
+        }
+
+        if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', PerformanceLoggingService.IndentationDepth.THREE){
+
+                //TODO: If we implement persistence of connectivity profile in MeasuredValues we have to enable this again!
+//                weight *= getBrowserConnectivityWeight(csiValue, browserConnectivityWeights)
+
+                weight *= getBrowserWeight(csiValue, browserConnectivityWeights)
+            }
+            if (weight == 0d){
+                return weight
+            }
+        }
+
+        if (weightFactors.contains(WeightFactor.PAGE)) {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] PAGE', PerformanceLoggingService.IndentationDepth.THREE){
+                weight *= getPageWeightFrom(csiValue)
+            }
+            if (weight == 0d){
+                return weight
+            }
+        }
+
 		return weight
 	}
-	
-	private Double getHourlyWeightFrom(Date date){
+
+    private double getPageWeightFrom(CsiValue csiValue) {
+
+        Page page = csiValue.retrieveTag().split(';').size() == 5 ?
+                measuredValueTagService.findPageOfHourlyEventTag(csiValue.retrieveTag()) :
+                measuredValueTagService.findPageOfWeeklyPageTag(csiValue.retrieveTag())
+        if (page == null || page.weight == null || page.weight <= 0) {
+            return 0
+        } else {
+            return page.weight
+        }
+
+    }
+
+    /**
+     * Should be used when persistence of connectivity profile in MeasuredValues is implemented instead of getBrowserWeight().
+     *
+     * @param csiValue
+     * @param browserConnectivityWeights
+     * @return
+     */
+    private double getBrowserConnectivityWeight(CsiValue csiValue, List<BrowserConnectivityWeight> browserConnectivityWeights) {
+
+        double browserConnectivityWeight
+
+        Browser browser
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.FOUR) {
+            browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
+        }
+        ConnectivityProfile connectivityProfile
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get connectivity profile', PerformanceLoggingService.IndentationDepth.FOUR) {
+            connectivityProfile = csiValue.retrieveConnectivityProfile()
+        }
+        if (browser == null || connectivityProfile == null) {
+            browserConnectivityWeight = 0
+        } else {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser connectivity weight', PerformanceLoggingService.IndentationDepth.FOUR) {
+                Double browserConnectivityWeightFromDb = browserConnectivityWeights.find {
+                    it.browser == browser && it.connectivity == connectivityProfile
+                }?.weight
+                if (browserConnectivityWeightFromDb == null || browserConnectivityWeightFromDb <= 0) {
+                    browserConnectivityWeight = 0
+                }else{
+                    browserConnectivityWeight = browserConnectivityWeightFromDb
+                }
+            }
+        }
+        return browserConnectivityWeight
+    }
+
+    /**
+     * Calculates browserConnectivityWeight just for given browser. ConnectivityProfile isn't respected.
+     * This method should be removed when persistence of connectivity profile in MeasuredValues is implemented.
+     *
+     * @param csiValue
+     * @param browserConnectivityWeights
+     * @return
+     */
+    private double getBrowserWeight(CsiValue csiValue, List<BrowserConnectivityWeight> browserConnectivityWeights) {
+
+        double browserWeight
+
+        Browser browser
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.FOUR) {
+            browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
+        }
+        if (browser == null) {
+            browserWeight = 0
+        } else {
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser connectivity weight', PerformanceLoggingService.IndentationDepth.FOUR) {
+                Double browserWeightFromDb = browserConnectivityWeights.find {
+                    it.browser == browser
+                }?.weight
+                if (browserWeightFromDb == null || browserWeightFromDb <= 0) {
+                    browserWeight = 0
+                }else{
+                    browserWeight = browserWeightFromDb
+                }
+            }
+        }
+        return browserWeight
+    }
+
+    private double getHourOfDayWeight(CsiValue csiValue) {
+
+        Double hourofdayWeight = getHourlyWeightFrom(csiValue.retrieveDate())
+        if (hourofdayWeight == null || hourofdayWeight <= 0) {
+            return 0
+        } else {
+            return hourofdayWeight
+        }
+
+    }
+
+    private Double getHourlyWeightFrom(Date date){
 		return customerSatisfactionWeightService.getHoursOfDay()[new DateTime(date).getHourOfDay()]
 	}
 	
