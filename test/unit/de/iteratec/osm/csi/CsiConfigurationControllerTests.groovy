@@ -19,10 +19,10 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
+import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.junit.Before
-import org.junit.Test
 import spock.lang.Specification
 
 /**
@@ -48,6 +48,9 @@ class CsiConfigurationControllerTests extends Specification{
         config2 = new CsiConfiguration(label: "config2", day: testDay2)
         config1.save(failOnError: true)
         config2.save(failOnError: true)
+
+        I18nService i18nService = Mock(I18nService)
+        controller.i18nService = i18nService
     }
 
     void "test saveCopy" () {
@@ -117,5 +120,26 @@ class CsiConfigurationControllerTests extends Specification{
         thrown(IllegalStateException)
     }
 
+    void "test validateDelition if all correct" () {
+        when:
+        controller.validateDeletion()
+        def jsonResponse = response.json
+
+        then:
+        jsonResponse.errorMessages.isEmpty()
+    }
+
+    void "test validateDelition if only one csiConfiguration is left" () {
+        given:
+        config2.delete()
+
+        when:
+        controller.validateDeletion()
+        def jsonResponse = response.json
+        List errorMessages = jsonResponse.errorMessages as List
+
+        then:
+        errorMessages.size() == 1
+    }
 
 }
