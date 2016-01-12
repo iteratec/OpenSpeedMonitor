@@ -24,6 +24,8 @@
                     <li><a href="#create-event">&raquo;&nbsp;<strong>POST</strong>&nbsp;Create event</a></li>
                     <li><a href="#measurement-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement activation</a></li>
                     <li><a href="#measurement-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Measurement deactivation</a></li>
+					<li><a href="#nightlyDatabaseCleanup-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup activation</a></li>
+					<li><a href="#nightlyDatabaseCleanup-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup deactivation</a></li>
 				</ul>
 			</div>
 			<div class="span9 content">
@@ -742,6 +744,98 @@
                     <hr>
 
                 </div>
+
+				<div id="nightlyDatabaseCleanup-activation">
+
+					<h2>PUT Method:&nbsp;<span class="text-info">NightlyDatabaseCleanup activation</span></h2>
+
+					<i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
+					<h3>Request signature</h3>
+					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/config/activateNightlyDatabaseCleanup</code></p>
+					<p>
+						The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
+						followed by <em>config/activateNightlyDatabaseCleanup</em>.
+					</p>
+					<h4>Parameters</h4>
+					<dl>
+						<dt>apiKey</dt>
+						<dd>
+							MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
+						</dd>
+					</dl>
+
+					<h3>Potential outcomes of a request</h3>
+					<dl>
+						<dt>HTTP status 200 OK</dt>
+						<dd>
+							The request handled successfully. The nightly-cleanup got enabled generally, no matter whether they were enabled before or not.
+						</dd>
+						<dt>HTTP status 400 Bad Request</dt>
+						<dd>This function requires an api key. You missed to submit one as parameter or the key doesn't have permission to activate nightlyDatabaseCleanup.
+						An error message with details is attached as response.<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+						<dt>HTTP status 404 Not Found</dt>
+						<dd>Submitted api key doesn't exist. An error message with details is attached as response.
+							<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+						<dt>HTTP status 403 Forbidden</dt>
+						<dd>Submitted api key is generally invalid. An error message with details is attached as response.
+							<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+					</dl>
+
+					<hr>
+
+				</div>
+
+				<div id="nightlyDatabaseCleanup-deactivation">
+
+					<h2>PUT Method:&nbsp;<span class="text-info">NightlyDatabaseCleanup deactivation</span></h2>
+
+					<i class="fa fa-info-circle">&nbsp;${protectedFunctionHint}</i>
+					<h3>Request signature</h3>
+					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/config/deactivateNightlyDatabaseCleanup</code></p>
+					<p>
+						The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
+						followed by <em>config/deactivateNightlyDatabaseCleanup</em>.
+					</p>
+					<h4>Parameters</h4>
+					<dl>
+						<dt>apiKey</dt>
+						<dd>
+							MANDATORY<br>An api key for OpenSpeedMonitor. Provides permissions for api functions.
+						</dd>
+					</dl>
+
+					<h3>Potential outcomes of a request</h3>
+					<dl>
+						<dt>HTTP status 200 OK</dt>
+						<dd>
+							The request handled successfully. The measurements got disabled generally, no matter whether they were enabled before or not.
+						</dd>
+						<dt>HTTP status 400 Bad Request</dt>
+						<dd>This function requires an api key. You missed to submit one as parameter or the key doesn't have permission to deactivate nightlyDatabaseCleanup.
+						An error message with details is attached as response.<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+						<dt>HTTP status 404 Not Found</dt>
+						<dd>Submitted api key doesn't exist. An error message with details is attached as response.
+							<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+						<dt>HTTP status 403 Forbidden</dt>
+						<dd>Submitted api key is generally invalid. An error message with details is attached as response.
+							<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+					</dl>
+
+					<hr>
+
+				</div>
 
 			</div>
 

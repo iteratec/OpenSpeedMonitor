@@ -47,6 +47,15 @@ class InMemoryConfigService {
     }
 
     /**
+     * Gets status of databaseCleanupEnabled
+     * If false no database-cleanup will run nightly. If true a nightly database-cleanup will be run.
+     * @return Whether the nightly-cleanup is generally enabled or not.
+     */
+    boolean isNightlyDatabaseCleanupEnabled(){
+        return databaseCleanupEnabled
+    }
+
+    /**
      * Sets measurementsGenerallyEnabled to true
      */
     /**

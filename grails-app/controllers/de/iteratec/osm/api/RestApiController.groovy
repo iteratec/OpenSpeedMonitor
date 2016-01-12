@@ -566,6 +566,25 @@ class RestApiController {
 
 	/**
 	 * <p>
+	 *     Activates or deactivates nightly cleanup.
+	 * </p>
+	 * @param cmd Binds parameters of requests.
+	 */
+	public Map<String, Object> securedViaApiKeySetNightlyDatabaseCleanupActivation(NightlyDatabaseCleanupActivationCommand cmd){
+		if(cmd.hasErrors()){
+			StringWriter sw = new StringWriter()
+			cmd.errors.getFieldErrors().each {fieldError->
+				sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
+			}
+			sendSimpleResponseAsStream(response, 400, sw.toString())
+		}else{
+			inMemoryConfigService.setDatabaseCleanupEnabled(cmd.activationToSet)
+			sendSimpleResponseAsStream(response, 200, "Set nightly-cleanup activation to: ${cmd.activationToSet}")
+		}
+	}
+
+	/**
+	 * <p>
 	 * Sends the object rendered as JSON. All public getters are used to
 	 * render the result. This call should be placed as last statement, the
 	 * return statement, of an action.
@@ -911,5 +930,26 @@ class MeasurementActivationCommand {
             else return true
         })
     }
+
+}
+
+/**
+ * Parameters of rest api functions /rest/config/activateNightlyDatabaseCleanup and
+ * /rest/config/deactivateNightlyCleanup.
+ */
+@Validateable(nullable = true)
+class NightlyDatabaseCleanupActivationCommand {
+
+	String apiKey
+	Boolean activationToSet
+
+	static constraints = {
+		activationToSet(nullable: false)
+		apiKey(validator: {String currentKey, NightlyDatabaseCleanupActivationCommand cmd ->
+			ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
+			if(!validApiKey.allowedForNightlyDatabaseCleanupActivation) return ["The submitted ApiKey doesn't have the permission to (de)activate nightly cleanups."]
+			else return true
+		})
+	}
 
 }

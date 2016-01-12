@@ -177,6 +177,16 @@ class UrlMappings {
             action = [PUT: "securedViaApiKeySetMeasurementActivation"]
             activationToSet = false
         }
+		"/rest/config/activateNightlyDatabaseCleanup" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
+			activationToSet = true
+		}
+		"/rest/config/deactivateNightlyDatabaseCleanup" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
+			activationToSet = false
+		}
 
 	}
 }

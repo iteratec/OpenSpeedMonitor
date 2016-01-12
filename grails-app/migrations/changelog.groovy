@@ -13,4 +13,6 @@ databaseChangeLog = {
     include file: '2016-01-04-DATA-create-initial-browser-connectivity-weights.groovy'
 
     include file: 'next-release-SCHEME.groovy'
+
+	include file: '2016-01-11-SCHEME-add-nightlyDatabaseCleanupPermission-to-apiKey.groovy'
 }
