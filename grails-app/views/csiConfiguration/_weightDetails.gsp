@@ -216,12 +216,13 @@
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
 
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+        <g:set var="customDefaultCsiMappingDeletePrefix" value='DeleteDefaultCsiMapping'/>
         <div class="span6" id="defaultMultilineGraphButtonLine">
                 <button type="button" class="btn btn-small btn-primary"  disabled="true"
                         id="btn-apply-mapping">
                     <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
                                default="Delete Default Mapping"/></button>
-                <button type="button" class="btn btn-small btn-danger" onclick="deleteDefault()" disabled="true"
+                <button type="button" class="btn btn-small btn-danger" data-toggle="modal" href="#DeleteModal${customDefaultCsiMappingDeletePrefix}" disabled="true"
                         id="btn-delete-default">
                     <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
                                default="Delete Default Mapping"/></button>
@@ -233,19 +234,7 @@
                     var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
                     $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
                     $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
-                }
-                function deleteDefault(){
-                    $('#btn-delete-default').prop('disabled', true);
-                    var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
-                    if(possibleChosen[0] != null){
-                        $.post( "<g:createLink action="deleteDefaultCsiMapping" absolute="true"/>", {"name":possibleChosen.datum().name})
-                          .done(function( data ) {
-                                window.location.reload();
-                          });
-                    }
-
-
-
+                    changeValue${customDefaultCsiMappingDeletePrefix}($(this).find("text").html());
                 }
             </asset:script>
         </div>
@@ -254,6 +243,8 @@
             margin-top: 10px;
         }
         </style>
+        <g:render template="/_common/modals/deleteDialogCustomAction" model="[itemLabel:message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName:'deleteDefaultCsiMapping', customPrefix:customDefaultCsiMappingDeletePrefix, customID:'name', customController:'CsiConfiguration']"/>
+        %{--entityName:'abc',item:[id:'4']--}%
     </sec:ifAllGranted>
 
     <g:if test="${!readOnly}">
