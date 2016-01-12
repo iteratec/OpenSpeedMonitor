@@ -21,8 +21,8 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
         controllerUnderTest = controller
         //test data common to all tests
         ApiKey.withTransaction {
-            new ApiKey(secretKey: apiKeyAllowed, valid: true, allowedForNightlyCleanupActivation: true).save(failOnError: true)
-            new ApiKey(secretKey: apiKeyNotAllowed, valid: true, allowedForNightlyCleanupActivation: false).save(failOnError: true)
+            new ApiKey(secretKey: apiKeyAllowed, valid: true, allowedForNightlyDatabaseCleanupActivation: true).save(failOnError: true)
+            new ApiKey(secretKey: apiKeyNotAllowed, valid: true, allowedForNightlyDatabaseCleanupActivation: false).save(failOnError: true)
         }
         //mocks common to all tests
 //        mockFilters(SecureApiFunctionsFilters)
@@ -32,7 +32,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
 
     // successful calls /////////////////////////////////////////////////////////////////////
 
-    void "successful activation of nightly-cleanup"(){
+    void "successful activation of nightly-database-cleanup"(){
         when:
         params.apiKey = apiKeyAllowed
         NightlyDatabaseCleanupActivationCommand cmd = new NightlyDatabaseCleanupActivationCommand(
@@ -40,17 +40,17 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 activationToSet: true
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyCleanupActivation(cmd)
+        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
+            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
         }
 
         then:
         response.status == 200
-        response.text == "Set nightly-cleanup activation to: true"
-        inMemoryConfigService.areMeasurementsGenerallyEnabled() == true
+        response.text == "Set nightly-database-cleanup activation to: true"
+        inMemoryConfigService.isDatabaseCleanupEnabled() == true
     }
 
-    void "successful deactivation of nightly-cleanup"(){
+    void "successful deactivation of nightly-database-cleanup"(){
         when:
         params.apiKey = apiKeyAllowed
         NightlyDatabaseCleanupActivationCommand cmd = new NightlyDatabaseCleanupActivationCommand(
@@ -58,14 +58,14 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 activationToSet: false
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyCleanupActivation(cmd)
+        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
+            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
         }
 
         then:
         response.status == 200
-        response.text == "Set nightly-cleanup activation to: false"
-        inMemoryConfigService.areMeasurementsGenerallyEnabled() == false
+        response.text == "Set nightly-database-cleanup activation to: false"
+        inMemoryConfigService.isDatabaseCleanupEnabled() == false
     }
 
     // failing calls /////////////////////////////////////////////////////////////////////
@@ -81,14 +81,14 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 activationToSet: true
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyCleanupActivation(cmd)
+        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
+            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
         }
 
         then:
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
         response.status == 400
-        response.text == "Error field apiKey: The submitted ApiKey doesn't have the permission to (de)activate the nightly-cleanup.\n"
+        response.text == "Error field apiKey: The submitted ApiKey doesn't have the permission to (de)activate nightly cleanups.\n"
     }
 
     void "should fail cause of missing boolean activationToSet"(){
@@ -101,8 +101,8 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 apiKey: apiKeyAllowed
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyCleanupActivation(cmd)
+        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
+            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
         }
 
         then:

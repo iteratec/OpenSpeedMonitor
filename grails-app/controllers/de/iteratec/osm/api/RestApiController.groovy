@@ -579,7 +579,7 @@ class RestApiController {
 			sendSimpleResponseAsStream(response, 400, sw.toString())
 		}else{
 			inMemoryConfigService.setDatabaseCleanupEnabled(cmd.activationToSet)
-			sendSimpleResponseAsStream(response, 200, "Set nightly-cleanup activation to: ${cmd.activationToSet}")
+			sendSimpleResponseAsStream(response, 200, "Set nightly-database-cleanup activation to: ${cmd.activationToSet}")
 		}
 	}
 
