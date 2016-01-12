@@ -619,14 +619,7 @@ class RestApiController {
 		response.setContentType('text/plain;charset=UTF-8')
 		response.status=httpStatus
 
-		Writer textOut = new OutputStreamWriter(response.getOutputStream())
-		textOut.write(message)
-		response.status=httpStatus
-
-		textOut.flush()
-		response.getOutputStream().flush()
-
-		render ''
+		render message
 	}
 
 }
