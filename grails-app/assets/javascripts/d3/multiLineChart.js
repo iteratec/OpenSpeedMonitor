@@ -291,10 +291,10 @@ function createMultiLineGraph(data, chartDivIdentifier) {
 }
 
 function handleDiagramKeyMouseEnter(d,chartDivIdentifier, idMap, colorScale){
-    highlightLine(d.name,chartDivIdentifier, idMap, colorScale);
     var hover = makeSingleTextBlack(chartDivIdentifier, idMap[d.name]);
     var chosen = getChosenLine(chartDivIdentifier);
     if(chosen[0][0] == null){
+        highlightLine(d.name,chartDivIdentifier, idMap, colorScale);
         hover.style("font-weight", "bold");
     }
 
@@ -313,16 +313,18 @@ function handleDiagramKeyMouseLeave(chartDivIdentifier, idMap, colorScale){
     }
 }
 
-function handleDiagramKeyClick(name, chartDivIdentifier, idMap){
+function handleDiagramKeyClick(name, chartDivIdentifier, idMap, colorScale){
     var chosen = d3.select("#"+chartDivIdentifier).select("#line_"+ idMap[name]);
     var bool = chosen.attr("chosen") === "false";
     d3.select("#"+chartDivIdentifier).selectAll(".oneLine").attr("chosen", false);
     chosen.attr("chosen", bool);
     if(!bool){
         makeTextBlack(chartDivIdentifier);
+        highlightLine(null,chartDivIdentifier, idMap, colorScale)
     } else{
         makeTextGrey(chartDivIdentifier);
         makeSingleTextBlack(chartDivIdentifier,idMap[chosen.datum().name]).style("font-weight", "bold");
+        highlightLine(name,chartDivIdentifier, idMap, colorScale)
     }
 }
 
@@ -412,13 +414,13 @@ function highlightLine(name, chartIdentifier, idMap, colorScale){
     } else{
        colorFunction = function() {return "#DBDBDB"};
     }
-    allLines.transition().duration(250).style("stroke", colorFunction).style("stroke-width",2);
+    allLines.transition().duration(100).style("stroke", colorFunction).style("stroke-width",2);
 
     if(chosenOne[0][0] != null){
         //re-append line so it won't be hidden by other lines
         chosenOne.node().parentNode.appendChild(chosenOne.node());
         //If there is a transition running, this will stop it for
         //our chosen one and start a transition to it's origin color
-        chosenOne.select(".line").transition().duration(250).style("stroke",colorScale(name)).style("stroke-width",5);
+        chosenOne.select(".line").transition().duration(100).style("stroke",colorScale(name)).style("stroke-width",5);
     }
 }
