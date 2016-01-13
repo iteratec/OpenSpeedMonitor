@@ -24,8 +24,8 @@ This is the standard dialog that initiates the delete action.
     </div>
 </div>
 <asset:script>
-    function changeValue${customPrefix}(value){
-        $('#DeleteModal${customPrefix}').find('#deleteValue').attr("value", value);
-        $('#DeleteModal${customPrefix}').find('#itemConfirm').html("${itemLabel}: " + value);
+    function changeValueToDelete(value, customPrefix){
+        $('#DeleteModal'+customPrefix).find('#deleteValue').attr("value", value);
+        $('#DeleteModal'+customPrefix).find('#itemConfirm').html("${itemLabel}: " + value);
     }
 </asset:script>

@@ -234,7 +234,7 @@
                     var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
                     $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
                     $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
-                    changeValue${customDefaultCsiMappingDeletePrefix}($(this).find("text").html());
+                    changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
                 }
             </asset:script>
         </div>
