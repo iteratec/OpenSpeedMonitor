@@ -4,12 +4,9 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
@@ -19,11 +16,11 @@ import spock.lang.Specification
  * Created by nkuhn on 22.05.15.
  */
 @TestFor(MvUpdateEventCleanupService)
-@Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, BatchActivity, MeasuredValueUpdateEvent ,JobGroup, Page])
-class MvUpdateEventCleanupServiceSpec extends Specification{
+@Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, BatchActivity, MeasuredValueUpdateEvent, JobGroup, Page])
+class MvUpdateEventCleanupServiceSpec extends Specification {
 
     MvUpdateEventCleanupService serviceUnderTest
-    
+
     private static long idDailyPageMvInitiallyOpenAndCalculated
     private static long idDailyPageMvInitiallyOpenAndOutdated
 
@@ -36,12 +33,11 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
     private static long idWeeklyShopMvInitiallyOpenAndCalculated
     private static long idWeeklyShopMvInitiallyOpenAndOutdated
 
-
     /**
      * This map contains id's of tested MeasuredValues as keys and the number these MeasuredValues get calculated in
      * respective service method as values. Counter values get incremented in mocked service methods.
      */
-    private static Map calculationCounts = [:].withDefault {0}
+    private static Map calculationCounts = [:].withDefault { 0 }
 
     private static final String irrelevant_PageTag = '1;1'
     private static final String irrelevant_ShopTag = '1'
@@ -60,7 +56,7 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         addMocksCommonForAllTests()
     }
 
-    void "already calculated daily page mvs get closed"(){
+    void "already calculated daily page mvs get closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idDailyPageMvInitiallyOpenAndCalculated])
@@ -75,7 +71,8 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyPageMvInitiallyOpenAndCalculated).size() == 0
         MeasuredValue.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
-    void "outdated daily page mvs get calculated and closed"(){
+
+    void "outdated daily page mvs get calculated and closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idDailyPageMvInitiallyOpenAndOutdated])
@@ -90,7 +87,8 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyPageMvInitiallyOpenAndOutdated).size() == 0
         MeasuredValue.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
-    void "already calculated weekly page mvs get closed"(){
+
+    void "already calculated weekly page mvs get closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idWeeklyPageMvInitiallyOpenAndCalculated])
@@ -105,7 +103,8 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyPageMvInitiallyOpenAndCalculated).size() == 0
         MeasuredValue.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
-    void "outdated weekly page mvs get calculated and closed"(){
+
+    void "outdated weekly page mvs get calculated and closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idWeeklyPageMvInitiallyOpenAndOutdated])
@@ -121,7 +120,7 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValue.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
 
-    void "already calculated daily shop mvs get closed"(){
+    void "already calculated daily shop mvs get closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idDailyShopMvInitiallyOpenAndCalculated])
@@ -136,7 +135,8 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndCalculated).size() == 0
         MeasuredValue.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
-    void "outdated daily shop mvs get calculated and closed"(){
+
+    void "outdated daily shop mvs get calculated and closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idDailyShopMvInitiallyOpenAndOutdated])
@@ -151,7 +151,8 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndOutdated).size() == 0
         MeasuredValue.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
-    void "already calculated weekly shop mvs get closed"(){
+
+    void "already calculated weekly shop mvs get closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idWeeklyShopMvInitiallyOpenAndCalculated])
@@ -166,7 +167,8 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyShopMvInitiallyOpenAndCalculated).size() == 0
         MeasuredValue.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
-    void "outdated weekly shop mvs get calculated and closed"(){
+
+    void "outdated weekly shop mvs get calculated and closed"() {
         setup:
         resetCalculationCounts()
         prepareDaoServiceMock([idWeeklyShopMvInitiallyOpenAndOutdated])
@@ -182,12 +184,11 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         MeasuredValue.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
 
-
     /**
      * Resets all calculation counters to 0.
      */
-    private void resetCalculationCounts(){
-        calculationCounts = [:].withDefault {0}
+    private void resetCalculationCounts() {
+        calculationCounts = [:].withDefault { 0 }
     }
 
     /**
@@ -196,13 +197,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
      * {@link MeasuredValueUpdateEvent}s.
      * @param mvIds List of id's of {@link MeasuredValueUpdateEvent}s to return from mocked method.
      */
-    private void prepareDaoServiceMock(List<Long> mvIds){
+    private void prepareDaoServiceMock(List<Long> mvIds) {
         serviceUnderTest.measuredValueDaoService = [
-                getOpenMeasuredValuesWhosIntervalExpiredForAtLeast: {int minutes ->
-                    return mvIds.collect {MeasuredValue.get(it)}
+                getOpenMeasuredValuesWhosIntervalExpiredForAtLeast: { int minutes ->
+                    return mvIds.collect { MeasuredValue.get(it) }
                 },
-                getUpdateEvents: {List<Long> measuredValueIds ->
-                    return mvIds.inject([]){List<MeasuredValueUpdateEvent> updateEvents, Long mvId->
+                getUpdateEvents                                   : { List<Long> measuredValueIds ->
+                    return mvIds.inject([]) { List<MeasuredValueUpdateEvent> updateEvents, Long mvId ->
                         updateEvents.addAll(MeasuredValueUpdateEvent.findAllByMeasuredValueId(mvId))
                         return updateEvents
                     }
@@ -212,12 +213,12 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
 
     void createTestDataCommonForAllTests() {
 
-        List<MeasuredValueInterval> intervals =  TestDataUtil.createMeasuredValueIntervals()
+        List<MeasuredValueInterval> intervals = TestDataUtil.createMeasuredValueIntervals()
         List<AggregatorType> aggregators = TestDataUtil.createAggregatorTypes()
-        daily = intervals.find {it.intervalInMinutes == MeasuredValueInterval.DAILY}
-        weekly = intervals.find {it.intervalInMinutes == MeasuredValueInterval.WEEKLY}
-        page = aggregators.find {it.name.equals(AggregatorType.PAGE)}
-        shop = aggregators.find {it.name.equals(AggregatorType.SHOP)}
+        daily = intervals.find { it.intervalInMinutes == MeasuredValueInterval.DAILY }
+        weekly = intervals.find { it.intervalInMinutes == MeasuredValueInterval.WEEKLY }
+        page = aggregators.find { it.name.equals(AggregatorType.PAGE) }
+        shop = aggregators.find { it.name.equals(AggregatorType.SHOP) }
 
         createMeasuredValues()
 
@@ -265,14 +266,14 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
     void addMocksCommonForAllTests() {
 
         serviceUnderTest.batchActivityService = [
-                getActiveBatchActivity: {Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
-                    return [updateStatus: {Map<String, Object> map -> /*do nothing*/ }] as BatchActivity
+                getActiveBatchActivity: { Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
+                    return [updateStatus: { Map<String, Object> map -> /*do nothing*/ }] as BatchActivity
                 },
-                calculateProgress: {int count, int actual -> 'not the concern of these tests'}
+                calculateProgress     : { int count, int actual -> 'not the concern of these tests' }
         ] as BatchActivityService
 
-        serviceUnderTest.inMemoryConfigService.metaClass{
-            areMeasurementsGenerallyEnabled {-> return true}
+        serviceUnderTest.inMemoryConfigService.metaClass {
+            areMeasurementsGenerallyEnabled { -> return true }
         }
 
         serviceUnderTest.measuredValueTagService = new MeasuredValueTagService()
@@ -285,16 +286,51 @@ class MvUpdateEventCleanupServiceSpec extends Specification{
         ] as ShopMeasuredValueService
 
         serviceUnderTest.pageMeasuredValueService = [
-                getHmvsByCsiGroupPageCombinationMap: {List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime->
+                getHmvsByCsiGroupPageCombinationMap: { List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime ->
                     Map irrelevantBecauseWholeCalculationIsMocked = [:]
                     return irrelevantBecauseWholeCalculationIsMocked
                 },
-                calcMv: { MeasuredValue toBeCalculated, MvCachingContainer cachingContainer ->
+                calcMv                             : { MeasuredValue toBeCalculated, MvCachingContainer cachingContainer ->
                     calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
                     return null
                 }
         ] as PageMeasuredValueService
 
+
+        serviceUnderTest.measuredValueTagService = [
+                getAllPagesFromWeeklyOrDailyPageTags    : { unused ->
+                    def result = [:].withDefault { [] }
+                    result[1].add(new Page())
+                    return result
+                },
+                getAllJobGroupsFromWeeklyOrDailyPageTags: { unused ->
+                    def result = [:].withDefault { [] }
+                    result[1].add(new JobGroup())
+                    return result
+                }
+        ] as MeasuredValueTagService
+
+        mockCachingContainerService()
     }
 
+    void mockCachingContainerService() {
+        ServiceMocker mocker = ServiceMocker.create()
+
+        def returnForGetDailyHemvMapByStartDate = [:].withDefault { [:].withDefault { [] } }
+        def returnForGetWeeklyHemvMapByStartDate = [:].withDefault { [:].withDefault { [] } }
+        def returnForGetDailyJobGroupsByStartDate = [:].withDefault { [] }
+        def returnForGetDailyPagesByStartDate = [:].withDefault { [] }
+        def returnForGetWeeklyJobGroupsByStartDate = [:].withDefault { [] }
+        def returnForGetWeeklyPagesByStartDate = [:].withDefault { [] }
+        def page = new Page(id: 1)
+        def hmvsByCsiGroupPageCombination = [:].withDefault {[]}
+        hmvsByCsiGroupPageCombination.put(MeasuredValue.get(idDailyShopMvInitiallyOpenAndOutdated).started.toString(), MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndOutdated))
+        def returnForCreateContainerFor = new MvCachingContainer(csiGroupToCalcMvFor: null,
+                pageToCalcMvFor: page,
+                hmvsByCsiGroupPageCombination: hmvsByCsiGroupPageCombination)
+
+        mocker.mockCachingContainerService(serviceUnderTest, returnForGetDailyJobGroupsByStartDate, returnForGetDailyPagesByStartDate,
+                returnForGetDailyHemvMapByStartDate, returnForGetWeeklyJobGroupsByStartDate, returnForGetWeeklyPagesByStartDate,
+                returnForGetWeeklyHemvMapByStartDate, returnForCreateContainerFor)
+    }
 }

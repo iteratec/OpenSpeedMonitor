@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.util.PerformanceLoggingService
+
 import static Contract.*
 
 import java.util.regex.Pattern
@@ -34,18 +36,18 @@ import de.iteratec.osm.measurement.environment.Location
  * A service to create an inspect tags used to identify and group 
  * {@link MeasuredValue}s.
  * </p>
- * 
+ *
  * <p>
  * Measured values identified by an tag, which is just text, to be 
  * decoupled from the data the measured value is based on. This service
  * provides methods to create tags (starting with {@code create}) and
  * to inspect tags (starting with {@code get} or {@code find}).
  * </p>
- * 
+ *
  * <p>
  * FIXME mze 2013-08-26: Change to use DAO-Services.
  * </p>
- * 
+ *
  * @author nkuhn
  * @author mze
  */
@@ -56,7 +58,7 @@ class MeasuredValueTagService {
 	 * characters expect the tag separation char ';'.
 	 */
 	private static String SUB_PATTERN_MATCHES_ALL_IDS = '[^;]*';
-	
+
 	PageService pageService
 	JobService jobService
 	JobResultDaoService jobResultDaoService
@@ -69,13 +71,13 @@ class MeasuredValueTagService {
 	 * <p>
 	 * Creates a tag to mark hourly event-{@link MeasuredValue}s.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * The result tag looks like:
 	 * {@code JobGroup-ID;MeasuredEvent-ID“;Page-ID;Browser-ID;Location-ID}
 	 * </p>
-	 * 
-	 * @param jobGroup 
+	 *
+	 * @param jobGroup
 	 *        The (previously saved) {@link JobGroup}, not <code>null</code>.
 	 * @param measuredEvent
 	 *        The (previously saved) {@link MeasuredEvent}, not <code>null</code>.
@@ -85,13 +87,13 @@ class MeasuredValueTagService {
 	 *        The (previously saved) {@link Browser}, not <code>null</code>.
 	 * @param location
 	 *        The (previously saved) {@link Location}, not <code>null</code>.
-	 * @return The calculated tag, never <code>null</code>, never 
+	 * @return The calculated tag, never <code>null</code>, never  Page.get(tagSegments[1] as Serializable)
 	 *         {@linkplain String#isEmpty() empty}.
-	 * @throws NullPointerException if at least one argument is 
-	 *         <code>null</code>.
-	 * @throws IllegalArgumentException if at least one passed entity 
+	 * @throws NullPointerException if at least one argument is
+	 *         <code>null</code>. Page.get(tagSegments[1] as Serializable)
+	 * @throws IllegalArgumentException if at least one passed entity
 	 *         has no id (was not saved before).
-	 * @since JIRA IT-40
+	 * @since JIRA IT-40 Page.get(tagSegments[1] as Serializable) Page.get(tagSegments[1] as Serializable)
 	 */
 	public String createHourlyEventTag(
 			JobGroup jobGroup,
@@ -111,7 +113,7 @@ class MeasuredValueTagService {
 		checkEntityHasAnId('page', page)
 		checkEntityHasAnId('browser', browser)
 		checkEntityHasAnId('location', location)
-		
+
 		StringBuilder resultBuilder = new StringBuilder()
 		resultBuilder.append(jobGroup.ident())
 		resultBuilder.append(';')
@@ -125,7 +127,7 @@ class MeasuredValueTagService {
 
 		return resultBuilder.toString()
 	}
-			
+
 	/**
 	 * <p>
 	 * Creates a tag to mark event result-{@link MeasuredValue}s.
@@ -167,13 +169,13 @@ class MeasuredValueTagService {
 	 * <p>
 	 * Creates an aggregator tag for page measured values.
 	 * </p>
-	 * 
+	 *
 	 * <i>Notice:</i> Used generally, changed to page tag in IT-89
-	 * 
-	 * @param group 
-	 *        The {@link JobGroup} of corresponding Jobs, 
+	 *
+	 * @param group
+	 *        The {@link JobGroup} of corresponding Jobs,
 	 *        not <code>null</code>.
-	 * @param page 
+	 * @param page
 	 *        The Page which values relevant, not <code>null</code>.
 	 * @return The tag, not <code>null</code>.
 	 * @since JIRA IT-40
@@ -182,7 +184,7 @@ class MeasuredValueTagService {
 	String createPageAggregatorTag(JobGroup group, Page page){
 		requiresArgumentNotNull('group', group)
 		requiresArgumentNotNull('page', page)
-	
+
 
 		return group.ident().toString() + ';' + page.ident().toString()
 	}
@@ -192,8 +194,8 @@ class MeasuredValueTagService {
 	 * Creates an aggregator tag for weekly shop measured values.
 	 * </p>
 	 *
-	 * @param group 
-	 *        The {@link JobGroup} of corresponding Jobs, 
+	 * @param group
+	 *        The {@link JobGroup} of corresponding Jobs,
 	 *        not <code>null</code>.
 	 * @return The tag, not <code>null</code>.
 	 * @since JIRA IT-40
@@ -207,7 +209,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * TODO Doc
-	 * 
+	 *
 	 * @param newResult
 	 * @return
 	 */
@@ -225,10 +227,39 @@ class MeasuredValueTagService {
 		return pageTag
 	}
 
+    /**
+     * Returns the pageID from the given tag
+     * @param tag a weekly- or dailyPageTag
+     * @return the page id
+     */
+	Long getPageIdFromWeeklyOrDailyPageTag(String tag) {
+//        PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
+        String[] tagSegments
+        Long ret
+//        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'TagService: split string', PerformanceLoggingService.IndentationDepth.ONE) {
+            tagSegments = getTagSegmentsOfTag(tag, 2)
+//        }
+//        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'TagService: getting long value', PerformanceLoggingService.IndentationDepth.ONE) {
+            ret = Long.valueOf(tagSegments[1])
+//        }
+        return ret
+        // return tagSegments[1] as Long
+	}
+
+    /**
+     * Returns the jobGroupId from the given tag
+     * @param tag a weekly- or dailyPageTag
+     * @return the jobGroup id
+     */
+	Long getJobGroupIdFromWeeklyOrDailyPageTag(String tag) {
+		String[] tagSegments = getTagSegmentsOfTag(tag, 2)
+		return tagSegments[0] as Long
+	}
+
 	/*
-	 * Retrieving objects from tags. 
+	 * Retrieving objects from tags.  Page.get(tagSegments[1] as Serializable)
 	 */
-	
+
 	/**
 	 * <p>
 	 * Finds the {@link JobGroup} referenced by the specified weekly shop-tag.
@@ -263,17 +294,17 @@ class MeasuredValueTagService {
 	public JobGroup findJobGroupOfEventResultTag(String eventResultTag) throws NullPointerException, IllegalArgumentException {
 		return this.findJobGroupOfHourlyEventTag(eventResultTag)
 	}
-	
+
 	/**
 	 * <p>
 	 * Finds the {@link JobGroup} referenced by the specified hourly aggregator tag.
 	 * </p>
-	 * 
+	 *
 	 * @param hourlyEventMvTag The hourly event tag, not <code>null</code>
 	 * @return The {@link JobGroup} or <code>null</code> if the group was not found anymore (ex. was deleted).
-	 * @throws NullPointerException 
+	 * @throws NullPointerException
 	 *         if {@code hourlyEventMvTag} is <code>null</code>.
-	 * @throws IllegalArgumentException 
+	 * @throws IllegalArgumentException
 	 *         if the specified tag is not an hourly event tag.
 	 * @since JIRA IT-40
 	 */
@@ -355,7 +386,7 @@ class MeasuredValueTagService {
 
 		return tagSegments[2] as Serializable
 	}
-	
+
 	/**
 	 * <p>
 	 * Finds the {@link JobGroup} referenced by the specified weekly page tag.
@@ -372,17 +403,15 @@ class MeasuredValueTagService {
 	public JobGroup findJobGroupOfWeeklyPageTag(String weeklyPageTag) throws NullPointerException, IllegalArgumentException {
 		requiresArgumentNotNull('weeklyPageTag', weeklyPageTag)
 
-		String[] tagSegments = getTagSegmentsOfTag(weeklyPageTag, 2)
-
-		return JobGroup.get(tagSegments[0] as Serializable)
+		return JobGroup.get(getJobGroupIdFromWeeklyOrDailyPageTag(weeklyPageTag))
 	}
-	
+
 	/**
 	 * <p>
 	 * Finds the {@link Page} referenced by the specified daily page tag.
 	 * <b>Note:</b> Daily page tag is the same as weekly page tag.
 	 * </p>
-	 * 
+	 *
 	 * @param dailyPageTag The daily page tag, not <code>null</code>
 	 * @return The {@link Page} or <code>null</code> if the page was not found anymore (ex. was deleted).
 	 * @throws NullPointerException
@@ -409,9 +438,7 @@ class MeasuredValueTagService {
 	public Page findPageOfWeeklyPageTag(String weeklyPageTag) throws NullPointerException, IllegalArgumentException {
 		requiresArgumentNotNull('weeklyPageTag', weeklyPageTag)
 
-		String[] tagSegments = getTagSegmentsOfTag(weeklyPageTag, 2)
-
-		return Page.get(tagSegments[1] as Serializable)
+		return Page.get(getPageIdFromWeeklyOrDailyPageTag(weeklyPageTag))
 	}
 	/**
 	 * <p>
@@ -547,11 +574,11 @@ class MeasuredValueTagService {
 	 * <p>
 	 * Gets a tag segments.
 	 * </p>
-	 * 	
+	 *
 	 * @param tag The tag which segments to get, not <code>null</code>.
 	 * @param requiredSegmentCount The required segment count required for the tag to be valid.
 	 * @return The tags segments, never <code>null</code>.
-	 * @throws IllegalArgumentException 
+	 * @throws IllegalArgumentException
 	 *         if the count of segments in the specified tag does not match {@code requiredSegmentCount}.
 	 * @since JIRA IT-40
 	 */
@@ -568,25 +595,25 @@ class MeasuredValueTagService {
 
 		return result
 	}
-	
+
 	/*-
-	 * Creation of tag-patterns for querying with gorm. 
+	 * Creation of tag-patterns for querying with gorm.
 	 */
 
 	/**
 	 * <p>
-	 * Creates a tag-pattern to find weekly page {@link MeasuredValue}s by 
-	 * {@link JobGroup}s and {@link Page}s. 
+	 * Creates a tag-pattern to find weekly page {@link MeasuredValue}s by
+	 * {@link JobGroup}s and {@link Page}s.
 	 * </p>
-	 * 
+	 *
 	 * <p>
-	 * <em>Note:</em> Passing an empty list to at least one of the 
+	 * <em>Note:</em> Passing an empty list to at least one of the
 	 * arguments will cause a pattern which fits none measured value.
 	 * </p>
-	 * 
+	 *
 	 * @param groups The groups result should match, not <code>null</code>.
 	 * @param pages The pages the result should match, not <code>null</code>.
-	 * 
+	 *
 	 * @return A tag-pattern, never <code>null</code>.
 	 */
 	public Pattern getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(List<JobGroup> groups, List<Page> pages) {
@@ -595,75 +622,75 @@ class MeasuredValueTagService {
 
 		String groupsPattern = createSubPatternToMatchIDs(groups*.ident())
 		String pagesPattern = createSubPatternToMatchIDs(pages*.ident())
-		
+
 		return ~/^${groupsPattern};${pagesPattern}$/
 	}
 
 	/**
 	 * <p>
-	 * Creates a tag-pattern to find weekly shop {@link MeasuredValue}s by 
+	 * Creates a tag-pattern to find weekly shop {@link MeasuredValue}s by
 	 * {@link JobGroup}s.
 	 * </p>
-	 * 
+	 *
 	 * <p>
-	 * <em>Note:</em> Passing an empty list to {@code groups} will cause a 
+	 * <em>Note:</em> Passing an empty list to {@code groups} will cause a
 	 * pattern which fits none measured value.
 	 * </p>
-	 * 
+	 *
 	 * @param groups The groups result should match, not <code>null</code>.
-	 * 
+	 *
 	 * @return A tag-pattern, never <code>null</code>.
 	 */
 	Pattern getTagPatternForWeeklyShopMvsWithJobGroups(List<JobGroup> groups){
 		requiresArgumentNotNull('groups', groups);
-		
+
 		String groupsPattern = createSubPatternToMatchIDs(groups*.ident())
-		
+
 		return ~/^${groupsPattern}$/
 	}
 
 	/**
 	 * <p>
-	 * Creates a search pattern to find hourly {@link MeasuredValue}s matching 
-	 * at least one of the elements in the corresponding collection of 
+	 * Creates a search pattern to find hourly {@link MeasuredValue}s matching
+	 * at least one of the elements in the corresponding collection of
 	 * elements.
 	 * </p>
-	 * 
+	 *
 	 * <p>
-	 * The returned {@link Pattern} could be used to query MaesuredValues from 
+	 * The returned {@link Pattern} could be used to query MaesuredValues from
 	 * the database via {@code rlike} search.
 	 * </p>
-	 * 
+	 *
 	 * <p>
-	 * <em>Note:</em> Passing an empty collection for a specific ID-scope will 
-	 * cause the creation of a pattern that finds any ID in this scope. For 
+	 * <em>Note:</em> Passing an empty collection for a specific ID-scope will
+	 * cause the creation of a pattern that finds any ID in this scope. For
 	 * example: Passing an empty group-ID-collection will result in a pattern
 	 * that will find elements for all groups.
 	 * </p>
-	 * 
-	 * @param queryParams 
+	 *
+	 * @param queryParams
 	 * 	      The {@linkplain MvQueryParams query arguments} for which measured
 	 *        values should be found, not <code>null</code>.
-	 * @return A pattern to match corresponding hourly measured values, 
+	 * @return A pattern to match corresponding hourly measured values,
 	 *         never <code>null</code>.
-	 * @throws NullPointerException if at least one argument is 
+	 * @throws NullPointerException if at least one argument is
 	 *         <code>null</code>.
 	 * @since JIRA IT-40
 	 * @version 2 (since JIRA IT-85)
 	 */
 	public Pattern getTagPatternForHourlyMeasuredValues(MvQueryParams queryParams) {
 		requiresArgumentNotNull('queryParams', queryParams)
-		
+
 		String jobGroupIDPattern = createSubPatternToMatchIDs(queryParams.jobGroupIds);
 		String measuredEventIDPattern = createSubPatternToMatchIDs(queryParams.measuredEventIds);
-		String pageIDPattern = createSubPatternToMatchIDs(queryParams.pageIds);		
-		String browserIDPattern = createSubPatternToMatchIDs(queryParams.browserIds);		
+		String pageIDPattern = createSubPatternToMatchIDs(queryParams.pageIds);
+		String browserIDPattern = createSubPatternToMatchIDs(queryParams.browserIds);
 		String locationIDPattern = createSubPatternToMatchIDs(queryParams.locationIds);
-		
+
 		return ~/^${jobGroupIDPattern};${measuredEventIDPattern};${pageIDPattern};${browserIDPattern};${locationIDPattern}$/
 	}
-	
-	
+
+
 	/**
 	 * <p>
 	 * Creates a search pattern to find result {@link MeasuredValue}s matching
@@ -695,8 +722,8 @@ class MeasuredValueTagService {
 	public Pattern getTagPatternForResultMeasuredValues(MvQueryParams queryParams) {
 		return getTagPatternForHourlyMeasuredValues(queryParams);
 	}
-		
-	
+
+
 	/**
 	 * <p>
 	 * Creates a search tag to find {@link MeasuredValue}s matching
@@ -730,26 +757,26 @@ class MeasuredValueTagService {
 		requiresArgumentNotNull('queryParams', page)
 		requiresArgumentNotNull('queryParams', browser)
 		requiresArgumentNotNull('queryParams', location)
-				
+
 		return jobGroup.toString() + ";" + measuredEvent.toString() + ";" + page.toString() + ";" + browser.toString() + ";" + location.toString();
 	}
-	
+
 	/**
 	 * <p>
-	 * Creates a sub-pattern to match any ID in the specified collection. If 
-	 * the collection is empty, the {@link #SUB_PATTERN_MATCHES_ALL_IDS} is 
+	 * Creates a sub-pattern to match any ID in the specified collection. If
+	 * the collection is empty, the {@link #SUB_PATTERN_MATCHES_ALL_IDS} is
 	 * returned.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Examples:
 	 * <br/>
-	 * The collection {@code [1,2,3]} results in the tag {@code (1|2|3)} and  
-	 * an empty collection {@code []} results in the tag 
+	 * The collection {@code [1,2,3]} results in the tag {@code (1|2|3)} and
+	 * an empty collection {@code []} results in the tag
 	 * {@code [^;]*} which fits all IDs.
 	 * </p>
-	 * 
-	 * @param ids 
+	 *
+	 * @param ids
 	 *         The collection of IDs, not <code>null</code>; possibly
 	 *         {@linkplain Collection#isEmpty() empty}.
 	 * @return A sub pattern to find tags as described above;
@@ -764,10 +791,10 @@ class MeasuredValueTagService {
 		} else {
 			result = '(' + result + ')'
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Proofs whether given tag is a valid hourly event-tag.
 	 * A valid hourly event-tag is composed of id's of the following five domains in this order:
@@ -778,9 +805,9 @@ class MeasuredValueTagService {
 	 * <li>{@link Browser}</li>
 	 * <li>{@link Location}</li>
 	 * </ul>
-	 *  
+	 *
 	 * @param tagToProof
-	 * @return True if tagToProof is composed of five Longs where  
+	 * @return True if tagToProof is composed of five Longs where
 	 * <ul>
 	 * <li>First is a valid identifier for an object of domain {@link JobGroup}</li>
 	 * <li>Second is a valid identifier for an object of domain {@link MeasuredEvent}</li>
@@ -803,4 +830,40 @@ class MeasuredValueTagService {
 		}
 		return true
 	}
+
+    /**
+     * Returns a Map of pageids to pages
+     * @param tags a list of daily- or weeklyPageTags
+     * @return a map of pageids to their pages
+     */
+    Map<Long, Page> getAllPagesFromWeeklyOrDailyPageTags(ArrayList<String> tags) {
+        Map<Long, Page> result = [:]
+
+        tags.each { tag ->
+            Long pageId = getPageIdFromWeeklyOrDailyPageTag(tag)
+            if (!result.containsKey(pageId)) {
+                result.put(pageId, findPageOfDailyPageTag(tag))
+            }
+        }
+
+        return result
+    }
+
+    /**
+     * Returns a Map of jobGroupIds to jobGroups
+     * @param tags a list of daily- or weeklyPageTags
+     * @return a map of jobGroupIds to their jobGroup
+     */
+    Map<Long, JobGroup> getAllJobGroupsFromWeeklyOrDailyPageTags(ArrayList<String> tags) {
+        Map<Long, JobGroup> result = [:]
+
+        tags.each { tag ->
+            Long jobGroupId = getJobGroupIdFromWeeklyOrDailyPageTag(tag)
+            if (!result.containsKey(jobGroupId)) {
+                result.put(jobGroupId, findJobGroupOfWeeklyPageTag(tag))
+            }
+        }
+
+        return result
+    }
 }

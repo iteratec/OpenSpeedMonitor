@@ -110,8 +110,6 @@ class EventMeasuredValueService {
 			throw new IllegalArgumentException("QuerParams for Event-MeasuredValues aren't valid: ${mvQueryParams}")
 		}
 		
-		List<MeasuredValue> calculatedMeasuredvalues = []
-		
 		DateTime toDateTime = new DateTime(toDate)
 		DateTime fromDateTime = new DateTime(fromDate)
 		

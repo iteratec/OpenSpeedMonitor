@@ -34,6 +34,5 @@ class MeasuredValueUpdateEventCleanupJob {
     }
     def execute() {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300, createBatchActivity)
-        mvUpdateEventCleanupService.deleteUpdateEventsForClosedMVs()
     }
 }

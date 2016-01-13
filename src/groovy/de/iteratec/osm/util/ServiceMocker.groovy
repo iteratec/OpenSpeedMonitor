@@ -580,4 +580,36 @@ class ServiceMocker {
         }
         serviceToMockIn.eventResultDaoService = eventResultDaoService.createMock()
     }
+
+	void mockCachingContainerService(serviceToMockIn, returnForGetDailyJobGroupsByStartDate, returnForGetDailyPagesByStartDate,
+									 returnForGetDailyHemvMapByStartDate, returnForGetWeeklyJobGroupsByStartDate, returnForGetWeeklyPagesByStartDate,
+									 returnForGetWeeklyHemvMapByStartDate, returnForCreateContainerFor) {
+		def cachingContainerService = mockFor(CachingContainerService, true)
+
+		cachingContainerService.demand.getDailyJobGroupsByStartDate(0..100000){dailyMvsToCalculate, allJobGroups ->
+			return returnForGetDailyJobGroupsByStartDate
+		}
+		cachingContainerService.demand.getDailyPagesByStartDate(0..100000){dailyMvsToCalculate, allPages ->
+			return returnForGetDailyPagesByStartDate
+		}
+		cachingContainerService.demand.getDailyHemvMapByStartDate(0..100000){dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
+			return returnForGetDailyHemvMapByStartDate
+		}
+
+		cachingContainerService.demand.getWeeklyJobGroupsByStartDate(0..100000){weeklyMvsToCalculate, allJobGroups ->
+			return returnForGetWeeklyJobGroupsByStartDate
+		}
+		cachingContainerService.demand.getWeeklyPagesByStartDate(0..100000){weeklyMvsToCalculate, allPages ->
+			return returnForGetWeeklyPagesByStartDate
+		}
+		cachingContainerService.demand.getWeeklyHemvMapByStartDate(0..100000){weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
+			return returnForGetWeeklyHemvMapByStartDate
+		}
+
+		cachingContainerService.demand.createContainerFor(0..100000){dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
+			return returnForCreateContainerFor
+		}
+
+		serviceToMockIn.cachingContainerService = cachingContainerService.createMock()
+	}
 }
