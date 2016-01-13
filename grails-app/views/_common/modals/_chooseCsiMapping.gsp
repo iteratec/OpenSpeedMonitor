@@ -19,10 +19,9 @@ This is a dialog to choose from different default csi mappings.
         <g:form>
             <g:hiddenField name="page" value="${pageInstance}"></g:hiddenField>
             <label for="selectedDefaultMapping">
-                <g:message code="de.iteratec.osm.csi.mapping.demand" args="${pageInstance}" default="Choose one of the following mappings for the page {0}"/>:
+                <g:message code="de.iteratec.osm.csi.mapping.demand" default="Choose one of the following pages"/>:
             </label>
-            <g:select from="${defaultMappings*.name.unique()}" name="selectedDefaultMapping" onchange="handleMappingSelect(this.value)" noSelection="${[null:message(code:'de.iteratec.osm.csi.mapping.select.default')]}">
-            </g:select>
+            <g:select from="${pages}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${[null:message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
             <a href="#" class="btn btn-primary"  disabled="true" id="applyMapping">
                 <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
             </a>
@@ -30,3 +29,26 @@ This is a dialog to choose from different default csi mappings.
 
     </div>
 </div>
+<asset:script>
+    modalGraph = createMultiLineGraph(${defaultMultiLineChart}, 'choose_default_csi');
+    function showPageSelect(newLine, color){
+        var defaults = ${defaultMultiLineChart}
+        var selectedDefault = $.grep(defaults.lines, function(e){ return e.name == newLine; });
+        var pages = ${pageData};
+        $("#CsiMappingModal").find("#selectPageMapping").change(function(d){handlePageDefaultSelect($(this))});
+        var colorScale = d3.scale.ordinal()
+                                          .domain([newLine, ""])
+                                          .range(["#DBDBDB", color])
+        handlePageDefaultSelect($());
+
+
+        function handlePageDefaultSelect(elementId){
+            var newGraph = {};
+            var pageName = elementId.find(":selected").text();
+            var selectedPage = $.grep(pages.lines, function(e){ return e.name == pageName; })
+            newGraph.lines = selectedDefault.concat(selectedPage);
+            modalGraph.clearGraph();
+            createMultiLineGraph(newGraph,'choose_default_csi', colorScale);
+        }
+    }
+</asset:script>

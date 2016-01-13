@@ -191,6 +191,9 @@
                   model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
                             'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                             'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+        <asset:script>
+            createMultiLineGraph(${pageTimeToCsMappings}, 'page_csi_mappings');
+        </asset:script>
     </g:if>
     <g:else>
         <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden."/></h5>
@@ -214,12 +217,15 @@
               model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
                         'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+    <asset:script>
+        defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}");
+    </asset:script>
 
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
         <g:set var="customDefaultCsiMappingDeletePrefix" value='DeleteDefaultCsiMapping'/>
         <div class="span6" id="defaultMultilineGraphButtonLine">
-                <button type="button" class="btn btn-small btn-primary"  disabled="true"
-                        id="btn-apply-mapping">
+                <button type="button" class="btn btn-small btn-primary" data-toggle="modal" href="#CsiMappingModal" disabled="true"
+                        id="btn-apply-mapping" onclick="showMappingDialog()">
                     <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
                                default="Delete Default Mapping"/></button>
                 <button type="button" class="btn btn-small btn-danger" data-toggle="modal" href="#DeleteModal${customDefaultCsiMappingDeletePrefix}" disabled="true"
@@ -227,15 +233,19 @@
                     <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
                                default="Delete Default Mapping"/></button>
                 <asset:script type="text/javascript">
-                $(document).ready(function(){
-                        $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
-                });
-                function defaultSelectChange(){
-                    var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
-                    $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
-                    $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
-                    changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
-                }
+                    $(document).ready(function(){
+                            $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
+                    });
+                    function defaultSelectChange(){
+                        var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
+                        $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
+                        $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
+                        changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
+                    }
+                    function showMappingDialog(){
+                        var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
+                        showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
+                    }
             </asset:script>
         </div>
         <style>
@@ -244,7 +254,7 @@
         }
         </style>
         <g:render template="/_common/modals/deleteDialogCustomAction" model="[itemLabel:message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName:'deleteDefaultCsiMapping', customPrefix:customDefaultCsiMappingDeletePrefix, customID:'name', customController:'CsiConfiguration']"/>
-        %{--entityName:'abc',item:[id:'4']--}%
+        <g:render template="/_common/modals/chooseCsiMapping" model="[defaultMultiLineChart:defaultTimeToCsMappings, pages:pages, pageData:pageTimeToCsMappings]"/>
     </sec:ifAllGranted>
 
     <g:if test="${!readOnly}">
