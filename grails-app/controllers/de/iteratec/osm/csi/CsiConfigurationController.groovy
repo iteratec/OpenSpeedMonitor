@@ -109,7 +109,7 @@ class CsiConfigurationController {
          barchartData            : barChartJSON,
          defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
          pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON,
-         pages                   : config.timeToCsMappings*.page.unique()]
+         pages                   : Page.list()]
     }
 
     /**

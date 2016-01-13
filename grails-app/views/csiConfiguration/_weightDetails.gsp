@@ -192,7 +192,7 @@
                             'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                             'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
         <asset:script>
-            createMultiLineGraph(${pageTimeToCsMappings}, 'page_csi_mappings');
+            createMultiLineGraph(${pageTimeToCsMappings}, 'page_csi_mappings', true);
         </asset:script>
     </g:if>
     <g:else>
@@ -218,7 +218,7 @@
                         'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
     <asset:script>
-        defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}");
+        defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}", true);
     </asset:script>
 
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">

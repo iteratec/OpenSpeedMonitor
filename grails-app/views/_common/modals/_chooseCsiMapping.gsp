@@ -21,10 +21,10 @@ This is a dialog to choose from different default csi mappings.
             <label for="selectedDefaultMapping">
                 <g:message code="de.iteratec.osm.csi.mapping.demand" default="Choose one of the following pages"/>:
             </label>
-            <g:select from="${pages}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${[null:message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
-            <a href="#" class="btn btn-primary"  disabled="true" id="applyMapping">
+            <g:select from="${pages}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${["-1":message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
+            <button href="#" type="button" class="btn btn-primary"  disabled="true" id="applyMapping">
                 <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
-            </a>
+            </button>
         </g:form>
 
     </div>
@@ -38,9 +38,10 @@ This is a dialog to choose from different default csi mappings.
         $("#CsiMappingModal").find("#selectPageMapping").change(function(d){handlePageDefaultSelect($(this))});
         var colorScale = d3.scale.ordinal()
                                           .domain([newLine, ""])
-                                          .range(["#DBDBDB", color])
-        handlePageDefaultSelect($());
+                                          .range(["#DBDBDB", color]);
 
+        $("#applyMapping").click(applyPageMapping);
+        handlePageDefaultSelect($());
 
         function handlePageDefaultSelect(elementId){
             var newGraph = {};
@@ -48,7 +49,19 @@ This is a dialog to choose from different default csi mappings.
             var selectedPage = $.grep(pages.lines, function(e){ return e.name == pageName; })
             newGraph.lines = selectedDefault.concat(selectedPage);
             modalGraph.clearGraph();
-            createMultiLineGraph(newGraph,'choose_default_csi', colorScale);
+            createMultiLineGraph(newGraph,'choose_default_csi', false, colorScale);
+            handleApplyButtonDisable(elementId);
+         }
+
+        function handleApplyButtonDisable(elementId){
+            var selectedValue = elementId.find(":selected").val();
+            var enableButton = (selectedValue === "-1" || selectedValue == null);
+            $("#applyMapping").prop('disabled',enableButton);
+        }
+
+        function applyPageMapping(){
+            var pageId = $("#CsiMappingModal").find("#selectPageMapping").find(":selected").val();
+            var mapping = newLine;
         }
     }
 </asset:script>

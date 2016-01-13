@@ -4,7 +4,7 @@
  * @param chartDivIdentifier a unique identifer for the chart div
  * @param customColorScale
  */
-function createMultiLineGraph(data, chartDivIdentifier, customColorScale) {
+function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColorScale) {
     var graphObject = {};
     //Values
 
@@ -184,17 +184,20 @@ function createMultiLineGraph(data, chartDivIdentifier, customColorScale) {
             var currentHeight= d3.select(this).node().getBBox().height;
             if(currentHeight>maxHeight) maxHeight=currentHeight;
         });
-        diagramKey.append("rect")
+        var rects = diagramKey.append("rect")
             .attr("width", maxWidth+5)
             .attr("height", 12)
             .style("opacity", 0)
-            .style("cursor", "pointer")
             .attr("y", function (d, i) {
                 return (i) * 12
-            })
-            .on("mouseenter", function(d){handleDiagramKeyMouseEnter(d)})
-            .on("mouseleave", function(){handleDiagramKeyMouseLeave()})
-            .on("click", function(d){handleDiagramKeyClick(d.name)});
+            });
+        if(enableHover){
+            rects.style("cursor", "pointer")
+                 .on("mouseenter", function(d){handleDiagramKeyMouseEnter(d)})
+                 .on("mouseleave", function(){handleDiagramKeyMouseLeave()})
+                 .on("click", function(d){handleDiagramKeyClick(d.name)});
+        }
+
 
         // Labels for Axis
         svg.append("text")
