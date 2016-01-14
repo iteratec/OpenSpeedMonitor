@@ -183,7 +183,7 @@ class PageController {
             response.sendError(404, "No page with name ${params.page} exists!")
         }
         try {
-            defaultTimeToCsMappingService.copyDefaultMappingToPage(page, params.selectedDefaultMapping)
+            defaultTimeToCsMappingService.copyDefaultMappingToPage(page, params.selectedDefaultMapping, null)
         } catch (IllegalArgumentException iae) {
             response.sendError(404, "No default csi mapping with name ${params.selectedDefaultMapping} exists!")
         }

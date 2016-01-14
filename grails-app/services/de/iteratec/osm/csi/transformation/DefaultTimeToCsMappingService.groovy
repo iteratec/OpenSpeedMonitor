@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi.transformation
 
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMapping
@@ -49,7 +50,7 @@ class DefaultTimeToCsMappingService {
      *
      * //TODO: write a test for this method
      */
-    void copyDefaultMappingToPage(Page page, String nameOfDefaultMapping){
+    void copyDefaultMappingToPage(Page page, String nameOfDefaultMapping, CsiConfiguration csiConfiguration){
 
         List<DefaultTimeToCsMapping> defaultMappingsToCopyToPage = DefaultTimeToCsMapping.findAllByName(nameOfDefaultMapping)
         if (defaultMappingsToCopyToPage.size() == 0)
@@ -58,17 +59,24 @@ class DefaultTimeToCsMappingService {
         Integer actualMappingVersion
         TimeToCsMapping.withTransaction {
             List<TimeToCsMapping> actualMappings = timeToCsMappingCacheService.getActualMappingsFromDb()
+            //TODO check why we first load all mappings, instead of just the necessary ones
             actualMappingVersion = actualMappings.size()>0 ? actualMappings[0].mappingVersion : 1
-            actualMappings.findAll {it.page.ident() == page.ident()}*.delete()
+            def oldMappings = actualMappings.findAll {it.page.ident() == page.ident()}
+            oldMappings.each {
+                csiConfiguration.removeFromTimeToCsMappings(it)
+            }
+            csiConfiguration.save(failOnError: true)
+            oldMappings*.delete()
         }
         TimeToCsMapping.withTransaction {
             defaultMappingsToCopyToPage.each {defaultMapping ->
-                new TimeToCsMapping(
+               csiConfiguration.addToTimeToCsMappings(new TimeToCsMapping(
                         page: page,
                         loadTimeInMilliSecs: defaultMapping.loadTimeInMilliSecs,
                         customerSatisfaction: defaultMapping.customerSatisfactionInPercent,
                         mappingVersion: actualMappingVersion
-                ).save(failOnError: true)
+                ).save(failOnError: true))
+                csiConfiguration.save(failOnError: true)
             }
         }
         TimeToCsMapping.withTransaction {

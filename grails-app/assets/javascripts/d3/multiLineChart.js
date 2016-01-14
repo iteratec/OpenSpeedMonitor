@@ -1,7 +1,8 @@
 /**
  * Creates a multi line chart in given div
  * @param data de.itertec.osm.d3Data.MultiLineChart as JSON
- * @param chartDivIdentifier a unique identifer for the chart div
+ * @param chartDivIdentifier a unique identifier for the chart div
+ * @param enableHover
  * @param customColorScale
  */
 function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColorScale) {

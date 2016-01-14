@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
+import grails.validation.Validateable
 
 /**
  * CsiConfigurationController
@@ -104,6 +105,7 @@ class CsiConfigurationController {
          mappingsToOverwrite     : params.list('mappingsToOverwrite'),
          csiConfigurations       : csi_configurations,
          selectedCsiConfiguration: selectedCsiConfigurationLabel,
+         selectCsiConfigurationId: config.id,
          matrixViewData          : matrixViewDataJSON,
          treemapData             : treemapDataJSON,
          barchartData            : barChartJSON,
@@ -199,4 +201,34 @@ class CsiConfigurationController {
         defaultTimeToCsMappingService.deleteDefaultTimeToCsMapping(name)
         redirect action:'configurations'
     }
+
+    def applyNewMappingToPage(ApplyMappingCommand applyMappingCommand){
+        defaultTimeToCsMappingService.copyDefaultMappingToPage(applyMappingCommand.getPage(),
+                applyMappingCommand.getDefaultMappingName(), applyMappingCommand.getCsiConfiguration())
+        render ""
+    }
+}
+
+@Validateable
+class ApplyMappingCommand {
+
+    String defaultMappingName
+    Long csiConfigurationId
+    Long pageId
+
+
+    static constraints = {
+        defaultMappingName(blank: false)
+        csiConfigurationId(nullable: false, min: 1l)
+        pageId(nullable: false, min: 1l)
+    }
+
+   public Page getPage(){
+       return Page.findById(pageId)
+   }
+
+    public CsiConfiguration getCsiConfiguration(){
+        return CsiConfiguration.findById(csiConfigurationId)
+    }
+
 }

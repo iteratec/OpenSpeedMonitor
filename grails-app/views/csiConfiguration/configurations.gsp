@@ -214,7 +214,6 @@
     <asset:javascript src="csidashboard/defaultMappingCsvValidator.js"/>
     <asset:javascript src="csidashboard/deleteCsiConfigValidation.js"/>
     <asset:script type="text/javascript">
-
         var registerEventHandlersForFileUploadControls = function () {
             $('input[id=theBrowserConnectivityCsvFile]').change(function () {
                 $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
@@ -248,6 +247,7 @@
         };
 
         $(document).ready(function () {
+            actualCsiConfigurationId = ${selectCsiConfigurationId};
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
             createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");

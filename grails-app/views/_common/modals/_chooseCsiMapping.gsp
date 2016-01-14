@@ -18,10 +18,10 @@ This is a dialog to choose from different default csi mappings.
     <div class="modal-footer">
         <g:form>
             <g:hiddenField name="page" value="${pageInstance}"></g:hiddenField>
-            <label for="selectedDefaultMapping">
+            <label for="selectPageMapping">
                 <g:message code="de.iteratec.osm.csi.mapping.demand" default="Choose one of the following pages"/>:
             </label>
-            <g:select from="${pages}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${["-1":message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
+            <g:select from="${pages.sort{it.name}}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${["-1":message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
             <button href="#" type="button" class="btn btn-primary"  disabled="true" id="applyMapping">
                 <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
             </button>
@@ -29,6 +29,11 @@ This is a dialog to choose from different default csi mappings.
 
     </div>
 </div>
+<style>
+    #selectPageMapping {
+        margin-top: 5px;
+    }
+</style>
 <asset:script>
     modalGraph = createMultiLineGraph(${defaultMultiLineChart}, 'choose_default_csi');
     function showPageSelect(newLine, color){
@@ -58,10 +63,23 @@ This is a dialog to choose from different default csi mappings.
             var enableButton = (selectedValue === "-1" || selectedValue == null);
             $("#applyMapping").prop('disabled',enableButton);
         }
-
         function applyPageMapping(){
-            var pageId = $("#CsiMappingModal").find("#selectPageMapping").find(":selected").val();
-            var mapping = newLine;
-        }
+            var select = $("#CsiMappingModal").find("#selectPageMapping");
+            select.prop('disabled', true);
+            startSpinner(this);
+            $("#applyMapping").prop('disabled', true);
+            var pageId = select.find(":selected").val()
+            jQuery.ajax({
+                type: 'GET',
+                url: "<g:createLink action="applyNewMappingToPage" absolute="true"/>",
+                data:{'defaultMappingName':newLine, 'csiConfigurationId':actualCsiConfigurationId, 'pageId':pageId},
+                success: function (content) {
+                    window.location.href="<g:createLink action="configurations" absolute="true"/>/"+actualCsiConfigurationId;
+                }
+         });
     }
+
+
+    }
+
 </asset:script>
