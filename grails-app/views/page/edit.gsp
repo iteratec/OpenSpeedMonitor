@@ -51,7 +51,6 @@
                 <div class="form-actions">
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
-                    <g:render template="/_common/modals/chooseCsiMapping" />
                     <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
@@ -82,29 +81,6 @@
                     };
                     return new Spinner(opts).spin(spinnerElement);
                 }
-
-                function copyDefaultMappingToPageAsynchronously(){
-
-                    var  spinner = startSpinner(document.getElementById('spinner-position'));
-
-                    var selectedMapping = document.querySelector('select[name=selectedDefaultMapping]').value;
-                    $.ajax({
-                        type: 'POST',
-                        url: '${createLink(controller: 'page', action: 'applyMappingToPage', absolute: true)}',
-                    data: {page: '${pageInstance}', selectedDefaultMapping: selectedMapping},
-                    success : function(data) {
-                        spinner.stop();
-                        //TODO: updating underlying chart doesn't word for now :(
-                        //console.log(data)
-                        //graphBuilder_choose_default_csi.setData(data);
-                        $('#CsiMappingModal').modal('hide');
-                    },
-                    error: function(result) {
-                        spinner.stop();
-                        $('#CsiMappingModal').modal('hide');
-                        return false;
-                    }
-                });
 
             }
 

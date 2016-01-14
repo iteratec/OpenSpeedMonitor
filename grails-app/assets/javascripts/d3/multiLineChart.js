@@ -418,22 +418,6 @@ function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColor
         }
     }
 
-    /**
-     * Enables the apply button, if a value was selected or disables it, if there was noe value selected
-     * @param selectedValue
-     */
-    function handleMappingSelect(selectedValue){
-        highlightLine(selectedValue);
-        var mappingButton =  d3.select("#"+graphObject.identifier).select("#applyMapping");
-        if(selectedValue=="null"){
-            mappingButton.attr("disabled",true);
-            mappingButton.attr("onClick",null);
-        }else{
-            mappingButton.attr("disabled",null);
-            mappingButton.attr("onClick","copyDefaultMappingToPageAsynchronously()");
-        }
-    }
-
     return graphObject;
 }
 

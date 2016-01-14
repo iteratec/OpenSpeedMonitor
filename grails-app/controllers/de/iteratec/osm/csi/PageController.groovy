@@ -171,36 +171,6 @@ class PageController {
     }
 
     /**
-     * Gets called asynchronously from modal dialog.
-     * @return
-     */
-    def applyMappingToPage() {
-
-        response.setContentType('application/json')
-
-        Page page = Page.findByName(params.page)
-        if (!page) {
-            response.sendError(404, "No page with name ${params.page} exists!")
-        }
-        try {
-            defaultTimeToCsMappingService.copyDefaultMappingToPage(page, params.selectedDefaultMapping, null)
-        } catch (IllegalArgumentException iae) {
-            response.sendError(404, "No default csi mapping with name ${params.selectedDefaultMapping} exists!")
-        }
-
-        sendSimpleResponseAsStream(
-                response,
-                200,
-                new RickshawHtmlCreater().transformCSIMappingData(
-                        timeToCsMappingCacheService.getMappingsFor(page)
-                ).toString()
-        )
-//        render(contentType: "application/json") {
-//            timeToCsMappingCacheService.getMappingsFor(page)
-//		}
-    }
-
-    /**
      * Sends error message with given error httpStatus and message as http response and breaks action (no subsequent
      * action code is executed).
      * @param response
