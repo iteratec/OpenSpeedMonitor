@@ -55,7 +55,8 @@ class TimeToCsMappingServiceTests {
     static final String FRUSTRATIONS_CSV = 'customerFrustrations.csv'
     static final String MAPPINGS_CSV = 'timeToCsMappings.csv'
     static final String EXPECTED_CUSTOMER_SATISFACTION_CSV = 'expectedValues.csv'
-    Map<String, List<TimeToCsMapping>> mappings
+    List<TimeToCsMapping> mappings
+    CsiConfiguration csiConfiguration
     static Map<String, List<Double>> frustrations
     static Map<String, List<ExpectedCustomerSatisfaction>> expectedCustomerSatisfactions
 
@@ -100,11 +101,11 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks, test execution and assertions
-            mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(pageName), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
-                Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page)
+                Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page, csiConfiguration)
                 Double difference = Math.abs(csCalculated - expected.customerSatisfaction)
 
                 //could be used for detailed analyze of differences between BY_RANK and BY_MAPPING:
@@ -123,7 +124,7 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks, test execution and assertions
-            mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(pageName), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
@@ -147,7 +148,7 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks and test execution
-            mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(pageName), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
@@ -174,11 +175,11 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks and test execution
-            mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(pageName), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
-                Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page)
+                Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page, csiConfiguration)
                 deviationsByPage[pageName].deviation += Math.abs(csCalculated - expected.customerSatisfaction)
                 deviationsByPage[pageName].runs++
 
@@ -200,29 +201,29 @@ class TimeToCsMappingServiceTests {
         Page page = new Page(name: "HP_entry", weight: 1)
 
         //with valid frustrations for page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), frustrations.get(page.name))
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
         assertThat(service.validFrustrationsExistFor(page), is(true))
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), [100, 200])
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100, 200])
         assertThat(service.validFrustrationsExistFor(page), is(true))
 
         //without frustrations for page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), [])
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
         //with invalid frustrations for page: just one frustration
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), [100])
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
         //with invalid frustrations for page: just one frustration
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), [1000, 1000, 1000, 1000])
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [1000, 1000, 1000, 1000])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
         //with valid frustrations but null as page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), frustrations.get(page.name))
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
         assertThat(service.validFrustrationsExistFor(null), is(false))
 
         //with valid frustrations but UNDEFINED page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(page.name), frustrations)
+        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations)
         assertThat(service.validFrustrationsExistFor(new Page(name: Page.UNDEFINED, weight: 0)), is(false))
 
     }
@@ -235,13 +236,13 @@ class TimeToCsMappingServiceTests {
         // mocks common for all tests
         mocker = ServiceMocker.create()
 
-        mappingsSetup()
+        csiConfigurationSetup()
 
     }
 
-    void mappingsSetup() {
+    void csiConfigurationSetup() {
         File csvFile = new File("test/resources/CsiData/TimeToCsMapping/${MAPPINGS_CSV}")
-        mappings = [:].withDefault{[]}
+        mappings = []
 
         int lineCounter = 0
         new FileInputStream(csvFile).eachLine { line ->
@@ -253,9 +254,9 @@ class TimeToCsMappingServiceTests {
                 Integer loadTimeInMilliSecs = Integer.parseInt(tokenized[1])
                 Double customerSatisfaction = Double.parseDouble(tokenized[2])
 
-                mappings[pageName].add(
+                mappings.add(
                         new TimeToCsMapping(
-                                page: new Page(name: pageName, weight: 1),
+                                page: new Page(name: pageName),
                                 loadTimeInMilliSecs: loadTimeInMilliSecs,
                                 customerSatisfaction: customerSatisfaction,
                                 mappingVersion: 1
@@ -265,6 +266,10 @@ class TimeToCsMappingServiceTests {
             lineCounter++
 
         }
+
+        csiConfiguration = new CsiConfiguration(label: "TestCsi",
+                                                description: "For Testing",
+                                                timeToCsMappings: mappings)
     }
 
     @BeforeClass

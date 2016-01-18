@@ -35,22 +35,22 @@ class TimeToCsMappingService {
      * @param Page page
      * @return Calculated customer-satisfaction or null if page is undefined or no calculation specification exists for it.
      */
-    public Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page) {
+    public Double getCustomerSatisfactionInPercent(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null) {
 
-        if (page.isUndefinedPage() || noTransformationPossibleFor(page)) {
+        if (page.isUndefinedPage() || noTransformationPossibleFor(page,csiConfiguration)) {
             return null;
         } else {
 
-            return transformLoadTime(docReadyTimeInMilliSecs, page)
+            return transformLoadTime(docReadyTimeInMilliSecs, page, csiConfiguration)
 
         }
     }
 
-    private double transformLoadTime(int docReadyTimeInMilliSecs, Page page) {
+    private double transformLoadTime(int docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
         Double cs
         CsiTransformation csiTransformation = configService.getCsiTransformation()
         if (csiTransformation == CsiTransformation.BY_MAPPING) {
-            cs = getCustomerSatisfactionInPercentViaMapping(docReadyTimeInMilliSecs, page)
+            cs = getCustomerSatisfactionInPercentViaMapping(docReadyTimeInMilliSecs, page, csiConfiguration)
         } else if (csiTransformation == CsiTransformation.BY_RANK) {
             cs = getCustomerSatisfactionPercentRank(docReadyTimeInMilliSecs, page)
         } else {
@@ -59,12 +59,12 @@ class TimeToCsMappingService {
         return cs
     }
 
-    private boolean noTransformationPossibleFor(Page page) {
+    private boolean noTransformationPossibleFor(Page page, CsiConfiguration csiConfiguration) {
         Boolean notPossible = true
         CsiTransformation csiTransformation = configService.getCsiTransformation()
         if (csiTransformation == CsiTransformation.BY_RANK && validFrustrationsExistFor(page)) {
             notPossible = false
-        } else if (csiTransformation == CsiTransformation.BY_MAPPING && validMappingsExistFor(page)) {
+        } else if (csiTransformation == CsiTransformation.BY_MAPPING && csiConfiguration != null && validMappingsExistFor(page,csiConfiguration)) {
             notPossible = false
         }
         return notPossible
@@ -79,8 +79,8 @@ class TimeToCsMappingService {
      * @param page
      * @return
      */
-    public Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page) {
-        List<TimeToCsMapping> mappingsForPage = timeToCsMappingCacheService.getMappingsFor(page)
+    public Double getCustomerSatisfactionInPercentViaMapping(Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
+        List<TimeToCsMapping> mappingsForPage = csiConfiguration.getTimeToCsMappingByPage(page)
 
         Integer loadtimeIncrement = 20
         Integer loadtimeNoUserWouldAccept = 20000
@@ -163,8 +163,8 @@ class TimeToCsMappingService {
         return isValid(page) && getCachedFrustrations(page).unique(false).size() > 1
     }
 
-    public Boolean validMappingsExistFor(Page page) {
-        return isValid(page) && timeToCsMappingCacheService.getMappingsFor(page)
+    public Boolean validMappingsExistFor(Page page, CsiConfiguration csiConfiguration) {
+        return isValid(page) && !csiConfiguration.getTimeToCsMappingByPage(page).isEmpty()
     }
 
     Boolean isValid(Page page) {

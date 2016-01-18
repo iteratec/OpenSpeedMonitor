@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
@@ -415,7 +416,9 @@ class LocationAndResultPersisterService implements iListener{
 		try{
 			log.debug("step=${step}")
 			log.debug("step.testedPage=${step.testedPage}")
-            result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage)
+			CsiConfiguration csiConfigurationOfResult = result.jobResult.job.jobGroup.csiConfiguration
+			log.debug("result.CsiConfiguration=${csiConfigurationOfResult}")
+            result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage,csiConfigurationOfResult)
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}

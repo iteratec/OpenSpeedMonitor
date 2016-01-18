@@ -62,4 +62,8 @@ class CsiConfiguration {
 
         return configToReturn
     }
+
+    public List<TimeToCsMapping> getTimeToCsMappingByPage(Page page) {
+        return this.timeToCsMappings.findAll {it -> it.page.name == page.name}
+    }
 }
