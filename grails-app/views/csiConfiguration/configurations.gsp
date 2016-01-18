@@ -175,7 +175,8 @@
 
 <g:render template="weightDetails" model="[readOnly               : false,
                                            errorMessagesCsi       : errorMessagesCsi,
-                                           defaultTimeToCsMappings: defaultTimeToCsMappings]" />
+                                           defaultTimeToCsMappings: defaultTimeToCsMappings],
+                                           chooseCsiMappingDialogNecessary: true" />
 
 <div class="row">
     <div class="span12">
