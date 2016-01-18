@@ -113,6 +113,11 @@ class JobGroupController {
                 return
             }
         }
+        String csiConfigLabel = params.remove("csiConfiguration")
+        if(csiConfigLabel != null) {
+            CsiConfiguration config = CsiConfiguration.findByLabel(csiConfigLabel)
+            jobGroupInstance.csiConfiguration = config
+        }
 
         jobGroupInstance.properties = params
 

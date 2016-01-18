@@ -224,6 +224,7 @@
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
         <g:set var="customDefaultCsiMappingDeletePrefix" value='DeleteDefaultCsiMapping'/>
         <div class="span6" id="defaultMultilineGraphButtonLine">
+            <g:if test="${!readOnly}">
                 <button type="button" class="btn btn-small btn-primary" data-toggle="modal" href="#CsiMappingModal" disabled="true"
                         id="btn-apply-mapping" onclick="showMappingDialog()">
                     <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
@@ -246,7 +247,8 @@
                         var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
                         showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
                     }
-            </asset:script>
+                </asset:script>
+            </g:if>
         </div>
         <style>
         #select-default {
@@ -254,7 +256,10 @@
         }
         </style>
         <g:render template="/_common/modals/deleteDialogCustomAction" model="[itemLabel:message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName:'deleteDefaultCsiMapping', customPrefix:customDefaultCsiMappingDeletePrefix, customID:'name', customController:'CsiConfiguration']"/>
-        <g:render template="/_common/modals/chooseCsiMapping" model="[defaultMultiLineChart:defaultTimeToCsMappings, pages:pages, pageData:pageTimeToCsMappings]"/>
+
+        <g:if test="${pages}">
+            <g:render template="/_common/modals/chooseCsiMapping" model="[defaultMultiLineChart:defaultTimeToCsMappings, pages:pages, pageData:pageTimeToCsMappings]"/>
+        </g:if>
     </sec:ifAllGranted>
 
     <g:if test="${!readOnly}">

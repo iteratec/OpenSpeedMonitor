@@ -39,7 +39,8 @@
         <div class="controls" id="csiConfigurationSelection">
             <g:select name="csiConfiguration" from="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
                       keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
-                      value="${jobGroupInstance?.csiConfiguration?.label}"/>
+                      value="${jobGroupInstance?.csiConfiguration?.label}"
+                      noSelection="${[null:g.message(code: 'jobGroup.csi_configuration.emptyLabel', default: 'Select one...')]}"/>
         </div>
     </div>
 
