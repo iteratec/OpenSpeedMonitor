@@ -328,7 +328,8 @@ class PageMeasuredValueService {
 
         List<WeightedCsiValue> weightedCsiValues = []
         if (hmvsOfTargetCsiGroupAndPage.size() > 0) {
-            weightedCsiValues = weightingService.getWeightedCsiValues(hmvsOfTargetCsiGroupAndPage, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            CsiConfiguration csiConfiguration = targetCsiGroup.csiConfiguration
+            weightedCsiValues = weightingService.getWeightedCsiValues(hmvsOfTargetCsiGroupAndPage, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
             log.debug("weightedCsiValues.size()=${weightedCsiValues.size()}")
         }
 

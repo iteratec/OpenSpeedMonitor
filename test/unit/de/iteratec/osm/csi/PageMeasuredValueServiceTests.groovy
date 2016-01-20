@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.util.ServiceMocker
 import org.junit.Assert
 
 import static org.junit.Assert.assertEquals
@@ -58,7 +59,7 @@ import de.iteratec.osm.measurement.environment.Location
  */
 @TestFor(PageMeasuredValueService)
 @Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location, 
-	EventResult, MeasuredValueDaoService, DefaultMeasuredEventDaoService, EventMeasuredValueService, 
+	EventResult, MeasuredValueDaoService, DefaultMeasuredEventDaoService, EventMeasuredValueService,
 	CustomerSatisfactionWeightService,Day, MeanCalcService, MeasuredValueUpdateEvent])
 class PageMeasuredValueServiceTests {
 
@@ -66,7 +67,9 @@ class PageMeasuredValueServiceTests {
 	
 	MeasuredValueInterval weeklyInterval, dailyInterval, hourlyInterval
 	JobGroup jobGroup1, jobGroup2, jobGroup3
+	Map<String,JobGroup> allCsiGroups
 	Page page1, page2, page3
+	Map<String,Page> allPages
 	AggregatorType pageAggregator;
 	Browser browser;
 	
@@ -132,46 +135,48 @@ class PageMeasuredValueServiceTests {
 		
 		//test execution, mocking inner services and assertions
 		
-		List<JobGroup> groups = [group1, group2, group3]
-		List<Page> pages = [page1, page2, page3]
+		Map<String,JobGroup> groups = ['1':group1, '2':group2, '3':group3]
+		Map<String,Page> pages = ['1':page1, '2':page2, '3':page3]
+		List<JobGroup> groupsAsList = groups.values().toList()
+		List<Page> pagesAsList = pages.values().toList()
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1to3_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group1]
-		pages = [page1, page2, page3]
+		Assert.assertEquals(with_group1to3_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group1]
+		pages = ['1':page1, '2':page2, '3':page3]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size() )
-		groups = [group2]
-		pages = [page1, page2, page3]
+		Assert.assertEquals(with_group1_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size() )
+		groups = ['1':group2]
+		pages = ['1':page1, '2':page2, '3':page3]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group2_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group3]
-		pages = [page1, page2, page3]
+		Assert.assertEquals(with_group2_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group3]
+		pages = ['1':page1, '2':page2, '3':page3]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group3_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group1, group2, group3]
-		pages = [page1]
+		Assert.assertEquals(with_group3_page1to3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group1, '2':group2, '3':group3]
+		pages = ['1':page1]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1to3_page1, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group1, group2, group3]
-		pages = [page2]
+		Assert.assertEquals(with_group1to3_page1, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group1, '2':group2, '3':group3]
+		pages = ['1':page2]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1to3_page2, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group1, group2, group3]
-		pages = [page3]
+		Assert.assertEquals(with_group1to3_page2, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group1, '2':group2, '3':group3]
+		pages = ['1':page3]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1to3_page3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group1, group2]
-		pages = [page3]
+		Assert.assertEquals(with_group1to3_page3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group1, '2':group2]
+		pages = ['1':page3]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1to2_page3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group1, group2]
-		pages = [page1]
+		Assert.assertEquals(with_group1to2_page3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group1, '2':group2]
+		pages = ['1':page1]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group1to2_page1, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
-		groups = [group3]
-		pages = [page1, page3]
+		Assert.assertEquals(with_group1to2_page1, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+		groups = ['1':group3]
+		pages = ['1':page1, '2':page3]
 		mockMeasuredValueTagService(groups, pages)
-		Assert.assertEquals(with_group3_page1or3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups, pages).size())
+		Assert.assertEquals(with_group3_page1or3, serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
 	}
 	
 	/**
@@ -188,7 +193,7 @@ class PageMeasuredValueServiceTests {
 		
 		//mocking inner services
 		
-		mockMeasuredValueTagService([], [])
+		mockMeasuredValueTagService(['1':jobGroup1], ['1':page1])
 		
 		//precondition
 		
@@ -230,7 +235,7 @@ class PageMeasuredValueServiceTests {
 		
 		//mocking inner services
 		
-		mockMeasuredValueTagService([], [])
+		mockMeasuredValueTagService(['1':jobGroup1], ['1':page1])
 		
 		//precondition
 		
@@ -281,7 +286,7 @@ class PageMeasuredValueServiceTests {
 		//mocking inner services
 		
 		mockMeasuredValueDaoService()
-		mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3], [page1, page2, page3])
+		mockMeasuredValueTagService(allCsiGroups, allPages)
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		
 		//precondition
@@ -336,7 +341,7 @@ class PageMeasuredValueServiceTests {
 		//mocking inner services
 		
 		mockMeasuredValueDaoService()
-		mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3], [page1, page2, page3])
+		mockMeasuredValueTagService(allCsiGroups, allPages)
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		
 		//precondition
@@ -399,7 +404,7 @@ class PageMeasuredValueServiceTests {
 		//mocking inner services
 		
 		mockMeasuredValueDaoService()
-		mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3], [page1, page2, page3])
+		mockMeasuredValueTagService(allCsiGroups, allPages)
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		
 		//precondition
@@ -460,7 +465,7 @@ class PageMeasuredValueServiceTests {
 		//mocking inner services
 		
 		mockMeasuredValueDaoService()
-		mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3], [page1, page2, page3])
+		mockMeasuredValueTagService(allCsiGroups, allPages)
 		
 		//precondition
 		
@@ -491,39 +496,24 @@ class PageMeasuredValueServiceTests {
 	 * @param csiGroups
 	 * @param pages
 	 */
-	private void mockMeasuredValueTagService(List<JobGroup> allCsiGroups, List<Page> allPages){
-		Pattern patternToReturn = ~/(${allCsiGroups*.ident().join('|')});(${allPages*.ident().join('|')})/
-		def measuredValueTagServiceMocked = mockFor(MeasuredValueTagService, true)
-		measuredValueTagServiceMocked.demand.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(0..10000) {
-			List<JobGroup> theCsiGroups, List<Page> thePages ->
-			return patternToReturn
-		}
-		Pattern hourlyPattern = ~/(${allCsiGroups*.ident().join('|')});(${allPages*.ident().join('|')});[^;];[^;];[^;]/
-		measuredValueTagServiceMocked.demand.getTagPatternForHourlyMeasuredValues(0..10000) { MvQueryParams thePages ->
-			return hourlyPattern;
-		}
-		String pageAggregatorTagToReturn = jobGroup1.ident()+';'+page1.ident();
-		measuredValueTagServiceMocked.demand.createPageAggregatorTagByEventResult(0..10000) {
-			EventResult newResult ->
-			return pageAggregatorTagToReturn
-		}
-		
-		measuredValueTagServiceMocked.demand.findBrowserOfHourlyEventTag(0..10000) { String tag ->
-			return browser;
-		}
-		measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
-			return jobGroup1;
-		}
-		measuredValueTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->
-			return page1;
-		}
-		measuredValueTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
-			return group.ident()+";"+page.ident();
-		}
-		
-		MeasuredValueTagService mVTS=measuredValueTagServiceMocked.createMock();
-		serviceUnderTest.measuredValueTagService = mVTS
-		serviceUnderTest.eventMeasuredValueService.measuredValueTagService = mVTS
+	private void mockMeasuredValueTagService(Map<String,JobGroup> allCsiGroups, Map<String,Page> allPages){
+//		def measuredValueTagServiceMocked = mockFor(MeasuredValueTagService, true)
+//		measuredValueTagServiceMocked.demand.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(0..10000) {
+//			List<JobGroup> theCsiGroups, List<Page> thePages ->
+//			return patternToReturn
+//		}
+
+//
+//		measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
+//			return jobGroup1;
+//		}
+//		measuredValueTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->
+//			return page1;
+//		}
+
+		ServiceMocker serviceMocker = ServiceMocker.create()
+		serviceMocker.mockMeasuredValueTagService(serviceUnderTest,allCsiGroups,null,allPages,null,null)
+		serviceMocker.mockMeasuredValueTagService(serviceUnderTest.eventMeasuredValueService,allCsiGroups,null,allPages,null,null)
 	}
 	
 	
@@ -539,7 +529,7 @@ class PageMeasuredValueServiceTests {
 	private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues){
 		def weightingService = mockFor(WeightingService, true)
 		weightingService.demand.getWeightedCsiValues(1..10000) {
-			List<CsiValue> csiValues, Set<WeightFactor> weightFactors ->
+			List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
 			return toReturnFromGetWeightedCsiValues
 		}
 		serviceUnderTest.weightingService = weightingService.createMock()
@@ -575,9 +565,9 @@ class PageMeasuredValueServiceTests {
 
 		browser=new Browser(name: "Test", weight: 1).save(failOnError: true);
 		
-		jobGroup1=new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-		jobGroup2=new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-		jobGroup3=new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+		jobGroup1=new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+		jobGroup2=new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+		jobGroup3=new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
 		page1=new Page(name: pageName1).save(validate: false)
 		page2=new Page(name: pageName2).save(validate: false)
 		page3=new Page(name: pageName3).save(validate: false)
@@ -603,6 +593,9 @@ class PageMeasuredValueServiceTests {
 		new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '4;4', started: startDate.toDate()).save(validate: false)
 		new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '5;14', started: startDate.toDate()).save(validate: false)
 		new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '6;7', started: startDate.toDate()).save(validate: false)
+
+		allCsiGroups = ['1':jobGroup1,'2':jobGroup2,'3':jobGroup3]
+		allPages = ['1':page1,'2':page2,'3':page3]
 	}
 	
 	private void deleteTestData(){

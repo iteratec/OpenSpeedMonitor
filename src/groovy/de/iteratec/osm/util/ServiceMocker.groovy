@@ -42,6 +42,7 @@ import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
 import java.text.DecimalFormat
+import java.util.regex.Pattern
 
 /**
  * <p>
@@ -303,7 +304,7 @@ class ServiceMocker {
 		Map idAsStringToLocationMap){
 
 		def measuredValueTagServiceMocked = mockFor(MeasuredValueTagService, true)
-		
+		Pattern patternToReturn = ~/(${idAsStringToJobGroupMap.values()*.ident().join('|')});(${idAsStringToPageMap.values()*.ident().join('|')})/
 		measuredValueTagServiceMocked.demand.createHourlyEventTag(1..10000) {
 			JobGroup jobGroupParam,
 			MeasuredEvent measuredEventParam,
@@ -329,6 +330,10 @@ class ServiceMocker {
 						pageParam,
 						browserParam,
 						locationParam)
+		}
+		Pattern hourlyPattern = ~/(${idAsStringToJobGroupMap.values()*.ident().join('|')});(${idAsStringToPageMap.values()*.ident().join('|')});[^;];[^;];[^;]/
+		measuredValueTagServiceMocked.demand.getTagPatternForHourlyMeasuredValues(0..10000) { MvQueryParams thePages ->
+			return hourlyPattern;
 		}
 		measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) {String mvTag ->
 			String idJobGroup = mvTag.split(";")[0]
@@ -367,6 +372,21 @@ class ServiceMocker {
 		}
 		measuredValueTagServiceMocked.demand.isValidHourlyEventTag(1..10000) {String tagToProof ->
 			return true // not the concern of the tests
+		}
+		measuredValueTagServiceMocked.demand.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(0..10000) {
+			List<JobGroup> theCsiGroups, List<Page> thePages ->
+				return patternToReturn
+		}
+		measuredValueTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
+			return group.ident()+";"+page.ident();
+		}
+
+		measuredValueTagServiceMocked.demand.createPageAggregatorTagByEventResult(0..10000) {
+			EventResult newResult ->
+				JobGroup jobGroup1 = idAsStringToJobGroupMap.values().toList().first() //get first value
+				Page page1 = idAsStringToPageMap.values().toList().first() //get first value
+				String pageAggregatorTagToReturn = jobGroup1.ident()+';'+page1.ident();
+				return pageAggregatorTagToReturn
 		}
 
 		serviceToMockIn.measuredValueTagService = measuredValueTagServiceMocked.createMock()
