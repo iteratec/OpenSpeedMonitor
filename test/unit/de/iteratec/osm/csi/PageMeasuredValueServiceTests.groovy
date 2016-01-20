@@ -59,7 +59,7 @@ import de.iteratec.osm.measurement.environment.Location
 @TestFor(PageMeasuredValueService)
 @Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location, 
 	EventResult, MeasuredValueDaoService, DefaultMeasuredEventDaoService, EventMeasuredValueService, 
-	CustomerSatisfactionWeightService,HourOfDay, MeanCalcService, MeasuredValueUpdateEvent])
+	CustomerSatisfactionWeightService,Day, MeanCalcService, MeasuredValueUpdateEvent])
 class PageMeasuredValueServiceTests {
 
 	static final double DELTA = 1e-15
@@ -268,9 +268,11 @@ class PageMeasuredValueServiceTests {
 		MeasuredValue hpmv=new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident()+';'+page1.ident()+';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d).save(failOnError: true);
 		TestDataUtil.createUpdateEvent(hpmv.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
+		Day testDay = new Day()
 		(0..23).each {
-			new HourOfDay(fullHour: it, weight: 1).save(failOnError: true);
+			testDay.setHourWeight(it, 1)
 		}
+		testDay.save(failOnError: true)
 		
 		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
 			new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [])]
@@ -320,10 +322,11 @@ class PageMeasuredValueServiceTests {
 		MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident()+';'+page1.ident()+';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY+1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true);
 		TestDataUtil.createUpdateEvent(mv5.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 		
-				
+		Day testDay = new Day()
 		(0..23).each {
-			new HourOfDay(fullHour: it, weight: 1).save(failOnError: true);
+			testDay.setHourWeight(it, 1)
 		}
+		testDay.save(failOnError: true)
 		
 		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
 			new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: []),
@@ -380,14 +383,13 @@ class PageMeasuredValueServiceTests {
 		TestDataUtil.createUpdateEvent(mv4.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 		MeasuredValue mv5 =new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident()+';'+page1.ident()+';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY+1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true)
 		TestDataUtil.createUpdateEvent(mv5.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-				
-		(0..11).each {
-			new HourOfDay(fullHour: it, weight: 1).save(failOnError: true);
+
+		Day testDay = new Day()
+		(0..23).each {
+			testDay.setHourWeight(it, 1)
 		}
-		new HourOfDay(fullHour: 12, weight: 10).save(failOnError: true);
-		(13..23).each {
-			new HourOfDay(fullHour: it, weight: 1).save(failOnError: true);
-		}
+		testDay.setHourWeight(12, 10)
+		testDay.save(failOnError: true)
 		
 		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
 			new WeightedCsiValue(weightedValue: new WeightedValue(value: 1d, weight: 10d), underlyingEventResultIds: []),
@@ -447,10 +449,12 @@ class PageMeasuredValueServiceTests {
 		TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 		MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident()+';'+page1.ident()+';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY+1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true);
 		TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-		
+
+		Day testDay = new Day()
 		(0..23).each {
-			new HourOfDay(fullHour: it, weight: 1).save(failOnError: true);
+			testDay.setHourWeight(it, 1)
 		}
+		testDay.save(failOnError: true)
 		
 		
 		//mocking inner services

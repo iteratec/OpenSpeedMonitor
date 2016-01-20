@@ -10,7 +10,6 @@ import grails.test.spock.IntegrationSpec
  */
 class CsiConfigurationTests extends IntegrationSpec {
 
-
     void 'test cascading delete'() {
 
         given: "A Saved CsiConfiguration"
@@ -21,10 +20,11 @@ class CsiConfigurationTests extends IntegrationSpec {
             browser.addToBrowserAliases(browserAlias)
             browser.save(flush: true)
             browserAlias.save(flush: true)
-            Day day = new Day(name:"a good day")
+            Day day = new Day()
             (0..23).each{
-                day.addToHoursOfDay(new HourOfDay(fullHour: it, weight: 1, ).save(failOnError: true))
+                day.setHourWeight(it, 1)
             }
+            day.save(failOnError: true)
             PageWeight pageWeight = new PageWeight(page: page, weight: 0.5).save(failOnError: true)
             TimeToCsMapping timeToCsMapping = new TimeToCsMapping(page: page, loadTimeInMilliSecs: 100, customerSatisfaction: 0.5, mappingVersion: 100 ).save(failOnError: true)
             CsiConfiguration csiConfiguration = new CsiConfiguration(label: "csiConfig", description: "some information")

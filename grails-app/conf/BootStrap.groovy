@@ -214,6 +214,7 @@ class BootStrap {
         AggregatorType.findByName(aggregatorName) ?: new AggregatorType([name: aggregatorName, measurandGroup: groupName]).save(failOnError: true)
     }
 
+
     void initCsiData() {
         log.info "initCsiData starts"
 
@@ -223,38 +224,12 @@ class BootStrap {
                 groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
 
         // here you can initialize the weights of the hours of the day for csi calculation  (see de.iteratec.osm.csi.PageMeasuredValueService)
-
-        (0..23).each { hour ->
-            Double weight = 0
-            switch (hour) {
-                case 0: weight = 1; break
-                case 1: weight = 1; break
-                case 2: weight = 1; break
-                case 3: weight = 1; break
-                case 4: weight = 1; break
-                case 5: weight = 1; break
-                case 6: weight = 1; break
-                case 7: weight = 1; break
-                case 8: weight = 1; break
-                case 9: weight = 1; break
-                case 10: weight = 1; break
-                case 11: weight = 1; break
-                case 12: weight = 1; break
-                case 13: weight = 1; break
-                case 14: weight = 1; break
-                case 15: weight = 1; break
-                case 16: weight = 1; break
-                case 17: weight = 1; break
-                case 18: weight = 1; break
-                case 19: weight = 1; break
-                case 20: weight = 1; break
-                case 21: weight = 1; break
-                case 22: weight = 1; break
-                case 23: weight = 1; break
+        if (Day.count <= 0) {
+            Day initDay = new Day(name: "initDay")
+            (0..23).each {
+                initDay.setHourWeight(it, 1)
             }
-            HourOfDay.findByFullHour(hour) ?: new HourOfDay(
-                    fullHour: hour,
-                    weight: weight).save(failOnError: true)
+            initDay.save(failOnError: true)
         }
 
         Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED, weight: 0).save(failOnError: true)
@@ -320,6 +295,7 @@ class BootStrap {
         ).save(failOnError: true)
 
         createDefaultTimeToCsiMappingIfMissing()
+
 
         log.info "initCsiData ends"
     }

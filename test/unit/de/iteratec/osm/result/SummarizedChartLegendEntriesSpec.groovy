@@ -17,17 +17,9 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.report.chart.OsmChartProcessingService
-import de.iteratec.osm.report.chart.OsmRickshawChart
-import de.iteratec.osm.util.I18nService
-
-import static de.iteratec.osm.util.Constants.*
-
+import de.iteratec.osm.csi.HourOfDay
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.HourOfDay
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
@@ -37,12 +29,9 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.OsmChartGraph
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -52,12 +41,14 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
 
+import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
-@Mock([Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile, HourOfDay])
+@Mock([HourOfDay, Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile])
 class SummarizedChartLegendEntriesSpec extends Specification{
 
     EventResultDashboardService serviceUnderTest

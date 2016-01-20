@@ -33,7 +33,6 @@ import org.junit.Test
 @TestFor(CustomerSatisfactionWeightService)
 @Mock([Page, Browser, HourOfDay, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping])
 class CustomerSatisfactionWeightServiceTests {
-
     CustomerSatisfactionWeightService serviceUnderTest
 
     @Before

@@ -185,21 +185,6 @@ class CustomerSatisfactionWeightService {
         }
     }
 
-    /**
-     * Provides lazy loaded map of weighted hours of days.
-     * TODO: This method caches HourOfDay values forever! Should be changed with CsiConfiguration.
-     * @return
-     */
-    Map<Integer, Double> getHoursOfDay() {
-        if (hoursOfDay == null) {
-            hoursOfDay = [:]
-            HourOfDay.findAll().each {
-                hoursOfDay[it.fullHour] = it.weight
-            }
-        }
-        return hoursOfDay
-    }
-
     private persistBrowserWeights(InputStream csv) {
         Integer lineCounter = 0
         csv.eachLine { line ->

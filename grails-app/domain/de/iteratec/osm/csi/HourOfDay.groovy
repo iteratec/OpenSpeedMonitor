@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.csi
 
-
+@Deprecated
 class HourOfDay {
     int fullHour
     Double weight

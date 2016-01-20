@@ -23,32 +23,51 @@ package de.iteratec.osm.csi
  */
 class Day {
 
-    static hasMany = [hoursOfDay: HourOfDay]
-    String name
+    double hour0Weight
+    double hour1Weight
+    double hour2Weight
+    double hour3Weight
+    double hour4Weight
+    double hour5Weight
+    double hour6Weight
+    double hour7Weight
+    double hour8Weight
+    double hour9Weight
+    double hour10Weight
+    double hour11Weight
+    double hour12Weight
+    double hour13Weight
+    double hour14Weight
+    double hour15Weight
+    double hour16Weight
+    double hour17Weight
+    double hour18Weight
+    double hour19Weight
+    double hour20Weight
+    double hour21Weight
+    double hour22Weight
+    double hour23Weight
 
     static belongsTo = [CsiConfiguration]
     static mapping = {
     }
 
     static constraints = {
-        //Check if we got unique hours and 24 hours
-        hoursOfDay validator: { hours, obj ->
-            HashSet set = new HashSet()
-            hours.each {
-                if (set.add(it.fullHour)) {
-                    return false
-                }
-            }
-            return set.size() == 24
-        }
+
+    }
+
+    public void setHourWeight(int hour, double weight) {
+        String property = "hour" + hour + "Weight"
+        this[property] = weight
+    }
+
+    public double getHourWeight(int hour) {
+        String property = "hour" + hour + "Weight"
+        return this[property]
     }
 
     static Day copyDay(Day source) {
-        Day toReturn = new Day(name: source.name)
-
-        source.hoursOfDay.each {
-            toReturn.addToHoursOfDay(HourOfDay.copyHourOfDay(it))
-        }
+        Day toReturn = new Day(source.properties)
 
         return toReturn
     }

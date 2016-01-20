@@ -18,7 +18,9 @@
 package de.iteratec.osm.csi.weighting
 
 import de.iteratec.osm.csi.BrowserConnectivityWeight
+import de.iteratec.osm.csi.Day
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 
@@ -256,9 +258,13 @@ class WeightingService {
         return browserWeight
     }
 
-    private double getHourOfDayWeight(CsiValue csiValue) {
+    public double getHourOfDayWeight(CsiValue csiValue) {
+        Long jobGroupID = measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(csiValue.retrieveTag())
+        JobGroup jobGroup = JobGroup.get(jobGroupID)
+        Day dayForCsiValue = jobGroup.csiConfiguration.day
+        int hour = new DateTime(csiValue.retrieveDate()).getHourOfDay()
+        Double hourofdayWeight = dayForCsiValue.getHourWeight(hour)
 
-        Double hourofdayWeight = getHourlyWeightFrom(csiValue.retrieveDate())
         if (hourofdayWeight == null || hourofdayWeight <= 0) {
             return 0
         } else {
@@ -267,8 +273,4 @@ class WeightingService {
 
     }
 
-    private Double getHourlyWeightFrom(Date date){
-		return customerSatisfactionWeightService.getHoursOfDay()[new DateTime(date).getHourOfDay()]
-	}
-	
 }

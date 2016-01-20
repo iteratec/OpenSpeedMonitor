@@ -19,36 +19,32 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserAlias
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-
-import static org.junit.Assert.assertEquals
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import org.junit.*
-
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
-import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.util.ServiceMocker
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.junit.Test
+
+import static org.junit.Assert.assertEquals
 
 /**
  * Tests the updating of hourly event-{@link MeasuredValue}s when a new {@link EventResult} is coming in.
@@ -56,7 +52,7 @@ import de.iteratec.osm.util.ServiceMocker
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
 @Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval,
-	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, HourOfDay, Script, MeasuredValueUpdateEvent, ConnectivityProfile])
+	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, Day, Script, MeasuredValueUpdateEvent, ConnectivityProfile])
 class UpdateEventResultDependentMeasuredValuesTests {
 	
 	static final double DELTA = 1e-15
@@ -431,7 +427,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	private void deleteTestData() {
 		OsmConfiguration.list()*.delete(flush: true)
 		MeasuredValue.list()*.delete(flush: true)
-		HourOfDay.list()*.delete(flush: true)
+		Day.list()*.delete(flush: true)
 		EventResult.list()*.delete(flush: true)
 		JobResult.list()*.delete(flush: true)
 		Job.list()*.delete(flush: true)

@@ -341,10 +341,6 @@ class PageMeasuredValueService {
         return toBeCalculated
     }
 
-    private Double getHourlyWeightFrom(Date dateOfHour) {
-        return customerSatisfactionWeightService.getHoursOfDay()[new DateTime(dateOfHour).getHourOfDay()]
-    }
-
     /**
      * Provides weekly page-{@link MeasuredValue}s for all pages and all csi-groups between toDate and fromDate.
      * Non-existent {@link MeasuredValue}s will be created.

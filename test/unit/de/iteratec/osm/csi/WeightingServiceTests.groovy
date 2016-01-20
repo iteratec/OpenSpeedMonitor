@@ -23,6 +23,8 @@ import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.MeasuredValue
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -36,7 +38,7 @@ import org.junit.Before
 import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
-@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile])
+@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile, JobGroup, Day, CsiConfiguration])
 class WeightingServiceTests {
 
     WeightingService serviceUnderTest
@@ -85,6 +87,8 @@ class WeightingServiceTests {
         CsiValue measuredValueTwoAClockAm = new MeasuredValue(started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
         CsiValue measuredValueFiveAClockPm = new MeasuredValue(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
 
+        mockMeasuredValueTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
+
         //test for EventResults
         Double deliveredWeight = serviceUnderTest.getWeight(eventResultTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
         double expectedWeight = 0.2d
@@ -99,12 +103,6 @@ class WeightingServiceTests {
         assertEquals(expectedWeight, deliveredWeight, DELTA)
         deliveredWeight = serviceUnderTest.getWeight(measuredValueFiveAClockPm, weightFactors, BrowserConnectivityWeight.list())
         expectedWeight = 7.3d
-        assertEquals(expectedWeight, deliveredWeight, DELTA)
-
-        //test for not getting correct hourofday
-        mockCustomerSatisfactionWeightServiceToDeliverWrongHoursofDay()
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors, BrowserConnectivityWeight.list())
-        expectedWeight = 0d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
 
@@ -592,6 +590,35 @@ class WeightingServiceTests {
         page_70 = new Page(name: 'page_70', weight: 0.7d)
         browserToReturn_50 = new Browser(name: 'browser_50', weight: 0.5d)
         browserToReturn_70 = new Browser(name: 'browser_70', weight: 0.7d)
+        Day day = new Day()
+        day.with{
+            hour0Weight = 2.9d
+            hour1Weight = 0.4d
+            hour2Weight = 0.2d
+            hour3Weight = 0.1d
+            hour4Weight = 0.1d
+            hour5Weight = 0.2d
+            hour6Weight = 0.7d
+            hour7Weight = 1.7d
+            hour8Weight = 3.2d
+            hour9Weight = 4.8d
+            hour10Weight = 5.6d
+            hour11Weight = 5.7d
+            hour12Weight = 5.5d
+            hour13Weight = 5.8d
+            hour14Weight = 5.9d
+            hour15Weight = 6.0d
+            hour16Weight = 6.7d
+            hour17Weight = 7.3d
+            hour18Weight = 7.6d
+            hour19Weight = 8.8d
+            hour20Weight = 9.3d
+            hour21Weight = 7.0d
+            hour22Weight = 3.6d
+            hour23Weight = 0.9d
+        }
+        CsiConfiguration csiConfiguration = new CsiConfiguration(label: "csiConfiguraion", description: "description", day: day)
+        new JobGroup(name: "jobGroup", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
     }
 
     /**
@@ -692,6 +719,9 @@ class WeightingServiceTests {
                 page = pageToReturn_70
             }
             return page
+        }
+        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) {unused ->
+            return 1
         }
         serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock();
     }

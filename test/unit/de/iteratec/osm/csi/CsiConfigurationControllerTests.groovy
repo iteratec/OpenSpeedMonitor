@@ -29,7 +29,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(CsiConfigurationController)
-@Mock([CsiConfiguration, Day ,HourOfDay, JobGroup])
+@Mock([CsiConfiguration, Day, JobGroup])
 class CsiConfigurationControllerTests extends Specification{
 
     CsiConfiguration config1
@@ -37,12 +37,12 @@ class CsiConfigurationControllerTests extends Specification{
 
     void setup() {
         Day testDay = new Day(name:"testDay")
-        (1..24).each{
-            testDay.addToHoursOfDay(new HourOfDay(fullHour: it, weight: it))
+        (0..23).each{
+            testDay.setHourWeight(it, it)
         }
         Day testDay2 = new Day(name:"testDay2")
-        (1..24).each{
-            testDay2.addToHoursOfDay(new HourOfDay(fullHour: (24-it), weight: it))
+        (0..23).each{
+            testDay2.setHourWeight(it, (24 - it))
         }
         config1 = new CsiConfiguration(label: "config1", day: testDay)
         config2 = new CsiConfiguration(label: "config2", day: testDay2)
