@@ -86,7 +86,7 @@ class CsiConfigurationController {
         // arrange barchart data
         BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
         (0..23).each {
-            barChartData.addDatum(new ChartEntry(name: it, weight: config.day.getHourWeight(it)))
+            barChartData.addDatum(new ChartEntry(name: it, weight: config.csiDay.getHourWeight(it)))
         }
         def barChartJSON = barChartData as JSON
 

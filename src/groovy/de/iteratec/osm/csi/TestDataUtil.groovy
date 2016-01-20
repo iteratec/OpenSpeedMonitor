@@ -179,7 +179,7 @@ class TestDataUtil {
                 OsmConfiguration.class,
                 MeasuredValue.class,
                 HourOfDay.class,
-                Day.class,
+                CsiDay.class,
                 EventResult.class,
                 JobResult.class,
                 WaterfallEntry.class,

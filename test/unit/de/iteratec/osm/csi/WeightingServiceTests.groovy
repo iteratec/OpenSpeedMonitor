@@ -38,7 +38,7 @@ import org.junit.Before
 import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
-@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile, JobGroup, Day, CsiConfiguration])
+@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration])
 class WeightingServiceTests {
 
     WeightingService serviceUnderTest
@@ -551,7 +551,7 @@ class WeightingServiceTests {
         page_70 = new Page(name: 'page_70')
         browserToReturn_50 = new Browser(name: 'browser_50', weight: 0.5d)
         browserToReturn_70 = new Browser(name: 'browser_70', weight: 0.7d)
-        Day day = new Day()
+        CsiDay day = new CsiDay()
         day.with{
             hour0Weight = 2.9d
             hour1Weight = 0.4d
@@ -578,7 +578,6 @@ class WeightingServiceTests {
             hour22Weight = 3.6d
             hour23Weight = 0.9d
         }
-
         connectivityProfile_50 = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
         connectivityProfile_70 = new ConnectivityProfile(name: "conn", packetLoss: 0, active: true, latency: 0, bandwidthDown: 0, bandwidthUp: 0)
 
@@ -593,10 +592,11 @@ class WeightingServiceTests {
 
         csiConfiguration = new CsiConfiguration(label: "Csi Config",
                 description: "For testing",
-                day: day,
+                csiDay: day,
                 browserConnectivityWeights: [browserConnectivityWeight_50, browserConnectivityWeight_70],
                 pageWeights: [new PageWeight(page: page_50, weight: 0.5d), new PageWeight(page: page_70, weight: 0.7d)]
         )
+
         new JobGroup(name: "jobGroup", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
     }
 

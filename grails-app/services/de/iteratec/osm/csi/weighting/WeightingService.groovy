@@ -17,24 +17,15 @@
 
 package de.iteratec.osm.csi.weighting
 
-import de.iteratec.osm.csi.BrowserConnectivityWeight
-import de.iteratec.osm.csi.Day
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.PageWeight
+import de.iteratec.osm.csi.*
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.Transactional
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.CsiValue
-import de.iteratec.osm.csi.CustomerSatisfactionWeightService
 import de.iteratec.osm.result.Contract
 import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.measurement.environment.Browser
-
+import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.Transactional
+import org.joda.time.DateTime
 
 /**
  * 
@@ -258,7 +249,7 @@ class WeightingService {
     public double getHourOfDayWeight(CsiValue csiValue) {
         Long jobGroupID = measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(csiValue.retrieveTag())
         JobGroup jobGroup = JobGroup.get(jobGroupID)
-        Day dayForCsiValue = jobGroup.csiConfiguration.day
+        CsiDay dayForCsiValue = jobGroup.csiConfiguration.csiDay
         int hour = new DateTime(csiValue.retrieveDate()).getHourOfDay()
         Double hourofdayWeight = dayForCsiValue.getHourWeight(hour)
 

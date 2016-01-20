@@ -76,7 +76,7 @@ class JobGroupController {
 
             // arrange barchart data
             BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
-            config.day.hoursOfDay.sort { a, b -> a.fullHour - b.fullHour }.each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
+            config.csiDay.hoursOfDay.sort { a, b -> a.fullHour - b.fullHour }.each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
             def barChartJSON = barChartData as JSON
 
             MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)

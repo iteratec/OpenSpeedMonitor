@@ -22,7 +22,7 @@ class CsiConfiguration {
 
     String label
     String description
-    Day day
+    CsiDay csiDay
     List<BrowserConnectivityWeight> browserConnectivityWeights = []
     List<PageWeight> pageWeights = []
     List<TimeToCsMapping> timeToCsMappings = []
@@ -45,7 +45,7 @@ class CsiConfiguration {
         configToReturn.with {
             label = source.label
             description = source.description
-            day = Day.copyDay(source.day)
+            csiDay = CsiDay.copyDay(source.csiDay)
         }
 
         source.browserConnectivityWeights.each {

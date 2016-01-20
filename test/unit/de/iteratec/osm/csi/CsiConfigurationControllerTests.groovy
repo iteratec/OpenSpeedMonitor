@@ -20,7 +20,6 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -29,23 +28,23 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
 @TestFor(CsiConfigurationController)
-@Mock([CsiConfiguration, Day, JobGroup])
+@Mock([CsiConfiguration, CsiDay, JobGroup])
 class CsiConfigurationControllerTests extends Specification{
 
     CsiConfiguration config1
     CsiConfiguration config2
 
     void setup() {
-        Day testDay = new Day(name:"testDay")
+        CsiDay testDay = new CsiDay(name:"testDay")
         (0..23).each{
             testDay.setHourWeight(it, it)
         }
-        Day testDay2 = new Day(name:"testDay2")
+        CsiDay testDay2 = new CsiDay(name:"testDay2")
         (0..23).each{
             testDay2.setHourWeight(it, (24 - it))
         }
-        config1 = new CsiConfiguration(label: "config1", day: testDay)
-        config2 = new CsiConfiguration(label: "config2", day: testDay2)
+        config1 = new CsiConfiguration(label: "config1", csiDay: testDay)
+        config2 = new CsiConfiguration(label: "config2", csiDay: testDay2)
         config1.save(failOnError: true)
         config2.save(failOnError: true)
 

@@ -2,7 +2,7 @@ databaseChangeLog = {
 
 	changeSet(author: "bwo (generated)", id: "1450880600666-1") {
 		addColumn(tableName: "csi_configuration") {
-			column(name: "day_id", type: "bigint") {
+			column(name: "csi_day_id", type: "bigint") {
 				constraints(nullable: "false")
 			}
 		}
@@ -14,7 +14,7 @@ databaseChangeLog = {
 
 	changeSet(author: "bwo (generated)", id: "1450880600666-4") {
 		createIndex(indexName: "FKA5B76130EF4854C8", tableName: "csi_configuration") {
-			column(name: "day_id")
+			column(name: "csi_day_id")
 		}
 	}
 
@@ -23,6 +23,6 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "bwo (generated)", id: "1450880600666-3") {
-		addForeignKeyConstraint(baseColumnNames: "day_id", baseTableName: "csi_configuration", constraintName: "FKA5B76130EF4854C8", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "day", referencesUniqueColumn: "false")
+		addForeignKeyConstraint(baseColumnNames: "csi_day_id", baseTableName: "csi_configuration", constraintName: "FKA5B76130EF4854C8", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_day", referencesUniqueColumn: "false")
 	}
 }

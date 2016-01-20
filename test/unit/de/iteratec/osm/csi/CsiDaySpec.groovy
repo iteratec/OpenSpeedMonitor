@@ -2,12 +2,12 @@ package de.iteratec.osm.csi
 
 import spock.lang.Specification
 
-class DaySpec extends Specification {
+class CsiDaySpec extends Specification {
 
-    Day dayToTest
+    CsiDay dayToTest
 
     void "setup"() {
-        dayToTest = new Day()
+        dayToTest = new CsiDay()
         dayToTest.with {
             hour0Weight = 0
             hour1Weight = 0.1
@@ -62,7 +62,7 @@ class DaySpec extends Specification {
 
     void "test copyDay creates a valid copy" () {
         when:
-        Day copy = Day.copyDay(dayToTest)
+        CsiDay copy = CsiDay.copyDay(dayToTest)
 
         then:
         assert copy.properties == dayToTest.properties
@@ -71,7 +71,7 @@ class DaySpec extends Specification {
 
     void "test change weight in copy does not effect source day"() {
         given:
-        Day copy = Day.copyDay(dayToTest)
+        CsiDay copy = CsiDay.copyDay(dayToTest)
         Double newWeight = 12.0
 
         when:

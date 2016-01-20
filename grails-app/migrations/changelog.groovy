@@ -7,9 +7,9 @@ databaseChangeLog = {
     include file: '2015-12-15-SCHEME-measured-value-and-connectivity-profile.groovy'
     include file: '2015-12-16-DATA-delete-invalid-default-csi-mappings.groovy'
     include file: '2015-12-22-DATA-delete-measured-value-update-events.groovy'
-    include file: '2015-12-23-SCHEME-day-class-with-hoursOfDay.groovy'
-    include file: '2015-12-23-SCHEME-replaced-hourOfDays-with-day-in-CsiConfiguration.groovy'
-    include file: '2015-12-23-DATA-convert-hoursOfDay-to-Day.groovy'
+    include file: '2015-12-23-SCHEME-CsiDay-class-with-hoursOfDay.groovy'
+    include file: '2015-12-23-SCHEME-replaced-hourOfDays-with-CsiDay-in-CsiConfiguration.groovy'
+    include file: '2015-12-23-DATA-convert-hoursOfDay-to-CsiDay.groovy'
     include file: '2015-12-23-SCHEME-added-csiConfiguration-to-jobGroup.groovy'
     include file: '2016-01-04-DATA-create-initial-browser-connectivity-weights.groovy'
 

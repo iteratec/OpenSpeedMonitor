@@ -196,7 +196,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     }
 
     private static void createHoursOfDay() {
-        Day day = new Day()
+        CsiDay day = new CsiDay()
         day.with {
             hour0Weight = 2.9
             hour1Weight = 0.4

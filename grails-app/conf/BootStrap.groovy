@@ -223,16 +223,16 @@ class BootStrap {
                 name: csiGroupName,
                 groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
 
-        // here you can initialize the weights of the hours of the day for csi calculation  (see de.iteratec.osm.csi.PageMeasuredValueService)
-        if (Day.count <= 0) {
-            Day initDay = new Day(name: "initDay")
+        // here you can initialize the weights of the hours of the csiDay for csi calculation  (see de.iteratec.osm.csi.PageMeasuredValueService)
+        if (CsiDay.count <= 0) {
+            CsiDay initDay = new CsiDay()
             (0..23).each {
                 initDay.setHourWeight(it, 1)
             }
             initDay.save(failOnError: true)
         }
 
-        Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED, weight: 0).save(failOnError: true)
+        Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED).save(failOnError: true)
 
         AggregatorType.findByName(AggregatorType.MEASURED_EVENT) ?: new AggregatorType(
                 name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
@@ -296,6 +296,15 @@ class BootStrap {
 
         createDefaultTimeToCsiMappingIfMissing()
 
+        if(CsiConfiguration.count <= 0) {
+            CsiConfiguration initCsiConfiguration = new CsiConfiguration()
+            initCsiConfiguration.with {
+                label = "initial csi configuration"
+                description = "a first csi configuration as template"
+                csiDay = CsiDay.findAll()[0]
+            }
+            initCsiConfiguration.save(failOnError: true)
+        }
 
         log.info "initCsiData ends"
     }

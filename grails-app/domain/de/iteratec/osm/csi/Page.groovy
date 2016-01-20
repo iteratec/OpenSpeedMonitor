@@ -35,12 +35,13 @@ class Page {
     public static final String UNDEFINED = 'undefined'
 
     String name
+    @Deprecated
     Double weight
     static final Double minWeight = 0
 
     static constraints = {
         name(unique: true, maxSize: 255)
-        weight(min: this.minWeight)
+        weight(min: this.minWeight, nullable: true)
     }
 
     static transients = ['undefinedPage']

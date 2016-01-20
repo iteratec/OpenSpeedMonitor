@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
 
+@Deprecated
 public enum JobGroupType {
     /**
      * Just results with this type get factored in calculation for customer satisfaction index.

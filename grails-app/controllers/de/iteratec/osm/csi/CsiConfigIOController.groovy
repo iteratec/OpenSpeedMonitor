@@ -93,7 +93,7 @@ class CsiConfigIOController {
         response.contentType = "text/csv"
         StringBuilder builder = new StringBuilder()
         builder.append('fullHour;weight\n')
-        // TODO change to day for csi Configuration
+        // TODO change to csiDay for csi Configuration
 //        HourOfDay.list().each {
 //            builder.append("${it.fullHour};${it.weight}\n")
 //        }

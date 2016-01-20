@@ -18,10 +18,10 @@
 package de.iteratec.osm.csi
 
 /**
- * Day
+ * CsiDay
  * A domain class describes the data object and it's mapping to the database
  */
-class Day {
+class CsiDay {
 
     double hour0Weight
     double hour1Weight
@@ -66,8 +66,8 @@ class Day {
         return this[property]
     }
 
-    static Day copyDay(Day source) {
-        Day toReturn = new Day(source.properties)
+    static CsiDay copyDay(CsiDay source) {
+        CsiDay toReturn = new CsiDay(source.properties)
 
         return toReturn
     }

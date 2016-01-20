@@ -1,6 +1,6 @@
 databaseChangeLog = {
     changeSet(author: "mmi", id: "1450880177365-1") {
-        createTable(tableName: "day") {
+        createTable(tableName: "csi_day") {
             column(autoIncrement: "true", name: "id", type: "bigint") {
                 constraints(nullable: "false", primaryKey: "true", primaryKeyName: "dayPK")
             }

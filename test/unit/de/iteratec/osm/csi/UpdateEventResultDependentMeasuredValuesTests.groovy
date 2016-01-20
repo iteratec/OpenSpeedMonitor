@@ -52,7 +52,7 @@ import static org.junit.Assert.assertEquals
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
 @Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval,
-	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, Day, Script, MeasuredValueUpdateEvent, ConnectivityProfile])
+	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, MeasuredValueUpdateEvent, ConnectivityProfile])
 class UpdateEventResultDependentMeasuredValuesTests {
 	
 	static final double DELTA = 1e-15
@@ -427,7 +427,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	private void deleteTestData() {
 		OsmConfiguration.list()*.delete(flush: true)
 		MeasuredValue.list()*.delete(flush: true)
-		Day.list()*.delete(flush: true)
+		CsiDay.list()*.delete(flush: true)
 		EventResult.list()*.delete(flush: true)
 		JobResult.list()*.delete(flush: true)
 		Job.list()*.delete(flush: true)

@@ -46,7 +46,7 @@ class MeasuredValueUtilService {
 	 * Calculates the interval (period) root/start for a {@linkplain DateTime 
 	 * date}. This is the first date that would be within the selected 
 	 * interval. This method uses {@link DateTimeConstants#FRIDAY} as reset
-	 * day-of-week for weekly intervals.
+	 * csiDay-of-week for weekly intervals.
 	 * </p>
 	 * 
 	 * <p>
@@ -75,7 +75,7 @@ class MeasuredValueUtilService {
 	 * <p>
 	 * Calculates the interval (period) root/start for a {@linkplain DateTime
 	 * date}. This is the first date that would be within the selected
-	 * interval. This method uses the specified day-of-week for weekly interval
+	 * interval. This method uses the specified csiDay-of-week for weekly interval
 	 * resets.
 	 * </p>
 	 *
@@ -89,7 +89,7 @@ class MeasuredValueUtilService {
 	 * @param intervalInMinutes
 	 *         The interval length in minutes.
 	 * @param dayOfWeek
-	 *         The day of week to be used for weekly resets. Must be one of 
+	 *         The csiDay of week to be used for weekly resets. Must be one of
 	 *         {@link DateTimeConstants#MONDAY}, 
 	 *         {@link DateTimeConstants#TUESDAY},
 	 *         {@link DateTimeConstants#WEDNESDAY},
@@ -127,7 +127,7 @@ class MeasuredValueUtilService {
 	 * <p>
 	 * Calculates the interval (period) end for a {@linkplain DateTime date}. 
 	 * This is the last date that would be within the selected interval. This 
-	 * method uses {@link DateTimeConstants#FRIDAY} as reset day-of-week for 
+	 * method uses {@link DateTimeConstants#FRIDAY} as reset csiDay-of-week for
 	 * weekly intervals.
 	 * </p>
 	 * 
@@ -158,7 +158,7 @@ class MeasuredValueUtilService {
 	 * <p>
 	 * Calculates the interval (period) end for a {@linkplain DateTime date}.
 	 * This is the last date that would be within the selected interval. This 
-	 * method uses the specified day-of-week for weekly interval resets.
+	 * method uses the specified csiDay-of-week for weekly interval resets.
 	 * </p>
 	 *
 	 * <p>
@@ -171,7 +171,7 @@ class MeasuredValueUtilService {
 	 * @param intervalInMinutes
 	 * 		The interval length in minutes.
 	 * @param dayOfWeek
-	 *         The day of week to be used for weekly resets. Must be one of 
+	 *         The csiDay of week to be used for weekly resets. Must be one of
 	 *         {@link DateTimeConstants#MONDAY}, 
 	 *         {@link DateTimeConstants#TUESDAY},
 	 *         {@link DateTimeConstants#WEDNESDAY},
@@ -199,7 +199,7 @@ class MeasuredValueUtilService {
 	 * Fixes the start and end date within the specified interval to match the 
 	 * the n-th of the interval-range where n is the maximum number of 
 	 * interval-ranges which fits within the specified interval plus 1.
-	 * The method uses {@link DateTimeConstants#FRIDAY} as reset day-of-week 
+	 * The method uses {@link DateTimeConstants#FRIDAY} as reset csiDay-of-week
 	 * for {@linkplain MeasuredValueInterval#WEEKLY weekly intervals}. 
 	 * </p>
 	 * 
