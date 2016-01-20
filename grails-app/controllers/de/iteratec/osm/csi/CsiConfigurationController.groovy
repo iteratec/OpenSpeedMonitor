@@ -80,6 +80,12 @@ class CsiConfigurationController {
 
         // arrange treemap data
         TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
+        List<Page> csiConfigPages = config.pageWeights*.page
+        Page.list().each {page ->
+            if(!csiConfigPages.contains(page)) {
+                treemapData.addNode(new ChartEntry(name: page.name, weight: 0))
+            }
+        }
         config.pageWeights.each { pageWeight -> treemapData.addNode(new ChartEntry(name: pageWeight.page.name, weight: pageWeight.weight)) }
         def treemapDataJSON = treemapData as JSON
 
