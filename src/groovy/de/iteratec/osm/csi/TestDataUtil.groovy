@@ -178,7 +178,6 @@ class TestDataUtil {
                 HttpArchive.class,
                 OsmConfiguration.class,
                 MeasuredValue.class,
-                HourOfDay.class,
                 CsiDay.class,
                 EventResult.class,
                 JobResult.class,
@@ -1273,46 +1272,6 @@ class TestDataUtil {
                 intervalInMinutes: MeasuredValueInterval.WEEKLY
         ).save(failOnError: true)
         return [hourly, daily, weekly]
-    }
-
-    /**
-     * <p>
-     * Creates the default hours of a Day with corresponding weights. (hourly; daily; weekly).
-     * </p>
-     */
-    public static void createHoursOfDay() {
-        (0..23).each { int hour ->
-            Double weight = 0
-            switch (hour) {
-                case 0: weight = 2.9; break
-                case 1: weight = 0.4; break
-                case 2: weight = 0.2; break
-                case 3: weight = 0.1; break
-                case 4: weight = 0.1; break
-                case 5: weight = 0.2; break
-                case 6: weight = 0.7; break
-                case 7: weight = 1.7; break
-                case 8: weight = 3.2; break
-                case 9: weight = 4.8; break
-                case 10: weight = 5.6; break
-                case 11: weight = 5.7; break
-                case 12: weight = 5.5; break
-                case 13: weight = 5.8; break
-                case 14: weight = 5.9; break
-                case 15: weight = 6.0; break
-                case 16: weight = 6.7; break
-                case 17: weight = 7.3; break
-                case 18: weight = 7.6; break
-                case 19: weight = 8.8; break
-                case 20: weight = 9.3; break
-                case 21: weight = 7.0; break
-                case 22: weight = 3.6; break
-                case 23: weight = 0.9; break
-            }
-            HourOfDay.findByFullHour(hour) ?: new HourOfDay(
-                    fullHour: hour,
-                    weight: weight).save(failOnError: true)
-        }
     }
 
     /**

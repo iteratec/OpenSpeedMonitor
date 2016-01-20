@@ -253,24 +253,25 @@ class CustomerSatisfactionWeightService {
         }
     }
 
-    private persistHourofdayWeights(InputStream csv) {
-        Integer lineCounter = 0
-        csv.eachLine { line ->
-            if (lineCounter > 0) {
-                List tokenized = line.tokenize(";")
-                HourOfDay hourOfDay = HourOfDay.findByFullHour(tokenized[0])
-                if (hourOfDay) {
-                    log.info("update Hourofday-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-                    hourOfDay.weight = Double.valueOf(tokenized[1])
-                    hourOfDay.save(failOnError: true)
-                } else {
-                    log.info("save new Hourofday-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-                    new HourOfDay(fullHour: tokenized[0], weight: Double.valueOf(tokenized[1])).save(failOnError: true)
-                }
-            }
-            lineCounter++
-        }
-    }
+    // TODO write test for csiDay upload
+//    private persistHourofdayWeights(InputStream csv) {
+//        Integer lineCounter = 0
+//        csv.eachLine { line ->
+//            if (lineCounter > 0) {
+//                List tokenized = line.tokenize(";")
+//                HourOfDay hourOfDay = HourOfDay.findByFullHour(tokenized[0])
+//                if (hourOfDay) {
+//                    log.info("update Hourofday-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
+//                    hourOfDay.weight = Double.valueOf(tokenized[1])
+//                    hourOfDay.save(failOnError: true)
+//                } else {
+//                    log.info("save new Hourofday-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
+//                    new HourOfDay(fullHour: tokenized[0], weight: Double.valueOf(tokenized[1])).save(failOnError: true)
+//                }
+//            }
+//            lineCounter++
+//        }
+//    }
 
     void persistNewDefaultMapping(InputStream csv) {
         Integer lineCounter = 0

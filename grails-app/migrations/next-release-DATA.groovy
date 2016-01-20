@@ -106,5 +106,12 @@ databaseChangeLog = {
         ''')
     }
 //     ### END INITIAL CSI-CONFIGURATION ###
+
+    // ### Delete old hourOfDay data ###
+    changeSet(author: "mmi", id: "1453304178000-1") {
+        sql('''
+            delete from hour_of_day
+        ''')
+    }
 }
 

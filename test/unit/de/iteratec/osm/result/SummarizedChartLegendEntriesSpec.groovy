@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.csi.HourOfDay
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
@@ -48,7 +47,7 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
-@Mock([HourOfDay, Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile])
+@Mock([Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile])
 class SummarizedChartLegendEntriesSpec extends Specification{
 
     EventResultDashboardService serviceUnderTest
@@ -246,7 +245,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
-        TestDataUtil.createHoursOfDay()
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 then:
@@ -378,7 +376,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
-        TestDataUtil.createHoursOfDay()
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 then:
@@ -512,7 +509,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
-        TestDataUtil.createHoursOfDay()
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 then:
