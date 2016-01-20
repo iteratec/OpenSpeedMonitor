@@ -258,7 +258,7 @@ class ShopMeasuredValueService {
     }
 
     private Page getPageFromPageMv(MeasuredValue toGetPageFrom) {
-        return measuredValueTagService.findPageOfWeeklyPageTag(toGetPageFrom.tag)
+        return measuredValueTagService.findPageByPageTag(toGetPageFrom.tag)
     }
 
     /**

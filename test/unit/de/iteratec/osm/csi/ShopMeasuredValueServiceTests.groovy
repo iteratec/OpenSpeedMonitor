@@ -107,7 +107,7 @@ class ShopMeasuredValueServiceTests {
     void tearDown() {
         // Tear down logic here
     }
-
+    
     @Test
     void testFindAll() {
         Integer countMvs = 4
@@ -320,7 +320,7 @@ class ShopMeasuredValueServiceTests {
         measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
             return jobGroup1;
         }
-        measuredValueTagServiceMocked.demand.findPageOfWeeklyPageTag(0..10000) { String tag ->
+        measuredValueTagServiceMocked.demand.findPageByPageTag(0..10000) { String tag ->
             return page1;
         }
         measuredValueTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->

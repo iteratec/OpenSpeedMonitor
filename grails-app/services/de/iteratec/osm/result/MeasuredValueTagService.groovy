@@ -408,6 +408,24 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
+	 * Finds the {@link Page} referenced by the specified page tag.
+	 * </p>
+	 *
+	 * @param weeklyPageTag The weekly page tag, not <code>null</code>
+	 * @return The {@link Page} or <code>null</code> if the page was not found anymore (ex. was deleted).
+	 * @throws NullPointerException
+	 *         if {@code weeklyPageTag} is <code>null</code>.
+	 * @throws IllegalArgumentException
+	 *         if the specified tag is not a daily page tag.
+	 */
+	public Page findPageByPageTag(String pageTag) throws NullPointerException, IllegalArgumentException {
+		requiresArgumentNotNull('pageTag', pageTag)
+
+		return Page.get(getPageIdFromWeeklyOrDailyPageTag(pageTag))
+	}
+
+	/**
+	 * <p>
 	 * Finds the {@link Page} referenced by the specified daily page tag.
 	 * <b>Note:</b> Daily page tag is the same as weekly page tag.
 	 * </p>
@@ -419,8 +437,9 @@ class MeasuredValueTagService {
 	 * @throws IllegalArgumentException
 	 *         if the specified tag is not a daily page tag.
 	 */
+	@Deprecated
 	public Page findPageOfDailyPageTag(String dailyPageTag) throws NullPointerException, IllegalArgumentException {
-		return findPageOfWeeklyPageTag(dailyPageTag)
+		return findPageByPageTag(dailyPageTag)
 	}
 	/**
 	 * <p>
@@ -435,10 +454,9 @@ class MeasuredValueTagService {
 	 *         if the specified tag is not a daily page tag.
 	 * @since JIRA IT-8
 	 */
+	@Deprecated
 	public Page findPageOfWeeklyPageTag(String weeklyPageTag) throws NullPointerException, IllegalArgumentException {
-		requiresArgumentNotNull('weeklyPageTag', weeklyPageTag)
-
-		return Page.get(getPageIdFromWeeklyOrDailyPageTag(weeklyPageTag))
+		return findPageByPageTag(weeklyPageTag)
 	}
 	/**
 	 * <p>
@@ -842,7 +860,7 @@ class MeasuredValueTagService {
         tags.each { tag ->
             Long pageId = getPageIdFromWeeklyOrDailyPageTag(tag)
             if (!result.containsKey(pageId)) {
-                result.put(pageId, findPageOfDailyPageTag(tag))
+                result.put(pageId, findPageByPageTag(tag))
             }
         }
 

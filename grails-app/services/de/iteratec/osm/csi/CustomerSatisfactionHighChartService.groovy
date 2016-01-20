@@ -284,12 +284,12 @@ class CustomerSatisfactionHighChartService {
 			if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
 				paramsToSend['aggrGroup'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
-				paramsToSend['selectedPages'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+				paramsToSend['selectedPages'] = measuredValueTagService.findPageByPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
 				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
-				paramsToSend['selectedPages'] = measuredValueTagService.findPageOfWeeklyPageTag(csiValue.tag).ident()
+				paramsToSend['selectedPages'] = measuredValueTagService.findPageByPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}
 
@@ -334,7 +334,7 @@ class CustomerSatisfactionHighChartService {
 			case AggregatorType.PAGE:
 				if (!weeklyPageTagToGraphLabelMap.containsKey(mv.tag)) {
 					JobGroup group = measuredValueTagService.findJobGroupOfWeeklyPageTag(mv.tag)
-					Page page = measuredValueTagService.findPageOfWeeklyPageTag(mv.tag)
+					Page page = measuredValueTagService.findPageByPageTag(mv.tag)
 					group && page?
 						weeklyPageTagToGraphLabelMap.put(mv.tag, "${group.name}${HIGHCHART_LEGEND_DELIMITTER}${page.name}"):
 						weeklyPageTagToGraphLabelMap.put(mv.tag, labelForValuesNotAssignable)

@@ -661,11 +661,7 @@ class MetricReportingServiceTests {
 			String hourlyEventMvTag ->
 			return new Location(location: LOCATION_LOCATION)
 		}
-		measuredValueTagService.demand.findPageOfDailyPageTag(1..10000) {
-			String dailyPageTag ->
-			return new Page(name: PAGE_NAME)
-		}
-		measuredValueTagService.demand.findPageOfWeeklyPageTag(1..10000) {
+		measuredValueTagService.demand.findPageByPageTag(1..10000) {
 			String weeklyPageTag ->
 			return new Page(name: PAGE_NAME)
 		}

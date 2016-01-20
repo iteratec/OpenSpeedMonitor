@@ -425,12 +425,7 @@ class QuartzControlledGrailsReportsTests {
 			location.setLocation(locationLocation)
 			return location
 		}
-		measuredValueTagService.demand.findPageOfDailyPageTag(1..10000) {String dailyPageMvTag ->
-			Page page = new Page()
-			page.setName(pageName)
-			return page
-		}
-		measuredValueTagService.demand.findPageOfWeeklyPageTag(1..10000) {String weeklyPageMvTag ->
+		measuredValueTagService.demand.findPageByPageTag(1..10000) {String weeklyPageMvTag ->
 			Page page = new Page()
 			page.setName(pageName)
 			return page

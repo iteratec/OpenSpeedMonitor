@@ -423,7 +423,7 @@ class MetricReportingService {
 	}
 
 	private void reportDailyPageMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
-		Page page = measuredValueTagService.findPageOfDailyPageTag(mv.tag)
+		Page page = measuredValueTagService.findPageByPageTag(mv.tag)
 
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))
@@ -452,7 +452,7 @@ class MetricReportingService {
 	}
 
 	private void reportWeeklyPageMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
-		Page page = measuredValueTagService.findPageOfWeeklyPageTag(mv.tag)
+		Page page = measuredValueTagService.findPageByPageTag(mv.tag)
 		
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))

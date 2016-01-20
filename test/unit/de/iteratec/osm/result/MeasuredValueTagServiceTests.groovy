@@ -464,13 +464,13 @@ class MeasuredValueTagServiceTests {
 	}
 	
 	@Test
-	void testFindPageOfWeeklyPageTag(){
+	void testFindPageByPageTag(){
 		// Select/create test data
 		JobGroup group = JobGroup.findByName(jobGroupName1)
 		Page page = Page.findByName(pageName1)
 		String weeklyPageTag = serviceUnderTest.createPageAggregatorTag(group, page)
 		//test execution
-		Page resultingPage = serviceUnderTest.findPageOfWeeklyPageTag(weeklyPageTag)
+		Page resultingPage = serviceUnderTest.findPageByPageTag(weeklyPageTag)
 		//assertions
 		assertEquals(page, resultingPage)
 	}

@@ -165,7 +165,7 @@ class WeightingService {
 
         Page page = csiValue.retrieveTag().split(';').size() == 5 ?
                 measuredValueTagService.findPageOfHourlyEventTag(csiValue.retrieveTag()) :
-                measuredValueTagService.findPageOfWeeklyPageTag(csiValue.retrieveTag())
+                measuredValueTagService.findPageByPageTag(csiValue.retrieveTag())
         if (page == null || pageWeights.empty) {
             return 0
         } else {

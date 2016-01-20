@@ -363,7 +363,7 @@ class ServiceMocker {
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
 		}
-		measuredValueTagServiceMocked.demand.findPageOfWeeklyPageTag(0..10000) {String mvTag ->
+		measuredValueTagServiceMocked.demand.findPageByPageTag(0..10000) {String mvTag ->
 			String pageId = mvTag.split(";")[1]
 			return idAsStringToPageMap[pageId]
 		}

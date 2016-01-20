@@ -689,7 +689,7 @@ class WeightingServiceTests {
             }
             return browser
         }
-        measuredValueTagService.demand.findPageOfWeeklyPageTag(0..10000) { String hourlyEventMvTag ->
+        measuredValueTagService.demand.findPageByPageTag(0..10000) { String hourlyEventMvTag ->
             Page page
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
                 page = pageToReturn_50
