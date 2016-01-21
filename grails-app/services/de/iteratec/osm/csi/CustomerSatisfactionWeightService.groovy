@@ -59,7 +59,7 @@ class CustomerSatisfactionWeightService {
                 classes.add(Double)
                 break
             case WeightFactor.BROWSER_CONNECTIVITY_COMBINATION:
-                errorMessages.addAll(validateBrowserAndConnectivtiyExisting(lines))
+                errorMessages.addAll(validateBrowserAndConnectivityExisting(lines))
                 classes.add(String)
                 classes.add(String)
                 classes.add(Double)
@@ -149,7 +149,7 @@ class CustomerSatisfactionWeightService {
         return errorMessages
     }
 
-    private List<String> validateBrowserAndConnectivtiyExisting(List<String> lines) {
+    private List<String> validateBrowserAndConnectivityExisting(List<String> lines) {
         List<String> errorMessages = []
 
         // exclude header row
