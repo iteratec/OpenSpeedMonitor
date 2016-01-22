@@ -49,6 +49,7 @@ node_modules/
 
 # ignore h2 dumps
 *.h2.gzip
+testDb*
 
 #ignore  dataSource-Config
 OpenSpeedMonitor-config.groovy
