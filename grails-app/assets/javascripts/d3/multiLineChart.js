@@ -177,14 +177,15 @@ function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColor
                 return d.name;
             });
 
-        var maxWidth = -1;
-        var maxHeight = -1;
-        diagramKey.each(function(d){
-            var currentWidth= d3.select(this).node().getBBox().width;
-            if(currentWidth>maxWidth) maxWidth=currentWidth;
-            var currentHeight= d3.select(this).node().getBBox().height;
-            if(currentHeight>maxHeight) maxHeight=currentHeight;
-        });
+        var maxWidth = 400;
+        //TODO firefox can't handle getBBox, we should calculate a good width
+        //diagramKey.each(function(d){
+        //    var node = d3.select(this).node();
+        //    var currentWidth=node.getBBox();//.width;
+        //    if(currentWidth>maxWidth) maxWidth=currentWidth;
+        //    var currentHeight= node.getBBox();  //.height;
+        //    if(currentHeight>maxHeight) maxHeight=currentHeight;
+        //});
         var rects = diagramKey.append("rect")
             .attr("width", maxWidth+5)
             .attr("height", 12)
