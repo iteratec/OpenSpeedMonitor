@@ -97,7 +97,7 @@ function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColor
             return d3.max(l.yPoints)
         });
         xScale.domain([xMin, xMax]);
-        yScale.domain([0, yMax]);
+        yScale.domain([-2, yMax]);
 
         // draw axis
         svg.append("g")
