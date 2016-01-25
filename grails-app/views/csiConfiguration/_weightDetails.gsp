@@ -256,8 +256,7 @@
         }
         </style>
         <g:render template="/_common/modals/deleteDialogCustomAction" model="[itemLabel:message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName:'deleteDefaultCsiMapping', customPrefix:customDefaultCsiMappingDeletePrefix, customID:'name', customController:'CsiConfiguration']"/>
-
-        <g:if test="${chooseCsiMappingDialogNecessary}">
+        <g:if test="${!readOnly}">
             <g:render template="/_common/modals/chooseCsiMapping" model="[defaultMultiLineChart:defaultTimeToCsMappings, pages:pages, pageData:pageTimeToCsMappings]"/>
         </g:if>
     </sec:ifAllGranted>
