@@ -34,6 +34,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.TestMixin
@@ -631,5 +632,31 @@ class ServiceMocker {
 		}
 
 		serviceToMockIn.cachingContainerService = cachingContainerService.createMock()
+	}
+
+	/**
+	 * Mocks methods of{@link MetricReportingService}.
+	 */
+	void mockMetricReportingService(serviceToMockIn) {
+		def metricReportingService = mockFor(MetricReportingService, true)
+		metricReportingService.demand.reportEventResultToGraphite(1..10000) {
+			EventResult result ->
+				//do nothing
+		}
+		serviceToMockIn.metricReportingService = metricReportingService.createMock()
+	}
+
+	/**
+	 * Mocks methods in {@link MeasuredValueUtilService}.
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
+	 */
+	void mockMeasuredValueUpdateService(serviceToMockIn){
+		def measuredValueUpdateService = mockFor(MeasuredValueUpdateService, true)
+		measuredValueUpdateService.demand.createOrUpdateDependentMvs(1..10000) {
+			EventResult result->
+			//do nothing
+		}
+		serviceToMockIn.measuredValueUpdateService = measuredValueUpdateService.createMock()
 	}
 }
