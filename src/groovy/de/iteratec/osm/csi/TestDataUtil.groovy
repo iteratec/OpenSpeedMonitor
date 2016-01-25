@@ -249,6 +249,40 @@ class TestDataUtil {
         ).save(failOnError: true)
     }
 
+    static CsiConfiguration createCsiConfiguration(
+            String label = 'testCsiConfiguration',
+            String description = 'CsiConfiguration for tests',
+            CsiDay csiDay = createCsiDay(),
+            List<BrowserConnectivityWeight> browserConnectivityWeights = new ArrayList<BrowserConnectivityWeight>(),
+            List<PageWeight> pageWeights = new ArrayList<PageWeight>(),
+            List<TimeToCsMapping> timeToCsMappings = new ArrayList<TimeToCsMapping>()
+    ) {
+        return new CsiConfiguration(
+                label: label,
+                description: description,
+                csiDay: csiDay,
+                browserConnectivityWeights: browserConnectivityWeights,
+                pageWeights: pageWeights,
+                timeToCsMappings: timeToCsMappings
+        ).save(failOnError: true)
+    }
+
+    /*
+     * @param hourWeights
+     *          set your specific weights for any hour. if no weight is given for an hour, '1.0' will be used.
+     */
+    static CsiDay createCsiDay(Map<Integer,Double> hourWeights = new HashMap<>()) {
+        CsiDay csiDay = new CsiDay()
+        (0..23).each {hour ->
+            if(hourWeights.containsKey(hour)) {
+                csiDay.setHourWeight(hour,hourWeights.get(hour))
+            } else {
+                csiDay.setHourWeight(hour,1.0)
+            }
+        }
+        return csiDay
+    }
+
     static createHttpArchive(JobResult jobResult) {
         new HttpArchive(
                 jobResult: jobResult
@@ -757,7 +791,7 @@ class TestDataUtil {
         ).save(failOnError: true)
     }
 
-    static void createServer() {
+    static WebPageTestServer createServer() {
         WebPageTestServer server1
         server1 = new WebPageTestServer(
                 baseUrl: 'http://wpt.server.de',
@@ -765,6 +799,7 @@ class TestDataUtil {
                 label: 'server 1 - wpt example',
                 proxyIdentifier: 'server 1 - wpt example'
         ).save(failOnError: true)
+        return server1
     }
 
     static Page createUndefinedPage() {

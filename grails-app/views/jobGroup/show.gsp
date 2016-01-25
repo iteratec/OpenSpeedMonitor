@@ -191,8 +191,7 @@
     <g:if test="${jobGroupInstance.csiConfiguration}">
         <g:set var="renderCsiConfiguration" value="true"></g:set>
         <g:render template="/csiConfiguration/weightDetails" model="[readOnly               : true,
-                                                                     defaultTimeToCsMappings: defaultTimeToCsMappings],
-                                                                     chooseCsiMappingDialogNecessary: false"/>
+                                                                     defaultTimeToCsMappings: defaultTimeToCsMappings]"/>
     </g:if>
 </section>
 

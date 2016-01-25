@@ -470,14 +470,17 @@ environments {
         grails.plugin.console.fileStore.remote.enabled = true
         // Whether to include the remote file store functionality. Default is true.
 
+        grails.plugin.databasemigration.dropOnStart = true
+        grails.plugin.databasemigration.autoMigrateScripts = 'TestApp'
+        grails.plugin.databasemigration.forceAutoMigrate = true
+
         log4j = {
             appenders {
                 console name: 'stdout', layout: pattern(conversionPattern: '%c{2} %m%n')
             }
-
-            info(stdout: ['grails.app', 'co.freeside.betamax'])
-
+            
             info(stdout: [
+                    'grails.app',
                     'org.codehaus.groovy.grails.web.servlet',        // controllers
                     'org.codehaus.groovy.grails.web.pages',          // GSP
                     'org.codehaus.groovy.grails.web.sitemesh',       // layouts
@@ -488,7 +491,8 @@ environments {
                     'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
                     'org.springframework',
                     'org.hibernate',
-                    'net.sf.ehcache.hibernate'])
+                    'net.sf.ehcache.hibernate',
+                    'co.freeside.betamax'])
 
         }
     }
