@@ -56,7 +56,7 @@ public interface CsiValue {
     /**
      * Whether or not this value should be factored in csi-calculations.
      * <ul>
-     * <li>{@link EventResult}s are relevant if they have set a docCompleteTimeInMillisecs and customerSatisfactionInPercent and customerSatisfactionInPercent
+     * <li>{@link EventResult}s are relevant if they have set a loadTimeInMillisecs and customerSatisfactionInPercent and customerSatisfactionInPercent
      * is within valid range.</li>
      * <li>{@link MesauredValue}s are relevant if they have a state of {@link Calculated#Yes}</li>
      * </ul>

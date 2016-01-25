@@ -80,7 +80,7 @@ class AggregatorType {
 	 * The Aggegation Type for uncached results
 	 */
 	private static final String UNCACHED_SUFFIX = "Uncached"
-	public static final String RESULT_UNCACHED_DOC_COMPLETE_TIME = "docCompleteTimeInMillisecs${UNCACHED_SUFFIX}"
+	public static final String RESULT_UNCACHED_DOC_COMPLETE_TIME = "loadTimeInMillisecs${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_DOM_TIME = "domTimeInMillisecs${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_FIRST_BYTE = "firstByteInMillisecs${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT = "fullyLoadedRequestCount${UNCACHED_SUFFIX}"
@@ -98,7 +98,7 @@ class AggregatorType {
 	 * The Aggegation Type for cached results
 	 */
 	private static final String CACHED_SUFFIX = "Cached"
-	public static final String RESULT_CACHED_DOC_COMPLETE_TIME = "docCompleteTimeInMillisecs${CACHED_SUFFIX}"
+	public static final String RESULT_CACHED_DOC_COMPLETE_TIME = "loadTimeInMillisecs${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_DOM_TIME = "domTimeInMillisecs${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_FIRST_BYTE = "firstByteInMillisecs${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT = "fullyLoadedRequestCount${CACHED_SUFFIX}"

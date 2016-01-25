@@ -57,7 +57,6 @@ class WeightingServiceTests {
     private ConnectivityProfile connectivityProfile_70
     private CsiConfiguration csiConfiguration
 
-
     @Before
     void setUp() {
         serviceUnderTest = service
@@ -115,7 +114,7 @@ class WeightingServiceTests {
         // test specific data
         Set<WeightFactor> weightFactors = [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set
 
-        ConnectivityProfile.metaClass.toString = {-> return delegate.name }
+        ConnectivityProfile.metaClass.toString = { -> return delegate.name }
 
         CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
         CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
@@ -178,7 +177,7 @@ class WeightingServiceTests {
 
     void testGetWeightWithMultipleWeightFactorsForEventResults() {
         // test specific data
-        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile("conn")
+        TestDataUtil.createConnectivityProfile("conn")
         CsiValue eventResultWeightFiftyTwoAm =
                 new EventResult(
                         tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
@@ -374,19 +373,19 @@ class WeightingServiceTests {
 
     void testGetWeightedCsiValuesFromMeasuredValues() {
         MeasuredValue measuredValueWeightFiftyTwoAm = new MeasuredValue(
-            value: 10d,
-            tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
-            started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
-            connectivityProfile: connectivityProfile_50
+                value: 10d,
+                tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50
         )
         measuredValueWeightFiftyTwoAm.addAllToResultIds([1l, 2l, 3l])
         measuredValueWeightFiftyTwoAm.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValueWeightFiftyTwoAm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         MeasuredValue measuredValueWeightSeventyFivePm = new MeasuredValue(
-            value: 20d,
-            tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
-            started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
-            connectivityProfile: connectivityProfile_70
+                value: 20d,
+                tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
+                connectivityProfile: connectivityProfile_70
         )
         measuredValueWeightSeventyFivePm.addAllToResultIds([4l, 5l, 6l])
         measuredValueWeightSeventyFivePm.save(validate: false)
@@ -538,7 +537,7 @@ class WeightingServiceTests {
         assertEquals((100 + 101) / 2, ofThirdWeight[0].weightedValue.value, DELTA)
     }
 
-    private void mocksCommonToAllTests(){
+    private void mocksCommonToAllTests() {
         mockCustomerSatisfactionWeightService()
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
         // into the domain EventResult injected service csiConfigCacheService would be null so we have to use metaclass to implement isCsiRelevant()-method for tests
@@ -546,13 +545,14 @@ class WeightingServiceTests {
             return true
         }
     }
-    private createTestdataCommonToAllTests(){
+
+    private createTestdataCommonToAllTests() {
         page_50 = new Page(name: 'page_50')
         page_70 = new Page(name: 'page_70')
         browserToReturn_50 = new Browser(name: 'browser_50', weight: 0.5d)
         browserToReturn_70 = new Browser(name: 'browser_70', weight: 0.7d)
         CsiDay day = new CsiDay()
-        day.with{
+        day.with {
             hour0Weight = 2.9d
             hour1Weight = 0.4d
             hour2Weight = 0.2d
@@ -638,43 +638,6 @@ class WeightingServiceTests {
     }
 
     /**
-     * Mocks used methods of {@link CustomerSatisfactionWeightService}.
-     */
-    private void mockCustomerSatisfactionWeightServiceToDeliverWrongHoursofDay() {
-        def customerSatisfactionWeightService = mockFor(CustomerSatisfactionWeightService, true)
-        customerSatisfactionWeightService.demand.getHoursOfDay(0..10000) { ->
-            Map<Integer, Double> hoursofday = [
-                    0 : null,
-                    1 : null,
-                    2 : null,
-                    3 : null,
-                    4 : null,
-                    5 : null,
-                    6 : null,
-                    7 : null,
-                    8 : null,
-                    9 : null,
-                    10: null,
-                    11: null,
-                    12: null,
-                    13: null,
-                    14: null,
-                    15: null,
-                    16: null,
-                    17: null,
-                    18: null,
-                    19: null,
-                    20: null,
-                    21: null,
-                    22: null,
-                    23: null
-            ]
-            return hoursofday
-        }
-        serviceUnderTest.customerSatisfactionWeightService = customerSatisfactionWeightService.createMock();
-    }
-
-    /**
      * Mocks used methods of {@link MeasuredValueTagService}.
      */
     private void mockMeasuredValueTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
@@ -699,7 +662,7 @@ class WeightingServiceTests {
             }
             return page
         }
-        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) {unused ->
+        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { unused ->
             return 1
         }
         serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock();

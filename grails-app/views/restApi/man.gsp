@@ -16,7 +16,6 @@
 					<li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
 					<li><a href="#csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI</a></li>
 					<li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
-					<li><a href="#csi-frustrations">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI frustrations</a></li>
 					<li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
 					<li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
 					<li><a href="#job-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job deactivation</a></li>
@@ -255,6 +254,10 @@
 						   <dd>
                                MANDATORY<br>Doc complete time to translate to customer satisfaction.
 						   </dd>
+						   <dt>csiConfiguration</dt>
+						   <dd>
+							   MANDATORY<br>The name of the csiConfiguration to use for calculation
+						   </dd>
 						  </dl>
 
 					<h3>Potential outcomes of a request</h3>
@@ -276,52 +279,6 @@
 						</dd>
 						<dt>HTTP status 400 Bad Request</dt>
 						<dd>One of the query arguments is missing or no page could be found for given pageName. An error message with details is attached as response.
-							<br />
-							The response is of type text/plain (encoding UTF-8).
-						</dd>
-					</dl>
-
-					<hr>
-
-				</div>
-
-				<div id="csi-frustrations">
-
-					<h2>GET Method:&nbsp;<span class="text-info">CSI frustrations</span></h2>
-
-					<h3>Request signature</h3>
-					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/csi/frustrations</code></p>
-					<p>
-						The request URL consists of <a href="#rest_base_path">REST-base-path</a> the word <em>csi</em> and the name of the method <em>frustrations</em>.
-					</p>
-					<h4>Parameters</h4>
-					   <dl>
-						<dt>pageName</dt>
-						   <dd>
-                               MANDATORY<br>The name of the page the customer frustration load times should be delivered for.
-						   </dd>
-						  </dl>
-
-					<h3>Potential outcomes of a request</h3>
-					<dl>
-						<dt>HTTP status 200 OK</dt>
-						<dd>
-							The request handled successfully, a result in JSON notation is returned.
-							It contains the complete list of customer frustration load times for page with given pageName. <br><br>
-							Response example:
-							<pre>
-	{"target":
-		{
-			"page":"MES",
-			"cachedFrustrations":[966,1076,1186,1220,1446,1457,1582,1605,1607,...],
-			"count":212
-		}
-	}</pre>
-							<br />
-							The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.
-						</dd>
-						<dt>HTTP status 400 Bad Request</dt>
-						<dd>Query argument pageName is missing or no page could be found for given pageName. An error message with details is attached as response.
 							<br />
 							The response is of type text/plain (encoding UTF-8).
 						</dd>

@@ -139,14 +139,16 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [GET: "translateToCustomerSatisfaction"]
 		}
-		"/rest/csi/frustrations" {
-			controller = "RestApi"
-			action = [GET: "getCsiFrustrationTimings"]
-		}
 		"/rest/job/$id/resultUrls/$timestampFrom/$timestampTo" {
 			controller = "RestApi"
 			action = [GET: "getResultUrls"]
 		}
+		/* Since IT-723 */
+		"/rest/$system/csi/translateToCustomerSatisfaction" {
+			controller = "RestApi"
+			action = [GET: "translateToCustomerSatisfaction"]
+		}
+
 		/*
 		 * Following PUT/POST rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by
 		 * naming convention of action methods.

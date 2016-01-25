@@ -169,7 +169,7 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 //			EventResult.withTransaction { status ->
 //
 //				EventResult eventResult = new EventResult(
-//						docCompleteTimeInMillisecs: 1000,
+//						loadTimeInMillisecs: 1000,
 //						wptStatus: 200,
 //						medianValue: true,
 //						numberOfWptRun: 1,

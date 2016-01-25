@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 
@@ -64,7 +66,12 @@ class ShopCsiService {
         List<WeightedCsiValue> weightedCsiValues = []
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] weight event results', PerformanceLoggingService.IndentationDepth.ONE){
             if (eventResults.size() > 0) {
-                weightedCsiValues = weightingService.getWeightedCsiValues(eventResults, weightFactors)
+                JobGroup jobGroup = JobGroup.get(queryParams.jobGroupIds[0])
+                CsiConfiguration csiConfiguration = jobGroup ? jobGroup.csiConfiguration : null
+                if(!csiConfiguration) {
+                    throw new IllegalArgumentException("there is no csi configuratin for jobGroup with id ${queryParams.jobGroupIds[0]}")
+                }
+                weightedCsiValues = weightingService.getWeightedCsiValues(eventResults, weightFactors, csiConfiguration)
             }
         }
 
