@@ -45,10 +45,9 @@ class DefaultTimeToCsMappingService {
      * Copies all Mapping values (load time to customer satisfaction) from given default mapping as actual mappings
      * for the given page.
      * <b>Note(!):</b> All existing latest mappings of the given page get deleted!
-     * @param page
-     * @param nameOfDefaultMapping
-     *
-     * //TODO: write a test for this method
+     * @param page the page the mapping will be applied to
+     * @param nameOfDefaultMapping the default mapping to use
+     * @param csiConfiguration the csi configuration where the mapping will be appplied
      */
     void copyDefaultMappingToPage(Page page, String nameOfDefaultMapping, CsiConfiguration csiConfiguration){
 
@@ -56,17 +55,12 @@ class DefaultTimeToCsMappingService {
         if (defaultMappingsToCopyToPage.size() == 0)
             throw new IllegalArgumentException("No default csi mapping with name ${nameOfDefaultMapping} exists!")
 
-        Integer actualMappingVersion
+        Integer actualMappingVersion = csiConfiguration.timeToCsMappings[0] ? csiConfiguration.timeToCsMappings[0].mappingVersion : 1
         TimeToCsMapping.withTransaction {
-            List<TimeToCsMapping> actualMappings = timeToCsMappingCacheService.getActualMappingsFromDb()
-            //TODO check why we first load all mappings, instead of just the necessary ones
-            actualMappingVersion = actualMappings.size()>0 ? actualMappings[0].mappingVersion : 1
-            def oldMappings = actualMappings.findAll {it.page.ident() == page.ident()}
-            oldMappings.each {
-                csiConfiguration.removeFromTimeToCsMappings(it)
-            }
+            List<TimeToCsMapping> csiConfigsToDelete = csiConfiguration.timeToCsMappings.findAll{it.page == page}
+            csiConfiguration.timeToCsMappings.removeAll(csiConfigsToDelete)
+            csiConfigsToDelete*.delete()
             csiConfiguration.save(failOnError: true)
-            oldMappings*.delete()
         }
         TimeToCsMapping.withTransaction {
             defaultMappingsToCopyToPage.each {defaultMapping ->
@@ -79,13 +73,6 @@ class DefaultTimeToCsMappingService {
                 csiConfiguration.save(failOnError: true)
             }
         }
-        TimeToCsMapping.withTransaction {
-            timeToCsMappingCacheService.fetchMappings()
-        }
-    }
-
-    def translateDefaultMappingsToJson(List<DefaultTimeToCsMapping> mappings){
-        return new RickshawHtmlCreater().transformCSIMappingData(mappings)
     }
 
     MultiLineChart getDefaultMappingsAsChart(int maxLoadTime) {
