@@ -35,6 +35,7 @@ import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WaterfallEntry
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
@@ -220,7 +221,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -293,7 +294,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -367,7 +368,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -401,7 +402,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -463,7 +464,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -568,7 +569,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -597,7 +598,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -629,7 +630,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -770,7 +771,7 @@ class PersistingNewEventResultsTests {
 		//mocking of inner services
 	
 		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
 		mockMeasuredValueTagService('notTheConcernOfThisTest')
@@ -816,17 +817,7 @@ class PersistingNewEventResultsTests {
 		serviceUnderTest.browserService = browserService.createMock()
 	}
 	private void mockTimeToCsMappingService(){
-		def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
-			return null
-		}
-		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
-			//not the concern of this test
-		}
-        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
-            //not the concern of this test
-        }
-		serviceUnderTest.timeToCsMappingService = timeToCsMappingService.createMock()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 	}
 	private void mockMeasuredValueUpdateService(){
 		def measuredValueUpdateServiceMocked = mockFor(MeasuredValueUpdateService, true)
