@@ -204,7 +204,6 @@ class CsiConfigurationController {
      * Deletes a defaultTimeToCsMapping
      * @param name the name of the defaultTimeToCsMapping
      */
-    @Secured(['ROLE_SUPER_ADMIN'])
     def deleteDefaultCsiMapping(String name) {
         defaultTimeToCsMappingService.deleteDefaultTimeToCsMapping(name)
         redirect action:'configurations'
