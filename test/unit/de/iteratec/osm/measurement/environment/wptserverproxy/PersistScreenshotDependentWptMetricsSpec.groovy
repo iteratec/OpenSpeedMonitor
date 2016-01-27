@@ -115,6 +115,12 @@ class PersistScreenshotDependentWptMetricsSpec {
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }
+        serviceUnderTest.metaClass.informDependents = { EventResult results ->
+            // not the concern of this test
+        }
+        serviceUnderTest.metaClass.informDependentMeasuredValues = { EventResult results ->
+            // not the concern of this test
+        }
         mocker.mockTTCsMappingService(serviceUnderTest)
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
     }
