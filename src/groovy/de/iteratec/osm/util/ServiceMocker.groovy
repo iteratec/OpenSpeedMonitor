@@ -439,7 +439,7 @@ class ServiceMocker {
 		timeToCsMappingCacheService.demand.getCustomerFrustrations(0..100000) {Page page ->
 			return frustrations
 		}
-		
+
 		serviceToMockIn.timeToCsMappingCacheService = timeToCsMappingCacheService.createMock()
 	}
 	/**
@@ -448,10 +448,10 @@ class ServiceMocker {
 	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
-	private void mockTTCsMappingService(serviceToMockIn){
+	void mockTTCsMappingService(serviceToMockIn){
 		def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage ->
-			//not the concern of this test
+		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+			return null
 		}
 		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
 			//not the concern of this test

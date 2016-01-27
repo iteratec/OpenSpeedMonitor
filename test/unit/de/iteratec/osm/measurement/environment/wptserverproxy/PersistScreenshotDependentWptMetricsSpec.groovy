@@ -109,6 +109,7 @@ class PersistScreenshotDependentWptMetricsSpec {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
         mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
+        mocker.mockMetricReportingService(serviceUnderTest)
         serviceUnderTest.pageService = new PageService()
         mocker.mockMeasuredValueTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->

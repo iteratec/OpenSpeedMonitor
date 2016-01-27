@@ -817,8 +817,8 @@ class PersistingNewEventResultsTests {
 	}
 	private void mockTimeToCsMappingService(){
 		def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage ->
-			//not the concern of this test
+		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+			return null
 		}
 		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
 			//not the concern of this test
