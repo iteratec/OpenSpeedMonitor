@@ -199,10 +199,10 @@
         <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden."/></h5>
     </g:else>
 
-    <br/>
     %{--Default Mappings--}%
     <div class="row">
         <div class="span12">
+            <hr>
             <span class="inline">
                 <span class="text-info">
                     <strong><g:message code="de.iteratec.osm.default.heading" default="Defaults"/></strong>
@@ -291,8 +291,3 @@
         </div>
     </g:if>
 </div>
-<style>
-#defaultMultilineGraphButtonLine{
-    margin-bottom: 30px;
-}
-</style>

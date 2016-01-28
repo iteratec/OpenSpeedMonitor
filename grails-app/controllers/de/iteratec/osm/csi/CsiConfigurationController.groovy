@@ -112,8 +112,7 @@ class CsiConfigurationController {
          showCsiWeights          : params.get('showCsiWeights') ?: false,
          mappingsToOverwrite     : params.list('mappingsToOverwrite'),
          csiConfigurations       : csi_configurations,
-         selectedCsiConfiguration: selectedCsiConfigurationLabel,
-         selectCsiConfigurationId: config.id,
+         selectedCsiConfiguration: config,
          matrixViewData          : matrixViewDataJSON,
          treemapData             : treemapDataJSON,
          barchartData            : barChartJSON,
@@ -213,6 +212,58 @@ class CsiConfigurationController {
         defaultTimeToCsMappingService.copyDefaultMappingToPage(applyMappingCommand.getPage(),
                 applyMappingCommand.getDefaultMappingName(), applyMappingCommand.getCsiConfiguration())
         render ""
+    }
+
+    /**
+     * Updates label and description for given {@link CsiConfiguration}.
+     * @param csiConfId
+     *          ID of {@link CsiConfiguration} to update.
+     * @param csiConfNewLabel
+     *          New label to set. May not be null.
+     * @param csiConfNewDescription
+     *          New description to set.
+     * @return Plain text response.
+     */
+    def updateConfiguration(Long csiConfId, String csiConfNewLabel, String csiConfNewDescription){
+
+        response.setContentType('text/plain;charset=UTF-8')
+
+        CsiConfiguration csiConf = CsiConfiguration.get(csiConfId)
+
+        if (csiConf == null){
+            response.status = 404
+            render i18nService.msg(
+                    'de.iteratec.osm.csi.configuration.update.error.wrong-id',
+                    "No CSIConfiguration found for ID '${csiConfId}'",
+                    [csiConfId]
+            )
+            return null
+        }
+        if (csiConfNewLabel == null){
+            response.status = 400
+            render i18nService.msg(
+                    'de.iteratec.osm.csi.configuration.update.error.null-label',
+                    "Label to set for new CSI configuration may not be null."
+            )
+            return null
+        }
+        if (csiConf.label != csiConfNewLabel && CsiConfiguration.findByLabel(csiConfNewLabel)){
+            response.status = 400
+            render i18nService.msg(
+                    'de.iteratec.osm.csi.configuration.update.error.label-already-exist',
+                    "A CSI Configuration with new label '${csiConfNewLabel}' already exists.",
+                    [csiConfNewLabel]
+            )
+            return null
+        }
+
+        csiConf.label = csiConfNewLabel
+        csiConf.description = csiConfNewDescription
+        csiConf.save(failOnError: true)
+
+        response.status = 200
+        render "Updated CSI configuration successfully."
+
     }
 }
 

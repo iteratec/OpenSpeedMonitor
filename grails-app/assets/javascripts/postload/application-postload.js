@@ -46,15 +46,6 @@ function PostLoaded(dataFromGsp){
     this.postloadInit = function(){
 
     }
-    this.promptForDuplicateName = function() {
-        var newName = prompt(this.i18n_duplicatePrompt, $('input#label').val() + this.i18n_duplicateSuffix);
-        if (newName != null && newName != '') {
-            $('input#label').val(newName);
-            return true;
-        } else {
-            return false;
-        }
-    }
     this.setDeleteConfirmationInformations = function(link){
         setTimeout(function(){
             var opts = {

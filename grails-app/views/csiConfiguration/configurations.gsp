@@ -1,4 +1,4 @@
-<%@ page import="grails.converters.JSON" contentType="text/html;charset=UTF-8" %>
+<%@ page import="grails.plugin.springsecurity.SpringSecurityUtils; grails.converters.JSON" contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
     <meta name="layout" content="kickstart_osm"/>
@@ -135,6 +135,9 @@
     .tooltipTextContainer {
         opacity: 0.5;
     }
+    #defaultMultilineGraphButtonLine{
+        margin-bottom: 30px;
+    }
     </style>
 </head>
 
@@ -143,67 +146,94 @@
 <g:render template="/layouts/mainMenu"/>
 
 %{--container for errors --}%
-<div class="alert alert-error" id="errorDeletingCsiConfiguration">
-    <strong><g:message
-            code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/></strong>
-
-    <p id="deletingCsiConfiguratioinErrors">
-    </p>
-
+<div class="alert alert-error" id="errorDeletingCsiConfiguration" style="display: none">
+    <strong>
+        <g:message code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/>
+    </strong>
+    <p id="deletingCsiConfiguratioinErrors"></p>
 </div>
 
 <div class="row">
-    <div class="span12">
-        <div class="btn-group pull-left">
-            <a id="csiConfigurationSelectButton" class="btn btn-small btn-info dropdown-toggle" data-toggle="dropdown"
-               href="#">
-                ${selectedCsiConfiguration}
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                <g:each in="${csiConfigurations}" var="conf">
-                    <li><a id="button_${conf}" onclick="changeCsiConfiguration(this.getAttribute('value'))"
-                           value="${conf[0]}">${conf[1]}</a>
-                    </li>
-                </g:each>
-            </ul>
-        </div>
+
+    %{--Name and description of actual config----------------------------------------------}%
+    <div class="span8">
+        <blockquote>
+            <p class="text-info">
+                <strong id="headerCsiConfLabel">${selectedCsiConfiguration.label}</strong>
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                    <a href="#updateCsiConfModal" class="fa fa-edit"
+                       style="text-decoration:none;color: #3a87ad;" data-toggle="modal"></a>
+                </sec:ifAnyGranted>
+            </p>
+            <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
+        </blockquote>
+    </div>
+
+    %{--dropdown button----------------------------------------------}%
+    <div class="span2 offset1">
+
+        <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size()>1}">
+
+            <div class="btn-group pull-left">
+                <button class="btn btn-small btn-info dropdown-toggle text-right" data-toggle="dropdown">
+                    <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration" default="This Configuration..."></g:message>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+
+                    %{--features for actual configuration----------------------------}%
+                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+                        <li>
+                            <a href="${createLink(absolute: true, controller: 'csiConfiguration', action: 'saveCopy')}"
+                               onclick="return promptForNewName(this, '${message(code: 'de.iteratec.osm.csiConfiguration.nameAlreadyExists', default: 'Name already exists')}')"
+                               disabled="disabled">
+                                <i class="fa fa-copy"></i>&nbsp;${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Copy')}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration',
+                                    params: [sourceCsiConfigLabel: selectedCsiConfiguration.label, label: selectedCsiConfiguration.label])}"
+                               onclick="return validateDeleting('${selectedCsiConfiguration.label}',
+                                       '${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete', args: [selectedCsiConfiguration.label], default: 'delete?')}',
+                                       '${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning', default: 'Overwriting')}')">
+                                <i class="fa fa-remove"></i>&nbsp;${message(code: 'de.iteratec.osm.csi.ui.delete.label', args: [selectedCsiConfiguration.label], default: 'delete')}
+                            </a>
+                        </li>
+                    </sec:ifAnyGranted>
+
+                    %{--submenu to show other configurations----------------------------}%
+                    <g:if test="${csiConfigurations.size()>1}">
+                        <li class="dropdown-submenu">
+                            <a tabindex="-1" href="#">
+                                <i class="fa fa-share-square-o"></i>&nbsp;<g:message
+                                    code="de.iteratec.osm.csi.configuration.messages.select-different" default="leave"/>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <g:each in="${csiConfigurations.findAll{it[0]!=selectedCsiConfiguration.ident()}}" var="conf">
+                                    <li>
+                                        <a id="button_${conf}" onclick="changeCsiConfiguration(this.getAttribute('value'))" value="${conf[0]}">
+                                            <g:message code="de.iteratec.osm.csi.ui.show.label" args="${[conf[1]]}" default="show ${conf[1]}"/>
+                                        </a>
+                                    </li>
+                                </g:each>
+                            </ul>
+                        </li>
+                    </g:if>
+                </ul>
+            </div>
+
+        </g:if>
+
     </div>
 </div>
 
-<hr>
-
-<g:render template="weightDetails" model="[readOnly               : false,
+%{--mapping and weights details----------------------------------------------}%
+<g:render template="confDetails" model="[readOnly               : false,
                                            errorMessagesCsi       : errorMessagesCsi,
                                            defaultTimeToCsMappings: defaultTimeToCsMappings]" />
 
-<div class="row">
-    <div class="span12">
-        <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
-            <hr>
-            <div class="btn-group">
-                <g:form method="post" role="form" class="form-horizontal">
-                    <g:hiddenField name="sourceCsiConfigLabel" value="${selectedCsiConfiguration}"/>
-                    <g:hiddenField name="label" value="${selectedCsiConfiguration}"/>
-
-                    <g:actionSubmit class="btn btn-small btn-primary"
-                                    value="${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Copy')}"
-                                    onclick="return createCsiConfiguration('${message(code: 'de.iteratec.osm.csiConfiguration.nameAlreadyExists', default: 'name already exists')}')"
-                                    action="saveCopy"/>
-
-                    <g:actionSubmit class="btn btn-small btn-danger"
-                                    value="${message(code: 'de.iteratec.osm.csiConfiguration.deleteCsiConfiguration', args: [selectedCsiConfiguration], default: 'Delete')}"
-                                    action="deleteCsiConfiguration"
-                                    onclick="return validateDeleting('${selectedCsiConfiguration}',
-                                    '${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete', args: [selectedCsiConfiguration], default: 'delete?')}',
-                                    '${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning', default: 'Overwriting')}')"/>
-
-                </g:form>
-            </div>
-        </sec:ifAnyGranted>
-    </div>
-</div>
-
+%{--initially invisible modal dialog to update csi configuratuion via ajax---------------}%
+<g:render template="/_common/modals/csi/updateCsiConfiguration"/>
 
 <%-- include bottom ---------------------------------------------------------------------------%>
 
@@ -244,17 +274,23 @@
                 $('#csi-weights').show();
             });
 
+            $('#updateCsiConfModal').on('shown', function () {
+                $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
+                $('#confDescriptionFromModal').val( $('#headerCsiConfDescription').text() );
+                $('#updatingCsiConfigurationErrors').text('');
+                $('#errorUpdatingCsiConfiguration').hide();
+            })
+
         };
 
         $(document).ready(function () {
-            actualCsiConfigurationId = ${selectCsiConfigurationId};
+            actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
             createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
 
             registerEventHandlers();
 
-            $("#errorDeletingCsiConfiguration").hide();
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
@@ -311,22 +347,41 @@
             return validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage);
         }
 
-        function createCsiConfiguration(nameExistsErrorMessage) {
-            var creatingOkay = POSTLOADED.promptForDuplicateName();
-            var input = $('input#label').val();
+        /**
+         * Asks for label of new csi config. If label is empty or a config with that label already exists
+         * link will be broken (this method delivers false).
+         * Otherwise previous and new label is added to links href before it can be followed.
+         * @param anchor
+         *          Anchor this function is called from (onclick handler).
+         * @param nameExistsErrorMessage
+         *          Internationalized error message.
+         * @returns {boolean}
+         *          True if new label chosen by user is ok, False otherwise.
+         */
+        function promptForNewName(anchor, nameExistsErrorMessage) {
 
-            var csiConfiguration = ${csiConfigurations as grails.converters.JSON};
+            var actualLabel = $('#headerCsiConfLabel').text();
+            var newName = prompt(
+                    POSTLOADED.i18n_duplicatePrompt,
+                    actualLabel + POSTLOADED.i18n_duplicateSuffix
+            );
+            if (newName === null || newName === '') {
+                return false;
+            }
 
-            for (var i = 0; i < csiConfiguration.length; i++) {
-                var config = csiConfiguration[i];
+            var csiConfigurations = ${csiConfigurations as grails.converters.JSON};
+
+            for (var i = 0; i < csiConfigurations.length; i++) {
+                var config = csiConfigurations[i];
                 var configName = config[1];
-                if (configName == input) {
+                if (configName == newName) {
                     alert(nameExistsErrorMessage);
-                    creatingOkay = false;
+                    return false;
                 }
             }
 
-            return creatingOkay;
+            anchor.href += '?'+'label='+newName+'&sourceCsiConfigLabel='+actualLabel
+            return true;
         }
 
     </asset:script>

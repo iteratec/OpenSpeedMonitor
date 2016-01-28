@@ -43,7 +43,7 @@
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
                         <g:actionSubmit class="btn btn-primary" action="save"
                                         value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
-                                        onclick="return POSTLOADED.promptForDuplicateName();"/>
+                                        onclick="return promptForDuplicateName();"/>
                     </g:if>
                     <g:elseif test="${mode == 'create'}">
                         <g:actionSubmit class="btn btn-primary" action="save"
@@ -72,10 +72,22 @@
             <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
                 <asset:javascript src="timeago/timeagoDe.js"/>
             </g:if>
-            <asset:script type="text/javascript">
+            <script type="text/javascript">
 
                 function getExecutionScheduleSetButInactiveLabel() {
                     return '${message(code:'job.executionScheduleSetButInactive.label')}';
+                }
+                function promptForDuplicateName() {
+                    var newName = prompt(
+                            encodeURIComponent(POSTLOADED.i18n_duplicatePrompt),
+                            encodeURIComponent($('input#label').val() + POSTLOADED.i18n_duplicateSuffix)
+                    );
+                    if (newName != null && newName != '') {
+                        $('input#label').val(newName);
+                        return true;
+                    } else {
+                        return false;
+                    }
                 }
 
                 $(document).ready(function() {
@@ -128,7 +140,7 @@
                     loader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css" absolute="true"/>');
 
                 });
-            </asset:script>
+            </script>
         </content>
     </body>
 </html>
