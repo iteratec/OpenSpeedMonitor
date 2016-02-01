@@ -244,7 +244,7 @@ class UserspecificEventResultDashboard {
     /**
      * toggle formatting rickshaw export to wide screen format
      */
-    Boolean wideScreenDiagramMontage
+    Boolean wideScreenDiagramMontage = false
     //###########################
 
     Boolean includeNativeConnectivity
@@ -309,7 +309,7 @@ class UserspecificEventResultDashboard {
 
         this.dashboardName = dashboardName
         this.publiclyVisible = publiclyVisible
-        this.wideScreenDiagramMontage = wideScreenDiagramMontage
+        this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
         this.username = username
 
         // Get Data from command
@@ -477,9 +477,7 @@ class UserspecificEventResultDashboard {
                 link += "&action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                if (board.wideScreenDiagramMontage) {
-                    link += "&wideScreenDiagramMontage=on"
-                }
+                link += "&wideScreenDiagramMontage=$board.wideScreenDiagramMontage"
                 link += "&selectedInterval=" + board.selectedInterval
 
                 if ((board.selectedAggrGroupValuesUnCached != null) && (board.selectedAggrGroupValuesUnCached.size() > 0)) {

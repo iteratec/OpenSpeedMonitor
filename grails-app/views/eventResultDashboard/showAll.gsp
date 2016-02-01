@@ -482,15 +482,17 @@
             var loadTimeMaximum = "${params.loadTimeMaximum}";
             var showDataMarkers = "${params.showDataMarkers}";
             var showDataLabels = "${params.showDataLabels}";
+            var optimizeForWideScreen = "${params.showDataLabels}"
             $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
             $("#dia-y-axis-min").val(loadTimeMinimum);
-            if(showDataMarkers){
+            console.log(showDataMarkers);
+            if(eval(showDataMarkers)){
                 $("#to-enable-marker").click();
             }
-            if(showDataLabels){
+            if(eval(showDataLabels)){
                 $("#to-enable-label").click();
             }
         }

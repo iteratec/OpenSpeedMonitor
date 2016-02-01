@@ -30,15 +30,6 @@
                 </label>
             </div>
         </div>
-
-        <div class="control-group">
-            <div class="controls">
-                <label class="checkbox" for="wideScreenDiagramMontage">
-                    <input type="checkbox" name="wideScreenDiagramMontage" id="wideScreenDiagramMontage">
-                    ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.wideScreenDiagramMontage.label', default: 'Diagrams exported from this dashboard will be optimized for widescreen display.')}
-                </label>
-            </div>
-        </div>
     </div>
 
     <div class="modal-footer">
@@ -119,7 +110,7 @@
 
             objectData["dashboardName"] = dashboardName;
             objectData["publiclyVisible"] = document.getElementById("publiclyVisibleFromModal").checked;
-            objectData["wideScreenDiagramMontage"] = document.getElementById("wideScreenDiagramMontage").checked;
+            objectData["wideScreenDiagramMontage"] = $("wide-screen-diagram-montage").is(':checked');
 
             objectData["chartTitle"] = $("#dia-title").val();
             objectData["chartWidth"] = $("#dia-width").val();
