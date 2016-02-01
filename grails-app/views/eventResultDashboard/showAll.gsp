@@ -424,9 +424,10 @@
                 <g:render template="/highchart/chart"
                           model="[
                                   chartData                    : wptCustomerSatisfactionValues,
-                                  chartTitle                   : chartTitle,
+                                  chartTitle                   : params.chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : '100%',
+                                  initialChartWidth            : '560',
+                                  initialChartHeight           : '300',
                                   chartUnit                    : '%',
                                   globalLineWidth              : '2',
                                   xAxisMin                     : fromTimestampForHighChart,
@@ -473,6 +474,27 @@
             </g:if>
         </g:each>
 
+        function setAdjustments(){
+            var chartTitle = "${params.chartTitle}";
+            var chartWidth = "${params.chartWidth}";
+            var chartHeight = "${params.chartHeight}";
+            var loadTimeMinimum = "${params.loadTimeMinimum}";
+            var loadTimeMaximum = "${params.loadTimeMaximum}";
+            var showDataMarkers = "${params.showDataMarkers}";
+            var showDataLabels = "${params.showDataLabels}";
+            $("#dia-title").val(chartTitle);
+            $("#dia-width").val(chartWidth);
+            $("#dia-height").val(chartHeight);
+            $("#dia-y-axis-max").val(loadTimeMaximum);
+            $("#dia-y-axis-min").val(loadTimeMinimum);
+            if(showDataMarkers){
+                $("#to-enable-marker").click();
+            }
+            if(showDataLabels){
+                $("#to-enable-label").click();
+            }
+        }
+
         $(document).ready(function(){
 
             initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
@@ -490,7 +512,7 @@
                     $("#dia-save-chart-as-png").attr( "title", "<g:message
             code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
                 }
-
+            setAdjustments();
             });
 
     </asset:script>

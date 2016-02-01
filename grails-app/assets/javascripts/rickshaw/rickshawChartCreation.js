@@ -131,7 +131,7 @@ function RickshawGraphBuilder(args) {
     }
 
     $("#rickshaw_main").width(args.width);
-    var widthOfChartSvg = $(rickshawGraphBuilder.graph.element).width();
+    var widthOfChartSvg = $(self.graph.element).width();
 
     // set height of html components
     $("#rickshaw_chart_title").width(args.width);
@@ -372,6 +372,7 @@ function RickshawGraphBuilder(args) {
   }
 
   this.initialize(args);
+  self.updateSize(args);
 }
 
 function XAxis(args) {
@@ -912,7 +913,7 @@ function HtmlProvider(args) {
   this.numberOfMeasurandGroups;
 
   this.initialize = function(args) {
-    self.HEIGHT_OF_CHART = args.heightOfChart;
+    self.HEIGHT_OF_CHART = args.height;
     self.numberOfMeasurandGroups = args.series.numberOfMeasurandGroups;
 
     self._generateLeftYAxis();

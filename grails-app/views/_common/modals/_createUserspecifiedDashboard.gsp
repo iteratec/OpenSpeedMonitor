@@ -121,6 +121,14 @@
             objectData["publiclyVisible"] = document.getElementById("publiclyVisibleFromModal").checked;
             objectData["wideScreenDiagramMontage"] = document.getElementById("wideScreenDiagramMontage").checked;
 
+            objectData["chartTitle"] = $("#dia-title").val();
+            objectData["chartWidth"] = $("#dia-width").val();
+            objectData["chartHeight"] = $("#dia-height").val();
+            objectData["loadTimeMaximum"] = $("#dia-y-axis-max").val();
+            objectData["loadTimeMinimum"] = $("#dia-y-axis-min").val();
+            objectData["showDataMarkers"] = $("#to-enable-marker").is(':checked');
+            objectData["showDataLabels"] = $("#to-enable-label").is(':checked');
+
             json_data = JSON.stringify(objectData);
 
             $.ajax({

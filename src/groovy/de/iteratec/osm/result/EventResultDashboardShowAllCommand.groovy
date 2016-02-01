@@ -258,6 +258,18 @@ public class EventResultDashboardShowAllCommand {
      */
     String customConnectivityName
 
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum
+    boolean showDataMarkers
+    boolean showDataLabels
+
+
     /**
      * Constraints needs to fit.
      */
@@ -317,6 +329,8 @@ public class EventResultDashboardShowAllCommand {
 
         customConnectivityName(nullable: true)
 
+        chartTitle(nullable: true)
+        loadTimeMaximum(nullable: true)
         //TODO: validators for trimAbove's and -Below's
 
     }
@@ -455,7 +469,11 @@ public class EventResultDashboardShowAllCommand {
         viewModelToCopyTo.put('debug', this.debug ?: false)
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
-
+        viewModelToCopyTo.put('chartTitle', this.chartTitle)
+        viewModelToCopyTo.put('chartWidth', this.chartWidth)
+        viewModelToCopyTo.put('chartHeight', this.chartHeight)
+        viewModelToCopyTo.put('loadTimeMaximum', this.loadTimeMaximum)
+        viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
     }
 
     /**

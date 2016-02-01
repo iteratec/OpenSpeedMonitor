@@ -229,10 +229,23 @@ class UserspecificEventResultDashboard {
      */
     Integer trimAboveRequestSizes
 
+    //#####Chart Adjustments#####
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum
+    boolean showDataMarkers
+    boolean showDataLabels
+
     /**
      * toggle formatting rickshaw export to wide screen format
      */
     Boolean wideScreenDiagramMontage
+    //###########################
 
     Boolean includeNativeConnectivity
     Boolean selectedAllConnectivityProfiles
@@ -280,6 +293,8 @@ class UserspecificEventResultDashboard {
         customConnectivityName(nullable: true)
         selectedConnectivityProfiles(nullable: true)
         includeCustomConnectivity(nullable: true)
+        chartTitle(nullable: true)
+        loadTimeMaximum(nullable: true)
     }
 
     /**
@@ -321,6 +336,13 @@ class UserspecificEventResultDashboard {
         includeNativeConnectivity = cmd.includeNativeConnectivity
         customConnectivityName = cmd.customConnectivityName
         selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
+        chartTitle = cmd.chartTitle
+        chartWidth = cmd.chartWidth
+        chartHeight = cmd.chartHeight
+        loadTimeMinimum = cmd.loadTimeMinimum
+        loadTimeMaximum = cmd.loadTimeMaximum
+        showDataMarkers = cmd.showDataMarkers
+        showDataLabels = cmd.showDataLabels
 
         // generate Strings for db
         String selectedFolderString = ""
@@ -391,7 +413,7 @@ class UserspecificEventResultDashboard {
 
     def getListOfAvailableDashboards() {
         List result = []
-        List fullList = []
+        List<UserspecificEventResultDashboard> fullList = []
         fullList = UserspecificEventResultDashboard.findAll().sort{it.dashboardName}
 
         String currentUser = ""
@@ -399,7 +421,7 @@ class UserspecificEventResultDashboard {
             currentUser = springSecurityService.authentication.principal.getUsername()
         }
         for (board in fullList) {
-            if ((board.publiclyVisible == true) || (board.username == currentUser)) {
+            if ((board.publiclyVisible) || (board.username == currentUser)) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
@@ -455,7 +477,7 @@ class UserspecificEventResultDashboard {
                 link += "&action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                if (board.wideScreenDiagramMontage == true) {
+                if (board.wideScreenDiagramMontage) {
                     link += "&wideScreenDiagramMontage=on"
                 }
                 link += "&selectedInterval=" + board.selectedInterval
@@ -495,11 +517,11 @@ class UserspecificEventResultDashboard {
                     link += board.trimAboveRequestSizes
                 }
                 link += "&_includeNativeConnectivity="
-                if(board.includeNativeConnectivity == true) {
+                if(board.includeNativeConnectivity) {
                     link += "&includeNativeConnectivity=on"
                 }
                 link += "&_selectedAllConnectivityProfiles="
-                if(board.selectedAllConnectivityProfiles == true) {
+                if(board.selectedAllConnectivityProfiles) {
                     link += "&selectedAllConnectivityProfiles=on"
                 }
                 link += "&customConnectivityName="
@@ -512,12 +534,21 @@ class UserspecificEventResultDashboard {
                     }
                 }
                 link += "&_includeCustomConnectivity="
-                if(board.includeCustomConnectivity == true) {
+                if(board.includeCustomConnectivity) {
                     link += "&includeCustomConnectivity=on"
                 }
 
 
-
+                link += "&chartTitle="
+                if(board.chartTitle){
+                    link += board.chartTitle
+                }
+                link += "&chartWidth=${board.chartWidth}"
+                link += "&chartHeight=${board.chartHeight}"
+                link += "&loadTimeMinimum=${board.loadTimeMinimum}"
+                link += "&loadTimeMaximum=${board.loadTimeMaximum}"
+                link += "&showDataMarkers=${board.showDataMarkers}"
+                link += "&showDataLabels=${board.showDataLabels}"
                 result.add([dashboardName: board.dashboardName, link: link])
             }
         }

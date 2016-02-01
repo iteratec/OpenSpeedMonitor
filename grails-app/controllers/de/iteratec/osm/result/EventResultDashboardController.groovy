@@ -132,7 +132,7 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
-
+        cmd.loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
@@ -243,7 +243,8 @@ class EventResultDashboardController {
                 selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
                 overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
                 includeCustomConnectivity: dashboardValues.includeCustomConnectivity, includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
-                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles)
+                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles, chartTitle: dashboardValues.chartTitle?:"",
+                loadTimeMaximum: dashboardValues.loadTimeMaximum?:"auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers)
 
         // Parse IntegerValues if they exist
         if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()
@@ -255,7 +256,10 @@ class EventResultDashboardController {
         if (dashboardValues.trimBelowRequestCounts) cmd.trimBelowRequestCounts = dashboardValues.trimBelowRequestCounts.toInteger()
         if (dashboardValues.trimAboveLoadTimes) cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes.toInteger()
         if (dashboardValues.trimBelowLoadTimes) cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()
-
+        if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
+        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
+        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
+        if (dashboardValues.chartWidth) cmd.chartWidth = dashboardValues.chartWidth.toInteger()
         // Check validation and send errors if needed
         if (!cmd.validate()) {
             //send errors
