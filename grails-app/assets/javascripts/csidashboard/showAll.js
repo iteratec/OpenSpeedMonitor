@@ -62,12 +62,16 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 var setFilterElementsVisibility = function() {
 	if ($(this).val() == 'measuredEvent') {
         $("#filter-browser-and-location").fadeIn();
+		$("#filter-connectivityprofile").fadeIn();
         $("#filter-navtab-browser-and-location").fadeIn();
+		$("#filter-navtab-connectivityprofile").fadeIn();
         $("#filter-measured-event").fadeIn();
 	}
 	else {
         $("#filter-browser-and-location").fadeOut();
+		$("#filter-connectivityprofile").fadeOut();
         $("#filter-navtab-browser-and-location").fadeOut();
+		$("#filter-navtab-connectivityprofile").fadeOut();
         $("#filter-measured-event").fadeOut();
         $('#filter-navtab-page a').click();
 	}

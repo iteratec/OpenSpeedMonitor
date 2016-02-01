@@ -131,6 +131,7 @@ class EventMeasuredValueService {
 	}
 	private getAllCalculatedHourlyMvs(MvQueryParams mvQueryParams, DateTime fromDateTime, DateTime toDateTimeEndOfInterval){
 		String queryPattern = measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams).pattern();
+		List<ConnectivityProfile> connectivityProfilesInQuery = ConnectivityProfile.findAllByIdInList(new ArrayList<Long>(mvQueryParams.connectivityProfileIds))
 		return queryPattern != null ?
 			measuredValueDaoService.getMvs(
 					fromDateTime.toDate(), 
@@ -138,7 +139,7 @@ class EventMeasuredValueService {
 					queryPattern,
 					MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
 					AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
-					mvQueryParams.connectivityProfileIds)
+					connectivityProfilesInQuery)
 			: []
 	}
 	

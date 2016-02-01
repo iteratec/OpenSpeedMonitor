@@ -248,7 +248,7 @@ class ShopMeasuredValueService {
         List<WeightedCsiValue> weightedCsiValues = []
 
         if (pageMeasuredValues.size() > 0) {
-            weightedCsiValues = weightingService.getWeightedCsiValues(pageMeasuredValues, [WeightFactor.PAGE] as Set)
+            weightedCsiValues = weightingService.getWeightedCsiValues(pageMeasuredValues, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
         }
         if (weightedCsiValues.size() > 0) {
             toBeCalculated.value = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)

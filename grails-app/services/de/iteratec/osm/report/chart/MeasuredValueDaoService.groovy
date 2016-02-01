@@ -99,7 +99,7 @@ class MeasuredValueDaoService {
 			String rlikePattern,
 			MeasuredValueInterval interval,
 			AggregatorType aggregator,
-			Set<ConnectivityProfile> connectivityProfiles
+			Collection<ConnectivityProfile> connectivityProfiles
 	){
 		def criteria = MeasuredValue.createCriteria()
 		return criteria.list {

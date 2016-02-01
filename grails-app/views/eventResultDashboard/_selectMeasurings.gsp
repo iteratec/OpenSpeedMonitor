@@ -48,13 +48,11 @@ GSP-Template Mappings:
                         <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message code="job.location.label" default="Location"/>
                     </a>
                 </li>
-                <g:if test="${showConnectivitySettings}">
-                    <li>
-                        <a href="#tab3" data-toggle="tab">
-                            <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
-                        </a>
-                    </li>
-                </g:if>
+                <li id="filter-navtab-connectivityprofile">
+                    <a href="#tab3" data-toggle="tab">
+                        <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
+                    </a>
+                </li>
             </ul>
 
             <div class="tab-content">
@@ -140,8 +138,8 @@ GSP-Template Mappings:
                         </div>
                     </div>
                 </div>
-                <g:if test="${showConnectivitySettings}">
-                        <div class="tab-pane" id="tab3">
+                    <div class="tab-pane" id="tab3">
+                        <div id="filter-connectivityprofile">
                             <div class="span6">
                                 <label for="selectedConnectivityProfilesHtmlId">
                                     <strong>
@@ -191,7 +189,7 @@ GSP-Template Mappings:
                                 </g:if>
                             </div>
                         </div>
-                    </g:if>
+                    </div>
             </div>
         </div>
 

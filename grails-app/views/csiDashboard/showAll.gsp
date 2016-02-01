@@ -191,7 +191,7 @@
                               'connectivityProfiles'           : connectivityProfiles,
                               'selectedConnectivityProfiles'   : selectedConnectivityProfiles,
                               'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles,
-                              'showConnectivitySettings'       : false]"/>
+                              'showExtendedConnectivitySettings': false]"/>
 
             <div style="clear:both;"></div>
 

@@ -101,7 +101,6 @@
                                 'connectivityProfiles':connectivityProfiles,
                                 'selectedConnectivityProfiles':selectedConnectivityProfiles,
                                 'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles,
-                                'showConnectivitySettings': true,
                                 'showExtendedConnectivitySettings': true]}"/>
             </g:else>
             <p>

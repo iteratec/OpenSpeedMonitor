@@ -160,7 +160,7 @@ class PageMeasuredValueService {
      * @param connectivityProfiles can be empty if MeasuredValueInterval is not "HOURLY"
      * @return
      */
-    List<MeasuredValue> getOrCalculatePageMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> pages = Page.list(), List<ConnectivityProfile> connectivityProfiles = []) {
+    List<MeasuredValue> getOrCalculatePageMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> pages = Page.list(), List<ConnectivityProfile> connectivityProfiles = ConnectivityProfile.list()) {
 
         DateTime toDateTime = new DateTime(toDate)
         DateTime fromDateTime = new DateTime(fromDate)
