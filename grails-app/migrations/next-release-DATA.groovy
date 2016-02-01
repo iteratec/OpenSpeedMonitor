@@ -1,3 +1,12 @@
+import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.result.EventResult
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 databaseChangeLog = {
     changeSet(author: "bka", id: "1452546683118-2") {
         sql(''' update api_key set allowed_for_nightly_database_cleanup_activation = false ''')
@@ -105,6 +114,51 @@ databaseChangeLog = {
             where group_type = 'CSI_AGGREGATION'
         ''')
     }
+
+    // add to every hourly-measured-value a valid connectivity-profile
+    changeSet(author: "bka", id: "1453106072000-9") {
+        grailsChange {
+            change {
+                MeasuredValueUpdateService measuredValueUpdateService = null
+                int maxItemsToProcess = 10000
+                AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+                MeasuredValueInterval measuredValueInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
+
+                int amountMvsHourlyAndPage = MeasuredValue.executeQuery("select count(*) from MeasuredValue where aggregator= ? and interval= ? and resultIds!=''", [aggregatorType,measuredValueInterval])[0]
+                println "processing #" + amountMvsHourlyAndPage + " elements"
+                int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
+
+                (0..amountLoops).each { loopNumber ->
+                    println "processing loop #" + loopNumber
+                    List<MeasuredValue> currentHourlyMeasuredValues = MeasuredValue.executeQuery("from MeasuredValue where aggregator= ? and interval= ? and resultIds!=''",
+                      [aggregatorType,measuredValueInterval],
+                      [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess])
+                    MeasuredValue.withNewSession {
+                        currentHourlyMeasuredValues.each { measuredValue ->
+                            List<EventResult> eventResultsOfMeasuredValue = EventResult.executeQuery("from EventResult where id in :ids",
+                                    [ids: measuredValue.resultIdsAsList])
+                            int amountDifferentConnectivityProfiles = eventResultsOfMeasuredValue*.connectivityProfile.unique(false).size()
+                            // simple case: if all results have same connectivity
+                            if (amountDifferentConnectivityProfiles == 1) {
+                                // ... then add connectivity from any of its results to measuredValue
+                                MeasuredValue.executeUpdate("update MeasuredValue set connectivityProfile=:cp where id=:mvId",
+                                        [cp: eventResultsOfMeasuredValue.first().connectivityProfile, mvId: measuredValue.id])
+                            } else { // ... else remove mv and calc it again by service
+                                if ( measuredValueUpdateService == null) {
+                                    measuredValueUpdateService = ctx.measuredValueUpdateService
+                                }
+                                MeasuredValue.executeUpdate("delete MeasuredValue where id= ?", [measuredValue.id])
+                                eventResultsOfMeasuredValue.each { eventResult ->
+                                    measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 //     ### END INITIAL CSI-CONFIGURATION ###
 
     // ### Delete old hourOfDay data ###
@@ -114,4 +168,3 @@ databaseChangeLog = {
         ''')
     }
 }
-
