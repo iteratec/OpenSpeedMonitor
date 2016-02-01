@@ -473,8 +473,9 @@ class LocationAndResultPersisterService implements iListener{
 	
 	void informDependentMeasuredValues(EventResult result){
 		try{
-			boolean isCsiRelevant = measuredValueTagService.findJobGroupOfEventResultTag(result.tag).groupType == JobGroupType.CSI_AGGREGATION
-			if (isCsiRelevant) measuredValueUpdateService.createOrUpdateDependentMvs(result)
+			if (result.isCsiRelevant()) {
+				measuredValueUpdateService.createOrUpdateDependentMvs(result)
+			}
 		}catch(Exception e){
 			log.error("An error occurred while creating EventResult-dependent MeasuredValues for result: ${result}", e)
 		}

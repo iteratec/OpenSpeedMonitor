@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.ServiceMocker
 import org.junit.Assert
 
@@ -60,7 +61,7 @@ import de.iteratec.osm.measurement.environment.Location
 @TestFor(PageMeasuredValueService)
 @Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location,
         EventResult, MeasuredValueDaoService, DefaultMeasuredEventDaoService, EventMeasuredValueService,
-        CustomerSatisfactionWeightService, CsiDay, MeanCalcService, MeasuredValueUpdateEvent])
+        CustomerSatisfactionWeightService, CsiDay, MeanCalcService, MeasuredValueUpdateEvent, ConnectivityProfile])
 
 class PageMeasuredValueServiceTests {
 
@@ -73,6 +74,7 @@ class PageMeasuredValueServiceTests {
     Map<String, Page> allPages
     AggregatorType pageAggregator;
     Browser browser;
+    ConnectivityProfile connectivityProfile
 
     DateTime startDate = new DateTime(2013, 5, 16, 0, 0, 0)
     String jobGroupName1 = 'myJobGroup1'
@@ -272,7 +274,7 @@ class PageMeasuredValueServiceTests {
     void testCalculation_DailyInterval_SingleHourlyMv() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        MeasuredValue hpmv = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d).save(failOnError: true);
+        MeasuredValue hpmv = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(hpmv.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -296,7 +298,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
 
         //assertions
 
@@ -315,17 +317,17 @@ class PageMeasuredValueServiceTests {
     void testCalculation_DailyInterval_MultipleHourlyMv() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d).save(failOnError: true);
+        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), resultIds: "1", value: 10d).save(failOnError: true);
+        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), resultIds: "1", value: 10d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv3 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), resultIds: "1", value: 11d).save(failOnError: true);
+        MeasuredValue mv3 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), resultIds: "1", value: 11d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv3.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         //MVs outside of Interval
-        MeasuredValue mv4 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true);
+        MeasuredValue mv4 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv4.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true);
+        MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv5.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -351,7 +353,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
 
         //assertions
 
@@ -377,17 +379,17 @@ class PageMeasuredValueServiceTests {
 
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.toDate(), resultIds: "1", value: 1d).save(failOnError: true)
+        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.toDate(), resultIds: "1", value: 1d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), resultIds: "1", value: 10d).save(failOnError: true)
+        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), resultIds: "1", value: 10d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv3 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), resultIds: "1", value: 11d).save(failOnError: true)
+        MeasuredValue mv3 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), resultIds: "1", value: 11d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv3.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         //MVs outside of Interval
-        MeasuredValue mv4 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true)
+        MeasuredValue mv4 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv4.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true)
+        MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv5.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -414,7 +416,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
 
         //assertions
 
@@ -450,9 +452,9 @@ class PageMeasuredValueServiceTests {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //MVs outside of Interval
-        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true);
+        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d).save(failOnError: true);
+        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -472,7 +474,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
 
         //assertions
 
@@ -562,6 +564,8 @@ class PageMeasuredValueServiceTests {
 
         browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
 
+        connectivityProfile = TestDataUtil.createConnectivityProfile("DSL1")
+
         jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
         jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
         jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
@@ -576,11 +580,11 @@ class PageMeasuredValueServiceTests {
         new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate()).save(validate: false)
         new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate()).save(validate: false)
 
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate(), value: 12).save(validate: true)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;2', started: startDate.toDate(), value: 10).save(validate: false)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;1', started: startDate.toDate(), value: 12).save(validate: false)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate(), value: 12).save(validate: false)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate(), value: 10).save(validate: false)
+        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate(), value: 12, connectivityProfile: connectivityProfile).save(validate: true)
+        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;2', started: startDate.toDate(), value: 10, connectivityProfile: connectivityProfile).save(validate: false)
+        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;1', started: startDate.toDate(), value: 12, connectivityProfile: connectivityProfile).save(validate: false)
+        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate(), value: 12, connectivityProfile: connectivityProfile).save(validate: false)
+        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate(), value: 10, connectivityProfile: connectivityProfile).save(validate: false)
 
         //not with existing page
         new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;4', started: startDate.toDate()).save(validate: false)

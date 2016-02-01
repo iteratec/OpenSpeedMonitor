@@ -257,7 +257,8 @@ class EventResult implements CsiValue {
 	public boolean isCsiRelevant() {
 		return this.customerSatisfactionInPercent && this.docCompleteTimeInMillisecs &&
 				(this.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
-						this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24))
+					this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
+				jobResult.job.jobGroup.csiConfiguration != null
 	}
 
 	@Override

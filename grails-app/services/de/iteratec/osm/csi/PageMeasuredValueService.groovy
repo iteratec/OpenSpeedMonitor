@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+
 import static de.iteratec.osm.util.Constants.*
 
 import org.joda.time.DateTime
@@ -147,20 +149,6 @@ class PageMeasuredValueService {
     }
 
     /**
-     * Provides {@link MeasuredValue}s for given {@link JobGroup}s and a {@link MeasuredValueInterval} between toDate and fromDate.
-     * Non-existent {@link MeasuredValue}s will be created.
-     * All {@link MeasuredValue}s with @{link MeasuredValue.Calculated.Not} will be calculated and persisted with @{link MeasuredValue.Calculated.Yes}* or @{link MeasuredValue.Calculated.YesNoData}.
-     * @param fromDateTime
-     * @param toDateTime
-     * @param interval
-     * @param csiGroups
-     * @return
-     */
-    List<MeasuredValue> getOrCalculatePageMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups) {
-        return getOrCalculatePageMeasuredValues(fromDate, toDate, interval, csiGroups, Page.list());
-    }
-
-    /**
      * Provides {@link MeasuredValue}s for given {@link Page}s, {@link JobGroup}s and a {@link MeasuredValueInterval} between toDate and fromDate.
      * Non-existent {@link MeasuredValue}s will be created.
      * All {@link MeasuredValue}s with @{link MeasuredValue.Calculated.Not} will be calculated and persisted with @{link MeasuredValue.Calculated.Yes}* or @{link MeasuredValue.Calculated.YesNoData}.
@@ -169,9 +157,10 @@ class PageMeasuredValueService {
      * @param interval
      * @param csiGroups
      * @param pages
+     * @param connectivityProfiles can be empty if MeasuredValueInterval is not "HOURLY"
      * @return
      */
-    List<MeasuredValue> getOrCalculatePageMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> pages) {
+    List<MeasuredValue> getOrCalculatePageMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> pages = Page.list(), List<ConnectivityProfile> connectivityProfiles = []) {
 
         DateTime toDateTime = new DateTime(toDate)
         DateTime fromDateTime = new DateTime(fromDate)
@@ -216,7 +205,7 @@ class PageMeasuredValueService {
 
                     } else {
                         calculatedMeasuredvalues.addAll(
-                                getOrCalculatePageMvs(currentDateTime, interval, csiGroups, pages, updateEvents)
+                                getOrCalculatePageMvs(currentDateTime, interval, csiGroups, pages, connectivityProfiles, updateEvents)
                         )
 
                     }
@@ -228,10 +217,10 @@ class PageMeasuredValueService {
         }
     }
 
-    private List<MeasuredValue> getOrCalculatePageMvs(DateTime toGetMvsFor, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> csiPages, List<MeasuredValueUpdateEvent> updateEvents) {
+    private List<MeasuredValue> getOrCalculatePageMvs(DateTime toGetMvsFor, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> csiPages, List<ConnectivityProfile> connectivityProfiles, List<MeasuredValueUpdateEvent> updateEvents) {
         List<MeasuredValue> calculatedPageMvs = []
         MvCachingContainer cachingContainer = new MvCachingContainer()
-        cachingContainer.hmvsByCsiGroupPageCombination = getHmvsByCsiGroupPageCombinationMap(csiGroups, csiPages, toGetMvsFor, toGetMvsFor.plusMinutes(interval.getIntervalInMinutes()))
+        cachingContainer.hmvsByCsiGroupPageCombination = getHmvsByCsiGroupPageCombinationMap(csiGroups, csiPages, toGetMvsFor, toGetMvsFor.plusMinutes(interval.getIntervalInMinutes()), connectivityProfiles)
         csiGroups.each { JobGroup group ->
             cachingContainer.csiGroupToCalcMvFor = group
             csiPages.each { Page page ->
@@ -243,7 +232,7 @@ class PageMeasuredValueService {
         return calculatedPageMvs
     }
 
-    Map<String, List<MeasuredValue>> getHmvsByCsiGroupPageCombinationMap(List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime) {
+    Map<String, List<MeasuredValue>> getHmvsByCsiGroupPageCombinationMap(List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime, List<ConnectivityProfile> connectivityProfiles = []) {
         List<MeasuredValue> hourlyMeasuredValues
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getHmvs: getting", IndentationDepth.FOUR) {
             MvQueryParams queryParams = new MvQueryParams();
@@ -252,6 +241,7 @@ class PageMeasuredValueService {
             queryParams.measuredEventIds.addAll(measuredEventDaoService.getEventsFor(csiPages)*.ident());
             queryParams.browserIds.addAll(Browser.list()*.ident());
             queryParams.locationIds.addAll(Location.list()*.ident());
+            queryParams.connectivityProfileIds.addAll(connectivityProfiles*.ident())
             hourlyMeasuredValues = eventMeasuredValueService.getHourylMeasuredValues(startDateTime.toDate(), endDateTime.toDate(), queryParams)
         }
         Map<String, List<MeasuredValue>> hmvsByCsiGroupPageCombination

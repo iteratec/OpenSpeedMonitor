@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfigCacheService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
@@ -54,7 +55,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
 @Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval, 
-	AggregatorType, Location, EventResult, JobResult, Job, MeasuredValueUpdateEvent])
+	AggregatorType, Location, EventResult, JobResult, Job, MeasuredValueUpdateEvent, ConnectivityProfile])
 class EventMeasuredValueServiceTests {
 	
 	public static final String jobGroupName1 = 'jobGroupName1' 
@@ -75,6 +76,7 @@ class EventMeasuredValueServiceTests {
 	EventMeasuredValueService serviceUnderTest
 	MeasuredValueInterval hourly
 	AggregatorType measuredEvent
+	ConnectivityProfile connectivityProfile
 	
     void setUp() {
 		serviceUnderTest = service
@@ -92,6 +94,7 @@ class EventMeasuredValueServiceTests {
 		new Location(location: locationName2).save(validate: false)
 		hourly = new MeasuredValueInterval(intervalInMinutes: MeasuredValueInterval.HOURLY).save(validate: false)
 		measuredEvent = new AggregatorType(name: AggregatorType.MEASURED_EVENT).save(validate: false)
+		connectivityProfile = TestDataUtil.createConnectivityProfile("Conn1")
     }
 
     void tearDown() {
@@ -225,7 +228,8 @@ class EventMeasuredValueServiceTests {
 			Date toDate,
 			String rlikePattern,
 			MeasuredValueInterval interval,
-			AggregatorType aggregator ->
+			AggregatorType aggregator,
+			Set<ConnectivityProfile> connectivityProfiles ->
 			return mvsToReturn
 		}
 		serviceUnderTest.measuredValueDaoService = measuredValueDaoService.createMock()

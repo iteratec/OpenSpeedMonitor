@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfigCacheService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.MeasuredValueDaoService
@@ -59,14 +60,25 @@ class EventMeasuredValueService {
 	 * @param targetInterval
 	 * @return
 	 */
-	List<MeasuredValue> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval) {
+	List<MeasuredValue> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, ConnectivityProfile connProfile = null) {
 		List<MeasuredValue> result = []
+		def query
 
-		def query = MeasuredValue.where {
-			started >= fromDate
-			started <= toDate
-			interval == targetInterval
-			aggregator == AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+		if(connProfile == null) {
+			query = MeasuredValue.where {
+				started >= fromDate
+				started <= toDate
+				interval == targetInterval
+				aggregator == AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+			}
+		} else {
+			query = MeasuredValue.where {
+				started >= fromDate
+				started <= toDate
+				interval == targetInterval
+				aggregator == AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+				connectivityProfile == connProfile
+			}
 		}
 		result = query.list()
 		return result
@@ -85,7 +97,8 @@ class EventMeasuredValueService {
 				MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
 				resultTag,
 				eventAggregator,
-				true)
+				true,
+				newResult.connectivityProfile)
 			calcMvForJobAggregatorWithoutQueryResultsFromDb(hmv, newResult)
 		}
 		
@@ -124,15 +137,16 @@ class EventMeasuredValueService {
 					toDateTimeEndOfInterval.toDate(),
 					queryPattern,
 					MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
-					AggregatorType.findByName(AggregatorType.MEASURED_EVENT))
+					AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
+					mvQueryParams.connectivityProfileIds)
 			: []
 	}
 	
-	private MeasuredValue ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed) {
+	private MeasuredValue ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
 		MeasuredValue toCreateAndOrCalculate
 		performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR){
-			toCreateAndOrCalculate = MeasuredValue.findByStartedAndIntervalAndAggregatorAndTag(startDate.toDate(), interval, eventAggregator, tag)
-			log.debug("MeasuredValue.findByStartedAndIntervalAndAggregatorAndTag delivered ${toCreateAndOrCalculate?'a':'no'} result")
+			toCreateAndOrCalculate = MeasuredValue.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile(startDate.toDate(), interval, eventAggregator, tag, connectivityProfile)
+			log.debug("MeasuredValue.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile delivered ${toCreateAndOrCalculate?'a':'no'} result")
 		}
 		if (!toCreateAndOrCalculate) {
 			toCreateAndOrCalculate = new MeasuredValue(
@@ -142,7 +156,8 @@ class EventMeasuredValueService {
 				tag: tag,
 				value: null,
 				resultIds: '',
-				closedAndCalculated: initiallyClosed
+				closedAndCalculated: initiallyClosed,
+				connectivityProfile: connectivityProfile
 			).save(failOnError: true)
 		}
 		return toCreateAndOrCalculate
@@ -156,11 +171,7 @@ class EventMeasuredValueService {
 	private MeasuredValue calcMvForJobAggregatorWithoutQueryResultsFromDb(MeasuredValue toBeCalculated, EventResult newResult) {
 		Integer countResults = toBeCalculated.countResultIds()
 		Double newValue
-		Boolean csiRelevance = eventResultService.isCsiRelevant(
-			newResult, 
-			osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24), 
-			osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) 
-		if(csiRelevance && !toBeCalculated.containsInResultIds(newResult.ident())){
+		if(newResult.isCsiRelevant() && !toBeCalculated.containsInResultIds(newResult.ident())){
 			if (countResults > 0 && newResult.customerSatisfactionInPercent != null) {
 				Double sumOfPreviousResults = (toBeCalculated.value?toBeCalculated.value:0) * countResults
 				newValue = (sumOfPreviousResults + newResult.customerSatisfactionInPercent) / (countResults + 1)

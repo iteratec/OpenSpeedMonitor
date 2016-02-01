@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
@@ -52,9 +53,10 @@ import static org.junit.Assert.assertEquals
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
 @Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval,
-	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, MeasuredValueUpdateEvent, ConnectivityProfile])
+	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, MeasuredValueUpdateEvent,
+	ConnectivityProfile, CsiConfiguration])
 class UpdateEventResultDependentMeasuredValuesTests {
-	
+
 	static final double DELTA = 1e-15
 	static final DateTime resultsExecutionTime = new DateTime(2012,1,1,0,0,0, DateTimeZone.UTC)
 	static final String measuredEventName = 'HP:::BV1 - Step 01'
@@ -71,6 +73,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	
 	MeasuredValueInterval hourly
 	AggregatorType measuredEvent
+	ConnectivityProfile connectivityProfile
 	EventResult result1OfCsiGroup1
 	EventResult result2OfCsiGroup1
 	EventResult result1OfCsiGroup2
@@ -82,7 +85,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
     void setUp() {
 		
 		serviceUnderTest = service	
-		
+
 		//mocks common for all tests
 		serviceUnderTest.performanceLoggingService = new PerformanceLoggingService() 
 		mockGenerator = ServiceMocker.create()
@@ -122,21 +125,26 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	void testUpdateDependentMeasuredValues() {
 		
 		//create test-specific data
-		
 		JobResult run = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
 		EventResult result1 = createNewResult(run, 50, '1;1;1;1;1')
 		EventResult result2 = createNewResult(run, 60, '1;1;1;1;1')
 		EventResult result3 = createNewResult(run, 70, '1;1;1;1;1')
 		EventResult result4 = createNewResult(run, 80, '1;1;1;1;1')
 		EventResult result5 = createNewResult(run, 90, '1;1;1;1;1')
+
+		mockGenerator.mockOsmConfigCacheService(result1)
+		mockGenerator.mockOsmConfigCacheService(result2)
+		mockGenerator.mockOsmConfigCacheService(result3)
+		mockGenerator.mockOsmConfigCacheService(result4)
+		mockGenerator.mockOsmConfigCacheService(result5)
 		
 		//execute test
 		
 		serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result1)
 		
 		//assertions (and following executions of tested method)
-		
-		List<MeasuredValue> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly)
+
+		List<MeasuredValue> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly, result1.connectivityProfile)
 		Integer countEvents = 1
 		assertEquals(countEvents, hourlyMvs.size())
 		
@@ -257,12 +265,13 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			jobResultJobConfigId: jobResult.job.ident(),
 			measuredEvent: event,
 			speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-			connectivityProfile: null,
+			connectivityProfile: connectivityProfile,
             customConnectivityName: null,
-            noTrafficShapingAtAll: true,
+            noTrafficShapingAtAll: false,
 			tag: resultTag).save(failOnError: true)
 			
-			jobResult.save(failOnError: true)
+		jobResult.save(failOnError: true)
+		mockGenerator.mockOsmConfigCacheService(returnValue)
 			
 			return returnValue
 	}
@@ -270,7 +279,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	//testdata////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private void createTestDataForAllTests(){
-		
+		createConnectivityProfile()
 		createOsmConfiguration()
 		createMeasuredValueIntervals()
 		createAggregatorTypes()
@@ -281,11 +290,15 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		createJobGroups()
 		createJobConfigRunAndResult()
 		createMeasuredEvents()
-		
 	}
 	private void initializeFields(){
 		hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 		measuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+	}
+
+	private void createConnectivityProfile() {
+		connectivityProfile = TestDataUtil.createConnectivityProfile("conn1")
+		connectivityProfile.connectivityProfileService = new ConnectivityProfileService()
 	}
 	
 	private void createOsmConfiguration(){
@@ -297,12 +310,19 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		).save(failOnError: true)
 	}
 	private void createJobGroups(){
+		//create CsiConfiguration for JobGroups
+		List<Page> allPages = [new Page(name: 'HP'),new Page(name: 'ADS')]
+		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+		csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages(allPages)
+		//create JobGroups
 		JobGroup.findByName(group1Name)?:new JobGroup(
 				name:group1Name,
-				groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+				groupType: JobGroupType.CSI_AGGREGATION,
+				csiConfiguration: csiConfiguration).save(failOnError: true)
 		JobGroup.findByName(group2Name)?:new JobGroup(
 			name:group2Name,
-			groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+			groupType: JobGroupType.CSI_AGGREGATION,
+			csiConfiguration: csiConfiguration).save(failOnError: true)
 	}
 	private void createAggregatorTypes(){
 		new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
@@ -368,8 +388,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			script: script,
 			maxDownloadTimeInMinutes: 60,
             customConnectivityProfile: false,
-			connectivityProfile: null,
-			noTrafficShapingAtAll: true
+			connectivityProfile: connectivityProfile,
+			noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
 		job2 = new Job(
@@ -383,8 +403,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			script: script,
 			maxDownloadTimeInMinutes: 60,
 			customConnectivityProfile: false,
-			connectivityProfile: null,
-			noTrafficShapingAtAll: true
+			connectivityProfile: connectivityProfile,
+			noTrafficShapingAtAll: false
         ).save(failOnError: true)
 
 		//wptjobrun

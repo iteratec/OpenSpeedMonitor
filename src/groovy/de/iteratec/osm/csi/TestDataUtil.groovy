@@ -283,6 +283,26 @@ class TestDataUtil {
         return csiDay
     }
 
+    static List<TimeToCsMapping> createTimeToCsMappingForAllPages(List<Page> allPages) {
+        List<TimeToCsMapping> timeToCsMappingList = new ArrayList<>()
+        allPages.each { page ->
+            (0..10000).each { loadTime ->
+                if(loadTime % 20 == 0) {
+                    timeToCsMappingList.add(
+                            new TimeToCsMapping(
+                                    page: page,
+                                    loadTimeInMilliSecs: loadTime,
+                                    customerSatisfaction: 0.5,
+                                    mappingVersion: 1
+                            )
+                    )
+                }
+            }
+        }
+
+        return timeToCsMappingList
+    }
+
     static createHttpArchive(JobResult jobResult) {
         new HttpArchive(
                 jobResult: jobResult

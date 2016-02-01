@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import org.joda.time.DateTime
 
 /**
@@ -77,6 +78,37 @@ class MeasuredValueDaoService {
 				eq("aggregator", aggregator)
 				rlike("tag", rlikePattern)
 			}
+	}
+
+	/**
+	 * Gets all {@link MeasuredValue}s from db respective given arguments. tag-attribute is queried via rlike.
+	 *
+	 * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
+	 * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
+	 * @param fromDate
+	 * @param toDate
+	 * @param rlikePattern
+	 * @param interval
+	 * @param aggregator
+	 * @param connectivityProfiles
+	 * @return
+	 */
+	List<MeasuredValue> getMvs(
+			Date fromDate,
+			Date toDate,
+			String rlikePattern,
+			MeasuredValueInterval interval,
+			AggregatorType aggregator,
+			Set<ConnectivityProfile> connectivityProfiles
+	){
+		def criteria = MeasuredValue.createCriteria()
+		return criteria.list {
+			between("started", fromDate, toDate)
+			eq("interval", interval)
+			eq("aggregator", aggregator)
+			'in'("connectivityProfile",connectivityProfiles)
+			rlike("tag", rlikePattern)
+		}
 	}
 	/**
 	 * Gets calc-not {@link MeasuredValue}s from db. tag-attribute is queried via rlike.
