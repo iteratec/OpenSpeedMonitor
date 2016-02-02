@@ -229,7 +229,7 @@ class EventMeasuredValueServiceTests {
 			String rlikePattern,
 			MeasuredValueInterval interval,
 			AggregatorType aggregator,
-			Set<ConnectivityProfile> connectivityProfiles ->
+			Collection<ConnectivityProfile> connectivityProfiles ->
 			return mvsToReturn
 		}
 		serviceUnderTest.measuredValueDaoService = measuredValueDaoService.createMock()

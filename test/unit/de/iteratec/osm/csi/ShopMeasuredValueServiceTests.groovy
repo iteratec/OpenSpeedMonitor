@@ -341,7 +341,7 @@ class ShopMeasuredValueServiceTests {
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues) {
         def weightingService = mockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
-            List<CsiValue> csiValues, Set<WeightFactor> weightFactors ->
+            List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
         }
         serviceUnderTest.weightingService = weightingService.createMock()

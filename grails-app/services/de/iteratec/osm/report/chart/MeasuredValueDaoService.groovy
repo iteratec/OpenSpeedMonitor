@@ -102,11 +102,11 @@ class MeasuredValueDaoService {
 			Collection<ConnectivityProfile> connectivityProfiles
 	){
 		def criteria = MeasuredValue.createCriteria()
+		criteria.inList('connectivityProfile',connectivityProfiles)
 		return criteria.list {
 			between("started", fromDate, toDate)
 			eq("interval", interval)
 			eq("aggregator", aggregator)
-			'in'("connectivityProfile",connectivityProfiles)
 			rlike("tag", rlikePattern)
 		}
 	}

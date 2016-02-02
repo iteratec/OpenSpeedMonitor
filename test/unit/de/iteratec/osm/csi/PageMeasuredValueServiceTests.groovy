@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.util.ServiceMocker
 import org.junit.Assert
 
@@ -61,7 +62,8 @@ import de.iteratec.osm.measurement.environment.Location
 @TestFor(PageMeasuredValueService)
 @Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location,
         EventResult, MeasuredValueDaoService, DefaultMeasuredEventDaoService, EventMeasuredValueService,
-        CustomerSatisfactionWeightService, CsiDay, MeanCalcService, MeasuredValueUpdateEvent, ConnectivityProfile])
+        CustomerSatisfactionWeightService, CsiDay, MeanCalcService, MeasuredValueUpdateEvent, ConnectivityProfile,
+        ConnectivityProfileService, CsiConfiguration])
 
 class PageMeasuredValueServiceTests {
 
@@ -298,7 +300,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
@@ -353,7 +355,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
@@ -416,7 +418,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
@@ -474,7 +476,7 @@ class PageMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1], [connectivityProfile])
+        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
@@ -566,12 +568,16 @@ class PageMeasuredValueServiceTests {
 
         connectivityProfile = TestDataUtil.createConnectivityProfile("DSL1")
 
-        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
         page1 = new Page(name: pageName1).save(validate: false)
         page2 = new Page(name: pageName2).save(validate: false)
         page3 = new Page(name: pageName3).save(validate: false)
+        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+        csiConfiguration.label = 'csiConf'
+        csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages([page1,page2,page3])
+
+        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
+        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
+        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
 
         //with existing JobGroup and Page:
         new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate()).save(validate: false)

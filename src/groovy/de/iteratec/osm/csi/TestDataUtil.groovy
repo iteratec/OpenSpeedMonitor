@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+
 import static org.junit.Assert.*
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
@@ -201,7 +203,7 @@ class TestDataUtil {
     }
 
     static ConnectivityProfile createConnectivityProfile(String profileName) {
-        return new ConnectivityProfile(
+        ConnectivityProfile result = new ConnectivityProfile(
                 name: profileName,
                 bandwidthDown: 6000,
                 bandwidthUp: 512,
@@ -209,6 +211,8 @@ class TestDataUtil {
                 packetLoss: 0,
                 active: true
         ).save(failOnError: true)
+        result.connectivityProfileService = new ConnectivityProfileService()
+        return result
     }
 
     static createTemplate() {
