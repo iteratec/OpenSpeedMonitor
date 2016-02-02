@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 
 import java.util.zip.GZIPOutputStream
@@ -244,7 +245,7 @@ class LocationAndResultPersisterService implements iListener{
 		Integer testStepCount = resultXml.getTestStepCount()
 		
 		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap = [:]
-		//TODO: enable parsing of waterfalls again, if nightly deletion is working (see de.iteratec.osm.persistence.DbCleanupService)
+		//TODO: remove this block if detail data persistance is integrated via mongodb
 		/*
 		try {
 			if (testStepCount>0 && har) {
@@ -258,22 +259,19 @@ class LocationAndResultPersisterService implements iListener{
 		log.debug("starting persistance of ${testStepCount} event results for test steps")
 		List<EventResult> resultsOfTeststep = []
 		testStepCount.times{nullBasedTeststepIndex ->
+
 			//TODO: possible to catch non median results at this position  and check if they should persist or not
 
-			EventResult.withTransaction { TransactionStatus status ->
-                log.debug("Persisting EventResults of jobRun: ${jobRun}: Start of transaction, transaction status=${status}")
-				try{
-					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
-                    log.debug("Persisting EventResults of jobRun: ${jobRun}: End of transaction, transaction status=${status}")
-				} catch (Exception e) {
-					status.setRollbackOnly()
-					log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
-				}
-			}
+            try{
+                resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
+            } catch (Exception e) {
+                log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
+            }
+
 		}
 		informDependents(resultsOfTeststep)
 	}
-	
+
 	protected List<EventResult> persistResultsOfOneTeststep(
 		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap){
 
@@ -304,18 +302,6 @@ class LocationAndResultPersisterService implements iListener{
                 if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
             }
 		}
-		/*
-		resultXml.getRunNodes().each{GPathResult run ->
-			
-			EventResult firstViewOfTeststep = persistSingleRunResult(run.firstView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
-			if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
-			
-			EventResult repeatedViewOfTeststep = persistSingleRunResult(run.repeatView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
-			if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
-			
-		}
-		*/
-		
 		return resultsOfTeststep
 	}
 		
@@ -358,10 +344,38 @@ class LocationAndResultPersisterService implements iListener{
 		return saveResult(result, jobRun, event, view, run, median, viewTag, pageidToWaterfallMap, waterfallAnchor)
 
 	}
-	
+
+    /**
+     * Storing single {@link EventResult}.
+     *
+     * Should be persisted even if some subdata couldn't get determined (e.g.
+     * customer satisfaction or determination fails with an exception. Therefore transaction must not be rollbacked
+     * even if an arbitrary exception is thrown.
+     *
+     * @param result
+     *          {@link EventResult} to save. A new unpersisted object in most of the cases.
+     * @param jobRun
+     *          {@link JobResult} of the {@link EventResult} to save.
+     * @param step
+     *          {@link MeasuredEvent} of the {@link EventResult} to save.
+     * @param view
+     *          {@link CachedView} of the {@link EventResult} to save.
+     * @param run
+     *          Run number of the {@link EventResult} to save.
+     * @param median
+     *          Whether or not the {@link EventResult} is a median result. Always true for tests with just one run.
+     * @param viewTag
+     *          Xml node with all the result data for the new {@link EventResult}.
+     * @param pageidToWaterfallMap
+     *          <code>Deprecated<code> map. Deprecated because waterfalls won't get persisted in relational db.
+     *          They will get persisted in mongodb in near future.
+     * @param waterfallAnchor
+     *          String to build webpagetest server link for this {@link EventResult} from.
+     * @return  Saved {@link EventResult}.
+     */
+    @Transactional(noRollbackFor = [Exception])
 	protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run,Boolean median,
 			GPathResult viewTag, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
-
 
 		log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
 		Integer docCompleteTime = viewTag.docTime.toInteger()
@@ -394,7 +408,7 @@ class LocationAndResultPersisterService implements iListener{
 		if(!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0 ){
 			result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
 		}
-		//TODO: enable saving of waterfalls again, if nightly deletion is working (see de.iteratec.osm.persistence.DbCleanupService)
+		//TODO: remove this block if detail data persistance is integrated via mongodb
 		/*
 		WebPerformanceWaterfall waterfall = pageidToWaterfallMap[
 			harParserService.createPageIdFrom(

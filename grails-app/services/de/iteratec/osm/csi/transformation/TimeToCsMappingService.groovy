@@ -22,8 +22,11 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.MultiLineChartLineData
 import de.iteratec.osm.util.I18nService
+import grails.transaction.Transactional
 
 class TimeToCsMappingService {
+
+    static transactional = false
 
     TimeToCsMappingCacheService timeToCsMappingCacheService
     ConfigService configService
@@ -44,6 +47,7 @@ class TimeToCsMappingService {
             return transformLoadTime(docReadyTimeInMilliSecs, page, csiConfiguration)
 
         }
+
     }
 
     private double transformLoadTime(int docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration) {
