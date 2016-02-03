@@ -230,7 +230,8 @@
 %{--mapping and weights details----------------------------------------------}%
 <g:render template="confDetails" model="[readOnly               : false,
                                            errorMessagesCsi       : errorMessagesCsi,
-                                           defaultTimeToCsMappings: defaultTimeToCsMappings]" />
+                                           defaultTimeToCsMappings: defaultTimeToCsMappings,
+                                           selectedCsiConfiguration: selectedCsiConfiguration ]" />
 
 %{--initially invisible modal dialog to update csi configuratuion via ajax---------------}%
 <g:render template="/_common/modals/csi/updateCsiConfiguration"/>

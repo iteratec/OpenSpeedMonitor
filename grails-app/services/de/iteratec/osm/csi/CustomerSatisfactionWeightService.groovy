@@ -176,15 +176,19 @@ class CustomerSatisfactionWeightService {
      * @param csv
      * @return
      */
-    def persistNewWeights(WeightFactor weightFactor, InputStream csv) {
+    def persistNewWeights(WeightFactor weightFactor, InputStream csv, CsiConfiguration changedCsiConfiguration) {
         switch (weightFactor) {
             case WeightFactor.BROWSER: persistBrowserWeights(csv); break
-            case WeightFactor.PAGE: persistPageWeights(csv); break
-            case WeightFactor.HOUROFDAY: persistHourofdayWeights(csv); break
-            case WeightFactor.BROWSER_CONNECTIVITY_COMBINATION: persistBrowserConnectivityWeights(csv); break
+            case WeightFactor.PAGE: persistPageWeights(csv, changedCsiConfiguration); break
+            case WeightFactor.HOUROFDAY: persistCsiDay(csv, changedCsiConfiguration); break
+            case WeightFactor.BROWSER_CONNECTIVITY_COMBINATION: persistBrowserConnectivityWeights(csv, changedCsiConfiguration); break
         }
+        changedCsiConfiguration.save(failOnError: true)
     }
 
+    /**
+     * @deprecated better use {@link persistBrowserConnectivityWeights()}
+     */
     private persistBrowserWeights(InputStream csv) {
         Integer lineCounter = 0
         csv.eachLine { line ->
@@ -204,8 +208,9 @@ class CustomerSatisfactionWeightService {
         }
     }
 
-    private persistBrowserConnectivityWeights(InputStream csv) {
+    private persistBrowserConnectivityWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {
         Integer lineCounter = 0
+        changedCsiConfiguration.browserConnectivityWeights.clear()
         csv.eachLine { line ->
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
@@ -216,14 +221,11 @@ class CustomerSatisfactionWeightService {
 
                 if (tokenized[2]) {
                     double newWeight = Double.parseDouble(tokenized[2])
-                    if (browserConnectivityWeight) {
-                        log.info("update browser-connectivity-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
-                        browserConnectivityWeight.weight = Double.valueOf(newWeight)
-                        browser.save(failOnError: true)
-                    } else {
+                    if (!browserConnectivityWeight) {
                         log.info("save new browser-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
-                        new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(newWeight)).save(failOnError: true)
+                        browserConnectivityWeight = new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(newWeight)).save(failOnError: true)
                     }
+                    changedCsiConfiguration.browserConnectivityWeights.add(browserConnectivityWeight)
                 } else {
                     if (browserConnectivityWeight) {
                         browserConnectivityWeight.delete(flush: true)
@@ -234,44 +236,43 @@ class CustomerSatisfactionWeightService {
         }
     }
 
-    private persistPageWeights(InputStream csv) {
+    private persistPageWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {
         Integer lineCounter = 0
+        changedCsiConfiguration.pageWeights.clear()
         csv.eachLine { line ->
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
                 Page page = Page.findByName(tokenized[0])
-                if (page) {
-                    log.info("update Page-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-                    page.weight = Double.valueOf(tokenized[1])
-                    page.save(failOnError: true)
-                } else {
-                    log.info("save new Page-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-                    new Page(name: tokenized[0], weight: Double.valueOf(tokenized[1])).save(failOnError: true)
+                if(page) {
+                    PageWeight pageWeight = PageWeight.findByPageAndWeight(page, Double.valueOf(tokenized[1]))
+                    if (!pageWeight) {
+                        log.info("save new Page-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
+                        pageWeight = new PageWeight(page: page, weight: Double.valueOf(tokenized[1])).
+                                save(failOnError: true)
+                    }
+                    changedCsiConfiguration.pageWeights.add(pageWeight)
                 }
             }
             lineCounter++
         }
     }
 
-    // TODO write test for csiDay upload
-//    private persistHourofdayWeights(InputStream csv) {
-//        Integer lineCounter = 0
-//        csv.eachLine { line ->
-//            if (lineCounter > 0) {
-//                List tokenized = line.tokenize(";")
-//                HourOfDay hourOfDay = HourOfDay.findByFullHour(tokenized[0])
-//                if (hourOfDay) {
-//                    log.info("update Hourofday-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-//                    hourOfDay.weight = Double.valueOf(tokenized[1])
-//                    hourOfDay.save(failOnError: true)
-//                } else {
-//                    log.info("save new Hourofday-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-//                    new HourOfDay(fullHour: tokenized[0], weight: Double.valueOf(tokenized[1])).save(failOnError: true)
-//                }
-//            }
-//            lineCounter++
-//        }
-//    }
+    private persistCsiDay(InputStream csv, CsiConfiguration changedCsiConfiguration) {
+        Integer lineCounter = 0
+        Map<String,Double> hourWeights = new HashMap<>()
+        csv.eachLine { line ->
+            if (lineCounter > 0) {
+                List tokenized = line.tokenize(";")
+
+                if (tokenized[0] && tokenized[1]) {
+                    hourWeights.put("hour" + tokenized[0] + "Weight",Double.parseDouble(tokenized[1]))
+                }
+            }
+            lineCounter++
+        }
+        CsiDay csiDay = CsiDay.findOrCreateWhere(hourWeights)
+        changedCsiConfiguration.csiDay = csiDay
+    }
 
     void persistNewDefaultMapping(InputStream csv) {
         Integer lineCounter = 0

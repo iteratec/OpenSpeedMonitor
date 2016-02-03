@@ -66,6 +66,15 @@ class CsiDay {
         return this[property]
     }
 
+    public Map<Integer,Double> getHourWeights() {
+        Map<Integer,Double> result = new HashMap<>()
+        (0..23).each { hour ->
+            result.put(hour,getHourWeight(hour))
+        }
+
+        return result
+    }
+
     static CsiDay copyDay(CsiDay source) {
         CsiDay toReturn = new CsiDay(source.properties)
 

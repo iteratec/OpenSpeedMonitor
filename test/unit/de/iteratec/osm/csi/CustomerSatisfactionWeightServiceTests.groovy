@@ -20,7 +20,6 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -31,17 +30,21 @@ import org.junit.Test
  * Test-suite of {@link CustomerSatisfactionWeightService}.
  */
 @TestFor(CustomerSatisfactionWeightService)
-@Mock([Page, Browser, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping])
+@Mock([Page, Browser, BrowserConnectivityWeight, ConnectivityProfile, DefaultTimeToCsMapping, CsiConfiguration, PageWeight, CsiDay])
 class CustomerSatisfactionWeightServiceTests {
     CustomerSatisfactionWeightService serviceUnderTest
+
+    CsiConfiguration csiConfiguration
 
     @Before
     void setUp() {
         serviceUnderTest = service
         ServiceMocker mocker = new ServiceMocker()
         mocker.mockI18nService(serviceUnderTest)
+        csiConfiguration = TestDataUtil.createCsiConfiguration()
+        csiConfiguration.label = "conf1"
 
-        createSomeBroserAndConnectivites()
+        createSomeBrowserAndConnectivitesAndPages()
     }
 
     @Test
@@ -86,60 +89,44 @@ class CustomerSatisfactionWeightServiceTests {
 
     @Test
     void testPersistNewWeights() {
-        Integer browsersBeforeUpload = Browser.findAll().size()
-        File csv = new File("test/resources/CsiData/BROWSER_weights.csv")
+        Integer browserConnectivityWeights = BrowserConnectivityWeight.findAll().size()
+        File csv = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
         InputStream csvStream = new FileInputStream(csv)
-        serviceUnderTest.persistNewWeights(WeightFactor.BROWSER, csvStream)
-        assertTrue(Browser.findAll().size() > browsersBeforeUpload)
+        serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream, csiConfiguration)
+        assertTrue(BrowserConnectivityWeight.findAll().size() > browserConnectivityWeights)
 
-        Integer pagesBeforeUpload = Page.findAll().size()
+        Integer pageWeightsBeforeUpload = PageWeight.findAll().size()
         csv = new File("test/resources/CsiData/PAGE_weights.csv")
         csvStream = new FileInputStream(csv)
-        serviceUnderTest.persistNewWeights(WeightFactor.PAGE, csvStream)
-        assertTrue(Page.findAll().size() > pagesBeforeUpload)
+        serviceUnderTest.persistNewWeights(WeightFactor.PAGE, csvStream, csiConfiguration)
+        assertTrue(PageWeight.findAll().size() > pageWeightsBeforeUpload)
 
-        // TODO write test for CsiDay upload
-//        Integer hoursofdayBeforeUpload = HourOfDay.findAll().size()
-//        csv = new File("test/resources/CsiData/HOUROFDAY_weights.csv")
-//        csvStream = new FileInputStream(csv)
-//        serviceUnderTest.persistNewWeights(WeightFactor.HOUROFDAY, csvStream)
-//        assertTrue(HourOfDay.findAll().size() > hoursofdayBeforeUpload)
-
-        Integer browserConnectivityWeights = BrowserConnectivityWeight.findAll().size()
-        csv = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
+        Integer hoursofdayBeforeUpload = CsiDay.findAll().size()
+        csv = new File("test/resources/CsiData/HOUROFDAY_weights.csv")
         csvStream = new FileInputStream(csv)
-        serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream)
-        assertTrue(BrowserConnectivityWeight.findAll().size() > browserConnectivityWeights)
+        serviceUnderTest.persistNewWeights(WeightFactor.HOUROFDAY, csvStream, csiConfiguration)
+        assertTrue(CsiDay.findAll().size() > hoursofdayBeforeUpload)
     }
 
     @Test
     void testUpdateWeights() {
-        testPersistNewWeights()
-
-        Integer browsersBeforeUpload = Browser.findAll().size()
-        File csv = new File("test/resources/CsiData/BROWSER_weights.csv")
+        Integer browserConnectivityWeights = BrowserConnectivityWeight.findAll().size()
+        File csv = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
         InputStream csvStream = new FileInputStream(csv)
-        serviceUnderTest.persistNewWeights(WeightFactor.BROWSER, csvStream)
-        assertEquals(browsersBeforeUpload, Browser.findAll().size())
+        serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream, csiConfiguration)
+        assertTrue(BrowserConnectivityWeight.findAll().size() > browserConnectivityWeights)
 
-        Integer pagesBeforeUpload = Page.findAll().size()
+        Integer pageWeightsBeforeUpload = PageWeight.findAll().size()
         csv = new File("test/resources/CsiData/PAGE_weights.csv")
         csvStream = new FileInputStream(csv)
-        serviceUnderTest.persistNewWeights(WeightFactor.PAGE, csvStream)
-        assertEquals(pagesBeforeUpload, Page.findAll().size())
+        serviceUnderTest.persistNewWeights(WeightFactor.PAGE, csvStream, csiConfiguration)
+        assertTrue(PageWeight.findAll().size() > pageWeightsBeforeUpload)
 
-        // TODO write test for CsiDay upload
-//        Integer hoursofdayBeforeUpload = HourOfDay.findAll().size()
-//        csv = new File("test/resources/CsiData/HOUROFDAY_weights.csv")
-//        csvStream = new FileInputStream(csv)
-//        serviceUnderTest.persistNewWeights(WeightFactor.HOUROFDAY, csvStream)
-//        assertEquals(hoursofdayBeforeUpload, HourOfDay.findAll().size())
-
-        Integer browserConnectivityWeights = BrowserConnectivityWeight.findAll().size()
-        csv = new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv")
+        Integer hoursofdayBeforeUpload = CsiDay.findAll().size()
+        csv = new File("test/resources/CsiData/HOUROFDAY_weights.csv")
         csvStream = new FileInputStream(csv)
-        serviceUnderTest.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csvStream)
-        assertEquals(browserConnectivityWeights, BrowserConnectivityWeight.findAll().size())
+        serviceUnderTest.persistNewWeights(WeightFactor.HOUROFDAY, csvStream, csiConfiguration)
+        assertTrue(CsiDay.findAll().size() > hoursofdayBeforeUpload)
     }
 
     @Test
@@ -152,11 +139,13 @@ class CustomerSatisfactionWeightServiceTests {
         assertTrue(DefaultTimeToCsMapping.findAll().size() > defaultMappingSizeBeforePersist)
     }
 
-    private void createSomeBroserAndConnectivites() {
+    private void createSomeBrowserAndConnectivitesAndPages() {
         new Browser(name: "Browser1", weight: 0).save(failOnError: true)
         new Browser(name: "Browser2", weight: 0).save(failOnError: true)
 
         new ConnectivityProfile(name: "DSL1", active: true, bandwidthDown: 0, bandwidthUp: 0, latency: 0, packetLoss: 0).save(failOnError: true)
         new ConnectivityProfile(name: "DSL2", active: true, bandwidthDown: 0, bandwidthUp: 0, latency: 0, packetLoss: 0).save(failOnError: true)
+
+        TestDataUtil.createPages(['HP','MES','SE','ADS','WKBS','WK'])
     }
 }

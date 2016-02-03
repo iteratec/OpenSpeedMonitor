@@ -39,6 +39,10 @@ class CsiConfigIOController {
 
     // export ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     *
+     * @deprecated
+     */
     def downloadBrowserWeights() {
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
@@ -53,50 +57,51 @@ class CsiConfigIOController {
     }
 
     def downloadBrowserConnectivityWeights() {
+        CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['id'])
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}browser_connectivity_weights.csv")
         response.contentType = "text/csv"
         StringBuilder builder = new StringBuilder()
         builder.append('browser;connectivity;weight\n')
-        Browser.findAll().each { browser ->
-            ConnectivityProfile.findAll().each { connectivity ->
-                BrowserConnectivityWeight weight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivity)
-                if (weight) {
-                    builder.append("${browser.name};${connectivity.name};${weight.weight}\n")
-                } else {
-                    builder.append("${browser.name};${connectivity.name};\n")
-                }
-            }
+        selectedCsiConfiguration.browserConnectivityWeights.each { browserConnectivityWeight ->
+            Browser browser = browserConnectivityWeight.browser
+            ConnectivityProfile connectivity = browserConnectivityWeight.connectivity
+
+            builder.append("${browser.name};${connectivity.name};${browserConnectivityWeight.weight}\n")
         }
 
         response.outputStream << builder.toString()
     }
 
     def downloadPageWeights() {
+        CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['id'])
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}page_weights.csv")
         response.contentType = "text/csv"
         StringBuilder builder = new StringBuilder()
         builder.append('name;weight\n')
-        pageDaoService.findAll().each {
-            builder.append("${it.name};${it.weight}\n")
+        selectedCsiConfiguration.pageWeights.each { pageWeight ->
+            builder.append("${pageWeight.page.name};${pageWeight.weight}\n")
         }
         response.outputStream << builder.toString()
     }
 
     def downloadHourOfDayWeights() {
+        CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['id'])
         DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
         response.setHeader("Content-disposition",
                 "attachment; filename=${dtFormater.print(new DateTime())}HourOfDays_weights.csv")
         response.contentType = "text/csv"
         StringBuilder builder = new StringBuilder()
         builder.append('fullHour;weight\n')
-        // TODO change to csiDay for csi Configuration
-//        HourOfDay.list().each {
-//            builder.append("${it.fullHour};${it.weight}\n")
-//        }
+        Map<Integer,Double> hourWeights = selectedCsiConfiguration.csiDay.hourWeights
+        List sortedKeys=new ArrayList(hourWeights.keySet());
+        Collections.sort(sortedKeys);
+        sortedKeys.each { hour ->
+            builder.append("${hour};${hourWeights.get(hour)}\n")
+        }
         response.outputStream << builder.toString()
     }
 
@@ -116,6 +121,10 @@ class CsiConfigIOController {
 
     // import ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     *
+     * @deprecated
+     */
     def uploadBrowserWeights() {
         MultipartFile csv = request.getFile('browserCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER, csv.getInputStream())
@@ -132,38 +141,32 @@ class CsiConfigIOController {
     def uploadBrowserConnectivityWeights() {
         MultipartFile csv = request.getFile('browserConnectivityCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
+        CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['selectedCsiConfigurationId'])
         if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream())
+            customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, csv.getInputStream(), selectedCsiConfiguration)
         }
         CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
-        redirect(controller: 'CsiDashboard',
-                action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation,
-                         showCsiWeights  : true])
+        redirect(controller: 'CsiConfiguration', action: 'configurations', params: [id: selectedCsiConfiguration.id])
     }
 
     def uploadPageWeights() {
         MultipartFile csv = request.getFile('pageCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.PAGE, csv.getInputStream())
+        CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['selectedCsiConfigurationId'])
         if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream())
+            customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream(), selectedCsiConfiguration)
         }
-        redirect(controller: 'CsiDashboard',
-                action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation,
-                         showCsiWeights  : true])
+        redirect(controller: 'CsiConfiguration', action: 'configurations', params: [id: selectedCsiConfiguration.id])
     }
 
     def uploadHourOfDayWeights() {
         MultipartFile csv = request.getFile('hourOfDayCsv')
         List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.HOUROFDAY, csv.getInputStream())
+        CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['selectedCsiConfigurationId'])
         if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream())
+            customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream(), selectedCsiConfiguration)
         }
-        redirect(controller: 'CsiDashboard',
-                action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation,
-                         showCsiWeights  : true])
+        redirect(controller: 'CsiConfiguration', action: 'configurations', params: [id: selectedCsiConfiguration.id])
     }
 
     def uploadDefaultTimeToCsMappings() {

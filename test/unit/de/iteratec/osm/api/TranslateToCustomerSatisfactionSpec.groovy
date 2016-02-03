@@ -29,7 +29,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
 
         ArrayList<TimeToCsMapping> timeToCsMappings = createTimeToCsMappings()
 
-        csiConfigurationLabel = "csiConfiguration"
+        csiConfigurationLabel = "csiConfigurationFilled"
         csiConfiguration = new CsiConfiguration(label: csiConfigurationLabel,
                 csiDay: new CsiDay(label: "unused"),
                 timeToCsMappings: timeToCsMappings)
@@ -72,7 +72,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
     void "test translateToCustomerSatisfaction with not valid command object"() {
         given:
         TranslateCustomerSatisfactionCommand cmd = new TranslateCustomerSatisfactionCommand()
-        String expectedResponse = "Params loadTimeInMillisecs AND pageName AND csiConfiguration must be set."
+        String expectedResponse = "Params loadTimeInMillisecs AND pageName AND csiConfigurationFilled must be set."
 
         when:
         controllerUnderTest.translateToCustomerSatisfaction(cmd)

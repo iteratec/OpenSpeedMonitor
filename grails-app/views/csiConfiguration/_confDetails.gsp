@@ -37,13 +37,15 @@
         </div>
     </div>
     <g:if test="${!readOnly}">
-        <g:link controller="csiConfigIO" action="downloadBrowserConnectivityWeights">
+        <g:link controller="csiConfigIO" action="downloadBrowserConnectivityWeights" id="${selectedCsiConfiguration.ident()}">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
         </g:link>
 
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:uploadForm controller="csiConfigIO" action="uploadBrowserConnectivityWeights">
                 <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv"
+                       style="display:none">
+                <input id="selectedCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
                 <div class="input-append">
@@ -72,12 +74,14 @@
         <g:message code="de.iteratec.isocsi.page_weight" default="Page"/>
     </h3>
     <g:if test="${!readOnly}">
-        <g:link controller="csiConfigIO" action="downloadPageWeights">
+        <g:link controller="csiConfigIO" action="downloadPageWeights" id="${selectedCsiConfiguration.ident()}">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
         </g:link>
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:uploadForm controller="csiConfigIO" action="uploadPageWeights">
                 <input id="thePageCsvFile" type="file" name="pageCsv" style="display:none">
+                <input id="selectedCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
+                       style="display:none">
 
                 <div class="input-append">
                     <label>
@@ -106,12 +110,14 @@
         <g:message code="de.iteratec.isocsi.hour_weight" default="Tageszeit"/>
     </h3>
     <g:if test="${!readOnly}">
-        <g:link controller="csiConfigIO" action="downloadHourOfDayWeights">
+        <g:link controller="csiConfigIO" action="downloadHourOfDayWeights" id="${selectedCsiConfiguration.ident()}">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
         </g:link>
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:uploadForm controller="csiConfigIO" action="uploadHourOfDayWeights">
                 <input id="theHourOfDayCsvFile" type="file" name="hourOfDayCsv" style="display:none">
+                <input id="selectedCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
+                       style="display:none">
 
                 <div class="input-append">
                     <label>
