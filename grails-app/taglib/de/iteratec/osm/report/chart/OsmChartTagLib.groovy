@@ -55,7 +55,7 @@ class OsmChartTagLib {
         highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
 
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,"650", highChartLabels, title, labelSummary, markerEnabled, annotations)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, highChartLabels, title, labelSummary, markerEnabled, annotations)
 
 		return out.toString()
 	}
@@ -91,7 +91,7 @@ class OsmChartTagLib {
 
         String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,"650", yAxesLabels, title, labelSummary, markerEnabled, annotations)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, yAxesLabels, title, labelSummary, markerEnabled, annotations)
 
 		return out.toString()
 	}
