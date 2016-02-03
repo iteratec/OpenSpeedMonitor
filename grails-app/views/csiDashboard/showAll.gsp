@@ -301,7 +301,7 @@
                                   chartData                    : wptCustomerSatisfactionValues,
                                   chartTitle                   : defaultChartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : '100%',
+                                  initialChartWidth            : '800',
                                   chartUnit                    : '%',
                                   globalLineWidth              : '2',
                                   xAxisMin                     : fromTimestampForHighChart,

@@ -99,15 +99,14 @@ class MeasuredValueDaoService {
 			String rlikePattern,
 			MeasuredValueInterval interval,
 			AggregatorType aggregator,
-			Collection<ConnectivityProfile> connectivityProfiles
+			List<ConnectivityProfile> connectivityProfiles
 	){
-		def criteria = MeasuredValue.createCriteria()
-		criteria.inList('connectivityProfile',connectivityProfiles)
-		return criteria.list {
-			between("started", fromDate, toDate)
-			eq("interval", interval)
-			eq("aggregator", aggregator)
-			rlike("tag", rlikePattern)
+		//TODO: optimize query to something like:
+		//findAllByStartedBetweenAndIntervalAndAggregatorAndConnectivityProfileInListAndTagRlike
+		//... which works in running App, but NOT in unit-tests!
+		List<MeasuredValue> result =  MeasuredValue.findAllByStartedBetweenAndIntervalAndAggregatorAndTagRlike(fromDate,toDate,interval,aggregator,rlikePattern)
+		result.findAll {
+			connectivityProfiles.contains(it.connectivityProfile)
 		}
 	}
 	/**
