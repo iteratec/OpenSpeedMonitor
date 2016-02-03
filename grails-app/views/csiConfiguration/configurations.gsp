@@ -169,6 +169,7 @@
         </blockquote>
     </div>
 
+    <div id="copyCsiConfigurationSpinner"></div>
     %{--dropdown button----------------------------------------------}%
     <div class="span2 offset1">
 
@@ -184,9 +185,8 @@
                     %{--features for actual configuration----------------------------}%
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
                         <li>
-                            <a href="${createLink(absolute: true, controller: 'csiConfiguration', action: 'saveCopy')}"
-                               onclick="return promptForNewName(this, '${message(code: 'de.iteratec.osm.csiConfiguration.nameAlreadyExists', default: 'Name already exists')}')"
-                               disabled="disabled">
+                            <a href="#"
+                               onclick="copyCsiConfiguration();">
                                 <i class="fa fa-copy"></i>&nbsp;${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Copy')}
                             </a>
                         </li>
@@ -347,18 +347,38 @@
             return validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage);
         }
 
+        function copyCsiConfiguration() {
+            var linkToCopyCsiConfig = promptForNewName('${createLink(absolute: true, controller: 'csiConfiguration', action: 'saveCopy')}','${message(code: 'de.iteratec.osm.csiConfiguration.nameAlreadyExists', default: 'Name already exists')}');
+            if(linkToCopyCsiConfig) {
+                var runningSpinner;
+                $.ajax({
+                    url: linkToCopyCsiConfig,
+                    beforeSend: function() {
+                        var copyConfigSpinner = document.getElementById('copyCsiConfigurationSpinner');
+                        runningSpinner = startSpinner(copyConfigSpinner);
+                    },
+                    complete: function(xhr, textStatus) {
+                        document.open();
+                        document.write(xhr.responseText);
+                        document.close();
+                        runningSpinner.stop();
+                    }
+                })
+            }
+        }
+
         /**
          * Asks for label of new csi config. If label is empty or a config with that label already exists
          * link will be broken (this method delivers false).
          * Otherwise previous and new label is added to links href before it can be followed.
-         * @param anchor
-         *          Anchor this function is called from (onclick handler).
+         * @param anchor-link
+         *          Link where the onclick-handler links to
          * @param nameExistsErrorMessage
          *          Internationalized error message.
          * @returns {boolean}
          *          True if new label chosen by user is ok, False otherwise.
          */
-        function promptForNewName(anchor, nameExistsErrorMessage) {
+        function promptForNewName(anchorLink, nameExistsErrorMessage) {
 
             var actualLabel = $('#headerCsiConfLabel').text();
             var newName = prompt(
@@ -380,8 +400,8 @@
                 }
             }
 
-            anchor.href += '?'+'label='+newName+'&sourceCsiConfigLabel='+actualLabel
-            return true;
+            anchorLink += '?'+'label='+newName+'&sourceCsiConfigLabel='+actualLabel
+            return anchorLink;
         }
 
     </asset:script>
