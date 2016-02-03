@@ -100,15 +100,30 @@ class CsiDashboardController {
 
     public static final String DAILY_AGGR_GROUP_PAGE = 'daily_page'
     public static final String DAILY_AGGR_GROUP_SHOP = 'daily_shop'
+    public static final String DAILY_AGGR_GROUP_SYSTEM = 'daily_system'
+    public static final String WEEKLY_AGGR_GROUP_PAGE = 'weekly_page'
+    public static final String WEEKLY_AGGR_GROUP_SHOP = 'weekly_shop'
+    public static final String WEEKLY_AGGR_GROUP_SYSTEM = 'weekly_system'
+    public static final String HOURLY_MEASURED_EVENT = "measured_event"
 
     String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
     public final static int MONDAY_WEEKSTART = 1
-    public final
-    static List<String> AGGREGATOR_GROUP_VALUES = [AggregatorType.MEASURED_EVENT, DAILY_AGGR_GROUP_PAGE, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
-                                                   AggregatorType.PAGE, DAILY_AGGR_GROUP_SHOP, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
-                                                   AggregatorType.SHOP]
-    public final
-    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event', 'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',]
+//    Toggled until Epic [3-C] is releasable
+//    public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
+//                                                                DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
+//                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP,
+//                                                                DAILY_AGGR_GROUP_SYSTEM, WEEKLY_AGGR_GROUP_SYSTEM]
+//    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event',
+//                                                                'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page',
+//                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',
+//                                                                'de.iteratec.isocsi.csi.per.csi.system.daily', 'de.iteratec.isocsi.csi.per.csi.system.weekly']
+
+    public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
+                                                                DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
+                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP]
+    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event',
+                                                                'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page',
+                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group']
 
     /**
      * <p>
@@ -248,19 +263,7 @@ class CsiDashboardController {
                         countOfSelectedEvents = ((Collection) modelToRender.get('measuredEvents')).size()
                     }
 
-                    int selectedAggregationIntervallInMintues = MeasuredValueInterval.HOURLY
-                    switch (cmd.aggrGroup) {
-                        case AggregatorType.PAGE:
-                        case DAILY_AGGR_GROUP_PAGE:
-                            selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
-                            break
-                        case AggregatorType.SHOP:
-                        case DAILY_AGGR_GROUP_SHOP:
-                            selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
-                            break
-                        default: // do nothing, take default.
-                            break
-                    }
+                    int selectedAggregationIntervallInMintues = cmd.getSelectedMeasuredIntervalInMinutes()
 
                     int countOfSelectedBrowser = cmd.selectedBrowsers.size()
                     if (countOfSelectedBrowser < 1) {
@@ -312,13 +315,10 @@ class CsiDashboardController {
         Interval timeFrame = cmd.getSelectedTimeFrame()
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
-        Set<JobGroup> csiGroups = jobGroupDaoService.findCSIGroups()
-        Set<Long> csiGroupIds = csiGroups
-
         MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams()
 
         switch (cmd.aggrGroup) {
-            case AggregatorType.PAGE:
+            case WEEKLY_AGGR_GROUP_PAGE:
                 MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
                 fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph)
                 break
@@ -326,7 +326,7 @@ class CsiDashboardController {
                 MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
                 fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph)
                 break
-            case AggregatorType.SHOP:
+            case WEEKLY_AGGR_GROUP_SHOP:
                 MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
                 fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false)
                 break
@@ -925,6 +925,10 @@ class CsiDashboardController {
 
         // ConnectivityProfiles
         result['connectivityProfiles'] = connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
+
+        // CsiSystems
+        List<CsiSystem> csiSystems = CsiSystem.findAll().sort(false, { it.label })
+        result.put('csiSystems', csiSystems)
 
         // JavaScript-Utility-Stuff:
         result.put("dateFormatString", DATE_FORMAT_STRING_FOR_HIGH_CHART)

@@ -75,6 +75,11 @@ class AggregatorType {
 	 * The name of the aggregation by shop (means by {@link JobGroup} of groupType {@link JobGroup#TYPE_CSI}).
 	 */
 	public static final String SHOP = "shop"
+
+	/**
+	 * The name of the aggregation by a {@link csiSystem}
+	 */
+	public static final String CSI_SYSTEM = "csiSystem"
 	
 	/**
 	 * The Aggegation Type for uncached results

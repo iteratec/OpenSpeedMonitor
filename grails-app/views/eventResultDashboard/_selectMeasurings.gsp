@@ -21,7 +21,7 @@ GSP-Template Mappings:
 * selectedAllLocations
  --%>
 <div class="row">
-    <div class="span4">
+    <div class="span4" id="filter-navtab-jobGroup">
         <div style="padding-top: 60px;"></div>
         <label for="folderSelectHtmlId">
             <strong>

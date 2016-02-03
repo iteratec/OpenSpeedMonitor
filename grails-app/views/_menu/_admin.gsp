@@ -39,6 +39,7 @@
                                      'ApiKeyController',
                                      'BrowserController',
                                      'BrowserAliasController',
+                                     'CsiSystemController',
                                      'CsTargetGraphController',
                                      'CsTargetValueController',
                                      'EventController',

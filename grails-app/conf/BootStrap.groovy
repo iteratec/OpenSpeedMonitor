@@ -246,6 +246,9 @@ class BootStrap {
         AggregatorType.findByName(AggregatorType.SHOP) ?: new AggregatorType(
                 name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 
+        AggregatorType.findByName(AggregatorType.CSI_SYSTEM) ?: new AggregatorType(
+                name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
+
 
         MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY) ?: new MeasuredValueInterval(
                 name: "hourly",

@@ -171,6 +171,21 @@
                     </legend>
                 </div>
             </div>
+            %{--Toggled until Epic [3-C] is  releasable--}%
+            %{--<div class="row">--}%
+                %{--<div class="span4" id="filter-navtab-csiSystem">--}%
+                    %{--<div style="padding-top: 60px;"></div>--}%
+                    %{--<label for="folderSelectCsiSystem">--}%
+                        %{--<strong>--}%
+                            %{--<g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CsiSystems:"/>--}%
+                        %{--</strong>--}%
+                    %{--</label>--}%
+                    %{--<g:select id="folderSelectCsiSystem" class="iteratec-element-select"--}%
+                              %{--name="selectedCsiSystem" from="${csiSystems}" optionKey="id"--}%
+                              %{--optionValue="label" value="${selectedCsiSystem}"--}%
+                              %{--multiple="true"/>--}%
+                %{--</div>--}%
+            %{--</div>--}%
             <g:render template="/eventResultDashboard/selectMeasurings"
                       model="[
                               'locationsOfBrowsers'            : locationsOfBrowsers,

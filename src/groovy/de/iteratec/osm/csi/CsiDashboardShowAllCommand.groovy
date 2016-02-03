@@ -53,8 +53,8 @@ public class CsiDashboardShowAllCommand {
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
-    String  fromHour
-    String  fromMinute
+    String fromHour
+    String fromMinute
 
     /**
      * The selected end hour of date.
@@ -208,58 +208,59 @@ public class CsiDashboardShowAllCommand {
      */
     static constraints = {
 
-        from(nullable: true, validator: {Date currentFrom, CsiDashboardShowAllCommand cmd ->
+        from(nullable: true, validator: { Date currentFrom, CsiDashboardShowAllCommand cmd ->
 
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
 
-            if(manualTimeframe && currentFrom == null) {
+            if (manualTimeframe && currentFrom == null) {
                 return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.from.nullWithManualSelection']
             }
 
         })
 
-        to(nullable:true, validator: { Date currentTo, CsiDashboardShowAllCommand cmd ->
+        to(nullable: true, validator: { Date currentTo, CsiDashboardShowAllCommand cmd ->
 
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
 
-            if(manualTimeframe && currentTo == null) {
+            if (manualTimeframe && currentTo == null) {
                 return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.nullWithManualSelection']
-            }
-            else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) {
+            } else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) {
                 return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.to.beforeFromDate']
             }
         })
 
-        fromHour(nullable: true, validator: {String currentFromHour, CsiDashboardShowAllCommand cmd ->
+        fromHour(nullable: true, validator: { String currentFromHour, CsiDashboardShowAllCommand cmd ->
 
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
 
-            if(manualTimeframe && currentFromHour == null) {
+            if (manualTimeframe && currentFromHour == null) {
                 return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
             }
 
         })
 
-        toHour(nullable: true, validator: {String currentToHour, CsiDashboardShowAllCommand cmd ->
+        toHour(nullable: true, validator: { String currentToHour, CsiDashboardShowAllCommand cmd ->
 
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
 
-            if(manualTimeframe && currentToHour == null) {
+            if (manualTimeframe && currentToHour == null) {
                 return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.nullWithManualSelection']
-            }
-            else if(manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
+            } else if (manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
 
                 DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
                 DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
 
-                if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) {
+                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) {
                     return ['de.iteratec.isr.CsiDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
                 }
 
             }
         })
 
-        aggrGroup(nullable:false, inList: [AggregatorType.MEASURED_EVENT, AggregatorType.PAGE, AggregatorType.SHOP, CsiDashboardController.DAILY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_SHOP])
+        aggrGroup(nullable: false, inList: [CsiDashboardController.HOURLY_MEASURED_EVENT,
+                                            CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_PAGE,
+                                            CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP, CsiDashboardController.DAILY_AGGR_GROUP_SHOP,
+                                            CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM, CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM])
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
             if (currentCollection.isEmpty()) {
@@ -269,62 +270,55 @@ public class CsiDashboardShowAllCommand {
 
         selectedPages(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmpty = AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) && (!currentCollection.isEmpty())
+            boolean correctBecauseHourlyEventAndNotEmpty = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty())
             boolean correctBecausePageAggregatorAndNotEmpty =
-                    (AggregatorType.PAGE.equals(cmd.aggrGroup) ||
-                    CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)) &&
-                    !currentCollection.isEmpty()
-            boolean correctBecauseShop = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+                    (cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE)) &&
+                            !currentCollection.isEmpty()
+            boolean correctBecauseShop = cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP)
 
-            if ( ! (correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty|| correctBecauseShop) ) {
+            if (!(correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty || correctBecauseShop)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
             }
 
         })
 
-        selectedMeasuredEventIds(nullable:false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedMeasuredEventIds(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents =
-                    AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) &&
-                    (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
-            boolean correctBecausePageAggregator = AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)
-            boolean correctBecauseShopAggregator = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
+            boolean correctBecausePageAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
 
-            if ( ! (correctBecauseHourlyEventAndNotEmptyOrAllEvents || correctBecausePageAggregator || correctBecauseShopAggregator) ) {
+            if (!(correctBecauseHourlyEventAndNotEmptyOrAllEvents || correctBecausePageAggregator || correctBecauseShopAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
             }
 
         })
 
-        selectedBrowsers(nullable:false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedBrowsers(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers =
-                    AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) &&
-                    (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
-            boolean correctBecausePageAggregator = AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)
-            boolean correctBecauseShopAggregator = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
+            boolean correctBecausePageAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
 
-            if ( ! (correctBecauseHourlyEventAndNotEmptyOrAllBrowsers || correctBecausePageAggregator || correctBecauseShopAggregator) ) {
+            if (!(correctBecauseHourlyEventAndNotEmptyOrAllBrowsers || correctBecausePageAggregator || correctBecauseShopAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
             }
 
         })
 
-        selectedLocations(nullable:false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedLocations(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations =
-                    AggregatorType.MEASURED_EVENT.equals(cmd.aggrGroup) &&
-                    (!currentCollection.isEmpty() || cmd.selectedAllLocations)
-            boolean correctBecausePageAggregator = AggregatorType.PAGE.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_PAGE.equals(cmd.aggrGroup)
-            boolean correctBecauseShopAggregator = AggregatorType.SHOP.equals(cmd.aggrGroup) || CsiDashboardController.DAILY_AGGR_GROUP_SHOP.equals(cmd.aggrGroup)
+            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)
+            boolean correctBecausePageAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
 
-            if ( ! (correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations || correctBecausePageAggregator || correctBecauseShopAggregator) ) {
+            if (!(correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations || correctBecausePageAggregator || correctBecauseShopAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
             }
 
         })
 
-        overwriteWarningAboutLongProcessingTime(nullable:true)
+        overwriteWarningAboutLongProcessingTime(nullable: true)
 
     }
 
@@ -341,10 +335,8 @@ public class CsiDashboardShowAllCommand {
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    public Interval getSelectedTimeFrame() throws IllegalStateException
-    {
-        if( !this.validate() )
-        {
+    public Interval getSelectedTimeFrame() throws IllegalStateException {
+        if (!this.validate()) {
             throw new IllegalStateException('A time frame is not available from an invalid command.')
         }
 
@@ -386,18 +378,18 @@ public class CsiDashboardShowAllCommand {
                     59, 999
             )
 
-        }else{
+        } else {
 
             end = new DateTime()
             start = end.minusSeconds(this.selectedTimeFrameInterval)
 
         }
-        if(!includeInterval) {
+        if (!includeInterval) {
             Integer intervalInMinutes = this.getSelectedMeasuredIntervalInMinutes()
-            if(measuredValueUtilService.isInActualInterval(end, intervalInMinutes)){
+            if (measuredValueUtilService.isInActualInterval(end, intervalInMinutes)) {
                 end = measuredValueUtilService.subtractOneInterval(end, intervalInMinutes)
             }
-            if(measuredValueUtilService.isInActualInterval(start, intervalInMinutes) || !start.isBefore(end)){
+            if (measuredValueUtilService.isInActualInterval(start, intervalInMinutes) || !start.isBefore(end)) {
                 start = measuredValueUtilService.subtractOneInterval(start, intervalInMinutes)
             }
         }
@@ -411,14 +403,14 @@ public class CsiDashboardShowAllCommand {
      * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
      * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
      */
-    public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException{
+    public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException {
 
         Pattern regexWithMeridian = ~/\d{1,2}:\d\d [AP]M/
         Pattern regexWithoutMeridian = ~/\d{1,2}:\d\d/
         String dateFormatString
 
-        if(timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
-        else if(timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
+        if (timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
+        else if (timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
         else throw new IllegalStateException("Wrong format of time: ${timeWithOrWithoutMeridian}")
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern(dateFormatString)
@@ -439,8 +431,7 @@ public class CsiDashboardShowAllCommand {
      *         Previously contained data will be overwritten.
      *         The argument might not be <code>null</code>.
      */
-    public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
-    {
+    public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         viewModelToCopyTo.put('selectedTimeFrameInterval', this.selectedTimeFrameInterval)
 
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
@@ -458,16 +449,16 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
 
         viewModelToCopyTo.put('from', this.from)
-        if(!this.fromHour.is(null)) {
-            viewModelToCopyTo.put('fromHour',this.fromHour)
+        if (!this.fromHour.is(null)) {
+            viewModelToCopyTo.put('fromHour', this.fromHour)
         }
 
         viewModelToCopyTo.put('to', this.to)
-        if (!this.toHour.is(null)){
+        if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }
         viewModelToCopyTo.put('aggrGroup', this.aggrGroup ?: AggregatorType.MEASURED_EVENT)
-        viewModelToCopyTo.put('debug', this.debug?:false)
+        viewModelToCopyTo.put('debug', this.debug ?: false)
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('includeInterval', this.includeInterval)
@@ -483,10 +474,8 @@ public class CsiDashboardShowAllCommand {
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    public MvQueryParams createMvQueryParams() throws IllegalStateException
-    {
-        if( !this.validate() )
-        {
+    public MvQueryParams createMvQueryParams() throws IllegalStateException {
+        if (!this.validate()) {
             throw new IllegalStateException('Query params are not available from an invalid command.')
         }
 
@@ -494,43 +483,39 @@ public class CsiDashboardShowAllCommand {
 
         result.jobGroupIds.addAll(this.selectedFolder)
 
-        if( !this.selectedAllMeasuredEvents )
-        {
+        if (!this.selectedAllMeasuredEvents) {
             result.measuredEventIds.addAll(this.selectedMeasuredEventIds)
         }
 
         result.pageIds.addAll(this.selectedPages)
 
-        if( !this.selectedAllBrowsers )
-        {
+        if (!this.selectedAllBrowsers) {
             result.browserIds.addAll(this.selectedBrowsers)
         }
 
-        if( !this.selectedAllLocations )
-        {
+        if (!this.selectedAllLocations) {
             result.locationIds.addAll(this.selectedLocations)
         }
-        if (this.selectedAllConnectivityProfiles){
+        if (this.selectedAllConnectivityProfiles) {
             result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-        }else if (this.selectedConnectivityProfiles.size() > 0){
+        } else if (this.selectedConnectivityProfiles.size() > 0) {
             result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
         }
 
         return result
     }
-    public Integer getSelectedMeasuredIntervalInMinutes(){
+
+    public Integer getSelectedMeasuredIntervalInMinutes() {
         Integer interval
-        switch (this.aggrGroup){
-            case AggregatorType.MEASURED_EVENT:
-                interval = MeasuredValueInterval.HOURLY;break
+        switch (this.aggrGroup) {
+            case CsiDashboardController.HOURLY_MEASURED_EVENT:
+                interval = MeasuredValueInterval.HOURLY; break
             case CsiDashboardController.DAILY_AGGR_GROUP_PAGE:
-                interval = MeasuredValueInterval.DAILY;break
-            case AggregatorType.PAGE:
-                interval = MeasuredValueInterval.WEEKLY;break
             case CsiDashboardController.DAILY_AGGR_GROUP_SHOP:
-                interval = MeasuredValueInterval.DAILY;break
-            case AggregatorType.SHOP:
-                interval = MeasuredValueInterval.WEEKLY;break
+                interval = MeasuredValueInterval.DAILY; break
+            case CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE:
+            case CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP:
+                interval = MeasuredValueInterval.WEEKLY; break
             default:
                 throw new IllegalArgumentException("No valid MeasuredValueInterval could be determined from command attrribute aggrGroup (actual value=${this.aggrGroup})")
         }

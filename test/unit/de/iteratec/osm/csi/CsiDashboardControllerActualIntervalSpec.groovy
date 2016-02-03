@@ -446,7 +446,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
         params.toHour = '12:00'
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = true
 
         // request args necessary to validate the command object
@@ -488,7 +488,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDate.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -534,7 +534,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.WEEKLY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -582,7 +582,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDateExpected.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -629,7 +629,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
         params.toHour = '12:00'
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = true
 
         // request args necessary to validate the command object
@@ -671,7 +671,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDate.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -717,7 +717,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.WEEKLY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -765,7 +765,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDateExpected.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
