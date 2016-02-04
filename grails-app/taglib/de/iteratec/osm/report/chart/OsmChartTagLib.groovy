@@ -47,8 +47,18 @@ class OsmChartTagLib {
 		Boolean openDatapointLinksInNewWindow = attrs['openDataPointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDataPointLinksInNewWindow'])  : true
         List annotations = attrs["annotations"]
 
-        String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
-        data.each {
+
+        String heightOfChart
+
+		def definedHeight = attrs["heightOfChart"]
+		if(definedHeight && definedHeight != "0"){
+			heightOfChart = definedHeight
+		} else{
+			heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
+		}
+
+
+		data.each {
             it.measurandGroup = MeasurandGroup.PERCENTAGES
         }
         List<OsmChartAxis> highChartLabels = new LinkedList<OsmChartAxis>();
@@ -89,7 +99,14 @@ class OsmChartTagLib {
 			title = "";
 		}
 
-        String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
+		String heightOfChart
+
+		def definedHeight = attrs["heightOfChart"]
+		if(definedHeight && definedHeight != "0"){
+			heightOfChart = definedHeight
+		} else{
+			heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
+		}
         def htmlCreater = new RickshawHtmlCreater()
         out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, yAxesLabels, title, labelSummary, markerEnabled, annotations)
 

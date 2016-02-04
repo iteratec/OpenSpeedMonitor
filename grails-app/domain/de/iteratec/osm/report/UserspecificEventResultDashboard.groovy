@@ -535,8 +535,6 @@ class UserspecificEventResultDashboard {
                 if(board.includeCustomConnectivity) {
                     link += "&includeCustomConnectivity=on"
                 }
-
-
                 link += "&chartTitle="
                 if(board.chartTitle){
                     link += board.chartTitle

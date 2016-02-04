@@ -299,9 +299,10 @@
                           model="[
                                   singleYAxis                  : 'false',
                                   chartData                    : wptCustomerSatisfactionValues,
-                                  chartTitle                   : defaultChartTitle,
+                                  chartTitle                   : params.chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : '800',
+                                  initialChartWidth            : params.chartWidth,
+                                  initialChartHeight           : params.chartHeight,
                                   chartUnit                    : '%',
                                   globalLineWidth              : '2',
                                   xAxisMin                     : fromTimestampForHighChart,
@@ -369,6 +370,27 @@
                                                            in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
             </g:if>
         </g:each>
+        function setAdjustments(){
+            var chartTitle = "${params.chartTitle}";
+            var chartWidth = "${params.chartWidth}";
+            var chartHeight = "${params.chartHeight}";
+            var loadTimeMinimum = "${params.loadTimeMinimum}";
+            var loadTimeMaximum = "${params.loadTimeMaximum}";
+            var showDataMarkers = "${params.showDataMarkers}";
+            var showDataLabels = "${params.showDataLabels}";
+            var optimizeForWideScreen = "${params.showDataLabels}"
+            $("#dia-title").val(chartTitle);
+            $("#dia-width").val(chartWidth);
+            $("#dia-height").val(chartHeight);
+            $("#dia-y-axis-max").val(loadTimeMaximum);
+            $("#dia-y-axis-min").val(loadTimeMinimum);
+            if(eval(showDataMarkers)){
+                $("#to-enable-marker").click();
+            }
+            if(eval(showDataLabels)){
+                $("#to-enable-label").click();
+            }
+        }
 
         $(document).ready(function(){
 
@@ -386,7 +408,7 @@
                         $("#dia-save-chart-as-png").attr( "title", "<g:message
             code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
                     }
-
+                    setAdjustments();
                 });
     </asset:script>
 </content>

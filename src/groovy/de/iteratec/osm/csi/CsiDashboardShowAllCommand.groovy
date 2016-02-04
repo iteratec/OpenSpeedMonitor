@@ -203,6 +203,17 @@ public class CsiDashboardShowAllCommand {
      */
     Boolean selectedAllConnectivityProfiles = true
 
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum
+    boolean showDataMarkers
+    boolean showDataLabels
+
     /**
      * Constraints needs to fit.
      */
@@ -319,6 +330,8 @@ public class CsiDashboardShowAllCommand {
         })
 
         overwriteWarningAboutLongProcessingTime(nullable: true)
+        chartTitle(nullable: true)
+        loadTimeMaximum(nullable: true)
 
     }
 
@@ -462,6 +475,13 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
         viewModelToCopyTo.put('includeInterval', this.includeInterval)
+        viewModelToCopyTo.put('setFromHour', this.setFromHour)
+        viewModelToCopyTo.put('setToHour', this.setToHour)
+        viewModelToCopyTo.put('chartTitle', this.chartTitle)
+        viewModelToCopyTo.put('chartWidth', this.chartWidth)
+        viewModelToCopyTo.put('chartHeight', this.chartHeight)
+        viewModelToCopyTo.put('loadTimeMaximum', this.loadTimeMaximum)
+        viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
     }
 
     /**

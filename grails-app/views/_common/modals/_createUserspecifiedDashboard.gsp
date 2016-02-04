@@ -110,8 +110,8 @@
 
             objectData["dashboardName"] = dashboardName;
             objectData["publiclyVisible"] = document.getElementById("publiclyVisibleFromModal").checked;
-            objectData["wideScreenDiagramMontage"] = $("wide-screen-diagram-montage").is(':checked');
-
+            objectData["wideScreenDiagramMontage"] = $("#wide-screen-diagram-montage").is(':checked');
+            console.log(objectData["wideScreenDiagramMontage"]);
             objectData["chartTitle"] = $("#dia-title").val();
             objectData["chartWidth"] = $("#dia-width").val();
             objectData["chartHeight"] = $("#dia-height").val();

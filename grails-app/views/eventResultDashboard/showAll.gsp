@@ -487,7 +487,6 @@
             $("#dia-height").val(chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
             $("#dia-y-axis-min").val(loadTimeMinimum);
-            console.log(showDataMarkers);
             if(eval(showDataMarkers)){
                 $("#to-enable-marker").click();
             }

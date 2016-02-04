@@ -90,14 +90,14 @@ class OsmChartTagLibSpec extends Specification {
 			measurementUnit: 'ms',
 			markerEnabled: 'true',
 			dataLabelsActivated: 'false',
-			yAxisScalable: 'true'
-
+			yAxisScalable: 'true',
+			initialChartHeight: "400"
 		]
 
 		when:
 
 		String actualHtml = applyTemplate(
-				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"800px\" '+
+				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"400px\" '+
 				'title=\"${chartTitle}\" yType=\"${targetYType}\" width=\"${targetWidth}\" xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" yAxisMax=\"${yAxisMax}\"' +
 				' measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" labelSummary=""/>',
 				model).stripIndent()

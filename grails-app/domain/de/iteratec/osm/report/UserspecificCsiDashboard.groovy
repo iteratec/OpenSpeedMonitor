@@ -199,11 +199,22 @@ class UserspecificCsiDashboard {
      */
     String selectedAggrGroupValuesUnCached = ""
 
+    //#####Chart Adjustments#####
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum
+    boolean showDataMarkers
+    boolean showDataLabels
 
     /**
      * toggle formatting rickshaw export to wide screen format
      */
-    Boolean wideScreenDiagramMontage
+    Boolean wideScreenDiagramMontage = false
 
     static mapping = {
     }
@@ -239,7 +250,7 @@ class UserspecificCsiDashboard {
     UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, String publiclyVisible,
                              String wideScreenDiagramMontage, String dashboardName, String username) {
         this.publiclyVisible = publiclyVisible
-        this.wideScreenDiagramMontage = wideScreenDiagramMontage
+        this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
         this.dashboardName = dashboardName
         this.username = username
 
@@ -284,6 +295,13 @@ class UserspecificCsiDashboard {
         selectedMeasuredEventIds = selectedMeasuredEventIdsString
         selectedBrowsers = selectedBrowsersString
         selectedLocations = selectedLocationsString
+        chartTitle = cmd.chartTitle
+        chartWidth = cmd.chartWidth
+        chartHeight = cmd.chartHeight
+        loadTimeMinimum = cmd.loadTimeMinimum
+        loadTimeMaximum = cmd.loadTimeMaximum
+        showDataMarkers = cmd.showDataMarkers
+        showDataLabels = cmd.showDataLabels
     }
 
     /**
@@ -315,7 +333,7 @@ class UserspecificCsiDashboard {
 
     def getListOfAvailableDashboards() {
         List result = []
-        List fullList = []
+        List<UserspecificCsiDashboard> fullList = []
         fullList = UserspecificCsiDashboard.findAll().sort {it.dashboardName}
 
         String currentUser = ""
@@ -323,7 +341,7 @@ class UserspecificCsiDashboard {
             currentUser = springSecurityService.authentication.principal.getUsername()
         }
         for (board in fullList) {
-            if ((board.publiclyVisible == true) || (board.username == currentUser)) {
+            if ((board.publiclyVisible) || (board.username == currentUser)) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
@@ -379,13 +397,21 @@ class UserspecificCsiDashboard {
                 link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                if (board.wideScreenDiagramMontage == true) {
-                    link += "&wideScreenDiagramMontage=on"
-                }
+                link += "&wideScreenDiagramMontage=$wideScreenDiagramMontage"
                 link += "&aggrGroup=" + board.aggrGroup
                 if (board.includeInterval != null) {
                     link += "&includeInterval=on"
                 }
+                link += "&chartTitle="
+                if(board.chartTitle){
+                    link += board.chartTitle
+                }
+                link += "&chartWidth=${board.chartWidth}"
+                link += "&chartHeight=${board.chartHeight}"
+                link += "&loadTimeMinimum=${board.loadTimeMinimum}"
+                link += "&loadTimeMaximum=${board.loadTimeMaximum}"
+                link += "&showDataMarkers=${board.showDataMarkers}"
+                link += "&showDataLabels=${board.showDataLabels}"
                 result.add([dashboardName: board.dashboardName, link: link])
             }
         }
