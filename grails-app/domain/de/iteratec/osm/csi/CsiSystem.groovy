@@ -14,4 +14,12 @@ class CsiSystem {
         jobGroupWeights minSize: 2
         label unique: true, blank: false
     }
+
+    List<JobGroup> getAffectedJobGroups() {
+        List<JobGroup> result = []
+        jobGroupWeights.each {
+            result.add(it.jobGroup)
+        }
+        return result
+    }
 }

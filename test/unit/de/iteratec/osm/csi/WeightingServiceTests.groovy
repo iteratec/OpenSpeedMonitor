@@ -38,7 +38,8 @@ import org.junit.Before
 import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
-@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile, JobGroup, CsiDay, CsiConfiguration])
+@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
+        JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 class WeightingServiceTests {
 
     WeightingService serviceUnderTest
@@ -47,6 +48,7 @@ class WeightingServiceTests {
     private static final DateTime SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM = new DateTime(2014, 1, 1, 17, 43, 56)
     private static final String TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT = 'browserWeightedFiftyPercent'
     private static final String TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT = 'browserWeightedSeventyPercent'
+    private JobGroup jobGroup1, jobGroup2
     private Page page_50
     private Page page_70
     private Browser browserToReturn_50
@@ -56,6 +58,7 @@ class WeightingServiceTests {
     private ConnectivityProfile connectivityProfile_50
     private ConnectivityProfile connectivityProfile_70
     private CsiConfiguration csiConfiguration
+    private CsiSystem csiSystem
 
     @Before
     void setUp() {
@@ -479,6 +482,51 @@ class WeightingServiceTests {
 
     }
 
+    void testGetWeightedCsiValuesFromMeasuredValuesByCsiSystem() {
+        MeasuredValue measuredValue1 = new MeasuredValue(
+                value: 10d,
+                tag: jobGroup1.ident(),
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+        )
+        measuredValue1.addAllToResultIds([1l, 2l, 3l])
+        measuredValue1.save(validate: false)
+        TestDataUtil.createUpdateEvent(measuredValue1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+        MeasuredValue measuredValue2 = new MeasuredValue(
+                value: 20d,
+                tag: jobGroup2.ident(),
+                started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
+                connectivityProfile: connectivityProfile_70
+        )
+        measuredValue2.addAllToResultIds([4l, 5l, 6l])
+        measuredValue2.save(validate: false)
+        TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+
+        //test specific mocks
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+
+        //tests with all three WeightFactors
+        List<WeightedCsiValue> weightedValues = serviceUnderTest.getWeightedCsiValues(
+                [measuredValue1, measuredValue2], csiSystem)
+
+        assertEquals(2, weightedValues.size())
+
+        double expectedJobGroupWeight1 = 0.5d
+        double expectedJobGroupWeight2 = 2.0d
+        WeightedCsiValue weightedCsiValue1 = weightedValues.find {
+            it.weightedValue.weight == expectedJobGroupWeight1
+        }
+        assertNotNull(weightedCsiValue1)
+        assertEquals(expectedJobGroupWeight1,weightedCsiValue1.weightedValue.weight, DELTA)
+        assertEquals(10d,weightedCsiValue1.weightedValue.value, DELTA)
+        weightedValues.removeElement(weightedCsiValue1)
+
+        WeightedCsiValue weightedCsiValue2 = weightedValues[0]
+        assertNotNull(weightedCsiValue1)
+        assertEquals(expectedJobGroupWeight2,weightedCsiValue2.weightedValue.weight, DELTA)
+        assertEquals(20d,weightedCsiValue2.weightedValue.value, DELTA)
+    }
+
     void testFlattenWeightedCsiValuesWithoutData() {
         //testdata
         List<WeightedCsiValue> valuesToFlatten = []
@@ -597,7 +645,13 @@ class WeightingServiceTests {
                 pageWeights: [new PageWeight(page: page_50, weight: 0.5d), new PageWeight(page: page_70, weight: 0.7d)]
         )
 
-        new JobGroup(name: "jobGroup", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+        jobGroup1 = new JobGroup(name: "jobGroup1", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+        jobGroup2 = new JobGroup(name: "jobGroup2", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+
+        csiSystem = new CsiSystem(jobGroupWeights: [
+                new JobGroupWeight(jobGroup: jobGroup1, weight: 0.5),
+                new JobGroupWeight(jobGroup: jobGroup2, weight: 2)
+        ])
     }
 
     /**
@@ -662,8 +716,12 @@ class WeightingServiceTests {
             }
             return page
         }
-        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { unused ->
-            return 1
+        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { String tag ->
+            try {
+                return Long.valueOf(tag)
+            } catch(NumberFormatException e) {
+                return 1
+            }
         }
         serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock();
     }

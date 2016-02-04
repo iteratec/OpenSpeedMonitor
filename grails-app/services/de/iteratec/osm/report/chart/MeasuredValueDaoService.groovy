@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.csi.CsiSystem
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import org.joda.time.DateTime
 

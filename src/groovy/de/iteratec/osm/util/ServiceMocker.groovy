@@ -378,8 +378,15 @@ class ServiceMocker {
 			List<JobGroup> theCsiGroups, List<Page> thePages ->
 				return patternToReturn
 		}
+		measuredValueTagServiceMocked.demand.getTagPatternForWeeklyShopMvsWithJobGroups(0..10000) {
+			List<JobGroup> theCsiGroups ->
+				return ~/(${theCsiGroups*.ident().join('|')})/
+		}
 		measuredValueTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
 			return group.ident()+";"+page.ident();
+		}
+		measuredValueTagServiceMocked.demand.createShopAggregatorTag(0..10000) { JobGroup group ->
+			return group.ident();
 		}
 
 		measuredValueTagServiceMocked.demand.createPageAggregatorTagByEventResult(0..10000) {

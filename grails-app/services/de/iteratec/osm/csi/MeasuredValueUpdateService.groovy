@@ -35,6 +35,7 @@ class MeasuredValueUpdateService {
 	EventMeasuredValueService eventMeasuredValueService
 	PageMeasuredValueService pageMeasuredValueService
 	ShopMeasuredValueService shopMeasuredValueService
+	CsiSystemMeasuredValueService csiSystemMeasuredValueService
 	MeasuredValueUtilService measuredValueUtilService
 	JobResultDaoService jobResultDaoService
 	
@@ -63,7 +64,7 @@ class MeasuredValueUpdateService {
 		
 		pageMeasuredValueService.markMvAsOutdated(startOfInterval, newResult, interval)
 		shopMeasuredValueService.markMvAsOutdated(startOfInterval, newResult, interval)
-		
+		csiSystemMeasuredValueService.markMvAsOutdated(startOfInterval, newResult, interval)
 	}
 	
 }
