@@ -52,8 +52,10 @@ import java.util.regex.Pattern
         Page, DefaultMeasuredEventDaoService, EventMeasuredValueService, MeasuredValueDaoService,
         CustomerSatisfactionWeightService, MeasuredValueUpdateEvent, CsiSystem])
 class CsiSystemMeasuredValueServiceSpec extends Specification {
+
     @Shared
     static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
+
     MeasuredValueInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
     CsiSystem csiSystem1, csiSystem2, csiSystemWith3
@@ -71,51 +73,13 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     CsiSystemMeasuredValueService serviceUnderTest
 
     void setup() {
-        weeklyInterval = new MeasuredValueInterval(name: 'weekly', intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
-        dailyInterval = new MeasuredValueInterval(name: 'daily', intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
-        hourlyInterval = new MeasuredValueInterval(name: 'hourly', intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true)
-
-        shop = new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
-        csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM).save(validate: false)
-        new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
-
-        csiSystem1 = new CsiSystem(jobGroupWeights: [
-                new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0),
-                new JobGroupWeight(jobGroup: jobGroup2, weight: 1.0),
-                new JobGroupWeight(jobGroup: jobGroup3, weight: 1.0)
-        ])
-        csiSystem2 = new CsiSystem(jobGroupWeights: [
-                new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0),
-                new JobGroupWeight(jobGroup: jobGroup2, weight: 2.0),
-                new JobGroupWeight(jobGroup: jobGroup3, weight: 3.0)
-        ])
-        csiSystemWith3 = new CsiSystem(jobGroupWeights: [
-                new JobGroupWeight(jobGroup: jobGroup3, weight: 3.0)
-        ])
-
-        //with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', started: startDate.toDate()).save(validate: false)
-        //not with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', started: startDate.toDate()).save(validate: false)
 
         serviceUnderTest = service
-        //mocks common for all tests
-        Map<String,JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3':jobGroup3]
-        SERVICE_MOCKER.mockMeasuredValueTagService(serviceUnderTest,idAsStringToJobGroupMap,[:],[:],[:],[:])
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
-        SERVICE_MOCKER.mockShopMeasuredValueService(serviceUnderTest, [new MeasuredValue()])
-        SERVICE_MOCKER.mockMeasuredValueTagService(serviceUnderTest.shopMeasuredValueService,idAsStringToJobGroupMap,[:],[:],[:],[:])
-        SERVICE_MOCKER.mockPerformanceLoggingService(serviceUnderTest)
-        SERVICE_MOCKER.mockPerformanceLoggingService(serviceUnderTest.shopMeasuredValueService)
-        mockMeasuredValueUpdateEventDaoService()
+
+        createTestDataCommonForAllTests()
+
+        mocksCommonForAllTests(serviceUnderTest)
+
     }
 
     void tearDown() {
@@ -242,8 +206,9 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         double valueThirdMv = 13d
         double pageWeightThirdMv = 3d
         double sumOfAllWeights = 6d
-        (((valueFirstMv * pageWeightFirstMv) + (valueSecondMv * pageWeightSecondMv) + (valueThirdMv * pageWeightThirdMv)) / sumOfAllWeights) ==
-                calculatedMvs[0].value
+
+        double expectedValue = ((valueFirstMv * pageWeightFirstMv) + (valueSecondMv * pageWeightSecondMv) + (valueThirdMv * pageWeightThirdMv)) / sumOfAllWeights
+        calculatedMvs[0].value == expectedValue
 
         mvs.size() == 1
     }
@@ -305,5 +270,58 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
 
         }
         serviceUnderTest.measuredValueUpdateEventDaoService = measuredValueUpdateEventDaoService.createMock()
+    }
+
+    private mocksCommonForAllTests(CsiSystemMeasuredValueService serviceUnderTest) {
+
+        Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
+        SERVICE_MOCKER.mockMeasuredValueTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
+
+        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
+
+        SERVICE_MOCKER.mockShopMeasuredValueService(serviceUnderTest, [new MeasuredValue()])
+
+        SERVICE_MOCKER.mockPerformanceLoggingService(serviceUnderTest)
+
+        mockMeasuredValueUpdateEventDaoService()
+
+    }
+
+    private void createTestDataCommonForAllTests() {
+        weeklyInterval = new MeasuredValueInterval(name: 'weekly', intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
+        dailyInterval = new MeasuredValueInterval(name: 'daily', intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
+        hourlyInterval = new MeasuredValueInterval(name: 'hourly', intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true)
+
+        shop = new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
+        csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM).save(validate: false)
+        new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
+
+        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+
+        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
+
+        csiSystem1 = new CsiSystem(jobGroupWeights: [
+                new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0),
+                new JobGroupWeight(jobGroup: jobGroup2, weight: 1.0),
+                new JobGroupWeight(jobGroup: jobGroup3, weight: 1.0)
+        ])
+        csiSystem2 = new CsiSystem(jobGroupWeights: [
+                new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0),
+                new JobGroupWeight(jobGroup: jobGroup2, weight: 2.0),
+                new JobGroupWeight(jobGroup: jobGroup3, weight: 3.0)
+        ])
+        csiSystemWith3 = new CsiSystem(jobGroupWeights: [
+                new JobGroupWeight(jobGroup: jobGroup3, weight: 3.0)
+        ])
+
+        //with existing JobGroup:
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', started: startDate.toDate()).save(validate: false)
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', started: startDate.toDate()).save(validate: false)
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', started: startDate.toDate()).save(validate: false)
+        //not with existing JobGroup:
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', started: startDate.toDate()).save(validate: false)
+        [jobGroup1, jobGroup2, jobGroup3]
     }
 }
