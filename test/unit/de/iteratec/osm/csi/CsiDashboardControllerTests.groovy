@@ -1212,7 +1212,7 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '18:00');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', AggregatorType.MEASURED_EVENT.toString());
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
         assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
