@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -70,6 +71,7 @@ class CsiDashboardControllerTests {
     MeasuredEventDaoService measuredEventDaoServiceMock
     BrowserDaoService browserDaoServiceMock
     LocationDaoService locationDaoServiceMock
+    ConfigService configServiceMock
 
     @Before
     public void setUp() {
@@ -107,8 +109,17 @@ class CsiDashboardControllerTests {
         this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
         controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
 
+        def configMock = mockFor(ConfigService, true)
+        configMock.demand.getInitialChartHeightInPixels(0..100000){->return 400}
+        configMock.demand.getInitialChartWidthInPixels(0..100000){->return 1000}
+        configServiceMock = configMock.createMock()
+        controllerUnderTest.configService = this.configServiceMock
+
+
+
         controllerUnderTest.csiHelperService = [getCsiChartDefaultTitle: { -> return 'not relevant for these tests'
         }] as CsiHelperService
+
     }
 
     /**

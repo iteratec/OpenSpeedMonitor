@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
 
@@ -299,7 +300,7 @@ class UserspecificCsiDashboard {
         chartWidth = cmd.chartWidth
         chartHeight = cmd.chartHeight
         loadTimeMinimum = cmd.loadTimeMinimum
-        loadTimeMaximum = cmd.loadTimeMaximum
+        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
         showDataMarkers = cmd.showDataMarkers
         showDataLabels = cmd.showDataLabels
     }

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.result.EventResultDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -340,7 +341,7 @@ class UserspecificEventResultDashboard {
         chartWidth = cmd.chartWidth
         chartHeight = cmd.chartHeight
         loadTimeMinimum = cmd.loadTimeMinimum
-        loadTimeMaximum = cmd.loadTimeMaximum
+        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
         showDataMarkers = cmd.showDataMarkers
         showDataLabels = cmd.showDataLabels
 

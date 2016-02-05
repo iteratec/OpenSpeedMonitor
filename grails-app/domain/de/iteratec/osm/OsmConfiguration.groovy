@@ -29,6 +29,7 @@ class OsmConfiguration {
     static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
     static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
+    static final Integer DEFAULT_INITIAL_CHART_WIDTH_IN_PIXELS = 1000
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
     static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
@@ -52,6 +53,8 @@ class OsmConfiguration {
     Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
     /** Initial height of charts when opening dashboards. */
     Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS
+    /** Initial width of charts when opening dashboards. */
+    Integer initialChartWidthInPixels = DEFAULT_INITIAL_CHART_WIDTH_IN_PIXELS
     /** Main url under test within this osm instance. Got shown in chart title of csi dashboard. */
     String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
     /** Maximum Number of months osm keeps results in database   */
@@ -65,6 +68,7 @@ class OsmConfiguration {
         minDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS)
         maxDocCompleteTimeInMillisecs(defaultValue: DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS)
         initialChartHeightInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
+        initialChartWidthInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE

@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -67,7 +68,7 @@ class EventResultDashboardController {
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
     def springSecurityService
-
+    ConfigService configService
     /**
      * The Grails engine to generate links.
      *
@@ -133,6 +134,9 @@ class EventResultDashboardController {
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
         cmd.loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        cmd.chartHeight = cmd.chartHeight>0?cmd.chartHeight:configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth>0?cmd.chartWidth:configService.getInitialChartWidthInPixels()
+
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
         cmd.copyRequestDataToViewModelMap(modelToRender);
 

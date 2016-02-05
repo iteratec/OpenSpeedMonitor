@@ -300,10 +300,10 @@
                           model="[
                                   singleYAxis                  : 'false',
                                   chartData                    : wptCustomerSatisfactionValues,
-                                  chartTitle                   : params.chartTitle,
+                                  chartTitle                   : chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : params.chartWidth,
-                                  initialChartHeight           : params.chartHeight,
+                                  initialChartWidth            : chartWidth,
+                                  initialChartHeight           : chartHeight,
                                   chartUnit                    : '%',
                                   globalLineWidth              : '2',
                                   xAxisMin                     : fromTimestampForHighChart,
@@ -372,14 +372,14 @@
             </g:if>
         </g:each>
         function setAdjustments(){
-            var chartTitle = "${params.chartTitle}";
-            var chartWidth = "${params.chartWidth}";
-            var chartHeight = "${params.chartHeight}";
-            var loadTimeMinimum = "${params.loadTimeMinimum}";
-            var loadTimeMaximum = "${params.loadTimeMaximum}";
-            var showDataMarkers = "${params.showDataMarkers}";
-            var showDataLabels = "${params.showDataLabels}";
-            var optimizeForWideScreen = "${params.showDataLabels}"
+            var chartTitle = "${chartTitle}";
+            var chartWidth = "${chartWidth}";
+            var chartHeight = "${chartHeight}";
+            var loadTimeMinimum = "${loadTimeMinimum}";
+            var loadTimeMaximum = "${loadTimeMaximum}";
+            var showDataMarkers = "${showDataMarkers}";
+            var showDataLabels = "${showDataLabels}";
+            var optimizeForWideScreen = "${showDataLabels}"
             $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);

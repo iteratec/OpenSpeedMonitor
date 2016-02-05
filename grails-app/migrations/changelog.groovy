@@ -19,4 +19,6 @@ databaseChangeLog = {
 	include file: '2016-01-27-SCHEME-CustomDashboardJSValues.groovy'
 
 	include file: '2016-02-04-SCHEME-UserspecificCsiDashboardJSValues.groovy'
+
+	include file: '2016-02-05-SCHEME-InitialChartWidth.groovy'
 }

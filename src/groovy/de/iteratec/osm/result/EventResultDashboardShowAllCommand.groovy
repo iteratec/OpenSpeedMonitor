@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.util.DateValueConverter
@@ -265,7 +266,7 @@ public class EventResultDashboardShowAllCommand {
     /**
      * The maximum load time could be set to 'auto', so we handle it as a string
      */
-    String loadTimeMaximum
+    String loadTimeMaximum = "auto"
     boolean showDataMarkers
     boolean showDataLabels
 

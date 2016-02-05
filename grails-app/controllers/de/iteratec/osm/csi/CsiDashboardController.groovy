@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
@@ -86,6 +87,7 @@ class CsiDashboardController {
     ConnectivityProfileDaoService connectivityProfileDaoService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
+    ConfigService configService
 
     /**
      * The Grails engine to generate links.
@@ -247,6 +249,8 @@ class CsiDashboardController {
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        cmd.chartHeight = cmd.chartHeight>0?cmd.chartHeight:configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth>0?cmd.chartWidth:configService.getInitialChartWidthInPixels()
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 

@@ -97,7 +97,7 @@ class OsmChartTagLibSpec extends Specification {
 		when:
 
 		String actualHtml = applyTemplate(
-				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"400px\" '+
+				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"400\" '+
 				'title=\"${chartTitle}\" yType=\"${targetYType}\" width=\"${targetWidth}\" xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" yAxisMax=\"${yAxisMax}\"' +
 				' measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" labelSummary=""/>',
 				model).stripIndent()
@@ -200,7 +200,7 @@ class OsmChartTagLibSpec extends Specification {
 			markerEnabled: 'true',
 			dataLabelsActivated: 'false',
 			yAxisScalable: 'true',
-			heightOfChart: '200px',
+			heightOfChart: '200',
 			highChartLabels: highChartLabels
 		]
 
@@ -208,7 +208,7 @@ class OsmChartTagLibSpec extends Specification {
 		when:
 
 		String actualHtml = applyTemplate(
-				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600px\" '+
+				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600\" '+
 				'title=\"${title}\" highChartLabels=\"${highChartLabels}\" labelSummary="" />',
 				model).stripIndent()
 

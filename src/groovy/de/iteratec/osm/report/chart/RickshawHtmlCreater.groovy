@@ -53,7 +53,7 @@ class RickshawHtmlCreater {
 
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
-        def height = transformHeightOfChart(heightOfChart)
+        def height = heightOfChart
 
         if (divId == null || divId == "") {
             divId = "rickshaw_all"
@@ -103,14 +103,14 @@ class RickshawHtmlCreater {
         </script>"""
     }
 
-    /**
-     * Removes "px" from height of chart. So the height can be
-     * treated like an integer in javascript.
-     */
-    def transformHeightOfChart = { String heightOfChart ->
-        def height = heightOfChart.split("px")[0];
-        return height;
-    }
+//    /**
+//     * Removes "px" from height of chart. So the height can be
+//     * treated like an integer in javascript.
+//     */
+//    def transformHeightOfChart = { String heightOfChart ->
+//        def height = heightOfChart.split("px")[0];
+//        return height;
+//    }
 
     /**
      * Transforms the data stored in a List of HighchartGraphs

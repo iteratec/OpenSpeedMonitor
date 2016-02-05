@@ -211,7 +211,7 @@ public class CsiDashboardShowAllCommand {
     /**
      * The maximum load time could be set to 'auto', so we handle it as a string
      */
-    String loadTimeMaximum
+    String loadTimeMaximum = "auto"
     boolean showDataMarkers
     boolean showDataLabels
 
