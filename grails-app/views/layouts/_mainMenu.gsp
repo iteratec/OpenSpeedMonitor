@@ -83,11 +83,6 @@
                 <g:link controller="csiDashboard" action="showAll"><i class="fa fa-signal"></i> <g:message
                         code="de.iteratec.isocsi.csiDashboard" default="Dashboard"/></g:link>
             </li>
-
-            <li class="controller ${actionName.equals('showDefault') ? 'active' : ''}">
-                <g:link controller="csiDashboard" action="showDefault"><i class="fa fa-picture-o"></i> <g:message
-                        code="de.iteratec.isocsi.csi.linktext.staticDashboard" default="Statische Ansicht"/></g:link>
-            </li>
             <li class="controller ${actionName.equals('configurations') ? 'active' : ''}">
                 <g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
                         code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>

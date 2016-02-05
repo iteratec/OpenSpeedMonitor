@@ -532,86 +532,12 @@ class CsiDashboardController {
     }
 
     /**
-     * <p>
-     * Fills the view-model-map with weekly shop values. Calling this method
-     * should not be mixed with other operations than weekly shop depended
-     * ones.
-     * </p>
-     *
-     * @param timeFrame
-     *         The time-frame for that data should be calculated,
-     *         not <code>null</code>.
-     * @param modelToRender
-     *         The map to be filled. Previously added entries are overridden.
-     *         This map should not be <code>null</code>.
-     * @param measuredValuesQueryParams
-     *         The {@linkplain MvQueryParams filter} to select relevant
-     *         measured values, not <code>null</code>.
-     * @param moveGraphsByOneWeek
-     * 			if true: moves the graph by one week (CSI-Default-View)
-     */
-    private void fillWithWeeklyShopValuesAsHighChartMap(
-            Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, boolean moveGraphsByOneWeek) {
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-        fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weekly, measuredValuesQueryParams, withTargetGraph, moveGraphsByOneWeek)
-    }
-
-    /**
      * Fixes the specified time frame to fit interval range.
      *
      * @return The fixed time frame, never <code>null</code>.
      */
     private Interval fixTimeFrame(Interval timeFrameToFix, int intervalRangeInMinutes) {
         return measuredValueUtilService.fixTimeFrameToMatchIntervalRange(timeFrameToFix, intervalRangeInMinutes)
-    }
-
-    /**
-     * Thats a view showing a graph for static defined criteria for the
-     * current weeks CSI data. This page is intended to be used by the
-     * management and marketing group. There is nothing changeable on
-     * this page and no further selection are possible.
-     *
-     * @return A CSI model map to be used by the corresponding GSP,
-     * 	       not <code>null</code> and never
-     * {@linkplain Map#isEmpty() empty}.
-     */
-    Map<String, Object> showDefault() {
-
-        DateTime toDate
-        if (params.includeInterval) {
-            toDate = new DateTime()
-        } else {
-            toDate = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
-        }
-        DateTime fromDate = toDate.minusMonths(3)
-
-        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-        Interval timeFrame = new Interval(fromDate, toDate)
-
-        MvQueryParams queryParams = new MvQueryParams()
-
-        List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['otto.de_Desktop', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
-        Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll {
-            namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)
-        }
-        Set<Long> csiGroupIds = csiGroupsToShow.collect({ it.id })
-        queryParams.jobGroupIds.addAll(csiGroupIds)
-
-        fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
-//        fillWithAnnotations(modelToRender, timeFrame)
-
-        modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
-        modelToRender.put('weekStart', MONDAY_WEEKSTART)
-        modelToRender.put('from', fromDate)
-        modelToRender.put('to', toDate)
-        modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
-        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
-        modelToRender.put('markerShouldBeEnabled', true)
-        modelToRender.put('labelShouldBeEnabled', true)
-        modelToRender.put('debug', params.debug ? true : false)
-        modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
-
-        return modelToRender
     }
 
     /**
