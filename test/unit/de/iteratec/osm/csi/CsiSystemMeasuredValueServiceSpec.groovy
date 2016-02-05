@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -27,10 +26,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
-import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -41,16 +36,13 @@ import org.junit.Test
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.util.regex.Pattern
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiSystemMeasuredValueService)
 @Mock([MeanCalcService, MeasuredValue, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location,
-        Page, DefaultMeasuredEventDaoService, EventMeasuredValueService, MeasuredValueDaoService,
-        CustomerSatisfactionWeightService, MeasuredValueUpdateEvent, CsiSystem])
+        Page, MeasuredValueUpdateEvent, CsiSystem])
 class CsiSystemMeasuredValueServiceSpec extends Specification {
 
     @Shared
@@ -182,11 +174,18 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     void "calc multiple daily-Mv"() {
         given:
         //test-specific data
+        double valueFirstMv = 12d
+        double weightFirstMv = 1d
+        double valueSecondMv = 10d
+        double weightSecondMv = 2d
+        double valueThirdMv = 13d
+        double weightThirdMv = 3d
+        double sumOfAllWeights = weightFirstMv + weightSecondMv + weightThirdMv
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
         List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
-                new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3]),
-                new WeightedCsiValue(weightedValue: new WeightedValue(value: 10d, weight: 2d), underlyingEventResultIds: [4]),
-                new WeightedCsiValue(weightedValue: new WeightedValue(value: 13d, weight: 3d), underlyingEventResultIds: [5, 6])]
+                new WeightedCsiValue(weightedValue: new WeightedValue(value: valueFirstMv, weight: weightFirstMv), underlyingEventResultIds: [1, 2, 3]),
+                new WeightedCsiValue(weightedValue: new WeightedValue(value: valueSecondMv, weight: weightSecondMv), underlyingEventResultIds: [4]),
+                new WeightedCsiValue(weightedValue: new WeightedValue(value: valueThirdMv, weight: weightThirdMv), underlyingEventResultIds: [5, 6])]
 
         //mocking inner services
         mockWeightingService(weightedCsiValuesToReturnInMock)
@@ -199,15 +198,8 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         calculatedMvs.size() == 1
         calculatedMvs[0].aggregator == csiSystemAggregator
         calculatedMvs[0].isCalculated()
-        double valueFirstMv = 12d
-        double pageWeightFirstMv = 1d
-        double valueSecondMv = 10d
-        double pageWeightSecondMv = 2d
-        double valueThirdMv = 13d
-        double pageWeightThirdMv = 3d
-        double sumOfAllWeights = 6d
 
-        double expectedValue = ((valueFirstMv * pageWeightFirstMv) + (valueSecondMv * pageWeightSecondMv) + (valueThirdMv * pageWeightThirdMv)) / sumOfAllWeights
+        double expectedValue = ((valueFirstMv * weightFirstMv) + (valueSecondMv * weightSecondMv) + (valueThirdMv * weightThirdMv)) / sumOfAllWeights
         calculatedMvs[0].value == expectedValue
 
         mvs.size() == 1
@@ -273,11 +265,11 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     }
 
     private mocksCommonForAllTests(CsiSystemMeasuredValueService serviceUnderTest) {
+        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
+        serviceUnderTest.measuredValueDaoService = new MeasuredValueDaoService()
 
         Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
         SERVICE_MOCKER.mockMeasuredValueTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
-
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
 
         SERVICE_MOCKER.mockShopMeasuredValueService(serviceUnderTest, [new MeasuredValue()])
 
@@ -322,6 +314,5 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', started: startDate.toDate()).save(validate: false)
         //not with existing JobGroup:
         new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', started: startDate.toDate()).save(validate: false)
-        [jobGroup1, jobGroup2, jobGroup3]
     }
 }
