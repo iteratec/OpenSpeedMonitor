@@ -260,7 +260,7 @@ class UserspecificCsiDashboard {
         toDate = cmd.to
         fromHour = cmd.fromHour
         toHour = cmd.toHour
-        aggrGroup = cmd.aggrGroup
+        aggrGroup = cmd.aggrGroupAndInterval
         selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
         includeInterval = cmd.includeInterval
         setFromHour = cmd.setFromHour
@@ -398,7 +398,7 @@ class UserspecificCsiDashboard {
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
                 link += "&wideScreenDiagramMontage=$wideScreenDiagramMontage"
-                link += "&aggrGroup=" + board.aggrGroup
+                link += "&aggrGroupAndInterval=" + board.aggrGroup
                 if (board.includeInterval != null) {
                     link += "&includeInterval=on"
                 }

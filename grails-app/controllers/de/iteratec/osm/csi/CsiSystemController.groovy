@@ -146,8 +146,7 @@ class CsiSystemController {
         }
 
         if (jobGroupsWeightsHaveErrors) {
-            // TODOMARCUS error erstellen
-            flash.message = message(code: 'sadfjs', default: "Vom Typ Double")
+            flash.message = message(code: 'de.iteratec.osm.csi.CsiSystem.weightError', default: "Gewichtungen muessen vom Typ Double sein")
             render(view: "edit", model: [csiSystemInstance: csiSystemInstance])
             return
         }

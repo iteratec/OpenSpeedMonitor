@@ -140,8 +140,8 @@
                                            default="Aggregator"/></legend>
 
                         <div>
-                            <g:radioGroup name="aggrGroup" labels="${aggrGroupLabels}" values="${aggrGroupValues}"
-                                          value="${aggrGroup}">
+                            <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}" values="${aggrGroupValues}"
+                                          value="${aggrGroupAndInterval}">
                                 <p>${it.radio} <g:message code="${it.label}"/></p>
                             </g:radioGroup>
                         </div>
@@ -272,23 +272,24 @@
 
     <div class="row">
         <%-- chart --%>
-        <g:if test="${aggrGroup == AggregatorType.MEASURED_EVENT}">
+        <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
             <g:set var="chartTitle"
                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.measured_steps.title')}"/>
             <g:set var="openDataPointLinksInNewWindow" value="true"/>
         </g:if>
         <g:elseif
-                test="${aggrGroup == 'page' || aggrGroup == CsiDashboardController.DAILY_AGGR_GROUP_PAGE}">
+                test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_PAGE}">
             <g:set var="chartTitle"
                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.pages.title')}"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>
         </g:elseif>
         <g:elseif
-                test="${aggrGroup == 'shop' || aggrGroup == CsiDashboardController.DAILY_AGGR_GROUP_SHOP}">
+                test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SHOP}">
             <g:set var="chartTitle"
                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>
         </g:elseif>
+        %{--TODOMARCUS hier muss noch csi System eals else if sein--}%
         <g:else>
             <g:set var="chartTitle" value="CSI"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>

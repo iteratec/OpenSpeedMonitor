@@ -154,7 +154,7 @@ class CsiDashboardControllerTests {
         Date expectedDateForTo = new Date(1376863200000L)
 
         params.toHour = '13:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedAllMeasuredEvents = false
@@ -180,7 +180,7 @@ class CsiDashboardControllerTests {
         assertEquals(expectedDateForFrom, command.from);
         assertEquals("12:00", command.fromHour);
         assertEquals("13:00", command.toHour);
-        assertEquals(CsiDashboardController.HOURLY_MEASURED_EVENT, command.aggrGroup);
+        assertEquals(CsiDashboardController.HOURLY_MEASURED_EVENT, command.aggrGroupAndInterval);
 
         assertEquals(1, command.selectedFolder.size())
         assertTrue(command.selectedFolder.contains(1L))
@@ -319,7 +319,7 @@ class CsiDashboardControllerTests {
         Date expectedDateForTo = new Date(1376776800000L)
 
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedAllMeasuredEvents = false
@@ -346,7 +346,7 @@ class CsiDashboardControllerTests {
         assertEquals(expectedDateForFrom, command.from);
         assertEquals("16:00", command.fromHour);
         assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, command.aggrGroup);
+        assertEquals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, command.aggrGroupAndInterval);
 
         assertEquals(1, command.selectedFolder.size())
         assertTrue(command.selectedFolder.contains(1L))
@@ -403,7 +403,7 @@ class CsiDashboardControllerTests {
         Date expectedDateForTo = new Date(1376776800000L)
 
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedAllMeasuredEvents = false
@@ -429,7 +429,7 @@ class CsiDashboardControllerTests {
         assertEquals(expectedDateForFrom, command.from);
         assertEquals("16:00", command.fromHour);
         assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE, command.aggrGroup);
+        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE, command.aggrGroupAndInterval);
 
         assertEquals(1, command.selectedFolder.size())
         assertTrue(command.selectedFolder.contains(1L))
@@ -486,7 +486,7 @@ class CsiDashboardControllerTests {
         Date expectedDateForTo = new Date(1376776800000L)
 
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
         params.selectedFolder = '1'
         params.selectedPages = []
         params.selectedAllMeasuredEvents = true
@@ -512,7 +512,7 @@ class CsiDashboardControllerTests {
         assertEquals(expectedDateForFrom, command.from);
         assertEquals("16:00", command.fromHour);
         assertEquals("18:00", command.toHour);
-        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP, command.aggrGroup);
+        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP, command.aggrGroupAndInterval);
 
         assertEquals(1, command.selectedFolder.size())
         assertTrue(command.selectedFolder.contains(1L))
@@ -563,7 +563,7 @@ class CsiDashboardControllerTests {
         params.to = '29.10.2013'
 
         params.toHour = '13:00'
-        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -588,7 +588,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '12:00'
         params.to = '19.08.2013'
         params.toHour = '13:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         params.selectedFolder = '1'
         params.selectedPages = ['NOT-A-NUMBER']
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -621,7 +621,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '16:00'
         params.to = '18.08.2013'
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         params.selectedFolder = '1'
         params.selectedPages = []
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -646,7 +646,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '16:00'
         params.to = '18.08.2013'
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.selectedFolder = '1'
         params.selectedPages = []
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -671,7 +671,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '16:00'
         params.to = '18.08.2013'
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
         params.selectedFolder = '1'
         params.selectedPages = []
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -696,7 +696,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '16:00'
         params.to = '18.08.2013'
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedAllMeasuredEvents = false
@@ -723,7 +723,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '16:00'
         params.to = '18.08.2013'
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -749,7 +749,7 @@ class CsiDashboardControllerTests {
         params.fromHour = '16:00'
         params.to = '18.08.2013'
         params.toHour = '18:00'
-        params.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        params.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         params.selectedFolder = '1'
         params.selectedPages = ['1', '5']
         params.selectedMeasuredEventIds = ['7', '8', '9']
@@ -1120,7 +1120,7 @@ class CsiDashboardControllerTests {
         Date expectedToDate = new Date(1376863200000L)
         command.to = expectedToDate
         command.toHour = '13:00'
-        command.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = false
@@ -1159,7 +1159,7 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroup', CsiDashboardController.HOURLY_MEASURED_EVENT);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
         assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
@@ -1179,7 +1179,7 @@ class CsiDashboardControllerTests {
         Date expectedToDate = new Date(1376863200000L)
         command.to = expectedToDate
         command.toHour = '18:00'
-        command.aggrGroup = null // Missing! -> Default should be set
+        command.aggrGroupAndInterval = null // Missing! -> Default should be set
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = false
@@ -1212,7 +1212,7 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '18:00');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroup', AggregatorType.MEASURED_EVENT.toString());
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', AggregatorType.MEASURED_EVENT.toString());
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
         assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
@@ -1233,7 +1233,7 @@ class CsiDashboardControllerTests {
         Date expectedToDate = new Date(1376863200000L)
         command.to = expectedToDate
         command.toHour = "13:00"
-        command.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = true
@@ -1272,7 +1272,7 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroup', CsiDashboardController.HOURLY_MEASURED_EVENT);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedTimeFrameInterval', 0)
         assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
@@ -1291,7 +1291,7 @@ class CsiDashboardControllerTests {
         // to = '19.08.2013'
         command.to = new Date(1376863200000L)
         command.toHour = '13:00'
-        command.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = false
@@ -1328,7 +1328,7 @@ class CsiDashboardControllerTests {
         // to = '19.08.2013'
         command.to = new Date(1376863200000L)
         command.toHour = '13:00'
-        command.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = true
@@ -1366,7 +1366,7 @@ class CsiDashboardControllerTests {
         // to = '19.08.2013'
         command.to = new Date(1376863200000L)
         command.toHour = '13:00'
-        command.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = false
@@ -1404,7 +1404,7 @@ class CsiDashboardControllerTests {
         // to = '19.08.2013'
         command.to = new Date(1376863200000L)
         command.toHour = '13:00'
-        command.aggrGroup = CsiDashboardController.HOURLY_MEASURED_EVENT
+        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
         command.selectedFolder = [1L]
         command.selectedPages = [1L, 5L]
         command.selectedAllMeasuredEvents = false

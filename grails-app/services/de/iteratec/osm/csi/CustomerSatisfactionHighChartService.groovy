@@ -269,11 +269,11 @@ class CustomerSatisfactionHighChartService {
 		if (csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
 
 			if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
-				paramsToSend['aggrGroup'] = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+				paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
-				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
+				paramsToSend['aggrGroupAndInterval'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
 				paramsToSend['selectedPages'] = Page.list()*.ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
@@ -282,12 +282,12 @@ class CustomerSatisfactionHighChartService {
 		}else if (csiValue.aggregator.name.equals(AggregatorType.PAGE)) {
 
 			if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
-				paramsToSend['aggrGroup'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+				paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
 				paramsToSend['selectedPages'] = measuredValueTagService.findPageByPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == MeasuredValueInterval.DAILY) {
-				paramsToSend['aggrGroup'] = AggregatorType.MEASURED_EVENT
+				paramsToSend['aggrGroupAndInterval'] = AggregatorType.MEASURED_EVENT
 				paramsToSend['selectedFolder'] = measuredValueTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
 				paramsToSend['selectedPages'] = measuredValueTagService.findPageByPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"

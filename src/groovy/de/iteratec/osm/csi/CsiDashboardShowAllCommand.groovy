@@ -6,13 +6,12 @@ import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.result.MvQueryParams
 import grails.validation.Validateable
-
-import java.util.regex.Pattern
-
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+
+import java.util.regex.Pattern
 
 /**
  * <p>
@@ -67,13 +66,15 @@ public class CsiDashboardShowAllCommand {
     /**
      * The name of the {@link de.iteratec.osm.report.chart.AggregatorType}.
      *
-     * @see de.iteratec.osm.report.chart.AggregatorType#getName()
-     * @see de.iteratec.osm.report.chart.AggregatorType#MEASURED_STEP
-     * @see de.iteratec.osm.report.chart.AggregatorType#PAGE
-     * @see de.iteratec.osm.report.chart.AggregatorType#PAGE_AND_BROWSER
-     * @see de.iteratec.osm.report.chart.AggregatorType#SHOP
+     * @see de.iteratec.osm.csi.CsiDashBoardController#DAILY_AGGR_GROUP_PAGE
+     * @see de.iteratec.osm.csi.CsiDashBoardController#DAILY_AGGR_GROUP_SHOP
+     * @see de.iteratec.osm.csi.CsiDashBoardController#DAILY_AGGR_GROUP_SYSTEM
+     * @see de.iteratec.osm.csi.CsiDashBoardController#WEEKLY_AGGR_GROUP_PAGE
+     * @see de.iteratec.osm.csi.CsiDashBoardController#WEEKLY_AGGR_GROUP_SHOP
+     * @see de.iteratec.osm.csi.CsiDashBoardController#WEEKLY_AGGR_GROUP_SYSTEM
+     * @see de.iteratec.osm.csi.CsiDashBoardController#HOURLY_MEASURED_EVENT
      */
-    String aggrGroup
+    String aggrGroupAndInterval
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
@@ -268,10 +269,10 @@ public class CsiDashboardShowAllCommand {
             }
         })
 
-        aggrGroup(nullable: false, inList: [CsiDashboardController.HOURLY_MEASURED_EVENT,
-                                            CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_PAGE,
-                                            CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP, CsiDashboardController.DAILY_AGGR_GROUP_SHOP,
-                                            CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM, CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM])
+        aggrGroupAndInterval(nullable: false, inList: [CsiDashboardController.HOURLY_MEASURED_EVENT,
+                                                       CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE, CsiDashboardController.DAILY_AGGR_GROUP_PAGE,
+                                                       CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP, CsiDashboardController.DAILY_AGGR_GROUP_SHOP,
+                                                       CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM, CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM])
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
             if (currentCollection.isEmpty()) {
@@ -281,11 +282,11 @@ public class CsiDashboardShowAllCommand {
 
         selectedPages(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmpty = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty())
+            boolean correctBecauseHourlyEventAndNotEmpty = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty())
             boolean correctBecausePageAggregatorAndNotEmpty =
-                    (cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE)) &&
+                    (cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE)) &&
                             !currentCollection.isEmpty()
-            boolean correctBecauseShop = cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP)
+            boolean correctBecauseShop = cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP)
 
             if (!(correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty || correctBecauseShop)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
@@ -295,9 +296,9 @@ public class CsiDashboardShowAllCommand {
 
         selectedMeasuredEventIds(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
-            boolean correctBecausePageAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
-            boolean correctBecauseShopAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
+            boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
 
             if (!(correctBecauseHourlyEventAndNotEmptyOrAllEvents || correctBecausePageAggregator || correctBecauseShopAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
@@ -307,9 +308,9 @@ public class CsiDashboardShowAllCommand {
 
         selectedBrowsers(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
-            boolean correctBecausePageAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
-            boolean correctBecauseShopAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
+            boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
 
             if (!(correctBecauseHourlyEventAndNotEmptyOrAllBrowsers || correctBecausePageAggregator || correctBecauseShopAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
@@ -319,9 +320,9 @@ public class CsiDashboardShowAllCommand {
 
         selectedLocations(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
 
-            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations = cmd.aggrGroup.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)
-            boolean correctBecausePageAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
-            boolean correctBecauseShopAggregator = cmd.aggrGroup.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroup.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)
+            boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
 
             if (!(correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations || correctBecausePageAggregator || correctBecauseShopAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
@@ -470,7 +471,7 @@ public class CsiDashboardShowAllCommand {
         if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }
-        viewModelToCopyTo.put('aggrGroup', this.aggrGroup ?: AggregatorType.MEASURED_EVENT)
+        viewModelToCopyTo.put('aggrGroupAndInterval', this.aggrGroupAndInterval ?: CsiDashboardController.HOURLY_MEASURED_EVENT)
         viewModelToCopyTo.put('debug', this.debug ?: false)
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
@@ -527,7 +528,7 @@ public class CsiDashboardShowAllCommand {
 
     public Integer getSelectedMeasuredIntervalInMinutes() {
         Integer interval
-        switch (this.aggrGroup) {
+        switch (this.aggrGroupAndInterval) {
             case CsiDashboardController.HOURLY_MEASURED_EVENT:
                 interval = MeasuredValueInterval.HOURLY; break
             case CsiDashboardController.DAILY_AGGR_GROUP_PAGE:
@@ -537,7 +538,7 @@ public class CsiDashboardShowAllCommand {
             case CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP:
                 interval = MeasuredValueInterval.WEEKLY; break
             default:
-                throw new IllegalArgumentException("No valid MeasuredValueInterval could be determined from command attrribute aggrGroup (actual value=${this.aggrGroup})")
+                throw new IllegalArgumentException("No valid MeasuredValueInterval could be determined from command attrribute aggrGroupAndInterval (actual value=${this.aggrGroupAndInterval})")
         }
         return interval
     }

@@ -30,9 +30,9 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects) {
 
     initChosenSelects(noResultsTextForChosenSelects);
 
-    $("input[name='aggrGroup']").change(setFilterElementsVisibility);
+    $("input[name='aggrGroupAndInterval']").change(setFilterElementsVisibility);
 
-    $("input[name='aggrGroup']:checked").each(setFilterElementsVisibility);
+    $("input[name='aggrGroupAndInterval']:checked").each(setFilterElementsVisibility);
 
     $("#override-long-processing-time").click(function () {
         $("#overwriteWarningAboutLongProcessingTime").prop('checked', true);
@@ -62,8 +62,8 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects) {
 var setFilterElementsVisibility = function () {
     // Some functions are toggled until Epic [3-C] is  releasable
 
-    var selectedAggr = $(this).val();
-    if (selectedAggr == 'measured_event') {
+    var selectedAggrGroupAndInterval = $(this).val();
+    if (selectedAggrGroupAndInterval == 'measured_event') {
         $("#filter-complete-tabbable").fadeIn();
         $("#filter-browser-and-location").fadeIn();
 		$("#filter-connectivityprofile").fadeIn();
@@ -80,15 +80,15 @@ var setFilterElementsVisibility = function () {
         $('#filter-navtab-page a').click();
     }
 
-    if (selectedAggr == 'weekly_page' || selectedAggr == 'daily_page') {
+    if (selectedAggrGroupAndInterval == 'weekly_page' || selectedAggrGroupAndInterval == 'daily_page') {
         $("#filter-complete-tabbable").fadeIn();
     }
 
-    if (selectedAggr == 'weekly_shop' || selectedAggr == 'daily_shop'){
+    if (selectedAggrGroupAndInterval == 'weekly_shop' || selectedAggrGroupAndInterval == 'daily_shop'){
         $("#filter-complete-tabbable").fadeOut();
     }
 
-    //if (selectedAggr == 'daily_system' || selectedAggr == 'weekly_system') {
+    //if (selectedAggrGroupAndInterval == 'daily_system' || selectedAggrGroupAndInterval == 'weekly_system') {
     //    $("#filter-navtab-jobGroup").hide();
     //    $("#filter-complete-tabbable").hide();
     //    $("#filter-navtab-csiSystem").show();
