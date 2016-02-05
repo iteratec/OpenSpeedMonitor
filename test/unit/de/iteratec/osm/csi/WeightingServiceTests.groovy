@@ -500,7 +500,7 @@ class WeightingServiceTests {
         )
         measuredValue2.addAllToResultIds([4l, 5l, 6l])
         measuredValue2.save(validate: false)
-        TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)NotNull
+        TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         //test specific mocks
         mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
