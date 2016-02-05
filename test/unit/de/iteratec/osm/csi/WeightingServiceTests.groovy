@@ -500,7 +500,7 @@ class WeightingServiceTests {
         )
         measuredValue2.addAllToResultIds([4l, 5l, 6l])
         measuredValue2.save(validate: false)
-        TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+        TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)NotNull
 
         //test specific mocks
         mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
@@ -516,13 +516,13 @@ class WeightingServiceTests {
         WeightedCsiValue weightedCsiValue1 = weightedValues.find {
             it.weightedValue.weight == expectedJobGroupWeight1
         }
-        assertNotNull(weightedCsiValue1)
+        assert(weightedCsiValue1)
         assertEquals(expectedJobGroupWeight1,weightedCsiValue1.weightedValue.weight, DELTA)
         assertEquals(10d,weightedCsiValue1.weightedValue.value, DELTA)
         weightedValues.removeElement(weightedCsiValue1)
 
         WeightedCsiValue weightedCsiValue2 = weightedValues[0]
-        assertNotNull(weightedCsiValue1)
+        assert(weightedCsiValue1)
         assertEquals(expectedJobGroupWeight2,weightedCsiValue2.weightedValue.weight, DELTA)
         assertEquals(20d,weightedCsiValue2.weightedValue.value, DELTA)
     }
@@ -717,6 +717,13 @@ class WeightingServiceTests {
             return page
         }
         measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { String tag ->
+            try {
+                return Long.valueOf(tag)
+            } catch(NumberFormatException e) {
+                return 1
+            }
+        }
+        measuredValueTagService.demand.findJobGroupIdOfHourlyEventTag(0..100000) { String tag ->
             try {
                 return Long.valueOf(tag)
             } catch(NumberFormatException e) {

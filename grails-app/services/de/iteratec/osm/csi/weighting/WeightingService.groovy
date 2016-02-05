@@ -288,7 +288,6 @@ class WeightingService {
 
     public double getHourOfDayWeight(CsiValue csiValue) {
         Serializable jobGroupID = measuredValueTagService.findJobGroupIdOfHourlyEventTag(csiValue.retrieveTag())
-//        Long jobGroupID = measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(csiValue.retrieveTag())
         JobGroup jobGroup = JobGroup.get(jobGroupID)
         CsiDay dayForCsiValue = jobGroup.csiConfiguration.csiDay
         int hour = new DateTime(csiValue.retrieveDate()).getHourOfDay()
