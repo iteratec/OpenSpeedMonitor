@@ -1,4 +1,5 @@
 databaseChangeLog = {
+
     // nightlyDatabaseCleanups can be de-/activated by REST-Call
     changeSet(author: "bka (generated)", id: "1452546683118-1") {
         addColumn(tableName: "api_key") {
@@ -78,6 +79,146 @@ databaseChangeLog = {
 
     changeSet(author: "marcus (generated)", id: "1454506331291-5") {
         addForeignKeyConstraint(baseColumnNames: "job_group_id", baseTableName: "job_group_weight", constraintName: "FK5044557A48E56BA7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group", referencesUniqueColumn: "false")
+    }
+
+    // [BEGIN] changes for custom event result dashboard /////////////////////////////////////////////////////////////////////
+    changeSet(author: "bwo (generated)", id: "1453899727017-1") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "chart_title", type: "varchar(255)") {
+                constraints(nullable: "true")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-2") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "chart_width", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-3") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "chart_height", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-4") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "load_time_maximum", type: "varchar(255)") {
+                constraints(nullable: "true")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-5") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "load_time_minimum", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-6") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "show_data_labels", type: "bit") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-7") {
+        addColumn(tableName: "userspecific_event_result_dashboard") {
+            column(name: "show_data_markers", type: "bit") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-8") {
+        modifyDataType(columnName: "weight", newDataType: "double precision", tableName: "page")
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-9") {
+        dropNotNullConstraint(columnDataType: "double precision", columnName: "weight", tableName: "page")
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-10") {
+        dropIndex(indexName: "full_hour", tableName: "hour_of_day")
+    }
+
+    // [END] changes for custom event result dashboard /////////////////////////////////////////////////////////////////////
+
+    // [BEGIN] changes for custom csi dashboard /////////////////////////////////////////////////////////////////////
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-1") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "chart_height", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-2") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "chart_title", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-3") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "chart_width", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-4") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "load_time_maximum", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-5") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "load_time_minimum", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-6") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "show_data_labels", type: "bit") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "bwo (generated)", id: "1454590842460-7") {
+        addColumn(tableName: "userspecific_csi_dashboard") {
+            column(name: "show_data_markers", type: "bit") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    // [END] changes for custom csi dashboard /////////////////////////////////////////////////////////////////////
+
+    // add initial chart width to OsmConfiguration
+    changeSet(author: "bwo (generated)", id: "1454675900207-1") {
+        addColumn(tableName: "osm_configuration") {
+            column(defaultValue: "1000", name: "initial_chart_width_in_pixels", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
     }
 
 //    ### add csiSystem to MeasuredValue
