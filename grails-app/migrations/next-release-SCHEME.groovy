@@ -79,4 +79,22 @@ databaseChangeLog = {
     changeSet(author: "marcus (generated)", id: "1454506331291-5") {
         addForeignKeyConstraint(baseColumnNames: "job_group_id", baseTableName: "job_group_weight", constraintName: "FK5044557A48E56BA7", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group", referencesUniqueColumn: "false")
     }
+
+//    ### add csiSystem to MeasuredValue
+    changeSet(author: "marcus (generated)", id: "1454929626682-1") {
+        addColumn(tableName: "measured_value") {
+            column(name: "csi_system_id", type: "bigint")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1454929626682-3") {
+        createIndex(indexName: "FKCC54EB8B8A7ADFB", tableName: "measured_value") {
+            column(name: "csi_system_id")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1454929626682-2") {
+        addForeignKeyConstraint(baseColumnNames: "csi_system_id", baseTableName: "measured_value", constraintName: "FKCC54EB8B8A7ADFB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_system", referencesUniqueColumn: "false")
+    }
+//    ### end add csiSystem to MeasuredValue
 }

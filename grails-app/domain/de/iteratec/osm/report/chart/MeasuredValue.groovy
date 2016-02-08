@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.csi.CsiSystem
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.gorm.DetachedCriteria
 import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
@@ -66,6 +67,7 @@ class MeasuredValue implements CsiValue {
         obj, source -> source['tag']
     })
     String tag
+    CsiSystem csiSystem
     ConnectivityProfile connectivityProfile
     Double value
     /**
@@ -102,6 +104,7 @@ class MeasuredValue implements CsiValue {
         resultIds()
         closedAndCalculated()
         connectivityProfile(nullable: true)
+        csiSystem(nullable: true)
     }
     static mapping = {
         resultIds(type: 'text')

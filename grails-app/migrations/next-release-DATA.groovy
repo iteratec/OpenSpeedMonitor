@@ -167,4 +167,5 @@ databaseChangeLog = {
             delete from hour_of_day
         ''')
     }
+
 }
