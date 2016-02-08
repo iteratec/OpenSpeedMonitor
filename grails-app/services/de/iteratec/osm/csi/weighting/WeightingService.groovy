@@ -93,7 +93,7 @@ class WeightingService {
                 if (csiValue.isCsiRelevant()) {
 
                     value = csiValue.retrieveValue()
-                    JobGroup jobGroupOfCsiValue = JobGroup.findById(measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(csiValue.retrieveTag()))
+                    JobGroup jobGroupOfCsiValue = JobGroup.findById(measuredValueTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
                     JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
                         it.jobGroup == jobGroupOfCsiValue
                     }

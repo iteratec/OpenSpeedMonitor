@@ -885,4 +885,8 @@ class MeasuredValueTagService {
         return result
     }
 
+	long getJobGroupIdFromWeeklyOrDailyShopTag(String shopTag) {
+		String[] tagSegments = getTagSegmentsOfTag(shopTag, 1)
+		return tagSegments[0] as Long
+	}
 }

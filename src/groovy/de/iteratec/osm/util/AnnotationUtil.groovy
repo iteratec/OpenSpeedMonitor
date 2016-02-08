@@ -45,4 +45,5 @@ class AnnotationUtil {
         modelToRender.put('annotations', annotations)
 
     }
+
 }

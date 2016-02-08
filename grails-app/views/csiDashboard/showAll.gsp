@@ -171,7 +171,7 @@
                     </legend>
                 </div>
             </div>
-            %{--Toggled until Epic [3-C] is  releasable--}%
+            %{-- TODO: FEATURE TOGGLE, IT-727--}%
             %{--<div class="row">--}%
                 %{--<div class="span4" id="filter-navtab-csiSystem">--}%
                     %{--<div style="padding-top: 60px;"></div>--}%
@@ -181,7 +181,7 @@
                         %{--</strong>--}%
                     %{--</label>--}%
                     %{--<g:select id="folderSelectCsiSystem" class="iteratec-element-select"--}%
-                              %{--name="selectedCsiSystem" from="${csiSystems}" optionKey="id"--}%
+                              %{--name="selectedCsiSystems" from="${csiSystems}" optionKey="id"--}%
                               %{--optionValue="label" value="${selectedCsiSystem}"--}%
                               %{--multiple="true"/>--}%
                 %{--</div>--}%
@@ -289,7 +289,13 @@
                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>
         </g:elseif>
-        %{--TODOMARCUS hier muss noch csi System eals else if sein--}%
+        %{--TODO: FEATURE TOGGLE, IT-727--}%
+        %{--<g:elseif--}%
+                %{--test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">--}%
+            %{--<g:set var="chartTitle"--}%
+                   %{--value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>--}%
+            %{--<g:set var="openDataPointLinksInNewWindow" value="false"/>--}%
+        %{--</g:elseif>--}%
         <g:else>
             <g:set var="chartTitle" value="CSI"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>

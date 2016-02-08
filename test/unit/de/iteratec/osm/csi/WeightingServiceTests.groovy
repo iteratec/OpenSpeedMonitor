@@ -723,6 +723,13 @@ class WeightingServiceTests {
                 return 1
             }
         }
+        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyShopTag(0..100000) { String tag ->
+            try {
+                return Long.valueOf(tag)
+            } catch(NumberFormatException e) {
+                return 1
+            }
+        }
         measuredValueTagService.demand.findJobGroupIdOfHourlyEventTag(0..100000) { String tag ->
             try {
                 return Long.valueOf(tag)

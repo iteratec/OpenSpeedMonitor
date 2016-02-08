@@ -110,7 +110,7 @@ class CsiDashboardController {
 
     String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
     public final static int MONDAY_WEEKSTART = 1
-//    Toggled until Epic [3-C] is releasable
+    // TODO: FEATURE TOGGLE, IT-727
 //    public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
 //                                                                DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
 //                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP,
@@ -119,7 +119,7 @@ class CsiDashboardController {
 //                                                                'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page',
 //                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',
 //                                                                'de.iteratec.isocsi.csi.per.csi.system.daily', 'de.iteratec.isocsi.csi.per.csi.system.weekly']
-
+//
     public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
                                                                 DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
                                                                 DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP]
@@ -248,9 +248,9 @@ class CsiDashboardController {
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
 
-        cmd.loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
-        cmd.chartHeight = cmd.chartHeight>0?cmd.chartHeight:configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth>0?cmd.chartWidth:configService.getInitialChartWidthInPixels()
+        cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
+        cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 
@@ -340,11 +340,25 @@ class CsiDashboardController {
                 MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
                 fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false)
                 break
+            case WEEKLY_AGGR_GROUP_SYSTEM:
+                MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, cmd.selectedCsiSystems, withTargetGraph, false)
+                break
+            case DAILY_AGGR_GROUP_SYSTEM:
+                MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
+                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, cmd.selectedCsiSystems, withTargetGraph, false)
+                break
             default: // AggregatorType.MEASURED_EVENT
                 fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
                 break
         }
-        fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
+        if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
+            List<JobGroup> jobGroups = CsiSystem.getAll(cmd.selectedCsiSystems)*.affectedJobGroups
+            Collection<Long> jobGroupsIds = jobGroups*.id.flatten().unique(false)
+            fillWithAnnotations(modelToRender, timeFrame, jobGroupsIds)
+        } else {
+            fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
+        }
     }
 
     /**
@@ -536,6 +550,76 @@ class CsiDashboardController {
     }
 
     /**
+     * <p>
+     * Fills the view-model-map with csiSystem values.
+     * </p>
+     *
+     * @param modelToRender
+     *         The map to be filled. Previously added entries are overridden.
+     *         This map should not be <code>null</code>.
+     * @param timeFrame
+     *         The time-frame for that data should be calculated,
+     *         not <code>null</code>.
+     * @param interval
+     *         The interval of measured values to include in calculation and
+     *         used for "fixing" the time-frame boundaries to find all measured
+     *         values in this interval, not <code>null</code>.
+     * @param selectedCsiSystems
+     *         The {@linkplain CsiSystem} to select relevant
+     *         measured values, not <code>null</code>.
+     * @param withTargetGraph
+     *  		Whether or not to include {@link CsTargetGraph}s.
+     * @param moveGraphsByOneWeek
+     *  		Whether or not to move all {@link OsmChartPoint}s to the end of their interval (in default-CSI-dashboard this is the default-behaviour).
+     */
+    private void fillWithCsiSystemValuesAsHighChartMap(
+            Map<String, Object> modelToRender,
+            Interval timeFrame,
+            MeasuredValueInterval interval,
+            Set<Long> selectedCsiSystems,
+            boolean withTargetGraph,
+            boolean moveGraphsByOneWeek) {
+
+        Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
+
+        DateTime resetFromDate = fixedTimeFrame.getStart()
+        DateTime resetToDate = fixedTimeFrame.getEnd()
+
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedCsiSystemMeasuredValuesAsHighChartMap(
+                fixedTimeFrame, interval, selectedCsiSystems
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+
+        if (moveGraphsByOneWeek == true) {
+            moveDataPointsOneWeekForward(graphs)
+            resetFromDate = resetFromDate.plusWeeks(1)
+            resetToDate = resetToDate.plusWeeks(1)
+        }
+
+        Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
+        DateTime resetFromDateWithOffsetChange = resetFromDate.minusMinutes(oneDayOffset)
+        Integer rightOffset = oneDayOffset
+        DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
+
+        if (withTargetGraph) {
+            graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
+                    resetFromDateWithOffsetChange.minusDays(1), resetToDateWithOffsetChange.plusDays(1))
+            )
+        }
+
+        boolean includeCsTargetGraphs = true
+        modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
+        modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
+        modelToRender.put('wptCustomerSatisfactionValues', graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
+
+        modelToRender.put('markerShouldBeEnabled', true)
+        modelToRender.put('labelShouldBeEnabled', false)
+    }
+
+    /**
      * Fixes the specified time frame to fit interval range.
      *
      * @return The fixed time frame, never <code>null</code>.
@@ -682,7 +766,7 @@ class CsiDashboardController {
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
                 includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
-                chartTitle: dashboardValues.chartTitle?:"", loadTimeMaximum: dashboardValues.loadTimeMaximum?:"auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers)
+                chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()

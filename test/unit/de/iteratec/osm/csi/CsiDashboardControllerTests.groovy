@@ -110,8 +110,8 @@ class CsiDashboardControllerTests {
         controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
 
         def configMock = mockFor(ConfigService, true)
-        configMock.demand.getInitialChartHeightInPixels(0..100000){->return 400}
-        configMock.demand.getInitialChartWidthInPixels(0..100000){->return 1000}
+        configMock.demand.getInitialChartHeightInPixels(0..100000) { -> return 400 }
+        configMock.demand.getInitialChartWidthInPixels(0..100000) { -> return 1000 }
         configServiceMock = configMock.createMock()
         controllerUnderTest.configService = this.configServiceMock
 
@@ -562,6 +562,65 @@ class CsiDashboardControllerTests {
         assertEquals(999, end.getMillisOfSecond())
     }
 
+    @Test
+    public void testShowAllCommand_BindFromValidRequestArgsIsValid_ValuesDifferingFromDefaults_DAILY_SYSTEM() {
+        // Fill-in request args:
+        params.from = '18.08.2013'
+        Date expectedDateForFrom = new Date(1376776800000L)
+
+        params.fromHour = '16:00'
+        params.to = '18.08.2013'
+        Date expectedDateForTo = new Date(1376776800000L)
+
+        params.toHour = '18:00'
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM
+        params.selectedCsiSystems = [1, 2]
+        params._action_showAll = 'Anzeigen'
+        params.selectedTimeFrameInterval = 0
+
+        // Create and fill the command:
+        controllerUnderTest.bindData(command, params)
+
+        // Verification:
+        assertTrue(command.validate())
+        assertNotNull("Collections are never null", command.selectedFolder)
+        assertNotNull("Collections are never null", command.selectedPages)
+        assertNotNull("Collections are never null", command.selectedMeasuredEventIds)
+        assertNotNull("Collections are never null", command.selectedBrowsers)
+        assertNotNull("Collections are never null", command.selectedLocations)
+        assertNotNull("Collections are never null", command.selectedCsiSystems)
+
+        assertEquals(expectedDateForFrom, command.from);
+        assertEquals("16:00", command.fromHour);
+        assertEquals("18:00", command.toHour);
+        assertEquals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM, command.aggrGroupAndInterval);
+
+        assertEquals(2, command.selectedCsiSystems.size())
+        assertTrue(command.selectedCsiSystems.contains(1L))
+        assertTrue(command.selectedCsiSystems.contains(2L))
+
+        // Could we assume the time frame at once?
+        Interval timeFrame = command.selectedTimeFrame;
+        DateTime start = timeFrame.getStart();
+        DateTime end = timeFrame.getEnd();
+
+        assertEquals(2013, start.getYear())
+        assertEquals(8, start.getMonthOfYear())
+        assertEquals(18, start.getDayOfMonth())
+        assertEquals(16, start.getHourOfDay())
+        assertEquals(0, start.getMinuteOfHour())
+        assertEquals(0, start.getSecondOfMinute())
+        assertEquals(0, start.getMillisOfSecond())
+
+        assertEquals(2013, end.getYear())
+        assertEquals(8, end.getMonthOfYear())
+        assertEquals(18, end.getDayOfMonth())
+        assertEquals(18, end.getHourOfDay())
+        assertEquals(0, end.getMinuteOfHour())
+        assertEquals(59, end.getSecondOfMinute())
+        assertEquals(999, end.getMillisOfSecond())
+    }
+
     /**
      * Test for inner class {@link CsiDashboardShowAllCommand}.
      */
@@ -688,6 +747,48 @@ class CsiDashboardControllerTests {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params._action_showAll = 'Anzeigen'
+
+        // Create and fill the command:
+        controllerUnderTest.bindData(command, params)
+
+        // Verification:
+        assertFalse(command.validate())
+    }
+
+    /**
+     * Test for inner class {@link CsiDashboardShowAllCommand}.
+     */
+    @Test
+    public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedCsiSystems_isEmpty_for_WEEKLY_SYTEM() {
+        // Fill-in request args:
+        params.from = '18.08.2013'
+        params.fromHour = '16:00'
+        params.to = '18.08.2013'
+        params.toHour = '18:00'
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM
+        params.selectedCsiSystems = []
+        params._action_showAll = 'Anzeigen'
+
+        // Create and fill the command:
+        controllerUnderTest.bindData(command, params)
+
+        // Verification:
+        assertFalse(command.validate())
+    }
+
+    /**
+     * Test for inner class {@link CsiDashboardShowAllCommand}.
+     */
+    @Test
+    public void testShowAllCommand_BindFromInvalidRequestArgsIsInvalid_selectedCsiSystems_isEmpty_for_DAILY_System() {
+        // Fill-in request args:
+        params.from = '18.08.2013'
+        params.fromHour = '16:00'
+        params.to = '18.08.2013'
+        params.toHour = '18:00'
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM
+        params.selectedCsiSystems = []
         params._action_showAll = 'Anzeigen'
 
         // Create and fill the command:

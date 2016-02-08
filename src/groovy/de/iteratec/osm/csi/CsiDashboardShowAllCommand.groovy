@@ -1,7 +1,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.result.MvQueryParams
@@ -150,6 +149,12 @@ public class CsiDashboardShowAllCommand {
     Boolean selectedAllLocations = true
 
     /**
+     * The database IDs of the selected {@linkplain CsiSystem}
+     * which results to be shown
+     */
+    Set<Long> selectedCsiSystems = []
+
+    /**
      * If the user has been warned about a potentially long processing
      * time, did he overwrite the waring and really want to perform
      * the request?
@@ -275,7 +280,8 @@ public class CsiDashboardShowAllCommand {
                                                        CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM, CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM])
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
-            if (currentCollection.isEmpty()) {
+            if (currentCollection.isEmpty() &&
+                    !(cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM))) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
             }
         })
@@ -287,8 +293,9 @@ public class CsiDashboardShowAllCommand {
                     (cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE)) &&
                             !currentCollection.isEmpty()
             boolean correctBecauseShop = cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP)
+            boolean correctBeacuseCsiSystem = cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM)
 
-            if (!(correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty || correctBecauseShop)) {
+            if (!(correctBecauseHourlyEventAndNotEmpty || correctBecausePageAggregatorAndNotEmpty || correctBecauseShop || correctBeacuseCsiSystem)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
             }
 
@@ -299,8 +306,9 @@ public class CsiDashboardShowAllCommand {
             boolean correctBecauseHourlyEventAndNotEmptyOrAllEvents = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllMeasuredEvents)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBeacuseCsiSystemAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)
 
-            if (!(correctBecauseHourlyEventAndNotEmptyOrAllEvents || correctBecausePageAggregator || correctBecauseShopAggregator)) {
+            if (!(correctBecauseHourlyEventAndNotEmptyOrAllEvents || correctBecausePageAggregator || correctBecauseShopAggregator || correctBeacuseCsiSystemAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
             }
 
@@ -311,8 +319,9 @@ public class CsiDashboardShowAllCommand {
             boolean correctBecauseHourlyEventAndNotEmptyOrAllBrowsers = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllBrowsers)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBeacuseCsiSystemAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)
 
-            if (!(correctBecauseHourlyEventAndNotEmptyOrAllBrowsers || correctBecausePageAggregator || correctBecauseShopAggregator)) {
+            if (!(correctBecauseHourlyEventAndNotEmptyOrAllBrowsers || correctBecausePageAggregator || correctBecauseShopAggregator || correctBeacuseCsiSystemAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
             }
 
@@ -323,11 +332,23 @@ public class CsiDashboardShowAllCommand {
             boolean correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT) && (!currentCollection.isEmpty() || cmd.selectedAllLocations)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBecauseCsiSystemAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)
 
-            if (!(correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations || correctBecausePageAggregator || correctBecauseShopAggregator)) {
+            if (!(correctBecauseHourlyEventAggregatorAndNotEmptyOrAllLocations || correctBecausePageAggregator || correctBecauseShopAggregator || correctBecauseCsiSystemAggregator)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
             }
 
+        })
+
+        selectedCsiSystems(nullable: false, validator: {Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+            boolean correctBecauseHourlyEventAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT)
+            boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
+            boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
+            boolean correctBecauseCsiSystemAggreagatorAndNotEmpty = (cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM)) && !currentCollection.isEmpty()
+
+            if (!(correctBecauseHourlyEventAggregator || correctBecausePageAggregator || correctBecauseShopAggregator || correctBecauseCsiSystemAggreagatorAndNotEmpty)) {
+                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiSystems']
+            }
         })
 
         overwriteWarningAboutLongProcessingTime(nullable: true)
@@ -533,9 +554,11 @@ public class CsiDashboardShowAllCommand {
                 interval = MeasuredValueInterval.HOURLY; break
             case CsiDashboardController.DAILY_AGGR_GROUP_PAGE:
             case CsiDashboardController.DAILY_AGGR_GROUP_SHOP:
+            case CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM:
                 interval = MeasuredValueInterval.DAILY; break
             case CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE:
             case CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP:
+            case CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM:
                 interval = MeasuredValueInterval.WEEKLY; break
             default:
                 throw new IllegalArgumentException("No valid MeasuredValueInterval could be determined from command attrribute aggrGroupAndInterval (actual value=${this.aggrGroupAndInterval})")

@@ -60,7 +60,6 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects) {
  * show or hide filter-elements, depending on aggregator type
  */
 var setFilterElementsVisibility = function () {
-    // Some functions are toggled until Epic [3-C] is  releasable
 
     var selectedAggrGroupAndInterval = $(this).val();
     if (selectedAggrGroupAndInterval == 'measured_event') {
@@ -88,6 +87,7 @@ var setFilterElementsVisibility = function () {
         $("#filter-complete-tabbable").fadeOut();
     }
 
+    //TODO: FEATURE TOGGLE, IT-727
     //if (selectedAggrGroupAndInterval == 'daily_system' || selectedAggrGroupAndInterval == 'weekly_system') {
     //    $("#filter-navtab-jobGroup").hide();
     //    $("#filter-complete-tabbable").hide();

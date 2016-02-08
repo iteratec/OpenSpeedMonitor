@@ -16,10 +16,6 @@ class CsiSystem {
     }
 
     List<JobGroup> getAffectedJobGroups() {
-        List<JobGroup> result = []
-        jobGroupWeights.each {
-            result.add(it.jobGroup)
-        }
-        return result
+        return jobGroupWeights*.jobGroup
     }
 }

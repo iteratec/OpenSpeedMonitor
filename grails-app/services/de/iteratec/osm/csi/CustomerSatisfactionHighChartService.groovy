@@ -70,6 +70,7 @@ class CustomerSatisfactionHighChartService {
 	CsTargetGraphDaoService csTargetGraphDaoService
 	MeasuredValueUtilService measuredValueUtilService
     OsmChartProcessingService osmChartProcessingService
+	CsiSystemMeasuredValueService csiSystemMeasuredValueService
 
 	/**
 	 * The Grails engine to generate links.
@@ -347,6 +348,10 @@ class CustomerSatisfactionHighChartService {
 					group.name:
 					labelForValuesNotAssignable
 			break
+			case AggregatorType.CSI_SYSTEM:
+				CsiSystem csiSystem = mv.csiSystem
+				return csiSystem? csiSystem.label: labelForValuesNotAssignable
+			break
 		}
 	}
 
@@ -402,5 +407,30 @@ class CustomerSatisfactionHighChartService {
 
 	private Long getHighchartCompatibleTimestampFrom(Date date){
 		return new DateTime(date, DateTimeZone.forID('MET')).getMillis()
+	}
+
+
+	/**
+	 * <p>
+	 * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
+	 * </p>
+	 *
+	 * @param timeFrame
+	 *         The time frame for which {@link MeasuredValue}s should be found. Both
+	 *         borders are included in search. This argument may not be
+	 *         <code>null</code>.
+	 * @param queryParams
+	 *         The {@linkplain MvQueryParams filter} to select relevant
+	 *         measured values, not <code>null</code>.
+	 * @return not <code>null</code>.
+	 * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
+	 */
+	OsmRickshawChart getCalculatedCsiSystemMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, Set<Long> selectedCsiSystems) {
+		Date fromDate = timeFrame.getStart().toDate();
+		Date toDate = timeFrame.getEnd().toDate();
+		List<CsiSystem> csiSystems = CsiSystem.getAll(selectedCsiSystems)
+		List<MeasuredValue> csiValues = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromDate, toDate, interval, csiSystems)
+
+		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
 	}
 }
