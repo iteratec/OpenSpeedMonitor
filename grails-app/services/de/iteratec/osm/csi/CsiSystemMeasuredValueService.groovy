@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -25,7 +24,6 @@ import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredValueTagService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -82,12 +80,8 @@ class CsiSystemMeasuredValueService {
         if (csiSystems.empty) {
             return result
         }
-        List<JobGroup> allAffectedJobGroups = []
-        csiSystems.each {
-            allAffectedJobGroups.addAll(it.getAffectedJobGroups())
-        }
-        String tagPattern = measuredValueTagService.getTagPatternForWeeklyShopMvsWithJobGroups(allAffectedJobGroups)
-        result = measuredValueDaoService.getMvs(fromDate, toDate, tagPattern, targetInterval, AggregatorType.findByName(AggregatorType.CSI_SYSTEM))
+
+        result = measuredValueDaoService.getMvs(fromDate, toDate, targetInterval, AggregatorType.findByName(AggregatorType.CSI_SYSTEM),csiSystems)
         return result
     }
 
@@ -211,7 +205,7 @@ class CsiSystemMeasuredValueService {
         AggregatorType csiSystemAggregator = AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
         String tag = measuredValueTagService.getTagPatternForWeeklyShopMvsWithJobGroups(csiSystem.getAffectedJobGroups())
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR) {
-            toCreateAndOrCalculate = MeasuredValue.findByStartedAndIntervalAndAggregatorAndTag(startDate.toDate(), interval, csiSystemAggregator, tag)
+            toCreateAndOrCalculate = MeasuredValue.findByStartedAndIntervalAndAggregatorAndTagAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, tag, csiSystem)
             log.debug("MeasuredValue.findByStartedAndIntervalAndAggregatorAndCsiSystem delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")
         }
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.createNewMV", IndentationDepth.FOUR) {
@@ -221,6 +215,7 @@ class CsiSystemMeasuredValueService {
                         interval: interval,
                         aggregator: csiSystemAggregator,
                         tag: tag,
+                        csiSystem: csiSystem,
                         value: null,
                         resultIds: ''
                 ).save(failOnError: true)

@@ -97,6 +97,35 @@ class MeasuredValueDaoService {
 	List<MeasuredValue> getMvs(
 			Date fromDate,
 			Date toDate,
+			MeasuredValueInterval interval,
+			AggregatorType aggregator,
+			List<CsiSystem> csiSystems
+							  ){
+		//TODO: optimize query to something like:
+		//findAllByStartedBetweenAndIntervalAndAggregatorAndCsiSystemInListAndTagRlike
+		//... which works in running App, but NOT in unit-tests!
+		List<MeasuredValue> result =  MeasuredValue.findAllByStartedBetweenAndIntervalAndAggregator(fromDate,toDate,interval,aggregator)
+		result.findAll {
+			csiSystems.contains(it.csiSystem)
+		}
+	}
+
+	/**
+	 * Gets all {@link MeasuredValue}s from db respective given arguments. tag-attribute is queried via rlike.
+	 *
+	 * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
+	 * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
+	 * @param fromDate
+	 * @param toDate
+	 * @param rlikePattern
+	 * @param interval
+	 * @param aggregator
+	 * @param connectivityProfiles
+	 * @return
+	 */
+	List<MeasuredValue> getMvs(
+			Date fromDate,
+			Date toDate,
 			String rlikePattern,
 			MeasuredValueInterval interval,
 			AggregatorType aggregator,

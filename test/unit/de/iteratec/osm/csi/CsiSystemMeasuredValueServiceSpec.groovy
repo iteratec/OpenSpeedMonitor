@@ -115,8 +115,8 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         List<MeasuredValue> mvsOnly3 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsOnly3)
 
         then:
-        mvs1.size() == 3
-        mvs2.size() == 3
+        mvs1.size() == 1
+        mvs2.size() == 1
         mvsOnly3.size() == 1
     }
 
@@ -309,10 +309,10 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         ])
 
         //with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', started: startDate.toDate()).save(validate: false)
-        //not with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', started: startDate.toDate()).save(validate: false)
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', csiSystem: csiSystemWith3, started: startDate.toDate()).save(validate: false)
+        //not with existing CsiSystem:
+        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', csiSystem: null, started: startDate.toDate()).save(validate: false)
     }
 }
