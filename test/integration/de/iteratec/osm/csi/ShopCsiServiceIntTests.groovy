@@ -25,8 +25,6 @@ import de.iteratec.osm.measurement.script.Script
 
 import static org.junit.Assert.*
 
-import java.util.Date;
-
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 
@@ -163,7 +161,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 			jobResultJobConfigId: 1,
 			tag: tag,
 			speedIndex: 1,
-			customerSatisfactionInPercent: value,
+			csByWptDocCompleteInPercent: value,
 			docCompleteTimeInMillisecs: 1000
 		).save(failOnError: true)
 	}

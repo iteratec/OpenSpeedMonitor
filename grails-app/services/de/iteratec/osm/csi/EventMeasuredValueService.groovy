@@ -24,7 +24,7 @@ import org.joda.time.DateTime
 import de.iteratec.osm.report.chart.MeasuredValueDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
@@ -60,19 +60,19 @@ class EventMeasuredValueService {
 	 * @param targetInterval
 	 * @return
 	 */
-	List<MeasuredValue> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, ConnectivityProfile connProfile = null) {
-		List<MeasuredValue> result = []
+	List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, ConnectivityProfile connProfile = null) {
+		List<CsiAggregation> result = []
 		def query
 
 		if(connProfile == null) {
-			query = MeasuredValue.where {
+			query = CsiAggregation.where {
 				started >= fromDate
 				started <= toDate
 				interval == targetInterval
 				aggregator == AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 			}
 		} else {
-			query = MeasuredValue.where {
+			query = CsiAggregation.where {
 				started >= fromDate
 				started <= toDate
 				interval == targetInterval
@@ -85,14 +85,14 @@ class EventMeasuredValueService {
 	}
 
 	/**
-	 * Calculates or recalculates hourly-job {@link MeasuredValue}s which depend from param newResult.
+	 * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResult.
 	 * @param newResult
 	 */
     void createOrUpdateHourlyValue(DateTime hourlyStart, EventResult newResult){
 		String resultTag = newResult.tag 
 		if (resultTag != null && measuredValueTagService.isValidHourlyEventTag(resultTag)) {
 			AggregatorType eventAggregator = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-			MeasuredValue hmv = ensurePresence(
+			CsiAggregation hmv = ensurePresence(
 				hourlyStart,
 				MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
 				resultTag,
@@ -105,16 +105,16 @@ class EventMeasuredValueService {
 	}
 	
 	/**
-	 * Provides all hourly event-{@link MeasuredValue}s between toDate and fromDate for query-params jobs mvQueryParams.
-	 * Non-existent {@link MeasuredValue}s will NOT be created and/or calculated. That happens exclusively on arrival of {@link EventResult}s in backgound.
+	 * Provides all hourly event-{@link CsiAggregation}s between toDate and fromDate for query-params jobs mvQueryParams.
+	 * Non-existent {@link CsiAggregation}s will NOT be created and/or calculated. That happens exclusively on arrival of {@link EventResult}s in backgound.
 	 * @param fromDate
 	 * @param toDate
 	 * @param mvQueryParams
-	 * 				Contains all parameters necessary for querying {@link MeasuredValue}s from db.
+	 * 				Contains all parameters necessary for querying {@link CsiAggregation}s from db.
 	 * @return
 	 */
-	List<MeasuredValue> getHourylMeasuredValues(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
-		List<MeasuredValue> calculatedMvs = []
+	List<CsiAggregation> getHourylMeasuredValues(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
+		List<CsiAggregation> calculatedMvs = []
 		if (fromDate>toDate) {
 			throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
 		}
@@ -143,20 +143,20 @@ class EventMeasuredValueService {
 			: []
 	}
 	
-	private MeasuredValue ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
-		MeasuredValue toCreateAndOrCalculate
+	private CsiAggregation ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
+		CsiAggregation toCreateAndOrCalculate
 		performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR){
-			toCreateAndOrCalculate = MeasuredValue.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile(startDate.toDate(), interval, eventAggregator, tag, connectivityProfile)
-			log.debug("MeasuredValue.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile delivered ${toCreateAndOrCalculate?'a':'no'} result")
+			toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile(startDate.toDate(), interval, eventAggregator, tag, connectivityProfile)
+			log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile delivered ${toCreateAndOrCalculate?'a':'no'} result")
 		}
 		if (!toCreateAndOrCalculate) {
-			toCreateAndOrCalculate = new MeasuredValue(
+			toCreateAndOrCalculate = new CsiAggregation(
 				started: startDate.toDate(),
 				interval: interval,
 				aggregator: eventAggregator,
 				tag: tag,
-				value: null,
-				resultIds: '',
+				csByWptDocCompleteInPercent: null,
+				underlyingEventResultsByWptDocComplete: '',
 				closedAndCalculated: initiallyClosed,
 				connectivityProfile: connectivityProfile
 			).save(failOnError: true)
@@ -164,22 +164,22 @@ class EventMeasuredValueService {
 		return toCreateAndOrCalculate
 	}
 	/**
-	 * Re-calculates {@link MeasuredValue} toBeCalculated cause data-basis changed with new {@link EventResult} newResult.
+	 * Re-calculates {@link CsiAggregation} toBeCalculated cause data-basis changed with new {@link EventResult} newResult.
 	 * @param toBeCalculated
 	 * @param newResult
 	 * @return
 	 */
-	private MeasuredValue calcMvForJobAggregatorWithoutQueryResultsFromDb(MeasuredValue toBeCalculated, EventResult newResult) {
+	private CsiAggregation calcMvForJobAggregatorWithoutQueryResultsFromDb(CsiAggregation toBeCalculated, EventResult newResult) {
 		Integer countResults = toBeCalculated.countResultIds()
 		Double newValue
 		if(newResult.isCsiRelevant() && !toBeCalculated.containsInResultIds(newResult.ident())){
-			if (countResults > 0 && newResult.customerSatisfactionInPercent != null) {
-				Double sumOfPreviousResults = (toBeCalculated.value?toBeCalculated.value:0) * countResults
-				newValue = (sumOfPreviousResults + newResult.customerSatisfactionInPercent) / (countResults + 1)
+			if (countResults > 0 && newResult.csByWptDocCompleteInPercent != null) {
+				Double sumOfPreviousResults = (toBeCalculated.csByWptDocCompleteInPercent?toBeCalculated.csByWptDocCompleteInPercent:0) * countResults
+				newValue = (sumOfPreviousResults + newResult.csByWptDocCompleteInPercent) / (countResults + 1)
 			} else if (countResults == 0) {
-				newValue = newResult.customerSatisfactionInPercent
+				newValue = newResult.csByWptDocCompleteInPercent
 			}
-			toBeCalculated.value = newValue
+			toBeCalculated.csByWptDocCompleteInPercent = newValue
 			toBeCalculated.addToResultIds(newResult.ident())
 		}
 		toBeCalculated.save(failOnError:true)

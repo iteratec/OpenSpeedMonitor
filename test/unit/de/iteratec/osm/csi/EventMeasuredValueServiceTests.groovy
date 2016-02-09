@@ -35,7 +35,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -54,7 +54,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
-@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval, 
+@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, MeasuredValueInterval,
 	AggregatorType, Location, EventResult, JobResult, Job, MeasuredValueUpdateEvent, ConnectivityProfile])
 class EventMeasuredValueServiceTests {
 	
@@ -126,7 +126,7 @@ class EventMeasuredValueServiceTests {
 		assertTrue(serviceUnderTest.validateMvQueryParams(invalidParams))
 	}
 	/**
-	 * Tests querying and calculation of hourly event-{@link MeasuredValue}s without existing {@link EventResult}s.
+	 * Tests querying and calculation of hourly event-{@link CsiAggregation}s without existing {@link EventResult}s.
 	 * MV's with status {@link Calculated.Not} should have status {@link Calculated.YesNoData} afterwards.
 	 */
 	@Test
@@ -155,7 +155,7 @@ class EventMeasuredValueServiceTests {
 		mockEventResultService()
 		
 		//run test////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		List<MeasuredValue> mvs = serviceUnderTest.getAllCalculatedHourlyMvs(irrelevantQueryParamsCauseDbQueryIsMocked, from, to)
+		List<CsiAggregation> mvs = serviceUnderTest.getAllCalculatedHourlyMvs(irrelevantQueryParamsCauseDbQueryIsMocked, from, to)
 		
 		//assertions////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -174,28 +174,28 @@ class EventMeasuredValueServiceTests {
 	//testdata///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Creates a {@linkplain MeasuredValue} as testdata.
+	 * Creates a {@linkplain CsiAggregation} as testdata.
 	 * {@link MeasuredValueUpdateEvent}s are created respective given params of calculated and withData. 
 	 * @return
 	 */
 	private void createhourlyEventMvWithDefaultTag(boolean calculated, boolean withData){
 		//measured value
-		MeasuredValue mv = new MeasuredValue(
+		CsiAggregation mv = new CsiAggregation(
 			started:inInterval.toDate(),
 			interval: hourly,
 			aggregator: measuredEvent,
 			tag: '1;1;1;1;1',
-			resultIds: '').save(failOnError: true)
+			underlyingEventResultsByWptDocComplete: '').save(failOnError: true)
 		//update events
 		createUpdateEventsForMv(mv, calculated, withData)
 	}
-	private void createUpdateEventsForMv(MeasuredValue mv, boolean calculated, boolean withData){
+	private void createUpdateEventsForMv(CsiAggregation mv, boolean calculated, boolean withData){
 		MeasuredValueUpdateEvent.UpdateCause cause = MeasuredValueUpdateEvent.UpdateCause.OUTDATED
 		if (calculated) {
 			cause = MeasuredValueUpdateEvent.UpdateCause.CALCULATED
 		}
 		if (withData) {
-			mv.value = 0.5
+			mv.csByWptDocCompleteInPercent = 0.5
 			mv.save(failOnError: true)
 		}
 		new MeasuredValueUpdateEvent(
@@ -205,23 +205,23 @@ class EventMeasuredValueServiceTests {
 		).save(failOnError: true)
 	}
 	/**
-	 * Deletes all {@link MeasuredValue}s in db.
+	 * Deletes all {@link CsiAggregation}s in db.
 	 * @return
 	 */
 	private deleteAllMeasuredValues(){
-		MeasuredValue.list()*.delete(flush: true)
+		CsiAggregation.list()*.delete(flush: true)
 	}
 	
 	//mocks of inner services///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Mocks {@linkplain EventMeasuredValueService#measuredValueDaoService}.
-	 * Method getMvs(Date fromDate, Date toDate, String rlikePattern, MeasuredValueInterval interval, AggregatorType aggregator) will return all {@link MeasuredValue}s from db.
+	 * Method getMvs(Date fromDate, Date toDate, String rlikePattern, MeasuredValueInterval interval, AggregatorType aggregator) will return all {@link CsiAggregation}s from db.
 	 * @param csiGroups
 	 * @param pages
 	 */
 	private void mockMeasuredValueDaoService(){
-		List<MeasuredValue> mvsToReturn = MeasuredValue.list()
+		List<CsiAggregation> mvsToReturn = CsiAggregation.list()
 		def measuredValueDaoService = mockFor(MeasuredValueDaoService, true)
 		measuredValueDaoService.demand.getMvs(1..10000) {
 			Date fromDate,

@@ -32,7 +32,7 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import org.joda.time.DateTime
 
 /**
- * Provides methods for calculating and retrieving {@link MeasuredValue}s with {@link AggregatorType#getName()}=={@link AggregatorType#JOB}.
+ * Provides methods for calculating and retrieving {@link CsiAggregation}s with {@link AggregatorType#getName()}=={@link AggregatorType#JOB}.
  * @author nkuhn
  *
  */
@@ -50,15 +50,15 @@ class CsiSystemMeasuredValueService {
     MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
 
     /**
-     * Just gets {@link MeasuredValue}s from DB. No creation or calculation.
+     * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
      * @param fromDate
      * @param toDate
      * @param targetInterval
      * @return
      */
-    List<MeasuredValue> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval) {
-        List<MeasuredValue> result = []
-        def query = MeasuredValue.where {
+    List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval) {
+        List<CsiAggregation> result = []
+        def query = CsiAggregation.where {
             started >= fromDate
             started <= toDate
             interval == targetInterval
@@ -68,15 +68,15 @@ class CsiSystemMeasuredValueService {
         return result
     }
     /**
-     * Just gets {@link MeasuredValue}s from DB. No creation or calculation.
+     * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
      * @param fromDate
      * @param toDate
      * @param targetInterval
      * @param csiSystems
      * @return
      */
-    List<MeasuredValue> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, List<CsiSystem> csiSystems) {
-        List<MeasuredValue> result = []
+    List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, List<CsiSystem> csiSystems) {
+        List<CsiAggregation> result = []
         if (csiSystems.empty) {
             return result
         }
@@ -86,7 +86,7 @@ class CsiSystemMeasuredValueService {
     }
 
     /**
-     * Marks {@link MeasuredValue}s which depend from param newResult and who's interval contains newResult as outdated.
+     * Marks {@link CsiAggregation}s which depend from param newResult and who's interval contains newResult as outdated.
      * @param start
      * 				00:00:00 of the respective interval.
      * @param newResult
@@ -99,7 +99,7 @@ class CsiSystemMeasuredValueService {
 
         if (affectedCsiSystems && jobGroup.groupType == JobGroupType.CSI_AGGREGATION) {
             affectedCsiSystems.each {
-                MeasuredValue csiSystemMv = ensurePresence(start, interval, it)
+                CsiAggregation csiSystemMv = ensurePresence(start, interval, it)
                 measuredValueUpdateEventDaoService.
                         createUpdateEvent(csiSystemMv.ident(), MeasuredValueUpdateEvent.UpdateCause.OUTDATED)
             }
@@ -108,15 +108,15 @@ class CsiSystemMeasuredValueService {
     }
 
     /**
-     * Provides all shop-{@link MeasuredValue}s of given csi-{@link JobGroup}s between toDate and fromDate.
-     * Non-existent {@link MeasuredValue}s will be created.
-     * All {@link MeasuredValue}s with @{link MeasuredValue.Calculated.Not} will be calculated and persisted with @{link MeasuredValue.Calculated.Yes}* or @{link MeasuredValue.Calculated.YesNoData}.
+     * Provides all shop-{@link CsiAggregation}s of given csi-{@link JobGroup}s between toDate and fromDate.
+     * Non-existent {@link CsiAggregation}s will be created.
+     * All {@link CsiAggregation}s with @{link CsiAggregation.Calculated.Not} will be calculated and persisted with @{link CsiAggregation.Calculated.Yes}* or @{link CsiAggregation.Calculated.YesNoData}.
      * @param fromDate
      * @param toDate
      * @param csiSystems
      * @return
      */
-    List<MeasuredValue> getOrCalculateCsiSystemMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<CsiSystem> csiSystems) {
+    List<CsiAggregation> getOrCalculateCsiSystemMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<CsiSystem> csiSystems) {
         if (fromDate > toDate) {
             throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
         }
@@ -125,9 +125,9 @@ class CsiSystemMeasuredValueService {
 
         Integer numberOfIntervals = measuredValueUtilService.getNumberOfIntervals(fromDateTime, toDateTime, interval)
 
-        List<MeasuredValue> existingMeasuredValues = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiSystems)
+        List<CsiAggregation> existingMeasuredValues = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiSystems)
 
-        List<MeasuredValue> openMeasuredValues = existingMeasuredValues.findAll { !it.closedAndCalculated }
+        List<CsiAggregation> openMeasuredValues = existingMeasuredValues.findAll { !it.closedAndCalculated }
         Boolean allMeasuredValuesExist = existingMeasuredValues.size() == numberOfIntervals * csiSystems.size()
         if (allMeasuredValuesExist && openMeasuredValues.size() == 0) {
             return existingMeasuredValues
@@ -135,7 +135,7 @@ class CsiSystemMeasuredValueService {
 
         List<MeasuredValueUpdateEvent> updateEvents = []
         if (openMeasuredValues.size() > 0) updateEvents.addAll(measuredValueDaoService.getUpdateEvents(openMeasuredValues*.ident()))
-        List<MeasuredValue> measuredValuesToBeCalculated = openMeasuredValues.findAll {
+        List<CsiAggregation> measuredValuesToBeCalculated = openMeasuredValues.findAll {
             it.hasToBeCalculatedAccordingEvents(updateEvents)
         }
 
@@ -145,14 +145,14 @@ class CsiSystemMeasuredValueService {
 
         } else {
 
-            List<MeasuredValue> calculatedMeasuredvalues = []
+            List<CsiAggregation> calculatedMeasuredvalues = []
             DateTime currentDateTime = fromDateTime
             while (!currentDateTime.isAfter(toDateTime)) {
                 performanceLoggingService.logExecutionTime(LogLevel.INFO, " get/create/calculate ${interval.name} shop-MeasureValue for: ${currentDateTime}", IndentationDepth.TWO) {
-                    List<MeasuredValue> existingMvsOfCurrentTime = existingMeasuredValues.findAll {
+                    List<CsiAggregation> existingMvsOfCurrentTime = existingMeasuredValues.findAll {
                         new DateTime(it.started) == currentDateTime
                     }
-                    List<MeasuredValue> mvsToBeCalculatedOfCurrentTime = measuredValuesToBeCalculated.findAll {
+                    List<CsiAggregation> mvsToBeCalculatedOfCurrentTime = measuredValuesToBeCalculated.findAll {
                         new DateTime(it.started) == currentDateTime
                     }
                     if (existingMvsOfCurrentTime.size() == csiSystems.size() && mvsToBeCalculatedOfCurrentTime.size() == 0) {
@@ -171,8 +171,8 @@ class CsiSystemMeasuredValueService {
         }
     }
 
-    private List<MeasuredValue> getOrCalculateCsiSystemMvs(DateTime toGetMvsFor, MeasuredValueInterval interval, List<CsiSystem> csiSystems, List<MeasuredValueUpdateEvent> updateEvents) {
-        List<MeasuredValue> smvs = []
+    private List<CsiAggregation> getOrCalculateCsiSystemMvs(DateTime toGetMvsFor, MeasuredValueInterval interval, List<CsiSystem> csiSystems, List<MeasuredValueUpdateEvent> updateEvents) {
+        List<CsiAggregation> smvs = []
         csiSystems.each { csiSystem ->
             smvs.addAll(ensurePresenceAndCalculation(toGetMvsFor, interval, csiSystem, updateEvents))
         }
@@ -180,15 +180,15 @@ class CsiSystemMeasuredValueService {
     }
 
     /**
-     * Creates respective {@link MeasuredValue} if it doesn't exist and calculates it.
-     * After calculation status is {@link MeasuredValue.Calculated.Yes} or {@link MeasuredValue.Calculated.YesNoData}.
+     * Creates respective {@link CsiAggregation} if it doesn't exist and calculates it.
+     * After calculation status is {@link CsiAggregation.Calculated.Yes} or {@link CsiAggregation.Calculated.YesNoData}.
      * @param startDate
      * @param interval
      * @param csiSystem
      * @return
      */
-    MeasuredValue ensurePresenceAndCalculation(DateTime startDate, MeasuredValueInterval interval, CsiSystem csiSystem, List<MeasuredValueUpdateEvent> updateEvents) {
-        MeasuredValue toCreateAndOrCalculate
+    CsiAggregation ensurePresenceAndCalculation(DateTime startDate, MeasuredValueInterval interval, CsiSystem csiSystem, List<MeasuredValueUpdateEvent> updateEvents) {
+        CsiAggregation toCreateAndOrCalculate
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence", IndentationDepth.THREE) {
             toCreateAndOrCalculate = ensurePresence(startDate, interval, csiSystem)
         }
@@ -200,24 +200,24 @@ class CsiSystemMeasuredValueService {
         return toCreateAndOrCalculate
     }
 
-    private MeasuredValue ensurePresence(DateTime startDate, MeasuredValueInterval interval, CsiSystem csiSystem) {
-        MeasuredValue toCreateAndOrCalculate
+    private CsiAggregation ensurePresence(DateTime startDate, MeasuredValueInterval interval, CsiSystem csiSystem) {
+        CsiAggregation toCreateAndOrCalculate
         AggregatorType csiSystemAggregator = AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
         String tag = measuredValueTagService.getTagPatternForWeeklyShopMvsWithJobGroups(csiSystem.getAffectedJobGroups())
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR) {
-            toCreateAndOrCalculate = MeasuredValue.findByStartedAndIntervalAndAggregatorAndTagAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, tag, csiSystem)
-            log.debug("MeasuredValue.findByStartedAndIntervalAndAggregatorAndCsiSystem delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")
+            toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregatorAndTagAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, tag, csiSystem)
+            log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")
         }
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.createNewMV", IndentationDepth.FOUR) {
             if (!toCreateAndOrCalculate) {
-                toCreateAndOrCalculate = new MeasuredValue(
+                toCreateAndOrCalculate = new CsiAggregation(
                         started: startDate.toDate(),
                         interval: interval,
                         aggregator: csiSystemAggregator,
                         tag: tag,
                         csiSystem: csiSystem,
-                        value: null,
-                        resultIds: ''
+                        csByWptDocCompleteInPercent: null,
+                        underlyingEventResultsByWptDocComplete: ''
                 ).save(failOnError: true)
             }
         }
@@ -225,17 +225,17 @@ class CsiSystemMeasuredValueService {
     }
 
     /**
-     * Calculates the given {@link MeasuredValue} toBeCalculated.
+     * Calculates the given {@link CsiAggregation} toBeCalculated.
      * @param toBeCalculated
-     * 		The {@link MeasuredValue} to be calculated.
-     * @return The calculated {@link MeasuredValue}.
+     * 		The {@link CsiAggregation} to be calculated.
+     * @return The calculated {@link CsiAggregation}.
      */
-    MeasuredValue calcMv(MeasuredValue toBeCalculated, CsiSystem csiSystem) {
+    CsiAggregation calcMv(CsiAggregation toBeCalculated, CsiSystem csiSystem) {
 
         Contract.requiresArgumentNotNull("toBeCalculated", toBeCalculated);
 
         List<JobGroup> groupsOfMv = csiSystem.getAffectedJobGroups()
-        List<MeasuredValue> shopMeasuredValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
+        List<CsiAggregation> shopMeasuredValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
                 toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), groupsOfMv)
 
         List<WeightedCsiValue> weightedCsiValues = []
@@ -244,7 +244,7 @@ class CsiSystemMeasuredValueService {
             weightedCsiValues = weightingService.getWeightedCsiValues(shopMeasuredValues, csiSystem)
         }
         if (weightedCsiValues.size() > 0) {
-            toBeCalculated.value = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+            toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
         }
         measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         return toBeCalculated

@@ -150,7 +150,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 lastStatusUpdate: jobResult.date,
                 wptStatus: 0,
                 validationState: 'validationState',
-                customerSatisfactionInPercent: 1,
+                csByWptDocCompleteInPercent: 1,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: 1,
                 measuredEvent: null,

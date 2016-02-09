@@ -19,10 +19,11 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.CsiSystem
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.persistence.OsmDataSourceService
 import org.joda.time.DateTime
 
 /**
- * Contains only methods that query {@link MeasuredValue}s from database. Doesn't contain any dependencies to other domains or
+ * Contains only methods that query {@link CsiAggregation}s from database. Doesn't contain any dependencies to other domains or
  * service-logic.
  * 
  * <p>
@@ -36,10 +37,11 @@ import org.joda.time.DateTime
 class MeasuredValueDaoService {
 	
 	MeasuredValueUtilService measuredValueUtilService
+	OsmDataSourceService osmDataSourceService = new OsmDataSourceService()
 	
 	/**
 	 * <p>
-	 * Finds a {@linkplain MeasuredValue measured value} by its database id 
+	 * Finds a {@linkplain CsiAggregation measured value} by its database id
 	 * if it exists.
 	 * </p>
 	 * 
@@ -48,13 +50,13 @@ class MeasuredValueDaoService {
 	 * @return The found measured value or <code>null</code> if no 
 	 *         corresponding measured value exists.  
 	 */
-	public MeasuredValue tryToFindById(long databaseId)
+	public CsiAggregation tryToFindById(long databaseId)
 	{
-		return MeasuredValue.get(databaseId);
+		return CsiAggregation.get(databaseId);
 	}
 	
 	/**
-	 * Gets all {@link MeasuredValue}s from db respective given arguments. tag-attribute is queried via rlike.
+	 * Gets all {@link CsiAggregation}s from db respective given arguments. tag-attribute is queried via rlike.
 	 * 
 	 * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
 	 * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements. 
@@ -65,14 +67,14 @@ class MeasuredValueDaoService {
 	 * @param aggregator
 	 * @return
 	 */
-	List<MeasuredValue> getMvs(
+	List<CsiAggregation> getMvs(
 		Date fromDate,
 		Date toDate,
 		String rlikePattern,
 		MeasuredValueInterval interval,
 		AggregatorType aggregator
-		){
-		def criteria = MeasuredValue.createCriteria()
+							   ){
+		def criteria = CsiAggregation.createCriteria()
 		return criteria.list {
 				between("started", fromDate, toDate)
 				eq("interval", interval)
@@ -82,7 +84,7 @@ class MeasuredValueDaoService {
 	}
 
 	/**
-	 * Gets all {@link MeasuredValue}s from db respective given arguments. tag-attribute is queried via rlike.
+	 * Gets all {@link CsiAggregation}s from db respective given arguments. tag-attribute is queried via rlike.
 	 *
 	 * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
 	 * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
@@ -94,24 +96,24 @@ class MeasuredValueDaoService {
 	 * @param connectivityProfiles
 	 * @return
 	 */
-	List<MeasuredValue> getMvs(
+	List<CsiAggregation> getMvs(
 			Date fromDate,
 			Date toDate,
 			MeasuredValueInterval interval,
 			AggregatorType aggregator,
 			List<CsiSystem> csiSystems
-							  ){
+							   ){
 		//TODO: optimize query to something like:
 		//findAllByStartedBetweenAndIntervalAndAggregatorAndCsiSystemInListAndTagRlike
 		//... which works in running App, but NOT in unit-tests!
-		List<MeasuredValue> result =  MeasuredValue.findAllByStartedBetweenAndIntervalAndAggregator(fromDate,toDate,interval,aggregator)
+		List<CsiAggregation> result =  CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregator(fromDate,toDate,interval,aggregator)
 		result.findAll {
 			csiSystems.contains(it.csiSystem)
 		}
 	}
 
 	/**
-	 * Gets all {@link MeasuredValue}s from db respective given arguments. tag-attribute is queried via rlike.
+	 * Gets all {@link CsiAggregation}s from db respective given arguments. tag-attribute is queried via rlike.
 	 *
 	 * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
 	 * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
@@ -123,24 +125,31 @@ class MeasuredValueDaoService {
 	 * @param connectivityProfiles
 	 * @return
 	 */
-	List<MeasuredValue> getMvs(
+	List<CsiAggregation> getMvs(
 			Date fromDate,
 			Date toDate,
 			String rlikePattern,
 			MeasuredValueInterval interval,
 			AggregatorType aggregator,
 			List<ConnectivityProfile> connectivityProfiles
-	){
+							   ){
 		//TODO: optimize query to something like:
 		//findAllByStartedBetweenAndIntervalAndAggregatorAndConnectivityProfileInListAndTagRlike
 		//... which works in running App, but NOT in unit-tests!
-		List<MeasuredValue> result =  MeasuredValue.findAllByStartedBetweenAndIntervalAndAggregatorAndTagRlike(fromDate,toDate,interval,aggregator,rlikePattern)
+		List<CsiAggregation> result
+		if(osmDataSourceService.getRLikeSupport()){
+			result =  CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregatorAndTagRlike(fromDate,toDate,interval,aggregator,rlikePattern)
+		} else {
+			result = CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregator(fromDate, toDate, interval, aggregator)
+			result.grep{ it.tag ==~ rlikePattern }
+		}
+
 		result.findAll {
 			connectivityProfiles.contains(it.connectivityProfile)
 		}
 	}
 	/**
-	 * Gets calc-not {@link MeasuredValue}s from db. tag-attribute is queried via rlike.
+	 * Gets calc-not {@link CsiAggregation}s from db. tag-attribute is queried via rlike.
 	 * TODO: dri-2014-01-13 Replace rlike statements when using this method in a test.
 	 * @param fromDate
 	 * @param toDate
@@ -149,25 +158,25 @@ class MeasuredValueDaoService {
 	 * @param aggregators
 	 * @return
 	 */
-	List<MeasuredValue> getMvs(
-		Date fromDate,
-		Date toDate,
-		String rlikePattern,
-		MeasuredValueInterval interval,
-		Collection<AggregatorType> aggregators
-		){
-		def criteria = MeasuredValue.createCriteria()
-		return criteria.list {
-			between("started", fromDate, toDate)
-			eq("interval", interval)
-			'in'('aggregator', aggregators)
-			rlike("tag", rlikePattern)
-		}
-	}
+//	List<CsiAggregation> getMvs(
+//		Date fromDate,
+//		Date toDate,
+//		String rlikePattern,
+//		MeasuredValueInterval interval,
+//		Collection<AggregatorType> aggregators
+//		){
+//		def criteria = CsiAggregation.createCriteria()
+//		return criteria.list {
+//			between("started", fromDate, toDate)
+//			eq("interval", interval)
+//			'in'('aggregator', aggregators)
+//			rlike("tag", rlikePattern)
+//		}
+//	}
 	
 	/**
 	 * <p> 
-	 * Finds all {@link MeasuredValue}s within the specified date range,
+	 * Finds all {@link CsiAggregation}s within the specified date range,
 	 * within the specified {@link MeasuredValueInterval} and with the 
 	 * specified {@link AggregatorType}.
 	 * </p>
@@ -179,13 +188,13 @@ class MeasuredValueDaoService {
 	 * 
 	 * @return Matching values, not <code>null</code> but possibly empty.
 	 */
-	public List<MeasuredValue> getMeasuredValues(
+	public List<CsiAggregation> getMeasuredValues(
 		Date fromDate,
 		Date toDate,
 		MeasuredValueInterval interval,
 		AggregatorType aggregator
-		) {
-		def criteria = MeasuredValue.createCriteria()
+												 ) {
+		def criteria = CsiAggregation.createCriteria()
 		return criteria.list {
 			between("started", fromDate, toDate)
 			eq("interval", interval)
@@ -194,9 +203,9 @@ class MeasuredValueDaoService {
 	}
 	
 	/**
-	 * Returns all {@link MeasuredValueUpdateEvent}s for given id's measuredValueIds of {@link MeasuredValue}s.
+	 * Returns all {@link MeasuredValueUpdateEvent}s for given id's measuredValueIds of {@link CsiAggregation}s.
 	 * @param measuredValueIds
-	 * @return A list of all {@link MeasuredValueUpdateEvent}s persisted for {@link MeasuredValue}s with id's from list measuredValueIds. 
+	 * @return A list of all {@link MeasuredValueUpdateEvent}s persisted for {@link CsiAggregation}s with id's from list measuredValueIds.
 	 */
 	public List<MeasuredValueUpdateEvent> getUpdateEvents(List<Long> measuredValueIds){
 		return MeasuredValueUpdateEvent.createCriteria().list{
@@ -204,21 +213,21 @@ class MeasuredValueDaoService {
 		}
 	}
 	/**
-	 * Returns all {@link MeasuredValueUpdateEvent}s for given {@link MeasuredValue}-id measuredValueId.
+	 * Returns all {@link MeasuredValueUpdateEvent}s for given {@link CsiAggregation}-id measuredValueId.
 	 * @param measuredValueId
-	 * @return A list of all {@link MeasuredValueUpdateEvent}s persisted for {@link MeasuredValue} with id measuredValueId.
+	 * @return A list of all {@link MeasuredValueUpdateEvent}s persisted for {@link CsiAggregation} with id measuredValueId.
 	 */
 	public List<MeasuredValueUpdateEvent> getUpdateEvents(Long measuredValueId){
 		return MeasuredValueUpdateEvent.findAllByMeasuredValueId(measuredValueId)
 	}
 	
 	/**
-	 * Returns all open {@link MeasuredValue}s (that is who's attribute closedAndCalculated is false) with start-date equal or before Date toFindBefore.
+	 * Returns all open {@link CsiAggregation}s (that is who's attribute closedAndCalculated is false) with start-date equal or before Date toFindBefore.
 	 * @param toFindBefore
-	 * @return All open {@link MeasuredValue}s (that is who's attribute closedAndCalculated is false) with start-date equal or before Date toFindBefore.
+	 * @return All open {@link CsiAggregation}s (that is who's attribute closedAndCalculated is false) with start-date equal or before Date toFindBefore.
 	 */
-	public List<MeasuredValue> getOpenMeasuredValuesEqualsOrBefore(Date toFindBefore){
-		def criteria = MeasuredValue.createCriteria()
+	public List<CsiAggregation> getOpenMeasuredValuesEqualsOrBefore(Date toFindBefore){
+		def criteria = CsiAggregation.createCriteria()
 		return criteria.list {
 			le("started", toFindBefore)
 			eq("closedAndCalculated", false)
@@ -226,22 +235,22 @@ class MeasuredValueDaoService {
 	}
 	
 	/**
-	 * Delivers all {@link MeasuredValue}s with closedAndCalculated=false who's time-interval has expired for at least minutes minutes.
+	 * Delivers all {@link CsiAggregation}s with closedAndCalculated=false who's time-interval has expired for at least minutes minutes.
 	 * @param minutes 
-	 * 					Time for which the MeasuredValue has to be expired.  e.g.
+	 * 					Time for which the CsiAggregation has to be expired.  e.g.
 	 * 					<ul>
-	 * 					<li>A HOURLY-MeasuredValue with <code>started=2014-07-07 15:00:00</code> and an expiration-time of 90 minutes expires at "2014-07-07 17:30:00"</li>
-	 * 					<li>A DAILY-MeasuredValue with <code>started=2014-07-07 00:00:00</code> and an expiration-time of 180 minutes expires at "2014-07-08 03:00:00"</li>
-	 * 					<li>A WEEKLY-MeasuredValue with <code>started=2014-07-04 00:00:00</code> and an expiration-time of 300 minutes expires at "2014-07-11 05:00:00"</li>
+	 * 					<li>A HOURLY-CsiAggregation with <code>started=2014-07-07 15:00:00</code> and an expiration-time of 90 minutes expires at "2014-07-07 17:30:00"</li>
+	 * 					<li>A DAILY-CsiAggregation with <code>started=2014-07-07 00:00:00</code> and an expiration-time of 180 minutes expires at "2014-07-08 03:00:00"</li>
+	 * 					<li>A WEEKLY-CsiAggregation with <code>started=2014-07-04 00:00:00</code> and an expiration-time of 300 minutes expires at "2014-07-11 05:00:00"</li>
 	 * 					</ul>
 	 * @return
 	 */
-	public List<MeasuredValue> getOpenMeasuredValuesWhosIntervalExpiredForAtLeast(int minutes){
+	public List<CsiAggregation> getOpenMeasuredValuesWhosIntervalExpiredForAtLeast(int minutes){
 		
 		DateTime expirationTimeAgo = measuredValueUtilService.getNowInUtc().minusMinutes(minutes)
 		DateTime expirationTimePlusOneHourAgo = measuredValueUtilService.subtractOneInterval(expirationTimeAgo, MeasuredValueInterval.HOURLY)
 
-		List<MeasuredValue> openAndExpired = []
+		List<CsiAggregation> openAndExpired = []
 		getOpenMeasuredValuesEqualsOrBefore(expirationTimePlusOneHourAgo.toDate()).each {openMv ->
 			
 			boolean isHourly = openMv.interval.intervalInMinutes==MeasuredValueInterval.HOURLY 
@@ -255,7 +264,7 @@ class MeasuredValueDaoService {
 		return openAndExpired
 	}
 
-	private void addIfDailyOrWeeklyAndExpired(MeasuredValue openMv, DateTime expirationTimeAgo, List openAndExpired) {
+	private void addIfDailyOrWeeklyAndExpired(CsiAggregation openMv, DateTime expirationTimeAgo, List openAndExpired) {
 		
 		boolean isDaily = openMv.interval.intervalInMinutes==MeasuredValueInterval.DAILY
 		DateTime expirationTimePlusOneDayAgo = measuredValueUtilService.subtractOneInterval(expirationTimeAgo, MeasuredValueInterval.DAILY)
@@ -268,7 +277,7 @@ class MeasuredValueDaoService {
 		}
 	}
 
-	private void addIfWeeklyAndExpired(MeasuredValue openMv, DateTime expirationTimeAgo, List openAndExpired) {
+	private void addIfWeeklyAndExpired(CsiAggregation openMv, DateTime expirationTimeAgo, List openAndExpired) {
 		boolean isWeekly = openMv.interval.intervalInMinutes==MeasuredValueInterval.WEEKLY
 		DateTime expirationTimePlusOneWeekAgo = measuredValueUtilService.subtractOneInterval(expirationTimeAgo, MeasuredValueInterval.WEEKLY)
 		boolean isOlderThanOneWeek = !new DateTime(openMv.started).isAfter(expirationTimePlusOneWeekAgo)

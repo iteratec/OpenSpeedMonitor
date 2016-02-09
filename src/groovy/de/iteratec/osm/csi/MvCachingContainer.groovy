@@ -17,10 +17,8 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.report.chart.CsiAggregation
 
 /**
  * For caching elements during expensive calculations in {@link EventMeasuredValueService}, {@link PageMeasuredValueService} or {@link ShopMeasuredValueService}.
@@ -30,5 +28,5 @@ import de.iteratec.osm.result.EventResult
 class MvCachingContainer {
 	JobGroup csiGroupToCalcMvFor
 	Page pageToCalcMvFor
-	Map<String,List<MeasuredValue>> hmvsByCsiGroupPageCombination
+	Map<String,List<CsiAggregation>> hmvsByCsiGroupPageCombination
 }

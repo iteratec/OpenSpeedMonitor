@@ -171,7 +171,7 @@ class ServiceMocker {
 		eventResultService.demand.isCsiRelevant(1..10000) {
 			EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
 			
-			return toProof.customerSatisfactionInPercent && toProof.docCompleteTimeInMillisecs &&
+			return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
 			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
 			
@@ -240,7 +240,7 @@ class ServiceMocker {
 	 * @param toReturnFromGetOrCalculateHourlyMeasuredValues
 	 * 		To return from mocked method {@link EventMeasuredValueService#getOrCalculateHourylMeasuredValues}.
 	 */
-	void mockEventMeasuredValueService(serviceToMockIn, List<MeasuredValue> toReturnFromGetOrCalculateHourlyMeasuredValues){
+	void mockEventMeasuredValueService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateHourlyMeasuredValues){
 		def eventMeasuredValueServiceMocked = mockFor(EventMeasuredValueService, true)
 		eventMeasuredValueServiceMocked.demand.getHourylMeasuredValues(0..10000) { Date from, Date to, MvQueryParams mvQueryParams ->
 			return 	toReturnFromGetOrCalculateHourlyMeasuredValues
@@ -252,9 +252,9 @@ class ServiceMocker {
 	 * @param serviceToMockIn 
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyPageMeasuredValues
-	 * 		List of {@link MeasuredValue}s, the method {@link PageMeasuredValueService#getOrCalculateWeeklyPageMeasuredValues(java.util.Date, java.util.Date)} should return.
+	 * 		List of {@link CsiAggregation}s, the method {@link PageMeasuredValueService#getOrCalculateWeeklyPageMeasuredValues(java.util.Date, java.util.Date)} should return.
 	 */
-	void mockPageMeasuredValueService(serviceToMockIn, List<MeasuredValue> toReturnFromGetOrCalculateWeeklyPageMeasuredValues){
+	void mockPageMeasuredValueService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyPageMeasuredValues){
 		def pageMeasuredValueServiceMocked = mockFor(PageMeasuredValueService)
 		// new Version:
 		pageMeasuredValueServiceMocked.demand.getOrCalculatePageMeasuredValues(0..10000) { 
@@ -268,9 +268,9 @@ class ServiceMocker {
 	 * @param serviceToMockIn 
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyShopMeasuredValues
-	 * 		List of {@link MeasuredValue}s, the method {@link ShopMeasuredValueService#getOrCalculateWeeklyShopMeasuredValues(java.util.Date, java.util.Date)} should return.
+	 * 		List of {@link CsiAggregation}s, the method {@link ShopMeasuredValueService#getOrCalculateWeeklyShopMeasuredValues(java.util.Date, java.util.Date)} should return.
 	 */
-	void mockShopMeasuredValueService(serviceToMockIn, List<MeasuredValue> toReturnFromGetOrCalculateWeeklyShopMeasuredValues){
+	void mockShopMeasuredValueService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopMeasuredValues){
 		def shopMeasuredValueServiceMocked = mockFor(ShopMeasuredValueService, true)
 		shopMeasuredValueServiceMocked.demand.getOrCalculateWeeklyShopMeasuredValues(0..10000) { Date from, Date to ->
 			return toReturnFromGetOrCalculateWeeklyShopMeasuredValues

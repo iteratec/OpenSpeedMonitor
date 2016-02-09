@@ -22,7 +22,7 @@ import org.junit.BeforeClass
 
 import de.iteratec.osm.report.chart.MeasuredValueDaoService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 
 /**
@@ -60,8 +60,8 @@ class IntTestWithDBCleanup {
 	 */
 	public static void substituteGetMvs() {
 		MeasuredValueDaoService.metaClass.getMvs = { Date fromDate, Date toDate, String rlikePattern, MeasuredValueInterval interval, AggregatorType aggregator ->
-			def criteria = MeasuredValue.createCriteria()
-			List<MeasuredValue> mvs = criteria.list {
+			def criteria = CsiAggregation.createCriteria()
+			List<CsiAggregation> mvs = criteria.list {
 				between("started", fromDate, toDate)
 				eq("interval", interval)
 				eq("aggregator", aggregator)

@@ -221,7 +221,7 @@ databaseChangeLog = {
         }
     }
 
-//    ### add csiSystem to MeasuredValue
+//    ### add csiSystem to CsiAggregation
     changeSet(author: "marcus (generated)", id: "1454929626682-1") {
         addColumn(tableName: "measured_value") {
             column(name: "csi_system_id", type: "bigint")
@@ -237,5 +237,62 @@ databaseChangeLog = {
     changeSet(author: "marcus (generated)", id: "1454929626682-2") {
         addForeignKeyConstraint(baseColumnNames: "csi_system_id", baseTableName: "measured_value", constraintName: "FKCC54EB8B8A7ADFB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_system", referencesUniqueColumn: "false")
     }
-//    ### end add csiSystem to MeasuredValue
+//    ### end add csiSystem to CsiAggregation
+    // START [IT-728] add csByVisuallyComplete
+    changeSet(author: "bka", id: "1455031326389-1") {
+        renameTable(oldTableName: "measured_value", newTableName: "csi_aggregation")
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-2") {
+        createTable(tableName: "csi_aggregation_event_result") {
+            column(name: "csi_aggregation_underlying_event_results_by_visually_complete_id", type: "bigint")
+
+            column(name: "event_result_id", type: "bigint")
+        }
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-3") {
+        addColumn(tableName: "event_result") {
+            column(name: "cs_by_wpt_visually_complete_in_percent", type: "double precision")
+        }
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-4") {
+        addColumn(tableName: "csi_aggregation") {
+            column(name: "cs_by_wpt_visually_complete_in_percent", type: "double precision")
+        }
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-5") {
+        addForeignKeyConstraint(baseColumnNames: "event_result_id", baseTableName: "csi_aggregation_event_result", constraintName: "FK4579D789CA94DFB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "event_result", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-6") {
+        addForeignKeyConstraint(baseColumnNames: "csi_aggregation_underlying_event_results_by_visually_complete_id", baseTableName: "csi_aggregation_event_result", constraintName: "FK4579D78978BC1A0C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_aggregation", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-7") {
+        createIndex(indexName: "FK4579D78978BC1A0C", tableName: "csi_aggregation_event_result") {
+            column(name: "csi_aggregation_underlying_event_results_by_visually_complete_id")
+        }
+    }
+
+    changeSet(author: "birger (generated)", id: "1455031326389-8") {
+        createIndex(indexName: "FK4579D789CA94DFB", tableName: "csi_aggregation_event_result") {
+            column(name: "event_result_id")
+        }
+    }
+
+    changeSet(author: "bka", id: "1455031326389-9") {
+        renameColumn(tableName: "event_result", oldColumnName: "customer_satisfaction_in_percent", newColumnName: "cs_by_wpt_doc_complete_in_percent", columnDataType: "double precision")
+    }
+
+    changeSet(author: "bka", id: "1455031326389-10") {
+        renameColumn(tableName: "csi_aggregation", oldColumnName: "value", newColumnName: "cs_by_wpt_doc_complete_in_percent", columnDataType: "double precision")
+    }
+
+    changeSet(author: "bka", id: "1455031326389-11") {
+        renameColumn(tableName: "csi_aggregation", oldColumnName: "result_ids", newColumnName: "underlying_event_results_by_wpt_doc_complete", columnDataType: "longtext")
+    }
+    // END [IT-728] add csByVisuallyComplete
 }

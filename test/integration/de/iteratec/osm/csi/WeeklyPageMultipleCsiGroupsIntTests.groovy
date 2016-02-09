@@ -31,7 +31,7 @@ import org.junit.Test
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -150,7 +150,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	}
 
 	/**
-	 * After pre-calculation of hourly job-{@link MeasuredValue}s the creation and calculation of weekly page-{@link MeasuredValue}s is tested.
+	 * After pre-calculation of hourly job-{@link CsiAggregation}s the creation and calculation of weekly page-{@link CsiAggregation}s is tested.
 	 */
 	void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
 
@@ -167,18 +167,18 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 
 		Date startDate = startOfWeek.toDate()
 		MeasuredValueInterval mvInterval=MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-		List<MeasuredValue> wpmvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, mvInterval, csiGroups, [testedPage])
+		List<CsiAggregation> wpmvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, mvInterval, csiGroups, [testedPage])
 		assertNotNull(wpmvs)
 		assertEquals(countWeeklyPageMvsToBeCreated, wpmvs.size())
 
-		wpmvs.each{MeasuredValue mvWeeklyPage ->
+		wpmvs.each{ CsiAggregation mvWeeklyPage ->
 			System.out.println(
 				"WeeklyPageMultipleCsiGroupsIntTests.creationAndCalculationOfWeeklyPageValuesTest(): " + 
 				mvWeeklyPage.ident()+" : "+mvWeeklyPage.getTag()+" : "+mvWeeklyPage.isCalculated());
 		}
 
 
-		wpmvs.each{MeasuredValue mvWeeklyPage ->
+		wpmvs.each{ CsiAggregation mvWeeklyPage ->
 			assertEquals(startDate, mvWeeklyPage.started)
 			assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)
 			assertEquals(page.name, mvWeeklyPage.aggregator.name)
@@ -187,10 +187,10 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 		
 		MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		csiGroups.each{JobGroup csiGroup ->
-			List<MeasuredValue> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weeklyInterval, [csiGroup], [testedPage])
+			List<CsiAggregation> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weeklyInterval, [csiGroup], [testedPage])
 			assertEquals(1, wpmvsOfOneGroupPageCombination.size())
 
-			wpmvsOfOneGroupPageCombination.each{MeasuredValue mvWeeklyPage ->
+			wpmvsOfOneGroupPageCombination.each{ CsiAggregation mvWeeklyPage ->
 				assertTrue(mvWeeklyPage.tag.equals(csiGroup.ident().toString() + ';' + testedPage.ident().toString()))
 				assertEquals(targetValues["${csiGroup.name}_${testedPage.name}"], mvWeeklyPage.value, 0.01d)
 			}
@@ -209,10 +209,10 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	 *
 	 * @return A collection of pre-calculated hourly values.
 	 */
-	private List<MeasuredValue> precalcHourlyJobMvs(JobGroup jobGroup, String pageName){
+	private List<CsiAggregation> precalcHourlyJobMvs(JobGroup jobGroup, String pageName){
 		DateTime currentDateTime = startOfWeek
 		DateTime endOfWeek = startOfWeek.plusWeeks(1)
-		List<MeasuredValue> createdHmvs = TestDataUtil.precalculateHourlyMeasuredValues(
+		List<CsiAggregation> createdHmvs = TestDataUtil.precalculateHourlyMeasuredValues(
 				jobGroup, pageName, endOfWeek, currentDateTime, hourly, 
 				eventMeasuredValueService,
 				measuredValueTagService,
@@ -225,8 +225,8 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	}
 
 
-	private Map<String, List<MeasuredValue>> getHmvsByPagenameMap(List<MeasuredValue> createdHmvs){
-		Map<String, List<MeasuredValue>> hmvsByPagename = [:]
+	private Map<String, List<CsiAggregation>> getHmvsByPagenameMap(List<CsiAggregation> createdHmvs){
+		Map<String, List<CsiAggregation>> hmvsByPagename = [:]
 		JobGroup csi = JobGroup.findByName("CSI")
 
 		allPages.each{
@@ -236,7 +236,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 		}
 
 		Page page
-		createdHmvs.each{MeasuredValue hmv ->
+		createdHmvs.each{ CsiAggregation hmv ->
 			page = measuredValueTagService.findPageOfHourlyEventTag(hmv.tag)
 			if (page && hmvsByPagename.containsKey(csi.ident()+':::'+page.ident())) {
 				hmvsByPagename[csi.ident()+':::'+page.ident()].add(hmv)

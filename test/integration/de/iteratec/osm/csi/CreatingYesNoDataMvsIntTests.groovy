@@ -34,7 +34,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.measurement.script.Script
@@ -43,8 +43,8 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
- * Contains tests which test the creation of {@link MeasuredValue}s without the existence of corresponding {@link EventResult}s.<br>
- * For all persisted {@link MeasuredValue}s a {@link MeasuredValueUpdateEvent} should be created, which marks measured value as calculated. 
+ * Contains tests which test the creation of {@link de.iteratec.osm.report.chart.CsiAggregation}s without the existence of corresponding {@link EventResult}s.<br>
+ * For all persisted {@link de.iteratec.osm.report.chart.CsiAggregation}s a {@link MeasuredValueUpdateEvent} should be created, which marks measured value as calculated.
  * @author nkuhn
  *
  */
@@ -76,11 +76,11 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     }
 
     /**
-     * Creating weekly-page {@link MeasuredValue}s without data.
+     * Creating weekly-page {@link CsiAggregation}s without data.
      */
     void testCreatingWeeklyPageValues() {
         DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
-        List<MeasuredValue> wpmvs = pageMeasuredValueService.getOrCalculateWeeklyPageMeasuredValues(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate())
+        List<CsiAggregation> wpmvs = pageMeasuredValueService.getOrCalculateWeeklyPageMeasuredValues(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate())
         Integer countWeeks = 2
         Integer countPages = 7
         assertThat(wpmvs.size(), is(countWeeks * countPages))
@@ -90,11 +90,11 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     }
 
     /**
-     * Creating weekly-shop {@link MeasuredValue}s without data.
+     * Creating weekly-shop {@link de.iteratec.osm.report.chart.CsiAggregation}s without data.
      */
     void testCreatingWeeklyShopValues() {
         DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
-        List<MeasuredValue> wsmvs = shopMeasuredValueService.getOrCalculateWeeklyShopMeasuredValues(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
+        List<CsiAggregation> wsmvs = shopMeasuredValueService.getOrCalculateWeeklyShopMeasuredValues(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
         Integer countWeeks = 2
         Integer countPages = 7
         assertThat(wsmvs.size(), is(countWeeks))

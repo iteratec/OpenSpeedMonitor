@@ -298,7 +298,7 @@ class CsiDashboardController {
     /**
      * <p>
      * Fills the specified map with approximate data based on {@linkplain
-     * MeasuredValue measured values} correspond to the selection in
+     * CsiAggregation measured values} correspond to the selection in
      * specified {@linkplain CsiDashboardShowAllCommand command object}.
      * </p>
      *
@@ -425,7 +425,7 @@ class CsiDashboardController {
      *         not <code>null</code>.
      * @param queryParams
      *         The query parameters to find corresponding {@linkplain
-     * MeasuredValue measured vales}.
+     * CsiAggregation measured vales}.
      * @param modelToRender
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.

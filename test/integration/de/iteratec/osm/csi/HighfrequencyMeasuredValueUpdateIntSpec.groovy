@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -29,7 +28,7 @@ import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
@@ -41,17 +40,17 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
  * <p>
- * Until 2014-07 the domain {@link MeasuredValue} had an (enum-)attribute calculated. The enum had the following values:
+ * Until 2014-07 the domain {@link CsiAggregation} had an (enum-)attribute calculated. The enum had the following values:
  * <ul>
  * <li><b>Not</b>: Never calculated or outdated.</li>
  * <li><b>Yes</b>: </li>Calculated based on existing data and not outdated afterwards.
  * <li><b>YesNoData</b>: Calculated without data and not outdated afterwards.</li>
  * </ul>
- * The {@link MeasuredValue}s get outdated if new {@link EventResult}s arrive and get calculated if somebody opens a csi-related dashboard and so requests and calculates {@link MeasuredValue}s.
- * Until 2014-07 obsolescence and calculation had to read and write the same object (the respective MeasuredValue). This led to org.hibernate.StaleObjectStateException's if both happened with a high frequency (some users
+ * The {@link CsiAggregation}s get outdated if new {@link EventResult}s arrive and get calculated if somebody opens a csi-related dashboard and so requests and calculates {@link CsiAggregation}s.
+ * Until 2014-07 obsolescence and calculation had to read and write the same object (the respective CsiAggregation). This led to org.hibernate.StaleObjectStateException's if both happened with a high frequency (some users
  * opened the csi-dashboard on monitors, auto-refreshing the page).
- * The test in this class failed due to thrown org.hibernate.StaleObjectStateException on executing <br><code>MeasuredValue.list()*.delete(failOnError: true, flush: true)</code><br>
- * Shouldn't happen after removing the attribute calculated from domain {@link MeasuredValue} and introduction of domain {@link MesauredValueUpdateEvent} instead.  
+ * The test in this class failed due to thrown org.hibernate.StaleObjectStateException on executing <br><code>CsiAggregation.list()*.delete(failOnError: true, flush: true)</code><br>
+ * Shouldn't happen after removing the attribute calculated from domain {@link CsiAggregation} and introduction of domain {@link MesauredValueUpdateEvent} instead.
  * </p>
  *  
  * @author nkuhn
@@ -193,9 +192,9 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 //
 //		mvCalculator.stop()
 //
-//		List<MeasuredValue> mvs = MeasuredValue.list()
-//		List<MeasuredValue> pmvs = mvs.findAll { it.aggregator.name == AggregatorType.PAGE }
-//		List<MeasuredValue> smvs = mvs.findAll { it.aggregator.name == AggregatorType.SHOP }
+//		List<CsiAggregation> mvs = CsiAggregation.list()
+//		List<CsiAggregation> pmvs = mvs.findAll { it.aggregator.name == AggregatorType.PAGE }
+//		List<CsiAggregation> smvs = mvs.findAll { it.aggregator.name == AggregatorType.SHOP }
 ////		mvs.each { mv ->
 //			//log.error '*************************'
 //			//log.error mv.started
@@ -211,7 +210,7 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 //		assertThat(pmvs.size(), is(4))
 //		assertThat(smvs.size(), is(2))
 //
-//		MeasuredValue.list()*.delete(failOnError: true, flush: true)
+//		CsiAggregation.list()*.delete(failOnError: true, flush: true)
 
 	}
 
@@ -221,7 +220,7 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 }
 	
 	/**
-	 * This thread retrieves daily and weekly-Page-{@link MeasuredValue}s continuously every 10 ms.
+	 * This thread retrieves daily and weekly-Page-{@link CsiAggregation}s continuously every 10 ms.
 	 * While retrieving these values get calculated.
 	 * @author nkuhn
 	 *
@@ -251,11 +250,11 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 	            } catch (InterruptedException e){
 	            }
 				log.error "getting daily page-mv's from calculator-thread:"
-				MeasuredValue.withTransaction {status ->
+				CsiAggregation.withTransaction { status ->
 					 List<JobGroup> groups = JobGroup.findAllByName('group')
 					 List<Page> pages = Page.findAllByName('HP')
 					//daily page
-					List<MeasuredValue> pmvs =  pageMVService.getOrCalculatePageMeasuredValues(
+					List<CsiAggregation> pmvs =  pageMVService.getOrCalculatePageMeasuredValues(
 						HighfrequencyMeasuredValueUpdateIntSpec.aTuesday.minusDays(1).toDate(), 
 						HighfrequencyMeasuredValueUpdateIntSpec.aTuesday.plusDays(1).toDate(), 
 						MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY), 

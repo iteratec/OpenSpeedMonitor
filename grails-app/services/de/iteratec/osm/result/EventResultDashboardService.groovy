@@ -417,7 +417,7 @@ public class EventResultDashboardService {
 
     /**
      * <p>
-     * Builds up an URL where details to the specified {@link MeasuredValue}
+     * Builds up an URL where details to the specified {@link CsiAggregation}
      * are available if possible.
      * </p>
      *
@@ -427,7 +427,7 @@ public class EventResultDashboardService {
      * @return The created URL or <code>null</code> if not possible to
      *         build up an URL.
      */
-    public URL tryToBuildTestsDetailsURL(MeasuredValue mv) {
+    public URL tryToBuildTestsDetailsURL(CsiAggregation mv) {
         URL result = null;
         List<Long> eventResultIds = mv.resultIdsAsList;
 

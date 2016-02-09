@@ -22,8 +22,8 @@ import groovy.transform.EqualsAndHashCode
 /**
  * Is written with timestamp of the occurrence of one of the following:
  * <ul>
- * <li>A {@link MeasuredValue} is outdated cause of a new, so far unregarded {@link EventResult} was running into the database.</li>
- * <li>A {@link MeasuredValue} is correctly calculated.</li>
+ * <li>A {@link CsiAggregation} is outdated cause of a new, so far unregarded {@link EventResult} was running into the database.</li>
+ * <li>A {@link CsiAggregation} is correctly calculated.</li>
  * </ul>
  */
 @EqualsAndHashCode
@@ -36,12 +36,12 @@ class MeasuredValueUpdateEvent {
 	 */
 	public enum UpdateCause {
 		/**
-		 * In the moment of the update the affected {@link MeasuredValue} is outdated cause of a new, so far unregarded {@link EventResult}.
+		 * In the moment of the update the affected {@link CsiAggregation} is outdated cause of a new, so far unregarded {@link EventResult}.
 		 */
 		OUTDATED (true),
 		/**
-		 * In the moment of the update the affected {@link MeasuredValue} is correctly calculated. All relevant {@link EventResult}s are factored in.
-		 * If no EventResult is relevant for the MeasuredValue the CALCULATED-UpdateEvent is written, too. The value of the affected MeasuredValue will remain null.
+		 * In the moment of the update the affected {@link CsiAggregation} is correctly calculated. All relevant {@link EventResult}s are factored in.
+		 * If no EventResult is relevant for the CsiAggregation the CALCULATED-UpdateEvent is written, too. The value of the affected CsiAggregation will remain null.
 		 */
 		CALCULATED(false),
 		
@@ -61,7 +61,7 @@ class MeasuredValueUpdateEvent {
 	 */
 	UpdateCause updateCause
 	/**
-	 * ID of affected {@link MeasuredValue}.
+	 * ID of affected {@link CsiAggregation}.
 	 */
 	Long measuredValueId
 	
@@ -81,6 +81,6 @@ class MeasuredValueUpdateEvent {
 	 */
 	@Override
 	public String toString() {
-		return "${dateOfUpdate}: ${updateCause} of MeasuredValue with id=${measuredValueId}";
+		return "${dateOfUpdate}: ${updateCause} of CsiAggregation with id=${measuredValueId}";
 	}
 }

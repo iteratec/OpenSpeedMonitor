@@ -100,8 +100,8 @@ class QuartzControlledGrailsReportsTests {
 		event.setName(AggregatorType.MEASURED_EVENT)
 		event.setMeasurandGroup(MeasurandGroup.NO_MEASURAND)
 		
-		MeasuredValue firstHmv = getMeasuredValue(interval, event, firstHourlyValueToSend, hourlyDateExpectedToBeSent, '1,2,3')
-		MeasuredValue secondHmv = getMeasuredValue(interval, event, secondHourlyValueToSend, hourlyDateExpectedToBeSent, '4,5,6')
+		CsiAggregation firstHmv = getMeasuredValue(interval, event, firstHourlyValueToSend, hourlyDateExpectedToBeSent, '1,2,3')
+		CsiAggregation secondHmv = getMeasuredValue(interval, event, secondHourlyValueToSend, hourlyDateExpectedToBeSent, '4,5,6')
 		
 		//mocking
 		mockJobGroupDaoService()
@@ -147,8 +147,8 @@ class QuartzControlledGrailsReportsTests {
 		aggregator.setName(AggregatorType.PAGE)
 		aggregator.setMeasurandGroup(MeasurandGroup.NO_MEASURAND)
 		
-		MeasuredValue firstDpmv = getMeasuredValue(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
-		MeasuredValue secondDpmv = getMeasuredValue(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
+		CsiAggregation firstDpmv = getMeasuredValue(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
+		CsiAggregation secondDpmv = getMeasuredValue(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
 		
 		//mocking
 		mockJobGroupDaoService()
@@ -197,8 +197,8 @@ class QuartzControlledGrailsReportsTests {
 		aggregator.setName(AggregatorType.SHOP)
 		aggregator.setMeasurandGroup(MeasurandGroup.NO_MEASURAND)
 		
-		MeasuredValue firstDsmv = getMeasuredValue(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
-		MeasuredValue secondDsmv = getMeasuredValue(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
+		CsiAggregation firstDsmv = getMeasuredValue(interval, aggregator, firstDailyValueToSend, dailyDateExpectedToBeSent, '1,2,3')
+		CsiAggregation secondDsmv = getMeasuredValue(interval, aggregator, secondDailyValueToSend, dailyDateExpectedToBeSent, '4,5,6')
 		
 		//mocking
 		mockJobGroupDaoService()
@@ -247,8 +247,8 @@ class QuartzControlledGrailsReportsTests {
 		aggregator.setName(AggregatorType.PAGE)
 		aggregator.setMeasurandGroup(MeasurandGroup.NO_MEASURAND)
 		
-		MeasuredValue firstWpmv = getMeasuredValue(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
-		MeasuredValue secondWpmv = getMeasuredValue(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
+		CsiAggregation firstWpmv = getMeasuredValue(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
+		CsiAggregation secondWpmv = getMeasuredValue(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
 		
 		//mocking
 		mockJobGroupDaoService()
@@ -297,8 +297,8 @@ class QuartzControlledGrailsReportsTests {
 		aggregator.setName(AggregatorType.SHOP)
 		aggregator.setMeasurandGroup(MeasurandGroup.NO_MEASURAND)
 		
-		MeasuredValue firstWsmv = getMeasuredValue(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
-		MeasuredValue secondWsmv = getMeasuredValue(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
+		CsiAggregation firstWsmv = getMeasuredValue(interval, aggregator, firstWeeklyValueToSend, weeklyDateExpectedToBeSent, '1,2,3')
+		CsiAggregation secondWsmv = getMeasuredValue(interval, aggregator, secondWeeklyValueToSend, weeklyDateExpectedToBeSent, '4,5,6')
 		
 		//mocking
 		mockJobGroupDaoService()
@@ -387,7 +387,7 @@ class QuartzControlledGrailsReportsTests {
 	/**
 	 * Mocks {@linkplain EventMeasuredValueService#getOrCalculateHourylMeasuredValues}.
 	 */
-	private void mockEventMeasuredValueService(Collection<MeasuredValue> toReturnFromGetHourylMeasuredValues){
+	private void mockEventMeasuredValueService(Collection<CsiAggregation> toReturnFromGetHourylMeasuredValues){
 		def eventMeasuredValueService = mockFor(EventMeasuredValueService, true)
 		
 		// FIXME mze-2013-12-10: Hier muss unterschieden werden, welche Op man mocken möchte!
@@ -435,7 +435,7 @@ class QuartzControlledGrailsReportsTests {
 	/**
 	 * Mocks {@linkplain PageMeasuredValueService#getOrCalculatePageMeasuredValues}.
 	 */
-	private void mockPageMeasuredValueService(Collection<MeasuredValue> toReturnOnDemandForGetOrCalculateMeasuredValues, Integer expectedIntervalInMinutes){
+	private void mockPageMeasuredValueService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateMeasuredValues, Integer expectedIntervalInMinutes){
 		def pageMeasuredValueService = mockFor(PageMeasuredValueService, true)
 		pageMeasuredValueService.demand.getOrCalculatePageMeasuredValues(1..10000) {
 			Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups ->
@@ -450,7 +450,7 @@ class QuartzControlledGrailsReportsTests {
 	/**
 	 * Mocks {@linkplain ShopMeasuredValueService#getOrCalculateShopMeasuredValues}.
 	 */
-	private void mockShopMeasuredValueService(Collection<MeasuredValue> toReturnOnDemandForGetOrCalculateMeasuredValues, Integer expectedIntervalInMinutes){
+	private void mockShopMeasuredValueService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateMeasuredValues, Integer expectedIntervalInMinutes){
 		def shopMeasuredValueService = mockFor(ShopMeasuredValueService, true)
 		shopMeasuredValueService.demand.getOrCalculateShopMeasuredValues(1..10000) {
 			Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups ->
@@ -495,13 +495,13 @@ class QuartzControlledGrailsReportsTests {
 			]
 	}
 	public static getMeasuredValue(MeasuredValueInterval interval, AggregatorType aggregator, Double value, DateTime valueForStated, String resultIds){
-		MeasuredValue hmv = new MeasuredValue()
+		CsiAggregation hmv = new CsiAggregation()
 		hmv.started = valueForStated.toDate()
 		hmv.interval =  interval
 		hmv.aggregator = aggregator
 		hmv.tag = ''
-		hmv.value = value
-		hmv.resultIds = resultIds
+		hmv.csByWptDocCompleteInPercent = value
+		hmv.underlyingEventResultsByWptDocComplete = resultIds
 		return hmv
 	}
 	

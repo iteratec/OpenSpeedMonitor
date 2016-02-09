@@ -33,12 +33,12 @@ import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertThat
 
 /**
- * Methods in this class test the functionality to close {@link MeasuredValue}s.
+ * Methods in this class test the functionality to close {@link CsiAggregation}s.
  * Closing means: 
  * <ul>
  * <li>set attribute closedAndCalculated to true</li>
- * <li>calculate MeasuredValue if necessary</li>
- * <li>delete all {@link MeasuredValueUpdateEvent}s of MeasuredValue</li>
+ * <li>calculate CsiAggregation if necessary</li>
+ * <li>delete all {@link MeasuredValueUpdateEvent}s of CsiAggregation</li>
  * </ul>
  * 
  */
@@ -112,7 +112,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
 		createMvWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
 		
-		List<MeasuredValue> mvs = MeasuredValue.list()
+		List<CsiAggregation> mvs = CsiAggregation.list()
 		assertThat(mvs.size(), is(2))
 		List<MeasuredValueUpdateEvent> updateEvents = MeasuredValueUpdateEvent.list()
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
@@ -123,7 +123,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		mvs = MeasuredValue.list()
+		mvs = CsiAggregation.list()
 		updateEvents = MeasuredValueUpdateEvent.list()
 		assertThat(mvs.size(), is(2))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(true)))
@@ -138,7 +138,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
 		createMvWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
 		
-		List<MeasuredValue> mvs = MeasuredValue.list()
+		List<CsiAggregation> mvs = CsiAggregation.list()
 		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(mvs*.ident())
 		assertThat(mvs.size(), is(2))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
@@ -149,7 +149,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		mvs = MeasuredValue.list()
+		mvs = CsiAggregation.list()
 		updateEvents = measuredValueDaoService.getUpdateEvents(mvs*.ident())
 		assertThat(mvs.size(), is(2))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(true)))
@@ -166,9 +166,9 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
 		createMvWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
 		
-		List<MeasuredValue> mvs = MeasuredValue.list()
+		List<CsiAggregation> mvs = CsiAggregation.list()
 		
-		List<MeasuredValue> smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
+		List<CsiAggregation> smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
 		List<MeasuredValueUpdateEvent> updateEventsOfSmvs = measuredValueDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(false)))
@@ -179,7 +179,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		mvs = MeasuredValue.list()
+		mvs = CsiAggregation.list()
 		
 		smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
 		updateEventsOfSmvs = measuredValueDaoService.getUpdateEvents(smvs*.ident())
@@ -189,14 +189,14 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		assertThat(updateEventsOfSmvs.size(), is(0))
 		
 		//second call cause the calculation of shop mvs creates new page mvs which get closed and calculated not until subsequent cleanup
-		List<MeasuredValue> pmvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
+		List<CsiAggregation> pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
 		List<MeasuredValueUpdateEvent> updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(pmvs*.isCalculatedWithoutData(),  everyItem(is(true)))
 		assertThat(updateEventsOfPmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
-		pmvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
+		pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
 		updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(true)))
@@ -212,8 +212,8 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
 		createMvWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
 		
-		List<MeasuredValue> mvs = MeasuredValue.list()
-		List<MeasuredValue> smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
+		List<CsiAggregation> mvs = CsiAggregation.list()
+		List<CsiAggregation> smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
 		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(false)))
@@ -224,7 +224,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		smvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
+		smvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
 		updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(true)))
@@ -232,14 +232,14 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		assertThat(updateEvents.size(), is(0))
 		
 		//second call cause the calculation of shop mvs creates new page mvs which get closed and calculated not until subsequent cleanup
-		List<MeasuredValue> pmvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
+		List<CsiAggregation> pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
 		List<MeasuredValueUpdateEvent> updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(pmvs*.isCalculatedWithoutData(),  everyItem(is(true)))
 		assertThat(updateEventsOfPmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
-		pmvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
+		pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
 		updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(true)))
@@ -257,7 +257,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		List<MeasuredValue> mvs = MeasuredValue.list()
+		List<CsiAggregation> mvs = CsiAggregation.list()
 		List<MeasuredValueUpdateEvent> updateEvents = MeasuredValueUpdateEvent.list()
 		assertThat(mvs.size(), is(1))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
@@ -275,7 +275,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		List<MeasuredValue> mvs = MeasuredValue.list()
+		List<CsiAggregation> mvs = CsiAggregation.list()
 		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(mvs*.ident())
 		assertThat(mvs.size(), is(1))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
@@ -293,7 +293,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		List<MeasuredValue> smvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
+		List<CsiAggregation> smvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
 		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(1))
 		assertThat(smvs[0].closedAndCalculated, is(false))
@@ -311,7 +311,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
 		
 		//assertions
-		List<MeasuredValue> smvs = MeasuredValue.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
+		List<CsiAggregation> smvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
 		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(1))
 		assertThat(smvs[0].closedAndCalculated, is(false))
@@ -321,7 +321,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 	
 	void createMvWithUpdateEventOutdated(Date started, MeasuredValueInterval interval, AggregatorType aggregator, boolean closed, String tag){
 		String resultIdsIrrelevantInTheseTests = '1,2,3'
-		MeasuredValue mv = TestDataUtil.createMeasuredValue(
+		CsiAggregation mv = TestDataUtil.createMeasuredValue(
 			started,
 			interval,
 			aggregator,

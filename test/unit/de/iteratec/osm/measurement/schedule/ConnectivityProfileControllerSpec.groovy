@@ -4,7 +4,7 @@ import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -14,13 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
 @TestFor(ConnectivityProfileController)
-@Mock([ConnectivityProfileService, ConnectivityProfile, MeasuredValue, Job, MeasuredValueInterval, AggregatorType, Script, Location, JobGroup])
+@Mock([ConnectivityProfileService, ConnectivityProfile, CsiAggregation, Job, MeasuredValueInterval, AggregatorType, Script, Location, JobGroup])
 class ConnectivityProfileControllerSpec extends Specification {
 
     ConnectivityProfileController controllerUnderTest
     ConnectivityProfile existingConnectivityProfile
 
-    MeasuredValue mvWithOldConnectiviyProfile
+    CsiAggregation mvWithOldConnectiviyProfile
     Job jobWithOldConnectivityProfile
 
 

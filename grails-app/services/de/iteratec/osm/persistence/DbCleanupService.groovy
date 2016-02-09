@@ -21,7 +21,7 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
@@ -30,11 +30,8 @@ import grails.gorm.DetachedCriteria
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.dao.EventResultDaoService
-import org.quartz.core.QuartzScheduler
 
 //import org.springframework.transaction.TransactionDefinition
-import org.springframework.transaction.support.DefaultTransactionDefinition
-
 /**
  * Provides methods for cleanup db. Can be used by quartz-jobs.
  */
@@ -148,17 +145,17 @@ class DbCleanupService {
 
 
     /**
-     * Deletes all {@link MeasuredValue}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
+     * Deletes all {@link CsiAggregation}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
     void deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(Date toDeleteBefore, boolean createBatchActivity = true){
         log.info "begin with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
 
-        def measuredValueDetachedCriteria = new DetachedCriteria(MeasuredValue).build {
+        def measuredValueDetachedCriteria = new DetachedCriteria(CsiAggregation).build {
             lt 'started', toDeleteBefore
         }
         int measuredValueCount = measuredValueDetachedCriteria.count()
-        log.info "MeasuredValue - Count : ${measuredValueCount}"
+        log.info "CsiAggregation - Count : ${measuredValueCount}"
 
         def measuredValueUpdateEventDetachedCriteria = new DetachedCriteria(MeasuredValueUpdateEvent).build {
             'in'('measuredValueId', measuredValueDetachedCriteria.list()*.id )
@@ -196,8 +193,8 @@ class DbCleanupService {
             //After then clean MeasuredValues
             0.step(measuredValueCount, batchSize) { int offset ->
                 batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
-                MeasuredValue.withNewTransaction {
-                    measuredValueDetachedCriteria.list(max: batchSize).each { MeasuredValue measuredValue ->
+                CsiAggregation.withNewTransaction {
+                    measuredValueDetachedCriteria.list(max: batchSize).each { CsiAggregation measuredValue ->
                         try {
                             measuredValue.delete()
                         } catch (Exception e) {
@@ -205,7 +202,7 @@ class DbCleanupService {
                     }
                 }
                 //clear hibernate session first-level cache
-                MeasuredValue.withSession { session -> session.clear() }
+                CsiAggregation.withSession { session -> session.clear() }
             }
             batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
             log.debug('Deletion of MeasuredValues finished')

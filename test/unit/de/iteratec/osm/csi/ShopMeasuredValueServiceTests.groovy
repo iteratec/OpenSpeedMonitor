@@ -31,7 +31,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
@@ -52,7 +52,7 @@ import de.iteratec.osm.measurement.environment.Location
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestFor(ShopMeasuredValueService)
-@Mock([MeanCalcService, MeasuredValue, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location, PageMeasuredValueService,
+@Mock([MeanCalcService, CsiAggregation, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location, PageMeasuredValueService,
         Page, DefaultMeasuredEventDaoService, EventMeasuredValueService, MeasuredValueDaoService, CustomerSatisfactionWeightService, MeasuredValueUpdateEvent])
 class ShopMeasuredValueServiceTests {
     MeasuredValueInterval weeklyInterval, dailyInterval, hourlyInterval
@@ -89,11 +89,11 @@ class ShopMeasuredValueServiceTests {
         browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
 
         //with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: shop, tag: '1', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: shop, tag: '2', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: shop, tag: '3', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '1', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '2', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '3', started: startDate.toDate()).save(validate: false)
         //not with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: shop, tag: '4', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '4', started: startDate.toDate()).save(validate: false)
 
         serviceUnderTest = service
         //mocks common for all tests
@@ -142,8 +142,8 @@ class ShopMeasuredValueServiceTests {
     }
 
     /**
-     * Tests calculation of daily-shop{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test one single page-{@link MeasuredValue}s exists, which should be the database of the calculation of the daily-shop-{@link MeasuredValue}.
+     * Tests calculation of daily-shop{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test one single page-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-shop-{@link CsiAggregation}.
      */
     @Test
     void testCalculation_DailyInterval_SingleDailyMv() {
@@ -162,25 +162,25 @@ class ShopMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
 
         //assertions
 
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
-        assertEquals(12d, calculatedMvs[0].value, DELTA)
+        assertEquals(12d, calculatedMvs[0].csByWptDocCompleteInPercent, DELTA)
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
     }
 
     /**
-     * Tests calculation of daily-shop-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test page-{@link MeasuredValue}s with different weights exist.
+     * Tests calculation of daily-shop-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test page-{@link CsiAggregation}s with different weights exist.
      */
     @Test
     void testCalculation_DailyInterval_MultipleDailyMv() {
@@ -200,11 +200,11 @@ class ShopMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
 
         //assertions
 
@@ -220,7 +220,7 @@ class ShopMeasuredValueServiceTests {
         double sumOfAllWeights = 4d
         assertEquals(
                 (((valueFirstMv * pageWeightFirstMv) + (valueSecondMv * pageWeightSecondMv) + (valueThirdMv * pageWeightThirdMv)) / sumOfAllWeights),
-                calculatedMvs[0].value,
+                calculatedMvs[0].csByWptDocCompleteInPercent,
                 DELTA
         )
 
@@ -230,8 +230,8 @@ class ShopMeasuredValueServiceTests {
     }
 
     /**
-     * Tests calculation of daily-shop-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test no page-{@link MeasuredValue}s exist, which are database of the calculation of daily-shop-{@link MeasuredValue}s. So all calculated values should have state {@link Calculated#YesNoData}
+     * Tests calculation of daily-shop-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test no page-{@link CsiAggregation}s exist, which are database of the calculation of daily-shop-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
      */
     @Test
     void testCalculation_DailyInterval_MultipleHourlyMv_YesCalculatedNoData() {
@@ -244,18 +244,18 @@ class ShopMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
 
         //assertions
 
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
-        assertEquals(null, calculatedMvs[0].value)
-        assertEquals(0, calculatedMvs[0].getResultIds().size())
+        assertEquals(null, calculatedMvs[0].csByWptDocCompleteInPercent)
+        assertEquals(0, calculatedMvs[0].getUnderlyingEventResultsByWptDocComplete().size())
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
@@ -269,7 +269,7 @@ class ShopMeasuredValueServiceTests {
         def pageMeasuredValueService = mockFor(PageMeasuredValueService, true)
         pageMeasuredValueService.demand.getOrCalculatePageMeasuredValues(0..10000) {
             Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups ->
-                List<MeasuredValue> irrelevantCauseListOfWeightedValuesIsRetrievedByMock = [new MeasuredValue()]
+                List<CsiAggregation> irrelevantCauseListOfWeightedValuesIsRetrievedByMock = [new CsiAggregation()]
                 return irrelevantCauseListOfWeightedValuesIsRetrievedByMock
         }
         serviceUnderTest.pageMeasuredValueService = pageMeasuredValueService.createMock();

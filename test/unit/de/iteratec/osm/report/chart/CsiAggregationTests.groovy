@@ -18,7 +18,6 @@
 package de.iteratec.osm.report.chart
 
 import static org.junit.Assert.*
-import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
 import grails.test.mixin.*
@@ -28,18 +27,12 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.*
 
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-
 /**
- * Test-suite for {@link MeasuredValue}.
+ * Test-suite for {@link CsiAggregation}.
  */
 @TestMixin(GrailsUnitTestMixin)
-@Mock([MeasuredValue, AggregatorType, MeasuredValueInterval, MeasuredValueUpdateEvent])
-class MeasuredValueTests {
+@Mock([CsiAggregation, AggregatorType, MeasuredValueInterval, MeasuredValueUpdateEvent])
+class CsiAggregationTests {
 	
 	Date dateOfMv1
 	Date dateOfMv2
@@ -68,25 +61,25 @@ class MeasuredValueTests {
 		
 		dateOfMv1 = new DateTime(2012,1,1,0,0, DateTimeZone.UTC).toDate()
 		dateOfMv2 = new DateTime(2012,1,2,0,0, DateTimeZone.UTC).toDate()
-		new MeasuredValue(
+		new CsiAggregation(
 			started: dateOfMv1,
 			interval: hourly,
 			aggregator: measuredEvent,
 			tag: '1;1;1;1;1',
-			resultIds: ''
+			underlyingEventResultsByWptDocComplete: ''
 		).save(failOnError: true)
-		new MeasuredValue(
+		new CsiAggregation(
 			started: dateOfMv2,
 			interval: hourly,
 			aggregator: measuredEvent,
 			tag: '1;1;1;1;1',
-			resultIds: '1,2'
+			underlyingEventResultsByWptDocComplete: '1,2'
 		).save(failOnError: true)
     }
 	
 	@Test
     void testAccessingResultIds() {
-		MeasuredValue mvInitialWithoutResultids = MeasuredValue.findByStarted(dateOfMv1)
+		CsiAggregation mvInitialWithoutResultids = CsiAggregation.findByStarted(dateOfMv1)
 		
 		assertEquals(0, mvInitialWithoutResultids.countResultIds())
 		assertEquals(0, mvInitialWithoutResultids.getResultIdsAsList().size())
@@ -95,14 +88,14 @@ class MeasuredValueTests {
 		assertEquals(1, mvInitialWithoutResultids.countResultIds())
 		assertEquals(1, mvInitialWithoutResultids.getResultIdsAsList().size())
 		
-		MeasuredValue mvWith2Results = MeasuredValue.findByStarted(dateOfMv2)
+		CsiAggregation mvWith2Results = CsiAggregation.findByStarted(dateOfMv2)
 		assertEquals(2,  mvWith2Results.countResultIds())
 		assertEquals(2, mvWith2Results.getResultIdsAsList().size())
 		
 		mvInitialWithoutResultids.addAllToResultIds(mvWith2Results.getResultIdsAsList())
 		assertEquals(3, mvInitialWithoutResultids.getResultIdsAsList().size())
 		
-		mvInitialWithoutResultids.addAllToResultIds(mvWith2Results.resultIds)
+		mvInitialWithoutResultids.addAllToResultIds(mvWith2Results.underlyingEventResultsByWptDocComplete)
 		assertEquals(5,  mvInitialWithoutResultids.countResultIds())
 		assertEquals(5, mvInitialWithoutResultids.getResultIdsAsList().size())
 		
@@ -113,8 +106,8 @@ class MeasuredValueTests {
     }
 	
 	/**
-	 * This test adds duplicate {@link EventResult}-ID's to {@link MeasuredValue}. This shouldn't occur in production.
-	 * We had a bug with this (see https://seu.hh.iteratec.de:8444/browse/IT-381) and decided to remove persistence of result_ids-String for daily and weekly-aggregated {@link MeasuredValue}s.
+	 * This test adds duplicate {@link EventResult}-ID's to {@link CsiAggregation}. This shouldn't occur in production.
+	 * We had a bug with this (see https://seu.hh.iteratec.de:8444/browse/IT-381) and decided to remove persistence of result_ids-String for daily and weekly-aggregated {@link CsiAggregation}s.
 	 * If duplicate ID's get persisted we just log an error but don't throw an exception, cause the error just arose with daily and/or weekly-result_ids-Strings and didn't had any productive impact. 
 	 * So this test just guarantees, that duplicate result-ids get persisted, although this doesn't make much sense.
 	 */
@@ -123,7 +116,7 @@ class MeasuredValueTests {
 		
 		//test specific data/////////////////////////////////////////////////////
 		
-		MeasuredValue mvInitialWithoutResultids = MeasuredValue.findByStarted(dateOfMv1)
+		CsiAggregation mvInitialWithoutResultids = CsiAggregation.findByStarted(dateOfMv1)
 		
 		//test execution and assertions/////////////////////////////////////////////////////
 		
@@ -157,7 +150,7 @@ class MeasuredValueTests {
 	@Test
 	public void testHasToBeCalculatedWithoutUpdateEvents() {
 		//create test-specific data
-		MeasuredValue mv = new MeasuredValue().save(validate: false)
+		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		//test
 		assertThat(mv.hasToBeCalculated(), is(true))
 	}
@@ -165,7 +158,7 @@ class MeasuredValueTests {
 	@Test
 	public void testHasToBeCalculatedLastUpdateEventOutdated() {
 		//create test-specific data
-		MeasuredValue mv = new MeasuredValue().save(validate: false)
+		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		Long mvId = mv.ident()
 		Date timestamp1 = new DateTime(2014,6,25,0,1,0).toDate()
 		Date timestamp2 = new DateTime(2014,6,25,0,2,0).toDate()
@@ -203,7 +196,7 @@ class MeasuredValueTests {
 	@Test
 	public void testHasToBeCalculatedLastUpdateEventCalculated() {
 		//create test-specific data
-		MeasuredValue mv = new MeasuredValue().save(validate: false)
+		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		Long mvId = mv.ident()
 		Date timestamp1 = new DateTime(2014,6,25,0,1,0).toDate()
 		Date timestamp2 = new DateTime(2014,6,25,0,2,0).toDate()
@@ -241,7 +234,7 @@ class MeasuredValueTests {
 	@Test
 	public void testHasToBeCalculatedAccordingEvents_WithoutUpdateEvents(){
 		//create test-specific data
-		MeasuredValue mv = new MeasuredValue().save(validate: false)
+		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		Long mvId = mv.ident()
 		Date timestamp1 = new DateTime(2014,6,25,0,1,0).toDate()
 		MeasuredValueUpdateEvent calculationOfOtherMeasuredValue = new MeasuredValueUpdateEvent(
@@ -259,7 +252,7 @@ class MeasuredValueTests {
 		
 		//create test-specific data
 		
-		MeasuredValue mv = new MeasuredValue().save(validate: false)
+		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		Long mvId = mv.ident()
 		Date timestamp1 = new DateTime(2014,6,25,0,1,0).toDate()
 		Date timestamp2 = new DateTime(2014,6,25,0,2,0).toDate()
@@ -312,7 +305,7 @@ class MeasuredValueTests {
 		
 		//create test-specific data
 		
-		MeasuredValue mv = new MeasuredValue().save(validate: false)
+		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		Long mvId = mv.ident()
 		Date timestamp1 = new DateTime(2014,6,25,0,1,0).toDate()
 		Date timestamp2 = new DateTime(2014,6,25,0,2,0).toDate()

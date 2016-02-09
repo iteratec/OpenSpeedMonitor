@@ -48,11 +48,11 @@ import org.junit.Test
 import static org.junit.Assert.assertEquals
 
 /**
- * Tests the updating of hourly event-{@link MeasuredValue}s when a new {@link EventResult} is coming in.
+ * Tests the updating of hourly event-{@link CsiAggregation}s when a new {@link EventResult} is coming in.
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventMeasuredValueService)
-@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, MeasuredValue, MeasuredValueInterval,
+@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, MeasuredValueInterval,
 	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, MeasuredValueUpdateEvent,
 	ConnectivityProfile, CsiConfiguration])
 class UpdateEventResultDependentMeasuredValuesTests {
@@ -119,7 +119,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	//tests////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Tests the update of dependent hourly event-{@link MeasuredValue}s.
+	 * Tests the update of dependent hourly event-{@link CsiAggregation}s.
 	 */
 	@Test
 	void testUpdateDependentMeasuredValues() {
@@ -144,11 +144,11 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		
 		//assertions (and following executions of tested method)
 
-		List<MeasuredValue> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly, result1.connectivityProfile)
+		List<CsiAggregation> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly, result1.connectivityProfile)
 		Integer countEvents = 1
 		assertEquals(countEvents, hourlyMvs.size())
 		
-		MeasuredValue calculated = hourlyMvs[0]
+		CsiAggregation calculated = hourlyMvs[0]
 		Double expectedValue = 50
 		proofHemv(calculated, true, 1, expectedValue)
 		
@@ -165,7 +165,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	}
 	
 	/**
-	 * Tests the update of dependent hourly event-{@link MeasuredValue}s for different CSI-{@link JobGroup}s.
+	 * Tests the update of dependent hourly event-{@link CsiAggregation}s for different CSI-{@link JobGroup}s.
 	 */
 	@Test
 	void testUpdateDependentMeasuredValuesForMultipleCsiGroups() {
@@ -192,43 +192,43 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		
 		//assertions
 		
-		List<MeasuredValue> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly)
+		List<CsiAggregation> hourlyMvs = serviceUnderTest.findAll(resultsExecutionTime.toDate(), resultsExecutionTime.toDate(), hourly)
 		Integer countEvents = 2
 		assertEquals(countEvents, hourlyMvs.size())
 		
-		List<MeasuredValue> hourlyMvsOfGroup1 = hourlyMvs.findAll{it.tag ==~ /${jobGroup1Id};\d+;\d+;\d+;\d+/}
+		List<CsiAggregation> hourlyMvsOfGroup1 = hourlyMvs.findAll{it.tag ==~ /${jobGroup1Id};\d+;\d+;\d+;\d+/}
 		assertEquals(1, hourlyMvsOfGroup1.size())
 		proofHemv(hourlyMvsOfGroup1[0], true, 2, 85)
 		
-		List<MeasuredValue> hourlyMvsOfGroup2 = hourlyMvs.findAll{it.tag ==~ /${jobGroup2Id};\d+;\d+;\d+;\d+/}
+		List<CsiAggregation> hourlyMvsOfGroup2 = hourlyMvs.findAll{it.tag ==~ /${jobGroup2Id};\d+;\d+;\d+;\d+/}
 		assertEquals(1, hourlyMvsOfGroup2.size())
 		proofHemv(hourlyMvsOfGroup2[0], true, 3, 20)
 		
 	}
 	
 	/**
-	 * Executes assertions to proof calculated {@link MeasuredValue}.
+	 * Executes assertions to proof calculated {@link CsiAggregation}.
 	 * @param mvHourlyEvent
-	 * 			{@link MeasuredValue} to proof
+	 * 			{@link CsiAggregation} to proof
 	 * @param expectedCalculatedState
-	 * 			Calculated-state of calculated {@link MeasuredValue} to expect. 
+	 * 			Calculated-state of calculated {@link CsiAggregation} to expect.
 	 * @param expectedResultCount
-	 * 			Count of {@link EventResult}s of calculated {@link MeasuredValue} to expect.
+	 * 			Count of {@link EventResult}s of calculated {@link CsiAggregation} to expect.
 	 * @param expectedValue
-	 * 			Double-value of calculated {@link MeasuredValue} to expect.
+	 * 			Double-value of calculated {@link CsiAggregation} to expect.
 	 */
 	private void proofHemv(
-		MeasuredValue mvHourlyEvent,
-		boolean expectedCalculatedState,
-		Integer expectedResultCount,
-		expectedValue){
+			CsiAggregation mvHourlyEvent,
+			boolean expectedCalculatedState,
+			Integer expectedResultCount,
+			expectedValue){
 		
 		assertEquals(resultsExecutionTime.toDate(), mvHourlyEvent.started)
 		assertEquals(hourly.intervalInMinutes, mvHourlyEvent.interval.intervalInMinutes)
 		assertEquals(measuredEvent.name, mvHourlyEvent.aggregator.name)
 		assertEquals(expectedCalculatedState, mvHourlyEvent.isCalculated())
 		assertEquals(expectedResultCount, mvHourlyEvent.countResultIds())
-		assertEquals(expectedValue, mvHourlyEvent.value, DELTA)
+		assertEquals(expectedValue, mvHourlyEvent.csByWptDocCompleteInPercent, DELTA)
 		
 	}
 		
@@ -259,7 +259,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			lastStatusUpdate: resultsExecutionTime.toDate(),
 			wptStatus: 0,
 			validationState : 'validationState',
-			customerSatisfactionInPercent: cs,
+			csByWptDocCompleteInPercent: cs,
 			jobResult: jobResult,
 			jobResultDate: jobResult.date,
 			jobResultJobConfigId: jobResult.job.ident(),
@@ -446,7 +446,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	 */
 	private void deleteTestData() {
 		OsmConfiguration.list()*.delete(flush: true)
-		MeasuredValue.list()*.delete(flush: true)
+		CsiAggregation.list()*.delete(flush: true)
 		CsiDay.list()*.delete(flush: true)
 		EventResult.list()*.delete(flush: true)
 		JobResult.list()*.delete(flush: true)

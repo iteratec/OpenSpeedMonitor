@@ -27,9 +27,8 @@ import org.junit.Before
 
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.MeasuredEvent
@@ -73,7 +72,7 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		String browserIE_ID = Browser.findByName('IE').ident().toString()
 		String browserFF_ID = Browser.findByName('FF').ident().toString()
 		
-		List<MeasuredValue> hmvs = []
+		List<CsiAggregation> hmvs = []
 		// HP|IE
 		double csiHpIe1 = 0.52d
 		double csiHpIe2 = 0.54d
@@ -123,7 +122,7 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		//test-execution ////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		Date startOfDailyInterval = measuredValueUtilService.resetToStartOfActualInterval(START, MeasuredValueInterval.DAILY).toDate()
-		List<MeasuredValue> smvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
+		List<CsiAggregation> smvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
 			startOfDailyInterval,
 			startOfDailyInterval,
 			MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY),
@@ -131,10 +130,10 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		)
 
 		//assertions ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		List<MeasuredValue> allMvs = MeasuredValue.list()
-		List<MeasuredValue> hourlyEventMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.HOURLY && it.aggregator.name == AggregatorType.MEASURED_EVENT}
-		List<MeasuredValue> dailyPageMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.DAILY && it.aggregator.name == AggregatorType.PAGE}
-		List<MeasuredValue> dailyShopMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.DAILY && it.aggregator.name == AggregatorType.SHOP}
+		List<CsiAggregation> allMvs = CsiAggregation.list()
+		List<CsiAggregation> hourlyEventMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.HOURLY && it.aggregator.name == AggregatorType.MEASURED_EVENT}
+		List<CsiAggregation> dailyPageMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.DAILY && it.aggregator.name == AggregatorType.PAGE}
+		List<CsiAggregation> dailyShopMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.DAILY && it.aggregator.name == AggregatorType.SHOP}
 		
 		assertEquals(12, hourlyEventMvs.size())
 		assertEquals(12, hourlyEventMvs.findAll{ it.isCalculatedWithData() }.size())
@@ -146,10 +145,10 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		
 		assertEquals(1, dailyShopMvs.size())
 		assertTrue(dailyShopMvs[0].isCalculatedWithData())
-		assertEquals(expectedCsi, dailyShopMvs[0].value, DELTA)
+		assertEquals(expectedCsi, dailyShopMvs[0].csByWptDocCompleteInPercent, DELTA)
 		assertEquals(1, smvs.size())
 		assertTrue(smvs[0].isCalculatedWithData())
-		assertEquals(expectedCsi, smvs[0].value, DELTA)
+		assertEquals(expectedCsi, smvs[0].csByWptDocCompleteInPercent, DELTA)
 		
 		//duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi) 
 		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1))
@@ -159,7 +158,7 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2))
 		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3))
 		
-		MeasuredValue.list().findAll{ ! it.aggregator.name.equals(AggregatorType.MEASURED_EVENT) }*.delete(flush: true)
+		CsiAggregation.list().findAll{ ! it.aggregator.name.equals(AggregatorType.MEASURED_EVENT) }*.delete(flush: true)
 		
 		smvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
 			startOfDailyInterval,
@@ -169,18 +168,18 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		)
 		assertEquals(1, smvs.size())
 		assertTrue(smvs[0].isCalculatedWithData())
-		assertEquals(expectedCsi, smvs[0].value, DELTA)
+		assertEquals(expectedCsi, smvs[0].csByWptDocCompleteInPercent, DELTA)
 		
     }
 	
-	MeasuredValue createMeasuredValue(String tag, double value){
-		MeasuredValue mv = new MeasuredValue(
+	CsiAggregation createMeasuredValue(String tag, double value){
+		CsiAggregation mv = new CsiAggregation(
 			started: START.toDate(),
 			interval: MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
 			aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
 			tag: tag,
-			value: value,
-			resultIds: '1',
+			csByWptDocCompleteInPercent: value,
+			underlyingEventResultsByWptDocComplete: '1',
 		).save(failOnError: true)
 		new MeasuredValueUpdateEvent(
 			dateOfUpdate: new Date(),

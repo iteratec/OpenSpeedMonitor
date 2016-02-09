@@ -45,7 +45,7 @@ import static org.junit.Assert.assertNotNull
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
  */
 @TestFor(CustomerSatisfactionHighChartService)
-@Mock([AggregatorType, MeasuredValue, MeasuredValueInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
+@Mock([AggregatorType, CsiAggregation, MeasuredValueInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
 	Script, WebPageTestServer])
 class CustomerSatisfactionHighChartServiceTests extends Specification{
 
@@ -61,7 +61,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
     @Shared Date fourMonthsAgo
 
 	/**
-	 * Contains one {@link MeasuredValue} for each existing combination of the following domain-objects
+	 * Contains one {@link CsiAggregation} for each existing combination of the following domain-objects
 	 * (2 objects of each got created as test data before test-execution):
 	 * <ul>
 	 * <li>{@link JobGroup}</li>
@@ -70,18 +70,18 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	 * <li>{@link Browser}</li>
 	 * <li>{@link Location}</li>
 	 * </ul>
-	 * So it contains 2EXP5=32 {@link MeasuredValue}s with respective tags.<br>
+	 * So it contains 2EXP5=32 {@link CsiAggregation}s with respective tags.<br>
 	 * <em>Note:</em>
-	 * The id's of these domains are concatenated to the tag of hourly event-{@link MeasuredValue}s.
+	 * The id's of these domains are concatenated to the tag of hourly event-{@link CsiAggregation}s.
 	 * @see #createMeasuredValues()
-	 * @see MeasuredValue#tag
+	 * @see CsiAggregation#tag
 	 */
-    @Shared List<MeasuredValue> measuredValueForEventHourlyList = []
-    @Shared List<MeasuredValue> measuredValueForPageWeeklyList = []
-    @Shared List<MeasuredValue> measuredValueForShopWeeklyList = []
-    @Shared List<MeasuredValue> measuredValueForShopWeeklyWithNullList = []
-    @Shared List<MeasuredValue> measuredValueListWithValuesLowerThanOne = []
-    @Shared List<MeasuredValue> measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
+    @Shared List<CsiAggregation> measuredValueForEventHourlyList = []
+    @Shared List<CsiAggregation> measuredValueForPageWeeklyList = []
+    @Shared List<CsiAggregation> measuredValueForShopWeeklyList = []
+    @Shared List<CsiAggregation> measuredValueForShopWeeklyWithNullList = []
+    @Shared List<CsiAggregation> measuredValueListWithValuesLowerThanOne = []
+    @Shared List<CsiAggregation> measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
 
     @Shared List<String> expectedJobLabels = ['job1', 'job2']
 
@@ -121,13 +121,13 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         where:
         mv << [
-            new MeasuredValue(
+            new CsiAggregation(
                     aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
                     tag: "1;2;1;2;1"),
-            new MeasuredValue(
+            new CsiAggregation(
                     aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
                     tag: "1;1;1;1;1"),
-            new MeasuredValue(
+            new CsiAggregation(
                     aggregator: new AggregatorType(name: AggregatorType.MEASURED_EVENT),
                     tag: "2;2;2;2;2")
         ]
@@ -152,15 +152,15 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         where:
         mv << [
-                new MeasuredValue(
+                new CsiAggregation(
                         aggregator: new AggregatorType(name: AggregatorType.PAGE),
                         interval: weekly,
                         tag: "1;1"),
-                new MeasuredValue(
+                new CsiAggregation(
                         aggregator: new AggregatorType(name: AggregatorType.PAGE),
                         interval: weekly,
                         tag: "1;2"),
-                new MeasuredValue(
+                new CsiAggregation(
                         aggregator: new AggregatorType(name: AggregatorType.PAGE),
                         interval: weekly,
                         tag: "2;2")
@@ -180,11 +180,11 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         where:
         mv << [
-                new MeasuredValue(
+                new CsiAggregation(
                         aggregator: new AggregatorType(name: AggregatorType.SHOP),
                         interval: weekly,
                         tag: "1"),
-                new MeasuredValue(
+                new CsiAggregation(
                         aggregator: new AggregatorType(name: AggregatorType.SHOP),
                         interval: weekly,
                         tag: "2")
@@ -470,164 +470,164 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 					2.times {zeroBasedIndexBrowser ->
 						2.times {zeroBasedIndexLocation ->
 							measuredValueForEventHourlyList.add(
-									new MeasuredValue(
+									new CsiAggregation(
 									started: now,
 									interval: hourly,
 									aggregator: measured_event,
 									tag: "${zeroBasedIndexJobGroup+1};${zeroBasedIndexPage+1};${zeroBasedIndexMeasuredEvent+1};${zeroBasedIndexBrowser+1};${zeroBasedIndexLocation+1}",
-									value: 85,
-									resultIds: '1,2'
+									csByWptDocCompleteInPercent: 85,
+									underlyingEventResultsByWptDocComplete: '1,2'
 									))
 						}}}}}
 
 		measuredValueForPageWeeklyList = [
-			new MeasuredValue(
+			new CsiAggregation(
 			started: now,
 			interval: hourly,
 			aggregator: page,
 			tag: "1;1",
-			value: 85,
-			resultIds: '1,2'
+			csByWptDocCompleteInPercent: 85,
+			underlyingEventResultsByWptDocComplete: '1,2'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 3),
 				interval: hourly,
 				aggregator: page,
 				tag: "1;1",
-				value: 83,
-				resultIds: '5,6'
+				csByWptDocCompleteInPercent: 83,
+				underlyingEventResultsByWptDocComplete: '5,6'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 2),
 				interval: hourly,
 				aggregator: page,
 				tag: "1;1",
-				value: 79,
-				resultIds: '3,4'
+				csByWptDocCompleteInPercent: 79,
+				underlyingEventResultsByWptDocComplete: '3,4'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 2),
 				interval: hourly,
 				aggregator: page,
 				tag: "1;2",
-				value: 65,
-				resultIds: '7,8'
+				csByWptDocCompleteInPercent: 65,
+				underlyingEventResultsByWptDocComplete: '7,8'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: now,
 				interval: hourly,
 				aggregator: page,
 				tag: "1;2",
-				value: 67,
-				resultIds: '9,10'
+				csByWptDocCompleteInPercent: 67,
+				underlyingEventResultsByWptDocComplete: '9,10'
 			)
 		]
 
 		measuredValueForShopWeeklyList = [
-			new MeasuredValue(
+			new CsiAggregation(
 				started: now,
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 85,
-				resultIds: '1,2'
+				csByWptDocCompleteInPercent: 85,
+				underlyingEventResultsByWptDocComplete: '1,2'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 3),
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 83,
-				resultIds: '5,6'
+				csByWptDocCompleteInPercent: 83,
+				underlyingEventResultsByWptDocComplete: '5,6'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 2),
 				interval: hourly,
 				aggregator: shop,
 				tag: '1',
-				value: 79,
-				resultIds: '3,4'
+				csByWptDocCompleteInPercent: 79,
+				underlyingEventResultsByWptDocComplete: '3,4'
 			)
 		]
 
 		measuredValueForShopWeeklyWithNullList = [
-			new MeasuredValue(
+			new CsiAggregation(
 				started: now,
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: null,
-				resultIds: '1,2'
+				csByWptDocCompleteInPercent: null,
+				underlyingEventResultsByWptDocComplete: '1,2'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 3),
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 83,
-				resultIds: '5,6'
+				csByWptDocCompleteInPercent: 83,
+				underlyingEventResultsByWptDocComplete: '5,6'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 2),
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 79,
-				resultIds: '3,4'
+				csByWptDocCompleteInPercent: 79,
+				underlyingEventResultsByWptDocComplete: '3,4'
 			)
 		]
 
 		measuredValueListWithValuesLowerThanOne = [
-			new MeasuredValue(
+			new CsiAggregation(
 				started: now,
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 32,
-				resultIds: '1,2'
+				csByWptDocCompleteInPercent: 32,
+				underlyingEventResultsByWptDocComplete: '1,2'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 			started: DateUtils.addHours(now, 3),
 			interval: weekly,
 			aggregator: shop,
 			tag: '1',
-			value: 83,
-			resultIds: '5,6'
+			csByWptDocCompleteInPercent: 83,
+			underlyingEventResultsByWptDocComplete: '5,6'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 2),
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 79,
-				resultIds: '3,4'
+				csByWptDocCompleteInPercent: 79,
+				underlyingEventResultsByWptDocComplete: '3,4'
 			)
 		]
 
 		measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = [
-			new MeasuredValue(
+			new CsiAggregation(
 				started: now,
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 32.4562,
-				resultIds: '1,2'
+				csByWptDocCompleteInPercent: 32.4562,
+				underlyingEventResultsByWptDocComplete: '1,2'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 3),
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 83.12367,
-				resultIds: '5,6'
+				csByWptDocCompleteInPercent: 83.12367,
+				underlyingEventResultsByWptDocComplete: '5,6'
 			),
-			new MeasuredValue(
+			new CsiAggregation(
 				started: DateUtils.addHours(now, 2),
 				interval: weekly,
 				aggregator: shop,
 				tag: '1',
-				value: 79.0968,
-				resultIds: '3,4'
+				csByWptDocCompleteInPercent: 79.0968,
+				underlyingEventResultsByWptDocComplete: '3,4'
 			)
 		]
 	}
@@ -672,7 +672,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
         // the service under test don't care about the URL itself.
         serviceUnderTest.eventResultDashboardService = new EventResultDashboardService() {
             @Override
-            public URL tryToBuildTestsDetailsURL(MeasuredValue mv) {
+            public URL tryToBuildTestsDetailsURL(CsiAggregation mv) {
                 return new URL('http://measuredvalue.example.com/'+mv.id);
             }
         }

@@ -32,7 +32,7 @@ import org.springframework.transaction.TransactionStatus
 /**
  * Contains the logic to ...
  * <ul>
- * <li>calculate (if necessary) and close {@link MeasuredValue}s who aren't already closed and who's interval expired.</li>
+ * <li>calculate (if necessary) and close {@link CsiAggregation}s who aren't already closed and who's interval expired.</li>
  * <li>cleanup associated {@link MeasuredValueUpdateEvent}s.</li>
  * </ul>
  * @author nkuhn
@@ -53,20 +53,20 @@ class MvUpdateEventCleanupService {
 
     /**
      * <p>
-     * Closes all {@link MeasuredValue}s with closedAndCalculated=false who's time-interval has expired for at least minutes minutes.<br>
+     * Closes all {@link CsiAggregation}s with closedAndCalculated=false who's time-interval has expired for at least minutes minutes.<br>
      * Closing means:
      * <ul>
      * <li>set attribute closedAndCalculated to true</li>
-     * <li>calculate MeasuredValue</li>
-     * <li>delete all {@link MeasuredValueUpdateEvent}s of MeasuredValue</li>
+     * <li>calculate CsiAggregation</li>
+     * <li>delete all {@link MeasuredValueUpdateEvent}s of CsiAggregation</li>
      * </ul>
      * Hourly event MeasuredValues should never be closed here because they are set as closed with creation already.
      * </p>
      * @param minutes
-     * 					Time for which the MeasuredValue has to be expired.  e.g.
+     * 					Time for which the CsiAggregation has to be expired.  e.g.
      * 					<ul>
-     * 					<li>A DAILY-MeasuredValue with <code>started=2014-07-07 00:00:00</code> and an expiration-time of 180 minutes expires at "2014-07-08 03:00:00"</li>
-     * 					<li>A WEEKLY-MeasuredValue with <code>started=2014-07-04 00:00:00</code> and an expiration-time of 300 minutes expires at "2014-07-11 05:00:00"</li>
+     * 					<li>A DAILY-CsiAggregation with <code>started=2014-07-07 00:00:00</code> and an expiration-time of 180 minutes expires at "2014-07-08 03:00:00"</li>
+     * 					<li>A WEEKLY-CsiAggregation with <code>started=2014-07-04 00:00:00</code> and an expiration-time of 300 minutes expires at "2014-07-11 05:00:00"</li>
      * 					</ul>
      */
     void closeMeasuredValuesExpiredForAtLeast(int minutes, boolean createBatchActivity = true) {
@@ -76,7 +76,7 @@ class MvUpdateEventCleanupService {
             return
         }
 
-        List<MeasuredValue> mvsOpenAndExpired = measuredValueDaoService.getOpenMeasuredValuesWhosIntervalExpiredForAtLeast(minutes)
+        List<CsiAggregation> mvsOpenAndExpired = measuredValueDaoService.getOpenMeasuredValuesWhosIntervalExpiredForAtLeast(minutes)
         log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${mvsOpenAndExpired.size()} MeasuredValues identified as open and expired.")
         if (mvsOpenAndExpired.size() > 0) {
             closeAndCalculateIfNecessary(mvsOpenAndExpired, createBatchActivity)
@@ -85,7 +85,7 @@ class MvUpdateEventCleanupService {
         deleteUpdateEventsForClosedAndCalculatedMvs()
     }
 
-    void closeAndCalculateIfNecessary(List<MeasuredValue> mvsOpenAndExpired, boolean createBatchActivity) {
+    void closeAndCalculateIfNecessary(List<CsiAggregation> mvsOpenAndExpired, boolean createBatchActivity) {
         BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate MeasuredValues", createBatchActivity)
         log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${MeasuredValueUpdateEvent.count()} update events in db before cleanup.")
         List<MeasuredValueUpdateEvent> updateEventsToBeDeleted = measuredValueDaoService.getUpdateEvents(mvsOpenAndExpired*.ident())
@@ -96,10 +96,10 @@ class MvUpdateEventCleanupService {
             updateEventsForMeasuredValue[ue.measuredValueId].add(ue)
         }
 
-        List<MeasuredValue> toCalculateAndClose = []
+        List<CsiAggregation> toCalculateAndClose = []
 
         activity.updateStatus(["stage": "Get MeasuredValues which have to be calculated before closing"])
-        mvsOpenAndExpired.eachWithIndex { MeasuredValue mvOpenAndExpired, int index ->
+        mvsOpenAndExpired.eachWithIndex { CsiAggregation mvOpenAndExpired, int index ->
             activity.updateStatus(["progressWithinStage": batchActivityService.calculateProgress(mvsOpenAndExpired.size(), index + 1)])
             if (mvOpenAndExpired.hasToBeCalculatedAccordingEvents(updateEventsForMeasuredValue[mvOpenAndExpired.ident()])) {
                 toCalculateAndClose.add(mvOpenAndExpired)
@@ -119,24 +119,24 @@ class MvUpdateEventCleanupService {
         log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: ${MeasuredValueUpdateEvent.count()} update events in db after cleanup.")
     }
 
-    void calculateAndCloseMeasuredValues(List<MeasuredValue> measuredValues, BatchActivity activity) {
+    void calculateAndCloseMeasuredValues(List<CsiAggregation> measuredValues, BatchActivity activity) {
         // split into different aggregator types
-        List<MeasuredValue> pageMvsToCalculate = measuredValues.findAll {
+        List<CsiAggregation> pageMvsToCalculate = measuredValues.findAll {
             it.aggregator.name.equals(AggregatorType.PAGE)
         }
         if (pageMvsToCalculate.size() > 0) calculatePageMvs(pageMvsToCalculate, activity)
         closeOpenAndExpiredMvs(pageMvsToCalculate, activity)
 
-        List<MeasuredValue> shopMvsToCalculate = measuredValues.findAll {
+        List<CsiAggregation> shopMvsToCalculate = measuredValues.findAll {
             it.aggregator.name.equals(AggregatorType.SHOP)
         }
         if (shopMvsToCalculate.size() > 0) calculateAndCloseShopMvs(shopMvsToCalculate, activity)
     }
 
-    void closeOpenAndExpiredMvs(List<MeasuredValue> measuredValuesToClose, BatchActivity activity = null) {
+    void closeOpenAndExpiredMvs(List<CsiAggregation> measuredValuesToClose, BatchActivity activity = null) {
         def lists = measuredValuesToClose.collate(DATACOUNT_BEFORE_WRITING_TO_DB)
         lists.eachWithIndex { l, index ->
-            MeasuredValue.withTransaction { TransactionStatus status ->
+            CsiAggregation.withTransaction { TransactionStatus status ->
                 if (activity)
                     activity.updateStatus(["progressWithinStage": batchActivityService.calculateProgress(measuredValuesToClose.size(), (index + 1) * DATACOUNT_BEFORE_WRITING_TO_DB)])
                 l.each { mv ->
@@ -149,15 +149,15 @@ class MvUpdateEventCleanupService {
         }
     }
 
-    void calculatePageMvs(List<MeasuredValue> pageMvsToCalculateAndClose, BatchActivity activity) {
+    void calculatePageMvs(List<CsiAggregation> pageMvsToCalculateAndClose, BatchActivity activity) {
 
-        Map<String, Map<String, List<MeasuredValue>>> hemvsForDailyPageMvs = [:].withDefault { [:].withDefault { [] } }
-        Map<String, Map<String, List<MeasuredValue>>> hemvsForWeeklyPageMvs = [:].withDefault { [:].withDefault { [] } }
+        Map<String, Map<String, List<CsiAggregation>>> hemvsForDailyPageMvs = [:].withDefault { [:].withDefault { [] } }
+        Map<String, Map<String, List<CsiAggregation>>> hemvsForWeeklyPageMvs = [:].withDefault { [:].withDefault { [] } }
 
-        List<MeasuredValue> dailyMvsToCalculate = pageMvsToCalculateAndClose.findAll() {
+        List<CsiAggregation> dailyMvsToCalculate = pageMvsToCalculateAndClose.findAll() {
             it.interval.intervalInMinutes == MeasuredValueInterval.DAILY
         }
-        List<MeasuredValue> weeklyMvsToCalculate = pageMvsToCalculateAndClose.findAll() {
+        List<CsiAggregation> weeklyMvsToCalculate = pageMvsToCalculateAndClose.findAll() {
             it.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY
         }
 
@@ -181,8 +181,8 @@ class MvUpdateEventCleanupService {
         int counter = 1
         def lists = pageMvsToCalculateAndClose.collate(DATACOUNT_BEFORE_WRITING_TO_DB)
         lists.each { l ->
-            MeasuredValue.withTransaction { TransactionStatus status ->
-                l.eachWithIndex { MeasuredValue dpmvToCalcAndClose, int index ->
+            CsiAggregation.withTransaction { TransactionStatus status ->
+                l.eachWithIndex { CsiAggregation dpmvToCalcAndClose, int index ->
                     activity.updateStatus(["progressWithinStage": batchActivityService.calculateProgress(size, counter)])
                     ++counter
 
@@ -192,7 +192,7 @@ class MvUpdateEventCleanupService {
                     } else if (dpmvToCalcAndClose.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY) {
                         mvCachingContainer = cachingContainerService.createContainerFor(dpmvToCalcAndClose, allJobGroups, allPages, hemvsForWeeklyPageMvs[dpmvToCalcAndClose.started.toString()])
                     } else {
-                        throw new IllegalArgumentException("Page MeasuredValues can only have interval DAILY or WEEKLY! This MeasuredValue caused this Exception: ${mv}")
+                        throw new IllegalArgumentException("Page MeasuredValues can only have interval DAILY or WEEKLY! This CsiAggregation caused this Exception: ${mv}")
                     }
                     pageMeasuredValueService.calcMv(dpmvToCalcAndClose, mvCachingContainer)
                 }
@@ -203,14 +203,14 @@ class MvUpdateEventCleanupService {
     }
 
 
-    void calculateAndCloseShopMvs(List<MeasuredValue> shopMvsToCalculate, BatchActivity activity) {
+    void calculateAndCloseShopMvs(List<CsiAggregation> shopMvsToCalculate, BatchActivity activity) {
         PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
 
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'mvUpdateEventCleanupService: calculate shop measured values', PerformanceLoggingService.IndentationDepth.ONE) {
             int size = shopMvsToCalculate.size()
-            shopMvsToCalculate.eachWithIndex { MeasuredValue smvToCalcAndClose, int index ->
+            shopMvsToCalculate.eachWithIndex { CsiAggregation smvToCalcAndClose, int index ->
                 performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, 'mvUpdateEventCleanupService: calculate ONE shop measured value', PerformanceLoggingService.IndentationDepth.ONE) {
-                    MeasuredValue.withTransaction { TransactionStatus status ->
+                    CsiAggregation.withTransaction { TransactionStatus status ->
                         activity.updateStatus(["progressWithinStage": batchActivityService.calculateProgress(size, index + 1)])
                         shopMeasuredValueService.calcMv(smvToCalcAndClose)
                         activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
@@ -224,7 +224,7 @@ class MvUpdateEventCleanupService {
 
     void deleteUpdateEventsForClosedAndCalculatedMvs() {
         log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: searching for update events which belong to closed and calculated measured values...")
-        List<Long> closedAndCalculatedMeasuredValueUpdateEventIds = MeasuredValue.findAllWhere(closedAndCalculated: true)*.ident()
+        List<Long> closedAndCalculatedMeasuredValueUpdateEventIds = CsiAggregation.findAllWhere(closedAndCalculated: true)*.ident()
 
         log.info("Quartz controlled cleanup of MeasuredValueUpdateEvents: deleting all update events for closed and calculated measured values")
 

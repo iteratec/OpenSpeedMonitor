@@ -25,7 +25,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUtilService
 import de.iteratec.osm.report.chart.OsmChartGraph
@@ -45,7 +45,7 @@ import org.joda.time.format.DateTimeFormatter
 
 
 /**
- * Provides methods to get {@link MeasuredValue}s from db and transform them into a chart processable format.
+ * Provides methods to get {@link CsiAggregation}s from db and transform them into a chart processable format.
  */
 class CustomerSatisfactionHighChartService {
 
@@ -83,7 +83,7 @@ class CustomerSatisfactionHighChartService {
 	def weeklyPageTagToGraphLabelMap = [:]
 
 	/**
-	 * Get hourly Customer Satisfaction job {@link MeasuredValue}s as a List of{@link OsmChartGraph}s in format for highcharts-taglib.
+	 * Get hourly Customer Satisfaction job {@link CsiAggregation}s as a List of{@link OsmChartGraph}s in format for highcharts-taglib.
 	 * see {@link CustomerSatisfactionHighChartService#convertToHighChartMap}
 	 *
 	 * @param fromDate The first date, inclusive, to find values for; not <code>null</code>.
@@ -94,19 +94,19 @@ class CustomerSatisfactionHighChartService {
 	OsmRickshawChart getCalculatedHourlyEventMeasuredValuesAsHighChartMap(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
 		List<OsmChartGraph> resultList = []
 
-		List<MeasuredValue> csiValues = eventMeasuredValueService.getHourylMeasuredValues(fromDate, toDate, mvQueryParams)
+		List<CsiAggregation> csiValues = eventMeasuredValueService.getHourylMeasuredValues(fromDate, toDate, mvQueryParams)
 
 		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
 	}
 
 	/**
 	 * <p>
-	 * Gets page CSI {@link MeasuredValue}s as a List of{@link OsmChartGraph}s in the highcharts
+	 * Gets page CSI {@link CsiAggregation}s as a List of{@link OsmChartGraph}s in the highcharts
 	 * taglib format.
 	 * </p>
 	 *
 	 * @param timeFrame
-	 *         The time frame for which {@link MeasuredValue}s should be found. Both
+	 *         The time frame for which {@link CsiAggregation}s should be found. Both
 	 *         borders are included in search. This argument may not be
 	 *         <code>null</code>.
 	 * @param queryParams
@@ -125,7 +125,7 @@ class CustomerSatisfactionHighChartService {
 		Date toDate = timeFrame.getEnd().toDate();
 		List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
 		List<Page> pages = queryParams.pageIds.collectNested { Page.get(it) };
-		List<MeasuredValue> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
+		List<CsiAggregation> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
         log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
 
 		OsmRickshawChart chart = osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
@@ -137,11 +137,11 @@ class CustomerSatisfactionHighChartService {
 
     /**
      * <p>
-     * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
+     * Gets shop CSI {@link CsiAggregation}s as a list with {@link OsmChartGraph}s.
      * </p>
      *
      * @param timeFrame
-     *         The time frame for which {@link MeasuredValue}s should be found. Both
+     *         The time frame for which {@link CsiAggregation}s should be found. Both
      *         borders are included in search. This argument may not be
      *         <code>null</code>.
      * @param queryParams
@@ -156,7 +156,7 @@ class CustomerSatisfactionHighChartService {
         Date fromDate = timeFrame.getStart().toDate();
         Date toDate = timeFrame.getEnd().toDate();
         List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
-        List<MeasuredValue> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
+        List<CsiAggregation> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
 
         return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
     }
@@ -164,7 +164,7 @@ class CustomerSatisfactionHighChartService {
 	/**
 	 * <p>
 	 * Creates {@link OsmChartGraph}s from the specified
-	 * {@link Collection} of {@link MeasuredValue}s.
+	 * {@link Collection} of {@link CsiAggregation}s.
 	 * </p>
 	 *
 	 * @param csiValues
@@ -173,15 +173,15 @@ class CustomerSatisfactionHighChartService {
 	 * @return A list of graphs sorted ascending by {@link
 	 *         OsmChartGraph#getLabel()}; never <code>null</code>.
 	 */
-	private List<OsmChartGraph> convertToHighchartGraphList(Collection<MeasuredValue> csiValues) {
+	private List<OsmChartGraph> convertToHighchartGraphList(Collection<CsiAggregation> csiValues) {
 		// Cache of already added graphs by tag
 		Map<String, OsmChartGraph> tagToGraph=new HashMap<String, OsmChartGraph>();
 
 		List<OsmChartGraph> graphs=new ArrayList<OsmChartGraph>();
 
-		for( MeasuredValue eachCsiVal : csiValues) {
+		for( CsiAggregation eachCsiVal : csiValues) {
 
-			if (eachCsiVal.value) {
+			if (eachCsiVal.csByWptDocCompleteInPercent) {
 
 				if(!tagToGraph.containsKey(eachCsiVal.getTag())) {
 					OsmChartGraph graph=new OsmChartGraph();
@@ -209,7 +209,7 @@ class CustomerSatisfactionHighChartService {
 	}
 
     double formatPercentage(value){
-        BigDecimal valueForRounding = new BigDecimal(value.value)
+        BigDecimal valueForRounding = new BigDecimal(value.csByWptDocCompleteInPercent)
         return valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
     }
     void sortPointsInAllGraphsByTime(List<OsmChartGraph> graphs){
@@ -222,7 +222,7 @@ class CustomerSatisfactionHighChartService {
     }
 
 	/**
-	 * Creates an URL for a link for the {@link MeasuredValue} (MV) csiValue (to be used in diagrams). The URL links to the underlying data of csiValue:
+	 * Creates an URL for a link for the {@link CsiAggregation} (MV) csiValue (to be used in diagrams). The URL links to the underlying data of csiValue:
 	 * <ul>
 	 * <li>If csiValue is a <b>weekly shop-MV: </b>Link to diagram-sight of daily shop-MV's of the respective week and shop/system.</li>
 	 * <li>If csiValue is a <b>daily shop-MV: </b>Link to diagram-sight of hourly measured step-MV's of the respective csiDay and shop/system.</li>
@@ -234,7 +234,7 @@ class CustomerSatisfactionHighChartService {
 	 * @return
 	 * @see https://seu.hh.iteratec.de:8444/browse/IT-381
 	 */
-	private URL getLinkFor(MeasuredValue csiValue){
+	private URL getLinkFor(CsiAggregation csiValue){
 		URL linkForPoint
 
 		if (csiValue.aggregator.name.equals(AggregatorType.PAGE) || csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
@@ -252,7 +252,7 @@ class CustomerSatisfactionHighChartService {
 		return linkForPoint
 	}
 
-	private Map getParamsForLink(MeasuredValue csiValue){
+	private Map getParamsForLink(CsiAggregation csiValue){
 		DateTime startOfInterval = new DateTime(csiValue.started)
 		DateTime endOfInterval = measuredValueUtilService.addOneInterval(startOfInterval, csiValue.interval.intervalInMinutes)
 		Map paramsToSend = [
@@ -300,13 +300,13 @@ class CustomerSatisfactionHighChartService {
 
 	/**
 	 * Get label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMap}
-	 * for given {@link MeasuredValue} and {@link AggregatorType}
+	 * for given {@link CsiAggregation} and {@link AggregatorType}
 	 *
 	 * @param mv
 	 * @param aggregator
 	 * @return Label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMap}
 	 */
-	private String getMapLabel(MeasuredValue mv) {
+	private String getMapLabel(CsiAggregation mv) {
 		String labelForValuesNotAssignable = 'n.a.'
 		switch (mv.aggregator.name) {
 			case AggregatorType.MEASURED_EVENT:
@@ -412,11 +412,11 @@ class CustomerSatisfactionHighChartService {
 
 	/**
 	 * <p>
-	 * Gets shop CSI {@link MeasuredValue}s as a list with {@link OsmChartGraph}s.
+	 * Gets shop CSI {@link CsiAggregation}s as a list with {@link OsmChartGraph}s.
 	 * </p>
 	 *
 	 * @param timeFrame
-	 *         The time frame for which {@link MeasuredValue}s should be found. Both
+	 *         The time frame for which {@link CsiAggregation}s should be found. Both
 	 *         borders are included in search. This argument may not be
 	 *         <code>null</code>.
 	 * @param queryParams
@@ -429,7 +429,7 @@ class CustomerSatisfactionHighChartService {
 		Date fromDate = timeFrame.getStart().toDate();
 		Date toDate = timeFrame.getEnd().toDate();
 		List<CsiSystem> csiSystems = CsiSystem.getAll(selectedCsiSystems)
-		List<MeasuredValue> csiValues = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromDate, toDate, interval, csiSystems)
+		List<CsiAggregation> csiValues = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromDate, toDate, interval, csiSystems)
 
 		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
 	}

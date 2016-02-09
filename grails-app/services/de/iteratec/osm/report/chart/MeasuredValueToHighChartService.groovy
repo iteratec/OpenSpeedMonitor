@@ -38,7 +38,7 @@ class MeasuredValueToHighChartService {
 	def nameMap = [:]
 
 	/**
-	 * Converts List of {@ MeasuredValue}s to Map in format
+	 * Converts List of {@ CsiAggregation}s to Map in format
 	 *
 	 * [
 	 *   label1: [timestamp1:customerSatisfaction1, ..., timestampN:customerSatisfactionN,],
@@ -52,7 +52,7 @@ class MeasuredValueToHighChartService {
 	 * @param aggregationspecificIdToLabel
 	 * @return
 	 */
-	Map convertToHighChartMap(List<MeasuredValue> mesValues, AggregatorType aggregator, Map<String,String> aggregationspecificIdToLabelMap, Map<String,DataType> labelToDataTypeMap) {
+	Map convertToHighChartMap(List<CsiAggregation> mesValues, AggregatorType aggregator, Map<String,String> aggregationspecificIdToLabelMap, Map<String,DataType> labelToDataTypeMap) {
 		def resultMap = [:]
 
 		addAggregationspecificLabelsToNameMaps(aggregator, aggregationspecificIdToLabelMap)
@@ -67,19 +67,19 @@ class MeasuredValueToHighChartService {
 			Map mesValueMap = resultMap.get(jobLabel)
 			curMesVal.started.getTime()
 			Long curTimestamp = getHighchartCompatibleTimestampFrom(curMesVal.started)
-			if (curMesVal.value) {
+			if (curMesVal.csByWptDocCompleteInPercent) {
 				if (aggregator.name.equals(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)) {
 					/*Result Dashboard*/
 					DataType dataType = labelToDataTypeMap.get(jobLabel)
 					if (dataType == DataType.TIME) {
-						mesValueMap.put(curTimestamp, (curMesVal.value / 1000))
+						mesValueMap.put(curTimestamp, (curMesVal.csByWptDocCompleteInPercent / 1000))
 					} else {
-						mesValueMap.put(curTimestamp, curMesVal.value)
+						mesValueMap.put(curTimestamp, curMesVal.csByWptDocCompleteInPercent)
 					}
 				} else {
 					/*CSI Dashboard*/
 					// TODO mal 100 wegen Anzeige in Sekunden?
-					def val = curMesVal.value * 100
+					def val = curMesVal.csByWptDocCompleteInPercent * 100
 					/*
 					 * round to 2 decimal places
 					 */
@@ -115,13 +115,13 @@ class MeasuredValueToHighChartService {
 
 	/**
 	 * Get label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMap}
-	 * for given {@link MeasuredValue} and {@link AggregatorType}
+	 * for given {@link CsiAggregation} and {@link AggregatorType}
 	 * 
 	 * @param mv
 	 * @param aggregator
 	 * @return Label for Map of {@link CustomerSatisfactionHighChartService#getOrCalculateCustomerSatisfactionMeasuredValuesAsHighChartMap}
 	 */
-	private String getMapLabel(MeasuredValue mv) {
+	private String getMapLabel(CsiAggregation mv) {
 
 		def labelMap = nameMap.get(mv.getAggregator().name)
 		

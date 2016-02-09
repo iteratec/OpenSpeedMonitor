@@ -17,16 +17,15 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.util.ServiceMocker
 import org.junit.Assert
 
 import static org.junit.Assert.assertEquals
 import grails.test.mixin.*
-
-import java.util.regex.Pattern
-
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.After
@@ -39,7 +38,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
@@ -49,8 +48,6 @@ import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
-import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.measurement.environment.Browser
@@ -60,10 +57,11 @@ import de.iteratec.osm.measurement.environment.Location
  * Test-suite of {@link PageMeasuredValueService}. 
  */
 @TestFor(PageMeasuredValueService)
-@Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location,
+@Mock([CsiAggregation, MeasuredValueInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location,
         EventResult, MeasuredValueDaoService, DefaultMeasuredEventDaoService, EventMeasuredValueService,
         CustomerSatisfactionWeightService, CsiDay, MeanCalcService, MeasuredValueUpdateEvent, ConnectivityProfile,
-        ConnectivityProfileService, CsiConfiguration])
+        ConnectivityProfileService, CsiConfiguration, ConfigService, OsmDataSourceService, EventMeasuredValueService,
+        PerformanceLoggingService, MeasuredValueUtilService])
 
 class PageMeasuredValueServiceTests {
 
@@ -94,9 +92,6 @@ class PageMeasuredValueServiceTests {
 
         //mocks common for all tests
         serviceUnderTest.measuredEventDaoService = new DefaultMeasuredEventDaoService();
-        serviceUnderTest.eventMeasuredValueService = new EventMeasuredValueService();
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
         mockMeasuredValueUpdateEventDaoService()
 
         //test-data common for all tests
@@ -186,7 +181,7 @@ class PageMeasuredValueServiceTests {
     }
 
     /**
-     * Tests the marking of dependent (weekly-page-){@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * Tests the marking of dependent (weekly-page-){@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * {@link MeasuredValueUpdateEvent}s with {@link MeasuredValueUpdateEvent#UpdateCause} OUTDATED should be written to db.
      */
     @Test
@@ -203,7 +198,7 @@ class PageMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> wpmvs = serviceUnderTest.findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval)
+        List<CsiAggregation> wpmvs = serviceUnderTest.findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval)
         assertEquals(0, wpmvs.size())
 
         //test execution
@@ -213,7 +208,7 @@ class PageMeasuredValueServiceTests {
 
         wpmvs = serviceUnderTest.findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval)
         assertEquals(1, wpmvs.size())
-        MeasuredValue wpmvMarked = wpmvs[0]
+        CsiAggregation wpmvMarked = wpmvs[0]
         assertFalse(wpmvMarked.isCalculated())
         assertTrue(wpmvMarked.hasToBeCalculated())
 
@@ -228,7 +223,7 @@ class PageMeasuredValueServiceTests {
     }
 
     /**
-     * Tests the marking of dependent (weekly-page-){@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * Tests the marking of dependent (weekly-page-){@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * {@link MeasuredValueUpdateEvent}s with {@link MeasuredValueUpdateEvent#UpdateCause} OUTDATED should be written to db.
      */
     @Test
@@ -245,7 +240,7 @@ class PageMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startTime.toDate(), startTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startTime.toDate(), startTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
@@ -255,7 +250,7 @@ class PageMeasuredValueServiceTests {
 
         mvs = serviceUnderTest.findAll(startTime.toDate(), startTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
-        MeasuredValue wpmvMarked = mvs[0]
+        CsiAggregation wpmvMarked = mvs[0]
         assertFalse(wpmvMarked.isCalculated())
         assertTrue(wpmvMarked.hasToBeCalculated())
 
@@ -270,13 +265,13 @@ class PageMeasuredValueServiceTests {
     }
 
     /**
-     * Tests calculation of daily-page-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * Tests calculation of daily-page-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
     @Test
     void testCalculation_DailyInterval_SingleHourlyMv() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        MeasuredValue hpmv = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation hpmv = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(hpmv.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -296,40 +291,40 @@ class PageMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
-        assertEquals(12d, calculatedMvs[0].value, DELTA)
+        assertEquals(12d, calculatedMvs[0].csByWptDocCompleteInPercent, DELTA)
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
     }
 
     /**
-     * Tests calculation of daily-page-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * Tests calculation of daily-page-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
     @Test
     void testCalculation_DailyInterval_MultipleHourlyMv() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), resultIds: "1", value: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), resultIds: "1", value: 10d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv3 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), resultIds: "1", value: 11d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv3 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 11d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv3.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         //MVs outside of Interval
-        MeasuredValue mv4 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv4 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv4.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv5.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -351,28 +346,28 @@ class PageMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
-        assertEquals(11d, calculatedMvs[0].value, DELTA)
+        assertEquals(11d, calculatedMvs[0].csByWptDocCompleteInPercent, DELTA)
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
 
-        MeasuredValue wpmvMarked = mvs[0]
+        CsiAggregation wpmvMarked = mvs[0]
         assertTrue(wpmvMarked.isCalculated())
 
     }
 
     /**
-     * Tests calculation of daily-page-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * Tests calculation of daily-page-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
     @Test
     void testCalculation_DailyInterval_MultipleHourlyMv_differentWeights() {
@@ -381,17 +376,17 @@ class PageMeasuredValueServiceTests {
 
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
-        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.toDate(), resultIds: "1", value: 1d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), resultIds: "1", value: 10d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv3 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), resultIds: "1", value: 11d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv3 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusHours(10).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 11d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv3.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         //MVs outside of Interval
-        MeasuredValue mv4 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv4 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv4.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv5 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
+        CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv5.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -414,11 +409,11 @@ class PageMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
@@ -434,29 +429,29 @@ class PageMeasuredValueServiceTests {
         double sumOfAllWeights = 12d
         assertEquals(
                 ((valueFirstMv * hourofdayWeightFirstMv * browserWeightAllMvs) + (valueSecondMv * hourofdayWeightSecondMv * browserWeightAllMvs) + (valueThirdMv * hourofdayWeightThirdMv * browserWeightAllMvs)) / sumOfAllWeights,
-                calculatedMvs[0].value,
+                calculatedMvs[0].csByWptDocCompleteInPercent,
                 DELTA
         );
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
 
-        MeasuredValue wpmvMarked = mvs[0]
+        CsiAggregation wpmvMarked = mvs[0]
         assertTrue(wpmvMarked.isCalculated())
 
     }
 
     /**
-     * Tests calculation of daily-page-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * Tests calculation of daily-page-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
     @Test
     void testCalculation_DailyInterval_MultipleHourlyMv_YesCalculatedNoData() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //MVs outside of Interval
-        MeasuredValue mv1 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.minusMinutes(1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue mv2 = new MeasuredValue(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), resultIds: "1", value: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), tag: jobGroup1.ident() + ';' + page1.ident() + ';1;1;1', started: startedTime.plusMinutes(MeasuredValueInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
         CsiDay testDay = new CsiDay()
@@ -472,17 +467,17 @@ class PageMeasuredValueServiceTests {
 
         //precondition
 
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(0, mvs.size())
 
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
 
         //assertions
 
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
-        assertNull(calculatedMvs[0].value)
+        assertNull(calculatedMvs[0].csByWptDocCompleteInPercent)
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
@@ -519,9 +514,6 @@ class PageMeasuredValueServiceTests {
 
 
     private void mockMeasuredValueDaoService() {
-        MeasuredValueDaoService original = new MeasuredValueDaoService()
-        serviceUnderTest.measuredValueDaoService = original
-        serviceUnderTest.eventMeasuredValueService.measuredValueDaoService = original
     }
 
     /**
@@ -580,26 +572,26 @@ class PageMeasuredValueServiceTests {
         jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
 
         //with existing JobGroup and Page:
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '1;2', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;1', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '1;2', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;1', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate()).save(validate: false)
 
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate(), value: 12, connectivityProfile: connectivityProfile).save(validate: true)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;2', started: startDate.toDate(), value: 10, connectivityProfile: connectivityProfile).save(validate: false)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;1', started: startDate.toDate(), value: 12, connectivityProfile: connectivityProfile).save(validate: false)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate(), value: 12, connectivityProfile: connectivityProfile).save(validate: false)
-        new MeasuredValue(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate(), value: 10, connectivityProfile: connectivityProfile).save(validate: false)
+        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate(), csByWptDocCompleteInPercent: 12, connectivityProfile: connectivityProfile).save(validate: true)
+        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, tag: '1;2', started: startDate.toDate(), csByWptDocCompleteInPercent: 10, connectivityProfile: connectivityProfile).save(validate: false)
+        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;1', started: startDate.toDate(), csByWptDocCompleteInPercent: 12, connectivityProfile: connectivityProfile).save(validate: false)
+        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;2', started: startDate.toDate(), csByWptDocCompleteInPercent: 12, connectivityProfile: connectivityProfile).save(validate: false)
+        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, tag: '3;3', started: startDate.toDate(), csByWptDocCompleteInPercent: 10, connectivityProfile: connectivityProfile).save(validate: false)
 
         //not with existing page
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;4', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '3;4', started: startDate.toDate()).save(validate: false)
         //not with existing JobGroup
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '4;2', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '4;2', started: startDate.toDate()).save(validate: false)
         //not with existing JobGroup and Page:
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '4;4', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '5;14', started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: pageAggregator, tag: '6;7', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '4;4', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '5;14', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '6;7', started: startDate.toDate()).save(validate: false)
 
         allCsiGroups = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
         allPages = ['1': page1, '2': page2, '3': page3]
@@ -607,7 +599,7 @@ class PageMeasuredValueServiceTests {
 
     private void deleteTestData() {
         Page.list()*.delete(flush: true)
-        MeasuredValue.list()*.delete(flush: true)
+        CsiAggregation.list()*.delete(flush: true)
         JobGroup.list()*.delete(flush: true)
     }
 }

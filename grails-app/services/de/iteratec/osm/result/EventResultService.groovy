@@ -337,7 +337,7 @@ class EventResultService {
 	 */
 	@Deprecated
 	public Boolean isCsiRelevant(EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs){
-		return toProof.customerSatisfactionInPercent && toProof.docCompleteTimeInMillisecs &&
+		return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
 			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
 	}

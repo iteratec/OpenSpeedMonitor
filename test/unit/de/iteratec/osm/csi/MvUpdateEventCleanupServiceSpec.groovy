@@ -16,7 +16,7 @@ import spock.lang.Specification
  * Created by nkuhn on 22.05.15.
  */
 @TestFor(MvUpdateEventCleanupService)
-@Mock([MeasuredValue, MeasuredValueInterval, AggregatorType, BatchActivity, MeasuredValueUpdateEvent, JobGroup, Page])
+@Mock([CsiAggregation, MeasuredValueInterval, AggregatorType, BatchActivity, MeasuredValueUpdateEvent, JobGroup, Page])
 class MvUpdateEventCleanupServiceSpec extends Specification {
 
     MvUpdateEventCleanupService serviceUnderTest
@@ -63,13 +63,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyPageMvInitiallyOpenAndCalculated).size() == 1
-        assert MeasuredValue.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
+        assert CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idDailyPageMvInitiallyOpenAndCalculated] == 0
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyPageMvInitiallyOpenAndCalculated).size() == 0
-        MeasuredValue.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
+        CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
 
     void "outdated daily page mvs get calculated and closed"() {
@@ -79,13 +79,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyPageMvInitiallyOpenAndOutdated).size() == 1
-        assert MeasuredValue.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == false
+        assert CsiAggregation.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idDailyPageMvInitiallyOpenAndOutdated] == 1
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyPageMvInitiallyOpenAndOutdated).size() == 0
-        MeasuredValue.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
+        CsiAggregation.get(idDailyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
 
     void "already calculated weekly page mvs get closed"() {
@@ -95,13 +95,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyPageMvInitiallyOpenAndCalculated).size() == 1
-        assert MeasuredValue.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
+        assert CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idWeeklyPageMvInitiallyOpenAndCalculated] == 0
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyPageMvInitiallyOpenAndCalculated).size() == 0
-        MeasuredValue.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
+        CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
 
     void "outdated weekly page mvs get calculated and closed"() {
@@ -111,13 +111,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyPageMvInitiallyOpenAndOutdated).size() == 1
-        assert MeasuredValue.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == false
+        assert CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idWeeklyPageMvInitiallyOpenAndOutdated] == 1
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyPageMvInitiallyOpenAndOutdated).size() == 0
-        MeasuredValue.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
+        CsiAggregation.get(idWeeklyPageMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
 
     void "already calculated daily shop mvs get closed"() {
@@ -127,13 +127,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndCalculated).size() == 1
-        assert MeasuredValue.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == false
+        assert CsiAggregation.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idDailyShopMvInitiallyOpenAndCalculated] == 0
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndCalculated).size() == 0
-        MeasuredValue.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
+        CsiAggregation.get(idDailyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
 
     void "outdated daily shop mvs get calculated and closed"() {
@@ -143,13 +143,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndOutdated).size() == 1
-        assert MeasuredValue.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == false
+        assert CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idDailyShopMvInitiallyOpenAndOutdated] == 1
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndOutdated).size() == 0
-        MeasuredValue.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
+        CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
 
     void "already calculated weekly shop mvs get closed"() {
@@ -159,13 +159,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyShopMvInitiallyOpenAndCalculated).size() == 1
-        assert MeasuredValue.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == false
+        assert CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idWeeklyShopMvInitiallyOpenAndCalculated] == 0
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyShopMvInitiallyOpenAndCalculated).size() == 0
-        MeasuredValue.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
+        CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndCalculated).closedAndCalculated == true
     }
 
     void "outdated weekly shop mvs get calculated and closed"() {
@@ -175,13 +175,13 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
         when:
         assert MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyShopMvInitiallyOpenAndOutdated).size() == 1
-        assert MeasuredValue.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == false
+        assert CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == false
         serviceUnderTest.closeMeasuredValuesExpiredForAtLeast(300)
 
         then:
         calculationCounts[idWeeklyShopMvInitiallyOpenAndOutdated] == 1
         MeasuredValueUpdateEvent.findAllByMeasuredValueId(idWeeklyShopMvInitiallyOpenAndOutdated).size() == 0
-        MeasuredValue.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
+        CsiAggregation.get(idWeeklyShopMvInitiallyOpenAndOutdated).closedAndCalculated == true
     }
 
     /**
@@ -193,14 +193,14 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
     /**
      * Mocks methods {@link MeasuredValueDaoService#getOpenMeasuredValuesWhosIntervalExpiredForAtLeast} and
-     * {@link MeasuredValueDaoService#getUpdateEvents} to return {@link MeasuredValue}s of given id list and associated
+     * {@link MeasuredValueDaoService#getUpdateEvents} to return {@link CsiAggregation}s of given id list and associated
      * {@link MeasuredValueUpdateEvent}s.
      * @param mvIds List of id's of {@link MeasuredValueUpdateEvent}s to return from mocked method.
      */
     private void prepareDaoServiceMock(List<Long> mvIds) {
         serviceUnderTest.measuredValueDaoService = [
                 getOpenMeasuredValuesWhosIntervalExpiredForAtLeast: { int minutes ->
-                    return mvIds.collect { MeasuredValue.get(it) }
+                    return mvIds.collect { CsiAggregation.get(it) }
                 },
                 getUpdateEvents                                   : { List<Long> measuredValueIds ->
                     return mvIds.inject([]) { List<MeasuredValueUpdateEvent> updateEvents, Long mvId ->
@@ -228,24 +228,24 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
 
     void createMeasuredValues() {
 
-        MeasuredValue mvDailyPageCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvDailyPageCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
         idDailyPageMvInitiallyOpenAndCalculated = mvDailyPageCalculated.ident()
-        MeasuredValue mvDailyPageOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvDailyPageOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
         idDailyPageMvInitiallyOpenAndOutdated = mvDailyPageOutdated.ident()
 
-        MeasuredValue mvDailyShopCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, shop, irrelevant_ShopTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvDailyShopCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, shop, irrelevant_ShopTag, irrelevant_Value, irrelevant_ResultIds, false)
         idDailyShopMvInitiallyOpenAndCalculated = mvDailyShopCalculated.ident()
-        MeasuredValue mvDailyShopOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, shop, irrelevant_ShopTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvDailyShopOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, daily, shop, irrelevant_ShopTag, irrelevant_Value, irrelevant_ResultIds, false)
         idDailyShopMvInitiallyOpenAndOutdated = mvDailyShopOutdated.ident()
 
-        MeasuredValue mvWeeklyPageCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvWeeklyPageCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
         idWeeklyPageMvInitiallyOpenAndCalculated = mvWeeklyPageCalculated.ident()
-        MeasuredValue mvWeeklyPageOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvWeeklyPageOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, page, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
         idWeeklyPageMvInitiallyOpenAndOutdated = mvWeeklyPageOutdated.ident()
 
-        MeasuredValue mvWeeklyShopCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, shop, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvWeeklyShopCalculated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, shop, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
         idWeeklyShopMvInitiallyOpenAndCalculated = mvWeeklyShopCalculated.ident()
-        MeasuredValue mvWeeklyShopOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, shop, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
+        CsiAggregation mvWeeklyShopOutdated = TestDataUtil.createMeasuredValue(irrelevant_MeasuredValueDate, weekly, shop, irrelevant_PageTag, irrelevant_Value, irrelevant_ResultIds, false)
         idWeeklyShopMvInitiallyOpenAndOutdated = mvWeeklyShopOutdated.ident()
     }
 
@@ -279,7 +279,7 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
         serviceUnderTest.measuredValueTagService = new MeasuredValueTagService()
 
         serviceUnderTest.shopMeasuredValueService = [
-                calcMv: { MeasuredValue toBeCalculated ->
+                calcMv: { CsiAggregation toBeCalculated ->
                     calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
                     return null
                 }
@@ -290,7 +290,7 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
                     Map irrelevantBecauseWholeCalculationIsMocked = [:]
                     return irrelevantBecauseWholeCalculationIsMocked
                 },
-                calcMv                             : { MeasuredValue toBeCalculated, MvCachingContainer cachingContainer ->
+                calcMv                             : { CsiAggregation toBeCalculated, MvCachingContainer cachingContainer ->
                     calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
                     return null
                 }
@@ -324,7 +324,7 @@ class MvUpdateEventCleanupServiceSpec extends Specification {
         def returnForGetWeeklyPagesByStartDate = [:].withDefault { [] }
         def page = new Page(id: 1)
         def hmvsByCsiGroupPageCombination = [:].withDefault {[]}
-        hmvsByCsiGroupPageCombination.put(MeasuredValue.get(idDailyShopMvInitiallyOpenAndOutdated).started.toString(), MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndOutdated))
+        hmvsByCsiGroupPageCombination.put(CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).started.toString(), MeasuredValueUpdateEvent.findAllByMeasuredValueId(idDailyShopMvInitiallyOpenAndOutdated))
         def returnForCreateContainerFor = new MvCachingContainer(csiGroupToCalcMvFor: null,
                 pageToCalcMvFor: page,
                 hmvsByCsiGroupPageCombination: hmvsByCsiGroupPageCombination)

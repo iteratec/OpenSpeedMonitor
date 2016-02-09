@@ -18,10 +18,10 @@
 package de.iteratec.osm.report.chart
 
 /**
- * MeasuredValueController
+ * CsiAggregationController
  * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
  */
-class MeasuredValueController {
+class CsiAggregationController {
 
 	static scaffold = true
 

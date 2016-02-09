@@ -17,7 +17,8 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile;
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.result.EventResult;
 
 /**
  * A value for calculation of customer satisfaction indices. 
@@ -26,9 +27,14 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile;
  */
 public interface CsiValue {
     /**
-     * Delivers csi-relevant value of this {@link CsiValue}.
+     * Delivers csi-relevant value calculated by docComplete-time
      */
-    public Double retrieveValue()
+    public Double retrieveCsByWptDocCompleteInPercent()
+
+    /**
+     * Delivers csi-relevant value calculated by visuallyComplete-time
+     */
+    public Double retrieveCsByWptVisuallyCompleteInPercent()
 
     /**
      * Delivers csi-relevant date of this {@link CsiValue}.
@@ -48,10 +54,16 @@ public interface CsiValue {
     public ConnectivityProfile retrieveConnectivityProfile()
 
     /**
-     * Delivers the id's of all {@link EventResult}s which underly this CsiValue.
+     * Delivers the id's of all {@link EventResult}s which underly this csByWptDocCompleteInPercent-value.
      * @return
      */
-    public List<Long> retrieveUnderlyingEventResultIds()
+    public List<Long> retrieveUnderlyingEventResultsByDocComplete()
+
+    /**
+     * Delivers all EventResults which underly this csByWptVisuallyCompleteInPercent-value.
+     * @return
+     */
+    public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete()
 
     /**
      * Whether or not this value should be factored in csi-calculations.

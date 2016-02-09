@@ -18,9 +18,6 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
 import grails.test.mixin.*
@@ -29,12 +26,6 @@ import grails.test.mixin.support.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.*
-
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.util.ServiceMocker;
 
 /**
@@ -42,7 +33,7 @@ import de.iteratec.osm.util.ServiceMocker;
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MeasuredValueDaoService)
-@Mock([MeasuredValueUpdateEvent, MeasuredValue, MeasuredValueInterval, AggregatorType])
+@Mock([MeasuredValueUpdateEvent, CsiAggregation, MeasuredValueInterval, AggregatorType])
 class MeasuredValueDaoServiceSpec {
 
 	MeasuredValueDaoService serviceUnderTest
@@ -128,9 +119,9 @@ class MeasuredValueDaoServiceSpec {
 		
 		List<MeasuredValueUpdateEvent> updateEvents = MeasuredValueUpdateEvent.list()
 		assertThat(updateEvents.size(), is(6))
-		assertThat(MeasuredValue.get(1).started, is(date_20140928))
-		assertThat(MeasuredValue.get(2).started, is(date_20140929))
-		assertThat(MeasuredValue.get(3).started, is(date_20140930))
+		assertThat(CsiAggregation.get(1).started, is(date_20140928))
+		assertThat(CsiAggregation.get(2).started, is(date_20140929))
+		assertThat(CsiAggregation.get(3).started, is(date_20140930))
 		
 		//execute tests and assertions
 		
@@ -139,7 +130,7 @@ class MeasuredValueDaoServiceSpec {
 		assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent.ident()]).size(), is(1))
 		assertThat(serviceUnderTest.getUpdateEvents([mvWithOneEvent.ident(), mvWithFiveEvents.ident(),mvWithoutEvents.ident()]).size(), is(6))
 		
-		List<MeasuredValue> emptyList = []
+		List<CsiAggregation> emptyList = []
 		assertThat(serviceUnderTest.getUpdateEvents(emptyList*.ident()).size(), is(0))
 		
 	}
@@ -154,7 +145,7 @@ class MeasuredValueDaoServiceSpec {
 		createAndSaveMeasuredValue(hourlyInterval, eventAggregator, false, date_20140928_0800)
 		createAndSaveMeasuredValue(hourlyInterval, eventAggregator, false, date_20140928_0900)
 		createAndSaveMeasuredValue(hourlyInterval, eventAggregator, false, date_20140928_1000)
-		List<MeasuredValue> openAndExpired
+		List<CsiAggregation> openAndExpired
 		
 		//test specific mocks, test executions and assertions
 		
@@ -191,7 +182,7 @@ class MeasuredValueDaoServiceSpec {
 		createAndSaveMeasuredValue(dailyInterval, pageAggregator, false, date_20140928)
 		createAndSaveMeasuredValue(dailyInterval, pageAggregator, false, date_20140929)
 		createAndSaveMeasuredValue(dailyInterval, pageAggregator, false, date_20140930)
-		List<MeasuredValue> openAndExpired
+		List<CsiAggregation> openAndExpired
 		
 		//test specific mocks, test executions and assertions
 		
@@ -228,7 +219,7 @@ class MeasuredValueDaoServiceSpec {
 		createAndSaveMeasuredValue(weeklyInterval, pageAggregator, false, date_20140905)
 		createAndSaveMeasuredValue(weeklyInterval, pageAggregator, false, date_20140912)
 		createAndSaveMeasuredValue(weeklyInterval, pageAggregator, false, date_20140919)
-		List<MeasuredValue> openAndExpired
+		List<CsiAggregation> openAndExpired
 		
 		//test specific mocks, test executions and assertions
 		
@@ -264,7 +255,7 @@ class MeasuredValueDaoServiceSpec {
 		createAndSaveMeasuredValue(dailyInterval, shopAggregator, false, date_20140928)
 		createAndSaveMeasuredValue(dailyInterval, shopAggregator, false, date_20140929)
 		createAndSaveMeasuredValue(dailyInterval, shopAggregator, false, date_20140930)
-		List<MeasuredValue> openAndExpired
+		List<CsiAggregation> openAndExpired
 		
 		//test specific mocks, test executions and assertions
 		
@@ -301,7 +292,7 @@ class MeasuredValueDaoServiceSpec {
 		createAndSaveMeasuredValue(weeklyInterval, shopAggregator, false, date_20140905)
 		createAndSaveMeasuredValue(weeklyInterval, shopAggregator, false, date_20140912)
 		createAndSaveMeasuredValue(weeklyInterval, shopAggregator, false, date_20140919)
-		List<MeasuredValue> openAndExpired
+		List<CsiAggregation> openAndExpired
 		
 		//test specific mocks, test executions and assertions
 		
@@ -327,27 +318,27 @@ class MeasuredValueDaoServiceSpec {
 		assertThat(openAndExpired.size(), is(3))
 	}
 	
-	private MeasuredValue createAndSaveMeasuredValue(MeasuredValueInterval interval, AggregatorType aggregator, boolean closedAndCalculated, Date started){
+	private CsiAggregation createAndSaveMeasuredValue(MeasuredValueInterval interval, AggregatorType aggregator, boolean closedAndCalculated, Date started){
 		double valueNotOfInterestInTheseTests = 42d
 		String resultIdsNotOfInterestInTheseTests = '4,2'
 		String tagNotOfInterestInTheseTests = '1;2;3;4;5'
-		return new MeasuredValue(
+		return new CsiAggregation(
 			started: started,
 			interval: interval,
 			aggregator: aggregator,
 			tag: tagNotOfInterestInTheseTests,
-			value: valueNotOfInterestInTheseTests,
-			resultIds: resultIdsNotOfInterestInTheseTests,
+			csByWptDocCompleteInPercent: valueNotOfInterestInTheseTests,
+			underlyingEventResultsByWptDocComplete: resultIdsNotOfInterestInTheseTests,
 			closedAndCalculated: closedAndCalculated
 		).save(failOnError: true)
 	}
-	private void createUpdateEventForMv(MeasuredValue mv, boolean calculated, boolean withData){
+	private void createUpdateEventForMv(CsiAggregation mv, boolean calculated, boolean withData){
 		MeasuredValueUpdateEvent.UpdateCause cause = MeasuredValueUpdateEvent.UpdateCause.OUTDATED
 		if (calculated) {
 			cause = MeasuredValueUpdateEvent.UpdateCause.CALCULATED
 		}
 		if (withData) {
-			mv.value = 0.5
+			mv.csByWptDocCompleteInPercent = 0.5
 			mv.save(failOnError: true)
 		}
 		new MeasuredValueUpdateEvent(

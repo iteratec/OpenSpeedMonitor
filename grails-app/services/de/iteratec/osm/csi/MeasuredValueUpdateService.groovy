@@ -40,8 +40,8 @@ class MeasuredValueUpdateService {
 	JobResultDaoService jobResultDaoService
 	
 	/**
-	 * Calculates or recalculates hourly-job {@link MeasuredValue}s which depend from param newResult.
-	 * Marks weekly {@link MeasuredValue}s which depend from param newResult as MeasuredValue.Calculated.Not.
+	 * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResult.
+	 * Marks weekly {@link CsiAggregation}s which depend from param newResult as CsiAggregation.Calculated.Not.
 	 * @param newResult
 	 */
 	void createOrUpdateDependentMvs(EventResult newResult) {

@@ -19,8 +19,7 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.CsiSystem
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.gorm.DetachedCriteria
-import org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.csi.CsiValue
 
 import org.grails.databinding.BindUsing
@@ -55,7 +54,7 @@ import org.grails.databinding.BindUsing
  * @author nkuhn
  * @author mze
  */
-class MeasuredValue implements CsiValue {
+class CsiAggregation implements CsiValue {
 
     public static final String DELIMITER_RESULTIDS = ','
 
@@ -69,7 +68,10 @@ class MeasuredValue implements CsiValue {
     String tag
     CsiSystem csiSystem
     ConnectivityProfile connectivityProfile
-    Double value
+    Double csByWptDocCompleteInPercent
+    Double csByWptVisuallyCompleteInPercent
+
+    static hasMany = [underlyingEventResultsByVisuallyComplete: EventResult]
     /**
      * <p>
      * If the interval of this measured value is actual (that is it contains now) this should always stay false.
@@ -84,14 +86,14 @@ class MeasuredValue implements CsiValue {
     /**
      * <p>
      * A comma-separated list of the database identifiers of {@link EventResult}s this value was
-     * calculated from. Maintained only for hourly-event- {@link MeasuredValue}s.
-     * Used to show a list of raw-data-results (underlying {@link EventResult}s) if users click to data-points of hourly-event- {@link MeasuredValue}s in graphs.
+     * calculated from. Maintained only for hourly-event- {@link CsiAggregation}s.
+     * Used to show a list of raw-data-results (underlying {@link EventResult}s) if users click to data-points of hourly-event- {@link CsiAggregation}s in graphs.
      * </p>
      */
     @BindUsing({
-        obj, source -> source['resultIds']
+        obj, source -> source['underlyingEventResultsByWptDocComplete']
     })
-    String resultIds
+    String underlyingEventResultsByWptDocComplete
 
     static transients = ['resultIdsAsList', 'latestUpdateEvent', 'calculated']
 
@@ -100,14 +102,15 @@ class MeasuredValue implements CsiValue {
         interval()
         aggregator()
         tag(maxSize: 255)
-        value(nullable: true)
-        resultIds()
+        csByWptDocCompleteInPercent(nullable: true)
+        csByWptVisuallyCompleteInPercent(nullable: true)
+        underlyingEventResultsByWptDocComplete()
         closedAndCalculated()
         connectivityProfile(nullable: true)
         csiSystem(nullable: true)
     }
     static mapping = {
-        resultIds(type: 'text')
+        underlyingEventResultsByWptDocComplete(type: 'text')
         closedAndCalculated(defaultValue: false, index: 'closedAndCalculated_and_started_idx')
         started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx')
         interval(index: 'started_and_iVal_and_aggr_idx')
@@ -128,7 +131,7 @@ class MeasuredValue implements CsiValue {
      * @see #countResultIds()
      */
     List<Long> getResultIdsAsList(){
-        return resultIds ? resultIds.tokenize(DELIMITER_RESULTIDS).collect({ Long.parseLong(it) }) : []
+        return underlyingEventResultsByWptDocComplete ? underlyingEventResultsByWptDocComplete.tokenize(DELIMITER_RESULTIDS).collect({ Long.parseLong(it) }) : []
     }
     /**
      * Adds the newResultId to the list of {@link EventResult}-identifiers, this value was calculated from.
@@ -137,9 +140,9 @@ class MeasuredValue implements CsiValue {
      */
     void addToResultIds(Long newResultId){
         List<Long> list = getResultIdsAsList()
-        if(list.contains(newResultId)) log.error("Didn't add EventResult to MeasuredValue because it was already in the list! (EventResult-ID=${newResultId}, MeasuredValue-ID=${this.ident()})")
+        if(list.contains(newResultId)) log.error("Didn't add EventResult to CsiAggregation because it was already in the list! (EventResult-ID=${newResultId}, CsiAggregation-ID=${this.ident()})")
         list.add(newResultId)
-        resultIds = list.join(DELIMITER_RESULTIDS)
+        underlyingEventResultsByWptDocComplete = list.join(DELIMITER_RESULTIDS)
     }
     /**
      * Check if the ResultId containing in the list of {@link EventResult}-identifiers
@@ -158,31 +161,31 @@ class MeasuredValue implements CsiValue {
         List<Long> list = getResultIdsAsList()
         List<Long> intersection = list.intersect(resultIdsToAddAsList)
         if(intersection.size() > 0) {
-            log.error("EventResults were added to MeasuredValue although some of them were already in the list! (id's which were already in the list=${intersection}, MeasuredValue-ID=${this.ident()})")
+            log.error("EventResults were added to CsiAggregation although some of them were already in the list! (id's which were already in the list=${intersection}, CsiAggregation-ID=${this.ident()})")
         }
         list.addAll(resultIdsToAddAsList)
-        resultIds = list.join(DELIMITER_RESULTIDS)
+        underlyingEventResultsByWptDocComplete = list.join(DELIMITER_RESULTIDS)
     }
     /**
      * Adds all {@link EventResult}-identifiers represented by resultIdsToAddAsString to the list of {@link EventResult}-identifiers, this value was calculated from.
      * The results are just added, no identifiers are removed previously.
      * @param resultIdsToAddAsString
-     * @see #resultIds
+     * @see #underlyingEventResultsByWptDocComplete
      */
     void addAllToResultIds(String resultIdsToAddAsString){
         List<Long> list = getResultIdsAsList()
         List<Long> intersection = list.intersect(resultIdsToAddAsString.tokenize(DELIMITER_RESULTIDS))
         if(intersection.size() > 0) {
-            log.error("EventResults were added to MeasuredValue although some of them were already in the list! (id's which were already in the list=${intersection}, MeasuredValue-ID=${this.ident()})")
+            log.error("EventResults were added to CsiAggregation although some of them were already in the list! (id's which were already in the list=${intersection}, CsiAggregation-ID=${this.ident()})")
         }
         list.addAll(resultIdsToAddAsString.tokenize(DELIMITER_RESULTIDS))
-        resultIds = list.join(DELIMITER_RESULTIDS)
+        underlyingEventResultsByWptDocComplete = list.join(DELIMITER_RESULTIDS)
     }
     /**
      * Removes all {@link EventResult}-identifiers from the list of identifiers, this value was calculated from.
      */
     void clearResultIds(){
-        this.resultIds = ''
+        this.underlyingEventResultsByWptDocComplete = ''
     }
 
     /**
@@ -201,10 +204,10 @@ class MeasuredValue implements CsiValue {
     }
 
     /**
-     * Reads latest {@link MeasuredValueUpdateEvent} for this {@link MeasuredValue} from db. If this events
+     * Reads latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} from db. If this events
      * attribute updateCause requires a recalculation or there is no event at all, true is returned. Otherwise false is returned.
      * @param toProof
-     * @return True if latest {@link MeasuredValueUpdateEvent} for this {@link MeasuredValue} requires recalculation
+     * @return True if latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} requires recalculation
      * 	or there is no event at all. Otherwise false.
      */
     public boolean hasToBeCalculated(){
@@ -216,11 +219,11 @@ class MeasuredValue implements CsiValue {
     }
 
     /**
-     * Gets latest {@link MeasuredValueUpdateEvent} for this {@link MeasuredValue} from param updateEvents. If this events
+     * Gets latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} from param updateEvents. If this events
      * attribute updateCause requires a recalculation or there is no event at all, true is returned. Otherwise false is returned.
      * <b>Note:</b> This method is implemented for performance reasons: If many MeasuredValues should be checked the UpdateEvents are only read once from db.
      * @param toProof
-     * @return True if latest {@link MeasuredValueUpdateEvent} for this {@link MeasuredValue} requires recalculation
+     * @return True if latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} requires recalculation
      * 	or there is no event at all. Otherwise false.
      */
     public boolean hasToBeCalculatedAccordingEvents(List<MeasuredValueUpdateEvent> updateEvents){
@@ -241,33 +244,33 @@ class MeasuredValue implements CsiValue {
     }
 
     /**
-     * Checks whether this MeasuredValue was calculated at least one time and never outdated afterwards.
-     * <b>Note:</b> If no underlying data exists the value of the MeasuredValue is null although it is calculated and this method returns true.
-     * @return True if the MeasuredValue was calculated at least one time and never outdated afterwards.
+     * Checks whether this CsiAggregation was calculated at least one time and never outdated afterwards.
+     * <b>Note:</b> If no underlying data exists the value of the CsiAggregation is null although it is calculated and this method returns true.
+     * @return True if the CsiAggregation was calculated at least one time and never outdated afterwards.
      */
     public boolean isCalculated(){
         return !hasToBeCalculated()
     }
 
     /**
-     * Checks whether this MeasuredValue was calculated based on underlying data at least one time and never outdated afterwards.
-     * @return True if the MeasuredValue was calculated based on underlying data at least one time and never outdated afterwards.
+     * Checks whether this CsiAggregation was calculated based on underlying data at least one time and never outdated afterwards.
+     * @return True if the CsiAggregation was calculated based on underlying data at least one time and never outdated afterwards.
      */
     public boolean isCalculatedWithData(){
-        return this.isCalculated() && this.value != null
+        return this.isCalculated() && this.csByWptDocCompleteInPercent != null
     }
 
     /**
-     * Checks whether this MeasuredValue was calculated without existing underlying data at least one time and never outdated afterwards.
-     * @return True if the MeasuredValue was calculated without existing underlying data at least one time and never outdated afterwards.
+     * Checks whether this CsiAggregation was calculated without existing underlying data at least one time and never outdated afterwards.
+     * @return True if the CsiAggregation was calculated without existing underlying data at least one time and never outdated afterwards.
      */
     public boolean isCalculatedWithoutData(){
-        return this.isCalculated() && this.value == null
+        return this.isCalculated() && this.csByWptDocCompleteInPercent == null
     }
 
     /**
-     * Delivers latest {@link MeasuredValueUpdateEvent} for this {@link MeasuredValue} from db.
-     * @return Latest {@link MeasuredValueUpdateEvent} for this {@link MeasuredValue} or null if no event exists.
+     * Delivers latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} from db.
+     * @return Latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} or null if no event exists.
      */
     private MeasuredValueUpdateEvent getLatestUpdateEvent() {
         def c = MeasuredValueUpdateEvent.createCriteria()
@@ -281,12 +284,17 @@ class MeasuredValue implements CsiValue {
 
     @Override
     public boolean isCsiRelevant(){
-        return this.isCalculated() && this.value != null
+        return this.isCalculated() && this.csByWptDocCompleteInPercent != null
     }
 
     @Override
-    public Double retrieveValue() {
-        return value
+    public Double retrieveCsByWptDocCompleteInPercent() {
+        return csByWptDocCompleteInPercent
+    }
+
+    @Override
+    public Double retrieveCsByWptVisuallyCompleteInPercent() {
+        return csByWptVisuallyCompleteInPercent
     }
 
     @Override
@@ -305,8 +313,13 @@ class MeasuredValue implements CsiValue {
     }
 
     @Override
-    public List<Long> retrieveUnderlyingEventResultIds(){
+    public List<Long> retrieveUnderlyingEventResultsByDocComplete(){
         return this.getResultIdsAsList()
+    }
+
+    @Override
+    public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete(){
+        return this.underlyingEventResultsByVisuallyComplete.toList()
     }
 
     public List<MeasuredValueUpdateEvent> getMeasuredValueUpdateEvents() {
@@ -314,6 +327,6 @@ class MeasuredValue implements CsiValue {
     }
 
     public String toString(){
-        return "${aggregator} | ${interval} | ${started} | ${value}"
+        return "${aggregator} | ${interval} | ${started} | ${csByWptDocCompleteInPercent}"
     }
 }

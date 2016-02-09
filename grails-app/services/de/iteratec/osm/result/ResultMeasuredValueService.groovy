@@ -206,7 +206,7 @@ class ResultMeasuredValueService {
 
 			case AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT:
 			case AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT:
-				returnVal= result.getCustomerSatisfactionInPercent() ? Double.valueOf(result.getCustomerSatisfactionInPercent()) : null
+				returnVal= result.getCsByWptDocCompleteInPercent() ? Double.valueOf(result.getCsByWptDocCompleteInPercent()) : null
 				break;
 
 			case AggregatorType.RESULT_UNCACHED_SPEED_INDEX:

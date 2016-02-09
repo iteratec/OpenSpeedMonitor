@@ -31,7 +31,7 @@ import org.junit.Test
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -83,13 +83,13 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		Date startDate = new DateTime(2012,01,12,0,0, DateTimeZone.UTC).toDate()
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
 
-		MeasuredValue mvWeeklyShop = new MeasuredValue(
+		CsiAggregation mvWeeklyShop = new CsiAggregation(
 				started: startDate,
 				interval: weekly,
 				aggregator: pageAggregatorShop,
 				tag: csiGroup.ident().toString(),
-				value: null,
-				resultIds: ''
+				csByWptDocCompleteInPercent: null,
+				underlyingEventResultsByWptDocComplete: ''
 				).save(failOnError:true)
 
 		//execute test
@@ -108,8 +108,8 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	}
 
 	/**
-	 * Tests the calculation of one weekly-shop-{@link MeasuredValue}. Databasis for calculation are weekly page-{@link MeasuredValue}s. These get calculated 
-	 * on-the-fly while calculating the respective weekly-shop-{@link MeasuredValue}. The hourly-event-{@link MeasuredValue}s of the period have to exist (they
+	 * Tests the calculation of one weekly-shop-{@link CsiAggregation}. Databasis for calculation are weekly page-{@link CsiAggregation}s. These get calculated
+	 * on-the-fly while calculating the respective weekly-shop-{@link CsiAggregation}. The hourly-event-{@link CsiAggregation}s of the period have to exist (they
 	 * won't get calculated on-the-fly. Therefore these get precalculated in test here. 
 	 */
 	@Test
@@ -123,19 +123,19 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 
 		//create test-specific data
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
-		List<MeasuredValue> createdHmvs = precalcHourlyJobMvs(csiGroup)
-		Map<String, List<MeasuredValue>> hmvsByPagename = getHmvsByPagenameMap(createdHmvs)
+		List<CsiAggregation> createdHmvs = precalcHourlyJobMvs(csiGroup)
+		Map<String, List<CsiAggregation>> hmvsByPagename = getHmvsByPagenameMap(createdHmvs)
 
 		Double expectedValue = 61.30
 
 
-		MeasuredValue mvWeeklyShop = new MeasuredValue(
+		CsiAggregation mvWeeklyShop = new CsiAggregation(
 				started: startDate,
 				interval: weekly,
 				aggregator: pageAggregatorShop,
 				tag: csiGroup.ident().toString(),
-				value: null,
-				resultIds: ''
+				csByWptDocCompleteInPercent: null,
+				underlyingEventResultsByWptDocComplete: ''
 				).save(failOnError:true)
 
 		//execute test
@@ -164,12 +164,12 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	 * 
 	 * @return A collection of pre-calculated hourly values.
 	 */
-	private List<MeasuredValue> precalcHourlyJobMvs(JobGroup jobGroup){
+	private List<CsiAggregation> precalcHourlyJobMvs(JobGroup jobGroup){
 
 		DateTime currentDateTime = startOfWeek
 		DateTime endOfWeek = startOfWeek.plusWeeks(1)
 		
-		List<MeasuredValue> createdHmvs = []
+		List<CsiAggregation> createdHmvs = []
 		pagesToTest.each { String pageName ->
 			createdHmvs.addAll(TestDataUtil.precalculateHourlyMeasuredValues(
 				jobGroup, pageName, endOfWeek, currentDateTime, hourly, 
@@ -184,13 +184,13 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		return createdHmvs
 	}
 	
-	private getHmvsByPagenameMap(List<MeasuredValue> createdHmvs){
-		Map<String, List<MeasuredValue>> hmvsByPagename = [:]
+	private getHmvsByPagenameMap(List<CsiAggregation> createdHmvs){
+		Map<String, List<CsiAggregation>> hmvsByPagename = [:]
 		pagesToTest.each{
 			hmvsByPagename[it] = []
 		}
 		Page page
-		createdHmvs.each{MeasuredValue hmv ->
+		createdHmvs.each{ CsiAggregation hmv ->
 			page = measuredValueTagService.findPageOfHourlyEventTag(hmv.tag)
 			if (page && hmvsByPagename.containsKey(page.name)) {
 				hmvsByPagename[page.name].add(hmv)

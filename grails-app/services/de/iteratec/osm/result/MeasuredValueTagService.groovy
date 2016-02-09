@@ -273,7 +273,7 @@ class MeasuredValueTagService {
 	 *         if the specified tag is not an weekly shop tag.
 	 * @version IT-89
 	 */
-	public findJobGroupOfWeeklyShopTag(String weeklyShopTag){
+	public JobGroup findJobGroupOfWeeklyShopTag(String weeklyShopTag){
 		requiresArgumentNotNull('hourlyEventMvTag', weeklyShopTag)
 		String[] tagSegments = getTagSegmentsOfTag(weeklyShopTag, 1)
 		return JobGroup.get(tagSegments[0] as Serializable)

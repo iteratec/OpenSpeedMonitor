@@ -37,7 +37,6 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
@@ -432,7 +431,7 @@ class LocationAndResultPersisterService implements iListener{
 			log.debug("step.testedPage=${step.testedPage}")
 			CsiConfiguration csiConfigurationOfResult = result.jobResult.job.jobGroup.csiConfiguration
 			log.debug("result.CsiConfiguration=${csiConfigurationOfResult}")
-            result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage,csiConfigurationOfResult)
+            result.csByWptDocCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage,csiConfigurationOfResult)
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}

@@ -25,7 +25,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredValueTagService
@@ -38,7 +38,7 @@ import org.junit.Before
 import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
-@Mock([EventResult, MeasuredValue, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
+@Mock([EventResult, CsiAggregation, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
         JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 class WeightingServiceTests {
 
@@ -75,12 +75,12 @@ class WeightingServiceTests {
         // test specific data
         Set<WeightFactor> weightFactors = [] as Set
         CsiValue eventResult = new EventResult()
-        CsiValue measuredValue = new MeasuredValue()
+        CsiValue measuredValue = new CsiAggregation()
 
         //test for EventResult
         Double deliveredWeight = serviceUnderTest.getWeight(eventResult, weightFactors, csiConfiguration)
         assertEquals(1d, deliveredWeight, DELTA)
-        //test for MeasuredValue
+        //test for CsiAggregation
         deliveredWeight = serviceUnderTest.getWeight(measuredValue, weightFactors, csiConfiguration)
         assertEquals(1d, deliveredWeight, DELTA)
 
@@ -91,8 +91,8 @@ class WeightingServiceTests {
         Set<WeightFactor> weightFactors = [WeightFactor.HOUROFDAY] as Set
         CsiValue eventResultTwoAClockAm = new EventResult(jobResultDate: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
         CsiValue eventResultFiveAClockPm = new EventResult(jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
-        CsiValue measuredValueTwoAClockAm = new MeasuredValue(started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
-        CsiValue measuredValueFiveAClockPm = new MeasuredValue(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
+        CsiValue measuredValueTwoAClockAm = new CsiAggregation(started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
+        CsiValue measuredValueFiveAClockPm = new CsiAggregation(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
 
         mockMeasuredValueTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
 
@@ -121,8 +121,8 @@ class WeightingServiceTests {
 
         CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
         CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
-        CsiValue measuredValueBrowserWeightOfFiftyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
-        CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
+        CsiValue measuredValueBrowserWeightOfFiftyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
+        CsiValue measuredValueBrowserWeightOfSeventyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
 
         //test specific mocks
         mockMeasuredValueTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
@@ -155,8 +155,8 @@ class WeightingServiceTests {
         Set<WeightFactor> weightFactors = [WeightFactor.PAGE] as Set
         CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
         CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
-        CsiValue measuredValueBrowserWeightOfFiftyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
-        CsiValue measuredValueBrowserWeightOfSeventyPercent = new MeasuredValue(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
+        CsiValue measuredValueBrowserWeightOfFiftyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
+        CsiValue measuredValueBrowserWeightOfSeventyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
 
         //test specific mocks
         mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
@@ -247,14 +247,14 @@ class WeightingServiceTests {
         // test specific data
         CsiValue eventResultWeightFiftyTwoAm = new EventResult(
                 id: 1l,
-                customerSatisfactionInPercent: 10d,
+                csByWptDocCompleteInPercent: 10d,
                 tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
                 jobResultDate: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 docCompleteTimeInMillisecs: 1000,
                 connectivityProfile: connectivityProfile_50).save(validate: false)
         CsiValue eventResultWeightSeventyFivePm = new EventResult(
                 id: 2l,
-                customerSatisfactionInPercent: 20d,
+                csByWptDocCompleteInPercent: 20d,
                 tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
                 jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 docCompleteTimeInMillisecs: 1000,
@@ -375,8 +375,8 @@ class WeightingServiceTests {
     }
 
     void testGetWeightedCsiValuesFromMeasuredValues() {
-        MeasuredValue measuredValueWeightFiftyTwoAm = new MeasuredValue(
-                value: 10d,
+        CsiAggregation measuredValueWeightFiftyTwoAm = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
                 tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50
@@ -384,8 +384,8 @@ class WeightingServiceTests {
         measuredValueWeightFiftyTwoAm.addAllToResultIds([1l, 2l, 3l])
         measuredValueWeightFiftyTwoAm.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValueWeightFiftyTwoAm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue measuredValueWeightSeventyFivePm = new MeasuredValue(
-                value: 20d,
+        CsiAggregation measuredValueWeightSeventyFivePm = new CsiAggregation(
+                csByWptDocCompleteInPercent: 20d,
                 tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
                 started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 connectivityProfile: connectivityProfile_70
@@ -483,8 +483,8 @@ class WeightingServiceTests {
     }
 
     void testGetWeightedCsiValuesFromMeasuredValuesByCsiSystem() {
-        MeasuredValue measuredValue1 = new MeasuredValue(
-                value: 10d,
+        CsiAggregation measuredValue1 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
                 tag: jobGroup1.ident(),
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50,
@@ -492,8 +492,8 @@ class WeightingServiceTests {
         measuredValue1.addAllToResultIds([1l, 2l, 3l])
         measuredValue1.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValue1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        MeasuredValue measuredValue2 = new MeasuredValue(
-                value: 20d,
+        CsiAggregation measuredValue2 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 20d,
                 tag: jobGroup2.ident(),
                 started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 connectivityProfile: connectivityProfile_70

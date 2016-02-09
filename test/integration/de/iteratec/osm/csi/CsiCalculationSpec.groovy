@@ -105,7 +105,7 @@ class CsiCalculationSpec extends Specification {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
         serviceUnderTest.listenToResult(xmlResult,"",server1)
         Collection<EventResult> results = EventResult.findAll {
-            customerSatisfactionInPercent != null
+            csByWptDocCompleteInPercent != null
         }
 
         expect:
@@ -120,8 +120,8 @@ class CsiCalculationSpec extends Specification {
         and: "and persist result for calculating csi"
         serviceUnderTest.listenToResult(xmlResult,"",server1)
         double csiValue = EventResult.findAll {
-            customerSatisfactionInPercent != null
-        }.first().customerSatisfactionInPercent
+            csByWptDocCompleteInPercent != null
+        }.first().csByWptDocCompleteInPercent
 
         expect:
         csiValue == 1.0
@@ -135,8 +135,8 @@ class CsiCalculationSpec extends Specification {
         and: "and persist result for calculating csi"
         serviceUnderTest.listenToResult(xmlResult,"",server1)
         double csiValue = EventResult.findAll {
-            customerSatisfactionInPercent != null
-        }.first().customerSatisfactionInPercent
+            csByWptDocCompleteInPercent != null
+        }.first().csByWptDocCompleteInPercent
 
         expect:
         csiValue == 0.5

@@ -106,7 +106,8 @@ class EventResult implements CsiValue {
 	Integer fullyLoadedTimeInMillisecs
 	Integer loadTimeInMillisecs
 	Integer startRenderInMillisecs
-	Double customerSatisfactionInPercent
+	Double csByWptDocCompleteInPercent
+	Double csByWptVisuallyCompleteInPercent
 
 	/**
 	 * The WPT speed index received from WPT server.
@@ -180,7 +181,8 @@ class EventResult implements CsiValue {
 		fullyLoadedTimeInMillisecs(nullable: true)
 		loadTimeInMillisecs(nullable: true)
 		startRenderInMillisecs(nullable: true)
-		customerSatisfactionInPercent(nullable: true)
+		csByWptDocCompleteInPercent(nullable: true)
+		csByWptVisuallyCompleteInPercent(nullable: true)
 		speedIndex(nullable: true)
 		visuallyCompleteInMillisecs(nullable: true)
 
@@ -255,15 +257,20 @@ class EventResult implements CsiValue {
 	 */
 	@Override
 	public boolean isCsiRelevant() {
-		return this.customerSatisfactionInPercent && this.docCompleteTimeInMillisecs &&
+		return this.csByWptDocCompleteInPercent && this.docCompleteTimeInMillisecs &&
 				(this.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
 					this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
 				jobResult.job.jobGroup.csiConfiguration != null
 	}
 
 	@Override
-	public Double retrieveValue() {
-		return customerSatisfactionInPercent
+	public Double retrieveCsByWptDocCompleteInPercent() {
+		return csByWptDocCompleteInPercent
+	}
+
+	@Override
+	public Double retrieveCsByWptVisuallyCompleteInPercent() {
+		return csByWptVisuallyCompleteInPercent
 	}
 
 	@Override
@@ -282,8 +289,13 @@ class EventResult implements CsiValue {
 	}
 
 	@Override
-	public List<Long> retrieveUnderlyingEventResultIds() {
+	public List<Long> retrieveUnderlyingEventResultsByDocComplete() {
 		return [this.id]
+	}
+
+	@Override
+	public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete() {
+		return [this]
 	}
 
 	/**
@@ -325,7 +337,7 @@ class EventResult implements CsiValue {
 				"\t\tfullyLoadedTimeInMillisecs=${this.fullyLoadedTimeInMillisecs}\n" +
 				"\t\tloadTimeInMillisecs=${this.loadTimeInMillisecs}\n" +
 				"\t\tstartRenderInMillisecs=${this.startRenderInMillisecs}\n" +
-				"\t\tcustomerSatisfactionInPercent=${this.customerSatisfactionInPercent}\n" +
+				"\t\tcustomerSatisfactionInPercent=${this.csByWptDocCompleteInPercent}\n" +
 				"\t\tspeedIndex=${this.speedIndex}\n" +
 				"\t\tdownloadAttempts=${this.downloadAttempts}\n" +
 				"\t\tfirstStatusUpdate=${this.firstStatusUpdate}\n" +

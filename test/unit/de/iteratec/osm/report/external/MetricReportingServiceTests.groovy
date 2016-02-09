@@ -18,10 +18,8 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
-import grails.test.GrailsMock
 
 import static org.junit.Assert.assertEquals
 
@@ -38,7 +36,7 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.csi.EventMeasuredValueService
@@ -209,8 +207,8 @@ class MetricReportingServiceTests {
 		AggregatorType eventAggr = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		MeasuredValueInterval hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> emvs = [
-			new MeasuredValue(interval: hourly, aggregator: eventAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> emvs = [
+			new CsiAggregation(interval: hourly, aggregator: eventAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -233,8 +231,8 @@ class MetricReportingServiceTests {
 		AggregatorType eventAggr = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		MeasuredValueInterval hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> emvs = [
-			new MeasuredValue(interval: hourly, aggregator: eventAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> emvs = [
+			new CsiAggregation(interval: hourly, aggregator: eventAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -257,8 +255,8 @@ class MetricReportingServiceTests {
 		AggregatorType eventAggr = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		MeasuredValueInterval hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> emvs = [
-			new MeasuredValue(interval: hourly, aggregator: eventAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> emvs = [
+			new CsiAggregation(interval: hourly, aggregator: eventAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -280,8 +278,8 @@ class MetricReportingServiceTests {
 		AggregatorType eventAggr = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		MeasuredValueInterval hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> emvs = [
-			new MeasuredValue(interval: hourly, aggregator: eventAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> emvs = [
+			new CsiAggregation(interval: hourly, aggregator: eventAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -306,8 +304,8 @@ class MetricReportingServiceTests {
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: daily, aggregator: pageAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')] 
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: daily, aggregator: pageAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -330,8 +328,8 @@ class MetricReportingServiceTests {
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: daily, aggregator: pageAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: daily, aggregator: pageAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -354,8 +352,8 @@ class MetricReportingServiceTests {
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: daily, aggregator: pageAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: daily, aggregator: pageAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -377,8 +375,8 @@ class MetricReportingServiceTests {
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: daily, aggregator: pageAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: daily, aggregator: pageAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -400,8 +398,8 @@ class MetricReportingServiceTests {
 		//test-specific data
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-		List<MeasuredValue> pmvsWithoutData = [
-			new MeasuredValue(interval: daily, aggregator: pageAggr, value: null, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '')]
+		List<CsiAggregation> pmvsWithoutData = [
+			new CsiAggregation(interval: daily, aggregator: pageAggr, csByWptDocCompleteInPercent: null, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -421,8 +419,8 @@ class MetricReportingServiceTests {
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval weeky = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: weeky, aggregator: pageAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: weeky, aggregator: pageAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -445,8 +443,8 @@ class MetricReportingServiceTests {
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval weeky = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: weeky, aggregator: pageAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: weeky, aggregator: pageAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -468,8 +466,8 @@ class MetricReportingServiceTests {
 		//test-specific data
 		AggregatorType pageAggr = AggregatorType.findByName(AggregatorType.PAGE)
 		MeasuredValueInterval weeky = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-		List<MeasuredValue> pmvs = [
-			new MeasuredValue(interval: weeky, aggregator: pageAggr, value: null, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), resultIds: '')]
+		List<CsiAggregation> pmvs = [
+			new CsiAggregation(interval: weeky, aggregator: pageAggr, csByWptDocCompleteInPercent: null, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), underlyingEventResultsByWptDocComplete: '')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -491,8 +489,8 @@ class MetricReportingServiceTests {
 		AggregatorType shopAggr = AggregatorType.findByName(AggregatorType.SHOP)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> smvs = [
-			new MeasuredValue(interval: daily, aggregator: shopAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> smvs = [
+			new CsiAggregation(interval: daily, aggregator: shopAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -515,8 +513,8 @@ class MetricReportingServiceTests {
 		AggregatorType shopAggr = AggregatorType.findByName(AggregatorType.SHOP)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> smvs = [
-			new MeasuredValue(interval: daily, aggregator: shopAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> smvs = [
+			new CsiAggregation(interval: daily, aggregator: shopAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -538,8 +536,8 @@ class MetricReportingServiceTests {
 		//test-specific data
 		AggregatorType shopAggr = AggregatorType.findByName(AggregatorType.SHOP)
 		MeasuredValueInterval daily = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-		List<MeasuredValue> smvs = [
-			new MeasuredValue(interval: daily, aggregator: shopAggr, value: null, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), resultIds: '')]
+		List<CsiAggregation> smvs = [
+			new CsiAggregation(interval: daily, aggregator: shopAggr, csByWptDocCompleteInPercent: null, started: REPORTING_TIMESTAMP_START_OF_DAY.toDate(), underlyingEventResultsByWptDocComplete: '')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -559,8 +557,8 @@ class MetricReportingServiceTests {
 		AggregatorType shopAggr = AggregatorType.findByName(AggregatorType.SHOP)
 		MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> smvs = [
-			new MeasuredValue(interval: weekly, aggregator: shopAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> smvs = [
+			new CsiAggregation(interval: weekly, aggregator: shopAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -583,8 +581,8 @@ class MetricReportingServiceTests {
 		AggregatorType shopAggr = AggregatorType.findByName(AggregatorType.SHOP)
 		MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
 		double csiValuePersistedInOsm = 0.78d
-		List<MeasuredValue> smvs = [
-			new MeasuredValue(interval: weekly, aggregator: shopAggr, value: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), resultIds: '1,2,3')]
+		List<CsiAggregation> smvs = [
+			new CsiAggregation(interval: weekly, aggregator: shopAggr, csByWptDocCompleteInPercent: csiValuePersistedInOsm, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), underlyingEventResultsByWptDocComplete: '1,2,3')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -606,8 +604,8 @@ class MetricReportingServiceTests {
 		//test-specific data
 		AggregatorType shopAggr = AggregatorType.findByName(AggregatorType.SHOP)
 		MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-		List<MeasuredValue> smvs = [
-			new MeasuredValue(interval: weekly, aggregator: shopAggr, value: null, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), resultIds: '')]
+		List<CsiAggregation> smvs = [
+			new CsiAggregation(interval: weekly, aggregator: shopAggr, csByWptDocCompleteInPercent: null, started: REPORTING_TIMESTAMP_START_OF_WEEK.toDate(), underlyingEventResultsByWptDocComplete: '')]
 		TestSocket testSocket = new TestSocket()
 		//test-specific mocks
 		AggregatorType irrelevantCauseJobGroupIsntRequestedFromHere = new AggregatorType()
@@ -711,7 +709,7 @@ class MetricReportingServiceTests {
 	/**
 	 * Mocks methods of {@linkplain PageMeasuredValueService}.
 	 */
-	private void mockEventMeasuredValueService(List<MeasuredValue> toReturnFromGetHourylMeasuredValues){
+	private void mockEventMeasuredValueService(List<CsiAggregation> toReturnFromGetHourylMeasuredValues){
 		def eventMeasuredValueService = mockFor(EventMeasuredValueService, true)
 		eventMeasuredValueService.demand.getHourylMeasuredValues(1..10000) {
 			Date fromDate, Date toDate, MvQueryParams mvQueryParams ->
@@ -722,7 +720,7 @@ class MetricReportingServiceTests {
 	/**
 	 * Mocks methods of {@linkplain PageMeasuredValueService}.
 	 */
-	private void mockPageMeasuredValueService(List<MeasuredValue> toReturnFromGetOrCalculatePageMeasuredValues){
+	private void mockPageMeasuredValueService(List<CsiAggregation> toReturnFromGetOrCalculatePageMeasuredValues){
 		def pageMeasuredValueService = mockFor(PageMeasuredValueService, true)
 		pageMeasuredValueService.demand.getOrCalculatePageMeasuredValues(1..10000) {
 			Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups ->
@@ -733,7 +731,7 @@ class MetricReportingServiceTests {
 	/**
 	 * Mocks methods of {@linkplain ShopMeasuredValueService}.
 	 */
-	private void mockShopMeasuredValueService(List<MeasuredValue> toReturnFromGetOrCalculateShopMeasuredValues){
+	private void mockShopMeasuredValueService(List<CsiAggregation> toReturnFromGetOrCalculateShopMeasuredValues){
 		def shopMeasuredValueService = mockFor(ShopMeasuredValueService, true)
 		shopMeasuredValueService.demand.getOrCalculateShopMeasuredValues(1..10000) {
 			Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups ->

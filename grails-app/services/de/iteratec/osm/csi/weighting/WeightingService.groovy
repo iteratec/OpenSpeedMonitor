@@ -56,9 +56,9 @@ class WeightingService {
             csiValues.each {CsiValue csiValue ->
                 if (csiValue.isCsiRelevant()) {
 
-                    value = csiValue.retrieveValue()
+                    value = csiValue.retrieveCsByWptDocCompleteInPercent()
                     weight = getWeight(csiValue, weightFactors, csiConfiguration)
-                    underlyingResultIds = csiValue.retrieveUnderlyingEventResultIds()
+                    underlyingResultIds = csiValue.retrieveUnderlyingEventResultsByDocComplete()
 
                     if (value != null && weight != null && weight > 0) {
                         addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
@@ -92,13 +92,13 @@ class WeightingService {
             csiValues.each {CsiValue csiValue ->
                 if (csiValue.isCsiRelevant()) {
 
-                    value = csiValue.retrieveValue()
+                    value = csiValue.retrieveCsByWptDocCompleteInPercent()
                     JobGroup jobGroupOfCsiValue = JobGroup.findById(measuredValueTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
                     JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
                         it.jobGroup == jobGroupOfCsiValue
                     }
                     weight = jobGroupWeightOfCsiValue.weight
-                    underlyingResultIds = csiValue.retrieveUnderlyingEventResultIds()
+                    underlyingResultIds = csiValue.retrieveUnderlyingEventResultsByDocComplete()
 
                     if (value != null && weight != null && weight > 0) {
                         addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)

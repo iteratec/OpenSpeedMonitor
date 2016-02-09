@@ -29,7 +29,7 @@ import org.junit.Test
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -157,8 +157,8 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 			measuredValueUpdateService.createOrUpdateDependentMvs(result)
 		}
 
-		List<MeasuredValue> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
-		MeasuredValue mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
+		List<CsiAggregation> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
+		CsiAggregation mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
 
 		assertEquals(startDate, mvWeeklyPage.started)
 		assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)

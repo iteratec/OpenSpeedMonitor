@@ -34,7 +34,7 @@ import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.measurement.script.Script
@@ -46,7 +46,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * Test-suite of {@link de.iteratec.osm.result.ResultMeasuredValueService}
  */
 @TestFor(ResultMeasuredValueService)
-@Mock([EventResult, Job, JobResult, JobGroup, MeasuredValue, MeasuredEvent, WebPageTestServer,
+@Mock([EventResult, Job, JobResult, JobGroup, CsiAggregation, MeasuredEvent, WebPageTestServer,
 	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script, ConnectivityProfile])
 class ResultMeasuredValueServiceTests {
 
@@ -256,7 +256,7 @@ class ResultMeasuredValueServiceTests {
 				wptStatus: 0,
 				validationState : 'validationState',
 				harData: 'harData',
-				customerSatisfactionInPercent:  1,
+				csByWptDocCompleteInPercent:  1,
 				jobResult: runInHour_One,
 				jobResultDate: runInHour_One.date,
 				jobResultJobConfigId: runInHour_One.job.ident(),
@@ -304,7 +304,7 @@ class ResultMeasuredValueServiceTests {
 				wptStatus: 0,
 				validationState : 'validationState',
 				harData: 'harData',
-				customerSatisfactionInPercent:  1,
+				csByWptDocCompleteInPercent:  1,
 				jobResult: runInHour_Two,
 				jobResultDate: runInHour_Two.date,
 				jobResultJobConfigId: runInHour_Two.job.ident(),
@@ -352,7 +352,7 @@ class ResultMeasuredValueServiceTests {
 				wptStatus: 0,
 				validationState : 'validationState',
 				harData: 'harData',
-				customerSatisfactionInPercent:  1,
+				csByWptDocCompleteInPercent:  1,
 				jobResult: runBeforeHour,
 				jobResultDate: runBeforeHour.date,
 				jobResultJobConfigId: runBeforeHour.job.ident(),
@@ -400,7 +400,7 @@ class ResultMeasuredValueServiceTests {
 				wptStatus: 0,
 				validationState : 'validationState',
 				harData: 'harData',
-				customerSatisfactionInPercent:  1,
+				csByWptDocCompleteInPercent:  1,
 				jobResult: runAfterHour,
 				jobResultDate: runAfterHour.date,
 				jobResultJobConfigId: runAfterHour.job.ident(),
@@ -416,14 +416,14 @@ class ResultMeasuredValueServiceTests {
 
 
 
-	private void assertIsCalculatedNotConstrain(List<MeasuredValue> values) {
-		values.each {MeasuredValue value ->
+	private void assertIsCalculatedNotConstrain(List<CsiAggregation> values) {
+		values.each { CsiAggregation value ->
 			assertFalse( value.isCalculated() )
 		}
 	}
 
-	private void assertIsCalculatedYesNoData(List<MeasuredValue> values) {
-		values.each {MeasuredValue value ->
+	private void assertIsCalculatedYesNoData(List<CsiAggregation> values) {
+		values.each { CsiAggregation value ->
 			assertTrue( value.isCalculated() )
 			assertNull( value.value )
 		}
@@ -499,9 +499,9 @@ class ResultMeasuredValueServiceTests {
 	/**
 	 * Mocks {@link MeasuredValueDaoService}.
 	 * @param toReturn
-	 * 				{@link MeasuredValue}s to return from mocked method getMvs().
+	 * 				{@link CsiAggregation}s to return from mocked method getMvs().
 	 */
-	private void mockMeasuredValueDaoService(List<MeasuredValue> toReturn){
+	private void mockMeasuredValueDaoService(List<CsiAggregation> toReturn){
 		def measuredValueDaoServiceMock = mockFor(MeasuredValueDaoService, true)
 		measuredValueDaoServiceMock.demand.getMvs(1..10000) {
 			Date fromDate,

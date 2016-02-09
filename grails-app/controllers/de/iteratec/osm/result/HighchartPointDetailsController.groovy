@@ -22,7 +22,7 @@ import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.MeasuredValueDaoService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -71,7 +71,7 @@ class HighchartPointDetailsController {
 	/**
 	 * <p>
 	 * Lists aggregated {@linkplain de.iteratec.osm.result.JobResult results} for a {@link
-	 * MeasuredValue} mostly afterwards a user clicked on an {@link 
+	 * CsiAggregation} mostly afterwards a user clicked on an {@link
 	 * HighchartPoint}.
 	 * </p>
 	 * 
@@ -82,13 +82,13 @@ class HighchartPointDetailsController {
 	 * </p>
 	 * 
 	 * <p>
-	 * If the {@link MeasuredValue#countResultIds() count of results} in the 
+	 * If the {@link CsiAggregation#countResultIds() count of results} in the
 	 * measured value differs from {@code lastKnownCountOfAggregatedResults} 
 	 * a waring in shown to the user.
 	 * </p>
 	 * 
 	 * @param measuredValueId 
-	 *         The database id of the {@link MeasuredValue} for which the 
+	 *         The database id of the {@link de.iteratec.osm.report.chart.CsiAggregation} for which the
 	 *         aggregated {@linkplain de.iteratec.osm.result.JobResult job results} should be listed.
 	 *         Passing <code>null</code> results in a "HTTP 400 Bad Request".
 	 * @param lastKnownCountOfAggregatedResultsOrNull 
@@ -190,7 +190,7 @@ class HighchartPointDetailsController {
 		Map<String, Object> modelToRender = Collections.checkedMap(new HashMap(), String.class, Object.class);
 
 		// Load relevant data:
-		MeasuredValue valueThatResultsShouldBeListed = measuredValueDaoService.tryToFindById(measuredValueId);
+		CsiAggregation valueThatResultsShouldBeListed = measuredValueDaoService.tryToFindById(measuredValueId);
 		
 		Collection<Long> resultIds = valueThatResultsShouldBeListed.getResultIdsAsList();
 		

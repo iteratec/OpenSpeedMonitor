@@ -42,9 +42,8 @@ import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -63,7 +62,7 @@ import de.iteratec.osm.util.I18nService
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
-@Mock([Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script])
+@Mock([Job, JobResult, MeasuredEvent, CsiAggregation, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script])
 class EventResultDashboardServiceTests {
 
     EventResultDashboardService serviceUnderTest
@@ -390,8 +389,8 @@ class EventResultDashboardServiceTests {
 
     private void tryToBuildTestsDetailsURL(String resultIDs, Integer resultIDsCount, final URL expectedURL) {
         // Create some data:
-        final MeasuredValue measuredValue = new MeasuredValue(
-                resultIds: resultIDs
+        final CsiAggregation measuredValue = new CsiAggregation(
+                underlyingEventResultsByWptDocComplete: resultIDs
         ) {
             public Long getId() {
                 return 4;
@@ -615,7 +614,7 @@ class EventResultDashboardServiceTests {
                 wptStatus: 200,
                 docCompleteTimeInMillisecs: 1,
                 domTimeInMillisecs: 2,
-                customerSatisfactionInPercent: 0,
+                csByWptDocCompleteInPercent: 0,
                 jobResult: jobResult,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: jobResult.job.ident(),
@@ -636,7 +635,7 @@ class EventResultDashboardServiceTests {
                 wptStatus: 200,
                 docCompleteTimeInMillisecs: 10,
                 domTimeInMillisecs: 20,
-                customerSatisfactionInPercent: 0,
+                csByWptDocCompleteInPercent: 0,
                 jobResult: jobResult2,
                 jobResultDate: jobResult2.date,
                 jobResultJobConfigId: jobResult2.job.ident(),

@@ -1,6 +1,7 @@
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.MeasuredValueInterval
 import de.iteratec.osm.result.EventResult
 import org.hibernate.Query;
@@ -128,20 +129,20 @@ databaseChangeLog = {
                 AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
                 MeasuredValueInterval measuredValueInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
 
-                int amountMvsHourlyAndPage = MeasuredValue.executeQuery(
-                        "select count(*) from MeasuredValue where aggregator= ? and interval= ? and resultIds!=''",
+                int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
+                        "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
                         [aggregatorType,measuredValueInterval])[0]
                 println "processing #" + amountMvsHourlyAndPage + " elements"
                 int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
 
                 (0..amountLoops).each { loopNumber ->
                     println "processing loop #" + loopNumber
-                    List<MeasuredValue> currentHourlyMeasuredValues = MeasuredValue.executeQuery(
-                            "from MeasuredValue where aggregator= ? and interval= ? and resultIds!=''",
+                    List<CsiAggregation> currentHourlyMeasuredValues = CsiAggregation.executeQuery(
+                            "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
                             [aggregatorType,measuredValueInterval],
                             [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
                     )
-                    MeasuredValue.withNewSession {
+                    CsiAggregation.withNewSession {
                         currentHourlyMeasuredValues.each { measuredValue ->
                             List<EventResult> eventResultsOfMeasuredValue = EventResult.executeQuery(
                                 "from EventResult where id in :ids",
@@ -151,15 +152,15 @@ databaseChangeLog = {
                             // simple case: if all results have same connectivity
                             if (amountDifferentConnectivityProfiles == 1) {
                                 // ... then add connectivity from any of its results to measuredValue
-                                MeasuredValue.executeUpdate(
-                                    "update MeasuredValue set connectivityProfile=:cp where id=:mvId",
+                                CsiAggregation.executeUpdate(
+                                    "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
                                     [cp: eventResultsOfMeasuredValue.first().connectivityProfile, mvId: measuredValue.id]
                                 )
                             } else { // ... else remove mv and calc it again by service
                                 if ( measuredValueUpdateService == null) {
                                     measuredValueUpdateService = ctx.measuredValueUpdateService
                                 }
-                                MeasuredValue.executeUpdate("delete MeasuredValue where id= ?", [measuredValue.id])
+                                CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [measuredValue.id])
                                 eventResultsOfMeasuredValue.each { eventResult ->
                                     measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
                                 }

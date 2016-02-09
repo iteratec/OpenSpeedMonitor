@@ -47,7 +47,7 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
-@Mock([Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile])
+@Mock([Job, JobResult, MeasuredEvent, CsiAggregation, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile])
 class SummarizedChartLegendEntriesSpec extends Specification{
 
     EventResultDashboardService serviceUnderTest

@@ -41,7 +41,7 @@ import spock.lang.Specification
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiSystemMeasuredValueService)
-@Mock([MeanCalcService, MeasuredValue, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location,
+@Mock([MeanCalcService, CsiAggregation, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location,
         Page, MeasuredValueUpdateEvent, CsiSystem])
 class CsiSystemMeasuredValueServiceSpec extends Specification {
 
@@ -84,7 +84,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         List<CsiSystem> groups = []
 
         when:
-        List<MeasuredValue> emptyList = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups)
+        List<CsiAggregation> emptyList = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups)
 
         then:
         emptyList.isEmpty()
@@ -96,7 +96,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         List<CsiSystem> groups = CsiSystem.findAll()
 
         when:
-        List<MeasuredValue> emptyList = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups)
+        List<CsiAggregation> emptyList = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups)
 
         then:
         emptyList.isEmpty()
@@ -110,9 +110,9 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         List<CsiSystem> groupsOnly3 = [csiSystemWith3]
 
         when:
-        List<MeasuredValue> mvs1 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups1)
-        List<MeasuredValue> mvs2 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups2)
-        List<MeasuredValue> mvsOnly3 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsOnly3)
+        List<CsiAggregation> mvs1 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups1)
+        List<CsiAggregation> mvs2 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups2)
+        List<CsiAggregation> mvsOnly3 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsOnly3)
 
         then:
         mvs1.size() == 1
@@ -121,8 +121,8 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     }
 
     /**
-     * Tests calculation of daily-CsiSystem{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test one single shop-{@link MeasuredValue}s exists, which should be the database of the calculation of the daily-csiSystem-{@link MeasuredValue}.
+     * Tests calculation of daily-CsiSystem{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test one single shop-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-csiSystem-{@link CsiAggregation}.
      */
     @Test
     void "don't calc daily-Mv if only findAll()"() {
@@ -136,7 +136,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         mockWeightingService(weightedCsiValuesToReturnInMock)
 
         when:
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
         mvs.isEmpty()
@@ -155,20 +155,20 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
 
         when:
         //test execution
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem1])
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem1])
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
         calculatedMvs.size() == 1
         calculatedMvs[0].isCalculated()
-        calculatedMvs[0].value == 12d
+        calculatedMvs[0].csByWptDocCompleteInPercent == 12d
 
         mvs.size() == 1
     }
 
     /**
-     * Tests calculation of daily-csiSystem-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test shop-{@link MeasuredValue}s with different weights exist.
+     * Tests calculation of daily-csiSystem-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test shop-{@link CsiAggregation}s with different weights exist.
      */
     @Test
     void "calc multiple daily-Mv"() {
@@ -191,8 +191,8 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         mockWeightingService(weightedCsiValuesToReturnInMock)
 
         when:
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
         calculatedMvs.size() == 1
@@ -200,14 +200,14 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         calculatedMvs[0].isCalculated()
 
         double expectedValue = ((valueFirstMv * weightFirstMv) + (valueSecondMv * weightSecondMv) + (valueThirdMv * weightThirdMv)) / sumOfAllWeights
-        calculatedMvs[0].value == expectedValue
+        calculatedMvs[0].csByWptDocCompleteInPercent == expectedValue
 
         mvs.size() == 1
     }
 
     /**
-     * Tests calculation of daily-csiSystem-{@link MeasuredValue}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test no shop-{@link MeasuredValue}s exist, which are database of the calculation of daily-csiSystem-{@link MeasuredValue}s. So all calculated values should have state {@link Calculated#YesNoData}
+     * Tests calculation of daily-csiSystem-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test no shop-{@link CsiAggregation}s exist, which are database of the calculation of daily-csiSystem-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
      */
     @Test
     void "calc multiple daily-Mv, but no value calculated"() {
@@ -219,14 +219,14 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         mockWeightingService([])
 
         when:
-        List<MeasuredValue> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
-        List<MeasuredValue> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
+        List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
         calculatedMvs.size() == 1
         calculatedMvs[0].aggregator == csiSystemAggregator
         calculatedMvs[0].isCalculated()
-        calculatedMvs[0].value == null
+        calculatedMvs[0].csByWptDocCompleteInPercent == null
         calculatedMvs[0].resultIdsAsList.isEmpty()
 
         mvs.size() == 1
@@ -271,7 +271,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
         SERVICE_MOCKER.mockMeasuredValueTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
 
-        SERVICE_MOCKER.mockShopMeasuredValueService(serviceUnderTest, [new MeasuredValue()])
+        SERVICE_MOCKER.mockShopMeasuredValueService(serviceUnderTest, [new CsiAggregation()])
 
         SERVICE_MOCKER.mockPerformanceLoggingService(serviceUnderTest)
 
@@ -309,10 +309,10 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         ])
 
         //with existing JobGroup:
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', csiSystem: csiSystemWith3, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', csiSystem: csiSystemWith3, started: startDate.toDate()).save(validate: false)
         //not with existing CsiSystem:
-        new MeasuredValue(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', csiSystem: null, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', csiSystem: null, started: startDate.toDate()).save(validate: false)
     }
 }
