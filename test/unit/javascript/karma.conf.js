@@ -15,7 +15,7 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'grails-app/assets/javascripts/csidashboard/defaultMappingCsvValidator.js',
+            'grails-app/assets/javascripts/csi/defaultMappingCsvValidator.js',
             'test/unit/javascript/specs/**/*.js'
         ],
 
