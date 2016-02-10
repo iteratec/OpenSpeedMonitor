@@ -156,6 +156,7 @@ class EventMeasuredValueService {
 				aggregator: eventAggregator,
 				tag: tag,
 				csByWptDocCompleteInPercent: null,
+				csByWptVisuallyCompleteInPercent: null,
 				underlyingEventResultsByWptDocComplete: '',
 				closedAndCalculated: initiallyClosed,
 				connectivityProfile: connectivityProfile
