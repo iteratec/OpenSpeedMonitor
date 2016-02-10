@@ -9,7 +9,7 @@ function validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage) {
         type: 'POST',
         dataType: "json",
         async: false,
-        url: POSTLOADED.validateDeletionOfCsiConfiguration,
+        url: POSTLOADED.link_validateDeletionOfCsiConfiguration,
         success: function (response) {
             if(response.errorMessages.length > 0) {
                 $("#errorDeletingCsiConfiguration").show();
@@ -47,7 +47,7 @@ function getUserConfirmation(label, sureDeleteMessage, overwriteWarningMessage) 
         dataType: "json",
         async: false,
         data: {csiConfigurationLabel: label},
-        url: POSTLOADED.getJobGroupsUsingCsiConfiguration,
+        url: POSTLOADED.link_getJobGroupsUsingCsiConfiguration,
         success: function (response) {
             var confirmationMessage = sureDeleteMessage + "\n\n";
             if(response.jobGroupNames && response.jobGroupNames.length > 0) {

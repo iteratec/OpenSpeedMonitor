@@ -9,7 +9,7 @@ This is a dialog to choose from different default csi mappings.
         <h3 id="ModalLabel"><g:message code="de.iteratec.osm.csi.mapping.title" default="Mapping: load time &rarr; customer satisfaction"/></h3>
     </div>
     <div class="modal-body row">
-        <div id="spinner-position"></div>
+        <div id="chose-csi-mapping-spinner-position" class="spinner-large-content-spinner"></div>
         <g:render template="/chart/csi-mappings"
                   model="${['chartData': defaultMultiLineChart, 'chartIdentifier': 'choose_default_csi',
                             'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
@@ -67,7 +67,9 @@ This is a dialog to choose from different default csi mappings.
         function applyPageMapping(){
             var select = $("#CsiMappingModal").find("#selectPageMapping");
             select.prop('disabled', true);
-            startSpinner(this);
+            var spinnerParent = document.getElementById('chose-csi-mapping-spinner-position');
+            var spinner = POSTLOADED.getLargeSpinner('#000', '50%', '50%');
+            spinnerParent.appendChild(spinner.el);
             $("#applyMapping").prop('disabled', true);
             var pageId = select.find(":selected").val()
             jQuery.ajax({

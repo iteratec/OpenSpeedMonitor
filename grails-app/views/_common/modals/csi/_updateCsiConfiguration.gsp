@@ -51,7 +51,10 @@
         var csiConfLabel = document.getElementById("confLabelFromModal").value;
         var csiConfDescription = document.getElementById("confDescriptionFromModal").value;
 
-        var spinner = startSpinner(document.getElementById('spinner-position'));
+        var spinnerParent = document.getElementById('spinner-position');
+        var spinner = POSTLOADED.getLargeSpinner('#000', '50%', '50%');
+        spinnerParent.appendChild(spinner.el);
+
 
         $.ajax({
             type: 'POST',

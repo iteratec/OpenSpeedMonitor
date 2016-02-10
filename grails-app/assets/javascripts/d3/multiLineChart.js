@@ -5,7 +5,13 @@
  * @param enableHover
  * @param customColorScale
  */
-function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColorScale) {
+function createMultiLineGraph(
+    data,
+    chartDivIdentifier,
+    enableHover,
+    customColorScale,
+    legendEntryClickCallback
+) {
     var graphObject = {};
     //Values
 
@@ -33,6 +39,8 @@ function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColor
     graphObject.clearGraph = function(){
             d3.select("#"+graphObject.identifier).html("");
     };
+
+    graphObject.legendEntryClickCallback = legendEntryClickCallback;
 
     createGraph();
 
@@ -148,7 +156,7 @@ function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColor
             .attr("x", margin.left)
             .attr("y", height + margin.bottom)
             .attr("width", width)
-            .attr("height", lines.length * 20);
+            .attr("height", lines.length * 14);
         var diagramKey = diagramKeySVG.selectAll(".diagramKey")
             .data(lines)
             .enter()
@@ -347,12 +355,22 @@ function createMultiLineGraph(data, chartDivIdentifier, enableHover, customColor
                 graphObject.selectedLine = [[]];
                 makeTextBlack();
                 highlightLine(null);
+                if(graphObject.legendEntryClickCallback != undefined){
+                    graphObject.legendEntryClickCallback(null)
+                }
+                graphObject.selectedName = "";
+                graphObject.selectedId = "";
             } else{
                 graphObject.selectedLine = chosen;
                 graphObject.selectedLine.attr("chosen", true);
                 makeTextGrey();
                 makeSingleTextBlack(graphObject.getSelectedId()).style("font-weight", "bold");
                 highlightLine(name);
+                if(graphObject.legendEntryClickCallback != undefined){
+                    graphObject.legendEntryClickCallback(name)
+                }
+                graphObject.selectedName = name;
+                graphObject.selectedId = graphObject.idMap[name];
             }
         }
 

@@ -265,6 +265,61 @@ class CsiConfigurationController {
         render "Updated CSI configuration successfully."
 
     }
+
+    def removePageMapping(){
+
+        Page pageToRemoveMappingFrom = Page.findByName(params.pageName)
+        CsiConfiguration csiConfigurationToRemovePageMappingFrom = CsiConfiguration.get(params.csiConfId)
+
+        if ( pageToRemoveMappingFrom == null ){
+            response.status = 404
+            render i18nService.msg(
+                    'de.iteratec.osm.csi.configuration.remove-page-mapppings.page-doesnt-exist',
+                    "A Page with name ${params.pageName} doesn't exist.",
+                    [params.pageName]
+            )
+            return null
+        }
+        if ( csiConfigurationToRemovePageMappingFrom == null ){
+            response.status = 404
+            render i18nService.msg(
+                    'de.iteratec.osm.csi.configuration.remove-page-mapppings.csiconf-doesnt-exist',
+                    "A CSI Configuration with ID ${params.csiConfId} doesn't exist.",
+                    [params.csiConfId]
+            )
+            return null
+        }
+        log.info("Mappings for page '${pageToRemoveMappingFrom.name}' should be removed from csi configuration '${csiConfigurationToRemovePageMappingFrom.label}'")
+        List<TimeToCsMapping> toDelete = []
+        toDelete.addAll(csiConfigurationToRemovePageMappingFrom.timeToCsMappings.findAll {
+            it.page.ident() == pageToRemoveMappingFrom.ident()
+        })
+        if ( toDelete.size() == 0 ){
+            response.status = 404
+            render i18nService.msg(
+                    'de.iteratec.osm.csi.configuration.remove-page-mapppings.csiconf-doesnt-has-mappings-for-page',
+                    "CSI Configuration with ID ${params.csiConfId} doesn't contain any page mappings for page with name ${params.pageName}.",
+                    [params.csiConfId, params.pageMappingId]
+            )
+            return null
+        }
+
+        log.info("Delete ${toDelete.size()} Mappings...")
+        toDelete.each {mappingToDelete ->
+            csiConfigurationToRemovePageMappingFrom.removeFromTimeToCsMappings(mappingToDelete)
+            mappingToDelete.delete()
+        }
+        log.info("...DONE")
+
+        response.status = 200
+        String successMessage = i18nService.msg(
+                'de.iteratec.osm.csi.configuration.remove-page-mapppings.success.msg',
+                "Removed ${toDelete.size()} Mappings of page ${pageToRemoveMappingFrom.name} from CsiConfiguration ${csiConfigurationToRemovePageMappingFrom.label}.",
+                [toDelete.size(), pageToRemoveMappingFrom.name, csiConfigurationToRemovePageMappingFrom.label]
+        )
+        render successMessage
+
+    }
 }
 
 @Validateable

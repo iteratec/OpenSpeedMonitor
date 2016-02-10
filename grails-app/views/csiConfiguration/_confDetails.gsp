@@ -193,16 +193,49 @@
         </div>
     </div>
     <g:if test="${pageTimeToCsMappings}">
-        <g:render template="/chart/csi-mappings"
-                  model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
-                            'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                            'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
-        <asset:script>
-            createMultiLineGraph(${pageTimeToCsMappings}, 'page_csi_mappings', true);
+        <div class="row">
+            <div class="span12">
+                <g:render template="/chart/csi-mappings"
+                          model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
+                                    'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                                    'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+            </div>
+        </div>
+        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+            <div class="row-fluid">
+                <div class="span12">
+                    <div class="row-fluid">
+                        <div class="span2">
+                            <button href="#" type="button" class="btn btn-primary" style="display: none;" id="removePageMapping"
+                                    onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping', absolute: true)}',
+                                            ${selectedCsiConfiguration.ident()});">
+                                <g:message code="de.iteratec.osm.csi.configuration.pagemapping.remove.label" default="Remove Mapping"/>
+                            </button>
+                        </div>
+                        <div class="span10" id="page-mapping-deletions"></div>
+                    </div>
+                </div>
+            </div>
+        </sec:ifAllGranted>
+        <asset:script type="text/javascript">
+            var legendEntryClickCallback = function(nameOfClickedLegendEntry){
+                var btnRemovePageMapping = $('#removePageMapping');
+                if(nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
+                    btnRemovePageMapping.show();
+                }else if(btnRemovePageMapping){
+                    btnRemovePageMapping.hide();
+                }
+            };
+            var graphData = ${pageTimeToCsMappings};
+            var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
         </asset:script>
     </g:if>
     <g:else>
-        <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden."/></h5>
+        <div class="row">
+            <div class="span12">
+                <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings" default="Keine Mappings vorhanden."/></h5>
+            </div>
+        </div>
     </g:else>
 
     %{--Default Mappings--}%
@@ -223,8 +256,8 @@
               model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
                         'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
                         'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
-    <asset:script>
-        defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}", true);
+    <asset:script type="text/javascript">
+        defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}", true, null, null);
     </asset:script>
 
     <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">

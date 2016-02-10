@@ -169,7 +169,7 @@
         </blockquote>
     </div>
 
-    <div id="copyCsiConfigurationSpinner"></div>
+    <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner"></div>
     %{--dropdown button----------------------------------------------}%
     <div class="span2 offset1">
 
@@ -186,16 +186,14 @@
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
                         <li>
                             <a href="#"
-                               onclick="copyCsiConfiguration();">
+                               onclick="prepareConfigurationListAndCopy();">
                                 <i class="fa fa-copy"></i>&nbsp;${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Copy')}
                             </a>
                         </li>
                         <li>
                             <a href="${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration',
                                     params: [sourceCsiConfigLabel: selectedCsiConfiguration.label, label: selectedCsiConfiguration.label])}"
-                               onclick="return validateDeleting('${selectedCsiConfiguration.label}',
-                                       '${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete', args: [selectedCsiConfiguration.label], default: 'delete?')}',
-                                       '${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning', default: 'Overwriting')}')">
+                               onclick="return validateDeleting('${selectedCsiConfiguration.label}','${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete.js', args: [selectedCsiConfiguration.label], default: 'delete?')}','${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning.js', default: 'Overwriting')}')">
                                 <i class="fa fa-remove"></i>&nbsp;${message(code: 'de.iteratec.osm.csi.ui.delete.label', args: [selectedCsiConfiguration.label], default: 'delete')}
                             </a>
                         </li>
@@ -211,7 +209,9 @@
                             <ul class="dropdown-menu">
                                 <g:each in="${csiConfigurations.findAll{it[0]!=selectedCsiConfiguration.ident()}}" var="conf">
                                     <li>
-                                        <a id="button_${conf}" onclick="changeCsiConfiguration(this.getAttribute('value'))" value="${conf[0]}">
+                                        <a id="button_${conf}"
+                                            onclick="changeCsiConfiguration(this.getAttribute('value'))"
+                                            value="${conf[0]}" >
                                             <g:message code="de.iteratec.osm.csi.ui.show.label" args="${[conf[1]]}" default="show ${conf[1]}"/>
                                         </a>
                                     </li>
@@ -242,26 +242,8 @@
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
-    <asset:javascript src="csidashboard/defaultMappingCsvValidator.js"/>
-    <asset:javascript src="csidashboard/deleteCsiConfigValidation.js"/>
     <asset:script type="text/javascript">
-        var registerEventHandlersForFileUploadControls = function () {
-            $('input[id=theBrowserConnectivityCsvFile]').change(function () {
-                $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=theBrowserCsvFile]').change(function () {
-                $('#theBrowserCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=thePageCsvFile]').change(function () {
-                $('#thePageCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=theHourOfDayCsvFile]').change(function () {
-                $('#theHourOfDayCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
-                $('#defaultTimeToCsMappingCsvFileVisible').val($(this).val());
-            });
-        };
+
         var registerEventHandlers = function () {
 
             registerEventHandlersForFileUploadControls();
@@ -280,18 +262,37 @@
                 $('#confDescriptionFromModal').val( $('#headerCsiConfDescription').text() );
                 $('#updatingCsiConfigurationErrors').text('');
                 $('#errorUpdatingCsiConfiguration').hide();
-            })
+            });
+
+            $('#defaultTimeToCsMappingCsvFile').bind('change', function () {
+                $("#warnAboutOverwritingBox").hide();
+                $("#errorBoxDefaultMappingCsv").hide();
+                $("#defaultMappingUploadButton").prop("disabled", true);
+
+                validateDefaultMappingCsv(this.files[0])
+            });
 
         };
 
-        $(document).ready(function () {
-            actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
-            createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
-            createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
-            createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
+        var registerEventHandlersForFileUploadControls = function () {
+            $('input[id=theBrowserConnectivityCsvFile]').change(function () {
+                $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
+            });
+            $('input[id=theBrowserCsvFile]').change(function () {
+                $('#theBrowserCsvFileTwitter').val($(this).val());
+            });
+            $('input[id=thePageCsvFile]').change(function () {
+                $('#thePageCsvFileTwitter').val($(this).val());
+            });
+            $('input[id=theHourOfDayCsvFile]').change(function () {
+                $('#theHourOfDayCsvFileTwitter').val($(this).val());
+            });
+            $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
+                $('#defaultTimeToCsMappingCsvFileVisible').val($(this).val());
+            });
+        };
 
-            registerEventHandlers();
-
+        var initializeSomeControls = function(){
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
@@ -300,110 +301,29 @@
             } else {
                 $("#btn-csi-mapping").click();
             }
+        }
+
+        var prepareConfigurationListAndCopy = function(){
+            return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
+        }
+
+        $(document).ready(function () {
+
+            actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
+
+            createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
+            createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
+            createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
+
+            registerEventHandlers();
+
+            initializeSomeControls();
 
         });
-
-        $('#defaultTimeToCsMappingCsvFile').bind('change', function () {
-            $("#warnAboutOverwritingBox").hide();
-            $("#errorBoxDefaultMappingCsv").hide();
-            $("#defaultMappingUploadButton").prop("disabled", true);
-
-            validateDefaultMappingCsv(this.files[0])
+        $( window ).load(function() {
+            var loader = new PostLoader();
+            loader.loadJavascript('<g:assetPath src="csi/configurationPost.js" absolute="true"/>');
         });
-
-        function showSpinner() {
-            var spinner = startSpinner(document.getElementById('spinner-position'));
-            return true;
-        }
-
-        function startSpinner(spinnerElement) {
-            var opts = {
-                lines: 15, // The number of lines to draw
-                length: 20, // The length of each line
-                width: 10, // The line thickness
-                radius: 30, // The radius of the inner circle
-                corners: 1, // Corner roundness (0..1)
-                rotate: 0, // The rotation offset
-                direction: 1, // 1: clockwise, -1: counterclockwise
-                color: '#000', // #rgb or #rrggbb or array of colors
-                speed: 1, // Rounds per second
-                trail: 60, // Afterglow percentage
-                shadow: true, // Whether to render a shadow
-                hwaccel: false, // Whether to use hardware acceleration
-                className: 'spinner', // The CSS class to assign to the spinner
-                zIndex: 2e9, // The z-index (defaults to 2000000000)
-                top: '50%', // Top position relative to parent in px
-                left: '50%' // Left position relative to parent in px
-            };
-            return new Spinner(opts).spin(spinnerElement);
-        }
-
-        function changeCsiConfiguration(id) {
-            window.location.href="<g:createLink action="configurations" absolute="true"/>/"+id;
-        }
-
-        function validateDeleting(label, sureDeleteMessage, overwriteWarningMessage) {
-            $("#errorDeletingCsiConfiguration").hide();
-
-            return validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage);
-        }
-
-        function copyCsiConfiguration() {
-            var linkToCopyCsiConfig = promptForNewName('${createLink(absolute: true, controller: 'csiConfiguration', action: 'saveCopy')}','${message(code: 'de.iteratec.osm.csiConfiguration.nameAlreadyExists', default: 'Name already exists')}');
-            if(linkToCopyCsiConfig) {
-                var runningSpinner;
-                $.ajax({
-                    url: linkToCopyCsiConfig,
-                    beforeSend: function() {
-                        var copyConfigSpinner = document.getElementById('copyCsiConfigurationSpinner');
-                        runningSpinner = startSpinner(copyConfigSpinner);
-                    },
-                    complete: function(xhr, textStatus) {
-                        document.open();
-                        document.write(xhr.responseText);
-                        document.close();
-                        runningSpinner.stop();
-                    }
-                })
-            }
-        }
-
-        /**
-         * Asks for label of new csi config. If label is empty or a config with that label already exists
-         * link will be broken (this method delivers false).
-         * Otherwise previous and new label is added to links href before it can be followed.
-         * @param anchor-link
-         *          Link where the onclick-handler links to
-         * @param nameExistsErrorMessage
-         *          Internationalized error message.
-         * @returns {boolean}
-         *          True if new label chosen by user is ok, False otherwise.
-         */
-        function promptForNewName(anchorLink, nameExistsErrorMessage) {
-
-            var actualLabel = $('#headerCsiConfLabel').text();
-            var newName = prompt(
-                    POSTLOADED.i18n_duplicatePrompt,
-                    actualLabel + POSTLOADED.i18n_duplicateSuffix
-            );
-            if (newName === null || newName === '') {
-                return false;
-            }
-
-            var csiConfigurations = ${csiConfigurations as grails.converters.JSON};
-
-            for (var i = 0; i < csiConfigurations.length; i++) {
-                var config = csiConfigurations[i];
-                var configName = config[1];
-                if (configName == newName) {
-                    alert(nameExistsErrorMessage);
-                    return false;
-                }
-            }
-
-            anchorLink += '?'+'label='+newName+'&sourceCsiConfigLabel='+actualLabel
-            return anchorLink;
-        }
 
     </asset:script>
 </content>

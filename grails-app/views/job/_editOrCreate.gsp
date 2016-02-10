@@ -72,7 +72,7 @@
             <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">
                 <asset:javascript src="timeago/timeagoDe.js"/>
             </g:if>
-            <script type="text/javascript">
+            <asset:script type="text/javascript">
 
                 function getExecutionScheduleSetButInactiveLabel() {
                     return '${message(code:'job.executionScheduleSetButInactive.label')}';
@@ -140,7 +140,7 @@
                     loader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css" absolute="true"/>');
 
                 });
-            </script>
+            </asset:script>
         </content>
     </body>
 </html>
