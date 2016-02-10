@@ -154,7 +154,7 @@ GSP-Template Mappings:
                                 <g:select id="selectedConnectivityProfilesHtmlId"
                                           class="iteratec-element-select"
                                           name="selectedConnectivityProfiles" from="${connectivityProfiles}" optionKey="id"
-                                          optionValue="name" multiple="true"
+                                          multiple="true"
                                           value="${selectedConnectivityProfiles}"/>
                                 <label class="checkbox inline">
                                     <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"

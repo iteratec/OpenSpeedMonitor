@@ -356,7 +356,7 @@ class TestDataUtil {
         ).save(failOnError: true)
     }
 
-    static Job createJob(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active, Integer maxDownloadTimeInMinutes) {
+    static Job createJob(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active, Integer maxDownloadTimeInMinutes, ConnectivityProfile profile = null) {
         return new Job(
                 label: label,
                 script: script,
@@ -371,7 +371,8 @@ class TestDataUtil {
                 bandwidthDown: 6000,
                 bandwidthUp: 512,
                 latency: 50,
-                packetLoss: 0
+                packetLoss: 0,
+                connectivityProfile: profile
         ).save(failOnError: true)
     }
 
@@ -1365,7 +1366,7 @@ class TestDataUtil {
      * @param closed
      */
     public
-    static MeasuredValue createMeasuredValue(Date date, MeasuredValueInterval mvInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed) {
+    static MeasuredValue createMeasuredValue(Date date, MeasuredValueInterval mvInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed, ConnectivityProfile profile = null) {
         return new MeasuredValue(
                 started: date,
                 interval: mvInterval,
@@ -1373,7 +1374,8 @@ class TestDataUtil {
                 tag: tag,
                 value: value,
                 resultIds: resultIdsAsString,
-                closedAndCalculated: closed
+                closedAndCalculated: closed,
+                connectivityProfile: profile
         ).save(failOnError: true)
     }
     /**

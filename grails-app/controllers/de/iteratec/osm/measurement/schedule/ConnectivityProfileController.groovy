@@ -97,7 +97,7 @@ class ConnectivityProfileController {
     def update() {
 
         // Deactivate previous version
-        def connectivityProfileInstance = ConnectivityProfile.get(params.id)
+        ConnectivityProfile connectivityProfileInstance = ConnectivityProfile.get(params.id)
 
         if (!connectivityProfileInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), params.id])
@@ -131,6 +131,12 @@ class ConnectivityProfileController {
         if (!connectivityProfileInstanceCopy.save(flush: true, insert: true)) {
             render(view: "create", model: [connectivityProfileInstance: connectivityProfileInstanceCopy])
             return
+        }
+
+        // Switch all the jobs concerned to the new ConnectivityProfile
+        Job.findAllByConnectivityProfile(connectivityProfileInstance).each {
+            it.connectivityProfile = connectivityProfileInstanceCopy
+            it.save()
         }
 
         flash.message = message(code: 'default.savedascopy.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
