@@ -90,6 +90,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -134,6 +135,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -180,6 +182,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
@@ -228,6 +231,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -273,6 +277,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -317,6 +322,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -363,6 +369,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
@@ -411,6 +418,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -456,6 +464,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -500,6 +509,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -546,6 +556,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
@@ -594,6 +605,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -639,6 +651,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -683,6 +696,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -729,6 +743,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
@@ -777,6 +792,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)

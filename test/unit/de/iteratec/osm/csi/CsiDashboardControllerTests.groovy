@@ -176,7 +176,7 @@ class CsiDashboardControllerTests {
         params.selectedLocations = '17'
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
-
+        params.csiTypeDocComplete = true
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -342,6 +342,7 @@ class CsiDashboardControllerTests {
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
         params.includeInterval = true
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -425,7 +426,7 @@ class CsiDashboardControllerTests {
         params.selectedLocations = '17'
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
-
+        params.csiTypeDocComplete = true
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -508,7 +509,7 @@ class CsiDashboardControllerTests {
         params.selectedLocations = []
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
-
+        params.csiTypeDocComplete = true
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -577,6 +578,7 @@ class CsiDashboardControllerTests {
         params.selectedCsiSystems = [1, 2]
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -640,7 +642,7 @@ class CsiDashboardControllerTests {
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params._action_showAll = 'Anzeigen'
-
+        params.csiTypeDocComplete = true
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -1245,6 +1247,7 @@ class CsiDashboardControllerTests {
         command.selectedTimeFrameInterval = 0
         command.setFromHour = false
         command.setToHour = false
+        command.csiTypeDocComplete = true
 
         // Create and fill a command:
         assertTrue(command.validate())
@@ -1330,6 +1333,64 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'setFromHour', false)
         assertContainedAndNotNullAndEquals(dataUnderTest, 'setToHour', false)
     }
+//TODO activiate with IT-732
+//    /**
+//     * Test for inner class {@link CsiDashboardShowAllCommand}.
+//     */
+//    @Test
+//    public void testShowAllCommand_testNoCsiTypeSelectedLeadsToFail() {
+//        // form = '18.08.2013'
+//        Date expectedDate = new Date(1376776800000L)
+//        command.from = expectedDate
+//        command.fromHour = '12:00'
+//        // to = '19.08.2013'
+//        Date expectedToDate = new Date(1376863200000L)
+//        command.to = expectedToDate
+//        command.toHour = '13:00'
+//        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
+//        command.selectedFolder = [1L]
+//        command.selectedPages = [1L, 5L]
+//        command.selectedAllMeasuredEvents = false
+//        command.selectedMeasuredEventIds = [7L, 8L, 9L]
+//        command.selectedAllBrowsers = false
+//        command.selectedBrowsers = [2L]
+//        command.selectedAllLocations = false
+//        command.selectedLocations = [17L]
+//        command.debug = true
+//        command.selectedTimeFrameInterval = 0
+//        command.setFromHour = false
+//        command.setToHour = false
+//
+//        assertFalse(command.validate())
+//
+//    }
+//    @Test
+//    public void testShowAllCommand_testAtleastOneCsiTypeSelected() {
+//        // form = '18.08.2013'
+//        Date expectedDate = new Date(1376776800000L)
+//        command.from = expectedDate
+//        command.fromHour = '12:00'
+//        // to = '19.08.2013'
+//        Date expectedToDate = new Date(1376863200000L)
+//        command.to = expectedToDate
+//        command.toHour = '13:00'
+//        command.aggrGroupAndInterval = CsiDashboardController.HOURLY_MEASURED_EVENT
+//        command.selectedFolder = [1L]
+//        command.selectedPages = [1L, 5L]
+//        command.selectedAllMeasuredEvents = false
+//        command.selectedMeasuredEventIds = [7L, 8L, 9L]
+//        command.selectedAllBrowsers = false
+//        command.selectedBrowsers = [2L]
+//        command.selectedAllLocations = false
+//        command.selectedLocations = [17L]
+//        command.debug = true
+//        command.selectedTimeFrameInterval = 0
+//        command.setFromHour = false
+//        command.setToHour = false
+//        command.csiTypeDocComplete = true
+//
+//        assertTrue(command.validate())
+//    }
 
     /**
      * Test for inner class {@link CsiDashboardShowAllCommand}.
@@ -1358,6 +1419,7 @@ class CsiDashboardControllerTests {
         command.selectedTimeFrameInterval = 0
         command.setFromHour = false
         command.setToHour = false
+        command.csiTypeDocComplete = true
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1412,6 +1474,7 @@ class CsiDashboardControllerTests {
         command.selectedBrowsers = [2L]
         command.selectedAllLocations = false
         command.selectedLocations = [17L]
+        command.csiTypeDocComplete = true
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1449,6 +1512,7 @@ class CsiDashboardControllerTests {
         command.selectedBrowsers = [2L]
         command.selectedAllLocations = false
         command.selectedLocations = [17L]
+        command.csiTypeDocComplete = true
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1487,6 +1551,7 @@ class CsiDashboardControllerTests {
         command.selectedBrowsers = [2L]
         command.selectedAllLocations = false
         command.selectedLocations = [17L]
+        command.csiTypeDocComplete = true
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1525,6 +1590,7 @@ class CsiDashboardControllerTests {
         command.selectedBrowsers = [2L]
         command.selectedAllLocations = true;
         command.selectedLocations = [17L]
+        command.csiTypeDocComplete = true
 
         // Do we fill all fields?
         assertTrue(command.validate())

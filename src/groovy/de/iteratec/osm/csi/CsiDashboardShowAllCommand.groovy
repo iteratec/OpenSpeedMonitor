@@ -220,6 +220,9 @@ public class CsiDashboardShowAllCommand {
     boolean showDataMarkers
     boolean showDataLabels
 
+    boolean csiTypeVisuallyComplete
+    boolean csiTypeDocComplete
+
     /**
      * Constraints needs to fit.
      */
@@ -350,6 +353,12 @@ public class CsiDashboardShowAllCommand {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiSystems']
             }
         })
+//TODO activate with IT-732
+//        csiTypeVisuallyComplete(validator: {boolean b , CsiDashboardShowAllCommand cmd ->
+//            if(!(cmd.csiTypeDocComplete || cmd.csiTypeVisuallyComplete) ){
+//                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiType']
+//            }
+//        })
 
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
