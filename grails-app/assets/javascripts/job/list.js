@@ -172,34 +172,34 @@ function filterJobList() {
     var reSkript = new RegExp(filterSkript, 'i');
     
 	$('table tbody tr').each(function() {
-		var tr = $(this);
-		var jobName = $('.jobName', tr).text();
-		var jobGroup = $('.jobgroup', tr).text();
-    var location = $('.location', tr).text();
-    var browser = $('.browser', tr).text();
-    var skript = $('.skript', tr).text();
-    	var showRow = true;
-		if (showRow && filterJobSetJobs) {showRow = filterJobSetJobs.indexOf($.trim(jobName)) >= 0}
-    	if (showRow && filterHighlightedJobs) { showRow = tr.hasClass('highlight'); }
-    	if (showRow && filterCheckedJobs) { showRow = $('.jobCheckbox', tr).prop('checked'); }
-    	if (showRow && !filterInactiveJobs) { showRow = $('.job_active', tr).val() == 'true'; }
-    	if (showRow && filterRunningJobs) { showRow = $('.running', tr).length > 0; }
-    	
-    	if (showRow && filterJobGroup !== '') { showRow = jobGroup.search(reJobGroup) > -1; }
-      if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
-      if (showRow && filterBrowser !== '') { showRow = browser.search(reBrowser) > -1; }
-      if (showRow && filterSkript !== '') { showRow = skript.search(reSkript) > -1; }
-    	if (showRow && filterText !== '') { showRow = jobName.search(reText) > -1; }
-    	
-    	if (showRow && checkedTags) {
-    		showRow = false;
-    		checkedTags.map(function(currentTag) {
-    			var usedTags = tr.attr('data-tags');
-    			if (usedTags && usedTags.split(',').indexOf(currentTag) > -1)
-    				showRow = true;
-    		}); 
-    	}
-    	tr.toggle(showRow);
+        var tr = $(this);
+        var jobName = $('.jobName', tr).text();
+        var jobGroup = $('.jobgroup', tr).text();
+        var location = $('.location', tr).text();
+        var browser = $('.browser', tr).text();
+        var skript = $('.skript', tr).text();
+        var showRow = true;
+        if (showRow && filterJobSetJobs) {showRow = filterJobSetJobs.indexOf($.trim(jobName)) >= 0}
+        if (showRow && filterHighlightedJobs) { showRow = tr.hasClass('highlight'); }
+        if (showRow && filterCheckedJobs) { showRow = $('.jobCheckbox', tr).prop('checked'); }
+        if (showRow && !filterInactiveJobs) { showRow = $('.job_active', tr).val() == 'true'; }
+        if (showRow && filterRunningJobs) { showRow = $('.running', tr).length > 0; }
+
+        if (showRow && filterJobGroup !== '') { showRow = jobGroup.search(reJobGroup) > -1; }
+        if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
+        if (showRow && filterBrowser !== '') { showRow = browser.search(reBrowser) > -1; }
+        if (showRow && filterSkript !== '') { showRow = skript.search(reSkript) > -1; }
+        if (showRow && filterText !== '') { showRow = jobName.search(reText) > -1; }
+
+        if (showRow && checkedTags) {
+            showRow = false;
+            checkedTags.map(function(currentTag) {
+                var usedTags = tr.attr('data-tags');
+                if (usedTags && usedTags.split(',').indexOf(currentTag) > -1)
+                    showRow = true;
+            });
+        }
+        tr.toggle(showRow);
     });
 }
 
@@ -233,7 +233,11 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 				top: 'auto', // Top position relative to parent in px
 				left: '50%' // Left position relative to parent in px
 		};
-		var spinner = new Spinner(opts).spin(document.getElementById('jobtable'));
+
+        var spinnerParent = document.getElementById('spinner-joblist');
+        var spinner = new Spinner(opts).spin();
+        spinnerParent.appendChild(spinner);
+
 		jQuery.ajax({
 			type : 'POST',
 			url : listJobsLink,
@@ -282,9 +286,7 @@ function doOnDomReady(
 	getRunningAndRecentlyFinishedJobsLink,
 	cancelJobRunLink,
 	getLastRunLink,
-	showOnlyActiveJobs,
-	nextExecutionLink,
-	listLink){
+	nextExecutionLink){
 	
 	$('#updateHints').popover();
 	$('#checkAll').on('click', function() {
@@ -337,25 +339,14 @@ function doOnDomReady(
 	 
 	$('.table-fixed-header').fixedHeader();
 	
-	
-	// when only active jobs were loaded, either issue an AJAX request to load all jobs
-	// immediately (if "Show inactive jobs" checkbox is checked) or set an event handler
-	// to load all jobs asynchronously when checking the checkbox for the first time.
-	var inactiveJobLoader = new InactiveJobLoader(listLink, nextExecutionLink);
-	if(showOnlyActiveJobs){
-		if ($('#filterInactiveJobs').prop('checked')) {
-			inactiveJobLoader.loadJobs();
-		} else {
-			$('#filterInactiveJobs').one('click', inactiveJobLoader.loadJobs);
-		}
-	}
-	
 }
 
-$(window).load(function() {
-	if ($("tr.highlight").length > 0) {
-		$('html, body').animate({
-			scrollTop : $("tr.highlight").offset().top - 100
-		}, 1000);
-	}
-});
+function doOnWindowLoad(listLink, nextExecutionLink){
+
+    if ($("tr.highlight").length > 0) {
+        $('html, body').animate({
+            scrollTop : $("tr.highlight").offset().top - 100
+        }, 1000);
+    }
+
+}
