@@ -239,12 +239,18 @@ class CsiSystemMeasuredValueService {
                 toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), groupsOfMv)
 
         List<WeightedCsiValue> weightedCsiValues = []
+        List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
         if (shopMeasuredValues.size() > 0) {
             weightedCsiValues = weightingService.getWeightedCsiValues(shopMeasuredValues, csiSystem)
+            weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(shopMeasuredValues, csiSystem)
         }
+
         if (weightedCsiValues.size() > 0) {
             toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+        }
+        if(weightedCsiValuesVisuallyComplete.size() > 0) {
+            toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
         }
         measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         return toBeCalculated

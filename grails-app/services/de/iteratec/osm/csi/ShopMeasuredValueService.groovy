@@ -245,13 +245,18 @@ class ShopMeasuredValueService {
         List<CsiAggregation> pageMeasuredValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(
                 toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), [groupOfMv])
 
-        List<WeightedCsiValue> weightedCsiValues = []
+        List<WeightedCsiValue> weightedCsiValuesDocComplete = []
+        List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
         if (pageMeasuredValues.size() > 0) {
-            weightedCsiValues = weightingService.getWeightedCsiValues(pageMeasuredValues, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
+            weightedCsiValuesDocComplete = weightingService.getWeightedCsiValues(pageMeasuredValues, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
+            weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(pageMeasuredValues, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
         }
-        if (weightedCsiValues.size() > 0) {
-            toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+        if (weightedCsiValuesDocComplete.size() > 0) {
+            toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesDocComplete*.weightedValue)
+        }
+        if(weightedCsiValuesVisuallyComplete.size() > 0) {
+            toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
         }
         measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         return toBeCalculated

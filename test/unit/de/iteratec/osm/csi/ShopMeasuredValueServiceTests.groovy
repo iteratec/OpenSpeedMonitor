@@ -53,7 +53,7 @@ import de.iteratec.osm.measurement.environment.Location
  */
 @TestFor(ShopMeasuredValueService)
 @Mock([MeanCalcService, CsiAggregation, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location, PageMeasuredValueService,
-        Page, DefaultMeasuredEventDaoService, EventMeasuredValueService, MeasuredValueDaoService, CustomerSatisfactionWeightService, MeasuredValueUpdateEvent])
+        Page, DefaultMeasuredEventDaoService, EventMeasuredValueService, MeasuredValueDaoService, CustomerSatisfactionWeightService, MeasuredValueUpdateEvent, CsiAggregation])
 class ShopMeasuredValueServiceTests {
     MeasuredValueInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
@@ -157,7 +157,7 @@ class ShopMeasuredValueServiceTests {
 
         //mocking inner services
         mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3])
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
         mockPageMeasuredValueService()
 
         //precondition
@@ -195,7 +195,7 @@ class ShopMeasuredValueServiceTests {
 
         //mocking inner services
         mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3])
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
         mockPageMeasuredValueService()
 
         //precondition
@@ -239,7 +239,7 @@ class ShopMeasuredValueServiceTests {
 
         //mocking inner services
         mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3])
-        mockWeightingService([])
+        mockWeightingService([], [])
         mockPageMeasuredValueService()
 
         //precondition
@@ -273,15 +273,6 @@ class ShopMeasuredValueServiceTests {
                 return irrelevantCauseListOfWeightedValuesIsRetrievedByMock
         }
         serviceUnderTest.pageMeasuredValueService = pageMeasuredValueService.createMock();
-    }
-
-    private void mockMeasuredEventDaoService() {
-        def measuredEventDaoService = mockFor(MeasuredEventDaoService, true)
-        measuredEventDaoService.demand.getEventsFor(0..10000) {
-            List<Page> newResult ->
-                return [];
-        }
-        serviceUnderTest.pageMeasuredValueService.measuredEventDaoService = measuredEventDaoService.createMock();
     }
 
     private void mockMeasuredValueDaoService() {
@@ -338,11 +329,15 @@ class ShopMeasuredValueServiceTests {
     /**
      * Mocks methods of {@link WeightingService}.
      */
-    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues) {
+    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
         def weightingService = mockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
+        }
+        weightingService.demand.getWeightedCsiValuesByVisuallyComplete(1..10000) {
+            List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
+                return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
         serviceUnderTest.weightingService = weightingService.createMock()
     }

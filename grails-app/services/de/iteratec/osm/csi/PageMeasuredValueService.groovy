@@ -315,16 +315,22 @@ class PageMeasuredValueService {
         List<CsiAggregation> hmvsOfTargetCsiGroupAndPage = cachingContainer.hmvsByCsiGroupPageCombination["${targetCsiGroup.ident() + UNIQUE_STRING_DELIMITTER + targetPage.ident()}"]
         log.debug("Calculating Page-CsiAggregation: Calculation-database are ${hmvsOfTargetCsiGroupAndPage.size()} hourly Event-MeasuredValues.")
 
-        List<WeightedCsiValue> weightedCsiValues = []
+        List<WeightedCsiValue> weightedCsiValuesByDocComplete = []
+        List<WeightedCsiValue> weightedCsiValuesByVisuallyComplete = []
         if (hmvsOfTargetCsiGroupAndPage.size() > 0) {
             CsiConfiguration csiConfiguration = targetCsiGroup.csiConfiguration
-            weightedCsiValues = weightingService.getWeightedCsiValues(hmvsOfTargetCsiGroupAndPage, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
-            log.debug("weightedCsiValues.size()=${weightedCsiValues.size()}")
+            weightedCsiValuesByDocComplete = weightingService.getWeightedCsiValues(hmvsOfTargetCsiGroupAndPage, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
+            weightedCsiValuesByVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(hmvsOfTargetCsiGroupAndPage, [WeightFactor.HOUROFDAY, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
+            log.debug("weightedCsiValuesByDocComplete.size()=${weightedCsiValuesByDocComplete.size()}")
+            log.debug("weightedCsiValuesByVisuallyComplete.size()=${weightedCsiValuesByVisuallyComplete.size()}")
         }
 
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - calculation wmv: calc weighted mean", IndentationDepth.FOUR) {
-            if (weightedCsiValues.size() > 0) {
-                toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+            if (weightedCsiValuesByDocComplete.size() > 0) {
+                toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesByDocComplete*.weightedValue)
+            }
+            if(weightedCsiValuesByVisuallyComplete.size() > 0) {
+                toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesByVisuallyComplete*.weightedValue)
             }
             measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         }

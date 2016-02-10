@@ -28,18 +28,18 @@ import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
- * 
+ *
  * @author nkuhn
  *
  */
 @Transactional
 class WeightingService {
-	
-	MeasuredValueTagService measuredValueTagService
-	CustomerSatisfactionWeightService customerSatisfactionWeightService
+
+    MeasuredValueTagService measuredValueTagService
+    CustomerSatisfactionWeightService customerSatisfactionWeightService
     PerformanceLoggingService performanceLoggingService
-	
-	/**
+
+    /**
      * Weights all csiValues respective given weightFactors. Delivers a list of all {@link de.iteratec.osm.csi.weighting.WeightedCsiValue}s.
      * @param csiValues
      * @param weightFactors
@@ -52,8 +52,8 @@ class WeightingService {
         Double weight = 0
         List<Long> underlyingResultIds = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO){
-            csiValues.each {CsiValue csiValue ->
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+            csiValues.each { CsiValue csiValue ->
                 if (csiValue.isCsiRelevant()) {
 
                     value = csiValue.retrieveCsByWptDocCompleteInPercent()
@@ -69,7 +69,7 @@ class WeightingService {
         }
 
         List<WeightedCsiValue> flattened
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO){
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
             flattened = flattenWeightedCsiValues(weightedCsiValues)
         }
 
@@ -88,8 +88,8 @@ class WeightingService {
         Double weight = 0
         List<Long> underlyingResultIds = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO){
-            csiValues.each {CsiValue csiValue ->
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+            csiValues.each { CsiValue csiValue ->
                 if (csiValue.isCsiRelevant()) {
 
                     value = csiValue.retrieveCsByWptDocCompleteInPercent()
@@ -109,97 +109,140 @@ class WeightingService {
         }
 
         List<WeightedCsiValue> flattened
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO){
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
             flattened = flattenWeightedCsiValues(weightedCsiValues)
         }
 
         return flattened
     }
-	
-	void addNewWeightedValue(List<WeightedCsiValue> weightedCsiValues, Double value, Double weight, List<Long> underlyingResultIds){
-		WeightedCsiValue weightedCsiValue = new WeightedCsiValue(weightedValue: new WeightedValue(value: value, weight: weight))
-		if (underlyingResultIds.size()>0) {
-			weightedCsiValue.underlyingEventResultIds = underlyingResultIds
-		}
-		weightedCsiValues.add(weightedCsiValue)
-	}
-	
-	/**
-	 * <p>
-	 * Groups the list of {@link WeightedCsiValue}s toFlatten by unique weights. For each unique weight, a
+
+    /**
+     * Weights all csiValues respective given jobGroupWeights in CsiSystem. Delivers a list of all {@link de.iteratec.osm.csi.weighting.WeightedCsiValue}s.
+     * @param csiValues
+     * @param csiSystem
+     * @return
+     */
+    public List<WeightedCsiValue> getWeightedCsiValuesByVisuallyComplete(List<CsiValue> csiValues, CsiSystem csiSystem) {
+        List<CsiValue> mvsWithVisuallyCompleteValue = csiValues.findAll {
+            it.retrieveCsByWptVisuallyCompleteInPercent() != null && it.isCsiRelevant()
+        }
+
+        List<WeightedCsiValue> weightedCsiValues = []
+        Double value = 0
+        Double weight = 0
+        List<Long> underlyingResultIds = []
+
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+            mvsWithVisuallyCompleteValue.each { CsiValue csiValue ->
+                value = csiValue.retrieveCsByWptVisuallyCompleteInPercent()
+                JobGroup jobGroupOfCsiValue = JobGroup.findById(measuredValueTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
+                JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
+                    it.jobGroup == jobGroupOfCsiValue
+                }
+                weight = jobGroupWeightOfCsiValue.weight
+                underlyingResultIds = csiValue.retrieveUnderlyingEventResultsByVisuallyComplete()
+
+                if (value != null && weight != null && weight > 0) {
+                    addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
+                }
+
+            }
+        }
+
+        List<WeightedCsiValue> flattened
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+            flattened = flattenWeightedCsiValues(weightedCsiValues)
+        }
+
+        return flattened
+    }
+
+    void addNewWeightedValue(List<WeightedCsiValue> weightedCsiValues, Double value, Double weight, List<Long> underlyingResultIds) {
+        WeightedCsiValue weightedCsiValue = new WeightedCsiValue(weightedValue: new WeightedValue(value: value, weight: weight))
+        if (underlyingResultIds.size() > 0) {
+            weightedCsiValue.underlyingEventResultIds = underlyingResultIds
+        }
+        weightedCsiValues.add(weightedCsiValue)
+    }
+
+    /**
+     * <p>
+     * Groups the list of {@link WeightedCsiValue}s toFlatten by unique weights. For each unique weight, a
      * new {@link WeightedCsiValue} is created with the unique weight as weight and the average of all
-	 * {@link WeightedCsiValue}s of that weight as value.   
-	 * </p>
-	 * @param toFlatten
-	 * @return A new list with one {@link WeightedCsiValue} for each unique weight in the original list toFlatten.  
-	 */
-	public List<WeightedCsiValue> flattenWeightedCsiValues(List<WeightedCsiValue> toFlatten){
-		
-		List<Double> uniqueWeights = toFlatten*.weightedValue*.weight.unique()
-		
-		return uniqueWeights.inject( [] ) { List<WeightedCsiValue> flattenedList, Double uniqueWeight ->
-			
-			List<WeightedCsiValue> weightedCsiValuesOfUniqueWeight = toFlatten.findAll { it.weightedValue.weight ==  uniqueWeight }
-			flattenedList.add(
-				new WeightedCsiValue(
-					underlyingEventResultIds: weightedCsiValuesOfUniqueWeight*.underlyingEventResultIds.flatten(),
-					weightedValue: new WeightedValue(
-						value: weightedCsiValuesOfUniqueWeight.inject(0){ sum, weightedCsiValue -> sum+=weightedCsiValue.weightedValue.value; return sum} / weightedCsiValuesOfUniqueWeight.size(),
-						weight: uniqueWeight))
-				)
-			return flattenedList
-			
-		}
-		
-	}
-	
-	/**
-	 * Determines weight of csiValue respective given list of {@link WeightFactor}s. Weights of the respective different {@link WeightFactor}s get multiplied.  
-	 * @param csiValue
-	 * 						Value to get Weight for. Should not be null.
-	 * @param weightFactors
-	 * 						{@link Set} of {@link WeightFactor}s. The csiValue is weighted respective all of the factors in this set.
-	 * 						This set should not be null. If it is empty the csiValue's weight is 1.
+     * {@link WeightedCsiValue}s of that weight as value.
+     * </p>
+     * @param toFlatten
+     * @return A new list with one {@link WeightedCsiValue} for each unique weight in the original list toFlatten.
+     */
+    public List<WeightedCsiValue> flattenWeightedCsiValues(List<WeightedCsiValue> toFlatten) {
+
+        List<Double> uniqueWeights = toFlatten*.weightedValue*.weight.unique()
+
+        return uniqueWeights.inject([]) { List<WeightedCsiValue> flattenedList, Double uniqueWeight ->
+
+            List<WeightedCsiValue> weightedCsiValuesOfUniqueWeight = toFlatten.findAll {
+                it.weightedValue.weight == uniqueWeight
+            }
+            flattenedList.add(
+                    new WeightedCsiValue(
+                            underlyingEventResultIds: weightedCsiValuesOfUniqueWeight*.underlyingEventResultIds.flatten(),
+                            weightedValue: new WeightedValue(
+                                    value: weightedCsiValuesOfUniqueWeight.inject(0) { sum, weightedCsiValue -> sum += weightedCsiValue.weightedValue.value; return sum } / weightedCsiValuesOfUniqueWeight.size(),
+                                    weight: uniqueWeight))
+            )
+            return flattenedList
+
+        }
+
+    }
+
+    /**
+     * Determines weight of csiValue respective given list of {@link WeightFactor}s. Weights of the respective different {@link WeightFactor}s get multiplied.
+     * @param csiValue
+     * 						Value to get Weight for. Should not be null.
+     * @param weightFactors
+     * {@link Set} of {@link WeightFactor}s. The csiValue is weighted respective all of the factors in this set.
+     * 						This set should not be null. If it is empty the csiValue's weight is 1.
      * @param browserConnectivityWeights
      *                      List of browserConnectivityWeights which are necessary if {@link WeightFactor#BROWSER_CONNECTIVITY_COMBINATION} is included.
-	 * @return
-	 */
-	public Double getWeight(CsiValue csiValue, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration){
-		
-		Contract.requiresArgumentNotNull("csiValue", csiValue)
-		Contract.requiresArgumentNotNull("weightFactors", weightFactors)
-		
-		Double weight = 1
+     * @return
+     */
+    public Double getWeight(CsiValue csiValue, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
+
+        Contract.requiresArgumentNotNull("csiValue", csiValue)
+        Contract.requiresArgumentNotNull("weightFactors", weightFactors)
+
+        Double weight = 1
 
         if (weightFactors.contains(WeightFactor.HOUROFDAY)) {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] HOUROFDAY', PerformanceLoggingService.IndentationDepth.THREE){
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] HOUROFDAY', PerformanceLoggingService.IndentationDepth.THREE) {
                 weight *= getHourOfDayWeight(csiValue)
             }
-            if (weight == 0d){
+            if (weight == 0d) {
                 return weight
             }
         }
 
         if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', PerformanceLoggingService.IndentationDepth.THREE){
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', PerformanceLoggingService.IndentationDepth.THREE) {
                 weight *= getBrowserConnectivityWeight(csiValue, csiConfiguration.browserConnectivityWeights)
             }
-            if (weight == 0d){
+            if (weight == 0d) {
                 return weight
             }
         }
 
         if (weightFactors.contains(WeightFactor.PAGE)) {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] PAGE', PerformanceLoggingService.IndentationDepth.THREE){
+            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] PAGE', PerformanceLoggingService.IndentationDepth.THREE) {
                 weight *= getPageWeightFrom(csiValue, csiConfiguration.pageWeights)
             }
-            if (weight == 0d){
+            if (weight == 0d) {
                 return weight
             }
         }
 
-		return weight
-	}
+        return weight
+    }
 
     private double getPageWeightFrom(CsiValue csiValue, List<PageWeight> pageWeights) {
 
@@ -216,7 +259,7 @@ class WeightingService {
     }
 
     /**
-     * Should be used when persistence of connectivity profile in MeasuredValues is implemented instead of getBrowserWeight().
+     * Should be used when persistence of connectivity profile in CsiAggregations is implemented instead of getBrowserWeight().
      *
      * @param csiValue
      * @param browserConnectivityWeights
@@ -251,41 +294,6 @@ class WeightingService {
         return browserConnectivityWeight
     }
 
-    /**
-     * Calculates browserConnectivityWeight just for given browser. ConnectivityProfile isn't respected.
-     * This method should be removed when persistence of connectivity profile in MeasuredValues is implemented.
-     *
-     * @param csiValue
-     * @param browserConnectivityWeights
-     * @return
-     * @deprecated Better use further {@link #getBrowserConnectivityWeight}
-     */
-    @Deprecated
-    private double getBrowserWeight(CsiValue csiValue, List<BrowserConnectivityWeight> browserConnectivityWeights) {
-
-        double browserWeight
-
-        Browser browser
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.FOUR) {
-            browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
-        }
-        if (browser == null) {
-            browserWeight = 0
-        } else {
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser connectivity weight', PerformanceLoggingService.IndentationDepth.FOUR) {
-                Double browserWeightFromDb = browserConnectivityWeights.find {
-                    it.browser == browser
-                }?.weight
-                if (browserWeightFromDb == null || browserWeightFromDb <= 0) {
-                    browserWeight = 0
-                }else{
-                    browserWeight = browserWeightFromDb
-                }
-            }
-        }
-        return browserWeight
-    }
-
     public double getHourOfDayWeight(CsiValue csiValue) {
         Serializable jobGroupID = measuredValueTagService.findJobGroupIdOfHourlyEventTag(csiValue.retrieveTag())
         JobGroup jobGroup = JobGroup.get(jobGroupID)
@@ -301,4 +309,41 @@ class WeightingService {
 
     }
 
+    /**
+     * Weights all csiValues.CsByWptVisuallyCompleteInPercent respective given weightFactors.
+     * @param csiValues the csiValues to weight
+     * @param weightFactors the weightFactors to use
+     * @param csiConfiguration the csi Configuration to use
+     * @return list of all {@link de.iteratec.osm.csi.weighting.WeightedCsiValue}s
+     */
+    List<WeightedCsiValue> getWeightedCsiValuesByVisuallyComplete(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
+        List<CsiValue> mvsWithVisuallyCompleteValue = csiValues.findAll {
+            it.retrieveCsByWptVisuallyCompleteInPercent() != null && it.isCsiRelevant()
+        }
+
+        List<WeightedCsiValue> weightedCsiValues = []
+        Double value = 0
+        Double weight = 0
+        List<Long> underlyingResultIds = []
+
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValuesByVisuallyComplete] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+            mvsWithVisuallyCompleteValue.each { CsiValue csiValue ->
+                value = csiValue.retrieveCsByWptVisuallyCompleteInPercent()
+                weight = getWeight(csiValue, weightFactors, csiConfiguration)
+                underlyingResultIds = csiValue.retrieveUnderlyingEventResultsByVisuallyComplete()
+
+                if (value != null && weight != null && weight > 0) {
+                    addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
+                }
+
+            }
+        }
+
+        List<WeightedCsiValue> flattened
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValuesByVisuallyComplete] flatten weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
+            flattened = flattenWeightedCsiValues(weightedCsiValues)
+        }
+
+        return flattened
+    }
 }

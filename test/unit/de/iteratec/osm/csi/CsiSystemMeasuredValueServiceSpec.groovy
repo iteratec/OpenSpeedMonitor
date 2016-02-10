@@ -77,7 +77,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     void tearDown() {
         // Tear down logic here
     }
-    
+
     @Test
     void "find no Mvs if no CsiSystem is given"() {
         given:
@@ -133,7 +133,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
 
         //mocking inner services
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         when:
         List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
@@ -151,7 +151,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
 
         //mocking inner services
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         when:
         //test execution
@@ -188,7 +188,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: valueThirdMv, weight: weightThirdMv), underlyingEventResultIds: [5, 6])]
 
         //mocking inner services
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         when:
         List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
@@ -216,7 +216,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //mocking inner services
-        mockWeightingService([])
+        mockWeightingService([],[])
 
         when:
         List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
@@ -237,11 +237,15 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     /**
      * Mocks methods of {@link WeightingService}.
      */
-    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues) {
+    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
         def weightingService = mockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
             List<CsiValue> csiValues, CsiSystem csiSystem ->
                 return toReturnFromGetWeightedCsiValues
+        }
+        weightingService.demand.getWeightedCsiValuesByVisuallyComplete(1..10000) {
+            List<CsiValue> csiValues, CsiSystem csiSystem ->
+                return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
         serviceUnderTest.weightingService = weightingService.createMock()
     }

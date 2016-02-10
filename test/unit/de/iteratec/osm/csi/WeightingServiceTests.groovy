@@ -64,7 +64,7 @@ class WeightingServiceTests {
     void setUp() {
         serviceUnderTest = service
         mocksCommonToAllTests()
-        createTestdataCommonToAllTests()
+        createTestDataCommonToAllTests()
     }
 
     void tearDown() {
@@ -527,8 +527,174 @@ class WeightingServiceTests {
         assertEquals(20d,weightedCsiValue2.weightedValue.value, DELTA)
     }
 
+    void testGetWeightedCsiValuesFromMeasuredValuesByVisuallyCompleteForCsiSystem() {
+        // data for this test
+        CsiValue measuredValueWithVisuallyComplete1 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                csByWptVisuallyCompleteInPercent: 10d,
+                tag: jobGroup1.ident(),
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithVisuallyComplete2 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                csByWptVisuallyCompleteInPercent: 20d,
+                tag: jobGroup1.ident(),
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithVisuallyComplete3 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                csByWptVisuallyCompleteInPercent: 20d,
+                tag: jobGroup2.ident(),
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithoutVisuallyComplete1 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                tag: jobGroup1.ident(),
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithoutVisuallyComplete2 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                tag: jobGroup2.ident(),
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+
+        measuredValueWithVisuallyComplete1.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithVisuallyComplete2.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithVisuallyComplete3.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
+            return true
+        }
+
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+
+        // execution
+        // test all underlying measuredValues have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesAllHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithVisuallyComplete2, measuredValueWithVisuallyComplete3], csiSystem)
+
+        // test some underlying measuredValues have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesSomeHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithoutVisuallyComplete1], csiSystem)
+
+        // test no underlying measuredValues have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesNoHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithoutVisuallyComplete1, measuredValueWithoutVisuallyComplete2], csiSystem)
+
+        // expectations
+        assertEquals(2, weightedCsiValuesAllHaveVisuallyComplete.size())
+        assertEquals(1, weightedCsiValuesSomeHaveVisuallyComplete.size())
+        assertEquals(0, weightedCsiValuesNoHaveVisuallyComplete.size())
+
+        //weights are defined in csiSystem
+        Double meanOfTwoEqualWeightedValues = (10.0 + 20.0)/2
+        assertEquals(new WeightedValue(value: meanOfTwoEqualWeightedValues, weight: 0.5), weightedCsiValuesAllHaveVisuallyComplete[0].weightedValue)
+        Double valueOfDifferentWeightedValue = 20.0
+        assertEquals(new WeightedValue(value: valueOfDifferentWeightedValue, weight: 2.0), weightedCsiValuesAllHaveVisuallyComplete[1].weightedValue)
+
+
+        assertEquals(new WeightedValue(value: 10.0, weight: 0.5), weightedCsiValuesSomeHaveVisuallyComplete[0].weightedValue)
+    }
+
+    void testGetWeightedCsiValuesFromMeasuredValuesByVisuallyComplete() {
+        // data for this test
+        CsiValue measuredValueWithVisuallyComplete1 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                csByWptVisuallyCompleteInPercent: 10d,
+                tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithVisuallyComplete2 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                csByWptVisuallyCompleteInPercent: 20d,
+                tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithVisuallyComplete3 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                csByWptVisuallyCompleteInPercent: 20d,
+                tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_70,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithoutVisuallyComplete1 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_50,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+        CsiValue measuredValueWithoutVisuallyComplete2 = new CsiAggregation(
+                csByWptDocCompleteInPercent: 10d,
+                tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
+                started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
+                connectivityProfile: connectivityProfile_70,
+                underlyingEventResultsByVisuallyComplete: "1L,2L"
+        )
+
+        measuredValueWithVisuallyComplete1.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithVisuallyComplete2.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithVisuallyComplete3.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
+            return true
+        }
+        measuredValueWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
+            return true
+        }
+
+        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+
+        // execution
+        // test all underlying measuredValues have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesAllHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithVisuallyComplete2, measuredValueWithVisuallyComplete3], [WeightFactor.PAGE] as Set, csiConfiguration)
+
+        // test some underlying measuredValues have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesSomeHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithoutVisuallyComplete1], [WeightFactor.PAGE] as Set, csiConfiguration)
+
+        // test no underlying measuredValues have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesNoHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithoutVisuallyComplete1, measuredValueWithoutVisuallyComplete2], [WeightFactor.PAGE] as Set, csiConfiguration)
+
+        // expectations
+        assertEquals(2, weightedCsiValuesAllHaveVisuallyComplete.size())
+        assertEquals(1, weightedCsiValuesSomeHaveVisuallyComplete.size())
+        assertEquals(0, weightedCsiValuesNoHaveVisuallyComplete.size())
+
+        // weights are defined in csiConfiguration
+        // (value 10 + value 20) / 2 --> both are weighted 0.5
+        assertEquals(new WeightedValue(value: 15.0, weight: 0.5), weightedCsiValuesAllHaveVisuallyComplete[0].weightedValue)
+        assertEquals(new WeightedValue(value: 20.0, weight: 0.7), weightedCsiValuesAllHaveVisuallyComplete[1].weightedValue)
+
+        assertEquals(new WeightedValue(value: 10.0, weight: 0.5), weightedCsiValuesSomeHaveVisuallyComplete[0].weightedValue)
+    }
+
     void testFlattenWeightedCsiValuesWithoutData() {
-        //testdata
+        //test data
         List<WeightedCsiValue> valuesToFlatten = []
         //test-execution
         List<WeightedCsiValue> flattened = serviceUnderTest.flattenWeightedCsiValues(valuesToFlatten)
@@ -537,7 +703,7 @@ class WeightingServiceTests {
     }
 
     void testFlattenWeightedCsiValuesCalledWithData() {
-        //testdata
+        //test data
         Double firstWeight = 0.1d
         Double secondWeight = 0.2d
         Double thirdWeight = 0.3d
@@ -592,9 +758,12 @@ class WeightingServiceTests {
         EventResult.metaClass.isCsiRelevant = { ->
             return true
         }
+        CsiAggregation.metaClass.isCsiRelevant = { ->
+            return true
+        }
     }
 
-    private createTestdataCommonToAllTests() {
+    private createTestDataCommonToAllTests() {
         page_50 = new Page(name: 'page_50')
         page_70 = new Page(name: 'page_70')
         browserToReturn_50 = new Browser(name: 'browser_50', weight: 0.5d)

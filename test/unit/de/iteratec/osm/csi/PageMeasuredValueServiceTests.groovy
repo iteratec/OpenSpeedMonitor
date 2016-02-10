@@ -287,7 +287,7 @@ class PageMeasuredValueServiceTests {
 
         mockMeasuredValueDaoService()
         mockMeasuredValueTagService(allCsiGroups, allPages)
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
 
@@ -342,7 +342,7 @@ class PageMeasuredValueServiceTests {
 
         mockMeasuredValueDaoService()
         mockMeasuredValueTagService(allCsiGroups, allPages)
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
 
@@ -405,7 +405,7 @@ class PageMeasuredValueServiceTests {
 
         mockMeasuredValueDaoService()
         mockMeasuredValueTagService(allCsiGroups, allPages)
-        mockWeightingService(weightedCsiValuesToReturnInMock)
+        mockWeightingService(weightedCsiValuesToReturnInMock,[])
 
         //precondition
 
@@ -481,8 +481,6 @@ class PageMeasuredValueServiceTests {
 
         mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
-
-
     }
 
     //mocking inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -493,20 +491,6 @@ class PageMeasuredValueServiceTests {
      * @param pages
      */
     private void mockMeasuredValueTagService(Map<String, JobGroup> allCsiGroups, Map<String, Page> allPages) {
-//		def measuredValueTagServiceMocked = mockFor(MeasuredValueTagService, true)
-//		measuredValueTagServiceMocked.demand.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(0..10000) {
-//			List<JobGroup> theCsiGroups, List<Page> thePages ->
-//			return patternToReturn
-//		}
-
-//
-//		measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
-//			return jobGroup1;
-//		}
-//		measuredValueTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->
-//			return page1;
-//		}
-
         ServiceMocker serviceMocker = ServiceMocker.create()
         serviceMocker.mockMeasuredValueTagService(serviceUnderTest, allCsiGroups, null, allPages, null, null)
         serviceMocker.mockMeasuredValueTagService(serviceUnderTest.eventMeasuredValueService, allCsiGroups, null, allPages, null, null)
@@ -519,11 +503,15 @@ class PageMeasuredValueServiceTests {
     /**
      * Mocks methods of {@link WeightingService}.
      */
-    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues) {
+    private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
         def weightingService = mockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
+        }
+        weightingService.demand.getWeightedCsiValuesByVisuallyComplete(1..10000) {
+            List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
+                return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
         serviceUnderTest.weightingService = weightingService.createMock()
     }
