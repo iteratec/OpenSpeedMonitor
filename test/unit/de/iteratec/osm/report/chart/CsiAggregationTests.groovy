@@ -81,27 +81,27 @@ class CsiAggregationTests {
     void testAccessingResultIds() {
 		CsiAggregation mvInitialWithoutResultids = CsiAggregation.findByStarted(dateOfMv1)
 		
-		assertEquals(0, mvInitialWithoutResultids.countResultIds())
-		assertEquals(0, mvInitialWithoutResultids.getResultIdsAsList().size())
+		assertEquals(0, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(0, mvInitialWithoutResultids.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		
-		mvInitialWithoutResultids.addToResultIds(3)
-		assertEquals(1, mvInitialWithoutResultids.countResultIds())
-		assertEquals(1, mvInitialWithoutResultids.getResultIdsAsList().size())
+		mvInitialWithoutResultids.addToUnderlyingEventResultsByWptDocComplete(3)
+		assertEquals(1, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(1, mvInitialWithoutResultids.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		
 		CsiAggregation mvWith2Results = CsiAggregation.findByStarted(dateOfMv2)
-		assertEquals(2,  mvWith2Results.countResultIds())
-		assertEquals(2, mvWith2Results.getResultIdsAsList().size())
+		assertEquals(2,  mvWith2Results.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(2, mvWith2Results.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		
-		mvInitialWithoutResultids.addAllToResultIds(mvWith2Results.getResultIdsAsList())
-		assertEquals(3, mvInitialWithoutResultids.getResultIdsAsList().size())
+		mvInitialWithoutResultids.addAllToUnderlyingEventResultsByWptDocComplete(mvWith2Results.getUnderlyingEventResultsByWptDocCompleteAsList())
+		assertEquals(3, mvInitialWithoutResultids.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		
 		mvInitialWithoutResultids.addAllToResultIds(mvWith2Results.underlyingEventResultsByWptDocComplete)
-		assertEquals(5,  mvInitialWithoutResultids.countResultIds())
-		assertEquals(5, mvInitialWithoutResultids.getResultIdsAsList().size())
+		assertEquals(5,  mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(5, mvInitialWithoutResultids.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		
-		mvInitialWithoutResultids.clearResultIds()
-		assertEquals(0,  mvInitialWithoutResultids.countResultIds())
-		assertEquals(0, mvInitialWithoutResultids.getResultIdsAsList().size())
+		mvInitialWithoutResultids.clearUnderlyingEventResultsByWptDocComplete()
+		assertEquals(0,  mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(0, mvInitialWithoutResultids.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		
     }
 	
@@ -121,30 +121,30 @@ class CsiAggregationTests {
 		//test execution and assertions/////////////////////////////////////////////////////
 		
 		//precondition
-		mvInitialWithoutResultids.clearResultIds()
-		assertEquals(0, mvInitialWithoutResultids.countResultIds())
-		assertEquals(0, mvInitialWithoutResultids.getResultIdsAsList().size())
+		mvInitialWithoutResultids.clearUnderlyingEventResultsByWptDocComplete()
+		assertEquals(0, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(0, mvInitialWithoutResultids.getUnderlyingEventResultsByWptDocCompleteAsList().size())
 		//adding single resulit-id's NO DUPLICATES
-		mvInitialWithoutResultids.addToResultIds(1)
-		mvInitialWithoutResultids.addToResultIds(2)
-		mvInitialWithoutResultids.addToResultIds(3)
-		assertEquals(3, mvInitialWithoutResultids.countResultIds())
+		mvInitialWithoutResultids.addToUnderlyingEventResultsByWptDocComplete(1)
+		mvInitialWithoutResultids.addToUnderlyingEventResultsByWptDocComplete(2)
+		mvInitialWithoutResultids.addToUnderlyingEventResultsByWptDocComplete(3)
+		assertEquals(3, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
 		//adding single resulit-id's DUPLICATES
-		mvInitialWithoutResultids.addToResultIds(3)
-		mvInitialWithoutResultids.addToResultIds(4)
-		assertEquals(5, mvInitialWithoutResultids.countResultIds())
+		mvInitialWithoutResultids.addToUnderlyingEventResultsByWptDocComplete(3)
+		mvInitialWithoutResultids.addToUnderlyingEventResultsByWptDocComplete(4)
+		assertEquals(5, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
 		//adding long-list of resulit-id's NO DUPLICATES
-		mvInitialWithoutResultids.addAllToResultIds([5,6,7])
-		assertEquals(8, mvInitialWithoutResultids.countResultIds())
+		mvInitialWithoutResultids.addAllToUnderlyingEventResultsByWptDocComplete([5,6,7])
+		assertEquals(8, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
 		//adding long-list of resulit-id's DUPLICATES
-		mvInitialWithoutResultids.addAllToResultIds([5,6,7,8])
-		assertEquals(12, mvInitialWithoutResultids.countResultIds())
+		mvInitialWithoutResultids.addAllToUnderlyingEventResultsByWptDocComplete([5,6,7,8])
+		assertEquals(12, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
 		//adding string-list of resulit-id's NO DUPLICATES
 		mvInitialWithoutResultids.addAllToResultIds('9,10,11')
-		assertEquals(15, mvInitialWithoutResultids.countResultIds())
+		assertEquals(15, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
 		//adding string-list of resulit-id's DUPLICATES
 		mvInitialWithoutResultids.addAllToResultIds('11,12,13')
-		assertEquals(18, mvInitialWithoutResultids.countResultIds())
+		assertEquals(18, mvInitialWithoutResultids.countUnderlyingEventResultsByWptDocComplete())
 	}
 	
 	@Test

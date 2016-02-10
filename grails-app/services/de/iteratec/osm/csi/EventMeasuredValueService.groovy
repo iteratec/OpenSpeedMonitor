@@ -170,17 +170,38 @@ class EventMeasuredValueService {
 	 * @return
 	 */
 	private CsiAggregation calcMvForJobAggregatorWithoutQueryResultsFromDb(CsiAggregation toBeCalculated, EventResult newResult) {
-		Integer countResults = toBeCalculated.countResultIds()
-		Double newValue
-		if(newResult.isCsiRelevant() && !toBeCalculated.containsInResultIds(newResult.ident())){
-			if (countResults > 0 && newResult.csByWptDocCompleteInPercent != null) {
-				Double sumOfPreviousResults = (toBeCalculated.csByWptDocCompleteInPercent?toBeCalculated.csByWptDocCompleteInPercent:0) * countResults
-				newValue = (sumOfPreviousResults + newResult.csByWptDocCompleteInPercent) / (countResults + 1)
-			} else if (countResults == 0) {
-				newValue = newResult.csByWptDocCompleteInPercent
+		Integer countUnderlyingEventResultsByWptDocComplete = toBeCalculated.countUnderlyingEventResultsByWptDocComplete()
+		Integer countUnderlyingEventResultsByWptVisuallyComplete = toBeCalculated.underlyingEventResultsByVisuallyComplete.size()
+		Double newCsByWptDocCompleteInPercent
+		Double newCsByWptVisuallyCompleteInPercent
+		if(newResult.isCsiRelevant()){
+			// add value for csByDocComplete
+			if(!toBeCalculated.containsInUnderlyingEventResultsByWptDocComplete(newResult.ident())) {
+				if (countUnderlyingEventResultsByWptDocComplete > 0 && newResult.csByWptDocCompleteInPercent != null) {
+					Double sumOfPreviousResults = (toBeCalculated.csByWptDocCompleteInPercent ?
+												   toBeCalculated.csByWptDocCompleteInPercent :
+												   0) * countUnderlyingEventResultsByWptDocComplete
+					newCsByWptDocCompleteInPercent = (sumOfPreviousResults + newResult.csByWptDocCompleteInPercent) / (countUnderlyingEventResultsByWptDocComplete + 1)
+				} else if (countUnderlyingEventResultsByWptDocComplete == 0) {
+					newCsByWptDocCompleteInPercent = newResult.csByWptDocCompleteInPercent
+				}
+				toBeCalculated.csByWptDocCompleteInPercent = newCsByWptDocCompleteInPercent
+				toBeCalculated.addToUnderlyingEventResultsByWptDocComplete(newResult.ident())
 			}
-			toBeCalculated.csByWptDocCompleteInPercent = newValue
-			toBeCalculated.addToResultIds(newResult.ident())
+
+			//add value for csByVisuallyComplete
+			if(!toBeCalculated.underlyingEventResultsByVisuallyComplete.contains(newResult)) {
+				if (countUnderlyingEventResultsByWptVisuallyComplete > 0 && newResult.csByWptVisuallyCompleteInPercent != null) {
+					Double sumOfPreviousResults = (toBeCalculated.csByWptVisuallyCompleteInPercent ?
+												   toBeCalculated.csByWptVisuallyCompleteInPercent :
+												   0) * countUnderlyingEventResultsByWptVisuallyComplete
+					newCsByWptVisuallyCompleteInPercent = (sumOfPreviousResults + newResult.csByWptVisuallyCompleteInPercent) / (countUnderlyingEventResultsByWptVisuallyComplete + 1)
+				} else if (countUnderlyingEventResultsByWptVisuallyComplete == 0) {
+					newCsByWptVisuallyCompleteInPercent = newResult.csByWptVisuallyCompleteInPercent
+				}
+				toBeCalculated.csByWptVisuallyCompleteInPercent = newCsByWptVisuallyCompleteInPercent
+				toBeCalculated.underlyingEventResultsByVisuallyComplete.add(newResult)
+			}
 		}
 		toBeCalculated.save(failOnError:true)
 		measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)

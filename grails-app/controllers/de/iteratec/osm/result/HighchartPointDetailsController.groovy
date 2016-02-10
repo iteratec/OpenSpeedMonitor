@@ -82,7 +82,7 @@ class HighchartPointDetailsController {
 	 * </p>
 	 * 
 	 * <p>
-	 * If the {@link CsiAggregation#countResultIds() count of results} in the
+	 * If the {@link CsiAggregation#countUnderlyingEventResultsByWptDocComplete() count of results} in the
 	 * measured value differs from {@code lastKnownCountOfAggregatedResults} 
 	 * a waring in shown to the user.
 	 * </p>
@@ -192,7 +192,7 @@ class HighchartPointDetailsController {
 		// Load relevant data:
 		CsiAggregation valueThatResultsShouldBeListed = measuredValueDaoService.tryToFindById(measuredValueId);
 		
-		Collection<Long> resultIds = valueThatResultsShouldBeListed.getResultIdsAsList();
+		Collection<Long> resultIds = valueThatResultsShouldBeListed.getUnderlyingEventResultsByWptDocCompleteAsList();
 		
 		addWaringIfResultCountDiffersFromExpectation(lastKnownCountOfAggregatedResultsOrNull, resultIds.size(), modelToRender);
 		

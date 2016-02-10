@@ -41,7 +41,7 @@ import org.grails.databinding.BindUsing
  * <pre>
  *  measuredValue.value = eventResult.aValue
  *  measuredValue.calculated = Calculated.Yes
- * 	measuredValue.addToResultIds(eventResult.ident())
+ * 	measuredValue.addToUnderlyingEventResultsByWptDocComplete(eventResult.ident())
  * </pre>
  * better use
  * <pre>
@@ -70,6 +70,7 @@ class CsiAggregation implements CsiValue {
     ConnectivityProfile connectivityProfile
     Double csByWptDocCompleteInPercent
     Double csByWptVisuallyCompleteInPercent
+    Collection<EventResult> underlyingEventResultsByVisuallyComplete = []
 
     static hasMany = [underlyingEventResultsByVisuallyComplete: EventResult]
     /**
@@ -95,7 +96,7 @@ class CsiAggregation implements CsiValue {
     })
     String underlyingEventResultsByWptDocComplete
 
-    static transients = ['resultIdsAsList', 'latestUpdateEvent', 'calculated']
+    static transients = ['underlyingEventResultsByWptDocCompleteAsList', 'latestUpdateEvent', 'calculated']
 
     static constraints = {
         started()
@@ -128,9 +129,9 @@ class CsiAggregation implements CsiValue {
      * @return A list of the identifiers of the event results aggregated to
      *         calculate this value. The size of returned list is >= 0.
      *         The result is never <code>null</code>.
-     * @see #countResultIds()
+     * @see #countUnderlyingEventResultsByWptDocComplete()
      */
-    List<Long> getResultIdsAsList(){
+    List<Long> getUnderlyingEventResultsByWptDocCompleteAsList(){
         return underlyingEventResultsByWptDocComplete ? underlyingEventResultsByWptDocComplete.tokenize(DELIMITER_RESULTIDS).collect({ Long.parseLong(it) }) : []
     }
     /**
@@ -138,8 +139,8 @@ class CsiAggregation implements CsiValue {
      * The newResultId is just added, no identifiers are removed previously.
      * @param newResultId
      */
-    void addToResultIds(Long newResultId){
-        List<Long> list = getResultIdsAsList()
+    void addToUnderlyingEventResultsByWptDocComplete(Long newResultId){
+        List<Long> list = getUnderlyingEventResultsByWptDocCompleteAsList()
         if(list.contains(newResultId)) log.error("Didn't add EventResult to CsiAggregation because it was already in the list! (EventResult-ID=${newResultId}, CsiAggregation-ID=${this.ident()})")
         list.add(newResultId)
         underlyingEventResultsByWptDocComplete = list.join(DELIMITER_RESULTIDS)
@@ -149,16 +150,16 @@ class CsiAggregation implements CsiValue {
      * @param resultId
      * @return true if the result already in the list
      */
-    boolean containsInResultIds(Long resultId){
-        return getResultIdsAsList().contains(resultId)
+    boolean containsInUnderlyingEventResultsByWptDocComplete(Long resultId){
+        return getUnderlyingEventResultsByWptDocCompleteAsList().contains(resultId)
     }
     /**
      * Adds all {@link EventResult}-identifiers in resultIdsToAddAsList to the list of {@link EventResult}-identifiers, this value was calculated from.
      * The results are just added, no identifiers are removed previously.
      * @param resultIdsToAddAsList
      */
-    void addAllToResultIds(List<Long> resultIdsToAddAsList){
-        List<Long> list = getResultIdsAsList()
+    void addAllToUnderlyingEventResultsByWptDocComplete(List<Long> resultIdsToAddAsList){
+        List<Long> list = getUnderlyingEventResultsByWptDocCompleteAsList()
         List<Long> intersection = list.intersect(resultIdsToAddAsList)
         if(intersection.size() > 0) {
             log.error("EventResults were added to CsiAggregation although some of them were already in the list! (id's which were already in the list=${intersection}, CsiAggregation-ID=${this.ident()})")
@@ -173,7 +174,7 @@ class CsiAggregation implements CsiValue {
      * @see #underlyingEventResultsByWptDocComplete
      */
     void addAllToResultIds(String resultIdsToAddAsString){
-        List<Long> list = getResultIdsAsList()
+        List<Long> list = getUnderlyingEventResultsByWptDocCompleteAsList()
         List<Long> intersection = list.intersect(resultIdsToAddAsString.tokenize(DELIMITER_RESULTIDS))
         if(intersection.size() > 0) {
             log.error("EventResults were added to CsiAggregation although some of them were already in the list! (id's which were already in the list=${intersection}, CsiAggregation-ID=${this.ident()})")
@@ -184,7 +185,7 @@ class CsiAggregation implements CsiValue {
     /**
      * Removes all {@link EventResult}-identifiers from the list of identifiers, this value was calculated from.
      */
-    void clearResultIds(){
+    void clearUnderlyingEventResultsByWptDocComplete(){
         this.underlyingEventResultsByWptDocComplete = ''
     }
 
@@ -197,10 +198,10 @@ class CsiAggregation implements CsiValue {
      *
      * @return The count of event results aggregated to calculate this value.
      *         The result is >= 0.
-     * @see #getResultIdsAsList()
+     * @see #getUnderlyingEventResultsByWptDocCompleteAsList()
      */
-    int countResultIds(){
-        return getResultIdsAsList().size()
+    int countUnderlyingEventResultsByWptDocComplete(){
+        return getUnderlyingEventResultsByWptDocCompleteAsList().size()
     }
 
     /**
@@ -314,7 +315,7 @@ class CsiAggregation implements CsiValue {
 
     @Override
     public List<Long> retrieveUnderlyingEventResultsByDocComplete(){
-        return this.getResultIdsAsList()
+        return this.getUnderlyingEventResultsByWptDocCompleteAsList()
     }
 
     @Override

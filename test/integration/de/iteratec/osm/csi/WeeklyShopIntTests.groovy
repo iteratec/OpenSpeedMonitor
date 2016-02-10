@@ -103,7 +103,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		assertEquals(pageAggregatorShop.name, mvWeeklyShop.aggregator.name)
 		assertEquals(csiGroup.ident().toString(), mvWeeklyShop.tag)
 		assertTrue(mvWeeklyShop.isCalculated())
-		assertEquals(0, mvWeeklyShop.countResultIds())
+		assertEquals(0, mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete())
 		assertNull(mvWeeklyShop.value)
 	}
 

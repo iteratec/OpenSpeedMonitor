@@ -126,11 +126,11 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		
 		//create test-specific data
 		JobResult run = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
-		EventResult result1 = createNewResult(run, 50, '1;1;1;1;1')
-		EventResult result2 = createNewResult(run, 60, '1;1;1;1;1')
-		EventResult result3 = createNewResult(run, 70, '1;1;1;1;1')
-		EventResult result4 = createNewResult(run, 80, '1;1;1;1;1')
-		EventResult result5 = createNewResult(run, 90, '1;1;1;1;1')
+		EventResult result1 = createNewResult(run, 50, null,'1;1;1;1;1')
+		EventResult result2 = createNewResult(run, 60, 60,'1;1;1;1;1')
+		EventResult result3 = createNewResult(run, 70, 70,'1;1;1;1;1')
+		EventResult result4 = createNewResult(run, 80, 80,'1;1;1;1;1')
+		EventResult result5 = createNewResult(run, 90, 90,'1;1;1;1;1')
 
 		mockGenerator.mockOsmConfigCacheService(result1)
 		mockGenerator.mockOsmConfigCacheService(result2)
@@ -149,18 +149,19 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		assertEquals(countEvents, hourlyMvs.size())
 		
 		CsiAggregation calculated = hourlyMvs[0]
-		Double expectedValue = 50
-		proofHemv(calculated, true, 1, expectedValue)
+		Double expectedCsByDocComplete = 50
+		proofHourlyCsiAggregation(calculated, true, 1, expectedCsByDocComplete,null)
 		
 		serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result2)
-		expectedValue = (50 + 60) / 2
-		proofHemv(calculated, true, 2, expectedValue)
+		expectedCsByDocComplete = (50 + 60) / 2
+		proofHourlyCsiAggregation(calculated, true, 2, expectedCsByDocComplete,60/2)
 		
 		serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result3)
 		serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result4)
 		serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result5)
-		expectedValue = (50 + 60 + 70 + 80 + 90) / 5
-		proofHemv(calculated, true, 5, expectedValue)
+		expectedCsByDocComplete = (50 + 60 + 70 + 80 + 90) / 5
+		Double expectedCsByVisuallyComplete = (60 + 70 + 80 + 90) / 5
+		proofHourlyCsiAggregation(calculated, true, 5, expectedCsByDocComplete, expectedCsByVisuallyComplete)
 		
 	}
 	
@@ -177,11 +178,11 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		JobGroup group2 = JobGroup.findByName(group2Name)
 		Long jobGroup1Id = group1.ident()
 		Long jobGroup2Id = group2.ident()
-		EventResult result1OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 80, "${jobGroup1Id};1;1;1;1")
-		EventResult result2OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 90, "${jobGroup1Id};1;1;1;1")
-		EventResult result1OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 10, "${jobGroup2Id};1;1;1;1")
-		EventResult result2OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 20, "${jobGroup2Id};1;1;1;1")
-		EventResult result3OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 30, "${jobGroup2Id};1;1;1;1")
+		EventResult result1OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 80, null,"${jobGroup1Id};1;1;1;1")
+		EventResult result2OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 90, 90,"${jobGroup1Id};1;1;1;1")
+		EventResult result1OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 10, 10,"${jobGroup2Id};1;1;1;1")
+		EventResult result2OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 20, 20,"${jobGroup2Id};1;1;1;1")
+		EventResult result3OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 30, 30,"${jobGroup2Id};1;1;1;1")
 		
 		//execute test
 		serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result1OfCsiGroup1)
@@ -198,47 +199,53 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		
 		List<CsiAggregation> hourlyMvsOfGroup1 = hourlyMvs.findAll{it.tag ==~ /${jobGroup1Id};\d+;\d+;\d+;\d+/}
 		assertEquals(1, hourlyMvsOfGroup1.size())
-		proofHemv(hourlyMvsOfGroup1[0], true, 2, 85)
+		proofHourlyCsiAggregation(hourlyMvsOfGroup1[0], true, 2, 85, 45)
 		
 		List<CsiAggregation> hourlyMvsOfGroup2 = hourlyMvs.findAll{it.tag ==~ /${jobGroup2Id};\d+;\d+;\d+;\d+/}
 		assertEquals(1, hourlyMvsOfGroup2.size())
-		proofHemv(hourlyMvsOfGroup2[0], true, 3, 20)
+		proofHourlyCsiAggregation(hourlyMvsOfGroup2[0], true, 3, 20, 20)
 		
 	}
 	
 	/**
 	 * Executes assertions to proof calculated {@link CsiAggregation}.
-	 * @param mvHourlyEvent
+	 * @param hourlyCsiAggregation
 	 * 			{@link CsiAggregation} to proof
 	 * @param expectedCalculatedState
 	 * 			Calculated-state of calculated {@link CsiAggregation} to expect.
 	 * @param expectedResultCount
 	 * 			Count of {@link EventResult}s of calculated {@link CsiAggregation} to expect.
-	 * @param expectedValue
+	 * @param expectedByDocComplete
 	 * 			Double-value of calculated {@link CsiAggregation} to expect.
 	 */
-	private void proofHemv(
-			CsiAggregation mvHourlyEvent,
+	private void proofHourlyCsiAggregation(
+			CsiAggregation hourlyCsiAggregation,
 			boolean expectedCalculatedState,
 			Integer expectedResultCount,
-			expectedValue){
+			Double expectedByDocComplete,
+			Double expectedByVisuallyComplete
+										  ){
 		
-		assertEquals(resultsExecutionTime.toDate(), mvHourlyEvent.started)
-		assertEquals(hourly.intervalInMinutes, mvHourlyEvent.interval.intervalInMinutes)
-		assertEquals(measuredEvent.name, mvHourlyEvent.aggregator.name)
-		assertEquals(expectedCalculatedState, mvHourlyEvent.isCalculated())
-		assertEquals(expectedResultCount, mvHourlyEvent.countResultIds())
-		assertEquals(expectedValue, mvHourlyEvent.csByWptDocCompleteInPercent, DELTA)
-		
+		assertEquals(resultsExecutionTime.toDate(), hourlyCsiAggregation.started)
+		assertEquals(hourly.intervalInMinutes, hourlyCsiAggregation.interval.intervalInMinutes)
+		assertEquals(measuredEvent.name, hourlyCsiAggregation.aggregator.name)
+		assertEquals(expectedCalculatedState, hourlyCsiAggregation.isCalculated())
+		assertEquals(expectedResultCount, hourlyCsiAggregation.countUnderlyingEventResultsByWptDocComplete())
+		assertEquals(expectedByDocComplete, hourlyCsiAggregation.csByWptDocCompleteInPercent, DELTA)
+		if(expectedByVisuallyComplete != null) {
+			assertEquals(expectedByVisuallyComplete, hourlyCsiAggregation.csByWptVisuallyCompleteInPercent, DELTA)
+		} else {
+			assertNull(hourlyCsiAggregation.csByWptVisuallyCompleteInPercent)
+		}
 	}
 		
 	/**
 	 * Creates a new {@link EventResult} and persists it.
 	 * @param jobResult
-	 * @param cs
+	 * @param csByDocComplete
 	 * @return
 	 */
-	private EventResult createNewResult(JobResult jobResult, Integer cs, String resultTag){
+	private EventResult createNewResult(JobResult jobResult, Integer csByDocComplete, Integer csByVisuallyComplete, String resultTag){
 		MeasuredEvent event = MeasuredEvent.findByName(measuredEventName) 
 		EventResult returnValue=new EventResult(
 			numberOfWptRun: 1,
@@ -259,7 +266,8 @@ class UpdateEventResultDependentMeasuredValuesTests {
 			lastStatusUpdate: resultsExecutionTime.toDate(),
 			wptStatus: 0,
 			validationState : 'validationState',
-			csByWptDocCompleteInPercent: cs,
+			csByWptDocCompleteInPercent: csByDocComplete,
+			csByWptVisuallyCompleteInPercent: csByVisuallyComplete,
 			jobResult: jobResult,
 			jobResultDate: jobResult.date,
 			jobResultJobConfigId: jobResult.job.ident(),

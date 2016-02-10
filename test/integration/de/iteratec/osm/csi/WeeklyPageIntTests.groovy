@@ -168,7 +168,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		// TODO mze-2013-08-15: Check this:
 		// Disabled reason: Values differ may from data
 		// int targetResultCount = targetResultCounts[csvName][pageName]?:-1
-		// assertEquals(targetResultCount, mvWeeklyPage.countResultIds())
+		// assertEquals(targetResultCount, mvWeeklyPage.countUnderlyingEventResultsByWptDocComplete())
 		assertNotNull(mvWeeklyPage.value)
 
 		double expectedValue = targetValues[csvName][pageName]?:-1

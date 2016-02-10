@@ -227,7 +227,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         calculatedMvs[0].aggregator == csiSystemAggregator
         calculatedMvs[0].isCalculated()
         calculatedMvs[0].csByWptDocCompleteInPercent == null
-        calculatedMvs[0].resultIdsAsList.isEmpty()
+        calculatedMvs[0].underlyingEventResultsByWptDocCompleteAsList.isEmpty()
 
         mvs.size() == 1
     }

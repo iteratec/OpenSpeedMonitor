@@ -198,7 +198,7 @@ class MetricReportingService {
 				MeasuredValueInterval.HOURLY)
 				.toDate();
 			List<CsiAggregation> mvs = eventMeasuredValueService.getHourylMeasuredValues(startOfLastClosedInterval, startOfLastClosedInterval, queryParams).findAll{ CsiAggregation hmv ->
-				hmv.csByWptDocCompleteInPercent != null && hmv.countResultIds() > 0
+				hmv.csByWptDocCompleteInPercent != null && hmv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
 
 			if(log.debugEnabled) log.debug("MeasuredValues to report for last hour: ${mvs}")
@@ -277,7 +277,7 @@ class MetricReportingService {
 			if(log.debugEnabled) log.debug("getting page csi-values to report to graphite: startOfLastClosedInterval=${startOfLastClosedInterval}")
 			MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(intervalInMinutes)
 			List<CsiAggregation> pmvsWithData = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startOfLastClosedInterval, startOfLastClosedInterval, interval, [eachJobGroup]).findAll{ CsiAggregation pmv ->
-				pmv.csByWptDocCompleteInPercent != null && pmv.countResultIds() > 0
+				pmv.csByWptDocCompleteInPercent != null && pmv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
 
 			if(log.debugEnabled) log.debug("reporting ${pmvsWithData.size()} page csi-values with intervalInMinutes ${intervalInMinutes} for JobGroup: ${eachJobGroup}");
@@ -350,7 +350,7 @@ class MetricReportingService {
 			if(log.debugEnabled) log.debug("getting shop csi-values to report to graphite: startOfLastClosedInterval=${startOfLastClosedInterval}")
 			MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(intervalInMinutes)
 			List<CsiAggregation> smvsWithData = shopMeasuredValueService.getOrCalculateShopMeasuredValues(startOfLastClosedInterval, startOfLastClosedInterval, interval, [eachJobGroup]).findAll { CsiAggregation smv ->
-				smv.csByWptDocCompleteInPercent != null && smv.countResultIds() > 0
+				smv.csByWptDocCompleteInPercent != null && smv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
 
 			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.SHOP, smvsWithData)

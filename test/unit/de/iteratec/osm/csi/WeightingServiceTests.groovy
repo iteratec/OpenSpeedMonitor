@@ -381,7 +381,7 @@ class WeightingServiceTests {
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50
         )
-        measuredValueWeightFiftyTwoAm.addAllToResultIds([1l, 2l, 3l])
+        measuredValueWeightFiftyTwoAm.addAllToUnderlyingEventResultsByWptDocComplete([1l, 2l, 3l])
         measuredValueWeightFiftyTwoAm.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValueWeightFiftyTwoAm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         CsiAggregation measuredValueWeightSeventyFivePm = new CsiAggregation(
@@ -390,7 +390,7 @@ class WeightingServiceTests {
                 started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 connectivityProfile: connectivityProfile_70
         )
-        measuredValueWeightSeventyFivePm.addAllToResultIds([4l, 5l, 6l])
+        measuredValueWeightSeventyFivePm.addAllToUnderlyingEventResultsByWptDocComplete([4l, 5l, 6l])
         measuredValueWeightSeventyFivePm.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValueWeightSeventyFivePm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 
@@ -489,7 +489,7 @@ class WeightingServiceTests {
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50,
         )
-        measuredValue1.addAllToResultIds([1l, 2l, 3l])
+        measuredValue1.addAllToUnderlyingEventResultsByWptDocComplete([1l, 2l, 3l])
         measuredValue1.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValue1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         CsiAggregation measuredValue2 = new CsiAggregation(
@@ -498,7 +498,7 @@ class WeightingServiceTests {
                 started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 connectivityProfile: connectivityProfile_70
         )
-        measuredValue2.addAllToResultIds([4l, 5l, 6l])
+        measuredValue2.addAllToUnderlyingEventResultsByWptDocComplete([4l, 5l, 6l])
         measuredValue2.save(validate: false)
         TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
 

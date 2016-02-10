@@ -146,7 +146,7 @@ databaseChangeLog = {
                         currentHourlyMeasuredValues.each { measuredValue ->
                             List<EventResult> eventResultsOfMeasuredValue = EventResult.executeQuery(
                                 "from EventResult where id in :ids",
-                                [ids: measuredValue.resultIdsAsList]
+                                [ids: measuredValue.underlyingEventResultsByWptDocCompleteAsList]
                             )
                             int amountDifferentConnectivityProfiles = eventResultsOfMeasuredValue*.connectivityProfile.unique(false).size()
                             // simple case: if all results have same connectivity

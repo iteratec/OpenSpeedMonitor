@@ -429,7 +429,7 @@ public class EventResultDashboardService {
      */
     public URL tryToBuildTestsDetailsURL(CsiAggregation mv) {
         URL result = null;
-        List<Long> eventResultIds = mv.resultIdsAsList;
+        List<Long> eventResultIds = mv.underlyingEventResultsByWptDocCompleteAsList;
 
         if (!eventResultIds.isEmpty()) {
             String testsDetaialsURLAsString = grailsLinkGenerator.link([

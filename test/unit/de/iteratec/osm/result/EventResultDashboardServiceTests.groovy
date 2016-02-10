@@ -396,7 +396,7 @@ class EventResultDashboardServiceTests {
                 return 4;
             }
         };
-        assertEquals(resultIDsCount, measuredValue.countResultIds());
+        assertEquals(resultIDsCount, measuredValue.countUnderlyingEventResultsByWptDocComplete());
 
         // Simulate GrailsLinkGenerator
         LinkGenerator grailsLinkGeneratorMock = Mockito.mock(LinkGenerator.class);

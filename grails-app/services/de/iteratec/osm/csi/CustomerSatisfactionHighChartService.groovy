@@ -193,7 +193,7 @@ class CustomerSatisfactionHighChartService {
                 OsmChartPoint chartPoint = new OsmChartPoint(
                         time: getHighchartCompatibleTimestampFrom(eachCsiVal.started),
                         measuredValue: formatPercentage(eachCsiVal),
-                        countOfAggregatedResults: eachCsiVal.countResultIds(),
+                        countOfAggregatedResults: eachCsiVal.countUnderlyingEventResultsByWptDocComplete(),
                         sourceURL: getLinkFor(eachCsiVal),
                         testingAgent: null
                 )

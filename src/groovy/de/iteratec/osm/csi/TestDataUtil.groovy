@@ -711,9 +711,9 @@ class TestDataUtil {
         }
         if (weightedCsiValues.size() > 0) {
             toBeCalculated.value = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
-            toBeCalculated.addAllToResultIds(weightedCsiValues*.underlyingEventResultIds.flatten())
+            toBeCalculated.addAllToUnderlyingEventResultsByWptDocComplete(weightedCsiValues*.underlyingEventResultIds.flatten())
         } else {
-            toBeCalculated.clearResultIds()
+            toBeCalculated.clearUnderlyingEventResultsByWptDocComplete()
         }
         measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
         toBeCalculated.save(failOnError: true)
