@@ -179,4 +179,11 @@ databaseChangeLog = {
         ''')
     }
 
+    changeSet(author: "bwo", id: "1455107343000-1") {
+        sql('''
+            INSERT INTO aggregator_type (version,measurand_group,name)
+            VALUES(0, 'PERCENTAGES', 'csBasedOnVisuallyCompleteInPercentUncached'), (0, 'PERCENTAGES', 'csBasedOnVisuallyCompleteInPercentCached');
+        ''')
+    }
+
 }
