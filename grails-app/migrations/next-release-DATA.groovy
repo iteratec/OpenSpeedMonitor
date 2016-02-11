@@ -136,7 +136,8 @@ databaseChangeLog = {
                 int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
 
                 (0..amountLoops).each { loopNumber ->
-                    println "processing loop #" + loopNumber
+                    Date startOfLoop = new Date()
+                    println "start loop #${loopNumber}: ${startOfLoop}"
                     List<CsiAggregation> currentHourlyMeasuredValues = CsiAggregation.executeQuery(
                             "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
                             [aggregatorType,measuredValueInterval],
@@ -167,6 +168,8 @@ databaseChangeLog = {
                             }
                         }
                     }
+                    Date endOfLoop = new Date()
+                    println "end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime())/(1000*60)} minutes"
                 }
             }
         }
