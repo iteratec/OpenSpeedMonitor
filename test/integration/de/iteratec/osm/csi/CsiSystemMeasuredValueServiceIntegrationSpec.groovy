@@ -115,32 +115,32 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
 
         pageDailyMvs.size() == Page.count()
         !pageDailyMvs.any {
-            it.csByWptDocCompleteInPercent != null
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
 
         pageWeeklyMvs.size() == Page.count()
         !pageWeeklyMvs.any {
-            it.csByWptDocCompleteInPercent != null
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
 
         shopDailyMvs.size() == 1
         !shopDailyMvs.any {
-            it.csByWptDocCompleteInPercent != null
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
 
         shopWeeklyMvs.size() == 1
         !shopWeeklyMvs.any {
-            it.csByWptDocCompleteInPercent != null
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
 
         csiSystemDailyMvs.size() == CsiSystem.count()
         !csiSystemDailyMvs.any {
-            it.csByWptDocCompleteInPercent != null
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
 
         csiSystemWeeklyMvs.size() == CsiSystem.count()
         !csiSystemWeeklyMvs.any {
-            it.csByWptDocCompleteInPercent != null
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
         }
     }
 
@@ -161,25 +161,25 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
 
         then:
         hourlyMvs.size() == 1
-        hourlyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0],DEFAULT_MV_VALUE)
 
         pageDailyMvs.size() == Page.count()
-        pageDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(pageDailyMvs[0],DEFAULT_MV_VALUE)
 
         pageWeeklyMvs.size() == Page.count()
-        pageWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(pageWeeklyMvs[0],DEFAULT_MV_VALUE)
 
         shopDailyMvs.size() == 1
-        shopDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(shopDailyMvs[0],DEFAULT_MV_VALUE)
 
         shopWeeklyMvs.size() == 1
-        shopWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0],DEFAULT_MV_VALUE)
 
         csiSystemDailyMvs.size() == CsiSystem.count()
-        csiSystemDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(csiSystemDailyMvs[0],DEFAULT_MV_VALUE)
 
         csiSystemWeeklyMvs.size() == CsiSystem.count()
-        csiSystemWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
     }
 
     @Test
@@ -198,22 +198,22 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
 
         then:
         hourlyMvs.size() == 1
-        hourlyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0],DEFAULT_MV_VALUE)
 
         pageDailyMvs.size() == 0
 
         pageWeeklyMvs.size() == csiSystem.affectedJobGroups.size() * Page.count()
-        pageWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(pageWeeklyMvs[0],DEFAULT_MV_VALUE)
 
         shopDailyMvs.size() == 0
 
         shopWeeklyMvs.size() == csiSystem.affectedJobGroups.size()
-        shopWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0],DEFAULT_MV_VALUE)
 
         csiSystemDailyMvs.size() == 0
 
         csiSystemWeeklyMvs.size() == 1
-        csiSystemWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
     }
 
     @Test
@@ -234,37 +234,27 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
         then:
         double expectedHourlySize = 2.0
         hourlyMvs.size() == expectedHourlySize.toInteger()
-        hourlyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0],DEFAULT_MV_VALUE)
 
 
         pageDailyMvs.size() == Page.count()
-        pageDailyMvs.find {
-            it.csByWptDocCompleteInPercent == null
-        } != null
-        pageDailyMvs.find {
-            it.csByWptDocCompleteInPercent != null
-        }.csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        amountEntriesWithAndWithoutCS(pageDailyMvs, 1, 1, DEFAULT_MV_VALUE)
 
 
         pageWeeklyMvs.size() == Page.count()
-        pageWeeklyMvs.find {
-            it.csByWptDocCompleteInPercent == null
-        } != null
-        pageWeeklyMvs.find {
-            it.csByWptDocCompleteInPercent != null
-        }.csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        amountEntriesWithAndWithoutCS(pageWeeklyMvs, 1, 1, DEFAULT_MV_VALUE)
 
         shopDailyMvs.size() == 1
-        shopDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(shopDailyMvs[0],DEFAULT_MV_VALUE)
 
         shopWeeklyMvs.size() == 1
-        shopWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0],DEFAULT_MV_VALUE)
 
         csiSystemDailyMvs.size() == CsiSystem.count()
-        csiSystemDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(csiSystemDailyMvs[0],DEFAULT_MV_VALUE)
 
         csiSystemWeeklyMvs.size() == CsiSystem.count()
-        csiSystemWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
     }
 
     @Test
@@ -285,38 +275,50 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
         then:
         int expectedHourlySize = 2
         hourlyMvs.size() == expectedHourlySize
-        hourlyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(hourlyMvs[0],DEFAULT_MV_VALUE)
 
 
         int daysInInterval = (toWeekly.dayOfMonth - fromWeekly.dayOfMonth) + 1
-        pageDailyMvs.size() == Page.count() * daysInInterval
-        pageDailyMvs.find {
-            it.csByWptDocCompleteInPercent == null
-        } != null
-        pageDailyMvs.find {
-            it.csByWptDocCompleteInPercent != null
-        }.csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        int expectedDailyCsiAggregations = Page.count() * daysInInterval
+        pageDailyMvs.size() == expectedDailyCsiAggregations
+        int addedHourlyCsiAggregations = 2
+        amountEntriesWithAndWithoutCS(pageDailyMvs, addedHourlyCsiAggregations, expectedDailyCsiAggregations-addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
 
         pageWeeklyMvs.size() == Page.count()
-        pageWeeklyMvs.find {
-            it.csByWptDocCompleteInPercent == null
-        } != null
-        pageWeeklyMvs.find {
-            it.csByWptDocCompleteInPercent != null
-        }.csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        amountEntriesWithAndWithoutCS(pageWeeklyMvs, 1, 1, DEFAULT_MV_VALUE)
 
         shopDailyMvs.size() == daysInInterval
-        shopDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        amountEntriesWithAndWithoutCS(shopDailyMvs, addedHourlyCsiAggregations, daysInInterval-addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
         shopWeeklyMvs.size() == 1
-        shopWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(shopWeeklyMvs[0],DEFAULT_MV_VALUE)
 
-        csiSystemDailyMvs.size() == CsiSystem.count() * daysInInterval
-        csiSystemDailyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        int expectedDailyCsiSystemAggregations = CsiSystem.count() * daysInInterval
+        csiSystemDailyMvs.size() == expectedDailyCsiSystemAggregations
+        amountEntriesWithAndWithoutCS(shopDailyMvs, addedHourlyCsiAggregations, expectedDailyCsiSystemAggregations-addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
         csiSystemWeeklyMvs.size() == CsiSystem.count()
-        csiSystemWeeklyMvs[0].csByWptDocCompleteInPercent == DEFAULT_MV_VALUE
+        csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
+    }
+
+    private boolean csByDocCompleteAndByVisualCompleteIs(CsiAggregation csiAggregation, double expectedValue) {
+        csiAggregation.csByWptDocCompleteInPercent == expectedValue && csiAggregation.csByWptVisuallyCompleteInPercent == expectedValue
+    }
+
+    private boolean amountEntriesWithAndWithoutCS(List<CsiAggregation> list, int expectedValueWithCs, int expectedValueWithoutCs, double expectedCsValue) {
+        List<CsiAggregation> withCs = list.findAll {
+            it.csByWptDocCompleteInPercent != null && it.csByWptVisuallyCompleteInPercent != null
+        }
+        List<CsiAggregation> withoutCs = list.findAll {
+            it.csByWptDocCompleteInPercent == null && it.csByWptVisuallyCompleteInPercent == null
+        }
+
+        boolean allValuesLikeExpected = !withCs.any {
+            it.csByWptDocCompleteInPercent != expectedCsValue && it.csByWptVisuallyCompleteInPercent != expectedCsValue
+        }
+
+        return withCs.size() == expectedValueWithCs && withoutCs.size() == expectedValueWithoutCs && allValuesLikeExpected
     }
 
     private void createCommonTestData() {
@@ -390,6 +392,7 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
                 tag: measuredValueTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser1,location1),
                 csiSystem: csiSystem,
                 csByWptDocCompleteInPercent: DEFAULT_MV_VALUE,
+                csByWptVisuallyCompleteInPercent: DEFAULT_MV_VALUE,
                 closedAndCalculated: true,
                 connectivityProfile: connectivityProfile,
                 underlyingEventResultsByWptDocComplete: '1,2,3,4').save(failOnError: true)
