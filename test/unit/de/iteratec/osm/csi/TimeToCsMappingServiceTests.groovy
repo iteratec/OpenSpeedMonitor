@@ -27,7 +27,6 @@ import org.junit.Test
 
 import static org.hamcrest.Matchers.is
 import static org.hamcrest.Matchers.lessThan
-import static org.junit.Assert.assertNull
 import static org.junit.Assert.assertThat
 
 /**
@@ -70,7 +69,7 @@ class TimeToCsMappingServiceTests {
     @Test
     void testUndefinedPage() {
         //test specific mocks
-        mocker.mockTimeToCsMappingService(serviceUnderTest, mappings.get(0), frustrations)
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, mappings.get(0), frustrations)
         //test execution
         Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercent(2000, new Page(name: Page.UNDEFINED))
         //assertions
@@ -80,7 +79,7 @@ class TimeToCsMappingServiceTests {
     @Test
     void testNoTransformationPossibleForPage() {
         //test specific mocks
-        mocker.mockTimeToCsMappingService(serviceUnderTest, [], [100])
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, [], [100])
 
         //test executions and assertions
         mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_MAPPING)
@@ -101,7 +100,7 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks, test execution and assertions
-            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
@@ -124,7 +123,7 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks, test execution and assertions
-            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
@@ -148,7 +147,7 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks and test execution
-            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
@@ -175,7 +174,7 @@ class TimeToCsMappingServiceTests {
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks and test execution
-            mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
+            mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
                 Page page = new Page(name: pageName, weight: 1)
@@ -201,29 +200,29 @@ class TimeToCsMappingServiceTests {
         Page page = new Page(name: "HP_entry", weight: 1)
 
         //with valid frustrations for page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
         assertThat(service.validFrustrationsExistFor(page), is(true))
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100, 200])
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100, 200])
         assertThat(service.validFrustrationsExistFor(page), is(true))
 
         //without frustrations for page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [])
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
         //with invalid frustrations for page: just one frustration
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100])
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
         //with invalid frustrations for page: just one frustration
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [1000, 1000, 1000, 1000])
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [1000, 1000, 1000, 1000])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
         //with valid frustrations but null as page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
         assertThat(service.validFrustrationsExistFor(null), is(false))
 
         //with valid frustrations but UNDEFINED page
-        mocker.mockTimeToCsMappingService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations)
+        mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations)
         assertThat(service.validFrustrationsExistFor(new Page(name: Page.UNDEFINED, weight: 0)), is(false))
 
     }

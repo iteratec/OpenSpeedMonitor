@@ -437,7 +437,7 @@ class ServiceMocker {
 	 * @param frustrations
 	 * 		To be returned from method {@link de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
 	 */
-	void mockTimeToCsMappingService(serviceToMockIn, timeToCsMappings, frustrations){
+	void mockTimeToCsMappingCacheService(serviceToMockIn, timeToCsMappings, frustrations){
 		def timeToCsMappingCacheService = mockFor(TimeToCsMappingCacheService)
 
 		timeToCsMappingCacheService.demand.getMappingsFor(0..100000) {Page page ->
@@ -458,7 +458,7 @@ class ServiceMocker {
 	void mockTTCsMappingService(serviceToMockIn){
 		def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
 		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
-			return null
+			return 1
 		}
 		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
 			//not the concern of this test

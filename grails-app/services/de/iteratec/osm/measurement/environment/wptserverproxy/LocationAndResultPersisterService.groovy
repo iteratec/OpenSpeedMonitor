@@ -432,6 +432,9 @@ class LocationAndResultPersisterService implements iListener{
 			CsiConfiguration csiConfigurationOfResult = result.jobResult.job.jobGroup.csiConfiguration
 			log.debug("result.CsiConfiguration=${csiConfigurationOfResult}")
             result.csByWptDocCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage,csiConfigurationOfResult)
+			if(result.visuallyCompleteInMillisecs) {
+				result.csByWptVisuallyCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(result.visuallyCompleteInMillisecs, step.testedPage,csiConfigurationOfResult)
+			}
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}

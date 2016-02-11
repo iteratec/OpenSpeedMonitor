@@ -18,10 +18,11 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.transformation.TimeToCsMappingService
+import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
@@ -52,11 +53,12 @@ import static org.junit.Assert.*
  * @author nkuhn
  * @see {@link ProxyService}
  * 
- * @deprecated This test is to complicated - make it simpler!
+ * TODO: This test is to complicated - make it simpler!
  */
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry, CsiConfiguration, TimeToCsMapping])
 class PersistingNewEventResultsTests {
+	private static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
 
 	WebPageTestServer server1, server2
 	
@@ -173,6 +175,7 @@ class PersistingNewEventResultsTests {
         createTestDataCommonForAllTests()
 		
 		//mocks common for all tests
+		SERVICE_MOCKER.mockTTCsMappingService(serviceUnderTest)
 		mockMetricReportingService()
 		mockHarParserService()
 		
@@ -353,6 +356,44 @@ class PersistingNewEventResultsTests {
 		assertTrue(tokensCached[1].contains(xmlResult.data.testId.toString()))
 		assertTrue(tokensCached[2].contains("1"))
 		assertTrue(tokensCached[3].contains("1#waterfall_viewHPArtikel suchen"))
+	}
+
+	@Test
+	void testCreatedEventsAfterListeningToMultistepResultHasCsByVisuallyComplete(){
+
+		//create test-specific data
+		String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
+		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+		GPathResult xmlResult = new XmlSlurper().parse(file)
+		String har = new File('test/resources/HARs/singleResult.har').getText()
+		createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
+
+		//mocking of inner services
+
+		mockMeasuredValueUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
+		mockPageService()
+		mockJobService()
+		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		deleteAllRelevantDomains()
+
+		//test execution
+
+		serviceUnderTest.listenToResult(xmlResult, har, server1)
+
+		//assertions
+
+		List<EventResult> events = EventResult.list()
+		assertEquals('Count of events', 15, events.size())
+
+
+		//check all EventResults have visualComplete
+		boolean allHaveVisualComplete = !events.any { it.visuallyCompleteInMillisecs == null }
+		assertTrue(allHaveVisualComplete)
+
+		//check all EventResults have set csByVisualComplete
+		boolean allHaveCsByVisualComplete = !events.any { it.csByWptVisuallyCompleteInPercent == null }
+		assertTrue(allHaveCsByVisualComplete)
 	}
 	
 	@Test
@@ -816,9 +857,6 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.browserService = browserService.createMock()
 	}
-	private void mockTimeToCsMappingService(){
-		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-	}
 	private void mockMeasuredValueUpdateService(){
 		def measuredValueUpdateServiceMocked = mockFor(MeasuredValueUpdateService, true)
 		measuredValueUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
@@ -980,5 +1018,10 @@ class PersistingNewEventResultsTests {
         TestDataUtil.createJob('IE_otto_hp_singlestep', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
         TestDataUtil.createJob('HP:::FF_BV1_Step01_Homepage - netlab', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
         TestDataUtil.createJob('example.de - Multiple steps with event names + dom elements', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+		TestDataUtil.createJob('FF_Otto_multistep', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+
+		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+		csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages(Page.list())
+		undefinedJobGroup.csiConfiguration = csiConfiguration
     }
 }
