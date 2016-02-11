@@ -103,6 +103,7 @@ class MeasuredValueDaoService {
 			AggregatorType aggregator,
 			List<CsiSystem> csiSystems
 							   ){
+		toDate = fromDate == toDate ? toDate + interval.intervalInMinutes : toDate
 		//TODO: optimize query to something like:
 		//findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndCsiSystemInListAndTagRlike
 		//... which works in running App, but NOT in unit-tests!
@@ -134,6 +135,7 @@ class MeasuredValueDaoService {
 			List<ConnectivityProfile> connectivityProfiles
 							   ){
 		List<CsiAggregation> result
+		toDate = fromDate == toDate ? toDate + interval.intervalInMinutes : toDate
 
 		//TODO: optimize query to something like:
 		//findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndConnectivityProfileInListAndTagRlike
