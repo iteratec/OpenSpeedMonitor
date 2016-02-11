@@ -16,7 +16,6 @@
 */
 //= require prettycron/prettycronManifest.js
 //= require tagit/tagit.js
-//= require tagit/tagit.js
 //= require_self
 function doOnDomReady(
     newJob,

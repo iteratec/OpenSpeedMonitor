@@ -21,6 +21,8 @@ GSP-Template Mappings:
 * selectedAllLocations
  --%>
 <div class="row">
+
+    %{--JobGroups----------------------------------------------------------------------------------------------}%
     <div class="span4">
         <div style="padding-top: 60px;"></div>
         <label for="folderSelectHtmlId">
@@ -29,11 +31,30 @@ GSP-Template Mappings:
             </strong>
         </label>
         <g:select id="folderSelectHtmlId" class="iteratec-element-select"
-                  name="selectedFolder" from="${folders}" optionKey="id"
-                  optionValue="name" value="${selectedFolder}"
-                  multiple="true"/>
+            name="selectedFolder" from="${folders}" optionKey="id"
+            optionValue="name" value="${selectedFolder}"
+            multiple="true"/>
+        <div class="btn-group" data-toggle="buttons-radio">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-mini" onclick="filterJobGroupSelect('')">
+                        <i class="fa fa-remove"></i>&nbsp;<g:message code="de.iteratec.osm.ui.filter.clear" default="Clear filter"/>
+                    </button>
+                </div>
+                <g:each in="${tagToJobGroupNameMap.keySet().collate(5)}" var="tagSubset">
+                    <div class="btn-group-justified">
+                        <div class="btn-group">
+                            <g:each in="${tagSubset}" var="tag">
+                                <button type="button" class="btn btn-mini" onclick="filterJobGroupSelect('${tag}')">
+                                    <i class="fa fa-filter"></i>&nbsp;${tag}
+                                </button>
+                            </g:each>
+                        </div>
+                    </div>
+                </g:each>
+        </div>
     </div>
 
+    %{--the rest----------------------------------------------------------------------------------------------}%
     <div id="filter-complete-tabbable">
 
         <div class="span7 tabbable">
@@ -141,60 +162,76 @@ GSP-Template Mappings:
                     </div>
                 </div>
                 <g:if test="${showConnectivitySettings}">
-                        <div class="tab-pane" id="tab3">
-                            <div class="span6">
-                                <label for="selectedConnectivityProfilesHtmlId">
-                                    <strong>
-                                        <g:message code="de.iteratec.isr.wptrd.labels.filterConnectivityProfile"
-                                                   default="Connectivity Profiles:"/>
-                                        (<a href="${g.createLink(controller: 'ConnectivityProfile', action: 'list', absolute: true)}">
-                                        <g:message code="de.iteratec.osm.result.predefined.linktext"
-                                                   default="predefined"/>
-                                    </a>):
-                                    </strong>
-                                </label>
-                                <g:select id="selectedConnectivityProfilesHtmlId"
-                                          class="iteratec-element-select"
-                                          name="selectedConnectivityProfiles" from="${connectivityProfiles}" optionKey="id"
-                                          optionValue="name" multiple="true"
-                                          value="${selectedConnectivityProfiles}"/>
+                    <div class="tab-pane" id="tab3">
+                        <div class="span6">
+                            <label for="selectedConnectivityProfilesHtmlId">
+                                <strong>
+                                    <g:message code="de.iteratec.isr.wptrd.labels.filterConnectivityProfile"
+                                               default="Connectivity Profiles:"/>
+                                    (<a href="${g.createLink(controller: 'ConnectivityProfile', action: 'list', absolute: true)}">
+                                    <g:message code="de.iteratec.osm.result.predefined.linktext"
+                                               default="predefined"/>
+                                </a>):
+                                </strong>
+                            </label>
+                            <g:select id="selectedConnectivityProfilesHtmlId"
+                                      class="iteratec-element-select"
+                                      name="selectedConnectivityProfiles" from="${connectivityProfiles}" optionKey="id"
+                                      optionValue="name" multiple="true"
+                                      value="${selectedConnectivityProfiles}"/>
+                            <label class="checkbox inline">
+                                <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
+                                            checked="${selectedAllConnectivityProfiles}" value="${true}"/>
+                                <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
+                                           default="Select all Connectivity Profiles"/>
+                            </label>
+                            <g:if test="${showExtendedConnectivitySettings}">
+                                <br>
                                 <label class="checkbox inline">
-                                    <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
-                                                checked="${selectedAllConnectivityProfiles}" value="${true}"/>
-                                    <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
-                                               default="Select all Connectivity Profiles"/>
+                                    <g:checkBox name="includeNativeConnectivity" id="includeNativeConnectivity"
+                                                checked="${includeNativeConnectivity}" value="${true}"/>
+                                    <g:message code="de.iteratec.osm.result.include-native-connectivity.label"
+                                               default="Show measurements with native connectivity"/>
                                 </label>
-                                <g:if test="${showExtendedConnectivitySettings}">
-                                    <br>
-                                    <label class="checkbox inline">
-                                        <g:checkBox name="includeNativeConnectivity" id="includeNativeConnectivity"
-                                                    checked="${includeNativeConnectivity}" value="${true}"/>
-                                        <g:message code="de.iteratec.osm.result.include-native-connectivity.label"
-                                                   default="Show measurements with native connectivity"/>
-                                    </label>
-                                    <label for="customConnectivityName">
-                                        <g:checkBox name="includeCustomConnectivity" id="includeCustomConnectivity"
-                                                    checked="${includeCustomConnectivity}" value="${true}"/>
-                                        <g:message code="de.iteratec.osm.result.include-custom-connectivity.label"
-                                                   default="Show measurements with custom connectivity (filter by regex expression):"/>
-                                    </label>
-                                    <g:textField name="customConnectivityName" class="form-control input-xxlarge"
-                                                 value="${customConnectivityName}" id="customConnectivityName"
-                                                 placeholder="${g.message(code: 'de.iteratec.osm.result.filter-custom-connectivity.placeholder', default: 'Search via regex')}"
-                                                 disabled="${!includeCustomConnectivity}">
-                                    </g:textField>
-                                    <br>
-                                    <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"
-                                       target="_blank">
-                                        <g:message code="de.iteratec.osm.result.connectivity.regex.link.label" default="https://en.wikipedia.org/wiki/Regular_expression#Syntax" />
-                                    </a>
-                                </g:if>
-                            </div>
+                                <label for="customConnectivityName">
+                                    <g:checkBox name="includeCustomConnectivity" id="includeCustomConnectivity"
+                                                checked="${includeCustomConnectivity}" value="${true}"/>
+                                    <g:message code="de.iteratec.osm.result.include-custom-connectivity.label"
+                                               default="Show measurements with custom connectivity (filter by regex expression):"/>
+                                </label>
+                                <g:textField name="customConnectivityName" class="form-control input-xxlarge"
+                                             value="${customConnectivityName}" id="customConnectivityName"
+                                             placeholder="${g.message(code: 'de.iteratec.osm.result.filter-custom-connectivity.placeholder', default: 'Search via regex')}"
+                                             disabled="${!includeCustomConnectivity}">
+                                </g:textField>
+                                <br>
+                                <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"
+                                   target="_blank">
+                                    <g:message code="de.iteratec.osm.result.connectivity.regex.link.label" default="https://en.wikipedia.org/wiki/Regular_expression#Syntax" />
+                                </a>
+                            </g:if>
                         </div>
-                    </g:if>
+                    </div>
+                </g:if>
             </div>
         </div>
 
     </div>
 
 </div>
+<asset:script type="text/javascript">
+
+    var tagToJobGroupNameMap = ${tagToJobGroupNameMap as grails.converters.JSON};
+    var jobGroupOptions = $('#folderSelectHtmlId option').clone();
+
+    var filterJobGroupSelect = function(filterText){
+
+        $('#folderSelectHtmlId').empty();
+
+        var jobGroupNamesToShow = tagToJobGroupNameMap[filterText];
+        jobGroupOptions.filter(function (idx, jobGroupOption) {
+            return (filterText === '' || $.inArray($(jobGroupOption).text(), jobGroupNamesToShow) > -1);
+        }).appendTo('#folderSelectHtmlId');
+
+    }
+</asset:script>
