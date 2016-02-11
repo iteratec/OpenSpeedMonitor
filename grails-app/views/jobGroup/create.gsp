@@ -7,6 +7,7 @@
 	<meta name="layout" content="kickstart" />
 	<g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" />
 	<title><g:message code="default.create.label" args="[entityName]" /></title>
+    <asset:stylesheet src="tagit.css"/>
 </head>
 
 <body>
@@ -30,6 +31,15 @@
 	</g:form>
 	
 </section>
+
+<content tag="include.bottom">
+    <asset:javascript src="tagit/tagit.js"/>
+    <asset:script type="text/javascript">
+        $(document).ready(function() {
+            $("ul[name='tags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags', absolute: true)}'});
+        });
+    </asset:script>
+</content>
 		
 </body>
 

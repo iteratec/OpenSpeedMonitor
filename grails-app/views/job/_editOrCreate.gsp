@@ -66,7 +66,6 @@
         </section>
         <content tag="include.bottom">
             <asset:javascript src="prettycron/prettycronManifest.js"/>
-            <asset:javascript src="tagit/tagit.js"/>
             <asset:javascript src="job/edit.js"/>
             <asset:javascript src="timeago/futureOnlyTimeago.js"/>
             <g:if test="${org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).language.equals('de')}">

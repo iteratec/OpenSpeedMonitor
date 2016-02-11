@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
+import org.grails.taggable.Taggable
 
 @Deprecated
 public enum JobGroupType {
@@ -37,7 +38,7 @@ public enum JobGroupType {
  * @author nkuhn
  *
  */
-class JobGroup {
+class JobGroup implements Taggable{
 
     /**
      * The name for an undefined JobGroup, respectively CSI. Please use {@link #isUndefinedCsiJobGroup()}

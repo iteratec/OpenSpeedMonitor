@@ -60,7 +60,6 @@ class EventResultDashboardController {
     PageDaoService pageDaoService
     BrowserDaoService browserDaoService
     LocationDaoService locationDaoService
-    EventResultService eventResulshowatService
     MeasuredValueUtilService measuredValueUtilService
     EventResultDashboardService eventResultDashboardService
     PageService pageService
@@ -709,6 +708,8 @@ class EventResultDashboardController {
 
         result.put("selectedChartType", 0);
         result.put("warnAboutExceededPointsPerGraphLimit", false);
+
+        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result;

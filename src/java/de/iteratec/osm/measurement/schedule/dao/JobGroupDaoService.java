@@ -21,6 +21,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,4 +72,26 @@ public interface JobGroupDaoService {
 	 *         {@linkplain Collection#isEmpty() empty}.
 	 */
 	public Set<JobGroup> findCSIGroups();
+
+    /**
+     * Returns all tags added to {@link JobGroup}s.
+     * Identical tags of multiple {@link JobGroup}s get returned just once.
+     * @return
+     */
+    public List<String> getAllUniqueTags();
+    /**
+     * Returns at most maxNumberOfTags tags added to {@link JobGroup}s.
+     * Identical tags of multiple {@link JobGroup}s get returned just once.
+     * @return
+     */
+    public List<String> getMaxUniqueTags(int maxNumberOfTags);
+
+    /**
+     * Returns a Map with all existing {@link JobGroup} tags as keys and
+     * a list of all {@link JobGroup} names which contain that tag.
+     *
+     * @return A Map with all existing {@link JobGroup} tags as keys and
+     * a list of all {@link JobGroup} names which contain that tag.
+     */
+    public Map<String, List<String>> getTagToJobGroupNameMap();
 }

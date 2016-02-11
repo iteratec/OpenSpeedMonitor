@@ -988,6 +988,7 @@ class CsiDashboardController {
         }
         result.put('locationsOfBrowsers', locationsOfBrowsers)
         result.put('defaultChartTitle', csiHelperService.getCsiChartDefaultTitle())
+        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result
