@@ -104,9 +104,9 @@ class MeasuredValueDaoService {
 			List<CsiSystem> csiSystems
 							   ){
 		//TODO: optimize query to something like:
-		//findAllByStartedBetweenAndIntervalAndAggregatorAndCsiSystemInListAndTagRlike
+		//findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndCsiSystemInListAndTagRlike
 		//... which works in running App, but NOT in unit-tests!
-		List<CsiAggregation> result =  CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregator(fromDate,toDate,interval,aggregator)
+		List<CsiAggregation> result =  CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate,toDate,toDate,interval,aggregator)
 		result.findAll {
 			csiSystems.contains(it.csiSystem)
 		}
@@ -133,14 +133,15 @@ class MeasuredValueDaoService {
 			AggregatorType aggregator,
 			List<ConnectivityProfile> connectivityProfiles
 							   ){
-		//TODO: optimize query to something like:
-		//findAllByStartedBetweenAndIntervalAndAggregatorAndConnectivityProfileInListAndTagRlike
-		//... which works in running App, but NOT in unit-tests!
 		List<CsiAggregation> result
+
+		//TODO: optimize query to something like:
+		//findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndConnectivityProfileInListAndTagRlike
+		//... which works in running App, but NOT in unit-tests!
 		if(osmDataSourceService.getRLikeSupport()){
-			result =  CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregatorAndTagRlike(fromDate,toDate,interval,aggregator,rlikePattern)
+			result =  CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndTagRlike(fromDate,toDate,toDate,interval,aggregator,rlikePattern)
 		} else {
-			result = CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregator(fromDate, toDate, interval, aggregator)
+			result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate, toDate, toDate, interval, aggregator)
 			result.grep{ it.tag ==~ rlikePattern }
 		}
 

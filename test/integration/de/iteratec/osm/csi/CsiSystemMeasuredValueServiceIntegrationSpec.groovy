@@ -265,7 +265,8 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
 
         when:
         List<CsiAggregation> hourlyMvs = eventMeasuredValueService.getHourylMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> pageDailyMvs1 = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> pageDailyMvs2 = pageMeasuredValueService.findAll(fromWeekly.toDate(), toWeekly.toDate(), daily)
         List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),weekly, [jobGroup1])
         List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
         List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),weekly, [jobGroup1])
@@ -280,9 +281,10 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
 
         int daysInInterval = (toWeekly.dayOfMonth - fromWeekly.dayOfMonth) + 1
         int expectedDailyCsiAggregations = Page.count() * daysInInterval
-        pageDailyMvs.size() == expectedDailyCsiAggregations
+        pageDailyMvs1.size() == expectedDailyCsiAggregations
+        pageDailyMvs1 == pageDailyMvs2
         int addedHourlyCsiAggregations = 2
-        amountEntriesWithAndWithoutCS(pageDailyMvs, addedHourlyCsiAggregations, expectedDailyCsiAggregations-addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
+        amountEntriesWithAndWithoutCS(pageDailyMvs1, addedHourlyCsiAggregations, expectedDailyCsiAggregations-addedHourlyCsiAggregations, DEFAULT_MV_VALUE)
 
 
         pageWeeklyMvs.size() == Page.count()
