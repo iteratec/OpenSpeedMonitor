@@ -207,7 +207,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         when:
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
-				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked
+				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked, CsiType.doc_complete
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
@@ -234,7 +234,8 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedPageMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 new MvQueryParams(),
-                weekly
+                weekly,
+				CsiType.doc_complete
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> pointsGroupPageCombination_11 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_11).getPoints();
@@ -268,7 +269,8 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
-                new MvQueryParams()
+                new MvQueryParams(),
+				CsiType.doc_complete
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -297,7 +299,8 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
-                new MvQueryParams()
+                new MvQueryParams(),
+				CsiType.doc_complete
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -326,7 +329,8 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
-                new MvQueryParams()
+                new MvQueryParams(),
+				CsiType.doc_complete
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -355,7 +359,8 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
-                new MvQueryParams()
+                new MvQueryParams(),
+				CsiType.doc_complete
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()

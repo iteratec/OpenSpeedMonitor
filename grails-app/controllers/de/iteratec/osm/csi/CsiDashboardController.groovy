@@ -322,34 +322,34 @@ class CsiDashboardController {
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams()
-
+        CsiType csiType = CsiType.doc_complete
         switch (cmd.aggrGroupAndInterval) {
             case WEEKLY_AGGR_GROUP_PAGE:
                 MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph)
+                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, csiType)
                 break
             case DAILY_AGGR_GROUP_PAGE:
                 MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph)
+                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, csiType)
                 break
             case WEEKLY_AGGR_GROUP_SHOP:
                 MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false)
+                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false, csiType)
                 break
             case DAILY_AGGR_GROUP_SHOP:
                 MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false)
+                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false, csiType)
                 break
             case WEEKLY_AGGR_GROUP_SYSTEM:
                 MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, cmd.selectedCsiSystems, withTargetGraph, false)
+                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, cmd.selectedCsiSystems, withTargetGraph, false, csiType)
                 break
             case DAILY_AGGR_GROUP_SYSTEM:
                 MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, cmd.selectedCsiSystems, withTargetGraph, false)
+                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, cmd.selectedCsiSystems, withTargetGraph, false, csiType)
                 break
             default: // AggregatorType.MEASURED_EVENT
-                fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
+                fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams, csiType)
                 break
         }
         if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
@@ -378,13 +378,13 @@ class CsiDashboardController {
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      */
-    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph) {
+    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, CsiType csiType) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
 
-        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval)
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval, csiType)
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
@@ -400,11 +400,10 @@ class CsiDashboardController {
         //add / remove 5 Minutes
         modelToRender.put('fromTimestampForHighChart', (resetFromDate.toDate().getTime() - 300000))
         modelToRender.put('toTimestampForHighChart', (resetToDate.toDate().getTime() + 300000))
+        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('wptCustomerSatisfactionValues', graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
-
-        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -430,13 +429,13 @@ class CsiDashboardController {
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.
      */
-    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams) {
+    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams, CsiType csiType) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY)
 
         OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
-                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams
+                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams, csiType
         )
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
@@ -448,10 +447,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDate.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDate.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues', chart.osmChartGraphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(chart.osmChartGraphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), chart.osmChartGraphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(chart.osmChartGraphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', false)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -509,14 +508,15 @@ class CsiDashboardController {
             MeasuredValueInterval interval,
             MvQueryParams measuredValuesQueryParams,
             boolean withTargetGraph,
-            boolean moveGraphsByOneWeek) {
+            boolean moveGraphsByOneWeek,
+            CsiType csiType) {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
 
         OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedShopMeasuredValuesAsHighChartMap(
-                fixedTimeFrame, interval, measuredValuesQueryParams
+                fixedTimeFrame, interval, measuredValuesQueryParams, csiType
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
@@ -540,10 +540,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues', graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -578,7 +578,8 @@ class CsiDashboardController {
             MeasuredValueInterval interval,
             Set<Long> selectedCsiSystems,
             boolean withTargetGraph,
-            boolean moveGraphsByOneWeek) {
+            boolean moveGraphsByOneWeek,
+            CsiType csiType) {
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
@@ -586,7 +587,7 @@ class CsiDashboardController {
         DateTime resetToDate = fixedTimeFrame.getEnd()
 
         OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedCsiSystemMeasuredValuesAsHighChartMap(
-                fixedTimeFrame, interval, selectedCsiSystems
+                fixedTimeFrame, interval, selectedCsiSystems, csiType
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
@@ -610,10 +611,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues', graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)

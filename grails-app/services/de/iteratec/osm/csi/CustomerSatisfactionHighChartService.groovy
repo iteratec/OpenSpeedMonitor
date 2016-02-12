@@ -91,12 +91,12 @@ class CustomerSatisfactionHighChartService {
 	 * @param mvQueryParams The query parameters to find hourly values, not <code>null</code>.
 	 * @return not <code>null</code>.
 	 */
-	OsmRickshawChart getCalculatedHourlyEventMeasuredValuesAsHighChartMap(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
+	OsmRickshawChart getCalculatedHourlyEventMeasuredValuesAsHighChartMap(Date fromDate, Date toDate, MvQueryParams mvQueryParams, CsiType csiType) {
 		List<OsmChartGraph> resultList = []
 
 		List<CsiAggregation> csiValues = eventMeasuredValueService.getHourylMeasuredValues(fromDate, toDate, mvQueryParams)
 
-		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
+		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues, csiType))
 	}
 
 	/**
@@ -117,7 +117,7 @@ class CustomerSatisfactionHighChartService {
 	 * @return not <code>null</code>.
 	 * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
 	 */
-	OsmRickshawChart getCalculatedPageMeasuredValuesAsHighChartMap(Interval timeFrame, MvQueryParams queryParams, MeasuredValueInterval mvInterval) {
+	OsmRickshawChart getCalculatedPageMeasuredValuesAsHighChartMap(Interval timeFrame, MvQueryParams queryParams, MeasuredValueInterval mvInterval, CsiType csiType) {
 
 		"Customer satisfaction index (CSI)"
 
@@ -128,7 +128,7 @@ class CustomerSatisfactionHighChartService {
 		List<CsiAggregation> csiValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromDate, toDate, mvInterval, csiGroups, pages)
         log.debug("Number of MeasuredValues got from PageMeasuredValueService: ${csiValues.size()}")
 
-		OsmRickshawChart chart = osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
+		OsmRickshawChart chart = osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues, csiType))
         log.debug("Number of ChartGraphs made from MeasuredValues: ${chart.osmChartGraphs.size()}")
         log.debug("Number of points in each ChartGraph made from MeasuredValues: ${chart.osmChartGraphs*.points.size()}")
 
@@ -150,7 +150,7 @@ class CustomerSatisfactionHighChartService {
      * @return not <code>null</code>.
      * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
      */
-    OsmRickshawChart getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams) {
+    OsmRickshawChart getCalculatedShopMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, MvQueryParams queryParams, CsiType csiType) {
         List<OsmChartGraph> resultList = []
 
         Date fromDate = timeFrame.getStart().toDate();
@@ -158,7 +158,7 @@ class CustomerSatisfactionHighChartService {
         List<JobGroup> csiGroups = queryParams.jobGroupIds.collectNested { JobGroup.get(it) };
         List<CsiAggregation> csiValues = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromDate, toDate, interval, csiGroups)
 
-        return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
+        return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues, csiType))
     }
 
 	/**
@@ -173,7 +173,7 @@ class CustomerSatisfactionHighChartService {
 	 * @return A list of graphs sorted ascending by {@link
 	 *         OsmChartGraph#getLabel()}; never <code>null</code>.
 	 */
-	private List<OsmChartGraph> convertToHighchartGraphList(Collection<CsiAggregation> csiValues) {
+	private List<OsmChartGraph> convertToHighchartGraphListTemplate(Collection<CsiAggregation> csiValues, Closure getValue) {
 		// Cache of already added graphs by tag
 		Map<String, OsmChartGraph> tagToGraph=new HashMap<String, OsmChartGraph>();
 
@@ -181,7 +181,7 @@ class CustomerSatisfactionHighChartService {
 
 		for( CsiAggregation eachCsiVal : csiValues) {
 
-			if (eachCsiVal.csByWptDocCompleteInPercent) {
+			if (getValue(eachCsiVal)) {
 
 				if(!tagToGraph.containsKey(eachCsiVal.getTag())) {
 					OsmChartGraph graph=new OsmChartGraph();
@@ -192,7 +192,7 @@ class CustomerSatisfactionHighChartService {
 
                 OsmChartPoint chartPoint = new OsmChartPoint(
                         time: getHighchartCompatibleTimestampFrom(eachCsiVal.started),
-                        measuredValue: formatPercentage(eachCsiVal),
+                        measuredValue: formatPercentage(getValue(eachCsiVal)),
                         countOfAggregatedResults: eachCsiVal.countUnderlyingEventResultsByWptDocComplete(),
                         sourceURL: getLinkFor(eachCsiVal),
                         testingAgent: null
@@ -208,8 +208,26 @@ class CustomerSatisfactionHighChartService {
 		return graphs;
 	}
 
-    double formatPercentage(value){
-        BigDecimal valueForRounding = new BigDecimal(value.csByWptDocCompleteInPercent)
+	private List<OsmChartGraph> convertToHighchartGraphListVisuallyCompleteBased(Collection<CsiAggregation> csiValues ){
+		return convertToHighchartGraphListTemplate(csiValues){CsiAggregation it -> it.csByWptVisuallyCompleteInPercent}
+	}
+
+	private List<OsmChartGraph> convertToHighchartGraphListDocCompleteBased(Collection<CsiAggregation> csiValues){
+		return convertToHighchartGraphListTemplate(csiValues){CsiAggregation it -> it.csByWptDocCompleteInPercent}
+	}
+
+	private List<OsmChartGraph> convertToHighchartGraphList(Collection<CsiAggregation> csiValues, CsiType csiType){
+		switch (csiType){
+			case CsiType.doc_complete:
+				return  convertToHighchartGraphListDocCompleteBased(csiValues)
+			case CsiType.visually_complete:
+				return  convertToHighchartGraphListVisuallyCompleteBased(csiValues)
+			default: return []
+		}
+	}
+
+    double formatPercentage(double value){
+        BigDecimal valueForRounding = new BigDecimal(value)
         return valueForRounding.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()
     }
     void sortPointsInAllGraphsByTime(List<OsmChartGraph> graphs){
@@ -425,12 +443,12 @@ class CustomerSatisfactionHighChartService {
 	 * @return not <code>null</code>.
 	 * @see CustomerSatisfactionHighChartService#convertToHighChartMap(List, AggregatorType)
 	 */
-	OsmRickshawChart getCalculatedCsiSystemMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, Set<Long> selectedCsiSystems) {
+	OsmRickshawChart getCalculatedCsiSystemMeasuredValuesAsHighChartMap(Interval timeFrame, MeasuredValueInterval interval, Set<Long> selectedCsiSystems, CsiType csiType) {
 		Date fromDate = timeFrame.getStart().toDate();
 		Date toDate = timeFrame.getEnd().toDate();
 		List<CsiSystem> csiSystems = CsiSystem.getAll(selectedCsiSystems)
 		List<CsiAggregation> csiValues = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromDate, toDate, interval, csiSystems)
 
-		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues))
+		return osmChartProcessingService.summarizeCsiGraphs(convertToHighchartGraphList(csiValues, csiType))
 	}
 }

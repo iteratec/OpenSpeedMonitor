@@ -279,7 +279,7 @@
     </div>
 </div>
 
-<g:if test="${wptCustomerSatisfactionValues}">
+<g:if test="${wptCustomerSatisfactionValues_doc_complete}">
     <hr>
 
     <div class="row">
@@ -332,7 +332,7 @@
                 <g:render template="/highchart/chart"
                           model="[
                                   singleYAxis                  : 'false',
-                                  chartData                    : wptCustomerSatisfactionValues,
+                                  chartData                    : wptCustomerSatisfactionValues_doc_complete,
                                   chartTitle                   : chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                   initialChartWidth            : chartWidth,
@@ -346,7 +346,9 @@
                                   yAxisScalable                : 'false',
                                   optimizeForExport            : 'false',
                                   openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
-                                  annotations                  : annotations]"/>
+                                  annotations                  : annotations,
+                                  labelSummary                 : labelSummary_doc_complete
+                                  ]"/>
             </div>
         </div>
         <%-- table --%>
@@ -356,12 +358,12 @@
                     <g:message error="${flash.tableDataError}"/>
                 </div>
             </g:if>
-            <g:if test="${wptCustomerSatisfactionValuesForTable != null}">
+            <g:if test="${wptCustomerSatisfactionValuesForTable_doc_complete != null}">
                 <table class="table table-bordered">
                     <tbody>
                     <tr>
                         <td class="text-info">
-                            ${wptCustomerSatisfactionValuesForTable.replace(';', '</td><td class="text-info">').replace('\n', '</td></tr><tr><td class="text-info">')}
+                            ${wptCustomerSatisfactionValuesForTable_doc_complete.replace(';', '</td><td class="text-info">').replace('\n', '</td></tr><tr><td class="text-info">')}
                         </td>
                     </tr>
                     </tbody>
