@@ -271,12 +271,6 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "csi_aggregation_underlying_event_results_by_visually_complete_id", baseTableName: "csi_aggregation_event_result", constraintName: "FK4579D78978BC1A0C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_aggregation", referencesUniqueColumn: "false")
     }
 
-    changeSet(author: "birger (generated)", id: "1455031326389-8") {
-        createIndex(indexName: "FK4579D789CA94DFB", tableName: "csi_aggregation_event_result") {
-            column(name: "event_result_id")
-        }
-    }
-
     changeSet(author: "bka", id: "1455031326389-9") {
         renameColumn(tableName: "event_result", oldColumnName: "customer_satisfaction_in_percent", newColumnName: "cs_by_wpt_doc_complete_in_percent", columnDataType: "double precision")
     }
