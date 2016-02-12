@@ -209,7 +209,7 @@ GSP-Template Mappings:
                             </g:if>
                         </div>
                     </div>
-                </g:if>
+                </div>
             </div>
         </div>
 
