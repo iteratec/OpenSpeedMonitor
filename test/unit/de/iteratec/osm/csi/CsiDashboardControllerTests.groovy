@@ -955,7 +955,7 @@ class CsiDashboardControllerTests {
 
         // Verify result (lists should be sorted by UI visible name or label):
         assertNotNull(result);
-        assertEquals(14, result.size());
+        assertEquals(15, result.size());
 
         // AggregatorType
         assertTrue(result.containsKey('aggrGroupLabels'))
@@ -1129,7 +1129,7 @@ class CsiDashboardControllerTests {
 
         // Verify result (lists should be sorted by UI visible name or label):
         assertNotNull(result);
-        assertEquals(14, result.size());
+        assertEquals(15, result.size());
 
         // AggregatorType
         assertTrue(result.containsKey('aggrGroupLabels'))
