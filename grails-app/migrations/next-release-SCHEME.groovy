@@ -147,7 +147,7 @@ databaseChangeLog = {
     }
 
     changeSet(author: "bwo (generated)", id: "1453899727017-10") {
-        dropIndex(indexName: "full_hour", tableName: "hour_of_day")
+        dropIndex(indexName: "full_hour_uniq_1447946152077", tableName: "hour_of_day")
     }
 
     // [END] changes for custom event result dashboard /////////////////////////////////////////////////////////////////////
