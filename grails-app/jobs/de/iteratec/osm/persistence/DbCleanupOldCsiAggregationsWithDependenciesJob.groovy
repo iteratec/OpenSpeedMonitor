@@ -6,7 +6,7 @@ import org.joda.time.DateTime
 import org.quartz.JobExecutionException
 
 
-class DbCleanupOldMeasuredValuesWithDependenciesJob {
+class DbCleanupOldCsiAggregationsWithDependenciesJob {
 
     DbCleanupService dbCleanupService
     ConfigService configService
@@ -18,13 +18,13 @@ class DbCleanupOldMeasuredValuesWithDependenciesJob {
         /**
          * Each Day at 3:00 am.
          */
-        cron(name: 'DailyOldMeasuredValuesWithDependenciesCleanup', cronExpression: '0 0 3 ? * *')
+        cron(name: 'DailyOldCsiAggregationsWithDependenciesCleanup', cronExpression: '0 0 3 ? * *')
     }
 
     def execute() {
         if(inMemoryConfigService.isDatabaseCleanupEnabled()) {
             Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
-            dbCleanupService.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(toDeleteResultsBefore, createBatchActivity)
+            dbCleanupService.deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore(toDeleteResultsBefore, createBatchActivity)
         }
     }
 }

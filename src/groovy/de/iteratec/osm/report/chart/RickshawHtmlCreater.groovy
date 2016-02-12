@@ -155,10 +155,10 @@ class RickshawHtmlCreater {
 		graph.getPoints().each {eachPoint ->
 
             def url = "undefined"
-			def measuredValue = eachPoint.measuredValue
+			def csiAggregation = eachPoint.csiAggregation
 
             if(measurandGroup == "LOAD_TIMES" || measurandGroup == "REQUEST_SIZES" ) {
-                measuredValue = measuredValue / 1000;
+                csiAggregation = csiAggregation / 1000;
             }
 
 			if (eachPoint.sourceURL != null) {
@@ -166,7 +166,7 @@ class RickshawHtmlCreater {
             }
 
             testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
-			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${measuredValue}, url: "${url}" ${testingAgent}}"""
+			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${csiAggregation}, url: "${url}" ${testingAgent}}"""
             prefix = ","
         }
         sw << """ ]"""

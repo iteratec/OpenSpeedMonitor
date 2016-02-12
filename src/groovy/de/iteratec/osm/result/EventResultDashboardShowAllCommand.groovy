@@ -1,8 +1,7 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.DateValueConverter
 import grails.validation.Validateable
 import org.joda.time.DateTime
@@ -70,7 +69,7 @@ public class EventResultDashboardShowAllCommand {
     String aggrGroup
 
     /**
-     * The time of the {@link de.iteratec.osm.report.chart.MeasuredValueInterval}.
+     * The time of the {@link CsiAggregationInterval}.
      */
     Integer selectedInterval
 
@@ -424,7 +423,7 @@ public class EventResultDashboardShowAllCommand {
     public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
 
         viewModelToCopyTo.put('selectedTimeFrameInterval', this.selectedTimeFrameInterval)
-        viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: MeasuredValueInterval.RAW)
+        viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
 
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
         viewModelToCopyTo.put('selectedPages', this.selectedPages)

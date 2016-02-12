@@ -22,10 +22,10 @@ package de.iteratec.osm.report.chart
  * @TODO TODO mze-2013-07-12: Questions:
  *   - Why this is not an enum? Are there are more possible values? 
  *   - Why there are constants an table data rows? 
- *   - Why the constants are int-values and not MeasuredValueInterval instances?
+ *   - Why the constants are int-values and not CsiAggregationInterval instances?
  *   - Name is a bit cryptic - This seems to be a time or date range.
  */
-class MeasuredValueInterval {
+class CsiAggregationInterval {
 	
 	public static final int RAW = -1
 	public static final int HOURLY = 60

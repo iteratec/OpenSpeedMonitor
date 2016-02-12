@@ -24,12 +24,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.measurement.script.Script
@@ -50,19 +50,19 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * Until 2014-07 obsolescence and calculation had to read and write the same object (the respective CsiAggregation). This led to org.hibernate.StaleObjectStateException's if both happened with a high frequency (some users
  * opened the csi-dashboard on monitors, auto-refreshing the page).
  * The test in this class failed due to thrown org.hibernate.StaleObjectStateException on executing <br><code>CsiAggregation.list()*.delete(failOnError: true, flush: true)</code><br>
- * Shouldn't happen after removing the attribute calculated from domain {@link CsiAggregation} and introduction of domain {@link MesauredValueUpdateEvent} instead.
+ * Shouldn't happen after removing the attribute calculated from domain {@link CsiAggregation} and introduction of domain {@link CsiAggregationUpdateEvent} instead.
  * </p>
  *  
  * @author nkuhn
- * @see MeasuredValueUpdateEvent 
+ * @see CsiAggregationUpdateEvent
  */
-class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
+class HighfrequencyCsiAggregationUpdateIntSpec extends IntTestWithDBCleanup {
 
 	static transactional = false
 
-	MeasuredValueUpdateService measuredValueUpdateService
-	PageMeasuredValueService pageMeasuredValueService
-	MeasuredValueUtilService measuredValueUtilService
+	CsiAggregationUpdateService csiAggregationUpdateService
+	PageCsiAggregationService pageCsiAggregationService
+	CsiAggregationUtilService csiAggregationUtilService
 	def log = LogFactory.getLog(getClass())
 
 	private static final aTuesday = new DateTime(2014, 6, 3, 0, 0, 0, DateTimeZone.UTC)
@@ -90,10 +90,10 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 		new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
 		new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
 		new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
-		new MeasuredValueInterval(name: 'raw', intervalInMinutes: MeasuredValueInterval.RAW).save(failOnError: true, flush: true)
-		new MeasuredValueInterval(name: 'hourly', intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true, flush: true)
-		new MeasuredValueInterval(name: 'daily', intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true, flush: true)
-		new MeasuredValueInterval(name: 'weekly', intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true, flush: true)
+		new CsiAggregationInterval(name: 'raw', intervalInMinutes: CsiAggregationInterval.RAW).save(failOnError: true, flush: true)
+		new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true, flush: true)
+		new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true, flush: true)
+		new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true, flush: true)
 		Script script = new Script(
 				label: 'script',
 				description: 'script',
@@ -136,22 +136,22 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 	}
 
 	@Test
-	void testPersistingNewEventResultsWhileManyMeasuredValueCalculationsOccur() {
+	void testPersistingNewEventResultsWhileManyCsiAggregationCalculationsOccur() {
 
 		/*TODO: enable this test again
-		 * If this test runs in front of ShopMeasureValueCalculationIntSpec,
-		 * the ShopMeasureValueCalculationIntSpec has a AssertionError and fails.
+		 * If this test runs in front of ShopCsiAggregationCalculationIntSpec,
+		 * the ShopCsiAggregationCalculationIntSpec has a AssertionError and fails.
 		 * The dependencies based on JobGroup creation in this Test.
 		 *
 		 * This test fails when it is running in integration test sequence,
 		 * the dependency belongs on ?
 		 */
 
-//		MeasuredValueCalculator mvCalculator = new MeasuredValueCalculator()
-//		mvCalculator.start(pageMeasuredValueService, log)
+//		CsiAggregationCalculator mvCalculator = new CsiAggregationCalculator()
+//		mvCalculator.start(pageCsiAggregationService, log)
 //
-//		DateTime startOfDay = measuredValueUtilService.resetToStartOfActualInterval(aTuesday, MeasuredValueInterval.DAILY)
-//		DateTime startOfWeek = measuredValueUtilService.resetToStartOfActualInterval(aTuesday, MeasuredValueInterval.WEEKLY)
+//		DateTime startOfDay = csiAggregationUtilService.resetToStartOfActualInterval(aTuesday, CsiAggregationInterval.DAILY)
+//		DateTime startOfWeek = csiAggregationUtilService.resetToStartOfActualInterval(aTuesday, CsiAggregationInterval.WEEKLY)
 //		JobResult jobResult = new JobResult(
 //				testId: 'testId',
 //				date: aTuesday.toDate(),
@@ -184,9 +184,9 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 //				jobResult.save(failOnError: true, flush: true)
 //
 //				//log.error "marking daily mv's with result nr. $index : startOfDay=$startOfDay result-date=$eventResult.jobResultDate"
-//				measuredValueUpdateService.markMvs(startOfDay, eventResult, MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY))
+//				csiAggregationUpdateService.markMvs(startOfDay, eventResult, CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY))
 //				//log.error "marking weekly mv's with result nr. $index : startOfWee=$startOfWeek result-date=$eventResult.jobResultDate"
-//				measuredValueUpdateService.markMvs(startOfWeek, eventResult, MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY))
+//				csiAggregationUpdateService.markMvs(startOfWeek, eventResult, CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY))
 //			}
 //		}
 //
@@ -225,17 +225,17 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 	 * @author nkuhn
 	 *
 	 */
-	class MeasuredValueCalculator implements Runnable{
+	class CsiAggregationCalculator implements Runnable{
 		
 		private volatile Thread calculatorThread
-		private PageMeasuredValueService pageMVService
+		private PageCsiAggregationService pageMVService
 		private def log
 
-		public MeasuredValueCalculator(){}
+		public CsiAggregationCalculator(){}
 		
-		public void start(PageMeasuredValueService pageMeasuredValueService, outerLog){
+		public void start(PageCsiAggregationService pageCsiAggregationService, outerLog){
 			calculatorThread = new Thread(this)
-			pageMVService = pageMeasuredValueService
+			pageMVService = pageCsiAggregationService
 			log = outerLog
 			calculatorThread.start()
 		}
@@ -254,10 +254,10 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 					 List<JobGroup> groups = JobGroup.findAllByName('group')
 					 List<Page> pages = Page.findAllByName('HP')
 					//daily page
-					List<CsiAggregation> pmvs =  pageMVService.getOrCalculatePageMeasuredValues(
-						HighfrequencyMeasuredValueUpdateIntSpec.aTuesday.minusDays(1).toDate(), 
-						HighfrequencyMeasuredValueUpdateIntSpec.aTuesday.plusDays(1).toDate(), 
-						MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY), 
+					List<CsiAggregation> pmvs =  pageMVService.getOrCalculatePageCsiAggregations(
+						HighfrequencyCsiAggregationUpdateIntSpec.aTuesday.minusDays(1).toDate(),
+						HighfrequencyCsiAggregationUpdateIntSpec.aTuesday.plusDays(1).toDate(),
+						CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY),
 						groups, 
 						pages
 					)
@@ -266,10 +266,10 @@ class HighfrequencyMeasuredValueUpdateIntSpec extends IntTestWithDBCleanup {
 					}
 					//weekly page
 					log.error "getting weekly page-mv's from calculator-thread:"
-					pmvs =  pageMVService.getOrCalculatePageMeasuredValues(
-						HighfrequencyMeasuredValueUpdateIntSpec.fridayBeforeTuesday.toDate(),
-						HighfrequencyMeasuredValueUpdateIntSpec.fridayBeforeTuesday.toDate(),
-						MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY),
+					pmvs =  pageMVService.getOrCalculatePageCsiAggregations(
+						HighfrequencyCsiAggregationUpdateIntSpec.fridayBeforeTuesday.toDate(),
+						HighfrequencyCsiAggregationUpdateIntSpec.fridayBeforeTuesday.toDate(),
+						CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY),
 						groups,
 						pages
 					)

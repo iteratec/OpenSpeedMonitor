@@ -21,46 +21,46 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import org.joda.time.DateTime
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.JobResultDaoService
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import de.iteratec.osm.measurement.environment.BrowserService
 
-class EventMeasuredValueService {
+class EventCsiAggregationService {
 	
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 	EventResultService eventResultService
 	PerformanceLoggingService performanceLoggingService
 	JobService jobService
 	OsmConfigCacheService osmConfigCacheService
 	JobResultDaoService jobResultDaoService
-	MeasuredValueDaoService measuredValueDaoService
+	CsiAggregationDaoService csiAggregationDaoService
 	BrowserService browserService
 	WeightingService weightingService
 	MeanCalcService meanCalcService
-	MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 	
 	/**
-	 * Just gets MeasuredValues from DB. No creation or calculation.
+	 * Just gets CsiAggregations from DB. No creation or calculation.
 	 * @param fromDate
 	 * @param toDate
 	 * @param targetInterval
 	 * @return
 	 */
-	List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, ConnectivityProfile connProfile = null) {
+	List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, ConnectivityProfile connProfile = null) {
 		List<CsiAggregation> result = []
 		def query
 
@@ -90,16 +90,16 @@ class EventMeasuredValueService {
 	 */
     void createOrUpdateHourlyValue(DateTime hourlyStart, EventResult newResult){
 		String resultTag = newResult.tag 
-		if (resultTag != null && measuredValueTagService.isValidHourlyEventTag(resultTag)) {
+		if (resultTag != null && csiAggregationTagService.isValidHourlyEventTag(resultTag)) {
 			AggregatorType eventAggregator = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 			CsiAggregation hmv = ensurePresence(
 				hourlyStart,
-				MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
+				CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
 				resultTag,
 				eventAggregator,
 				true,
 				newResult.connectivityProfile)
-			calcMvForJobAggregatorWithoutQueryResultsFromDb(hmv, newResult)
+			calcCsiAggregationForJobAggregatorWithoutQueryResultsFromDb(hmv, newResult)
 		}
 		
 	}
@@ -113,37 +113,37 @@ class EventMeasuredValueService {
 	 * 				Contains all parameters necessary for querying {@link CsiAggregation}s from db.
 	 * @return
 	 */
-	List<CsiAggregation> getHourylMeasuredValues(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
+	List<CsiAggregation> getHourlyCsiAggregations(Date fromDate, Date toDate, MvQueryParams mvQueryParams) {
 		List<CsiAggregation> calculatedMvs = []
 		if (fromDate>toDate) {
 			throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
 		}
 		
 		if (validateMvQueryParams(mvQueryParams) == false){
-			throw new IllegalArgumentException("QuerParams for Event-MeasuredValues aren't valid: ${mvQueryParams}")
+			throw new IllegalArgumentException("QuerParams for Event-CsiAggregations aren't valid: ${mvQueryParams}")
 		}
 		
 		DateTime toDateTime = new DateTime(toDate)
 		DateTime fromDateTime = new DateTime(fromDate)
 		
-		calculatedMvs.addAll(getAllCalculatedHourlyMvs(mvQueryParams, fromDateTime, toDateTime))
+		calculatedMvs.addAll(getAllCalculatedHourlyCas(mvQueryParams, fromDateTime, toDateTime))
 		return calculatedMvs
 	}
-	private getAllCalculatedHourlyMvs(MvQueryParams mvQueryParams, DateTime fromDateTime, DateTime toDateTimeEndOfInterval){
-		String queryPattern = measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams).pattern();
+	private getAllCalculatedHourlyCas(MvQueryParams mvQueryParams, DateTime fromDateTime, DateTime toDateTimeEndOfInterval){
+		String queryPattern = csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams).pattern();
 		List<ConnectivityProfile> connectivityProfilesInQuery = ConnectivityProfile.findAllByIdInList(new ArrayList<Long>(mvQueryParams.connectivityProfileIds))
 		return queryPattern != null ?
-			measuredValueDaoService.getMvs(
+			   csiAggregationDaoService.getMvs(
 					fromDateTime.toDate(), 
 					toDateTimeEndOfInterval.toDate(),
 					queryPattern,
-					MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
+					CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
 					AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
 					connectivityProfilesInQuery)
 			: []
 	}
 	
-	private CsiAggregation ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
+	private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {
 		CsiAggregation toCreateAndOrCalculate
 		performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR){
 			toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregatorAndTagAndConnectivityProfile(startDate.toDate(), interval, eventAggregator, tag, connectivityProfile)
@@ -170,7 +170,7 @@ class EventMeasuredValueService {
 	 * @param newResult
 	 * @return
 	 */
-	private CsiAggregation calcMvForJobAggregatorWithoutQueryResultsFromDb(CsiAggregation toBeCalculated, EventResult newResult) {
+	private CsiAggregation calcCsiAggregationForJobAggregatorWithoutQueryResultsFromDb(CsiAggregation toBeCalculated, EventResult newResult) {
 		Integer countUnderlyingEventResultsByWptDocComplete = toBeCalculated.countUnderlyingEventResultsByWptDocComplete()
 		Integer countUnderlyingEventResultsByWptVisuallyComplete = toBeCalculated.underlyingEventResultsByVisuallyComplete.size()
 		Double newCsByWptDocCompleteInPercent
@@ -205,7 +205,7 @@ class EventMeasuredValueService {
 			}
 		}
 		toBeCalculated.save(failOnError:true)
-		measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+		csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 		return toBeCalculated
 	}
 	

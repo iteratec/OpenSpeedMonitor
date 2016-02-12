@@ -19,7 +19,7 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.csi.IntTestWithDBCleanup
-import de.iteratec.osm.csi.MvUpdateEventCleanupService
+import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -38,23 +38,23 @@ import static org.junit.Assert.assertThat
  * <ul>
  * <li>set attribute closedAndCalculated to true</li>
  * <li>calculate CsiAggregation if necessary</li>
- * <li>delete all {@link MeasuredValueUpdateEvent}s of CsiAggregation</li>
+ * <li>delete all {@link CsiAggregationUpdateEvent}s of CsiAggregation</li>
  * </ul>
  * 
  */
 class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 
-	MeasuredValueUtilService measuredValueUtilService
-	MvUpdateEventCleanupService mvUpdateEventCleanupService
-	MeasuredValueDaoService measuredValueDaoService
+	CsiAggregationUtilService csiAggregationUtilService
+	CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
+	CsiAggregationDaoService csiAggregationDaoService
 	InMemoryConfigService inMemoryConfigService
 	
 	AggregatorType eventAggregator
 	AggregatorType pageAggregator 
 	AggregatorType shopAggregator
-	MeasuredValueInterval weeklyInterval
-	MeasuredValueInterval dailyInterval
-	MeasuredValueInterval hourlyInterval
+	CsiAggregationInterval weeklyInterval
+	CsiAggregationInterval dailyInterval
+	CsiAggregationInterval hourlyInterval
 	
 	DateTime mockedExecTimeOfCleanup
 	DateTime actualWeekStart
@@ -74,7 +74,7 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		
 		//mocking common to all tests
 		mockedExecTimeOfCleanup = new DateTime(2014,7,7,5,30,0, DateTimeZone.UTC) 
-		MeasuredValueUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
+		CsiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
 		
 		//create test-data common to all tests
 		List<AggregatorType> aggregators = TestDataUtil.createAggregatorTypes()
@@ -82,25 +82,25 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		shopAggregator = aggregators.find{ it.name == AggregatorType.SHOP }
 		eventAggregator = aggregators.find{ it.name == AggregatorType.MEASURED_EVENT }
 		
-		List<MeasuredValueInterval> intervals = TestDataUtil.createMeasuredValueIntervals()
-		weeklyInterval = intervals.find{ it.intervalInMinutes == MeasuredValueInterval.WEEKLY }
-		dailyInterval = intervals.find{ it.intervalInMinutes == MeasuredValueInterval.DAILY }
-		hourlyInterval = intervals.find{ it.intervalInMinutes == MeasuredValueInterval.HOURLY}
+		List<CsiAggregationInterval> intervals = TestDataUtil.createCsiAggregationIntervals()
+		weeklyInterval = intervals.find{ it.intervalInMinutes == CsiAggregationInterval.WEEKLY }
+		dailyInterval = intervals.find{ it.intervalInMinutes == CsiAggregationInterval.DAILY }
+		hourlyInterval = intervals.find{ it.intervalInMinutes == CsiAggregationInterval.HOURLY}
 		
 		if (JobGroup.list().size() == 0) TestDataUtil.createJobGroups()
 		if (Page.list().size() == 0) TestDataUtil.createPages(['homepage', 'product list', 'product page'])
 		
-		actualWeekStart = measuredValueUtilService.resetToStartOfActualInterval(mockedExecTimeOfCleanup, weeklyInterval.intervalInMinutes)
-		lastWeekStart = measuredValueUtilService.subtractOneInterval(actualWeekStart, weeklyInterval.intervalInMinutes)
-		secondLastWeekStart = measuredValueUtilService.subtractOneInterval(lastWeekStart, weeklyInterval.intervalInMinutes)
+		actualWeekStart = csiAggregationUtilService.resetToStartOfActualInterval(mockedExecTimeOfCleanup, weeklyInterval.intervalInMinutes)
+		lastWeekStart = csiAggregationUtilService.subtractOneInterval(actualWeekStart, weeklyInterval.intervalInMinutes)
+		secondLastWeekStart = csiAggregationUtilService.subtractOneInterval(lastWeekStart, weeklyInterval.intervalInMinutes)
 		
-		actualDayStart = measuredValueUtilService.resetToStartOfActualInterval(mockedExecTimeOfCleanup, dailyInterval.intervalInMinutes)
-		lastDayStart = measuredValueUtilService.subtractOneInterval(actualDayStart, dailyInterval.intervalInMinutes)
-		secondLastDayStart = measuredValueUtilService.subtractOneInterval(lastDayStart, dailyInterval.intervalInMinutes)
+		actualDayStart = csiAggregationUtilService.resetToStartOfActualInterval(mockedExecTimeOfCleanup, dailyInterval.intervalInMinutes)
+		lastDayStart = csiAggregationUtilService.subtractOneInterval(actualDayStart, dailyInterval.intervalInMinutes)
+		secondLastDayStart = csiAggregationUtilService.subtractOneInterval(lastDayStart, dailyInterval.intervalInMinutes)
 		
-		actualHourStart = measuredValueUtilService.resetToStartOfActualInterval(mockedExecTimeOfCleanup, hourlyInterval.intervalInMinutes)
-		lastHourStart = measuredValueUtilService.subtractOneInterval(actualHourStart, dailyInterval.intervalInMinutes)
-		secondLastHourStart = measuredValueUtilService.subtractOneInterval(lastHourStart, dailyInterval.intervalInMinutes)
+		actualHourStart = csiAggregationUtilService.resetToStartOfActualInterval(mockedExecTimeOfCleanup, hourlyInterval.intervalInMinutes)
+		lastHourStart = csiAggregationUtilService.subtractOneInterval(actualHourStart, dailyInterval.intervalInMinutes)
+		secondLastHourStart = csiAggregationUtilService.subtractOneInterval(lastHourStart, dailyInterval.intervalInMinutes)
 
 		inMemoryConfigService.activateMeasurementsGenerally()
     }
@@ -114,17 +114,17 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		
 		List<CsiAggregation> mvs = CsiAggregation.list()
 		assertThat(mvs.size(), is(2))
-		List<MeasuredValueUpdateEvent> updateEvents = MeasuredValueUpdateEvent.list()
+		List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(mvs*.isCalculated(),  everyItem(is(false)))
 		assertThat(updateEvents.size(), is(2))
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		mvs = CsiAggregation.list()
-		updateEvents = MeasuredValueUpdateEvent.list()
+		updateEvents = CsiAggregationUpdateEvent.list()
 		assertThat(mvs.size(), is(2))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(true)))
 		assertThat(mvs*.isCalculatedWithoutData(),  everyItem(is(true)))
@@ -139,18 +139,18 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
 		
 		List<CsiAggregation> mvs = CsiAggregation.list()
-		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(mvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEvents = csiAggregationDaoService.getUpdateEvents(mvs*.ident())
 		assertThat(mvs.size(), is(2))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(mvs*.isCalculated(),  everyItem(is(false)))
 		assertThat(updateEvents.size(), is(2))
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		mvs = CsiAggregation.list()
-		updateEvents = measuredValueDaoService.getUpdateEvents(mvs*.ident())
+		updateEvents = csiAggregationDaoService.getUpdateEvents(mvs*.ident())
 		assertThat(mvs.size(), is(2))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(true)))
 		assertThat(mvs*.isCalculated(),  everyItem(is(true)))
@@ -169,20 +169,20 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		List<CsiAggregation> mvs = CsiAggregation.list()
 		
 		List<CsiAggregation> smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
-		List<MeasuredValueUpdateEvent> updateEventsOfSmvs = measuredValueDaoService.getUpdateEvents(smvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEventsOfSmvs = csiAggregationDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(smvs*.isCalculated(),  everyItem(is(false)))
 		assertThat(updateEventsOfSmvs.size(), is(2))
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		mvs = CsiAggregation.list()
 		
 		smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
-		updateEventsOfSmvs = measuredValueDaoService.getUpdateEvents(smvs*.ident())
+		updateEventsOfSmvs = csiAggregationDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(true)))
 		assertThat(smvs*.isCalculatedWithoutData(),  everyItem(is(true)))
@@ -190,14 +190,14 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		
 		//second call cause the calculation of shop mvs creates new page mvs which get closed and calculated not until subsequent cleanup
 		List<CsiAggregation> pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
-		List<MeasuredValueUpdateEvent> updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEventsOfPmvs = csiAggregationDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(pmvs*.isCalculatedWithoutData(),  everyItem(is(true)))
 		assertThat(updateEventsOfPmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
-		updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
+		updateEventsOfPmvs = csiAggregationDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(true)))
 		assertThat(pmvs*.isCalculatedWithoutData(),  everyItem(is(true)))
@@ -214,18 +214,18 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		
 		List<CsiAggregation> mvs = CsiAggregation.list()
 		List<CsiAggregation> smvs = mvs.findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
-		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEvents = csiAggregationDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(smvs*.isCalculated(),  everyItem(is(false)))
 		assertThat(updateEvents.size(), is(2))
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		smvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
-		updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
+		updateEvents = csiAggregationDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(2))
 		assertThat(smvs*.closedAndCalculated, everyItem(is(true)))
 		assertThat(smvs*.isCalculatedWithoutData(),  everyItem(is(true)))
@@ -233,14 +233,14 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		
 		//second call cause the calculation of shop mvs creates new page mvs which get closed and calculated not until subsequent cleanup
 		List<CsiAggregation> pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
-		List<MeasuredValueUpdateEvent> updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEventsOfPmvs = csiAggregationDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(pmvs*.isCalculatedWithoutData(),  everyItem(is(true)))
 		assertThat(updateEventsOfPmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		pmvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.PAGE)}
-		updateEventsOfPmvs = measuredValueDaoService.getUpdateEvents(pmvs*.ident())
+		updateEventsOfPmvs = csiAggregationDaoService.getUpdateEvents(pmvs*.ident())
 		assertThat(pmvs.size(), is(NUMBER_OF_PAGES * numberOfShopMvs))
 		assertThat(pmvs*.closedAndCalculated, everyItem(is(true)))
 		assertThat(pmvs*.isCalculatedWithoutData(),  everyItem(is(true)))
@@ -254,11 +254,11 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		List<CsiAggregation> mvs = CsiAggregation.list()
-		List<MeasuredValueUpdateEvent> updateEvents = MeasuredValueUpdateEvent.list()
+		List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
 		assertThat(mvs.size(), is(1))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(mvs*.isCalculated(), everyItem(is(false)))
@@ -272,11 +272,11 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		List<CsiAggregation> mvs = CsiAggregation.list()
-		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(mvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEvents = csiAggregationDaoService.getUpdateEvents(mvs*.ident())
 		assertThat(mvs.size(), is(1))
 		assertThat(mvs*.closedAndCalculated, everyItem(is(false)))
 		assertThat(mvs*.isCalculated(), everyItem(is(false)))
@@ -290,11 +290,11 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		List<CsiAggregation> smvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
-		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEvents = csiAggregationDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(1))
 		assertThat(smvs[0].closedAndCalculated, is(false))
 		assertThat(smvs[0].isCalculated(),  is(false))
@@ -308,20 +308,20 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 		createMvWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
 		
 		//test execution
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
 		
 		//assertions
 		List<CsiAggregation> smvs = CsiAggregation.list().findAll{ it.aggregator.name.equals(AggregatorType.SHOP)}
-		List<MeasuredValueUpdateEvent> updateEvents = measuredValueDaoService.getUpdateEvents(smvs*.ident())
+		List<CsiAggregationUpdateEvent> updateEvents = csiAggregationDaoService.getUpdateEvents(smvs*.ident())
 		assertThat(smvs.size(), is(1))
 		assertThat(smvs[0].closedAndCalculated, is(false))
 		assertThat(smvs[0].isCalculated(),  is(false))
 		assertThat(updateEvents.size(), is(1))
 	}
 	
-	void createMvWithUpdateEventOutdated(Date started, MeasuredValueInterval interval, AggregatorType aggregator, boolean closed, String tag){
+	void createMvWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, String tag){
 		String resultIdsIrrelevantInTheseTests = '1,2,3'
-		CsiAggregation mv = TestDataUtil.createMeasuredValue(
+		CsiAggregation mv = TestDataUtil.createCsiAggregation(
 			started,
 			interval,
 			aggregator,
@@ -330,6 +330,6 @@ class CloseExpiredUpdateEventsIntTests extends IntTestWithDBCleanup {
 			resultIdsIrrelevantInTheseTests,
 			closed
 		)
-		TestDataUtil.createUpdateEvent(mv.ident(), MeasuredValueUpdateEvent.UpdateCause.OUTDATED)
+		TestDataUtil.createUpdateEvent(mv.ident(), CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
 	}
 }

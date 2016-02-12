@@ -23,7 +23,7 @@ import de.iteratec.osm.report.external.MetricReportingService
 
 
 /**
- * Triggers hourly csi-{@link MeasuredValue}-reporting.
+ * Triggers hourly csi-{@link CsiAggregation}-reporting.
  * @author nkuhn
  * @author mze
  * @since IT-199

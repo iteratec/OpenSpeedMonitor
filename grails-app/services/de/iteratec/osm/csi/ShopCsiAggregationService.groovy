@@ -19,23 +19,23 @@ package de.iteratec.osm.csi
 
 import org.joda.time.DateTime
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -45,19 +45,19 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
  * @author nkuhn
  *
  */
-class ShopMeasuredValueService {
+class ShopCsiAggregationService {
 
-    PageMeasuredValueService pageMeasuredValueService
+    PageCsiAggregationService pageCsiAggregationService
     CsiHelperService csiHelperService
     MeanCalcService meanCalcService
-    MeasuredValueTagService measuredValueTagService
+    CsiAggregationTagService csiAggregationTagService
     PerformanceLoggingService performanceLoggingService
     JobService jobService
     JobResultDaoService jobResultDaoService
-    MeasuredValueDaoService measuredValueDaoService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationDaoService csiAggregationDaoService
+    CsiAggregationUtilService csiAggregationUtilService
     WeightingService weightingService
-    MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+    CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
     /**
      * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
@@ -66,7 +66,7 @@ class ShopMeasuredValueService {
      * @param targetInterval
      * @return
      */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval) {
+    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval) {
         List<CsiAggregation> result = []
         def query = CsiAggregation.where {
             started >= fromDate
@@ -85,13 +85,13 @@ class ShopMeasuredValueService {
      * @param csiGroups
      * @return
      */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval, List<JobGroup> csiGroups) {
+    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, List<JobGroup> csiGroups) {
         List<CsiAggregation> result = []
         if (csiGroups.size() == 0) {
             return result
         }
-        String tagPattern = measuredValueTagService.getTagPatternForWeeklyShopMvsWithJobGroups(csiGroups)
-        result = measuredValueDaoService.getMvs(fromDate, toDate, tagPattern, targetInterval, AggregatorType.findByName(AggregatorType.SHOP))
+        String tagPattern = csiAggregationTagService.getTagPatternForWeeklyShopCasWithJobGroups(csiGroups)
+        result = csiAggregationDaoService.getMvs(fromDate, toDate, tagPattern, targetInterval, AggregatorType.findByName(AggregatorType.SHOP))
         return result
     }
 
@@ -102,15 +102,15 @@ class ShopMeasuredValueService {
      * @param newResult
      * 				New {@link EventResult}.
      */
-    void markMvAsOutdated(DateTime start, EventResult newResult, MeasuredValueInterval interval) {
+    void markMvAsOutdated(DateTime start, EventResult newResult, CsiAggregationInterval interval) {
 
         JobResult jobResult = newResult.jobResult;
         JobGroup jobGroup = jobService.getCsiJobGroupOf(jobResult.job)
-        String shopTag = measuredValueTagService.createShopAggregatorTag(jobGroup)
+        String shopTag = csiAggregationTagService.createShopAggregatorTag(jobGroup)
 
         if (jobGroup && jobGroup.groupType == JobGroupType.CSI_AGGREGATION && shopTag) {
             CsiAggregation shopMv = ensurePresence(start, interval, shopTag)
-            measuredValueUpdateEventDaoService.createUpdateEvent(shopMv.ident(), MeasuredValueUpdateEvent.UpdateCause.OUTDATED)
+            csiAggregationUpdateEventDaoService.createUpdateEvent(shopMv.ident(), CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
 
     }
@@ -124,65 +124,65 @@ class ShopMeasuredValueService {
      * @param csiGroups
      * @return
      */
-    List<CsiAggregation> getOrCalculateShopMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups) {
+    List<CsiAggregation> getOrCalculateShopCsiAggregations(Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups) {
         if (fromDate > toDate) {
             throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
         }
         DateTime toDateTime = new DateTime(toDate)
         DateTime fromDateTime = new DateTime(fromDate)
 
-        Integer numberOfIntervals = measuredValueUtilService.getNumberOfIntervals(fromDateTime, toDateTime, interval)
+        Integer numberOfIntervals = csiAggregationUtilService.getNumberOfIntervals(fromDateTime, toDateTime, interval)
 
-        List<CsiAggregation> existingMeasuredValues = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiGroups)
+        List<CsiAggregation> existingCsiAggregations = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiGroups)
 
-        List<CsiAggregation> openMeasuredValues = existingMeasuredValues.findAll { !it.closedAndCalculated }
-        Boolean allMeasuredValuesExist = existingMeasuredValues.size() == numberOfIntervals * csiGroups.size()
-        if (allMeasuredValuesExist && openMeasuredValues.size() == 0) {
-            return existingMeasuredValues
+        List<CsiAggregation> openCsiAggregations = existingCsiAggregations.findAll { !it.closedAndCalculated }
+        Boolean allCsiAggregationsExist = existingCsiAggregations.size() == numberOfIntervals * csiGroups.size()
+        if (allCsiAggregationsExist && openCsiAggregations.size() == 0) {
+            return existingCsiAggregations
         }
 
-        List<MeasuredValueUpdateEvent> updateEvents = []
-        if (openMeasuredValues.size() > 0) updateEvents.addAll(measuredValueDaoService.getUpdateEvents(openMeasuredValues*.ident()))
-        List<CsiAggregation> measuredValuesToBeCalculated = openMeasuredValues.findAll {
+        List<CsiAggregationUpdateEvent> updateEvents = []
+        if (openCsiAggregations.size() > 0) updateEvents.addAll(csiAggregationDaoService.getUpdateEvents(openCsiAggregations*.ident()))
+        List<CsiAggregation> csiAggregationsToBeCalculated = openCsiAggregations.findAll {
             it.hasToBeCalculatedAccordingEvents(updateEvents)
         }
 
-        if (allMeasuredValuesExist && measuredValuesToBeCalculated.size() == 0) {
+        if (allCsiAggregationsExist && csiAggregationsToBeCalculated.size() == 0) {
 
-            return existingMeasuredValues
+            return existingCsiAggregations
 
         } else {
 
-            List<CsiAggregation> calculatedMeasuredvalues = []
+            List<CsiAggregation> calculatedCsiAggregations = []
             DateTime currentDateTime = fromDateTime
             while (!currentDateTime.isAfter(toDateTime)) {
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, " get/create/calculate ${interval.name} shop-MeasureValue for: ${currentDateTime}", IndentationDepth.TWO) {
-                    List<CsiAggregation> existingMvsOfCurrentTime = existingMeasuredValues.findAll {
+                performanceLoggingService.logExecutionTime(LogLevel.INFO, " get/create/calculate ${interval.name} shop-CsiAggregation for: ${currentDateTime}", IndentationDepth.TWO) {
+                    List<CsiAggregation> existingMvsOfCurrentTime = existingCsiAggregations.findAll {
                         new DateTime(it.started) == currentDateTime
                     }
-                    List<CsiAggregation> mvsToBeCalculatedOfCurrentTime = measuredValuesToBeCalculated.findAll {
+                    List<CsiAggregation> mvsToBeCalculatedOfCurrentTime = csiAggregationsToBeCalculated.findAll {
                         new DateTime(it.started) == currentDateTime
                     }
                     if (existingMvsOfCurrentTime.size() == csiGroups.size() && mvsToBeCalculatedOfCurrentTime.size() == 0) {
 
-                        calculatedMeasuredvalues.addAll(existingMvsOfCurrentTime)
+                        calculatedCsiAggregations.addAll(existingMvsOfCurrentTime)
 
                     } else {
 
-                        calculatedMeasuredvalues.addAll(getOrCalculateShopMvs(currentDateTime, interval, csiGroups, updateEvents))
+                        calculatedCsiAggregations.addAll(getOrCalculateShopCas(currentDateTime, interval, csiGroups, updateEvents))
 
                     }
                 }
-                currentDateTime = measuredValueUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
+                currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
             }
-            return calculatedMeasuredvalues
+            return calculatedCsiAggregations
         }
     }
 
-    private List<CsiAggregation> getOrCalculateShopMvs(DateTime toGetMvsFor, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<MeasuredValueUpdateEvent> updateEvents) {
+    private List<CsiAggregation> getOrCalculateShopCas(DateTime toGetMvsFor, CsiAggregationInterval interval, List<JobGroup> csiGroups, List<CsiAggregationUpdateEvent> updateEvents) {
         List<CsiAggregation> smvs = []
         csiGroups.each { csiGroup ->
-            String tag = measuredValueTagService.createShopAggregatorTag(csiGroup)
+            String tag = csiAggregationTagService.createShopAggregatorTag(csiGroup)
             smvs.addAll(ensurePresenceAndCalculation(toGetMvsFor, interval, tag, updateEvents))
         }
         return smvs
@@ -196,20 +196,20 @@ class ShopMeasuredValueService {
      * @param tag
      * @return
      */
-    CsiAggregation ensurePresenceAndCalculation(DateTime startDate, MeasuredValueInterval interval, String tag, List<MeasuredValueUpdateEvent> updateEvents) {
+    CsiAggregation ensurePresenceAndCalculation(DateTime startDate, CsiAggregationInterval interval, String tag, List<CsiAggregationUpdateEvent> updateEvents) {
         CsiAggregation toCreateAndOrCalculate
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence", IndentationDepth.THREE) {
             toCreateAndOrCalculate = ensurePresence(startDate, interval, tag)
         }
         if (toCreateAndOrCalculate.hasToBeCalculatedAccordingEvents(updateEvents)) {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "calculateCustomerSatisfactionMeasuredValue (interval=${interval.intervalInMinutes}; aggregator=shop)", IndentationDepth.THREE) {
-                toCreateAndOrCalculate = calcMv(toCreateAndOrCalculate)
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "calculateCustomerSatisfactionCsiAggregation (interval=${interval.intervalInMinutes}; aggregator=shop)", IndentationDepth.THREE) {
+                toCreateAndOrCalculate = calcCa(toCreateAndOrCalculate)
             }
         }
         return toCreateAndOrCalculate
     }
 
-    private CsiAggregation ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag) {
+    private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, String tag) {
         CsiAggregation toCreateAndOrCalculate
         AggregatorType shopAggregator = AggregatorType.findByName(AggregatorType.SHOP)
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR) {
@@ -237,20 +237,20 @@ class ShopMeasuredValueService {
      * 		The {@link CsiAggregation} to be calculated.
      * @return The calculated {@link de.iteratec.osm.report.chart.CsiAggregation}.
      */
-    CsiAggregation calcMv(CsiAggregation toBeCalculated) {
+    CsiAggregation calcCa(CsiAggregation toBeCalculated) {
 
         Contract.requiresArgumentNotNull("toBeCalculated", toBeCalculated);
 
-        JobGroup groupOfMv = measuredValueTagService.findJobGroupOfWeeklyShopTag(toBeCalculated.tag)
-        List<CsiAggregation> pageMeasuredValues = pageMeasuredValueService.getOrCalculatePageMeasuredValues(
+        JobGroup groupOfMv = csiAggregationTagService.findJobGroupOfWeeklyShopTag(toBeCalculated.tag)
+        List<CsiAggregation> pageCsiAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(
                 toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), [groupOfMv])
 
         List<WeightedCsiValue> weightedCsiValuesDocComplete = []
         List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
-        if (pageMeasuredValues.size() > 0) {
-            weightedCsiValuesDocComplete = weightingService.getWeightedCsiValues(pageMeasuredValues, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
-            weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(pageMeasuredValues, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
+        if (pageCsiAggregations.size() > 0) {
+            weightedCsiValuesDocComplete = weightingService.getWeightedCsiValues(pageCsiAggregations, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
+            weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(pageCsiAggregations, [WeightFactor.PAGE] as Set, groupOfMv.csiConfiguration)
         }
         if (weightedCsiValuesDocComplete.size() > 0) {
             toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesDocComplete*.weightedValue)
@@ -258,12 +258,12 @@ class ShopMeasuredValueService {
         if(weightedCsiValuesVisuallyComplete.size() > 0) {
             toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
         }
-        measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+        csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         return toBeCalculated
     }
 
-    private Page getPageFromPageMv(CsiAggregation toGetPageFrom) {
-        return measuredValueTagService.findPageByPageTag(toGetPageFrom.tag)
+    private Page getPageFromPageCa(CsiAggregation toGetPageFrom) {
+        return csiAggregationTagService.findPageByPageTag(toGetPageFrom.tag)
     }
 
     /**
@@ -274,8 +274,8 @@ class ShopMeasuredValueService {
      * @param toDate
      * @return
      */
-    List<CsiAggregation> getOrCalculateWeeklyShopMeasuredValues(Date fromDate, Date toDate) {
-        MeasuredValueInterval mvInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-        return getOrCalculateShopMeasuredValues(fromDate, toDate, mvInterval, JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION))
+    List<CsiAggregation> getOrCalculateWeeklyShopCsiAggregations(Date fromDate, Date toDate) {
+        CsiAggregationInterval mvInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+        return getOrCalculateShopCsiAggregations(fromDate, toDate, mvInterval, JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION))
     }
 }

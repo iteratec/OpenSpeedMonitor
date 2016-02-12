@@ -17,7 +17,7 @@ import de.iteratec.osm.result.ErQueryParams
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -378,7 +378,7 @@ class QueryEventResultsByConnectivitySpec extends Specification {
 
         JobResult jobRun = TestDataUtil.createJobResult('1', runDate.toDate(), job, job.location)
 
-        MeasuredValueTagService tagService = new MeasuredValueTagService()
+        CsiAggregationTagService tagService = new CsiAggregationTagService()
         withPredefinedProfile1 = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
         withPredefinedProfile1.connectivityProfile = predefinedProfile1
         withPredefinedProfile1.customConnectivityName = null

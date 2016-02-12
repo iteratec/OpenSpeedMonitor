@@ -283,4 +283,23 @@ databaseChangeLog = {
         renameColumn(tableName: "csi_aggregation", oldColumnName: "result_ids", newColumnName: "underlying_event_results_by_wpt_doc_complete", columnDataType: "longtext")
     }
     // END [IT-728] add csByVisuallyComplete
+    // START [IT-885] rename *MeasuredValue* to *CsiAggregation*
+    changeSet(author: "bka", id: "1455031326389-12") {
+        renameTable(oldTableName: "measured_value_interval", newTableName: "csi_aggregation_interval")
+    }
+    changeSet(author: "bka", id: "1455031326389-13") {
+        renameTable(oldTableName: "measured_value_update_event", newTableName: "csi_aggregation_update_event")
+    }
+    changeSet(author: "bka", id: "1455031326389-14") {
+        renameColumn(tableName: "csi_aggregation_update_event", oldColumnName: "measured_value_id", newColumnName: "csi_aggregation_id", columnDataType: "bigint")
+    }
+    changeSet(author: "bka", id: "1455031326389-15") {
+        dropIndex(indexName: "measuredValueId_idx", tableName: "csi_aggregation_update_event")
+    }
+    changeSet(author: "bka", id: "1455031326389-16") {
+        createIndex(indexName: "csiAggregationId_idx", tableName: "csi_aggregation_update_event") {
+            column(name: "csi_aggregation_id")
+        }
+    }
+    // END [IT-885] rename *MeasuredValue* to *CsiAggregation*
 }

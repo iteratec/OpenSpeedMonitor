@@ -22,7 +22,7 @@ import org.joda.time.DateTime
 import de.iteratec.osm.report.external.MetricReportingService
 
 /**
- * Triggers daily csi-{@link MeasuredValue}-reporting.
+ * Triggers daily csi-{@link CsiAggregation}-reporting.
  * @author nkuhn
  * @author mze
  * @since IT-201

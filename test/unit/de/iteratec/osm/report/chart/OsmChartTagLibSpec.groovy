@@ -56,10 +56,10 @@ class OsmChartTagLibSpec extends Specification {
 		Date oneHourAfterNow = new Date(1373635396000L);
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
-		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), measuredValue: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), csiAggregation: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/now"), testingAgent: null);
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), measuredValue: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), measuredValue: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), csiAggregation: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
+		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), csiAggregation: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/twoHoursAfterNow"), testingAgent: null);
 
 		OsmChartGraph graph=new OsmChartGraph();
@@ -154,10 +154,10 @@ class OsmChartTagLibSpec extends Specification {
 		Date oneHourAfterNow = new Date(1373635396000L);
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
-		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), measuredValue: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), csiAggregation: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/now"), testingAgent: null);
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), measuredValue: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), measuredValue: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), csiAggregation: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
+		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), csiAggregation: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/twoHoursAfterNow"), testingAgent: null);
 
 		OsmChartGraph graph1=new OsmChartGraph();

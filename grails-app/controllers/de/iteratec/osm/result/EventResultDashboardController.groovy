@@ -60,7 +60,7 @@ class EventResultDashboardController {
     PageDaoService pageDaoService
     BrowserDaoService browserDaoService
     LocationDaoService locationDaoService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationUtilService csiAggregationUtilService
     EventResultDashboardService eventResultDashboardService
     PageService pageService
     I18nService i18nService
@@ -77,12 +77,12 @@ class EventResultDashboardController {
 
     public final static Integer EXPECTED_RESULTS_PER_DAY = 50;
     public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultMeasuredValueService.getAggregatorMapForOptGroupSelect()
+    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final
     static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
 
-    List<Long> measuredValueIntervals = [MeasuredValueInterval.RAW, MeasuredValueInterval.HOURLY, MeasuredValueInterval.DAILY, MeasuredValueInterval.WEEKLY]
+    List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
 
     public final static String DATE_FORMAT_STRING = 'dd.mm.yyyy';
@@ -162,7 +162,7 @@ class EventResultDashboardController {
                 if (warnAboutLongProcessingTimeInsteadOfShowingData) {
                     modelToRender.put('warnAboutLongProcessingTime', true)
                 } else {
-                    fillWithMeasuredValueData(modelToRender, cmd);
+                    fillWithCsiAggregationData(modelToRender, cmd);
                 }
             }
         }
@@ -280,7 +280,7 @@ class EventResultDashboardController {
         }
     }
 
-    private void fillWithMeasuredValueData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
+    private void fillWithCsiAggregationData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.getSelectedTimeFrame();
 
         List<String> aggregatorNames = [];
@@ -519,7 +519,7 @@ class EventResultDashboardController {
             for (String eachGraphLabel : graphLabelsInOrderOfHeader) {
                 OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel);
                 if (point != null) {
-                    row.add(valueFormat.format(roundDouble(point.measuredValue)));
+                    row.add(valueFormat.format(roundDouble(point.csiAggregation)));
                 } else {
                     row.add("");
                 }
@@ -547,7 +547,7 @@ class EventResultDashboardController {
         Map<String, Object> modelToRender = new HashMap<String, Object>();
 
         if (request.queryString && cmd.validate()) {
-            fillWithMeasuredValueData(modelToRender, cmd);
+            fillWithCsiAggregationData(modelToRender, cmd);
             cmd.copyRequestDataToViewModelMap(modelToRender)
         } else {
             redirectWith303('showAll', params)
@@ -602,7 +602,7 @@ class EventResultDashboardController {
         int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes();
 
         long expectedPointsOfEachGraph;
-        if (interval == MeasuredValueInterval.RAW || interval == 0 || interval == null) {
+        if (interval == CsiAggregationInterval.RAW || interval == 0 || interval == null) {
             //50 results per Day
             expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / 60 / 24 * EXPECTED_RESULTS_PER_DAY);
         } else {
@@ -645,7 +645,7 @@ class EventResultDashboardController {
         result.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
 
         // Intervals
-        result.put('measuredValueIntervals', measuredValueIntervals)
+        result.put('csiAggregationIntervals', csiAggregationIntervals)
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()

@@ -30,7 +30,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.ServiceMocker
 import groovy.util.slurpersupport.GPathResult
@@ -75,12 +75,12 @@ class CsiCalculationSpec extends Specification {
         serviceUnderTest = service
         serviceUnderTest.jobService = new JobService()
         serviceUnderTest.pageService = new PageService()
-        serviceUnderTest.measuredValueTagService = new MeasuredValueTagService()
+        serviceUnderTest.csiAggregationTagService = new CsiAggregationTagService()
         serviceUnderTest.timeToCsMappingService = new TimeToCsMappingService()
         serviceMocker.mockPerformanceLoggingService(serviceUnderTest)
         serviceMocker.mockProxyService(serviceUnderTest)
         serviceMocker.mockMetricReportingService(serviceUnderTest)
-        serviceMocker.mockMeasuredValueUpdateService(serviceUnderTest)
+        serviceMocker.mockCsiAggregationUpdateService(serviceUnderTest)
         serviceMocker.mockConfigService(serviceUnderTest.timeToCsMappingService, 'org.h2.Driver', 60, CsiTransformation.BY_MAPPING)
 
         //create test-specific data

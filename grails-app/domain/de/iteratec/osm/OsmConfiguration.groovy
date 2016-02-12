@@ -47,9 +47,9 @@ class OsmConfiguration {
     Integer detailDataStorageTimeInWeeks = DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS
     /** Maximum time in minutes osm polls result of a job run. If no result with status >= 200 returned within this time run is marked as failed */
     Integer defaultMaxDownloadTimeInMinutes = DEFAULT_MAX_DOWNLOAD_TIME_IN_MINUTES
-    /** {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link MeasuredValue} */
+    /** {@link EventResult}s with a loadTimeInMillisecs lower than this won't be factored in csi-{@link CsiAggregation} */
     Integer minDocCompleteTimeInMillisecs = DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS
-    /** {@link EventResult}s with a loadTimeInMillisecs greater than this won't be factored in csi-{@link MeasuredValue} */
+    /** {@link EventResult}s with a loadTimeInMillisecs greater than this won't be factored in csi-{@link CsiAggregation} */
     Integer maxDocCompleteTimeInMillisecs = DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS
     /** Initial height of charts when opening dashboards. */
     Integer initialChartHeightInPixels = DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS

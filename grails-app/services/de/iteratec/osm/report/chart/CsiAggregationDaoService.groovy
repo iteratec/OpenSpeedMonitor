@@ -34,9 +34,9 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
-class MeasuredValueDaoService {
+class CsiAggregationDaoService {
 	
-	MeasuredValueUtilService measuredValueUtilService
+	CsiAggregationUtilService csiAggregationUtilService
 	OsmDataSourceService osmDataSourceService = new OsmDataSourceService()
 	
 	/**
@@ -68,11 +68,11 @@ class MeasuredValueDaoService {
 	 * @return
 	 */
 	List<CsiAggregation> getMvs(
-		Date fromDate,
-		Date toDate,
-		String rlikePattern,
-		MeasuredValueInterval interval,
-		AggregatorType aggregator
+			Date fromDate,
+			Date toDate,
+			String rlikePattern,
+			CsiAggregationInterval interval,
+			AggregatorType aggregator
 							   ){
 		def criteria = CsiAggregation.createCriteria()
 		return criteria.list {
@@ -99,7 +99,7 @@ class MeasuredValueDaoService {
 	List<CsiAggregation> getMvs(
 			Date fromDate,
 			Date toDate,
-			MeasuredValueInterval interval,
+			CsiAggregationInterval interval,
 			AggregatorType aggregator,
 			List<CsiSystem> csiSystems
 							   ){
@@ -130,7 +130,7 @@ class MeasuredValueDaoService {
 			Date fromDate,
 			Date toDate,
 			String rlikePattern,
-			MeasuredValueInterval interval,
+			CsiAggregationInterval interval,
 			AggregatorType aggregator,
 			List<ConnectivityProfile> connectivityProfiles
 							   ){
@@ -165,7 +165,7 @@ class MeasuredValueDaoService {
 //		Date fromDate,
 //		Date toDate,
 //		String rlikePattern,
-//		MeasuredValueInterval interval,
+//		CsiAggregationInterval interval,
 //		Collection<AggregatorType> aggregators
 //		){
 //		def criteria = CsiAggregation.createCriteria()
@@ -180,7 +180,7 @@ class MeasuredValueDaoService {
 	/**
 	 * <p> 
 	 * Finds all {@link CsiAggregation}s within the specified date range,
-	 * within the specified {@link MeasuredValueInterval} and with the 
+	 * within the specified {@link CsiAggregationInterval} and with the
 	 * specified {@link AggregatorType}.
 	 * </p>
 	 * 
@@ -191,12 +191,12 @@ class MeasuredValueDaoService {
 	 * 
 	 * @return Matching values, not <code>null</code> but possibly empty.
 	 */
-	public List<CsiAggregation> getMeasuredValues(
-		Date fromDate,
-		Date toDate,
-		MeasuredValueInterval interval,
-		AggregatorType aggregator
-												 ) {
+	public List<CsiAggregation> getCsiAggregations(
+			Date fromDate,
+			Date toDate,
+			CsiAggregationInterval interval,
+			AggregatorType aggregator
+												  ) {
 		def criteria = CsiAggregation.createCriteria()
 		return criteria.list {
 			between("started", fromDate, toDate)
@@ -206,22 +206,22 @@ class MeasuredValueDaoService {
 	}
 	
 	/**
-	 * Returns all {@link MeasuredValueUpdateEvent}s for given id's measuredValueIds of {@link CsiAggregation}s.
-	 * @param measuredValueIds
-	 * @return A list of all {@link MeasuredValueUpdateEvent}s persisted for {@link CsiAggregation}s with id's from list measuredValueIds.
+	 * Returns all {@link CsiAggregationUpdateEvent}s for given id's csiAggregationIds of {@link CsiAggregation}s.
+	 * @param csiAggregationIds
+	 * @return A list of all {@link CsiAggregationUpdateEvent}s persisted for {@link CsiAggregation}s with id's from list csiAggregationIds.
 	 */
-	public List<MeasuredValueUpdateEvent> getUpdateEvents(List<Long> measuredValueIds){
-		return MeasuredValueUpdateEvent.createCriteria().list{
-			'in'("measuredValueId", measuredValueIds)
+	public List<CsiAggregationUpdateEvent> getUpdateEvents(List<Long> csiAggregationIds){
+		return CsiAggregationUpdateEvent.createCriteria().list{
+			'in'("csiAggregationId", csiAggregationIds)
 		}
 	}
 	/**
-	 * Returns all {@link MeasuredValueUpdateEvent}s for given {@link CsiAggregation}-id measuredValueId.
-	 * @param measuredValueId
-	 * @return A list of all {@link MeasuredValueUpdateEvent}s persisted for {@link CsiAggregation} with id measuredValueId.
+	 * Returns all {@link CsiAggregationUpdateEvent}s for given {@link CsiAggregation}-id csiAggregationId.
+	 * @param csiAggregationId
+	 * @return A list of all {@link CsiAggregationUpdateEvent}s persisted for {@link CsiAggregation} with id csiAggregationId.
 	 */
-	public List<MeasuredValueUpdateEvent> getUpdateEvents(Long measuredValueId){
-		return MeasuredValueUpdateEvent.findAllByMeasuredValueId(measuredValueId)
+	public List<CsiAggregationUpdateEvent> getUpdateEvents(Long csiAggregationId){
+		return CsiAggregationUpdateEvent.findAllByCsiAggregationId(csiAggregationId)
 	}
 	
 	/**
@@ -229,7 +229,7 @@ class MeasuredValueDaoService {
 	 * @param toFindBefore
 	 * @return All open {@link CsiAggregation}s (that is who's attribute closedAndCalculated is false) with start-date equal or before Date toFindBefore.
 	 */
-	public List<CsiAggregation> getOpenMeasuredValuesEqualsOrBefore(Date toFindBefore){
+	public List<CsiAggregation> getOpenCsiAggregationsEqualsOrBefore(Date toFindBefore){
 		def criteria = CsiAggregation.createCriteria()
 		return criteria.list {
 			le("started", toFindBefore)
@@ -248,15 +248,15 @@ class MeasuredValueDaoService {
 	 * 					</ul>
 	 * @return
 	 */
-	public List<CsiAggregation> getOpenMeasuredValuesWhosIntervalExpiredForAtLeast(int minutes){
+	public List<CsiAggregation> getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(int minutes){
 		
-		DateTime expirationTimeAgo = measuredValueUtilService.getNowInUtc().minusMinutes(minutes)
-		DateTime expirationTimePlusOneHourAgo = measuredValueUtilService.subtractOneInterval(expirationTimeAgo, MeasuredValueInterval.HOURLY)
+		DateTime expirationTimeAgo = csiAggregationUtilService.getNowInUtc().minusMinutes(minutes)
+		DateTime expirationTimePlusOneHourAgo = csiAggregationUtilService.subtractOneInterval(expirationTimeAgo, CsiAggregationInterval.HOURLY)
 
 		List<CsiAggregation> openAndExpired = []
-		getOpenMeasuredValuesEqualsOrBefore(expirationTimePlusOneHourAgo.toDate()).each {openMv ->
+		getOpenCsiAggregationsEqualsOrBefore(expirationTimePlusOneHourAgo.toDate()).each { openMv ->
 			
-			boolean isHourly = openMv.interval.intervalInMinutes==MeasuredValueInterval.HOURLY 
+			boolean isHourly = openMv.interval.intervalInMinutes==CsiAggregationInterval.HOURLY
 			if( isHourly ) { 
 				openAndExpired.add(openMv)
 			}else{
@@ -269,8 +269,8 @@ class MeasuredValueDaoService {
 
 	private void addIfDailyOrWeeklyAndExpired(CsiAggregation openMv, DateTime expirationTimeAgo, List openAndExpired) {
 		
-		boolean isDaily = openMv.interval.intervalInMinutes==MeasuredValueInterval.DAILY
-		DateTime expirationTimePlusOneDayAgo = measuredValueUtilService.subtractOneInterval(expirationTimeAgo, MeasuredValueInterval.DAILY)
+		boolean isDaily = openMv.interval.intervalInMinutes==CsiAggregationInterval.DAILY
+		DateTime expirationTimePlusOneDayAgo = csiAggregationUtilService.subtractOneInterval(expirationTimeAgo, CsiAggregationInterval.DAILY)
 		
 		boolean isOlderThanOneDay = !new DateTime(openMv.started).isAfter(expirationTimePlusOneDayAgo)
 		if( isDaily && isOlderThanOneDay ) {
@@ -281,8 +281,8 @@ class MeasuredValueDaoService {
 	}
 
 	private void addIfWeeklyAndExpired(CsiAggregation openMv, DateTime expirationTimeAgo, List openAndExpired) {
-		boolean isWeekly = openMv.interval.intervalInMinutes==MeasuredValueInterval.WEEKLY
-		DateTime expirationTimePlusOneWeekAgo = measuredValueUtilService.subtractOneInterval(expirationTimeAgo, MeasuredValueInterval.WEEKLY)
+		boolean isWeekly = openMv.interval.intervalInMinutes==CsiAggregationInterval.WEEKLY
+		DateTime expirationTimePlusOneWeekAgo = csiAggregationUtilService.subtractOneInterval(expirationTimeAgo, CsiAggregationInterval.WEEKLY)
 		boolean isOlderThanOneWeek = !new DateTime(openMv.started).isAfter(expirationTimePlusOneWeekAgo)
 		if( isWeekly && isOlderThanOneWeek ) { openAndExpired.add(openMv)}
 	}
@@ -296,17 +296,17 @@ class MeasuredValueDaoService {
 	 *
 	 * Dies ist zwar "etwas zu viel" Logik für diesen DAO, aber die Schnittstelle
 	 * belibt dann verständlicher. Der Kommentar der Klasse müsste dann angepasst 
-	 * werden. Schöner wäre natürlich, ein HourlyMeasuredValueTag reinzureichen, 
+	 * werden. Schöner wäre natürlich, ein HourlyCsiAggregationTag reinzureichen,
 	 * der bereits vorher aus den MvQueryParams per MVTS erstellt wurde
 	 * (siehe hierzu auch: IT-62).
 	 *
 	 * In diesem Zuge sollte man ggf. auch die Klasse MvQueryParams umbenennen zu
-	 * HourlyMeasuredValueQueryArguments, da die Klasse für für hourly mvs wirklich
+	 * HourlyCsiAggregationQueryArguments, da die Klasse für für hourly mvs wirklich
 	 * nutzbar ist.
 	 * 
 	 * Ferner sollte die "Validierung" der Klasse MvQueryParams in die Klasse selbst 
 	 * wandern, also von: 
-	 *     de.iteratec.isocsi.EventMeasuredValueService.validateMvQueryParams(MvQueryParams)
+	 *     de.iteratec.isocsi.EventCsiAggregationService.validateMvQueryParams(MvQueryParams)
 	 * in MvQueryParams verschoben werden.
 	 */
 }

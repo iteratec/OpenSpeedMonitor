@@ -24,8 +24,6 @@ import org.joda.time.DateTimeConstants
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-
 /**
  * <p>
  * An utility service for measured values.
@@ -39,7 +37,7 @@ import de.iteratec.osm.report.chart.MeasuredValueInterval
  * @TODO TODO mze-2013-07-12: Name possibly not matching. This service seems to
  *       handle intervals calculations and not measured values explicitly!?
  */
-class MeasuredValueUtilService {
+class CsiAggregationUtilService {
 
 	/**
 	 * <p>
@@ -63,9 +61,9 @@ class MeasuredValueUtilService {
 	 * @throws NullPointerException 
 	 *         if at least on argument is <code>null</code>.
 	 * 
-	 * @see MeasuredValueInterval#HOURLY
-	 * @see MeasuredValueInterval#DAILY
-	 * @see MeasuredValueInterval#WEEKLY
+	 * @see CsiAggregationInterval#HOURLY
+	 * @see CsiAggregationInterval#DAILY
+	 * @see CsiAggregationInterval#WEEKLY
 	 */
 	DateTime resetToStartOfActualInterval(DateTime dateWithinInterval, Integer intervalInMinutes) throws NullPointerException {
 		return resetToStartOfActualInterval(dateWithinInterval, intervalInMinutes, FRIDAY);
@@ -102,20 +100,20 @@ class MeasuredValueUtilService {
 	 * @throws IllegalArgumentException
 	 *         if {@code dayOfWeek} is not within the above specified range.
 	 *
-	 * @see MeasuredValueInterval#HOURLY
-	 * @see MeasuredValueInterval#DAILY
-	 * @see MeasuredValueInterval#WEEKLY
+	 * @see CsiAggregationInterval#HOURLY
+	 * @see CsiAggregationInterval#DAILY
+	 * @see CsiAggregationInterval#WEEKLY
 	 */
 	DateTime resetToStartOfActualInterval(DateTime dateWithinInterval, Integer intervalInMinutes, int dayOfWeek) throws NullPointerException, IllegalArgumentException {
 		DateTime result = dateWithinInterval
 		switch (intervalInMinutes) {
-			case MeasuredValueInterval.WEEKLY:
+			case CsiAggregationInterval.WEEKLY:
 				result=result.withDayOfWeek(dayOfWeek)
 				if( result.isAfter(dateWithinInterval) ) {
 					result = result.minusWeeks(1);
 				}
-			case MeasuredValueInterval.DAILY:
-			/* and MeasuredValueInterval.WEEKLY as well (as declared before) */
+			case CsiAggregationInterval.DAILY:
+			/* and CsiAggregationInterval.WEEKLY as well (as declared before) */
 				result=result.withHourOfDay(0)
 			default:
 				result=result.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0)
@@ -146,9 +144,9 @@ class MeasuredValueUtilService {
 	 * @throws NullPointerException
 	 *         if at least on argument is <code>null</code>.
 	 * 
-	 * @see MeasuredValueInterval#HOURLY
-	 * @see MeasuredValueInterval#DAILY
-	 * @see MeasuredValueInterval#WEEKLY
+	 * @see CsiAggregationInterval#HOURLY
+	 * @see CsiAggregationInterval#DAILY
+	 * @see CsiAggregationInterval#WEEKLY
 	 */
 	DateTime resetToEndOfActualInterval(DateTime dateWithinInterval, Integer intervalInMinutes) throws NullPointerException {
 		return resetToStartOfActualInterval(dateWithinInterval, intervalInMinutes).plusMinutes(intervalInMinutes)
@@ -185,9 +183,9 @@ class MeasuredValueUtilService {
 	 * @throws IllegalArgumentException
 	 *         if {@code dayOfWeek} is not within the above specified range.
 	 *         
-	 * @see MeasuredValueInterval#HOURLY
-	 * @see MeasuredValueInterval#DAILY
-	 * @see MeasuredValueInterval#WEEKLY
+	 * @see CsiAggregationInterval#HOURLY
+	 * @see CsiAggregationInterval#DAILY
+	 * @see CsiAggregationInterval#WEEKLY
 	 */
 	DateTime resetToEndOfActualInterval(DateTime actualDateTime, Integer intervalInMinutes, int dayOfWeek) throws NullPointerException, IllegalArgumentException {
 		DateTime endOfInterval = actualDateTime
@@ -200,14 +198,14 @@ class MeasuredValueUtilService {
 	 * the n-th of the interval-range where n is the maximum number of 
 	 * interval-ranges which fits within the specified interval plus 1.
 	 * The method uses {@link DateTimeConstants#FRIDAY} as reset csiDay-of-week
-	 * for {@linkplain MeasuredValueInterval#WEEKLY weekly intervals}. 
+	 * for {@linkplain CsiAggregationInterval#WEEKLY weekly intervals}.
 	 * </p>
 	 * 
 	 * @param timeFrameToFix 
 	 *         The time frame to fix; not <code>null</code>.
 	 * @param intervalRangeInMinutes
 	 *         The range of one (and all other) {@linkplain 
-	 *         MeasuredValueInterval interval}(s) within the time frame.
+	 *         CsiAggregationInterval interval}(s) within the time frame.
 	 * @return The fixed time frame which start and ends is is set to fit the
 	 *         interval range. The start could be earlier, the end later than 
 	 *         the original time frame dates passes. The result is never 
@@ -234,21 +232,21 @@ class MeasuredValueUtilService {
 
 	/**
 	 * <p>
-	 * Adds the given {@link MeasuredValueInterval} to the given {@link DateTime}. For adding intervals "plus-methods" from JodaTime are used, so
+	 * Adds the given {@link CsiAggregationInterval} to the given {@link DateTime}. For adding intervals "plus-methods" from JodaTime are used, so
 	 * switches cause of daylight saving time are taken into consideration. 
 	 * </p>
 	 * @param toAddTo
 	 * @param interval
 	 * @return 
-	 * @throws IllegalArgumentException if interval isn't one of {@link MeasuredValueInterval#HOURLY}, {@link MeasuredValueInterval#DAILY} or 
-	 * {@link MeasuredValueInterval#WEEKLY}.
+	 * @throws IllegalArgumentException if interval isn't one of {@link CsiAggregationInterval#HOURLY}, {@link CsiAggregationInterval#DAILY} or
+	 * {@link CsiAggregationInterval#WEEKLY}.
 	 */
 	DateTime addOneInterval(DateTime toAddTo, Integer intervalInMinutes){
-		if (intervalInMinutes == MeasuredValueInterval.HOURLY) {
+		if (intervalInMinutes == CsiAggregationInterval.HOURLY) {
 			return toAddTo.plusHours(1)
-		}else if (intervalInMinutes == MeasuredValueInterval.DAILY) {
+		}else if (intervalInMinutes == CsiAggregationInterval.DAILY) {
 			return toAddTo.plusDays(1)
-		}else if (intervalInMinutes == MeasuredValueInterval.WEEKLY) {
+		}else if (intervalInMinutes == CsiAggregationInterval.WEEKLY) {
 			return toAddTo.plusWeeks(1)
 		}else{
 			throw new IllegalArgumentException("Unnknown interval: ${interval}")
@@ -257,21 +255,21 @@ class MeasuredValueUtilService {
 	
 	/**
 	 * <p>
-	 * Subtracts the given {@link MeasuredValueInterval} to the given {@link DateTime}. For subtracting intervals "minus-methods" from JodaTime are used, so
+	 * Subtracts the given {@link CsiAggregationInterval} to the given {@link DateTime}. For subtracting intervals "minus-methods" from JodaTime are used, so
 	 * switches cause of daylight saving time are taken into consideration.
 	 * </p>
 	 * @param toSubtractFrom {@link DateTime} from which interval should be subtracted.
 	 * @param interval Interval in minutes to subtract from toSubtractFrom. 
 	 * @return {@link DateTime} representing the timestamp intervalInMinutes before toSubtractFrom.   
-	 * @throws IllegalArgumentException if interval isn't one of {@link MeasuredValueInterval#HOURLY}, {@link MeasuredValueInterval#DAILY} or
-	 * {@link MeasuredValueInterval#WEEKLY}.
+	 * @throws IllegalArgumentException if interval isn't one of {@link CsiAggregationInterval#HOURLY}, {@link CsiAggregationInterval#DAILY} or
+	 * {@link CsiAggregationInterval#WEEKLY}.
 	 */
 	DateTime subtractOneInterval(DateTime toSubtractFrom, Integer intervalInMinutes){
-		if (intervalInMinutes == MeasuredValueInterval.HOURLY) {
+		if (intervalInMinutes == CsiAggregationInterval.HOURLY) {
 			return toSubtractFrom.minusHours(1)
-		}else if (intervalInMinutes == MeasuredValueInterval.DAILY) {
+		}else if (intervalInMinutes == CsiAggregationInterval.DAILY) {
 			return toSubtractFrom.minusDays(1)
-		}else if (intervalInMinutes == MeasuredValueInterval.WEEKLY) {
+		}else if (intervalInMinutes == CsiAggregationInterval.WEEKLY) {
 			return toSubtractFrom.minusWeeks(1)
 		}else{
 			throw new IllegalArgumentException("Unknown interval: ${intervalInMinutes}")
@@ -285,7 +283,7 @@ class MeasuredValueUtilService {
 	 * @param interval
 	 * @return
 	 */
-	Integer getNumberOfIntervals(DateTime from, DateTime to, MeasuredValueInterval interval){
+	Integer getNumberOfIntervals(DateTime from, DateTime to, CsiAggregationInterval interval){
 		DateTime currentDateTime = from
 		Integer numberOfIntervals = 0
 		while (!currentDateTime.isAfter(to)) {

@@ -27,10 +27,10 @@ import groovy.transform.EqualsAndHashCode
  * </ul>
  */
 @EqualsAndHashCode
-class MeasuredValueUpdateEvent {
+class CsiAggregationUpdateEvent {
 	
 	/**
-	 * Subject a {@link MeasuredValueUpdateFlag} can have.
+	 * Subject a {@link CsiAggregationUpdateFlag} can have.
 	 * @author nkuhn
 	 *
 	 */
@@ -63,17 +63,17 @@ class MeasuredValueUpdateEvent {
 	/**
 	 * ID of affected {@link CsiAggregation}.
 	 */
-	Long measuredValueId
+	Long csiAggregationId
 	
 	
     static mapping = {
-        measuredValueId(index: 'measuredValueId_idx')
+        csiAggregationId(index: 'csiAggregationId_idx')
     }
     
 	static constraints = {
 		dateOfUpdate()
 		updateCause()
-		measuredValueId()
+		csiAggregationId()
     }
 	
 	/*
@@ -81,6 +81,6 @@ class MeasuredValueUpdateEvent {
 	 */
 	@Override
 	public String toString() {
-		return "${dateOfUpdate}: ${updateCause} of CsiAggregation with id=${measuredValueId}";
+		return "${dateOfUpdate}: ${updateCause} of CsiAggregation with id=${csiAggregationId}";
 	}
 }

@@ -39,13 +39,13 @@ import org.grails.databinding.BindUsing
  * All calculation relevant changes should be placed here, which means:
  * Instead of code like:
  * <pre>
- *  measuredValue.value = eventResult.aValue
- *  measuredValue.calculated = Calculated.Yes
- * 	measuredValue.addToUnderlyingEventResultsByWptDocComplete(eventResult.ident())
+ *  csiAggregation.value = eventResult.aValue
+ *  csiAggregation.calculated = Calculated.Yes
+ * 	csiAggregation.addToUnderlyingEventResultsByWptDocComplete(eventResult.ident())
  * </pre>
  * better use
  * <pre>
- *  measuredValue.addResult(eventResult)
+ *  csiAggregation.addResult(eventResult)
  * </pre>
  * A change of {@link #value} and {@link #resultIds} should be done in this
  * class only to guarantee a consistent state.
@@ -59,7 +59,7 @@ class CsiAggregation implements CsiValue {
     public static final String DELIMITER_RESULTIDS = ','
 
     Date started
-    MeasuredValueInterval interval
+    CsiAggregationInterval interval
     AggregatorType aggregator
 
     @BindUsing({
@@ -76,11 +76,11 @@ class CsiAggregation implements CsiValue {
     /**
      * <p>
      * If the interval of this measured value is actual (that is it contains now) this should always stay false.
-     * A nightly quartz-job deletes all {@link MeasuredValueUpdateEvent}s of measured values which interval has expired for at least some hours. These measured values
+     * A nightly quartz-job deletes all {@link CsiAggregationUpdateEvent}s of measured values which interval has expired for at least some hours. These measured values
      * get calculated if their last update event requires a recalculation.
      * </p>
      * <b>Note: </b>Finally their closedAndCalculated attribute is set to true.
-     * @see MeasuredValueUpdateEvent
+     * @see CsiAggregationUpdateEvent
      */
     Boolean closedAndCalculated = false
 
@@ -205,36 +205,36 @@ class CsiAggregation implements CsiValue {
     }
 
     /**
-     * Reads latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} from db. If this events
+     * Reads latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} from db. If this events
      * attribute updateCause requires a recalculation or there is no event at all, true is returned. Otherwise false is returned.
      * @param toProof
-     * @return True if latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} requires recalculation
+     * @return True if latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} requires recalculation
      * 	or there is no event at all. Otherwise false.
      */
     public boolean hasToBeCalculated(){
         if (this.closedAndCalculated) {
             return false
         }
-        MeasuredValueUpdateEvent latestUpdateEvent = getLatestUpdateEvent()
+        CsiAggregationUpdateEvent latestUpdateEvent = getLatestUpdateEvent()
         return latestUpdateEvent == null || latestUpdateEvent.updateCause.requiresRecalculation()
     }
 
     /**
-     * Gets latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} from param updateEvents. If this events
+     * Gets latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} from param updateEvents. If this events
      * attribute updateCause requires a recalculation or there is no event at all, true is returned. Otherwise false is returned.
-     * <b>Note:</b> This method is implemented for performance reasons: If many MeasuredValues should be checked the UpdateEvents are only read once from db.
+     * <b>Note:</b> This method is implemented for performance reasons: If many CsiAggregations should be checked the UpdateEvents are only read once from db.
      * @param toProof
-     * @return True if latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} requires recalculation
+     * @return True if latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} requires recalculation
      * 	or there is no event at all. Otherwise false.
      */
-    public boolean hasToBeCalculatedAccordingEvents(List<MeasuredValueUpdateEvent> updateEvents){
+    public boolean hasToBeCalculatedAccordingEvents(List<CsiAggregationUpdateEvent> updateEvents){
         if (this.closedAndCalculated) {
             return false
         }
         boolean hasToBeCalculated = true
 
-        updateEvents.inject(null){ Long maxDateOfUpdate, MeasuredValueUpdateEvent actualEvent ->
-            if (actualEvent.measuredValueId == this.ident() && ( !maxDateOfUpdate || actualEvent.dateOfUpdate.getTime() > maxDateOfUpdate )) {
+        updateEvents.inject(null){ Long maxDateOfUpdate, CsiAggregationUpdateEvent actualEvent ->
+            if (actualEvent.csiAggregationId == this.ident() && ( !maxDateOfUpdate || actualEvent.dateOfUpdate.getTime() > maxDateOfUpdate )) {
                 hasToBeCalculated = actualEvent.updateCause.requiresRecalculation
                 return actualEvent.dateOfUpdate.getTime()
             }else{
@@ -270,13 +270,13 @@ class CsiAggregation implements CsiValue {
     }
 
     /**
-     * Delivers latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} from db.
-     * @return Latest {@link MeasuredValueUpdateEvent} for this {@link CsiAggregation} or null if no event exists.
+     * Delivers latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} from db.
+     * @return Latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} or null if no event exists.
      */
-    private MeasuredValueUpdateEvent getLatestUpdateEvent() {
-        def c = MeasuredValueUpdateEvent.createCriteria()
-        List<MeasuredValueUpdateEvent> listWithLastUpdateEvent = c.list{
-            eq("measuredValueId", this.ident())
+    private CsiAggregationUpdateEvent getLatestUpdateEvent() {
+        def c = CsiAggregationUpdateEvent.createCriteria()
+        List<CsiAggregationUpdateEvent> listWithLastUpdateEvent = c.list{
+            eq("csiAggregationId", this.ident())
             maxResults(1)
             order("dateOfUpdate", "desc")
         }
@@ -323,8 +323,8 @@ class CsiAggregation implements CsiValue {
         return this.underlyingEventResultsByVisuallyComplete.toList()
     }
 
-    public List<MeasuredValueUpdateEvent> getMeasuredValueUpdateEvents() {
-        return MeasuredValueUpdateEvent.findAllByMeasuredValueId(this.ident())
+    public List<CsiAggregationUpdateEvent> getCsiAggregationUpdateEvents() {
+        return CsiAggregationUpdateEvent.findAllByCsiAggregationId(this.ident())
     }
 
     public String toString(){

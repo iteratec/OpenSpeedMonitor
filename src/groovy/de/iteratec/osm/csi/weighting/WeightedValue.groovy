@@ -20,7 +20,7 @@ package de.iteratec.osm.csi.weighting
 /**
  * A value with a weight for building weighted means.
  * @author nkuhn
- * @see de.iteratec.isocsi.MeasuredValueService
+ * @see de.iteratec.isocsi.CsiAggregationService
  *
  */
 class WeightedValue {

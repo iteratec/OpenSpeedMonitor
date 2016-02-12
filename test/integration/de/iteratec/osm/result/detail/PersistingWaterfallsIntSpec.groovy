@@ -60,7 +60,7 @@ class PersistingWaterfallsIntSpec extends IntTestWithDBCleanup {
 		createLocations()
 		//mocks common to all tests
 		mockTimeToCsMappingService()
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		mockMetricReportingService()
 		locationAndResultPersisterService.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
 			getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
@@ -247,8 +247,8 @@ class PersistingWaterfallsIntSpec extends IntTestWithDBCleanup {
 			return 42 //not the concern of this tests
 		}
 	}
-	void mockMeasuredValueUpdateService(){
-		locationAndResultPersisterService.measuredValueUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result -> 
+	void mockCsiAggregationUpdateService(){
+		locationAndResultPersisterService.csiAggregationUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result ->
 			//not the concern of this tests
 		}	
 	}

@@ -22,7 +22,7 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -145,58 +145,59 @@ class DbCleanupService {
 
 
     /**
-     * Deletes all {@link CsiAggregation}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
+     * Deletes all {@link CsiAggregation}s {@link CsiAggregationUpdateEvent}s before date toDeleteBefore.
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
-    void deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(Date toDeleteBefore, boolean createBatchActivity = true){
-        log.info "begin with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
+    void deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore(Date toDeleteBefore, boolean createBatchActivity = true){
+        log.info "begin with deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore"
 
-        def measuredValueDetachedCriteria = new DetachedCriteria(CsiAggregation).build {
+        def csiAggregationDetachedCriteria = new DetachedCriteria(CsiAggregation).build {
             lt 'started', toDeleteBefore
         }
-        int measuredValueCount = measuredValueDetachedCriteria.count()
-        log.info "CsiAggregation - Count : ${measuredValueCount}"
+        int csiAggregationCount = csiAggregationDetachedCriteria.count()
+        log.info "CsiAggregation - Count : ${csiAggregationCount}"
 
-        def measuredValueUpdateEventDetachedCriteria = new DetachedCriteria(MeasuredValueUpdateEvent).build {
-            'in'('measuredValueId', measuredValueDetachedCriteria.list()*.id )
+        def csiAggregationUpdateEventDetachedCriteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
+            'in'('csiAggregationId', csiAggregationDetachedCriteria.list()*.id )
         }
-        int measuredValueUpdateEventsCount = measuredValueUpdateEventDetachedCriteria.count()
-        log.info "MeasuredValueUpdateEvent - Count : ${measuredValueUpdateEventsCount}"
+        int csiAggregationUpdateEventsCount = csiAggregationUpdateEventDetachedCriteria.count()
+        log.info "CsiAggregationUpdateEvent - Count : ${csiAggregationUpdateEventsCount}"
 
-        int globalCount = measuredValueCount + measuredValueUpdateEventsCount
+        int globalCount = csiAggregationCount + csiAggregationUpdateEventsCount
 
         //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
-        if(measuredValueCount > 0 && !batchActivityService.runningBatch(this.class, 2)) {
-            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of MeasuredValues and MeasuredValueUpdateEvents",createBatchActivity )
+        if(csiAggregationCount > 0 && !batchActivityService.runningBatch(this.class, 2)) {
+            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of CsiAggregations and CsiAggregationUpdateEvents",createBatchActivity )
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
-            log.debug('Starting deletion of MeasuredValueUpdateEvents and MeasuredValues')
+            log.debug('Starting deletion of CsiAggregationUpdateEvents and CsiAggregations')
 
-            //First clean MeasuredValueUpdateEvents
-            0.step(measuredValueUpdateEventsCount, batchSize){ int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete MeasuredValueUpdateEvents'])
-                MeasuredValueUpdateEvent.withNewTransaction {
-                    measuredValueUpdateEventDetachedCriteria.list(max: batchSize).each{ MeasuredValueUpdateEvent measuredValueUpdateEvent ->
+            //First clean CsiAggregationUpdateEvents
+            0.step(csiAggregationUpdateEventsCount, batchSize){ int offset ->
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete CsiAggregationUpdateEvents'])
+                CsiAggregationUpdateEvent.withNewTransaction {
+                    csiAggregationUpdateEventDetachedCriteria.list(max: batchSize).each{ CsiAggregationUpdateEvent csiAggregationUpdateEvent
+                        ->
                         try {
-                            measuredValueUpdateEvent.delete()
+                            csiAggregationUpdateEvent.delete()
                         }
                         catch(Exception e){
                         }
                     }
                 }
                 //clear hibernate session first-level cache
-                MeasuredValueUpdateEvent.withSession { session -> session.clear() }
+                CsiAggregationUpdateEvent.withSession { session -> session.clear() }
             }
 
-            log.debug('Deletion of MeasuredValueUpdateEvents finished')
+            log.debug('Deletion of CsiAggregationUpdateEvents finished')
 
-            //After then clean MeasuredValues
-            0.step(measuredValueCount, batchSize) { int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
+            //After then clean CsiAggregations
+            0.step(csiAggregationCount, batchSize) { int offset ->
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(csiAggregationCount, offset+csiAggregationUpdateEventsCount), 'stage': 'delete CsiAggregations'])
                 CsiAggregation.withNewTransaction {
-                    measuredValueDetachedCriteria.list(max: batchSize).each { CsiAggregation measuredValue ->
+                    csiAggregationDetachedCriteria.list(max: batchSize).each { CsiAggregation csiAggregation ->
                         try {
-                            measuredValue.delete()
+                            csiAggregation.delete()
                         } catch (Exception e) {
                         }
                     }
@@ -205,10 +206,10 @@ class DbCleanupService {
                 CsiAggregation.withSession { session -> session.clear() }
             }
             batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
-            log.debug('Deletion of MeasuredValues finished')
+            log.debug('Deletion of CsiAggregations finished')
         }
 
-        log.info "end with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
+        log.info "end with deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore"
     }
 }
 

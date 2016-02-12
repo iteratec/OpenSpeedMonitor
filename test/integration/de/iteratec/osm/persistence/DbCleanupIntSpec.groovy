@@ -33,7 +33,7 @@ class DbCleanupIntSpec extends IntTestWithDBCleanup{
 	 * TODO: The following test-methods test whether db is cleaned between execution of single methods. They are green by itself but tests 
 	 * in subsequent test-classes of the whole suite fail if they run (although the database is cleared after execution of the methods). 
 	 * 
-	 * 2014-07-26, nkuhn: Test in de.iteratec.isocsi.ShopMeasureValueCalculationIntSpec fails if the following methods run and passes if they don't run. 
+	 * 2014-07-26, nkuhn: Test in de.iteratec.isocsi.ShopCsiAggregationCalculationIntSpec fails if the following methods run and passes if they don't run.
 	 * 	To reproduce call:
 	 * 	 
 	 */

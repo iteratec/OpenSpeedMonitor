@@ -40,15 +40,15 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
-@TestFor(CsiSystemMeasuredValueService)
-@Mock([MeanCalcService, CsiAggregation, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location,
-        Page, MeasuredValueUpdateEvent, CsiSystem])
-class CsiSystemMeasuredValueServiceSpec extends Specification {
+@TestFor(CsiSystemCsiAggregationService)
+@Mock([MeanCalcService, CsiAggregation, CsiAggregationInterval, AggregatorType, Browser, JobGroup, Location,
+        Page, CsiAggregationUpdateEvent, CsiSystem])
+class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     @Shared
     static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
 
-    MeasuredValueInterval weeklyInterval, dailyInterval, hourlyInterval
+    CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
     CsiSystem csiSystem1, csiSystem2, csiSystemWith3
 
@@ -62,7 +62,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     String jobGroupName2 = 'myJobGroup2'
     String jobGroupName3 = 'myJobGroup3'
 
-    CsiSystemMeasuredValueService serviceUnderTest
+    CsiSystemCsiAggregationService serviceUnderTest
 
     void setup() {
 
@@ -155,7 +155,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
 
         when:
         //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem1])
         List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
@@ -191,7 +191,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         when:
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
         List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
@@ -219,7 +219,7 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
         mockWeightingService([],[])
 
         when:
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
         List<CsiAggregation> mvs = serviceUnderTest.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
 
         then:
@@ -251,42 +251,42 @@ class CsiSystemMeasuredValueServiceSpec extends Specification {
     }
 
     /**
-     * Mocks methods of {@link MeasuredValueUpdateEventDaoService}.
+     * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
-    private void mockMeasuredValueUpdateEventDaoService() {
-        def measuredValueUpdateEventDaoService = mockFor(MeasuredValueUpdateEventDaoService, true)
-        measuredValueUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
-            Long measuredValueId, MeasuredValueUpdateEvent.UpdateCause cause ->
+    private void mockCsiAggregationUpdateEventDaoService() {
+        def csiAggregationUpdateEventDaoService = mockFor(CsiAggregationUpdateEventDaoService, true)
+        csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
+            Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 
-                new MeasuredValueUpdateEvent(
+                new CsiAggregationUpdateEvent(
                         dateOfUpdate: new Date(),
-                        measuredValueId: measuredValueId,
+                        csiAggregationId: csiAggregationId,
                         updateCause: cause
                 ).save(failOnError: true)
 
         }
-        serviceUnderTest.measuredValueUpdateEventDaoService = measuredValueUpdateEventDaoService.createMock()
+        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.createMock()
     }
 
-    private mocksCommonForAllTests(CsiSystemMeasuredValueService serviceUnderTest) {
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
-        serviceUnderTest.measuredValueDaoService = new MeasuredValueDaoService()
+    private mocksCommonForAllTests(CsiSystemCsiAggregationService serviceUnderTest) {
+        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService();
+        serviceUnderTest.csiAggregationDaoService = new CsiAggregationDaoService()
 
         Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
-        SERVICE_MOCKER.mockMeasuredValueTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
+        SERVICE_MOCKER.mockCsiAggregationTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
 
-        SERVICE_MOCKER.mockShopMeasuredValueService(serviceUnderTest, [new CsiAggregation()])
+        SERVICE_MOCKER.mockShopCsiAggregationService(serviceUnderTest, [new CsiAggregation()])
 
         SERVICE_MOCKER.mockPerformanceLoggingService(serviceUnderTest)
 
-        mockMeasuredValueUpdateEventDaoService()
+        mockCsiAggregationUpdateEventDaoService()
 
     }
 
     private void createTestDataCommonForAllTests() {
-        weeklyInterval = new MeasuredValueInterval(name: 'weekly', intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
-        dailyInterval = new MeasuredValueInterval(name: 'daily', intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
-        hourlyInterval = new MeasuredValueInterval(name: 'hourly', intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true)
+        weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
+        dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
+        hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
 
         shop = new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
         csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM).save(validate: false)

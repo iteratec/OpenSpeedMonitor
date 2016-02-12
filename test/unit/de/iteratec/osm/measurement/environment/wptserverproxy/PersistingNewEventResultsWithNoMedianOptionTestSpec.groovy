@@ -18,7 +18,7 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
@@ -108,11 +108,11 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
         //mocking of inner services
 
-        mockMeasuredValueUpdateService()
+        mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
         mockJobService()
-        mockMeasuredValueTagService('notTheConcernOfThisTest')
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
 
         // Mock Location needed!
         mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
@@ -158,11 +158,11 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
         //mocking of inner services
 
-        mockMeasuredValueUpdateService()
+        mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
         mockJobService()
-        mockMeasuredValueTagService('notTheConcernOfThisTest')
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
 
         // Mock Location needed!
         mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
@@ -201,11 +201,11 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
         //mocking of inner services
 
-        mockMeasuredValueUpdateService()
+        mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
         mockJobService()
-        mockMeasuredValueTagService('notTheConcernOfThisTest')
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
 
 
         // Mock Location needed!
@@ -246,11 +246,11 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
         //mocking of inner services
 
-        mockMeasuredValueUpdateService()
+        mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
         mockJobService()
-        mockMeasuredValueTagService('notTheConcernOfThisTest')
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
 
         // Mock Location needed!
         mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
@@ -310,13 +310,13 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         }
         serviceUnderTest.timeToCsMappingService = timeToCsMappingService.createMock()
     }
-    private void mockMeasuredValueUpdateService(){
-        def measuredValueUpdateServiceMocked = mockFor(MeasuredValueUpdateService, true)
-        measuredValueUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
+    private void mockCsiAggregationUpdateService(){
+        def csiAggregationUpdateServiceMocked = mockFor(CsiAggregationUpdateService, true)
+        csiAggregationUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
             //not the concern of this test
             return 34d
         }
-        serviceUnderTest.measuredValueUpdateService = measuredValueUpdateServiceMocked.createMock()
+        serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.createMock()
     }
     private void mockPageService(){
         def pageServiceMocked = mockFor(PageService, true)
@@ -343,9 +343,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         }
         serviceUnderTest.jobService = jobServiceMocked.createMock()
     }
-    private void mockMeasuredValueTagService(String tagToReturn){
-        def measuredValueTagService = mockFor(MeasuredValueTagService, true)
-        measuredValueTagService.demand.createEventResultTag(0..100) {
+    private void mockCsiAggregationTagService(String tagToReturn){
+        def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+        csiAggregationTagService.demand.createEventResultTag(0..100) {
             JobGroup jobGroup,
             MeasuredEvent measuredEvent,
             Page page,
@@ -353,11 +353,11 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
             Location location ->
                 return tagToReturn
         }
-        measuredValueTagService.demand.findJobGroupOfEventResultTag(0..100) {
+        csiAggregationTagService.demand.findJobGroupOfEventResultTag(0..100) {
             String tag ->
                 return undefinedJobGroup
         }
-        serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock()
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
     }
     private void mockMetricReportingService(){
         def metricReportingService = mockFor(MetricReportingService, true)

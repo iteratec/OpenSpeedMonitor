@@ -23,21 +23,21 @@ import static de.iteratec.osm.util.Constants.*
 
 import org.joda.time.DateTime
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -46,20 +46,20 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 
-class PageMeasuredValueService {
+class PageCsiAggregationService {
 
-    EventMeasuredValueService eventMeasuredValueService
+    EventCsiAggregationService eventCsiAggregationService
     JobService jobService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
     CsiHelperService csiHelperService
     MeanCalcService meanCalcService
-    MeasuredValueTagService measuredValueTagService
+    CsiAggregationTagService csiAggregationTagService
     PerformanceLoggingService performanceLoggingService
     MeasuredEventDaoService measuredEventDaoService
-    MeasuredValueDaoService measuredValueDaoService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationDaoService csiAggregationDaoService
+    CsiAggregationUtilService csiAggregationUtilService
     WeightingService weightingService
-    MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+    CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
     /**
      * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
@@ -68,7 +68,7 @@ class PageMeasuredValueService {
      * @param targetInterval
      * @return
      */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, MeasuredValueInterval targetInterval) {
+    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval) {
         List<CsiAggregation> result = []
 
         def query = CsiAggregation.where {
@@ -94,37 +94,37 @@ class PageMeasuredValueService {
      *
      * @param fromDate
      *         First {@link Date} (inclusive) of a test start date for that
-     *         result measured values to find,
+     *         result CsiAggregations to find,
      *         not <code>null</code>.
      * @param toDate
      *         Last {@link Date} (inclusive) of a test start date for that
-     *         result measured values to find,
+     *         result CsiAggregations to find,
      *         not <code>null</code>.
      * @param targetInterval
-     *         The interval of the page measured values to find, currently only
-     * {@link MeasuredValueInterval#WEEKLY} is supported,
+     *         The interval of the page CsiAggregations to find, currently only
+     * {@link CsiAggregationInterval#WEEKLY} is supported,
      *         not <code>null</code> (this argument is deprecated).
      * @param groups
-     *         The groups for that measured values should be found,
+     *         The groups for that CsiAggregations should be found,
      *         not <code>null</code>.
      * @param pages
-     *         The pages for that measured values should be found,
+     *         The pages for that CsiAggregations should be found,
      *         not <code>null</code>.
      *
-     * @return Found (weekly) page measured values, not <code>null</code>.
+     * @return Found (weekly) page CsiAggregations, not <code>null</code>.
      *
      * @see CsiAggregation#getStarted()
      */
     public List<CsiAggregation> findAll(Date fromDate, Date toDate,
                                         @Deprecated
-                                               MeasuredValueInterval targetInterval,
+                                               CsiAggregationInterval targetInterval,
                                         List<JobGroup> groups, List<Page> pages) {
         List<CsiAggregation> result = []
         if (groups.size() == 0 || pages.size() == 0) {
             return result
         }
-        String tagPattern = measuredValueTagService.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(groups, pages)
-        result = measuredValueDaoService.getMvs(
+        String tagPattern = csiAggregationTagService.getTagPatternForWeeklyPageCasWithJobGroupsAndPages(groups, pages)
+        result = csiAggregationDaoService.getMvs(
                 fromDate,
                 toDate,
                 tagPattern,
@@ -140,16 +140,16 @@ class PageMeasuredValueService {
      * @param newResult
      * 			New {@link EventResult}.
      */
-    void markMvAsOutdated(DateTime start, EventResult newResult, MeasuredValueInterval interval) {
-        String pageTag = measuredValueTagService.createPageAggregatorTagByEventResult(newResult)
+    void markMvAsOutdated(DateTime start, EventResult newResult, CsiAggregationInterval interval) {
+        String pageTag = csiAggregationTagService.createPageAggregatorTagByEventResult(newResult)
         if (pageTag) {
             CsiAggregation pageMv = ensurePresence(start, interval, pageTag)
-            measuredValueUpdateEventDaoService.createUpdateEvent(pageMv.ident(), MeasuredValueUpdateEvent.UpdateCause.OUTDATED)
+            csiAggregationUpdateEventDaoService.createUpdateEvent(pageMv.ident(), CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
     }
 
     /**
-     * Provides {@link CsiAggregation}s for given {@link Page}s, {@link JobGroup}s and a {@link MeasuredValueInterval} between toDate and fromDate.
+     * Provides {@link CsiAggregation}s for given {@link Page}s, {@link JobGroup}s and a {@link CsiAggregationInterval} between toDate and fromDate.
      * Non-existent {@link CsiAggregation}s will be created.
      * All {@link CsiAggregation}s with @{link CsiAggregation.Calculated.Not} will be calculated and persisted with @{link CsiAggregation.Calculated.Yes}* or @{link CsiAggregation.Calculated.YesNoData}.
      * @param fromDateTime
@@ -159,7 +159,7 @@ class PageMeasuredValueService {
      * @param pages
      * @return
      */
-    List<CsiAggregation> getOrCalculatePageMeasuredValues(Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> pages = Page.list()) {
+    List<CsiAggregation> getOrCalculatePageCsiAggregations(Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups, List<Page> pages = Page.list()) {
 
         DateTime toDateTime = new DateTime(toDate)
         DateTime fromDateTime = new DateTime(fromDate)
@@ -167,64 +167,64 @@ class PageMeasuredValueService {
             throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
         }
 
-        Integer numberOfIntervals = measuredValueUtilService.getNumberOfIntervals(fromDateTime, toDateTime, interval)
-        List<CsiAggregation> existingMeasuredValues = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiGroups, pages)
+        Integer numberOfIntervals = csiAggregationUtilService.getNumberOfIntervals(fromDateTime, toDateTime, interval)
+        List<CsiAggregation> existingCsiAggregations = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiGroups, pages)
 
-        List<CsiAggregation> openMeasuredValues = existingMeasuredValues.findAll { !it.closedAndCalculated }
-        Boolean allMeasuredValuesExist = existingMeasuredValues.size() == numberOfIntervals * csiGroups.size() * pages.size()
-        if (allMeasuredValuesExist && openMeasuredValues.size() == 0) {
-            return existingMeasuredValues
+        List<CsiAggregation> openCsiAggregations = existingCsiAggregations.findAll { !it.closedAndCalculated }
+        Boolean allCsiAggregationsExist = existingCsiAggregations.size() == numberOfIntervals * csiGroups.size() * pages.size()
+        if (allCsiAggregationsExist && openCsiAggregations.size() == 0) {
+            return existingCsiAggregations
         }
 
-        List<MeasuredValueUpdateEvent> updateEvents = []
-        if (openMeasuredValues.size() > 0) updateEvents.addAll(measuredValueDaoService.getUpdateEvents(openMeasuredValues*.ident()))
-        List<CsiAggregation> measuredValuesToBeCalculated = openMeasuredValues.findAll {
+        List<CsiAggregationUpdateEvent> updateEvents = []
+        if (openCsiAggregations.size() > 0) updateEvents.addAll(csiAggregationDaoService.getUpdateEvents(openCsiAggregations*.ident()))
+        List<CsiAggregation> csiAggregationsToBeCalculated = openCsiAggregations.findAll {
             it.hasToBeCalculatedAccordingEvents(updateEvents)
         }
 
-        if (allMeasuredValuesExist && measuredValuesToBeCalculated.size() == 0) {
+        if (allCsiAggregationsExist && csiAggregationsToBeCalculated.size() == 0) {
 
-            return existingMeasuredValues;
+            return existingCsiAggregations;
 
         } else {
 
-            List<CsiAggregation> calculatedMeasuredvalues = []
+            List<CsiAggregation> calculatedCsiAggregations = []
             DateTime currentDateTime = fromDateTime
             while (!currentDateTime.isAfter(toDateTime)) {
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, " get/create/calculate ${interval.name} page-MeasureValue for: ${currentDateTime}", IndentationDepth.TWO) {
-                    List<CsiAggregation> existingMvsOfCurrentTime = existingMeasuredValues.findAll {
+                performanceLoggingService.logExecutionTime(LogLevel.INFO, " get/create/calculate ${interval.name} page-CsiAggregation for: ${currentDateTime}", IndentationDepth.TWO) {
+                    List<CsiAggregation> existingMvsOfCurrentTime = existingCsiAggregations.findAll {
                         new DateTime(it.started) == currentDateTime
                     }
-                    List<CsiAggregation> mvsToBeCalculatedOfCurrentTime = measuredValuesToBeCalculated.findAll {
+                    List<CsiAggregation> mvsToBeCalculatedOfCurrentTime = csiAggregationsToBeCalculated.findAll {
                         new DateTime(it.started) == currentDateTime
                     }
                     if (existingMvsOfCurrentTime.size() == csiGroups.size() * pages.size() &&
                             mvsToBeCalculatedOfCurrentTime.size() == 0) {
-                        calculatedMeasuredvalues.addAll(existingMvsOfCurrentTime)
+                        calculatedCsiAggregations.addAll(existingMvsOfCurrentTime)
 
                     } else {
-                        calculatedMeasuredvalues.addAll(
+                        calculatedCsiAggregations.addAll(
                                 getOrCalculatePageMvs(currentDateTime, interval, csiGroups, pages, updateEvents)
                         )
 
                     }
                 }
-                currentDateTime = measuredValueUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
+                currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
 
             }
-            return calculatedMeasuredvalues
+            return calculatedCsiAggregations
         }
     }
 
-    private List<CsiAggregation> getOrCalculatePageMvs(DateTime toGetMvsFor, MeasuredValueInterval interval, List<JobGroup> csiGroups, List<Page> csiPages, List<MeasuredValueUpdateEvent> updateEvents) {
+    private List<CsiAggregation> getOrCalculatePageMvs(DateTime toGetMvsFor, CsiAggregationInterval interval, List<JobGroup> csiGroups, List<Page> csiPages, List<CsiAggregationUpdateEvent> updateEvents) {
         List<CsiAggregation> calculatedPageMvs = []
-        MvCachingContainer cachingContainer = new MvCachingContainer()
-        cachingContainer.hmvsByCsiGroupPageCombination = getHmvsByCsiGroupPageCombinationMap(csiGroups, csiPages, toGetMvsFor, toGetMvsFor.plusMinutes(interval.getIntervalInMinutes()))
+        CsiAggregationCachingContainer cachingContainer = new CsiAggregationCachingContainer()
+        cachingContainer.hCsiAggregationsByCsiGroupPageCombination = getHmvsByCsiGroupPageCombinationMap(csiGroups, csiPages, toGetMvsFor, toGetMvsFor.plusMinutes(interval.getIntervalInMinutes()))
         csiGroups.each { JobGroup group ->
-            cachingContainer.csiGroupToCalcMvFor = group
+            cachingContainer.csiGroupToCalcCsiAggregationFor = group
             csiPages.each { Page page ->
-                cachingContainer.pageToCalcMvFor = page
-                String tag = measuredValueTagService.createPageAggregatorTag(group, page)
+                cachingContainer.pageToCalcCsiAggregationFor = page
+                String tag = csiAggregationTagService.createPageAggregatorTag(group, page)
                 calculatedPageMvs.add(ensurePresenceAndCalculation(toGetMvsFor, interval, tag, cachingContainer, updateEvents))
             }
         }
@@ -232,7 +232,7 @@ class PageMeasuredValueService {
     }
 
     Map<String, List<CsiAggregation>> getHmvsByCsiGroupPageCombinationMap(List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime) {
-        List<CsiAggregation> hourlyMeasuredValues
+        List<CsiAggregation> hourlyCsiAggregations
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getHmvs: getting", IndentationDepth.FOUR) {
             MvQueryParams queryParams = new MvQueryParams();
             queryParams.jobGroupIds.addAll(csiGroups*.ident());
@@ -241,14 +241,14 @@ class PageMeasuredValueService {
             queryParams.browserIds.addAll(Browser.list()*.ident());
             queryParams.locationIds.addAll(Location.list()*.ident());
             queryParams.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-            hourlyMeasuredValues = eventMeasuredValueService.getHourylMeasuredValues(startDateTime.toDate(), endDateTime.toDate(), queryParams)
+            hourlyCsiAggregations = eventCsiAggregationService.getHourlyCsiAggregations(startDateTime.toDate(), endDateTime.toDate(), queryParams)
         }
         Map<String, List<CsiAggregation>> hmvsByCsiGroupPageCombination
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getHmvs: iterate and write to map", IndentationDepth.FOUR) {
             hmvsByCsiGroupPageCombination = [:].withDefault { [] }
-            hourlyMeasuredValues.each { hmv ->
-                JobGroup groupOfHmv = measuredValueTagService.findJobGroupOfHourlyEventTag(hmv.tag)
-                Page pageOfHmv = measuredValueTagService.findPageOfHourlyEventTag(hmv.tag)
+            hourlyCsiAggregations.each { hmv ->
+                JobGroup groupOfHmv = csiAggregationTagService.findJobGroupOfHourlyEventTag(hmv.tag)
+                Page pageOfHmv = csiAggregationTagService.findPageOfHourlyEventTag(hmv.tag)
                 if (groupOfHmv && pageOfHmv && csiGroups.contains(groupOfHmv) && csiPages.contains(pageOfHmv)) {
                     hmvsByCsiGroupPageCombination["${groupOfHmv.ident() + UNIQUE_STRING_DELIMITTER + pageOfHmv.ident()}"].add(hmv)
                 }
@@ -265,20 +265,20 @@ class PageMeasuredValueService {
      * @param cachingContainer
      * @return
      */
-    CsiAggregation ensurePresenceAndCalculation(DateTime startDate, MeasuredValueInterval interval, String tag, MvCachingContainer cachingContainer, List<MeasuredValueUpdateEvent> updateEvents) {
+    CsiAggregation ensurePresenceAndCalculation(DateTime startDate, CsiAggregationInterval interval, String tag, CsiAggregationCachingContainer cachingContainer, List<CsiAggregationUpdateEvent> updateEvents) {
         CsiAggregation toCreateAndOrCalculate
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence", IndentationDepth.THREE) {
             toCreateAndOrCalculate = ensurePresence(startDate, interval, tag)
         }
         if (toCreateAndOrCalculate.hasToBeCalculatedAccordingEvents(updateEvents)) {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "calculateCustomerSatisfactionMeasuredValue (interval=${interval.intervalInMinutes}; aggregator=page)", IndentationDepth.THREE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "calculateCustomerSatisfactionCsiAggregation (interval=${interval.intervalInMinutes}; aggregator=page)", IndentationDepth.THREE) {
                 toCreateAndOrCalculate = calcMv(toCreateAndOrCalculate, cachingContainer)
             }
         }
         return toCreateAndOrCalculate
     }
 
-    private CsiAggregation ensurePresence(DateTime startDate, MeasuredValueInterval interval, String tag) {
+    private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, String tag) {
         CsiAggregation toCreateAndOrCalculate
         AggregatorType pageAggregator = AggregatorType.findByName(AggregatorType.PAGE)
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR) {
@@ -301,19 +301,19 @@ class PageMeasuredValueService {
      * Calculates the given {@link CsiAggregation} toBeCalculated.
      * @return The calculated {@link CsiAggregation}.
      */
-    CsiAggregation calcMv(CsiAggregation toBeCalculated, MvCachingContainer cachingContainer) {
+    CsiAggregation calcMv(CsiAggregation toBeCalculated, CsiAggregationCachingContainer cachingContainer) {
         JobGroup targetCsiGroup
         Page targetPage
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getJobGroupAndPageFromCachingContainer", IndentationDepth.FOUR) {
-            targetCsiGroup = cachingContainer.csiGroupToCalcMvFor
-            targetPage = cachingContainer.pageToCalcMvFor
+            targetCsiGroup = cachingContainer.csiGroupToCalcCsiAggregationFor
+            targetPage = cachingContainer.pageToCalcCsiAggregationFor
         }
         if (toBeCalculated == null || !targetCsiGroup || !targetPage) {
-            log.error("MeasuerdValue can't be calculated: ${toBeCalculated}. targetCsiGroup=${targetCsiGroup}, targetPage=${targetPage}")
+            log.error("CsiAggregation can't be calculated: ${toBeCalculated}. targetCsiGroup=${targetCsiGroup}, targetPage=${targetPage}")
             return toBeCalculated
         }
-        List<CsiAggregation> hmvsOfTargetCsiGroupAndPage = cachingContainer.hmvsByCsiGroupPageCombination["${targetCsiGroup.ident() + UNIQUE_STRING_DELIMITTER + targetPage.ident()}"]
-        log.debug("Calculating Page-CsiAggregation: Calculation-database are ${hmvsOfTargetCsiGroupAndPage.size()} hourly Event-MeasuredValues.")
+        List<CsiAggregation> hmvsOfTargetCsiGroupAndPage = cachingContainer.hCsiAggregationsByCsiGroupPageCombination["${targetCsiGroup.ident() + UNIQUE_STRING_DELIMITTER + targetPage.ident()}"]
+        log.debug("Calculating Page-CsiAggregation: Calculation-database are ${hmvsOfTargetCsiGroupAndPage.size()} hourly Event-CsiAggregations.")
 
         List<WeightedCsiValue> weightedCsiValuesByDocComplete = []
         List<WeightedCsiValue> weightedCsiValuesByVisuallyComplete = []
@@ -332,7 +332,7 @@ class PageMeasuredValueService {
             if(weightedCsiValuesByVisuallyComplete.size() > 0) {
                 toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesByVisuallyComplete*.weightedValue)
             }
-            measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+            csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
         return toBeCalculated
     }
@@ -344,12 +344,12 @@ class PageMeasuredValueService {
      * @param fromDate
      * @param toDate
      * @return
-     * @deprecated Use {@link #getOrCalculateWeeklyPageMeasuredValues(Date, Date, List, List)}
+     * @deprecated Use {@link #getOrCalculateWeeklyPageCsiAggregations(Date, Date, List, List)}
      */
     @Deprecated
-    List<CsiAggregation> getOrCalculateWeeklyPageMeasuredValues(Date fromDate, Date toDate) {
-        MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
-        return getOrCalculatePageMeasuredValues(fromDate, toDate, weeklyInterval, JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION), Page.list())
+    List<CsiAggregation> getOrCalculateWeeklyPageCsiAggregations(Date fromDate, Date toDate) {
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
+        return getOrCalculatePageCsiAggregations(fromDate, toDate, weeklyInterval, JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION), Page.list())
     }
 
     /**
@@ -361,11 +361,11 @@ class PageMeasuredValueService {
      * @param csiGroups
      * @return
      *
-     * @deprecated Use {@link #getOrCalculateWeeklyPageMeasuredValues(Date, Date, List, List)}
+     * @deprecated Use {@link #getOrCalculateWeeklyPageCsiAggregations(Date, Date, List, List)}
      */
     @Deprecated
-    List<CsiAggregation> getOrCalculateWeeklyPageMeasuredValues(Date fromDate, Date toDate, List<JobGroup> csiGroups) {
-        MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
-        return getOrCalculatePageMeasuredValues(fromDate, toDate, weeklyInterval, csiGroups, Page.list());
+    List<CsiAggregation> getOrCalculateWeeklyPageCsiAggregations(Date fromDate, Date toDate, List<JobGroup> csiGroups) {
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
+        return getOrCalculatePageCsiAggregations(fromDate, toDate, weeklyInterval, csiGroups, Page.list());
     }
 }

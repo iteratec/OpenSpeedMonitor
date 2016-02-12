@@ -28,8 +28,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
@@ -89,7 +88,7 @@ class CsiDashboardControllerTests {
 
         // Mock relevant services:
         command = new CsiDashboardShowAllCommand()
-        command.measuredValueUtilService = new MeasuredValueUtilService()
+        command.csiAggregationUtilService = new CsiAggregationUtilService()
 
         this.aggregatorTypeDaoServiceMock = Mockito.mock(AggregatorTypeDaoService.class);
         controllerUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoServiceMock;

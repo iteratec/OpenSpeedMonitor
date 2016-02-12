@@ -15,18 +15,26 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.csi
-
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-
+package de.iteratec.osm.report.chart
 /**
- * For caching elements during expensive calculations in {@link EventMeasuredValueService}, {@link PageMeasuredValueService} or {@link ShopMeasuredValueService}.
- * @author nkuhn
- *
+ * CsiAggregationUpdateEventDaoService
+ * A service class encapsulates the core business logic of a Grails application
  */
-class MvCachingContainer {
-	JobGroup csiGroupToCalcMvFor
-	Page pageToCalcMvFor
-	Map<String,List<CsiAggregation>> hmvsByCsiGroupPageCombination
+class CsiAggregationUpdateEventDaoService {
+
+    static transactional = true
+	
+	/**
+	 * Writes a new {@link CsiAggregationUpdateEvent} with dateOfUpdate = NOW.
+	 * @param csiAggregationId
+	 * @param cause
+	 */
+    void createUpdateEvent(Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause){
+		new CsiAggregationUpdateEvent(
+			dateOfUpdate: new Date(),
+			csiAggregationId: csiAggregationId,
+			updateCause: cause
+		).save(failOnError: true)
+	}
+	
 }

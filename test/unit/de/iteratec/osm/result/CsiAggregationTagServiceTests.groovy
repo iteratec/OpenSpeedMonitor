@@ -37,14 +37,14 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
- * Test-suite of {@link de.iteratec.osm.result.MeasuredValueTagService}.
+ * Test-suite of {@link CsiAggregationTagService}.
  * 
  * @author nkuhn
  * @author mze
  */
-@TestFor(MeasuredValueTagService)
+@TestFor(CsiAggregationTagService)
 @Mock([Job, JobResult, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, WebPageTestServer])
-class MeasuredValueTagServiceTests {
+class CsiAggregationTagServiceTests {
 
 	static final Integer eventResultStatus = 200
 	static final String jobGroupName1 = 'myJobGroup'
@@ -59,7 +59,7 @@ class MeasuredValueTagServiceTests {
 	static final String browserName1 = 'browserName1'
 	static final String browserName2 = 'browserName2'
 
-	MeasuredValueTagService serviceUnderTest
+	CsiAggregationTagService serviceUnderTest
 
 	@Before
 	void setUp() {
@@ -172,7 +172,7 @@ class MeasuredValueTagServiceTests {
 	}
 
 	@Test
-	public void testGetTagPatternForHourlyMeasuredValues() {
+	public void testGetTagPatternForHourlyCsiAggregations() {
 		// Create a query request:
 		MvQueryParams queryParams = new MvQueryParams();
 		queryParams.jobGroupIds.addAll([8, 9]);
@@ -185,14 +185,14 @@ class MeasuredValueTagServiceTests {
 		String expectedPatternAsString = '^(8|9);(38|77);(1|3|8);(7);(99|101)$'
 
 		// Run the test
-		Pattern createdPattern = serviceUnderTest.getTagPatternForHourlyMeasuredValues(queryParams)
+		Pattern createdPattern = serviceUnderTest.getTagPatternForHourlyCsiAggregations(queryParams)
 
 		// Verify results
 		assertEquals(expectedPatternAsString, createdPattern.toString())
 	}
 	
 	@Test
-	public void testGetTagPatternForHourlyMeasuredValues_EmptyGroups_CreatesPatternToFindAllGroups() {
+	public void testGetTagPatternForHourlyCsiAggregations_EmptyGroups_CreatesPatternToFindAllGroups() {
 		// Create a query request:
 		MvQueryParams queryParams = new MvQueryParams();
 		assertTrue('Here is the empty one!', queryParams.jobGroupIds.isEmpty());
@@ -205,14 +205,14 @@ class MeasuredValueTagServiceTests {
 		String expectedPatternAsString = '^[^;]*;(38|77);(1|3|8);(7);(99|101)$'
 
 		// Run the test
-		Pattern createdPattern = serviceUnderTest.getTagPatternForHourlyMeasuredValues(queryParams)
+		Pattern createdPattern = serviceUnderTest.getTagPatternForHourlyCsiAggregations(queryParams)
 
 		// Verify results
 		assertEquals(expectedPatternAsString, createdPattern.toString())
 	}
 	
 	@Test
-	public void testGetTagPatternForHourlyMeasuredValues_EmptyPages_CreatesPatternToFindAllPages() {
+	public void testGetTagPatternForHourlyCsiAggregations_EmptyPages_CreatesPatternToFindAllPages() {
 		// Create a query request:
 		MvQueryParams queryParams = new MvQueryParams();
 		queryParams.jobGroupIds.addAll([8, 9]);
@@ -225,7 +225,7 @@ class MeasuredValueTagServiceTests {
 		String expectedPatternAsString = '^(8|9);(38|77);[^;]*;(7);(99|101)$'
 
 		// Run the test
-		Pattern createdPattern = serviceUnderTest.getTagPatternForHourlyMeasuredValues(queryParams)
+		Pattern createdPattern = serviceUnderTest.getTagPatternForHourlyCsiAggregations(queryParams)
 
 		// Verify results
 		assertEquals(expectedPatternAsString, createdPattern.toString())
@@ -352,7 +352,7 @@ class MeasuredValueTagServiceTests {
 		Pattern expectedPattern = ~/^(1|2|3);(1|2)$/
 
 		// Run the test:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages([group1, group2, group3], [page1, page2])
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageCasWithJobGroupsAndPages([group1, group2, group3], [page1, page2])
 
 		// Verify result:
 		assertEquals(expectedPattern.pattern(), tagPattern.pattern())
@@ -369,7 +369,7 @@ class MeasuredValueTagServiceTests {
 		Pattern expectedPattern = ~/^(1|2|3);[^;]*$/
 
 		// Run the test:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages([group1, group2, group3], [])
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageCasWithJobGroupsAndPages([group1, group2, group3], [])
 
 		// Verify result:
 		assertEquals(expectedPattern.pattern(), tagPattern.pattern())
@@ -386,7 +386,7 @@ class MeasuredValueTagServiceTests {
 		Pattern expectedPattern = ~/^(3);(1|3)$/
 
 		// Run the test:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages([group3], [page1, page3])
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageCasWithJobGroupsAndPages([group3], [page1, page3])
 
 		// Verify result:
 		assertEquals(expectedPattern.pattern(), tagPattern.pattern())
@@ -399,7 +399,7 @@ class MeasuredValueTagServiceTests {
 		Page page3 = Page.findByName(pageName3)
 
 		// Run the test should fail:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(null, [page1, page3])
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageCasWithJobGroupsAndPages(null, [page1, page3])
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -408,7 +408,7 @@ class MeasuredValueTagServiceTests {
 		JobGroup group3 = JobGroup.findByName(jobGroupName3)
 
 		// Run the test should fail:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages([group3], null)
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyPageCasWithJobGroupsAndPages([group3], null)
 	}
 
 	@Test
@@ -422,7 +422,7 @@ class MeasuredValueTagServiceTests {
 		Pattern expectedPattern = ~/^(1|2|3)$/
 
 		// Run the test:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyShopMvsWithJobGroups([group1, group2, group3])
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyShopCasWithJobGroups([group1, group2, group3])
 
 		// Verify result:
 		assertEquals(expectedPattern.pattern(), tagPattern.pattern())
@@ -434,7 +434,7 @@ class MeasuredValueTagServiceTests {
 		Pattern expectedPattern = ~/^[^;]*$/
 
 		// Run the test:
-		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyShopMvsWithJobGroups([])
+		Pattern tagPattern = serviceUnderTest.getTagPatternForWeeklyShopCasWithJobGroups([])
 
 		// Verify result:
 		assertEquals(expectedPattern.pattern(), tagPattern.pattern())

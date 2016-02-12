@@ -74,9 +74,9 @@ class OsmChartProcessingServiceSpec extends Specification{
         mocksCommonForAllTests()
     }
 
-    // event measured values ////////////////////////////////////////////////////////////////////////////
+    // event csiAggregations ////////////////////////////////////////////////////////////////////////////
 
-    void "event measured values, every legend part in every graph different -> no summarization"(){
+    void "event csiAggregations, every legend part in every graph different -> no summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -100,7 +100,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "event measured values, some legend parts in every graph the same, some different -> summarization"(){
+    void "event csiAggregations, some legend parts in every graph the same, some different -> summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -127,7 +127,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
-    void "event measured values, single legend parts in some but not all graphs the same -> no summarization"(){
+    void "event csiAggregations, single legend parts in some but not all graphs the same -> no summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -152,9 +152,9 @@ class OsmChartProcessingServiceSpec extends Specification{
         chart.osmChartGraphsCommonLabel == ''
     }
 
-    // page measured values ////////////////////////////////////////////////////////////////////////////
+    // page csiAggregations ////////////////////////////////////////////////////////////////////////////
 
-    void "page measured values, every legend part in every graph different -> no summarization"(){
+    void "page csiAggregations, every legend part in every graph different -> no summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -178,7 +178,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "page measured values, some legend parts in every graph the same, some different -> summarization"(){
+    void "page csiAggregations, some legend parts in every graph the same, some different -> summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -203,7 +203,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
-    void "page measured values, single legend parts in some but not all graphs the same -> no summarization"(){
+    void "page csiAggregations, single legend parts in some but not all graphs the same -> no summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -227,7 +227,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "page measured values, single legend parts begin with same chars but end different -> no summarization" () {
+    void "page csiAggregations, single legend parts begin with same chars but end different -> no summarization" () {
         given:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: ["jobGroup_Name", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),
@@ -251,7 +251,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         ])
         chart.osmChartGraphsCommonLabel == ''
     }
-    void "page measured values, page name and jobGroup name are equal -> no summarization" () {
+    void "page csiAggregations, page name and jobGroup name are equal -> no summarization" () {
         given:
         List<OsmChartGraph> graphs = [
                 new OsmChartGraph(label: ["HP", "HP"].join(HIGHCHART_LEGEND_DELIMITTER)),

@@ -17,15 +17,15 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.csi.MvUpdateEventCleanupService;
+import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService;
 
 /**
  * This job calculates and closes aggregated csi values and deletes associated update events each night.
  * @author nkuhn
  */
-class MeasuredValueUpdateEventCleanupJob {
+class CsiAggregationUpdateEventCleanupJob {
 	
-	MvUpdateEventCleanupService mvUpdateEventCleanupService
+	CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
     boolean createBatchActivity = true
 	
     static triggers = {
@@ -33,6 +33,6 @@ class MeasuredValueUpdateEventCleanupJob {
 		cron(name: 'dailyUpdateEventCleanup', cronExpression: '0 30 5 ? * *')
     }
     def execute() {
-		mvUpdateEventCleanupService.closeMeasuredValuesExpiredForAtLeast(300, createBatchActivity)
+		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, createBatchActivity)
     }
 }

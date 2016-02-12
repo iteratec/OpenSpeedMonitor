@@ -1,8 +1,8 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MvQueryParams
 import grails.validation.Validateable
 import org.joda.time.DateTime
@@ -30,7 +30,7 @@ import java.util.regex.Pattern
 @Validateable(nullable = true)
 public class CsiDashboardShowAllCommand {
 
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationUtilService csiAggregationUtilService
 
     /**
      * The selected start date (inclusive).
@@ -430,11 +430,11 @@ public class CsiDashboardShowAllCommand {
         }
         if (!includeInterval) {
             Integer intervalInMinutes = this.getSelectedMeasuredIntervalInMinutes()
-            if (measuredValueUtilService.isInActualInterval(end, intervalInMinutes)) {
-                end = measuredValueUtilService.subtractOneInterval(end, intervalInMinutes)
+            if (csiAggregationUtilService.isInActualInterval(end, intervalInMinutes)) {
+                end = csiAggregationUtilService.subtractOneInterval(end, intervalInMinutes)
             }
-            if (measuredValueUtilService.isInActualInterval(start, intervalInMinutes) || !start.isBefore(end)) {
-                start = measuredValueUtilService.subtractOneInterval(start, intervalInMinutes)
+            if (csiAggregationUtilService.isInActualInterval(start, intervalInMinutes) || !start.isBefore(end)) {
+                start = csiAggregationUtilService.subtractOneInterval(start, intervalInMinutes)
             }
         }
         return new Interval(start, end)
@@ -560,17 +560,17 @@ public class CsiDashboardShowAllCommand {
         Integer interval
         switch (this.aggrGroupAndInterval) {
             case CsiDashboardController.HOURLY_MEASURED_EVENT:
-                interval = MeasuredValueInterval.HOURLY; break
+                interval = CsiAggregationInterval.HOURLY; break
             case CsiDashboardController.DAILY_AGGR_GROUP_PAGE:
             case CsiDashboardController.DAILY_AGGR_GROUP_SHOP:
             case CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM:
-                interval = MeasuredValueInterval.DAILY; break
+                interval = CsiAggregationInterval.DAILY; break
             case CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE:
             case CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP:
             case CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM:
-                interval = MeasuredValueInterval.WEEKLY; break
+                interval = CsiAggregationInterval.WEEKLY; break
             default:
-                throw new IllegalArgumentException("No valid MeasuredValueInterval could be determined from command attrribute aggrGroupAndInterval (actual value=${this.aggrGroupAndInterval})")
+                throw new IllegalArgumentException("No valid CsiAggregationInterval could be determined from command attrribute aggrGroupAndInterval (actual value=${this.aggrGroupAndInterval})")
         }
         return interval
     }

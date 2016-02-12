@@ -588,12 +588,12 @@ class TabularResultPresentationController {
          * with this command.
          * </p>
          *
-         * @param measuredValueTagService
-         *         The {@link de.iteratec.osm.result.MeasuredValueTagService} to create the tag with.
+         * @param csiAggregationTagService
+         *         The {@link CsiAggregationTagService} to create the tag with.
          * @return Never <code>null</code>.
          */
-        public Pattern createResultsQueryPattern(MeasuredValueTagService measuredValueTagService) {
-            return measuredValueTagService.getTagPatternForHourlyMeasuredValues(createMvQueryParams());
+        public Pattern createResultsQueryPattern(CsiAggregationTagService csiAggregationTagService) {
+            return csiAggregationTagService.getTagPatternForHourlyCsiAggregations(createMvQueryParams());
         }
 
         /**

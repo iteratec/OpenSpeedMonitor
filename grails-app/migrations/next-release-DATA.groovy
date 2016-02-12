@@ -1,9 +1,10 @@
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -125,61 +126,61 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1453106072000-9") {
         grailsChange {
             change {
-                MeasuredValueUpdateService measuredValueUpdateService = null
+                CsiAggregationUpdateService csiAggregationUpdateService = null
                 int maxItemsToProcess = 10000
                 AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-                MeasuredValueInterval measuredValueInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
+                CsiAggregationInterval csiAggregationInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
 
                 int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
                         "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                        [aggregatorType,measuredValueInterval])[0]
+                        [aggregatorType,csiAggregationInterval])[0]
                 println "processing #" + amountMvsHourlyAndPage + " elements"
                 int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
 
                 (0..amountLoops).each { loopNumber ->
                     Date startOfLoop = new Date()
                     println "############################################# start loop #${loopNumber}: ${startOfLoop}"
-                    List<CsiAggregation> currentHourlyMeasuredValues = CsiAggregation.executeQuery(
+                    List<CsiAggregation> currentHourlyCsiAggregations = CsiAggregation.executeQuery(
                             "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                            [aggregatorType,measuredValueInterval],
+                            [aggregatorType,csiAggregationInterval],
                             [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
                     )
-                    println "before session: currentHourlyMeasuredValues=${currentHourlyMeasuredValues}"
+                    println "before session: currentHourlyCsiAggregations=${currentHourlyCsiAggregations}"
                     CsiAggregation.withNewSession {
-                        currentHourlyMeasuredValues.each { measuredValue ->
+                        currentHourlyCsiAggregations.each { CsiAggregation ->
                             println "##################"
-                            println "measuredValue=${measuredValue}"
-                            List<EventResult> eventResultsOfMeasuredValue = EventResult.executeQuery(
+                            println "CsiAggregation=${CsiAggregation}"
+                            List<EventResult> eventResultsOfCsiAggregation = EventResult.executeQuery(
                                 "from EventResult where id in :ids",
-                                [ids: measuredValue.underlyingEventResultsByWptDocCompleteAsList]
+                                [ids: CsiAggregation.underlyingEventResultsByWptDocCompleteAsList]
                             )
-                            println "eventResultsOfMeasuredValue.size()=${eventResultsOfMeasuredValue.size()}"
-                            int amountDifferentConnectivityProfiles = eventResultsOfMeasuredValue*.connectivityProfile.unique(false).size()
+                            println "eventResultsOfCsiAggregation.size()=${eventResultsOfCsiAggregation.size()}"
+                            int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivityProfile.unique(false).size()
                             println "amountDifferentConnectivityProfiles=${amountDifferentConnectivityProfiles}"
                             // simple case: if all results have same connectivity
-                            if (amountDifferentConnectivityProfiles == 1 && eventResultsOfMeasuredValue.first().connectivityProfile != null) {
-                                // ... then add connectivity from any of its results to measuredValue
-                                println "eventResultsOfMeasuredValue=${eventResultsOfMeasuredValue}"
-                                println "eventResultsOfMeasuredValue.first()=${eventResultsOfMeasuredValue.first()}"
-                                println "eventResultsOfMeasuredValue.first().connectivityProfile=${eventResultsOfMeasuredValue.first().connectivityProfile}"
-                                println "measuredValue.id=${measuredValue.id}"
+                            if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.first().connectivityProfile != null) {
+                                // ... then add connectivity from any of its results to CsiAggregation
+                                println "eventResultsOfCsiAggregation=${eventResultsOfCsiAggregation}"
+                                println "eventResultsOfCsiAggregation.first()=${eventResultsOfCsiAggregation.first()}"
+                                println "eventResultsOfCsiAggregation.first().connectivityProfile=${eventResultsOfCsiAggregation.first().connectivityProfile}"
+                                println "CsiAggregation.id=${CsiAggregation.id}"
                                 CsiAggregation.executeUpdate(
                                     "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
-                                    [cp: eventResultsOfMeasuredValue.first().connectivityProfile, mvId: measuredValue.id]
+                                    [cp: eventResultsOfCsiAggregation.first().connectivityProfile, mvId: CsiAggregation.id]
                                 )
                             } else { // ... else remove mv and calc it again by service
                                 println "different connectivity profiles"
-                                if ( measuredValueUpdateService == null) {
+                                if ( csiAggregationUpdateService == null) {
                                     println "initializing service"
-                                    measuredValueUpdateService = ctx.measuredValueUpdateService
-                                    println "initialized service DONE: ${measuredValueUpdateService}"
+                                    csiAggregationUpdateService = ctx.csiAggregationUpdateService
+                                    println "initialized service DONE: ${csiAggregationUpdateService}"
                                 }
-                                CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [measuredValue.id])
+                                CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [CsiAggregation.id])
                                 println "removed MaesuredValue"
-                                eventResultsOfMeasuredValue.each { eventResult ->
+                                eventResultsOfCsiAggregation.each { eventResult ->
                                     if (eventResult.connectivityProfile != null){
                                         println "adding EventResult via update service: ${eventResult}"
-                                        measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
+                                        csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
                                         println "adding EventResult via update service: ...DONE"
                                     }
                                 }

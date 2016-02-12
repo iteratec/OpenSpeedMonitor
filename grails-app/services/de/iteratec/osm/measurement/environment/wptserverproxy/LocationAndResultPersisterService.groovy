@@ -28,7 +28,7 @@ import java.util.zip.GZIPOutputStream
 import org.springframework.transaction.TransactionStatus
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
@@ -45,7 +45,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
@@ -64,12 +64,12 @@ class LocationAndResultPersisterService implements iListener{
 	public static final String STATIC_PART_WATERFALL_ANCHOR = '#waterfall_view'
 	
 	BrowserService browserService
-	MeasuredValueUpdateService measuredValueUpdateService
+	CsiAggregationUpdateService csiAggregationUpdateService
 	TimeToCsMappingService timeToCsMappingService
 	PageService pageService
 	JobService jobService
 	EventResultService eventResultService
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 	ProxyService proxyService
 	MetricReportingService metricReportingService
 	HarParserService harParserService
@@ -115,7 +115,7 @@ class LocationAndResultPersisterService implements iListener{
 
 	/**
 	 * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
-	 * Dependent {@link de.iteratec.isocsi.MeasuredValue}s will be created/marked/calculated.
+	 * Dependent {@link de.iteratec.isocsi.CsiAggregation}s will be created/marked/calculated.
 	 * Persisted {@link EventResult} will be reported to graphite if configured respectively.
 	 * <br><b>Note:</b> Persistance of the {@link EventResult}s of one test step (i.e. for one {@link MeasuredEvent}) is wrapped into a transaction. So ANY other downstream operations may not rollback the persistance 
 	 * of the {@link EventResult}s
@@ -398,7 +398,7 @@ class LocationAndResultPersisterService implements iListener{
 		result.jobResultDate=jobRun.date
 		result.jobResultJobConfigId=jobRun.job.ident()
 		JobGroup csiGroup = jobRun.job.jobGroup?:JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-		result.tag = measuredValueTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
+		result.tag = csiAggregationTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
 		if(!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0 ){
 			result.speedIndex = viewTag.SpeedIndex.toInteger()
 		}else {
@@ -477,7 +477,7 @@ class LocationAndResultPersisterService implements iListener{
 			
 			if (result.cachedView==CachedView.UNCACHED) {
 				log.debug('informing dependent measured values ...')
-				informDependentMeasuredValues(result)
+				informDependentCsiAggregations(result)
 				log.debug('informing dependent measured values ... DONE')
 			}
 			log.debug('reporting persisted event result ...')
@@ -487,13 +487,13 @@ class LocationAndResultPersisterService implements iListener{
 		}
 	}
 	
-	void informDependentMeasuredValues(EventResult result){
+	void informDependentCsiAggregations(EventResult result){
 		try{
 			if (result.isCsiRelevant()) {
-				measuredValueUpdateService.createOrUpdateDependentMvs(result)
+				csiAggregationUpdateService.createOrUpdateDependentMvs(result)
 			}
 		}catch(Exception e){
-			log.error("An error occurred while creating EventResult-dependent MeasuredValues for result: ${result}", e)
+			log.error("An error occurred while creating EventResult-dependent CsiAggregations for result: ${result}", e)
 		}
 	}
 	

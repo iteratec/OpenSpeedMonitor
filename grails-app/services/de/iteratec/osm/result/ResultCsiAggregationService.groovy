@@ -17,8 +17,8 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -27,19 +27,19 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.util.I18nService
 
 /**
- * Calculates {@link MeasuredValue}s for EventResults.
+ * Calculates {@link de.iteratec.osm.report.chart.CsiAggregation}s for EventResults.
  *
  * @author rhe
  */
-class ResultMeasuredValueService {
+class ResultCsiAggregationService {
 
 
 	/** injected by grails */
 	JobResultDaoService jobResultDaoService
-	MeasuredValueUtilService measuredValueUtilService
+	CsiAggregationUtilService csiAggregationUtilService
 	BrowserDaoService browserDaoService
-	MeasuredValueTagService measuredValueTagService
-	MeasuredValueDaoService measuredValueDaoService
+	CsiAggregationTagService csiAggregationTagService
+	CsiAggregationDaoService csiAggregationDaoService
 	EventResultDaoService eventResultDaoService
 	PerformanceLoggingService performanceLoggingService
 	I18nService i18nService
@@ -261,7 +261,7 @@ class ResultMeasuredValueService {
 	 * Returns the {@link CachedView} the Result-{@link AggregatorType} is bound to.
 	 *
 	 * <p>
-	 * Requires the {@link AggregatorType} to be bound to the {@link CachedView}, see {@link ResultMeasuredValueService#getAggregatorMap()}
+	 * Requires the {@link AggregatorType} to be bound to the {@link CachedView}, see {@link ResultCsiAggregationService#getAggregatorMap()}
 	 * </p>
 	 *
 	 * @param aggregator

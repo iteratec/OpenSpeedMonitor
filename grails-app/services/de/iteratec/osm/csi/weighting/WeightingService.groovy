@@ -22,7 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.Contract
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import org.joda.time.DateTime
@@ -35,7 +35,7 @@ import org.joda.time.DateTime
 @Transactional
 class WeightingService {
 
-    MeasuredValueTagService measuredValueTagService
+    CsiAggregationTagService csiAggregationTagService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
     PerformanceLoggingService performanceLoggingService
 
@@ -93,7 +93,7 @@ class WeightingService {
                 if (csiValue.isCsiRelevant()) {
 
                     value = csiValue.retrieveCsByWptDocCompleteInPercent()
-                    JobGroup jobGroupOfCsiValue = JobGroup.findById(measuredValueTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
+                    JobGroup jobGroupOfCsiValue = JobGroup.findById(csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
                     JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
                         it.jobGroup == jobGroupOfCsiValue
                     }
@@ -135,7 +135,7 @@ class WeightingService {
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
             mvsWithVisuallyCompleteValue.each { CsiValue csiValue ->
                 value = csiValue.retrieveCsByWptVisuallyCompleteInPercent()
-                JobGroup jobGroupOfCsiValue = JobGroup.findById(measuredValueTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
+                JobGroup jobGroupOfCsiValue = JobGroup.findById(csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
                 JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
                     it.jobGroup == jobGroupOfCsiValue
                 }
@@ -247,8 +247,8 @@ class WeightingService {
     private double getPageWeightFrom(CsiValue csiValue, List<PageWeight> pageWeights) {
 
         Page page = csiValue.retrieveTag().split(';').size() == 5 ?
-                measuredValueTagService.findPageOfHourlyEventTag(csiValue.retrieveTag()) :
-                measuredValueTagService.findPageByPageTag(csiValue.retrieveTag())
+                    csiAggregationTagService.findPageOfHourlyEventTag(csiValue.retrieveTag()) :
+                    csiAggregationTagService.findPageByPageTag(csiValue.retrieveTag())
         if (page == null || pageWeights.empty) {
             return 0
         } else {
@@ -271,7 +271,7 @@ class WeightingService {
 
         Browser browser
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.FOUR) {
-            browser = measuredValueTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
+            browser = csiAggregationTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
         }
         ConnectivityProfile connectivityProfile
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get connectivity profile', PerformanceLoggingService.IndentationDepth.FOUR) {
@@ -295,7 +295,7 @@ class WeightingService {
     }
 
     public double getHourOfDayWeight(CsiValue csiValue) {
-        Serializable jobGroupID = measuredValueTagService.findJobGroupIdOfHourlyEventTag(csiValue.retrieveTag())
+        Serializable jobGroupID = csiAggregationTagService.findJobGroupIdOfHourlyEventTag(csiValue.retrieveTag())
         JobGroup jobGroup = JobGroup.get(jobGroupID)
         CsiDay dayForCsiValue = jobGroup.csiConfiguration.csiDay
         int hour = new DateTime(csiValue.retrieveDate()).getHourOfDay()

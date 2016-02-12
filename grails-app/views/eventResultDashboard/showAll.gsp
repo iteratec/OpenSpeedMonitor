@@ -141,7 +141,7 @@
 
                                     <div class="span2">
                                         <g:select id="selectedIntervalHtmlId" class="input-medium"
-                                                  name="selectedInterval" from="${measuredValueIntervals}"
+                                                  name="selectedInterval" from="${csiAggregationIntervals}"
                                                   valueMessagePrefix="de.iteratec.isr.wptrd.intervals"
                                                   value="${selectedInterval}"/>
                                     </div>

@@ -38,9 +38,9 @@ import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.result.detail.WaterfallEntry
 import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
@@ -51,7 +51,7 @@ import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -90,9 +90,9 @@ class TestDataUtil {
      * @todo TODO mze-2013-08-15: Use {@link Collection} instead of List
      *       because the values are not sorted!
      *
-     * @param hourlyMeasuredValues The hourly measured value to insert in the
+     * @param hourlyCsiAggregations The hourly measured value to insert in the
      *         maps collections; not <code>null</code>.
-     * @param measuredValueTagService
+     * @param csiAggregationTagService
      *         The service to use for tag generation, not <code>null</code>.
      *
      * @return A map as described above, never <code>null</code>.
@@ -102,18 +102,19 @@ class TestDataUtil {
      *
      * @since IT-43
      */
-    public static Map<String, List<CsiAggregation>> createHourlyMeasuredValueByGroupAndPageIdMap(
-            List<CsiAggregation> hourlyMeasuredValues,
-            MeasuredValueTagService measuredValueTagService) throws IllegalArgumentException {
+    public static Map<String, List<CsiAggregation>> createHourlyCsiAggregationByGroupAndPageIdMap(
+            List<CsiAggregation> hourlyCsiAggregations,
+            CsiAggregationTagService csiAggregationTagService
+                                                              ) throws IllegalArgumentException {
 
         Map<String, List<CsiAggregation>> result = [:];
 
-        for (CsiAggregation hmv : hourlyMeasuredValues) {
-            Page page = measuredValueTagService.findPageOfHourlyEventTag(hmv.tag);
-            assertNotNull("You must create a page for the measured value with id " + hmv.ident() + "first", page);
+        for (CsiAggregation hCsiAggregation : hourlyCsiAggregations) {
+            Page page = csiAggregationTagService.findPageOfHourlyEventTag(hCsiAggregation.tag);
+            assertNotNull("You must create a page for the measured value with id " + hCsiAggregation.ident() + "first", page);
 
-            JobGroup group = measuredValueTagService.findJobGroupOfHourlyEventTag(hmv.tag);
-            assertNotNull("You must create a group for the measured value with id " + hmv.ident() + "first", group);
+            JobGroup group = csiAggregationTagService.findJobGroupOfHourlyEventTag(hCsiAggregation.tag);
+            assertNotNull("You must create a group for the measured value with id " + hCsiAggregation.ident() + "first", group);
 
             String key = group.ident() + ':::' + page.ident();
             Collection valuesForPageAndGroup = result[key];
@@ -123,7 +124,7 @@ class TestDataUtil {
                 result[key] = valuesForPageAndGroup;
             }
 
-            valuesForPageAndGroup.add(hmv);
+            valuesForPageAndGroup.add(hCsiAggregation);
         }
 
         return result;
@@ -195,8 +196,8 @@ class TestDataUtil {
                 MeasuredEvent.class,
                 Page.class,
                 AggregatorType.class,
-                MeasuredValueInterval.class,
-                MeasuredValueUpdateEvent.class,
+                CsiAggregationInterval.class,
+                CsiAggregationUpdateEvent.class,
                 ConnectivityProfile.class,
                 MeasuredEvent.class
         ]
@@ -445,11 +446,11 @@ class TestDataUtil {
         ).save(failOnError: true)
     }
 
-    static createMeasuredValueUpdateEvent(Date dateOfUpdate, MeasuredValueUpdateEvent.UpdateCause cause, String mvId) {
-        new MeasuredValueUpdateEvent(
+    static createCsiAggregationUpdateEvent(Date dateOfUpdate, CsiAggregationUpdateEvent.UpdateCause cause, String mvId) {
+        new CsiAggregationUpdateEvent(
                 dateOfUpdate: dateOfUpdate,
                 updateCause: cause,
-                measuredValueId: mvId
+                csiAggregationId: mvId
         ).save(failOnError: true)
     }
 
@@ -486,13 +487,13 @@ class TestDataUtil {
      *         The current date, should be before {@code end},
      *         not <code>null</code>.
      * @param hourlyInterval
-     *         The {@link MeasuredValueInterval} to use for
+     *         The {@link CsiAggregationInterval} to use for
      *         calculation, should be an
-     * {@link MeasuredValueInterval#HOURLY} one;
+     * {@link CsiAggregationInterval#HOURLY} one;
      *         not <code>null</code>.
-     * @param measuredValueTagService
+     * @param csiAggregationTagService
      *         The service to use for tag generation, not <code>null</code>.
-     * @param eventMeasuredValueService
+     * @param eventCsiAggregationService
      *         The service to use for calcualtion, not <code>null</code>.
      *
      * @return A collection of pre-calculated hourly values.
@@ -500,28 +501,29 @@ class TestDataUtil {
      * @see #loadTestDataFromCustomerCSV(File, List, List)
      * @since IT-43
      */
-    public static List<CsiAggregation> precalculateHourlyMeasuredValues(
+    public static List<CsiAggregation> precalculateHourlyCsiAggregations(
             JobGroup jobGroup, String pageName,
             DateTime end, DateTime currentDate,
-            MeasuredValueInterval hourlyInterval,
-            EventMeasuredValueService eventMeasuredValueService,
-            MeasuredValueTagService measuredValueTagService,
+            CsiAggregationInterval hourlyInterval,
+            EventCsiAggregationService eventCsiAggregationService,
+            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
-            MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService) {
+            CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+                                                                        ) {
 
         List<CsiAggregation> createdHmvs = []
         while (!currentDate.isAfter(end)) {
 
             createdHmvs.addAll(calculateMvsOfOneHour(
                     currentDate, hourlyInterval, jobGroup, pageName,
-                    eventMeasuredValueService,
-                    measuredValueTagService,
+                    eventCsiAggregationService,
+                    csiAggregationTagService,
                     eventResultService,
                     weightingService,
                     meanCalcService,
-                    measuredValueUpdateEventDaoService)
+                    csiAggregationUpdateEventDaoService)
             )
             currentDate = currentDate.plusHours(1)
 
@@ -535,24 +537,25 @@ class TestDataUtil {
      * </p>
      *
      * @param dateTimeToCalculateMvFor The hour to create for.
-     * @param hourly The intervall which is {@link MeasuredValueInterval#HOURLY}.
+     * @param hourly The intervall which is {@link CsiAggregationInterval#HOURLY}.
      * @param jobGroup The {@link JobGroup} to use.
-     * @param eventMeasuredValueService
+     * @param eventCsiAggregationService
      *         The service to use for calcualtion, not <code>null</code>.
      *
      * @return The created measured values.
      */
     private static List<CsiAggregation> calculateMvsOfOneHour(
             DateTime dateTimeToCalculateMvFor,
-            MeasuredValueInterval hourly,
+            CsiAggregationInterval hourly,
             JobGroup jobGroup,
             String pageName,
-            EventMeasuredValueService eventMeasuredValueService,
-            MeasuredValueTagService measuredValueTagService,
+            EventCsiAggregationService eventCsiAggregationService,
+            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
-            MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService) {
+            CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+                                                             ) {
         List<CsiAggregation> createdHmvs = []
 
         Page page = Page.findByName(pageName)
@@ -562,7 +565,7 @@ class TestDataUtil {
         MeasuredEvent event = findMeasuredEvent(jobGroup, page)
 
         // FF
-        String tagFF = measuredValueTagService.createHourlyEventTag(
+        String tagFF = csiAggregationTagService.createHourlyEventTag(
                 jobGroup,
                 event,
                 page,
@@ -571,16 +574,16 @@ class TestDataUtil {
 
         createdHmvs.add(
                 ensurePresenceAndCalculation(dateTimeToCalculateMvFor, hourly, tagFF,
-                        eventMeasuredValueService,
-                        measuredValueTagService,
+                        eventCsiAggregationService,
+                        csiAggregationTagService,
                         eventResultService,
                         weightingService,
                         meanCalcService,
-                        measuredValueUpdateEventDaoService)
+                        csiAggregationUpdateEventDaoService)
         )
 
         // IE
-        String tagIE = measuredValueTagService.createHourlyEventTag(
+        String tagIE = csiAggregationTagService.createHourlyEventTag(
                 jobGroup,
                 event,
                 page,
@@ -589,12 +592,12 @@ class TestDataUtil {
 
         createdHmvs.add(
                 ensurePresenceAndCalculation(dateTimeToCalculateMvFor, hourly, tagIE,
-                        eventMeasuredValueService,
-                        measuredValueTagService,
+                        eventCsiAggregationService,
+                        csiAggregationTagService,
                         eventResultService,
                         weightingService,
                         meanCalcService,
-                        measuredValueUpdateEventDaoService)
+                        csiAggregationUpdateEventDaoService)
         )
 
         return createdHmvs
@@ -610,49 +613,49 @@ class TestDataUtil {
      */
     public static CsiAggregation ensurePresenceAndCalculation(
             DateTime startDate,
-            MeasuredValueInterval interval,
+            CsiAggregationInterval interval,
             String tag,
-            EventMeasuredValueService eventMeasuredValueService,
-            MeasuredValueTagService measuredValueTagService,
+            EventCsiAggregationService eventCsiAggregationService,
+            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
-            MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+            CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
                                                              ) {
         return ensurePresenceAndCalculation(
                 startDate,
                 interval,
                 tag,
                 AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
-                eventMeasuredValueService,
-                measuredValueTagService,
+                eventCsiAggregationService,
+                csiAggregationTagService,
                 eventResultService,
                 weightingService,
                 meanCalcService,
-                measuredValueUpdateEventDaoService
+                csiAggregationUpdateEventDaoService
         )
     }
 
     public static CsiAggregation ensurePresenceAndCalculation(
             DateTime startDate,
-            MeasuredValueInterval interval,
+            CsiAggregationInterval interval,
             String tag,
             AggregatorType eventAggregator,
-            EventMeasuredValueService eventMeasuredValueService,
-            MeasuredValueTagService measuredValueTagService,
+            EventCsiAggregationService eventCsiAggregationService,
+            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
-            MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+            CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
                                                              ) {
-        CsiAggregation toCreateAndOrCalculate = eventMeasuredValueService.ensurePresence(startDate, interval, tag, eventAggregator, false)
+        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false)
         return calcMv(
                 toCreateAndOrCalculate,
-                measuredValueTagService,
+                csiAggregationTagService,
                 eventResultService,
                 weightingService,
                 meanCalcService,
-                measuredValueUpdateEventDaoService
+                csiAggregationUpdateEventDaoService
         )
     }
 
@@ -664,11 +667,11 @@ class TestDataUtil {
      */
     public static CsiAggregation calcMv(
             CsiAggregation toBeCalculated,
-            MeasuredValueTagService measuredValueTagService,
+            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
-            MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+            CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
                                        ) {
         if (toBeCalculated) {
 
@@ -677,7 +680,7 @@ class TestDataUtil {
 
             if (!toBeCalculated.isCalculated()) {
                 reCalc(toBeCalculated, fromDate, toDate,
-                        measuredValueTagService, eventResultService, weightingService, meanCalcService, measuredValueUpdateEventDaoService)
+                        csiAggregationTagService, eventResultService, weightingService, meanCalcService, csiAggregationUpdateEventDaoService)
             }
             return toBeCalculated
         }
@@ -688,15 +691,16 @@ class TestDataUtil {
             CsiAggregation toBeCalculated,
             Date fromDate,
             Date toDate,
-            MeasuredValueTagService measuredValueTagService,
+            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
-            MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService) {
+            CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+                                       ) {
 
-        MeasuredEvent measuredEvent = measuredValueTagService.findMeasuredEventOfHourlyEventTag(toBeCalculated.tag)
-        JobGroup jobGroup = measuredValueTagService.findJobGroupOfHourlyEventTag(toBeCalculated.tag)
-        Location location = measuredValueTagService.findLocationOfHourlyEventTag(toBeCalculated.tag)
+        MeasuredEvent measuredEvent = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(toBeCalculated.tag)
+        JobGroup jobGroup = csiAggregationTagService.findJobGroupOfHourlyEventTag(toBeCalculated.tag)
+        Location location = csiAggregationTagService.findLocationOfHourlyEventTag(toBeCalculated.tag)
 
         if (!measuredEvent || !jobGroup || jobGroup.groupType != JobGroupType.CSI_AGGREGATION || !location) {
             return toBeCalculated
@@ -715,7 +719,7 @@ class TestDataUtil {
         } else {
             toBeCalculated.clearUnderlyingEventResultsByWptDocComplete()
         }
-        measuredValueUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+        csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         toBeCalculated.save(failOnError: true)
         return toBeCalculated
     }
@@ -761,11 +765,11 @@ class TestDataUtil {
      *         The names of the pages to process (see {@link Page}),
      *         not <code>null</code>,
      *         not {@linkplain Collection#isEmpty() empty}.
-     * @param measuredValueTagService
-     * 		   The {@link MeasuredValueTagService} for generating the tag of {@link EventResult}
+     * @param csiAggregationTagService
+     * 		   The {@link CsiAggregationTagService} for generating the tag of {@link EventResult}
      */
     public
-    static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages, MeasuredValueTagService measuredValueTagService) {
+    static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages, CsiAggregationTagService csiAggregationTagService) {
         createJobGroups()
         createServer()
         createPages(allPages)
@@ -775,7 +779,7 @@ class TestDataUtil {
         csvFile.eachLine { String csvLine ->
             if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
                 //				System.out.println('Processing line: ' + csvLine);
-                decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, measuredValueTagService)
+                decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, csiAggregationTagService)
             }
         }
     }
@@ -1128,8 +1132,8 @@ class TestDataUtil {
      *         The doc-complete-time in milliseconds.
      * @param customerSatisfactionInPercent
      *         The customer-satisfaction-index in percent.
-     * @param measuredValueTagService
-     * 		   The {@link MeasuredValueTagService} for generating the tag of {@link EventResult}
+     * @param csiAggregationTagService
+     * 		   The {@link CsiAggregationTagService} for generating the tag of {@link EventResult}
      */
     static EventResult createEventResult(
             Job job,
@@ -1137,14 +1141,15 @@ class TestDataUtil {
             int docCompleteTimeInMillisecs,
             double customerSatisfactionInPercent,
             MeasuredEvent event,
-            MeasuredValueTagService measuredValueTagService) {
+            CsiAggregationTagService csiAggregationTagService
+                                        ) {
 
         JobGroup jobGroup = job.jobGroup
         Page page = event.testedPage
         Location location = job.location
         Browser browser = location.browser
 
-        String resultTag = measuredValueTagService.createEventResultTag(jobGroup, event, page, browser, location)
+        String resultTag = csiAggregationTagService.createEventResultTag(jobGroup, event, page, browser, location)
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1232,7 +1237,7 @@ class TestDataUtil {
      * @param csvLine
      */
     private
-    static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor, MeasuredValueTagService measuredValueTagService) {
+    static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor, CsiAggregationTagService csiAggregationTagService) {
         String[] columns = csvLine.split(';');
 
         String jobName = columns[0]
@@ -1284,7 +1289,7 @@ class TestDataUtil {
         assertNotNull(jobResult)
 
         if (columns.length > 8 && !columns[8].isEmpty()) {
-            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, measuredValueTagService);
+            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, csiAggregationTagService);
         }
     }
 
@@ -1358,21 +1363,21 @@ class TestDataUtil {
 
     /**
      * <p>
-     * Creates the default MeasuredValueIntervals (hourly; daily; weekly).
+     * Creates the default CsiAggregationIntervals (hourly; daily; weekly).
      * </p>
      */
-    public static List<MeasuredValueInterval> createMeasuredValueIntervals() {
-        MeasuredValueInterval hourly = new MeasuredValueInterval(
+    public static List<CsiAggregationInterval> createCsiAggregationIntervals() {
+        CsiAggregationInterval hourly = new CsiAggregationInterval(
                 name: "hourly",
-                intervalInMinutes: MeasuredValueInterval.HOURLY
+                intervalInMinutes: CsiAggregationInterval.HOURLY
         ).save(failOnError: true)
-        MeasuredValueInterval daily = new MeasuredValueInterval(
+        CsiAggregationInterval daily = new CsiAggregationInterval(
                 name: "daily",
-                intervalInMinutes: MeasuredValueInterval.DAILY
+                intervalInMinutes: CsiAggregationInterval.DAILY
         ).save(failOnError: true)
-        MeasuredValueInterval weekly = new MeasuredValueInterval(
+        CsiAggregationInterval weekly = new CsiAggregationInterval(
                 name: "weekly",
-                intervalInMinutes: MeasuredValueInterval.WEEKLY
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
         ).save(failOnError: true)
         return [hourly, daily, weekly]
     }
@@ -1401,17 +1406,17 @@ class TestDataUtil {
     /**
      * Writes new {@link CsiAggregation} to db.
      * @param date
-     * @param mvInterval
+     * @param csiAggregationInterval
      * @param aggregator
      * @param tag
      * @param value
      * @param resultIdsAsString
      * @param closed
      */
-    public static CsiAggregation createMeasuredValue(Date date, MeasuredValueInterval mvInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed, ConnectivityProfile profile = null) {
+    public static CsiAggregation createCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed, ConnectivityProfile profile = null) {
         return new CsiAggregation(
                 started: date,
-                interval: mvInterval,
+                interval: csiAggregationInterval,
                 aggregator: aggregator,
                 tag: tag,
                 csByWptDocCompleteInPercent: value,
@@ -1421,15 +1426,15 @@ class TestDataUtil {
         ).save(failOnError: true)
     }
     /**
-     * Writes a new {@link MeasuredValueUpdateEvent} with dateOfUpdate = NOW.
-     * @param measuredValueId
+     * Writes a new {@link CsiAggregationUpdateEvent} with dateOfUpdate = NOW.
+     * @param csiAggregationId
      * @param cause
      */
     public
-    static MeasuredValueUpdateEvent createUpdateEvent(Long measuredValueId, MeasuredValueUpdateEvent.UpdateCause cause) {
-        return new MeasuredValueUpdateEvent(
+    static CsiAggregationUpdateEvent createUpdateEvent(Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause) {
+        return new CsiAggregationUpdateEvent(
                 dateOfUpdate: new Date(),
-                measuredValueId: measuredValueId,
+                csiAggregationId: csiAggregationId,
                 updateCause: cause
         ).save(failOnError: true)
     }

@@ -15,9 +15,9 @@
 
     <p>
         Measuring stated: ${measuringOfValueStartedAt}
-        <g:if test="${!aggregatedMeasuredValue.equals('unassigned')}">
+        <g:if test="${!aggregatedCsiAggregation.equals('unassigned')}">
         <br />
-        Aggregated value: ${aggregatedMeasuredValue}
+        Aggregated value: ${aggregatedCsiAggregation}
         </g:if>
     </p>
 
@@ -74,8 +74,8 @@
 		<g:else>
 			<%-- need to send next request to listAggregatedResults --%>
 			<g:form method="GET">
-				<g:hiddenField name="measuredValueId"
-					value="${params.measuredValueId}" />
+				<g:hiddenField name="csiAggregationId"
+					value="${params.csiAggregationId}" />
 				<g:hiddenField name="lastKnownCountOfAggregatedResultsOrNull"
 					value="${params.lastKnownCountOfAggregatedResultsOrNull}" />
 				<g:hiddenField name="showAll" value="${true}" />
