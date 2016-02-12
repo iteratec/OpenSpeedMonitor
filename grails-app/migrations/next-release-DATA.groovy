@@ -1,4 +1,5 @@
 import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -156,7 +157,7 @@ databaseChangeLog = {
                             int amountDifferentConnectivityProfiles = eventResultsOfMeasuredValue*.connectivityProfile.unique(false).size()
                             println "amountDifferentConnectivityProfiles=${amountDifferentConnectivityProfiles}"
                             // simple case: if all results have same connectivity
-                            if (amountDifferentConnectivityProfiles == 1) {
+                            if (amountDifferentConnectivityProfiles == 1 && eventResultsOfMeasuredValue.first().connectivityProfile != null) {
                                 // ... then add connectivity from any of its results to measuredValue
                                 println "eventResultsOfMeasuredValue=${eventResultsOfMeasuredValue}"
                                 println "eventResultsOfMeasuredValue.first()=${eventResultsOfMeasuredValue.first()}"
@@ -176,9 +177,11 @@ databaseChangeLog = {
                                 CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [measuredValue.id])
                                 println "removed MaesuredValue"
                                 eventResultsOfMeasuredValue.each { eventResult ->
-                                    println "adding EventResult via update service: ${eventResult}"
-                                    measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
-                                    println "adding EventResult via update service: ...DONE"
+                                    if (eventResult.connectivityProfile != null){
+                                        println "adding EventResult via update service: ${eventResult}"
+                                        measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
+                                        println "adding EventResult via update service: ...DONE"
+                                    }
                                 }
                             }
                         }
