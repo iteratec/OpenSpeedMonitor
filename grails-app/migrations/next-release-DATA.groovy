@@ -158,6 +158,10 @@ databaseChangeLog = {
                             // simple case: if all results have same connectivity
                             if (amountDifferentConnectivityProfiles == 1) {
                                 // ... then add connectivity from any of its results to measuredValue
+                                println "eventResultsOfMeasuredValue=${eventResultsOfMeasuredValue}"
+                                println "eventResultsOfMeasuredValue.first()=${eventResultsOfMeasuredValue.first()}"
+                                println "eventResultsOfMeasuredValue.first().connectivityProfile=${eventResultsOfMeasuredValue.first().connectivityProfile}"
+                                println "measuredValue.id=${measuredValue.id}"
                                 CsiAggregation.executeUpdate(
                                     "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
                                     [cp: eventResultsOfMeasuredValue.first().connectivityProfile, mvId: measuredValue.id]
