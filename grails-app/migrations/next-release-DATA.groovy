@@ -137,19 +137,24 @@ databaseChangeLog = {
 
                 (0..amountLoops).each { loopNumber ->
                     Date startOfLoop = new Date()
-                    println "start loop #${loopNumber}: ${startOfLoop}"
+                    println "############################################# start loop #${loopNumber}: ${startOfLoop}"
                     List<CsiAggregation> currentHourlyMeasuredValues = CsiAggregation.executeQuery(
                             "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
                             [aggregatorType,measuredValueInterval],
                             [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
                     )
+                    println "before session: currentHourlyMeasuredValues=${currentHourlyMeasuredValues}"
                     CsiAggregation.withNewSession {
                         currentHourlyMeasuredValues.each { measuredValue ->
+                            println "##################"
+                            println "measuredValue=${measuredValue}"
                             List<EventResult> eventResultsOfMeasuredValue = EventResult.executeQuery(
                                 "from EventResult where id in :ids",
                                 [ids: measuredValue.underlyingEventResultsByWptDocCompleteAsList]
                             )
+                            println "eventResultsOfMeasuredValue.size()=${eventResultsOfMeasuredValue.size()}"
                             int amountDifferentConnectivityProfiles = eventResultsOfMeasuredValue*.connectivityProfile.unique(false).size()
+                            println "amountDifferentConnectivityProfiles=${amountDifferentConnectivityProfiles}"
                             // simple case: if all results have same connectivity
                             if (amountDifferentConnectivityProfiles == 1) {
                                 // ... then add connectivity from any of its results to measuredValue
@@ -158,18 +163,24 @@ databaseChangeLog = {
                                     [cp: eventResultsOfMeasuredValue.first().connectivityProfile, mvId: measuredValue.id]
                                 )
                             } else { // ... else remove mv and calc it again by service
+                                println "different connectivity profiles"
                                 if ( measuredValueUpdateService == null) {
+                                    println "initializing service"
                                     measuredValueUpdateService = ctx.measuredValueUpdateService
+                                    println "initialized service DONE: ${measuredValueUpdateService}"
                                 }
                                 CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [measuredValue.id])
+                                println "removed MaesuredValue"
                                 eventResultsOfMeasuredValue.each { eventResult ->
+                                    println "adding EventResult via update service: ${eventResult}"
                                     measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
+                                    println "adding EventResult via update service: ...DONE"
                                 }
                             }
                         }
                     }
                     Date endOfLoop = new Date()
-                    println "end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime())/(1000*60)} minutes"
+                    println "############################################# end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime())/(1000*60)} minutes"
                 }
             }
         }
