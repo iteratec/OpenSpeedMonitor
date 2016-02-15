@@ -147,7 +147,17 @@ databaseChangeLog = {
     }
 
     changeSet(author: "bwo (generated)", id: "1453899727017-10") {
+        preConditions (onFail: 'MARK_RAN'){
+            indexExists(indexName: 'full_hour_uniq_1447946152077')
+        }
         dropIndex(indexName: "full_hour_uniq_1447946152077", tableName: "hour_of_day")
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-11") {
+        preConditions (onFail: 'MARK_RAN'){
+            indexExists(indexName: 'full_hour')
+        }
+        dropIndex(indexName: "full_hour", tableName: "hour_of_day")
     }
 
     // [END] changes for custom event result dashboard /////////////////////////////////////////////////////////////////////
