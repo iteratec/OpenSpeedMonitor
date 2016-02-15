@@ -282,6 +282,9 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1455031326389-11") {
         renameColumn(tableName: "csi_aggregation", oldColumnName: "result_ids", newColumnName: "underlying_event_results_by_wpt_doc_complete", columnDataType: "longtext")
     }
+    changeSet(author: "bka", id: "1455031326389-11") {
+        addNotNullConstraint(columnDataType: "longtext", columnName: "underlying_event_results_by_wpt_doc_complete", tableName: "csi_aggregation")
+    }
     // END [IT-728] add csByVisuallyComplete
     // START [IT-885] rename *MeasuredValue* to *CsiAggregation*
     changeSet(author: "bka", id: "1455031326389-12") {
@@ -300,6 +303,9 @@ databaseChangeLog = {
         createIndex(indexName: "csiAggregationId_idx", tableName: "csi_aggregation_update_event") {
             column(name: "csi_aggregation_id")
         }
+    }
+    changeSet(author: "bka", id: "1455031326389-17") {
+        addNotNullConstraint(columnDataType: "bigint", columnName: "csi_aggregation_id", tableName: "csi_aggregation_update_event")
     }
     // END [IT-885] rename *MeasuredValue* to *CsiAggregation*
 }
