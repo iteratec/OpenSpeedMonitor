@@ -282,29 +282,29 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1455031326389-11") {
         renameColumn(tableName: "csi_aggregation", oldColumnName: "result_ids", newColumnName: "underlying_event_results_by_wpt_doc_complete", columnDataType: "longtext")
     }
-    changeSet(author: "bka", id: "1455031326389-11") {
+    changeSet(author: "bka", id: "1455031326389-12") {
         addNotNullConstraint(columnDataType: "longtext", columnName: "underlying_event_results_by_wpt_doc_complete", tableName: "csi_aggregation")
     }
     // END [IT-728] add csByVisuallyComplete
     // START [IT-885] rename *MeasuredValue* to *CsiAggregation*
-    changeSet(author: "bka", id: "1455031326389-12") {
+    changeSet(author: "bka", id: "1455031326389-13") {
         renameTable(oldTableName: "measured_value_interval", newTableName: "csi_aggregation_interval")
     }
-    changeSet(author: "bka", id: "1455031326389-13") {
+    changeSet(author: "bka", id: "1455031326389-14") {
         renameTable(oldTableName: "measured_value_update_event", newTableName: "csi_aggregation_update_event")
     }
-    changeSet(author: "bka", id: "1455031326389-14") {
+    changeSet(author: "bka", id: "1455031326389-15") {
         renameColumn(tableName: "csi_aggregation_update_event", oldColumnName: "measured_value_id", newColumnName: "csi_aggregation_id", columnDataType: "bigint")
     }
-    changeSet(author: "bka", id: "1455031326389-15") {
+    changeSet(author: "bka", id: "1455031326389-16") {
         dropIndex(indexName: "measuredValueId_idx", tableName: "csi_aggregation_update_event")
     }
-    changeSet(author: "bka", id: "1455031326389-16") {
+    changeSet(author: "bka", id: "1455031326389-17") {
         createIndex(indexName: "csiAggregationId_idx", tableName: "csi_aggregation_update_event") {
             column(name: "csi_aggregation_id")
         }
     }
-    changeSet(author: "bka", id: "1455031326389-17") {
+    changeSet(author: "bka", id: "1455031326389-18") {
         addNotNullConstraint(columnDataType: "bigint", columnName: "csi_aggregation_id", tableName: "csi_aggregation_update_event")
     }
     // END [IT-885] rename *MeasuredValue* to *CsiAggregation*
