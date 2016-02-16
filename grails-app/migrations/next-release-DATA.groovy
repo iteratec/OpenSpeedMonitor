@@ -45,10 +45,7 @@ databaseChangeLog = {
                 }
             }
         }
-        sql('''insert into csi_configuration(
-                select tb1.*
-                from (select 1 as id, 1 as version, "a first csi configuration" as description, "initial csi configuration" as label, (select csi_day.id from csi_day) as csi_day_id) as tb1)
-        ''')
+        sql('insert into csi_configuration (version, description, label, csi_day_id) values (1, "a first csi configuration", "initial csi configuration", (select csi_day.id from csi_day))')
     }
 
     // map browser_connectivity_weights to first csi_configuration
