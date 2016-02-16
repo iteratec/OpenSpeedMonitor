@@ -328,7 +328,7 @@ databaseChangeLog = {
     }
 
     changeSet(author: "birger (generated)", id: "1455561393941-2") {
-        dropForeignKeyConstraint(baseTableName: "csi_system_job_group_weight", baseTableSchemaName: "osm", constraintName: "FK588975446326A28C")
+        dropForeignKeyConstraint(baseTableName: "csi_system_job_group_weight", constraintName: "FK588975446326A28C")
     }
 
     changeSet(author: "birger (generated)", id: "1455561393941-4") {
