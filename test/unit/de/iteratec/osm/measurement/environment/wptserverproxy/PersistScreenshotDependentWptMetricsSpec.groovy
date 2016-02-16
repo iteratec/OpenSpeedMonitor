@@ -111,14 +111,14 @@ class PersistScreenshotDependentWptMetricsSpec {
         mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
         mocker.mockMetricReportingService(serviceUnderTest)
         serviceUnderTest.pageService = new PageService()
-        mocker.mockMeasuredValueTagService(serviceUnderTest, [:], [:], [:], [:], [:])
+        mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }
         serviceUnderTest.metaClass.informDependents = { EventResult results ->
             // not the concern of this test
         }
-        serviceUnderTest.metaClass.informDependentMeasuredValues = { EventResult results ->
+        serviceUnderTest.metaClass.informDependentCsiAggregations = { EventResult results ->
             // not the concern of this test
         }
         mocker.mockTTCsMappingService(serviceUnderTest)

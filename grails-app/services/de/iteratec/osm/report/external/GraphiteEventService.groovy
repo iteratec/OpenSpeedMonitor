@@ -23,7 +23,7 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -37,7 +37,7 @@ class GraphiteEventService {
     EventDaoService eventDaoService
     BatchActivityService batchActivityService
 	HttpRequestService httpRequestService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationUtilService csiAggregationUtilService
 
     static final DateTimeFormatter GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT =  DateTimeFormat.forPattern("HH:mm_yyyyMMdd")
 
@@ -52,7 +52,7 @@ class GraphiteEventService {
      */
     public void fetchGraphiteEvents(boolean createBatchActivity, int lastNMinutes) {
 
-        DateTime until = measuredValueUtilService.getNowInUtc()
+        DateTime until = csiAggregationUtilService.getNowInUtc()
         DateTime from = until.minusMinutes(lastNMinutes)
         String untilFormatted = GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT.print(until)
         String fromFormatted = GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT.print(from)

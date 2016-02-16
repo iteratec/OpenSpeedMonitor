@@ -25,25 +25,24 @@ import java.util.regex.Pattern
 import org.joda.time.DateTime
 import org.junit.*
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -51,11 +50,11 @@ import de.iteratec.osm.measurement.environment.Location
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-@TestFor(ShopMeasuredValueService)
-@Mock([MeanCalcService, CsiAggregation, MeasuredValueInterval, AggregatorType, Browser, JobGroup, Location, PageMeasuredValueService,
-        Page, DefaultMeasuredEventDaoService, EventMeasuredValueService, MeasuredValueDaoService, CustomerSatisfactionWeightService, MeasuredValueUpdateEvent, CsiAggregation])
-class ShopMeasuredValueServiceTests {
-    MeasuredValueInterval weeklyInterval, dailyInterval, hourlyInterval
+@TestFor(ShopCsiAggregationService)
+@Mock([MeanCalcService, CsiAggregation, CsiAggregationInterval, AggregatorType, Browser, JobGroup, Location, PageCsiAggregationService,
+        Page, DefaultMeasuredEventDaoService, EventCsiAggregationService, CsiAggregationDaoService, CustomerSatisfactionWeightService, CsiAggregationUpdateEvent, CsiAggregation])
+class ShopCsiAggregationServiceTests {
+    CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
     Page page1
 
@@ -69,12 +68,12 @@ class ShopMeasuredValueServiceTests {
     String jobGroupName2 = 'myJobGroup2'
     String jobGroupName3 = 'myJobGroup3'
 
-    ShopMeasuredValueService serviceUnderTest
+    ShopCsiAggregationService serviceUnderTest
 
     void setUp() {
-        weeklyInterval = new MeasuredValueInterval(name: 'weekly', intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
-        dailyInterval = new MeasuredValueInterval(name: 'daily', intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
-        hourlyInterval = new MeasuredValueInterval(name: 'hourly', intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true)
+        weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
+        dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
+        hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
 
         shop = new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
         page = new AggregatorType(name: AggregatorType.PAGE).save(validate: false)
@@ -97,11 +96,11 @@ class ShopMeasuredValueServiceTests {
 
         serviceUnderTest = service
         //mocks common for all tests
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService();
-        serviceUnderTest.pageMeasuredValueService.measuredValueUtilService = new MeasuredValueUtilService();
-        serviceUnderTest.pageMeasuredValueService.meanCalcService = new MeanCalcService();
+        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService();
+        serviceUnderTest.pageCsiAggregationService.csiAggregationUtilService = new CsiAggregationUtilService();
+        serviceUnderTest.pageCsiAggregationService.meanCalcService = new MeanCalcService();
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
-        mockMeasuredValueUpdateEventDaoService()
+        mockCsiAggregationUpdateEventDaoService()
     }
 
     void tearDown() {
@@ -116,7 +115,7 @@ class ShopMeasuredValueServiceTests {
 
     @Test
     void testFindAllByJobGroups() {
-        mockMeasuredValueDaoService()
+        mockCsiAggregationDaoService()
 
         JobGroup group1 = JobGroup.findByName(jobGroupName1)
         JobGroup group2 = JobGroup.findByName(jobGroupName2)
@@ -128,16 +127,16 @@ class ShopMeasuredValueServiceTests {
         Integer with_group2 = 1
 
         List<JobGroup> groups = [group1, group2, group3]
-        mockMeasuredValueTagService(groups)
+        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group1to3
         groups = [group2, group3]
-        mockMeasuredValueTagService(groups)
+        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group2to3
         groups = [group1, group3]
-        mockMeasuredValueTagService(groups)
+        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group1or3
         groups = [group2]
-        mockMeasuredValueTagService(groups)
+        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group2
     }
 
@@ -156,9 +155,9 @@ class ShopMeasuredValueServiceTests {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
 
         //mocking inner services
-        mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3])
+        mockCsiAggregationTagService([jobGroup1, jobGroup2, jobGroup3])
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
-        mockPageMeasuredValueService()
+        mockPageCsiAggregationService()
 
         //precondition
 
@@ -166,7 +165,7 @@ class ShopMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
 
         //assertions
 
@@ -194,9 +193,9 @@ class ShopMeasuredValueServiceTests {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 13d, weight: 1d), underlyingEventResultIds: [5, 6])]
 
         //mocking inner services
-        mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3])
+        mockCsiAggregationTagService([jobGroup1, jobGroup2, jobGroup3])
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
-        mockPageMeasuredValueService()
+        mockPageCsiAggregationService()
 
         //precondition
 
@@ -204,7 +203,7 @@ class ShopMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
 
         //assertions
 
@@ -238,9 +237,9 @@ class ShopMeasuredValueServiceTests {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //mocking inner services
-        mockMeasuredValueTagService([jobGroup1, jobGroup2, jobGroup3])
+        mockCsiAggregationTagService([jobGroup1, jobGroup2, jobGroup3])
         mockWeightingService([], [])
-        mockPageMeasuredValueService()
+        mockPageCsiAggregationService()
 
         //precondition
 
@@ -248,7 +247,7 @@ class ShopMeasuredValueServiceTests {
         assertEquals(0, mvs.size())
 
         //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopMeasuredValues(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
+        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
 
         //assertions
 
@@ -265,65 +264,65 @@ class ShopMeasuredValueServiceTests {
 
     // mocks
 
-    private void mockPageMeasuredValueService() {
-        def pageMeasuredValueService = mockFor(PageMeasuredValueService, true)
-        pageMeasuredValueService.demand.getOrCalculatePageMeasuredValues(0..10000) {
-            Date fromDate, Date toDate, MeasuredValueInterval interval, List<JobGroup> csiGroups ->
+    private void mockPageCsiAggregationService() {
+        def pageCsiAggregationService = mockFor(PageCsiAggregationService, true)
+        pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations(0..10000) {
+            Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 List<CsiAggregation> irrelevantCauseListOfWeightedValuesIsRetrievedByMock = [new CsiAggregation()]
                 return irrelevantCauseListOfWeightedValuesIsRetrievedByMock
         }
-        serviceUnderTest.pageMeasuredValueService = pageMeasuredValueService.createMock();
+        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.createMock();
     }
 
-    private void mockMeasuredValueDaoService() {
-        MeasuredValueDaoService original = new MeasuredValueDaoService()
-        serviceUnderTest.measuredValueDaoService = original
-        serviceUnderTest.pageMeasuredValueService.measuredValueDaoService = original
-        serviceUnderTest.pageMeasuredValueService.eventMeasuredValueService.measuredValueDaoService = original
+    private void mockCsiAggregationDaoService() {
+        CsiAggregationDaoService original = new CsiAggregationDaoService()
+        serviceUnderTest.csiAggregationDaoService = original
+        serviceUnderTest.pageCsiAggregationService.csiAggregationDaoService = original
+        serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationDaoService = original
     }
 
-    private void mockMeasuredValueTagService(List<JobGroup> csiGroups) {
+    private void mockCsiAggregationTagService(List<JobGroup> csiGroups) {
         Pattern patternToReturn = ~/(${csiGroups*.ident().join('||')})/
-        def measuredValueTagServiceMocked = mockFor(MeasuredValueTagService, true)
-        measuredValueTagServiceMocked.demand.getTagPatternForWeeklyShopMvsWithJobGroups() {
+        def csiAggregationTagServiceMocked = mockFor(CsiAggregationTagService, true)
+        csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyShopCasWithJobGroups() {
             List<JobGroup> theCsiGroups ->
                 return patternToReturn
         }
         String aggregatorTagToReturn = jobGroup1.ident().toString();
-        measuredValueTagServiceMocked.demand.createShopAggregatorTag(0..10000) {
+        csiAggregationTagServiceMocked.demand.createShopAggregatorTag(0..10000) {
             EventResult newResult ->
                 return aggregatorTagToReturn
         }
         Pattern hourlyPattern = ~/(${csiGroups*.ident().join('|')});[^;];[^;];[^;];[^;]/
-        measuredValueTagServiceMocked.demand.getTagPatternForHourlyMeasuredValues(0..10000) { MvQueryParams thePages ->
+        csiAggregationTagServiceMocked.demand.getTagPatternForHourlyCsiAggregations(0..10000) { MvQueryParams thePages ->
             return hourlyPattern;
         }
-        measuredValueTagServiceMocked.demand.findJobGroupOfWeeklyShopTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.demand.findJobGroupOfWeeklyShopTag(0..10000) { String tag ->
             return jobGroup1;
         }
-        measuredValueTagServiceMocked.demand.getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(0..10000) { List<JobGroup> groups, List<Page> pages ->
+        csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyPageCasWithJobGroupsAndPages(0..10000) { List<JobGroup> groups, List<Page> pages ->
             Pattern weeklyPattern = ~/(${groups*.ident().join('||')});(${pages*.ident().join('||')})/
             return weeklyPattern
         }
-        measuredValueTagServiceMocked.demand.findBrowserOfHourlyEventTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.demand.findBrowserOfHourlyEventTag(0..10000) { String tag ->
             return browser;
         }
-        measuredValueTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
             return jobGroup1;
         }
-        measuredValueTagServiceMocked.demand.findPageByPageTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.demand.findPageByPageTag(0..10000) { String tag ->
             return page1;
         }
-        measuredValueTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->
             return page1;
         }
-        measuredValueTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
+        csiAggregationTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
             return group.ident() + ";" + page.ident();
         }
-        MeasuredValueTagService mVTS = measuredValueTagServiceMocked.createMock();
-        serviceUnderTest.measuredValueTagService = mVTS
-        serviceUnderTest.pageMeasuredValueService.measuredValueTagService = mVTS
-        serviceUnderTest.pageMeasuredValueService.eventMeasuredValueService.measuredValueTagService = mVTS
+        CsiAggregationTagService mVTS = csiAggregationTagServiceMocked.createMock();
+        serviceUnderTest.csiAggregationTagService = mVTS
+        serviceUnderTest.pageCsiAggregationService.csiAggregationTagService = mVTS
+        serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationTagService = mVTS
     }
 
     /**
@@ -343,20 +342,20 @@ class ShopMeasuredValueServiceTests {
     }
 
     /**
-     * Mocks methods of {@link MeasuredValueUpdateEventDaoService}.
+     * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
-    private void mockMeasuredValueUpdateEventDaoService() {
-        def measuredValueUpdateEventDaoService = mockFor(MeasuredValueUpdateEventDaoService, true)
-        measuredValueUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
-            Long measuredValueId, MeasuredValueUpdateEvent.UpdateCause cause ->
+    private void mockCsiAggregationUpdateEventDaoService() {
+        def csiAggregationUpdateEventDaoService = mockFor(CsiAggregationUpdateEventDaoService, true)
+        csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
+            Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 
-                new MeasuredValueUpdateEvent(
+                new CsiAggregationUpdateEvent(
                         dateOfUpdate: new Date(),
-                        measuredValueId: measuredValueId,
+                        csiAggregationId: csiAggregationId,
                         updateCause: cause
                 ).save(failOnError: true)
 
         }
-        serviceUnderTest.measuredValueUpdateEventDaoService = measuredValueUpdateEventDaoService.createMock()
+        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.createMock()
     }
 }

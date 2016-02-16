@@ -147,7 +147,17 @@ databaseChangeLog = {
     }
 
     changeSet(author: "bwo (generated)", id: "1453899727017-10") {
+        preConditions (onFail: 'MARK_RAN'){
+            indexExists(indexName: 'full_hour_uniq_1447946152077')
+        }
         dropIndex(indexName: "full_hour_uniq_1447946152077", tableName: "hour_of_day")
+    }
+
+    changeSet(author: "bwo (generated)", id: "1453899727017-11") {
+        preConditions (onFail: 'MARK_RAN'){
+            indexExists(indexName: 'full_hour')
+        }
+        dropIndex(indexName: "full_hour", tableName: "hour_of_day")
     }
 
     // [END] changes for custom event result dashboard /////////////////////////////////////////////////////////////////////
@@ -271,12 +281,6 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "csi_aggregation_underlying_event_results_by_visually_complete_id", baseTableName: "csi_aggregation_event_result", constraintName: "FK4579D78978BC1A0C", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_aggregation", referencesUniqueColumn: "false")
     }
 
-    changeSet(author: "birger (generated)", id: "1455031326389-8") {
-        createIndex(indexName: "FK4579D789CA94DFB", tableName: "csi_aggregation_event_result") {
-            column(name: "event_result_id")
-        }
-    }
-
     changeSet(author: "bka", id: "1455031326389-9") {
         renameColumn(tableName: "event_result", oldColumnName: "customer_satisfaction_in_percent", newColumnName: "cs_by_wpt_doc_complete_in_percent", columnDataType: "double precision")
     }
@@ -288,5 +292,30 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1455031326389-11") {
         renameColumn(tableName: "csi_aggregation", oldColumnName: "result_ids", newColumnName: "underlying_event_results_by_wpt_doc_complete", columnDataType: "longtext")
     }
+    changeSet(author: "bka", id: "1455031326389-12") {
+        addNotNullConstraint(columnDataType: "longtext", columnName: "underlying_event_results_by_wpt_doc_complete", tableName: "csi_aggregation")
+    }
     // END [IT-728] add csByVisuallyComplete
+    // START [IT-885] rename *MeasuredValue* to *CsiAggregation*
+    changeSet(author: "bka", id: "1455031326389-13") {
+        renameTable(oldTableName: "measured_value_interval", newTableName: "csi_aggregation_interval")
+    }
+    changeSet(author: "bka", id: "1455031326389-14") {
+        renameTable(oldTableName: "measured_value_update_event", newTableName: "csi_aggregation_update_event")
+    }
+    changeSet(author: "bka", id: "1455031326389-15") {
+        renameColumn(tableName: "csi_aggregation_update_event", oldColumnName: "measured_value_id", newColumnName: "csi_aggregation_id", columnDataType: "bigint")
+    }
+    changeSet(author: "bka", id: "1455031326389-16") {
+        dropIndex(indexName: "measuredValueId_idx", tableName: "csi_aggregation_update_event")
+    }
+    changeSet(author: "bka", id: "1455031326389-17") {
+        createIndex(indexName: "csiAggregationId_idx", tableName: "csi_aggregation_update_event") {
+            column(name: "csi_aggregation_id")
+        }
+    }
+    changeSet(author: "bka", id: "1455031326389-18") {
+        addNotNullConstraint(columnDataType: "bigint", columnName: "csi_aggregation_id", tableName: "csi_aggregation_update_event")
+    }
+    // END [IT-885] rename *MeasuredValue* to *CsiAggregation*
 }

@@ -19,8 +19,8 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.result.CsiAggregationTagService
 import org.joda.time.DateTime
 
 /**
@@ -28,30 +28,30 @@ import org.joda.time.DateTime
  * A service class encapsulates the core business logic of a Grails application
  */
 class CachingContainerService {
-    MeasuredValueTagService measuredValueTagService
-    PageMeasuredValueService pageMeasuredValueService
+    CsiAggregationTagService csiAggregationTagService
+    PageCsiAggregationService pageCsiAggregationService
 
-    MvCachingContainer createContainerFor(CsiAggregation mv, Map<Long, JobGroup> cachedJobGroups, Map<Long, Page> cachedPages, Map<String, List<CsiAggregation>> hemvs) {
-        return new MvCachingContainer(
-                csiGroupToCalcMvFor: cachedJobGroups[measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(mv.tag)],
-                pageToCalcMvFor: cachedPages[measuredValueTagService.getPageIdFromWeeklyOrDailyPageTag(mv.tag)],
-                hmvsByCsiGroupPageCombination: hemvs)
+    CsiAggregationCachingContainer createContainerFor(CsiAggregation mv, Map<Long, JobGroup> cachedJobGroups, Map<Long, Page> cachedPages, Map<String, List<CsiAggregation>> hemvs) {
+        return new CsiAggregationCachingContainer(
+                csiGroupToCalcCsiAggregationFor: cachedJobGroups[csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyPageTag(mv.tag)],
+                pageToCalcCsiAggregationFor: cachedPages[csiAggregationTagService.getPageIdFromWeeklyOrDailyPageTag(mv.tag)],
+                hCsiAggregationsByCsiGroupPageCombination: hemvs)
     }
 
-    Map<String, Map<String, List<CsiAggregation>>> getDailyHemvMapByStartDate(List<CsiAggregation> dailyPageMeasuredValuesToCalculate,
-                                                                              Map<String, List<JobGroup>> dailyJobGroupsByStartDate, Map<String, List<Page>> dailyPagesByStartDate) {
+    Map<String, Map<String, List<CsiAggregation>>> getDailyHeCsiAggregationMapByStartDate(List<CsiAggregation> dailyPageCsiAggregationsToCalculate,
+                                                                                          Map<String, List<JobGroup>> dailyJobGroupsByStartDate, Map<String, List<Page>> dailyPagesByStartDate) {
         Map<String, Map<String, List<CsiAggregation>>> result = [:].withDefault {[:]}
 
-        dailyPageMeasuredValuesToCalculate*.started.unique().each { Date uniqueStartDate ->
+        dailyPageCsiAggregationsToCalculate*.started.unique().each { Date uniqueStartDate ->
 
             DateTime startForGettingHemv = new DateTime(uniqueStartDate)
             String uniqueStartDateAsString = uniqueStartDate.toString()
 
-            Map<String, List<CsiAggregation>> hemv = pageMeasuredValueService.getHmvsByCsiGroupPageCombinationMap(
+            Map<String, List<CsiAggregation>> hemv = pageCsiAggregationService.getHmvsByCsiGroupPageCombinationMap(
                     dailyJobGroupsByStartDate[uniqueStartDateAsString].unique(),
                     dailyPagesByStartDate[uniqueStartDateAsString].unique(),
                     startForGettingHemv,
-                    startForGettingHemv.plusMinutes(MeasuredValueInterval.DAILY))
+                    startForGettingHemv.plusMinutes(CsiAggregationInterval.DAILY))
 
             result.put(uniqueStartDateAsString, hemv)
         }
@@ -63,7 +63,7 @@ class CachingContainerService {
         Map<String, List<JobGroup>> result = [:].withDefault { key -> [] }
 
         dailyPageMvsToCalculate.each { dpmv ->
-            Long jobGroupID = measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(dpmv.tag)
+            Long jobGroupID = csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyPageTag(dpmv.tag)
 
             JobGroup jobGroup = cachedJobGroups[jobGroupID]
 
@@ -77,7 +77,7 @@ class CachingContainerService {
         Map<String, List<Page>> result = [:].withDefault { key -> [] }
 
         dailyPageMvsToCalculate.each { dpmv ->
-            Long pageID = measuredValueTagService.getPageIdFromWeeklyOrDailyPageTag(dpmv.tag)
+            Long pageID = csiAggregationTagService.getPageIdFromWeeklyOrDailyPageTag(dpmv.tag)
 
             Page page = cachedPages[pageID]
 
@@ -91,7 +91,7 @@ class CachingContainerService {
         Map<String, List<JobGroup>> result = [:].withDefault { key -> [] }
         weeklyPageMvsToCalculate.each { wpmv ->
 
-            JobGroup jobGroup = cachedJobGroups[measuredValueTagService.getJobGroupIdFromWeeklyOrDailyPageTag(wpmv.tag)]
+            JobGroup jobGroup = cachedJobGroups[csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyPageTag(wpmv.tag)]
 
             result[wpmv.started.toString()].add(jobGroup)
         }
@@ -102,27 +102,27 @@ class CachingContainerService {
     Map<String, List<Page>> getWeeklyPagesByStartDate(List<CsiAggregation> weeklyPageMvsToCalculate, Map<Long, Page> cachedPages) {
         Map<String, List<Page>> result = [:].withDefault { key -> [] }
         weeklyPageMvsToCalculate.each { wpmv ->
-            Page page = cachedPages[measuredValueTagService.getPageIdFromWeeklyOrDailyPageTag(wpmv.tag)]
+            Page page = cachedPages[csiAggregationTagService.getPageIdFromWeeklyOrDailyPageTag(wpmv.tag)]
 
             result[wpmv.started.toString()].add(page)
         }
         return result
     }
 
-    Map<String, Map<String, List<CsiAggregation>>> getWeeklyHemvMapByStartDate(List<CsiAggregation> weeklyPageMeasuredValuesToCalculate,
-                                                                               Map<String, List<JobGroup>> weeklyJobGroupsByStartDate, Map<String, List<Page>> weeklyPagesByStartDate) {
+    Map<String, Map<String, List<CsiAggregation>>> getWeeklyHeCsiAggregationMapByStartDate(List<CsiAggregation> weeklyPageCsiAggregationsToCalculate,
+                                                                                           Map<String, List<JobGroup>> weeklyJobGroupsByStartDate, Map<String, List<Page>> weeklyPagesByStartDate) {
         Map<String, Map<String, List<CsiAggregation>>> result = [:]
 
-        weeklyPageMeasuredValuesToCalculate*.started.unique().each { Date uniqueStartDate ->
+        weeklyPageCsiAggregationsToCalculate*.started.unique().each { Date uniqueStartDate ->
 
             DateTime startForGettingHemv = new DateTime(uniqueStartDate)
             String uniqueStartDateAsString = uniqueStartDate.toString()
 
-            result[uniqueStartDateAsString] = pageMeasuredValueService.getHmvsByCsiGroupPageCombinationMap(
+            result[uniqueStartDateAsString] = pageCsiAggregationService.getHmvsByCsiGroupPageCombinationMap(
                     weeklyJobGroupsByStartDate[uniqueStartDateAsString].unique(),
                     weeklyPagesByStartDate[uniqueStartDateAsString].unique(),
                     startForGettingHemv,
-                    startForGettingHemv.plusMinutes(MeasuredValueInterval.WEEKLY))
+                    startForGettingHemv.plusMinutes(CsiAggregationInterval.WEEKLY))
         }
 
         return result

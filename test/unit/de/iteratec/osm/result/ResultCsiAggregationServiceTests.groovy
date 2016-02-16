@@ -26,8 +26,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
@@ -35,7 +35,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
@@ -43,17 +43,17 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 /**
- * Test-suite of {@link de.iteratec.osm.result.ResultMeasuredValueService}
+ * Test-suite of {@link ResultCsiAggregationService}
  */
-@TestFor(ResultMeasuredValueService)
+@TestFor(ResultCsiAggregationService)
 @Mock([EventResult, Job, JobResult, JobGroup, CsiAggregation, MeasuredEvent, WebPageTestServer,
-	Browser, Page, Location, AggregatorType, MeasuredValueInterval, Script, ConnectivityProfile])
-class ResultMeasuredValueServiceTests {
+	Browser, Page, Location, AggregatorType, CsiAggregationInterval, Script, ConnectivityProfile])
+class ResultCsiAggregationServiceTests {
 
-	ResultMeasuredValueService serviceUnderTest
+	ResultCsiAggregationService serviceUnderTest
 	BrowserDaoService browserDaoServiceMock
-	MeasuredValueUtilService measuredValueUtilServiceMock
-	MeasuredValueTagService measuredValueTagServiceMock
+	CsiAggregationUtilService csiAggregationUtilServiceMock
+	CsiAggregationTagService csiAggregationTagServiceMock
 
 	List<EventResult> results = []
 
@@ -62,7 +62,7 @@ class ResultMeasuredValueServiceTests {
 	Job job1, job2
 	Date runDate
 
-	MeasuredValueInterval hourly, daily, weekly
+	CsiAggregationInterval hourly, daily, weekly
 	AggregatorType docCompleteTime, domTime, firstByte, fullyLoadedRequestCount, fullyLoadedTime, loadTime, startRender, docCompleteIncommingBytes, docCompleteRequests, fullyLoadedIncommingBytes
 
 	JobResult runInHour_One, runInHour_Two, runBeforeHour, runAfterHour
@@ -84,10 +84,10 @@ class ResultMeasuredValueServiceTests {
 		serviceUnderTest.eventResultDaoService = new EventResultDaoService();
 
 		/** Functional Services **/
-		measuredValueTagServiceMock = new MeasuredValueTagService();
-		serviceUnderTest.measuredValueTagService = measuredValueTagServiceMock
-		measuredValueUtilServiceMock=new MeasuredValueUtilService();
-		serviceUnderTest.measuredValueUtilService = measuredValueUtilServiceMock
+		csiAggregationTagServiceMock = new CsiAggregationTagService();
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagServiceMock
+		csiAggregationUtilServiceMock=new CsiAggregationUtilService();
+		serviceUnderTest.csiAggregationUtilService = csiAggregationUtilServiceMock
 
 		// Init some data:
 		initIteratecTestData();
@@ -142,9 +142,9 @@ class ResultMeasuredValueServiceTests {
 
 		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
 
-		daily = new MeasuredValueInterval(name: "daily", intervalInMinutes: MeasuredValueInterval.DAILY).save(failOnError: true)
-		weekly = new MeasuredValueInterval(name: "weekly", intervalInMinutes: MeasuredValueInterval.WEEKLY).save(failOnError: true)
-		hourly = new MeasuredValueInterval(name: "hourly", intervalInMinutes: MeasuredValueInterval.HOURLY).save(failOnError: true)
+		daily = new CsiAggregationInterval(name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
+		weekly = new CsiAggregationInterval(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
+		hourly = new CsiAggregationInterval(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
 
 		docCompleteTime=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		docCompleteIncommingBytes=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, measurandGroup: MeasurandGroup.REQUEST_SIZES).save(failOnError: true)
@@ -450,7 +450,7 @@ class ResultMeasuredValueServiceTests {
 
 		/* test */
 
-		assertEquals(cached.size(), ResultMeasuredValueService.getAggregatorMap().get(CachedView.CACHED).size())
+		assertEquals(cached.size(), ResultCsiAggregationService.getAggregatorMap().get(CachedView.CACHED).size())
 
 		cached.each {String aggregatorName ->
 			AggregatorType aggregator=AggregatorType.findByName(aggregatorName);
@@ -484,7 +484,7 @@ class ResultMeasuredValueServiceTests {
 
 		/* test */
 
-		assertEquals(uncached.size(), ResultMeasuredValueService.getAggregatorMap().get(CachedView.UNCACHED).size())
+		assertEquals(uncached.size(), ResultCsiAggregationService.getAggregatorMap().get(CachedView.UNCACHED).size())
 
 		uncached.each {String aggregatorName ->
 			AggregatorType aggregator=AggregatorType.findByName(aggregatorName);
@@ -497,21 +497,21 @@ class ResultMeasuredValueServiceTests {
 	// mocks /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Mocks {@link MeasuredValueDaoService}.
+	 * Mocks {@link CsiAggregationDaoService}.
 	 * @param toReturn
 	 * 				{@link CsiAggregation}s to return from mocked method getMvs().
 	 */
-	private void mockMeasuredValueDaoService(List<CsiAggregation> toReturn){
-		def measuredValueDaoServiceMock = mockFor(MeasuredValueDaoService, true)
-		measuredValueDaoServiceMock.demand.getMvs(1..10000) {
+	private void mockCsiAggregationDaoService(List<CsiAggregation> toReturn){
+		def csiAggregationDaoServiceMock = mockFor(CsiAggregationDaoService, true)
+		csiAggregationDaoServiceMock.demand.getMvs(1..10000) {
 			Date fromDate,
 			Date toDate,
 			String rlikePattern,
-			MeasuredValueInterval interval,
+			CsiAggregationInterval interval,
 			AggregatorType aggregator ->
 			return toReturn
 		}
-		serviceUnderTest.measuredValueDaoService = measuredValueDaoServiceMock.createMock()
+		serviceUnderTest.csiAggregationDaoService = csiAggregationDaoServiceMock.createMock()
 	}
 	
 }

@@ -42,7 +42,7 @@ import static org.junit.Assert.*
 
 /**
  * Tests the saving of locations and results. These functions are used in proxy-mechanism.
- * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link MeasuredValue}s is not the concern of the tests in this class. 
+ * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link CsiAggregation}s is not the concern of the tests in this class.
  * @author nkuhn
  * @see {@link ProxyService}
  * 

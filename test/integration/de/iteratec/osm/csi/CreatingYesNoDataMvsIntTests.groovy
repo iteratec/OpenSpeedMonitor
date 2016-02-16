@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
@@ -35,7 +35,7 @@ import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
@@ -44,7 +44,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
  * Contains tests which test the creation of {@link de.iteratec.osm.report.chart.CsiAggregation}s without the existence of corresponding {@link EventResult}s.<br>
- * For all persisted {@link de.iteratec.osm.report.chart.CsiAggregation}s a {@link MeasuredValueUpdateEvent} should be created, which marks measured value as calculated.
+ * For all persisted {@link de.iteratec.osm.report.chart.CsiAggregation}s a {@link CsiAggregationUpdateEvent} should be created, which marks measured value as calculated.
  * @author nkuhn
  *
  */
@@ -54,12 +54,12 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     static transactional = false
 
     /** injected by grails */
-    PageMeasuredValueService pageMeasuredValueService
-    ShopMeasuredValueService shopMeasuredValueService
-    MeasuredValueUtilService measuredValueUtilService
+    PageCsiAggregationService pageCsiAggregationService
+    ShopCsiAggregationService shopCsiAggregationService
+    CsiAggregationUtilService csiAggregationUtilService
 
-    MeasuredValueInterval hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
-    MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+    CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+    CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
     AggregatorType job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
     AggregatorType page = AggregatorType.findByName(AggregatorType.PAGE)
     AggregatorType shop = AggregatorType.findByName(AggregatorType.SHOP)
@@ -80,7 +80,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
      */
     void testCreatingWeeklyPageValues() {
         DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
-        List<CsiAggregation> wpmvs = pageMeasuredValueService.getOrCalculateWeeklyPageMeasuredValues(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate())
+        List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculateWeeklyPageCsiAggregations(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate())
         Integer countWeeks = 2
         Integer countPages = 7
         assertThat(wpmvs.size(), is(countWeeks * countPages))
@@ -94,7 +94,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
      */
     void testCreatingWeeklyShopValues() {
         DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
-        List<CsiAggregation> wsmvs = shopMeasuredValueService.getOrCalculateWeeklyShopMeasuredValues(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
+        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
         Integer countWeeks = 2
         Integer countPages = 7
         assertThat(wsmvs.size(), is(countWeeks))
@@ -102,8 +102,8 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
             assertTrue(it.isCalculated())
         }
 
-        Date endOfLastWeek = measuredValueUtilService.resetToEndOfActualInterval(endDate, MeasuredValueInterval.WEEKLY).toDate()
-        assert pageMeasuredValueService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
+        Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
+        assert pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
     }
 
     /**
@@ -111,7 +111,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
      */
     @BeforeClass
     static void createTestData() {
-        createMeasuredValueIntervals()
+        createCsiAggregationIntervals()
         createAggregatorTypes()
         createPagesAndEvents()
         createBrowsers()
@@ -136,20 +136,20 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
                 name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
     }
 
-    private static createMeasuredValueIntervals() {
-        MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY) ?: new MeasuredValueInterval(
+    private static createCsiAggregationIntervals() {
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
                 name: "hourly",
-                intervalInMinutes: MeasuredValueInterval.HOURLY
+                intervalInMinutes: CsiAggregationInterval.HOURLY
         ).save(failOnError: true)
 
-        MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY) ?: new MeasuredValueInterval(
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY) ?: new CsiAggregationInterval(
                 name: "daily",
-                intervalInMinutes: MeasuredValueInterval.DAILY
+                intervalInMinutes: CsiAggregationInterval.DAILY
         ).save(failOnError: true)
 
-        MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY) ?: new MeasuredValueInterval(
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY) ?: new CsiAggregationInterval(
                 name: "weekly",
-                intervalInMinutes: MeasuredValueInterval.WEEKLY
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
         ).save(failOnError: true)
     }
 

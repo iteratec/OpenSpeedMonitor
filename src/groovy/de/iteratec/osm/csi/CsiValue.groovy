@@ -44,7 +44,7 @@ public interface CsiValue {
 
     /**
      * Delivers csi-tag.
-     * @see MeasuredValueTagService
+     * @see CsiAggregationTagService
      */
     public String retrieveTag()
 

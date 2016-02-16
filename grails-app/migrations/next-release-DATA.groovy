@@ -1,8 +1,10 @@
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiAggregationUpdateService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -43,10 +45,7 @@ databaseChangeLog = {
                 }
             }
         }
-        sql('''insert into csi_configuration(
-                select tb1.*
-                from (select 1 as id, 1 as version, "a first csi configuration" as description, "initial csi configuration" as label, (select csi_day.id from csi_day) as csi_day_id) as tb1)
-        ''')
+        sql('insert into csi_configuration (version, description, label, csi_day_id) values (1, "a first csi configuration", "initial csi configuration", (select csi_day.id from csi_day))')
     }
 
     // map browser_connectivity_weights to first csi_configuration
@@ -124,52 +123,69 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1453106072000-9") {
         grailsChange {
             change {
-                MeasuredValueUpdateService measuredValueUpdateService = null
+                CsiAggregationUpdateService csiAggregationUpdateService = null
                 int maxItemsToProcess = 10000
                 AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-                MeasuredValueInterval measuredValueInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
+                CsiAggregationInterval csiAggregationInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
 
                 int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
                         "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                        [aggregatorType,measuredValueInterval])[0]
+                        [aggregatorType,csiAggregationInterval])[0]
                 println "processing #" + amountMvsHourlyAndPage + " elements"
                 int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
 
                 (0..amountLoops).each { loopNumber ->
                     Date startOfLoop = new Date()
-                    println "start loop #${loopNumber}: ${startOfLoop}"
-                    List<CsiAggregation> currentHourlyMeasuredValues = CsiAggregation.executeQuery(
+                    println "############################################# start loop #${loopNumber}: ${startOfLoop}"
+                    List<CsiAggregation> currentHourlyCsiAggregations = CsiAggregation.executeQuery(
                             "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                            [aggregatorType,measuredValueInterval],
+                            [aggregatorType,csiAggregationInterval],
                             [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
                     )
+                    println "before session: currentHourlyCsiAggregations=${currentHourlyCsiAggregations}"
                     CsiAggregation.withNewSession {
-                        currentHourlyMeasuredValues.each { measuredValue ->
-                            List<EventResult> eventResultsOfMeasuredValue = EventResult.executeQuery(
+                        currentHourlyCsiAggregations.each { CsiAggregation ->
+                            println "##################"
+                            println "CsiAggregation=${CsiAggregation}"
+                            List<EventResult> eventResultsOfCsiAggregation = EventResult.executeQuery(
                                 "from EventResult where id in :ids",
-                                [ids: measuredValue.underlyingEventResultsByWptDocCompleteAsList]
+                                [ids: CsiAggregation.underlyingEventResultsByWptDocCompleteAsList]
                             )
-                            int amountDifferentConnectivityProfiles = eventResultsOfMeasuredValue*.connectivityProfile.unique(false).size()
+                            println "eventResultsOfCsiAggregation.size()=${eventResultsOfCsiAggregation.size()}"
+                            int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivityProfile.unique(false).size()
+                            println "amountDifferentConnectivityProfiles=${amountDifferentConnectivityProfiles}"
                             // simple case: if all results have same connectivity
-                            if (amountDifferentConnectivityProfiles == 1) {
-                                // ... then add connectivity from any of its results to measuredValue
+                            if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.first().connectivityProfile != null) {
+                                // ... then add connectivity from any of its results to CsiAggregation
+                                println "eventResultsOfCsiAggregation=${eventResultsOfCsiAggregation}"
+                                println "eventResultsOfCsiAggregation.first()=${eventResultsOfCsiAggregation.first()}"
+                                println "eventResultsOfCsiAggregation.first().connectivityProfile=${eventResultsOfCsiAggregation.first().connectivityProfile}"
+                                println "CsiAggregation.id=${CsiAggregation.id}"
                                 CsiAggregation.executeUpdate(
                                     "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
-                                    [cp: eventResultsOfMeasuredValue.first().connectivityProfile, mvId: measuredValue.id]
+                                    [cp: eventResultsOfCsiAggregation.first().connectivityProfile, mvId: CsiAggregation.id]
                                 )
                             } else { // ... else remove mv and calc it again by service
-                                if ( measuredValueUpdateService == null) {
-                                    measuredValueUpdateService = ctx.measuredValueUpdateService
+                                println "different connectivity profiles"
+                                if ( csiAggregationUpdateService == null) {
+                                    println "initializing service"
+                                    csiAggregationUpdateService = ctx.csiAggregationUpdateService
+                                    println "initialized service DONE: ${csiAggregationUpdateService}"
                                 }
-                                CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [measuredValue.id])
-                                eventResultsOfMeasuredValue.each { eventResult ->
-                                    measuredValueUpdateService.createOrUpdateDependentMvs(eventResult)
+                                CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [CsiAggregation.id])
+                                println "removed MaesuredValue"
+                                eventResultsOfCsiAggregation.each { eventResult ->
+                                    if (eventResult.connectivityProfile != null){
+                                        println "adding EventResult via update service: ${eventResult}"
+                                        csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
+                                        println "adding EventResult via update service: ...DONE"
+                                    }
                                 }
                             }
                         }
                     }
                     Date endOfLoop = new Date()
-                    println "end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime())/(1000*60)} minutes"
+                    println "############################################# end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime())/(1000*60)} minutes"
                 }
             }
         }

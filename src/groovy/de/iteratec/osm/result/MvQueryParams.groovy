@@ -21,7 +21,7 @@ package de.iteratec.osm.result
 
 /**
  * <p>
- * Assembles params which are used to query {@link MeasuredValue}s via tag.
+ * Assembles params which are used to query {@link CsiAggregation}s via tag.
  * </p>
  * 
  * <p>

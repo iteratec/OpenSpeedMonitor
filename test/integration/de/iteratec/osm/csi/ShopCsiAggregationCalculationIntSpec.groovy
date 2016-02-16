@@ -25,12 +25,12 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Before
 
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.measurement.environment.Browser
@@ -39,11 +39,11 @@ import de.iteratec.osm.measurement.environment.Browser
  *
  */
 @TestMixin(IntegrationTestMixin)
-class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWithDBCleanup{
+class ShopCsiAggregationCalculationIntSpec extends de.iteratec.osm.csi.IntTestWithDBCleanup{
 
     static final double DELTA = 1e-15
-	ShopMeasuredValueService shopMeasuredValueService
-	MeasuredValueUtilService measuredValueUtilService
+	ShopCsiAggregationService shopCsiAggregationService
+	CsiAggregationUtilService csiAggregationUtilService
 	DateTime START = new DateTime(2014,1,1,10,0, DateTimeZone.UTC)
 
 	@Before
@@ -52,7 +52,7 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		//test-data common to all tests
 		TestDataUtil.cleanUpDatabase()
 		TestDataUtil.createOsmConfig()
-		TestDataUtil.createMeasuredValueIntervals()
+		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
 		TestDataUtil.createHoursOfDay()
 		TestDataUtil.createJobGroups()
@@ -72,35 +72,35 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		String browserIE_ID = Browser.findByName('IE').ident().toString()
 		String browserFF_ID = Browser.findByName('FF').ident().toString()
 		
-		List<CsiAggregation> hmvs = []
+		List<CsiAggregation> hCsiAggregations = []
 		// HP|IE
 		double csiHpIe1 = 0.52d
 		double csiHpIe2 = 0.54d
 		double csiHpIe3 = 0.52d
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe2))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe3))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe2))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe3))
 		// HP|FF
 		double csiHpFf1 = 0.54d
 		double csiHpFf2 = 0.52d
 		double csiHpFf3 = 0.54d
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf1))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf1))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3))
 		// MES|IE
 		double csiMesIe1 = 0.92d
 		double csiMesIe2 = 0.94d
 		double csiMesIe3 = 0.92d
-		hmvs.add(createMeasuredValue("1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe1))
-		hmvs.add(createMeasuredValue("1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe2))
-		hmvs.add(createMeasuredValue("1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe3))
+		hCsiAggregations.add(createCsiAggregation("1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe1))
+		hCsiAggregations.add(createCsiAggregation("1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe2))
+		hCsiAggregations.add(createCsiAggregation("1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe3))
 		// MES|FF
 		double csiMesFf1 = 0.94d
 		double csiMesFf2 = 0.92d
 		double csiMesFf3 = 0.94d
-		hmvs.add(createMeasuredValue("1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf1))
-		hmvs.add(createMeasuredValue("1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf2))
-		hmvs.add(createMeasuredValue("1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf3))
+		hCsiAggregations.add(createCsiAggregation("1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf1))
+		hCsiAggregations.add(createCsiAggregation("1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf2))
+		hCsiAggregations.add(createCsiAggregation("1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf3))
 		
 		Double ieWeight = 45d
 		Double ffWeight = 55d
@@ -114,26 +114,26 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		Double expectedCsi = ((avgHpIe * hpWeight * ieWeight) + (avgHpFf * hpWeight * ffWeight) + (avgMesIe * mesWeight * ieWeight) + (avgMesFf * mesWeight * ffWeight)) / 
 			((ieWeight * hpWeight) + (ieWeight * mesWeight) + (ffWeight * hpWeight) + (ffWeight * mesWeight))
 			
-		// mocking hourly event-MeasuredValues ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		shopMeasuredValueService.pageMeasuredValueService.eventMeasuredValueService.metaClass.getOrCalculateHourylMeasuredValues = {Date start, Date end, MvQueryParams mvQueryparams ->
-			return hmvs
+		// mocking hourly event-CsiAggregations ////////////////////////////////////////////////////////////////////////////////////////////////////////
+		shopCsiAggregationService.pageCsiAggregationService.eventCsiAggregationService.metaClass.getOrCalculateHourylCsiAggregations = { Date start, Date end, MvQueryParams mvQueryparams ->
+			return hCsiAggregations
 		}
 		
 		//test-execution ////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		Date startOfDailyInterval = measuredValueUtilService.resetToStartOfActualInterval(START, MeasuredValueInterval.DAILY).toDate()
-		List<CsiAggregation> smvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
+		Date startOfDailyInterval = csiAggregationUtilService.resetToStartOfActualInterval(START, CsiAggregationInterval.DAILY).toDate()
+		List<CsiAggregation> smvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(
 			startOfDailyInterval,
 			startOfDailyInterval,
-			MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY),
+			CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY),
 			[JobGroup.findByName('CSI')]
 		)
 
 		//assertions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 		List<CsiAggregation> allMvs = CsiAggregation.list()
-		List<CsiAggregation> hourlyEventMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.HOURLY && it.aggregator.name == AggregatorType.MEASURED_EVENT}
-		List<CsiAggregation> dailyPageMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.DAILY && it.aggregator.name == AggregatorType.PAGE}
-		List<CsiAggregation> dailyShopMvs = allMvs.findAll{ it.interval.intervalInMinutes == MeasuredValueInterval.DAILY && it.aggregator.name == AggregatorType.SHOP}
+		List<CsiAggregation> hourlyEventMvs = allMvs.findAll{ it.interval.intervalInMinutes == CsiAggregationInterval.HOURLY && it.aggregator.name == AggregatorType.MEASURED_EVENT}
+		List<CsiAggregation> dailyPageMvs = allMvs.findAll{ it.interval.intervalInMinutes == CsiAggregationInterval.DAILY && it.aggregator.name == AggregatorType.PAGE}
+		List<CsiAggregation> dailyShopMvs = allMvs.findAll{ it.interval.intervalInMinutes == CsiAggregationInterval.DAILY && it.aggregator.name == AggregatorType.SHOP}
 		
 		assertEquals(12, hourlyEventMvs.size())
 		assertEquals(12, hourlyEventMvs.findAll{ it.isCalculatedWithData() }.size())
@@ -151,19 +151,19 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		assertEquals(expectedCsi, smvs[0].csByWptDocCompleteInPercent, DELTA)
 		
 		//duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi) 
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe2))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe3))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf1))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2))
-		hmvs.add(createMeasuredValue("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe2))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe3))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf1))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2))
+		hCsiAggregations.add(createCsiAggregation("1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3))
 		
 		CsiAggregation.list().findAll{ ! it.aggregator.name.equals(AggregatorType.MEASURED_EVENT) }*.delete(flush: true)
 		
-		smvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(
+		smvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(
 			startOfDailyInterval,
 			startOfDailyInterval,
-			MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY),
+			CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY),
 			[JobGroup.findByName('CSI')]
 		)
 		assertEquals(1, smvs.size())
@@ -172,19 +172,19 @@ class ShopMeasureValueCalculationIntSpec extends de.iteratec.osm.csi.IntTestWith
 		
     }
 	
-	CsiAggregation createMeasuredValue(String tag, double value){
+	CsiAggregation createCsiAggregation(String tag, double value){
 		CsiAggregation mv = new CsiAggregation(
 			started: START.toDate(),
-			interval: MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY),
+			interval: CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
 			aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
 			tag: tag,
 			csByWptDocCompleteInPercent: value,
 			underlyingEventResultsByWptDocComplete: '1',
 		).save(failOnError: true)
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: new Date(),
-			measuredValueId: mv.ident(),
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mv.ident(),
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		).save(failOnError: true)
 		return mv
 	}

@@ -27,9 +27,11 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -41,8 +43,8 @@ import de.iteratec.osm.csi.CsiTransformation
 
 class BootStrap {
 
-    EventMeasuredValueService eventMeasuredValueService
-    MeasuredValueUtilService measuredValueUtilService
+    EventCsiAggregationService eventCsiAggregationService
+    CsiAggregationUtilService csiAggregationUtilService
     JobResultDaoService jobResultService
     JobProcessingService jobProcessingService
     I18nService i18nService
@@ -223,7 +225,7 @@ class BootStrap {
                 name: csiGroupName,
                 groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
 
-        // here you can initialize the weights of the hours of the csiDay for csi calculation  (see de.iteratec.osm.csi.PageMeasuredValueService)
+        // here you can initialize the weights of the hours of the csiDay for csi calculation  (see de.iteratec.osm.csi.PageCsiAggregationService)
         if (CsiDay.count <= 0) {
             CsiDay initDay = new CsiDay()
             (0..23).each {
@@ -250,19 +252,19 @@ class BootStrap {
                 name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 
 
-        MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY) ?: new MeasuredValueInterval(
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
                 name: "hourly",
-                intervalInMinutes: MeasuredValueInterval.HOURLY
+                intervalInMinutes: CsiAggregationInterval.HOURLY
         ).save(failOnError: true)
 
-        MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY) ?: new MeasuredValueInterval(
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY) ?: new CsiAggregationInterval(
                 name: "daily",
-                intervalInMinutes: MeasuredValueInterval.DAILY
+                intervalInMinutes: CsiAggregationInterval.DAILY
         ).save(failOnError: true)
 
-        MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY) ?: new MeasuredValueInterval(
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY) ?: new CsiAggregationInterval(
                 name: "weekly",
-                intervalInMinutes: MeasuredValueInterval.WEEKLY
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
         ).save(failOnError: true)
 
         Date date = new DateTime(2000, 1, 1, 0, 0).toDate()

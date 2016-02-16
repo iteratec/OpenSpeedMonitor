@@ -184,7 +184,7 @@ class UserspecificEventResultDashboard {
     Boolean setToHour
 
     /**
-     * The time of the {@link MeasuredValueInterval}.
+     * The time of the {@link CsiAggregationInterval}.
      */
     Integer selectedInterval
 

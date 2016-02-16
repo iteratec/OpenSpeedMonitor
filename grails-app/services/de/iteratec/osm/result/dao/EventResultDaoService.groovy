@@ -20,7 +20,6 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.dao.CriteriaAggregator
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.result.*
@@ -40,7 +39,7 @@ public class EventResultDaoService {
 		
 	OsmDataSourceService osmDataSourceService
 	JobResultDaoService jobResultDaoService
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 
 	/**
 	 * <p>
@@ -98,7 +97,7 @@ public class EventResultDaoService {
             Date fromDate, Date toDate, Set<CachedView> cachedViews, MvQueryParams mvQueryParams
     ){
 
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams)
+		Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams)
 		return getMedianEventResultsBy(fromDate, toDate, cachedViews, rlikePattern.pattern)
 
 	}
@@ -148,7 +147,7 @@ public class EventResultDaoService {
         CriteriaSorting sorting
     ){
 		
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(queryParams)
+		Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(queryParams)
 
         if(osmDataSourceService.getRLikeSupport()){
 
@@ -425,7 +424,7 @@ public class EventResultDaoService {
             Date fromDate, Date toDate, Collection<CachedView> cachedViews, MvQueryParams mvQueryParams
     ){
 
-        Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams);
+        Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams);
 
 		def criteria = EventResult.createCriteria()
 		if(osmDataSourceService.getRLikeSupport()) {

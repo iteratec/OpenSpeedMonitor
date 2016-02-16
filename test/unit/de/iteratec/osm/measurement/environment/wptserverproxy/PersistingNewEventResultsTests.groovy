@@ -19,7 +19,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.csi.TimeToCsMapping
@@ -49,7 +49,7 @@ import static org.junit.Assert.*
 
 /**
  * Tests the saving of locations and results. These functions are used in proxy-mechanism.
- * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link MeasuredValue}s is not the concern of the tests in this class. 
+ * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link CsiAggregation}s is not the concern of the tests in this class.
  * @author nkuhn
  * @see {@link ProxyService}
  * 
@@ -223,11 +223,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -296,11 +296,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -370,11 +370,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -408,11 +408,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -442,11 +442,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -504,11 +504,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -609,11 +609,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		mockProxyService(xmlResult.data.location.toString())
 		
 		deleteAllRelevantDomains() // No Locations left!
@@ -638,11 +638,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
 		//test execution
@@ -670,11 +670,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
 		//test execution
@@ -811,11 +811,11 @@ class PersistingNewEventResultsTests {
 	private void mockInnerServices() {
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
+		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 	}
 
 	private void createLocationIfNotExistent(String locationIdentifier, Browser browser, WebPageTestServer server) {
@@ -857,13 +857,13 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.browserService = browserService.createMock()
 	}
-	private void mockMeasuredValueUpdateService(){
-		def measuredValueUpdateServiceMocked = mockFor(MeasuredValueUpdateService, true)
-		measuredValueUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
+	private void mockCsiAggregationUpdateService(){
+		def csiAggregationUpdateServiceMocked = mockFor(CsiAggregationUpdateService, true)
+		csiAggregationUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
 			//not the concern of this test
 			return 34d
 		}
-		serviceUnderTest.measuredValueUpdateService = measuredValueUpdateServiceMocked.createMock()
+		serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.createMock()
 	}
 	private void mockPageService(){
 		def pageServiceMocked = mockFor(PageService, true)
@@ -890,9 +890,9 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.jobService = jobServiceMocked.createMock()
 	}
-	private void mockMeasuredValueTagService(String tagToReturn){
-		def measuredValueTagService = mockFor(MeasuredValueTagService, true)
-		measuredValueTagService.demand.createEventResultTag(0..100) { 
+	private void mockCsiAggregationTagService(String tagToReturn){
+		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+		csiAggregationTagService.demand.createEventResultTag(0..100) {
 			JobGroup jobGroup,
 			MeasuredEvent measuredEvent,
 			Page page,
@@ -900,11 +900,11 @@ class PersistingNewEventResultsTests {
 			Location location ->
 			return tagToReturn
 		}
-		measuredValueTagService.demand.findJobGroupOfEventResultTag(0..100) {
+		csiAggregationTagService.demand.findJobGroupOfEventResultTag(0..100) {
 			String tag ->
 			return undefinedJobGroup
 		}
-		serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock()
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
 	}
 	private void mockMetricReportingService(){
 		def metricReportingService = mockFor(MetricReportingService, true)

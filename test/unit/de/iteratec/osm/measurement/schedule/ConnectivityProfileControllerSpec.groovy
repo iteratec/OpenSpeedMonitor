@@ -5,16 +5,13 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.mock.interceptor.MockFor
-import org.jsoup.helper.DataUtil
-import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Specification
 
 @TestFor(ConnectivityProfileController)
-@Mock([ConnectivityProfileService, ConnectivityProfile, CsiAggregation, Job, MeasuredValueInterval, AggregatorType, Script, Location, JobGroup])
+@Mock([ConnectivityProfileService, ConnectivityProfile, CsiAggregation, Job, CsiAggregationInterval, AggregatorType, Script, Location, JobGroup])
 class ConnectivityProfileControllerSpec extends Specification {
 
     ConnectivityProfileController controllerUnderTest
@@ -30,13 +27,13 @@ class ConnectivityProfileControllerSpec extends Specification {
 
         existingConnectivityProfile.metaClass.toString = { -> "unused" }
 
-        TestDataUtil.createMeasuredValueIntervals()
+        TestDataUtil.createCsiAggregationIntervals()
         TestDataUtil.createAggregatorTypes()
-        mvWithOldConnectiviyProfile = TestDataUtil.createMeasuredValue(new Date(), MeasuredValueInterval.get(1), AggregatorType.get(1), "",1, "", true, existingConnectivityProfile)
+        mvWithOldConnectiviyProfile = TestDataUtil.createCsiAggregation(new Date(), CsiAggregationInterval.get(1), AggregatorType.get(1), "",1, "", true, existingConnectivityProfile)
         jobWithOldConnectivityProfile = TestDataUtil.createJob("existingJob", new Script(), new Location(), new JobGroup(), "description", 1, false, 50, existingConnectivityProfile)
     }
 
-    // necessary because old measuredValues refer to the connectivityProfile
+    // necessary because old csiAggregations refer to the connectivityProfile
     void "test editConnectivityProfile creates copy of profile instead of editing the source"() {
         given:
         params.id = existingConnectivityProfile.id

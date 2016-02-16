@@ -31,13 +31,13 @@ import org.junit.*
  * Test-suite for {@link CsiAggregation}.
  */
 @TestMixin(GrailsUnitTestMixin)
-@Mock([CsiAggregation, AggregatorType, MeasuredValueInterval, MeasuredValueUpdateEvent])
+@Mock([CsiAggregation, AggregatorType, CsiAggregationInterval, CsiAggregationUpdateEvent])
 class CsiAggregationTests {
 	
 	Date dateOfMv1
 	Date dateOfMv2
 	AggregatorType measuredEvent, page, shop
-	MeasuredValueInterval hourly, daily, weekly
+	CsiAggregationInterval hourly, daily, weekly
 
     void setUp() {
 		measuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT) ?: new AggregatorType(
@@ -46,17 +46,17 @@ class CsiAggregationTests {
 			name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 		shop = AggregatorType.findByName(AggregatorType.SHOP) ?: new AggregatorType(
 			name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-		hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY) ?: new MeasuredValueInterval(
+		hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
 			name: "hourly",
-			intervalInMinutes: MeasuredValueInterval.HOURLY
+			intervalInMinutes: CsiAggregationInterval.HOURLY
 			).save(failOnError: true)
-		daily  = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY) ?: new MeasuredValueInterval(
+		daily  = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY) ?: new CsiAggregationInterval(
 			name: "daily",
-			intervalInMinutes: MeasuredValueInterval.DAILY
+			intervalInMinutes: CsiAggregationInterval.DAILY
 			).save(failOnError: true)
-		weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY) ?: new MeasuredValueInterval(
+		weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY) ?: new CsiAggregationInterval(
 			name: "weekly",
-			intervalInMinutes: MeasuredValueInterval.WEEKLY
+			intervalInMinutes: CsiAggregationInterval.WEEKLY
 			).save(failOnError: true)
 		
 		dateOfMv1 = new DateTime(2012,1,1,0,0, DateTimeZone.UTC).toDate()
@@ -166,29 +166,29 @@ class CsiAggregationTests {
 		Date timestamp4 = new DateTime(2014,6,25,0,4,0).toDate()
 		
 		//creation of update events and test
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp1,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		).save(failOnError: true)
 		assertThat(mv.hasToBeCalculated(), is(true))
 		
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp2,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		).save(failOnError: true)
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp3,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		).save(failOnError: true)
 		assertThat(mv.hasToBeCalculated(), is(true))
 		
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp4,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		).save(failOnError: true)
 		assertThat(mv.hasToBeCalculated(), is(true))
 	}
@@ -204,29 +204,29 @@ class CsiAggregationTests {
 		Date timestamp4 = new DateTime(2014,6,25,0,4,0).toDate()
 		
 		//creation of update events and test
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp1,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		).save(failOnError: true)
 		assertThat(mv.hasToBeCalculated(), is(false))
 		
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp2,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		).save(failOnError: true)
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp3,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		).save(failOnError: true)
 		assertThat(mv.hasToBeCalculated(), is(false))
 		
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp3,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		).save(failOnError: true)
 		assertThat(mv.hasToBeCalculated(), is(false))
 	}
@@ -237,14 +237,14 @@ class CsiAggregationTests {
 		CsiAggregation mv = new CsiAggregation().save(validate: false)
 		Long mvId = mv.ident()
 		Date timestamp1 = new DateTime(2014,6,25,0,1,0).toDate()
-		MeasuredValueUpdateEvent calculationOfOtherMeasuredValue = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent calculationOfOtherCsiAggregation = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp1,
-			measuredValueId: mvId+1,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId+1,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		)
 		//tests
 		assertThat(mv.hasToBeCalculatedAccordingEvents([]), is(true))
-		assertThat(mv.hasToBeCalculatedAccordingEvents([calculationOfOtherMeasuredValue]), is(true))
+		assertThat(mv.hasToBeCalculatedAccordingEvents([calculationOfOtherCsiAggregation]), is(true))
 	}
 	
 	@Test
@@ -260,32 +260,32 @@ class CsiAggregationTests {
 		Date timestamp4 = new DateTime(2014,6,25,0,4,0).toDate()
 		Date timestamp5 = new DateTime(2014,6,25,0,5,0).toDate()
 		
-		MeasuredValueUpdateEvent outdated1 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent outdated1 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp1,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		)
-		MeasuredValueUpdateEvent calculated1 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent calculated1 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp2,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		)
-		MeasuredValueUpdateEvent outdated2 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent outdated2 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp3,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		)
-		MeasuredValueUpdateEvent outdated3 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent outdated3 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp4,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		)
-		MeasuredValueUpdateEvent calculationOfOtherMeasuredValue = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent calculationOfOtherCsiAggregation = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp5,
-			measuredValueId: mvId+1,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId+1,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		)
-		List<MeasuredValueUpdateEvent> events = [calculationOfOtherMeasuredValue]
+		List<CsiAggregationUpdateEvent> events = [calculationOfOtherCsiAggregation]
 		
 		//test
 		
@@ -313,32 +313,32 @@ class CsiAggregationTests {
 		Date timestamp4 = new DateTime(2014,6,25,0,4,0).toDate()
 		Date timestamp5 = new DateTime(2014,6,25,0,5,0).toDate()
 		
-		MeasuredValueUpdateEvent calculated1 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent calculated1 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp1,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		)
-		MeasuredValueUpdateEvent outdated1 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent outdated1 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp2,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		)
-		MeasuredValueUpdateEvent calculated2 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent calculated2 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp3,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		)
-		MeasuredValueUpdateEvent calculated3 = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent calculated3 = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp4,
-			measuredValueId: mvId,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			csiAggregationId: mvId,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		)
-		MeasuredValueUpdateEvent outdatedOfOtherMeasuredValue = new MeasuredValueUpdateEvent(
+		CsiAggregationUpdateEvent outdatedOfOtherCsiAggregation = new CsiAggregationUpdateEvent(
 			dateOfUpdate: timestamp5,
-			measuredValueId: mvId+1,
-			updateCause: MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+			csiAggregationId: mvId+1,
+			updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		)
-		List<MeasuredValueUpdateEvent> events = [outdatedOfOtherMeasuredValue]
+		List<CsiAggregationUpdateEvent> events = [outdatedOfOtherCsiAggregation]
 		
 		//test
 		

@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report.chart
 
-import static org.hamcrest.CoreMatchers.*
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
 
@@ -29,11 +28,11 @@ import org.junit.*
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(MeasuredValueUpdateEventDaoService)
-@Mock([MeasuredValueUpdateEvent])
-class MeasuredValueUpdateEventDaoServiceSpec {
+@TestFor(CsiAggregationUpdateEventDaoService)
+@Mock([CsiAggregationUpdateEvent])
+class CsiAggregationUpdateEventDaoServiceSpec {
 
-	MeasuredValueUpdateEventDaoService serviceUnderTest
+	CsiAggregationUpdateEventDaoService serviceUnderTest
 	
 	@Before
 	public void setUp(){
@@ -44,27 +43,27 @@ class MeasuredValueUpdateEventDaoServiceSpec {
     void testWritingUpdateEvents() {
 		
 		//test-specific data
-		Long idOutdatedMeasuredValue = 1
-		Long idCalculatedMeasuredValue = 1
+		Long idOutdatedCsiAggregation = 1
+		Long idCalculatedCsiAggregation = 1
 		DateTime oneMinuteAgo = new DateTime().minusMinutes(1)
 		
 		//test-execution
-		serviceUnderTest.createUpdateEvent(idOutdatedMeasuredValue, MeasuredValueUpdateEvent.UpdateCause.OUTDATED)
-		serviceUnderTest.createUpdateEvent(idCalculatedMeasuredValue, MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+		serviceUnderTest.createUpdateEvent(idOutdatedCsiAggregation, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
+		serviceUnderTest.createUpdateEvent(idCalculatedCsiAggregation, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 		
 		//assertions
-		List<MeasuredValueUpdateEvent> updateEvents = MeasuredValueUpdateEvent.list()
+		List<CsiAggregationUpdateEvent> updateEvents = CsiAggregationUpdateEvent.list()
 		assertThat(updateEvents.size(), is(2))
 		
-		MeasuredValueUpdateEvent outdatedEvent = updateEvents.find{ it.updateCause == MeasuredValueUpdateEvent.UpdateCause.OUTDATED }
+		CsiAggregationUpdateEvent outdatedEvent = updateEvents.find{ it.updateCause == CsiAggregationUpdateEvent.UpdateCause.OUTDATED }
 		assertNotNull(outdatedEvent)
-		assertThat(outdatedEvent.measuredValueId, is(idOutdatedMeasuredValue))
+		assertThat(outdatedEvent.csiAggregationId, is(idOutdatedCsiAggregation))
 		boolean updateEventNewerThanOneMinute = new DateTime(outdatedEvent.dateOfUpdate).isAfter(oneMinuteAgo)
 		assertTrue(updateEventNewerThanOneMinute)
 		
-		MeasuredValueUpdateEvent calculatedEvent = updateEvents.find{ it.updateCause == MeasuredValueUpdateEvent.UpdateCause.CALCULATED }
+		CsiAggregationUpdateEvent calculatedEvent = updateEvents.find{ it.updateCause == CsiAggregationUpdateEvent.UpdateCause.CALCULATED }
 		assertNotNull(calculatedEvent)
-		assertThat(calculatedEvent.measuredValueId, is(idCalculatedMeasuredValue))
+		assertThat(calculatedEvent.csiAggregationId, is(idCalculatedCsiAggregation))
 		updateEventNewerThanOneMinute = new DateTime(calculatedEvent.dateOfUpdate).isAfter(oneMinuteAgo) 
 		assertTrue(updateEventNewerThanOneMinute)
     }

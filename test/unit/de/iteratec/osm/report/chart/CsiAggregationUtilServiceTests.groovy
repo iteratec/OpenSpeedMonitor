@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.report.chart
 
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-
 import static org.junit.Assert.*
 import grails.test.mixin.TestFor
 
@@ -28,15 +26,13 @@ import org.joda.time.Interval
 import org.junit.Before
 import org.junit.Test
 
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-
 /**
- * Test-suite of {@link de.iteratec.osm.report.chart.MeasuredValueUtilService}.
+ * Test-suite of {@link CsiAggregationUtilService}.
  */
-@TestFor(MeasuredValueUtilService)
-class MeasuredValueUtilServiceTests {
+@TestFor(CsiAggregationUtilService)
+class CsiAggregationUtilServiceTests {
 
-	MeasuredValueUtilService serviceUnderTest
+	CsiAggregationUtilService serviceUnderTest
 	
 	@Before
 	void setUp() {
@@ -49,7 +45,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 1, 10, 13, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToStartOfActualInterval(
-				dateToReset, MeasuredValueInterval.HOURLY); 
+				dateToReset, CsiAggregationInterval.HOURLY);
 		
 		assertEquals(expectedResult, currentResult);
 	}
@@ -60,7 +56,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 1, 10, 0, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToStartOfActualInterval(
-				dateToReset, MeasuredValueInterval.DAILY);
+				dateToReset, CsiAggregationInterval.DAILY);
 		
 		assertEquals(expectedResult, currentResult);
 	}
@@ -71,7 +67,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 1, 4, 0, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToStartOfActualInterval(
-				dateToReset, MeasuredValueInterval.WEEKLY);
+				dateToReset, CsiAggregationInterval.WEEKLY);
 		
 		assertEquals(expectedResult, currentResult);
     }
@@ -82,7 +78,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 1, 10, 14, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToEndOfActualInterval(
-			dateToReset, MeasuredValueInterval.HOURLY);
+			dateToReset, CsiAggregationInterval.HOURLY);
 		
 		assertEquals(expectedResult, currentResult);
 	}
@@ -93,7 +89,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 1, 11, 0, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToEndOfActualInterval(
-			dateToReset, MeasuredValueInterval.DAILY);
+			dateToReset, CsiAggregationInterval.DAILY);
 		
 		assertEquals(expectedResult, currentResult);
 	}
@@ -104,7 +100,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 1, 11, 0, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToEndOfActualInterval(
-			dateToReset, MeasuredValueInterval.WEEKLY);
+			dateToReset, CsiAggregationInterval.WEEKLY);
 		
 		assertEquals(expectedResult, currentResult);
 	}
@@ -116,7 +112,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 9, 5, 0, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToStartOfActualInterval(
-			dateToReset, MeasuredValueInterval.WEEKLY, 
+			dateToReset, CsiAggregationInterval.WEEKLY,
 			DateTimeConstants.THURSDAY);
 		
 		assertEquals(expectedResult, currentResult);
@@ -128,7 +124,7 @@ class MeasuredValueUtilServiceTests {
 		DateTime expectedResult = new DateTime(2013, 9, 13, 0, 0, 0, 0);
 		
 		DateTime currentResult = serviceUnderTest.resetToEndOfActualInterval(
-			dateToReset, MeasuredValueInterval.WEEKLY, 
+			dateToReset, CsiAggregationInterval.WEEKLY,
 			DateTimeConstants.THURSDAY);
 		
 		assertEquals(expectedResult, currentResult);
@@ -145,7 +141,7 @@ class MeasuredValueUtilServiceTests {
 		Interval timeFrame = new Interval(startDate, endDate);
 		
 		Interval fixedTimeFrame = serviceUnderTest.fixTimeFrameToMatchIntervalRange(
-			timeFrame, MeasuredValueInterval.WEEKLY);
+			timeFrame, CsiAggregationInterval.WEEKLY);
 		
 		assertNotNull(fixedTimeFrame);
 		assertEquals(expectedFixedStartDate, fixedTimeFrame.getStart());
@@ -169,17 +165,17 @@ class MeasuredValueUtilServiceTests {
 		DateTime noonLastDayOfSummertime = new DateTime(2013, 10, 27, 12, 0, 0);
 		
 		//adding a week
-		assertEquals(threeDaysBeforeEndOfSummertime, serviceUnderTest.addOneInterval(tenDaysBeforeEndOfSummertime, MeasuredValueInterval.WEEKLY));
-		assertEquals(fourDaysAfterEndOfSummertime, serviceUnderTest.addOneInterval(threeDaysBeforeEndOfSummertime, MeasuredValueInterval.WEEKLY));
-		assertEquals(elevenDaysAfterEndOfSummertime, serviceUnderTest.addOneInterval(fourDaysAfterEndOfSummertime, MeasuredValueInterval.WEEKLY));
+		assertEquals(threeDaysBeforeEndOfSummertime, serviceUnderTest.addOneInterval(tenDaysBeforeEndOfSummertime, CsiAggregationInterval.WEEKLY));
+		assertEquals(fourDaysAfterEndOfSummertime, serviceUnderTest.addOneInterval(threeDaysBeforeEndOfSummertime, CsiAggregationInterval.WEEKLY));
+		assertEquals(elevenDaysAfterEndOfSummertime, serviceUnderTest.addOneInterval(fourDaysAfterEndOfSummertime, CsiAggregationInterval.WEEKLY));
 		//adding a day
-		assertEquals(twoDaysBeforeEndOfSummertime, serviceUnderTest.addOneInterval(threeDaysBeforeEndOfSummertime, MeasuredValueInterval.DAILY));
-		assertEquals(midnightFirstDayAfterSummertime, serviceUnderTest.addOneInterval(midnightLastDayOfSummertime, MeasuredValueInterval.DAILY));
-		assertEquals(midnightSecondDayAfterSummertime, serviceUnderTest.addOneInterval(midnightFirstDayAfterSummertime, MeasuredValueInterval.DAILY));
+		assertEquals(twoDaysBeforeEndOfSummertime, serviceUnderTest.addOneInterval(threeDaysBeforeEndOfSummertime, CsiAggregationInterval.DAILY));
+		assertEquals(midnightFirstDayAfterSummertime, serviceUnderTest.addOneInterval(midnightLastDayOfSummertime, CsiAggregationInterval.DAILY));
+		assertEquals(midnightSecondDayAfterSummertime, serviceUnderTest.addOneInterval(midnightFirstDayAfterSummertime, CsiAggregationInterval.DAILY));
 		//adding an hour
-		assertEquals(oneHourBeforeEndOfSummertime, serviceUnderTest.addOneInterval(twoHoursBeforeEndOfSummertime, MeasuredValueInterval.HOURLY));
-		assertEquals(oneHourBeforeEndOfSummertime.getHourOfDay(), serviceUnderTest.addOneInterval(oneHourBeforeEndOfSummertime, MeasuredValueInterval.HOURLY).getHourOfDay());
-		assertEquals(new DateTime(2013, 10, 27, 13, 0, 0), serviceUnderTest.addOneInterval(noonLastDayOfSummertime, MeasuredValueInterval.HOURLY));
+		assertEquals(oneHourBeforeEndOfSummertime, serviceUnderTest.addOneInterval(twoHoursBeforeEndOfSummertime, CsiAggregationInterval.HOURLY));
+		assertEquals(oneHourBeforeEndOfSummertime.getHourOfDay(), serviceUnderTest.addOneInterval(oneHourBeforeEndOfSummertime, CsiAggregationInterval.HOURLY).getHourOfDay());
+		assertEquals(new DateTime(2013, 10, 27, 13, 0, 0), serviceUnderTest.addOneInterval(noonLastDayOfSummertime, CsiAggregationInterval.HOURLY));
 		
 	}
 	
@@ -203,17 +199,17 @@ class MeasuredValueUtilServiceTests {
 		DateTime noonLastDayOfSummertime = new DateTime(2013, 10, 27, 12, 0, 0);
 		
 		//subtracting a week
-		assertEquals(tenDaysBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(threeDaysBeforeEndOfSummertime, MeasuredValueInterval.WEEKLY));
-		assertEquals(threeDaysBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(fourDaysAfterEndOfSummertime, MeasuredValueInterval.WEEKLY));
-		assertEquals(fourDaysAfterEndOfSummertime, serviceUnderTest.subtractOneInterval(elevenDaysAfterEndOfSummertime, MeasuredValueInterval.WEEKLY));
+		assertEquals(tenDaysBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(threeDaysBeforeEndOfSummertime, CsiAggregationInterval.WEEKLY));
+		assertEquals(threeDaysBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(fourDaysAfterEndOfSummertime, CsiAggregationInterval.WEEKLY));
+		assertEquals(fourDaysAfterEndOfSummertime, serviceUnderTest.subtractOneInterval(elevenDaysAfterEndOfSummertime, CsiAggregationInterval.WEEKLY));
 		//subtracting a day
-		assertEquals(threeDaysBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(twoDaysBeforeEndOfSummertime, MeasuredValueInterval.DAILY));
-		assertEquals(midnightLastDayOfSummertime, serviceUnderTest.subtractOneInterval(midnightFirstDayAfterSummertime, MeasuredValueInterval.DAILY));
-		assertEquals(midnightFirstDayAfterSummertime, serviceUnderTest.subtractOneInterval(midnightSecondDayAfterSummertime, MeasuredValueInterval.DAILY));
+		assertEquals(threeDaysBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(twoDaysBeforeEndOfSummertime, CsiAggregationInterval.DAILY));
+		assertEquals(midnightLastDayOfSummertime, serviceUnderTest.subtractOneInterval(midnightFirstDayAfterSummertime, CsiAggregationInterval.DAILY));
+		assertEquals(midnightFirstDayAfterSummertime, serviceUnderTest.subtractOneInterval(midnightSecondDayAfterSummertime, CsiAggregationInterval.DAILY));
 		//subtracting an hour
-		assertEquals(twoHoursBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(oneHourBeforeEndOfSummertime, MeasuredValueInterval.HOURLY));
-		assertEquals(oneHourBeforeEndOfSummertime.getHourOfDay(), serviceUnderTest.subtractOneInterval(exactlyEndOfSummertime, MeasuredValueInterval.HOURLY).getHourOfDay());
-		assertEquals(exactlyEndOfSummertime.getHourOfDay(), serviceUnderTest.subtractOneInterval(oneHourAfterEndOfSummertime, MeasuredValueInterval.HOURLY).getHourOfDay());
+		assertEquals(twoHoursBeforeEndOfSummertime, serviceUnderTest.subtractOneInterval(oneHourBeforeEndOfSummertime, CsiAggregationInterval.HOURLY));
+		assertEquals(oneHourBeforeEndOfSummertime.getHourOfDay(), serviceUnderTest.subtractOneInterval(exactlyEndOfSummertime, CsiAggregationInterval.HOURLY).getHourOfDay());
+		assertEquals(exactlyEndOfSummertime.getHourOfDay(), serviceUnderTest.subtractOneInterval(oneHourAfterEndOfSummertime, CsiAggregationInterval.HOURLY).getHourOfDay());
 		
 	}
 	
@@ -226,9 +222,9 @@ class MeasuredValueUtilServiceTests {
     void testIsInActualInterval() {
 
         //test specific data
-        Integer hourly = MeasuredValueInterval.HOURLY
-        Integer daily = MeasuredValueInterval.DAILY
-        Integer weekly = MeasuredValueInterval.WEEKLY
+        Integer hourly = CsiAggregationInterval.HOURLY
+        Integer daily = CsiAggregationInterval.DAILY
+        Integer weekly = CsiAggregationInterval.WEEKLY
         DateTime now = new DateTime()
 
         //assertions

@@ -19,7 +19,7 @@ package de.iteratec.osm.persistence
 
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
@@ -36,7 +36,7 @@ import org.junit.*
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestFor(DbCleanupService)
-@Mock([JobResult, EventResult, HttpArchive, CsiAggregation, MeasuredValueUpdateEvent, BatchActivity])
+@Mock([JobResult, EventResult, HttpArchive, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity])
 class DbCleanupServiceSpec {
 
     static transactional = false
@@ -68,11 +68,11 @@ class DbCleanupServiceSpec {
         new EventResult(jobResult: jobResultWithAfterCleanupDate, jobResultDate: jobResultWithAfterCleanupDate.date).save(validate: false)
         new HttpArchive(jobResult: jobResultWithAfterCleanupDate).save(validate: false)
 
-        CsiAggregation measuredValueWithBeforeCleanupDate = new CsiAggregation(started: executionDateBeforeCleanUpDate.toDate()).save(validate: false)
-        new MeasuredValueUpdateEvent(measuredValueId: measuredValueWithBeforeCleanupDate.id).save(validate: false)
+        CsiAggregation csiAggregationWithBeforeCleanupDate = new CsiAggregation(started: executionDateBeforeCleanUpDate.toDate()).save(validate: false)
+        new CsiAggregationUpdateEvent(csiAggregationId: csiAggregationWithBeforeCleanupDate.id).save(validate: false)
 
-        CsiAggregation measuredValueWithAfterCleanupDate = new CsiAggregation(started: executionDateAfterCleanUpDate.toDate()).save(validate: false)
-        new MeasuredValueUpdateEvent(measuredValueId: measuredValueWithAfterCleanupDate.id).save(validate: false)
+        CsiAggregation csiAggregationWithAfterCleanupDate = new CsiAggregation(started: executionDateAfterCleanUpDate.toDate()).save(validate: false)
+        new CsiAggregationUpdateEvent(csiAggregationId: csiAggregationWithAfterCleanupDate.id).save(validate: false)
 
         // before DbCleanupJob execution
         assertThat(JobResult.list().size(), is(2))
@@ -80,11 +80,11 @@ class DbCleanupServiceSpec {
         assertThat(HttpArchive.list().size(), is(2))
 
         assertThat(CsiAggregation.list().size(), is(2))
-        assertThat(MeasuredValueUpdateEvent.list().size(), is(2))
+        assertThat(CsiAggregationUpdateEvent.list().size(), is(2))
 
-        //delete all {@link JobResult}s, {@link EventResult}s, {@link HttpArchive}s, {@link CsiAggregation}s, {@link MeasuredValueUpdateEvent}s older then one year (12 months)
+        //delete all {@link JobResult}s, {@link EventResult}s, {@link HttpArchive}s, {@link CsiAggregation}s, {@link CsiAggregationUpdateEvent}s older then one year (12 months)
         serviceUnderTest.deleteResultsDataBefore(new DateTime().minusMonths(12).toDate())
-        serviceUnderTest.deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(new DateTime().minusMonths(12).toDate())
+        serviceUnderTest.deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore(new DateTime().minusMonths(12).toDate())
 
         //after DbCleanupJob execution
         assertThat(HttpArchive.list().size(), is(1))
@@ -102,10 +102,10 @@ class DbCleanupServiceSpec {
         assertThat(JobResult.findById(jobResultWithBeforeCleanupDate.ident()), is(nullValue()))
         assertThat(JobResult.findById(jobResultWithAfterCleanupDate.ident()), is(notNullValue()))
 
-        assertThat(MeasuredValueUpdateEvent.list().size(), is(1))
-        //check that the correct MeasuredValueUpdateEvent is deleted
-        assertThat(MeasuredValueUpdateEvent.findByMeasuredValueId(measuredValueWithBeforeCleanupDate.ident()), is(nullValue()))
-        assertThat(MeasuredValueUpdateEvent.findByMeasuredValueId(measuredValueWithAfterCleanupDate.ident()), is(notNullValue()))
+        assertThat(CsiAggregationUpdateEvent.list().size(), is(1))
+        //check that the correct CsiAggregationUpdateEvent is deleted
+        assertThat(CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationWithBeforeCleanupDate.ident()), is(nullValue()))
+        assertThat(CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationWithAfterCleanupDate.ident()), is(notNullValue()))
 
         assertThat(CsiAggregation.list().size(), is(1))
         //check that the correct CsiAggregation is deleted

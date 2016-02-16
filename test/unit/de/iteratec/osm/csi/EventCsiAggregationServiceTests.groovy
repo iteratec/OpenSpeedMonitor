@@ -30,19 +30,19 @@ import java.util.regex.Pattern
 import org.joda.time.DateTime
 import org.junit.*
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -50,13 +50,13 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
- * Tests low level-functionality of {@link EventMeasuredValueService}.
+ * Tests low level-functionality of {@link EventCsiAggregationService}.
  */
 @TestMixin(GrailsUnitTestMixin)
-@TestFor(EventMeasuredValueService)
-@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, MeasuredValueInterval,
-	AggregatorType, Location, EventResult, JobResult, Job, MeasuredValueUpdateEvent, ConnectivityProfile])
-class EventMeasuredValueServiceTests {
+@TestFor(EventCsiAggregationService)
+@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, CsiAggregationInterval,
+	AggregatorType, Location, EventResult, JobResult, Job, CsiAggregationUpdateEvent, ConnectivityProfile])
+class EventCsiAggregationServiceTests {
 	
 	public static final String jobGroupName1 = 'jobGroupName1' 
 	public static final String jobGroupName2 = 'jobGroupName2'
@@ -73,8 +73,8 @@ class EventMeasuredValueServiceTests {
 	public static final DateTime inInterval = new DateTime(2013,8,5,8,0,0)
 	public static final DateTime outOfInterval = new DateTime(2013,8,5,19,0,0)
 	
-	EventMeasuredValueService serviceUnderTest
-	MeasuredValueInterval hourly
+	EventCsiAggregationService serviceUnderTest
+	CsiAggregationInterval hourly
 	AggregatorType measuredEvent
 	ConnectivityProfile connectivityProfile
 	
@@ -92,7 +92,7 @@ class EventMeasuredValueServiceTests {
 		new Browser(name: browserName2).save(validate: false)
 		new Location(location: locationName1).save(validate: false)
 		new Location(location: locationName2).save(validate: false)
-		hourly = new MeasuredValueInterval(intervalInMinutes: MeasuredValueInterval.HOURLY).save(validate: false)
+		hourly = new CsiAggregationInterval(intervalInMinutes: CsiAggregationInterval.HOURLY).save(validate: false)
 		measuredEvent = new AggregatorType(name: AggregatorType.MEASURED_EVENT).save(validate: false)
 		connectivityProfile = TestDataUtil.createConnectivityProfile("Conn1")
     }
@@ -133,7 +133,7 @@ class EventMeasuredValueServiceTests {
 	void testGetAllCalculatedHourlyMvs(){
 		
 		//creating testdata////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		deleteAllMeasuredValues()
+		deleteAllCsiAggregations()
 		5.times{
 			//calculated, with data
 			createhourlyEventMvWithDefaultTag(true, true)
@@ -149,19 +149,19 @@ class EventMeasuredValueServiceTests {
 		irrelevantQueryParamsCauseDbQueryIsMocked.pageIds.add(Page.findByName(pageName1).id);
 		
 		//mock inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		mockMeasuredValueDaoService()
-		mockMeasuredValueTagService()
+		mockCsiAggregationDaoService()
+		mockCsiAggregationTagService()
 		mockCsiConfigCacheService()
 		mockEventResultService()
 		
 		//run test////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		List<CsiAggregation> mvs = serviceUnderTest.getAllCalculatedHourlyMvs(irrelevantQueryParamsCauseDbQueryIsMocked, from, to)
+		List<CsiAggregation> mvs = serviceUnderTest.getAllCalculatedHourlyCas(irrelevantQueryParamsCauseDbQueryIsMocked, from, to)
 		
 		//assertions////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		assertThat(mvs.size(), is(10))
-		//no additional update-events got written cause no calculation took place in EventMeasuredValueService
-		assertThat(MeasuredValueUpdateEvent.list().size(), is(10))
+		//no additional update-events got written cause no calculation took place in EventCsiAggregationService
+		assertThat(CsiAggregationUpdateEvent.list().size(), is(10))
 		
 		Integer calcNotMvsExpected = 0
 		assertThat(mvs.findAll{ ! it.isCalculated() }.size(), is(calcNotMvsExpected))
@@ -175,7 +175,7 @@ class EventMeasuredValueServiceTests {
 	
 	/**
 	 * Creates a {@linkplain CsiAggregation} as testdata.
-	 * {@link MeasuredValueUpdateEvent}s are created respective given params of calculated and withData. 
+	 * {@link CsiAggregationUpdateEvent}s are created respective given params of calculated and withData.
 	 * @return
 	 */
 	private void createhourlyEventMvWithDefaultTag(boolean calculated, boolean withData){
@@ -190,17 +190,17 @@ class EventMeasuredValueServiceTests {
 		createUpdateEventsForMv(mv, calculated, withData)
 	}
 	private void createUpdateEventsForMv(CsiAggregation mv, boolean calculated, boolean withData){
-		MeasuredValueUpdateEvent.UpdateCause cause = MeasuredValueUpdateEvent.UpdateCause.OUTDATED
+		CsiAggregationUpdateEvent.UpdateCause cause = CsiAggregationUpdateEvent.UpdateCause.OUTDATED
 		if (calculated) {
-			cause = MeasuredValueUpdateEvent.UpdateCause.CALCULATED
+			cause = CsiAggregationUpdateEvent.UpdateCause.CALCULATED
 		}
 		if (withData) {
 			mv.csByWptDocCompleteInPercent = 0.5
 			mv.save(failOnError: true)
 		}
-		new MeasuredValueUpdateEvent(
+		new CsiAggregationUpdateEvent(
 			dateOfUpdate: new Date(),
-			measuredValueId: mv.ident(),
+			csiAggregationId: mv.ident(),
 			updateCause: cause
 		).save(failOnError: true)
 	}
@@ -208,63 +208,63 @@ class EventMeasuredValueServiceTests {
 	 * Deletes all {@link CsiAggregation}s in db.
 	 * @return
 	 */
-	private deleteAllMeasuredValues(){
+	private deleteAllCsiAggregations(){
 		CsiAggregation.list()*.delete(flush: true)
 	}
 	
 	//mocks of inner services///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * Mocks {@linkplain EventMeasuredValueService#measuredValueDaoService}.
-	 * Method getMvs(Date fromDate, Date toDate, String rlikePattern, MeasuredValueInterval interval, AggregatorType aggregator) will return all {@link CsiAggregation}s from db.
+	 * Mocks {@linkplain EventCsiAggregationService#csiAggregationDaoService}.
+	 * Method getMvs(Date fromDate, Date toDate, String rlikePattern, CsiAggregationInterval interval, AggregatorType aggregator) will return all {@link CsiAggregation}s from db.
 	 * @param csiGroups
 	 * @param pages
 	 */
-	private void mockMeasuredValueDaoService(){
+	private void mockCsiAggregationDaoService(){
 		List<CsiAggregation> mvsToReturn = CsiAggregation.list()
-		def measuredValueDaoService = mockFor(MeasuredValueDaoService, true)
-		measuredValueDaoService.demand.getMvs(1..10000) {
+		def csiAggregationDaoService = mockFor(CsiAggregationDaoService, true)
+		csiAggregationDaoService.demand.getMvs(1..10000) {
 			Date fromDate,
 			Date toDate,
 			String rlikePattern,
-			MeasuredValueInterval interval,
+			CsiAggregationInterval interval,
 			AggregatorType aggregator,
 			Collection<ConnectivityProfile> connectivityProfiles ->
 			return mvsToReturn
 		}
-		serviceUnderTest.measuredValueDaoService = measuredValueDaoService.createMock()
+		serviceUnderTest.csiAggregationDaoService = csiAggregationDaoService.createMock()
 	}
 	/**
-	 * Mocks {@linkplain EventMeasuredValueService#measuredValueTagService}
+	 * Mocks {@linkplain EventCsiAggregationService#csiAggregationTagService}
 	 * @param csiGroups
 	 * @param pages
 	 */
-	private void mockMeasuredValueTagService(){
-		def measuredValueTagService = mockFor(MeasuredValueTagService, true)
+	private void mockCsiAggregationTagService(){
+		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
 		Pattern irrelevantPatternCauseDbCallIsMockedToo = Pattern.compile('1;1;1;1;1')
-		measuredValueTagService.demand.getTagPatternForHourlyMeasuredValues(1..10000) {
+		csiAggregationTagService.demand.getTagPatternForHourlyCsiAggregations(1..10000) {
 			MvQueryParams mvQueryParams ->
 			return irrelevantPatternCauseDbCallIsMockedToo
 		}
 		MeasuredEvent eventToReturn = new MeasuredEvent(name: 'testEvent', testedPage: new Page(name: 'testPage', weight: 0.5))
-		measuredValueTagService.demand.findMeasuredEventOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findMeasuredEventOfHourlyEventTag(1..10000) {
 			String hourlyEventMvTag ->
 			return eventToReturn
 		}
 		JobGroup jobGroupToReturn = new JobGroup(name: 'csiGroup', groupType: JobGroupType.CSI_AGGREGATION)
-		measuredValueTagService.demand.findJobGroupOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findJobGroupOfHourlyEventTag(1..10000) {
 			String hourlyEventMvTag ->
 			return jobGroupToReturn
 		}
 		Location locationToReturn = new Location(location: 'location')
-		measuredValueTagService.demand.findLocationOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findLocationOfHourlyEventTag(1..10000) {
 			String hourlyEventMvTag ->
 			return locationToReturn
 		}
-		serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock()
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
 	}
 	/**
-	 * Mocks {@linkplain EventMeasuredValueService#eventResultService}
+	 * Mocks {@linkplain EventCsiAggregationService#eventResultService}
 	 * @param csiGroups
 	 * @param pages
 	 */
@@ -287,7 +287,7 @@ class EventMeasuredValueServiceTests {
 		serviceUnderTest.eventResultService = eventResultService.createMock()
 	}
 	/**
-	 * Mocks {@linkplain EventMeasuredValueService#csiConfigCacheService}
+	 * Mocks {@linkplain EventCsiAggregationService#csiConfigCacheService}
 	 * @param csiGroups
 	 * @param pages
 	 */

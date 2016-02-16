@@ -15,26 +15,18 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.report.chart
-/**
- * MeasuredValueUpdateEventDaoService
- * A service class encapsulates the core business logic of a Grails application
- */
-class MeasuredValueUpdateEventDaoService {
+package de.iteratec.osm.csi
 
-    static transactional = true
-	
-	/**
-	 * Writes a new {@link MeasuredValueUpdateEvent} with dateOfUpdate = NOW.
-	 * @param measuredValueId
-	 * @param cause
-	 */
-    void createUpdateEvent(Long measuredValueId, MeasuredValueUpdateEvent.UpdateCause cause){
-		new MeasuredValueUpdateEvent(
-			dateOfUpdate: new Date(),
-			measuredValueId: measuredValueId,
-			updateCause: cause
-		).save(failOnError: true)
-	}
-	
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.CsiAggregation
+
+/**
+ * For caching elements during expensive calculations in {@link EventCsiAggregationService}, {@link PageCsiAggregationService} or {@link ShopCsiAggregationService}.
+ * @author nkuhn
+ *
+ */
+class CsiAggregationCachingContainer {
+	JobGroup csiGroupToCalcCsiAggregationFor
+	Page pageToCalcCsiAggregationFor
+	Map<String,List<CsiAggregation>> hCsiAggregationsByCsiGroupPageCombination
 }

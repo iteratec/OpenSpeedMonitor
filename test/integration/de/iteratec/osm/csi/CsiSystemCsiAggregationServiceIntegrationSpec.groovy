@@ -8,15 +8,15 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.junit.Test
 
-class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
+class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
 
     static final String jobGroupName1 = 'jobGroupName1'
     static final String jobGroupName2 = 'jobGroupName2'
@@ -38,15 +38,15 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     static final DateTime inWeeklyInterval2 = new DateTime(2013,8,9,0,0,0)
     static final double DEFAULT_MV_VALUE = 1
 
-    CsiSystemMeasuredValueService csiSystemMeasuredValueService
-    MeasuredValueTagService measuredValueTagService
-    EventMeasuredValueService eventMeasuredValueService
-    PageMeasuredValueService pageMeasuredValueService
-    ShopMeasuredValueService shopMeasuredValueService
+    CsiSystemCsiAggregationService csiSystemCsiAggregationService
+    CsiAggregationTagService csiAggregationTagService
+    EventCsiAggregationService eventCsiAggregationService
+    PageCsiAggregationService pageCsiAggregationService
+    ShopCsiAggregationService shopCsiAggregationService
 
-    MeasuredValueInterval hourly
-    MeasuredValueInterval daily
-    MeasuredValueInterval weekly
+    CsiAggregationInterval hourly
+    CsiAggregationInterval daily
+    CsiAggregationInterval weekly
     AggregatorType measuredEvent
     ConnectivityProfile connectivityProfile
     JobGroup jobGroup1
@@ -76,15 +76,15 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     }
 
     @Test
-    void "find no measuredValues if no existing"() {
+    void "find no csiAggregations if no existing"() {
         when:
-        List<CsiAggregation> hourlyMvs = eventMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),hourly,connectivityProfile)
-        List<CsiAggregation> pageDailyMvs = pageMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
-        List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
-        List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
-        List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
+        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),hourly,connectivityProfile)
+        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
+        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
+        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
+        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
+        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
+        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
 
         then:
         hourlyMvs.isEmpty()
@@ -97,18 +97,18 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     }
 
     @Test
-    void "calculate empty measuredValue if no existing"() {
+    void "calculate empty csiAggregation if no existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
 
         when:
-        List<CsiAggregation> hourlyMvs = eventMeasuredValueService.getHourylMeasuredValues(fromHourly.toDate(),toHourly.toDate(),getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, CsiSystem.findAll())
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, CsiSystem.findAll())
+        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(),toHourly.toDate(),getAllParams)
+        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, CsiSystem.findAll())
+        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, CsiSystem.findAll())
 
         then:
         hourlyMvs.size() == 0
@@ -145,19 +145,19 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     }
 
     @Test
-    void "calculate single measuredValue if 1 is existing"() {
+    void "calculate single csiAggregation if 1 is existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
-        createSingleHourlyMeasuredValues()
+        createSingleHourlyCsiAggregations()
 
         when:
-        List<CsiAggregation> hourlyMvs = eventMeasuredValueService.getHourylMeasuredValues(fromHourly.toDate(),toHourly.toDate(),getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, CsiSystem.findAll())
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, CsiSystem.findAll())
+        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(),toHourly.toDate(),getAllParams)
+        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, CsiSystem.findAll())
+        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, CsiSystem.findAll())
 
         then:
         hourlyMvs.size() == 1
@@ -185,16 +185,16 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     @Test
     void "calculate single weekly Mv if 1 is existing and only highest weekly-aggregation is called"() {
         given:
-        createSingleHourlyMeasuredValues()
+        createSingleHourlyCsiAggregations()
 
         when:
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [csiSystem])
-        List<CsiAggregation> hourlyMvs = eventMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),hourly,connectivityProfile)
-        List<CsiAggregation> pageDailyMvs = pageMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
-        List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
-        List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
-        List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemMeasuredValueService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
+        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [csiSystem])
+        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),hourly,connectivityProfile)
+        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
+        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
+        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
+        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),weekly)
+        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),daily)
 
         then:
         hourlyMvs.size() == 1
@@ -217,19 +217,19 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     }
 
     @Test
-    void "aggregate to single measuredValue if 2 hourlys are existing"() {
+    void "aggregate to single csiAggregation if 2 hourlys are existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
-        createTwoHourlyMeasuredValues()
+        createTwoHourlyCsiAggregations()
 
         when:
-        List<CsiAggregation> hourlyMvs = eventMeasuredValueService.getHourylMeasuredValues(fromHourly.toDate(),toHourly.toDate(),getAllParams)
-        List<CsiAggregation> pageDailyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),daily, [csiSystem])
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromHourly.toDate(),toHourly.toDate(),weekly, [csiSystem])
+        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(),toHourly.toDate(),getAllParams)
+        List<CsiAggregation> pageDailyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),daily, [csiSystem])
+        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [csiSystem])
 
         then:
         double expectedHourlySize = 2.0
@@ -258,20 +258,20 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     }
 
     @Test
-    void "aggregate to 2 daily- and a single weekly-measuredValue if 2 hourlys on different days are existing"() {
+    void "aggregate to 2 daily- and a single weekly-csiAggregation if 2 hourlys on different days are existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
-        createTwoHourlyMeasuredValuesOnDifferentDays()
+        createTwoHourlyCsiAggregationsOnDifferentDays()
 
         when:
-        List<CsiAggregation> hourlyMvs = eventMeasuredValueService.getHourylMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),getAllParams)
-        List<CsiAggregation> pageDailyMvs1 = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> pageDailyMvs2 = pageMeasuredValueService.findAll(fromWeekly.toDate(), toWeekly.toDate(), daily)
-        List<CsiAggregation> pageWeeklyMvs = pageMeasuredValueService.getOrCalculatePageMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> shopDailyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
-        List<CsiAggregation> shopWeeklyMvs = shopMeasuredValueService.getOrCalculateShopMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),weekly, [jobGroup1])
-        List<CsiAggregation> csiSystemDailyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),daily, CsiSystem.findAll())
-        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemMeasuredValueService.getOrCalculateCsiSystemMeasuredValues(fromWeekly.toDate(),toWeekly.toDate(),weekly, CsiSystem.findAll())
+        List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),getAllParams)
+        List<CsiAggregation> pageDailyMvs1 = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> pageDailyMvs2 = pageCsiAggregationService.findAll(fromWeekly.toDate(), toWeekly.toDate(), daily)
+        List<CsiAggregation> pageWeeklyMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> shopDailyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),daily, [jobGroup1])
+        List<CsiAggregation> shopWeeklyMvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),weekly, [jobGroup1])
+        List<CsiAggregation> csiSystemDailyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),daily, CsiSystem.findAll())
+        List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromWeekly.toDate(),toWeekly.toDate(),weekly, CsiSystem.findAll())
 
         then:
         int expectedHourlySize = 2
@@ -351,9 +351,9 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
         location1 = TestDataUtil.createLocation(server,locationName1,browser1,true)
         location2 = TestDataUtil.createLocation(server,locationName2,browser2,true)
 
-        hourly = new MeasuredValueInterval(name: "hourly", intervalInMinutes: MeasuredValueInterval.HOURLY).save(validate: false)
-        daily = new MeasuredValueInterval(name: "daily", intervalInMinutes: MeasuredValueInterval.DAILY).save(validate: false)
-        weekly = new MeasuredValueInterval(name: "weekly", intervalInMinutes: MeasuredValueInterval.WEEKLY).save(validate: false)
+        hourly = new CsiAggregationInterval(name: "hourly", intervalInMinutes: CsiAggregationInterval.HOURLY).save(validate: false)
+        daily = new CsiAggregationInterval(name: "daily", intervalInMinutes: CsiAggregationInterval.DAILY).save(validate: false)
+        weekly = new CsiAggregationInterval(name: "weekly", intervalInMinutes: CsiAggregationInterval.WEEKLY).save(validate: false)
 
         TestDataUtil.createAggregatorTypes()
         measuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
@@ -372,26 +372,26 @@ class CsiSystemMeasuredValueServiceIntegrationSpec extends IntegrationSpec {
     }
 
 
-    private void createSingleHourlyMeasuredValues() {
-        createMeasuredValues(inHourlyInterval1)
+    private void createSingleHourlyCsiAggregations() {
+        createCsiAggregations(inHourlyInterval1)
     }
 
-    private void createTwoHourlyMeasuredValues() {
-        createMeasuredValues(inHourlyInterval1)
-        createMeasuredValues(inHourlyInterval2)
+    private void createTwoHourlyCsiAggregations() {
+        createCsiAggregations(inHourlyInterval1)
+        createCsiAggregations(inHourlyInterval2)
     }
 
-    private void createTwoHourlyMeasuredValuesOnDifferentDays() {
-        createMeasuredValues(inWeeklyInterval1)
-        createMeasuredValues(inWeeklyInterval2)
+    private void createTwoHourlyCsiAggregationsOnDifferentDays() {
+        createCsiAggregations(inWeeklyInterval1)
+        createCsiAggregations(inWeeklyInterval2)
     }
 
-    private void createMeasuredValues(DateTime started) {
+    private void createCsiAggregations(DateTime started) {
         new CsiAggregation(
                 started:started.toDate(),
                 interval: hourly,
                 aggregator: measuredEvent,
-                tag: measuredValueTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser1,location1),
+                tag: csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser1,location1),
                 csiSystem: csiSystem,
                 csByWptDocCompleteInPercent: DEFAULT_MV_VALUE,
                 csByWptVisuallyCompleteInPercent: DEFAULT_MV_VALUE,

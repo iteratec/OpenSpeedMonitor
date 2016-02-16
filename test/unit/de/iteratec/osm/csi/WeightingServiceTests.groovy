@@ -26,9 +26,9 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -38,7 +38,7 @@ import org.junit.Before
 import static org.junit.Assert.assertEquals
 
 @TestFor(WeightingService)
-@Mock([EventResult, CsiAggregation, MeasuredValueUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
+@Mock([EventResult, CsiAggregation, CsiAggregationUpdateEvent, BrowserConnectivityWeight, Browser, ConnectivityProfile,
         JobGroup, CsiDay, CsiConfiguration, CsiSystem])
 class WeightingServiceTests {
 
@@ -75,13 +75,13 @@ class WeightingServiceTests {
         // test specific data
         Set<WeightFactor> weightFactors = [] as Set
         CsiValue eventResult = new EventResult()
-        CsiValue measuredValue = new CsiAggregation()
+        CsiValue csiAggregation = new CsiAggregation()
 
         //test for EventResult
         Double deliveredWeight = serviceUnderTest.getWeight(eventResult, weightFactors, csiConfiguration)
         assertEquals(1d, deliveredWeight, DELTA)
         //test for CsiAggregation
-        deliveredWeight = serviceUnderTest.getWeight(measuredValue, weightFactors, csiConfiguration)
+        deliveredWeight = serviceUnderTest.getWeight(csiAggregation, weightFactors, csiConfiguration)
         assertEquals(1d, deliveredWeight, DELTA)
 
     }
@@ -91,10 +91,10 @@ class WeightingServiceTests {
         Set<WeightFactor> weightFactors = [WeightFactor.HOUROFDAY] as Set
         CsiValue eventResultTwoAClockAm = new EventResult(jobResultDate: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
         CsiValue eventResultFiveAClockPm = new EventResult(jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
-        CsiValue measuredValueTwoAClockAm = new CsiAggregation(started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
-        CsiValue measuredValueFiveAClockPm = new CsiAggregation(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
+        CsiValue csiAggregationTwoAClockAm = new CsiAggregation(started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate())
+        CsiValue csiAggregationFiveAClockPm = new CsiAggregation(started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate())
 
-        mockMeasuredValueTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
+        mockCsiAggregationTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
 
         //test for EventResults
         Double deliveredWeight = serviceUnderTest.getWeight(eventResultTwoAClockAm, weightFactors, csiConfiguration)
@@ -104,11 +104,11 @@ class WeightingServiceTests {
         expectedWeight = 7.3d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueTwoAClockAm, weightFactors, csiConfiguration)
+        //test for CsiAggregations
+        deliveredWeight = serviceUnderTest.getWeight(csiAggregationTwoAClockAm, weightFactors, csiConfiguration)
         expectedWeight = 0.2d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueFiveAClockPm, weightFactors, csiConfiguration)
+        deliveredWeight = serviceUnderTest.getWeight(csiAggregationFiveAClockPm, weightFactors, csiConfiguration)
         expectedWeight = 7.3d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -121,11 +121,11 @@ class WeightingServiceTests {
 
         CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
         CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
-        CsiValue measuredValueBrowserWeightOfFiftyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
-        CsiValue measuredValueBrowserWeightOfSeventyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
+        CsiValue csiAggregationBrowserWeightOfFiftyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT, connectivityProfile: connectivityProfile_50)
+        CsiValue csiAggregationBrowserWeightOfSeventyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT, connectivityProfile: connectivityProfile_70)
 
         //test specific mocks
-        mockMeasuredValueTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
+        mockCsiAggregationTagService(this.browserToReturn_50, this.browserToReturn_70, this.page_50, this.page_70)
 
         //test for EventResults
         Double deliveredWeight = serviceUnderTest.getWeight(
@@ -138,14 +138,14 @@ class WeightingServiceTests {
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        //test for MeasuredValues
+        //test for CsiAggregations
         deliveredWeight = serviceUnderTest.getWeight(
-                measuredValueBrowserWeightOfFiftyPercent, weightFactors, csiConfiguration
+                csiAggregationBrowserWeightOfFiftyPercent, weightFactors, csiConfiguration
         )
         //assertions
         expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors, csiConfiguration)
+        deliveredWeight = serviceUnderTest.getWeight(csiAggregationBrowserWeightOfSeventyPercent, weightFactors, csiConfiguration)
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -155,11 +155,11 @@ class WeightingServiceTests {
         Set<WeightFactor> weightFactors = [WeightFactor.PAGE] as Set
         CsiValue eventResultBrowserWeightOfFiftyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
         CsiValue eventResultBrowserWeightOfSeventyPercent = new EventResult(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
-        CsiValue measuredValueBrowserWeightOfFiftyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
-        CsiValue measuredValueBrowserWeightOfSeventyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
+        CsiValue csiAggregationBrowserWeightOfFiftyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)
+        CsiValue csiAggregationBrowserWeightOfSeventyPercent = new CsiAggregation(tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT)
 
         //test specific mocks
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         //test for EventResults
         Double deliveredWeight = serviceUnderTest.getWeight(eventResultBrowserWeightOfFiftyPercent, weightFactors, csiConfiguration)
@@ -169,11 +169,11 @@ class WeightingServiceTests {
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
 
-        //test for MeasuredValues
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfFiftyPercent, weightFactors, csiConfiguration)
+        //test for CsiAggregations
+        deliveredWeight = serviceUnderTest.getWeight(csiAggregationBrowserWeightOfFiftyPercent, weightFactors, csiConfiguration)
         expectedWeight = 0.5d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
-        deliveredWeight = serviceUnderTest.getWeight(measuredValueBrowserWeightOfSeventyPercent, weightFactors, csiConfiguration)
+        deliveredWeight = serviceUnderTest.getWeight(csiAggregationBrowserWeightOfSeventyPercent, weightFactors, csiConfiguration)
         expectedWeight = 0.7d
         assertEquals(expectedWeight, deliveredWeight, DELTA)
     }
@@ -195,7 +195,7 @@ class WeightingServiceTests {
                 )
 
         //test specific mocks
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         //test with all three WeightFactors
         Double deliveredWeight = serviceUnderTest.getWeight(
@@ -268,7 +268,7 @@ class WeightingServiceTests {
         }
 
         //test specific mocks
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, this.page_50, this.page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, this.page_50, this.page_70)
 
         //tests with all three WeightFactors
 
@@ -374,32 +374,32 @@ class WeightingServiceTests {
 
     }
 
-    void testGetWeightedCsiValuesFromMeasuredValues() {
-        CsiAggregation measuredValueWeightFiftyTwoAm = new CsiAggregation(
+    void testGetWeightedCsiValuesFromCsiAggregations() {
+        CsiAggregation csiAggregationWeightFiftyTwoAm = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50
         )
-        measuredValueWeightFiftyTwoAm.addAllToUnderlyingEventResultsByWptDocComplete([1l, 2l, 3l])
-        measuredValueWeightFiftyTwoAm.save(validate: false)
-        TestDataUtil.createUpdateEvent(measuredValueWeightFiftyTwoAm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation measuredValueWeightSeventyFivePm = new CsiAggregation(
+        csiAggregationWeightFiftyTwoAm.addAllToUnderlyingEventResultsByWptDocComplete([1l, 2l, 3l])
+        csiAggregationWeightFiftyTwoAm.save(validate: false)
+        TestDataUtil.createUpdateEvent(csiAggregationWeightFiftyTwoAm.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+        CsiAggregation csiAggregationWeightSeventyFivePm = new CsiAggregation(
                 csByWptDocCompleteInPercent: 20d,
                 tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
                 started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 connectivityProfile: connectivityProfile_70
         )
-        measuredValueWeightSeventyFivePm.addAllToUnderlyingEventResultsByWptDocComplete([4l, 5l, 6l])
-        measuredValueWeightSeventyFivePm.save(validate: false)
-        TestDataUtil.createUpdateEvent(measuredValueWeightSeventyFivePm.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+        csiAggregationWeightSeventyFivePm.addAllToUnderlyingEventResultsByWptDocComplete([4l, 5l, 6l])
+        csiAggregationWeightSeventyFivePm.save(validate: false)
+        TestDataUtil.createUpdateEvent(csiAggregationWeightSeventyFivePm.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //test specific mocks
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         //tests with all three WeightFactors
         List<WeightedCsiValue> weightedValues = serviceUnderTest.getWeightedCsiValues(
-                [measuredValueWeightFiftyTwoAm, measuredValueWeightSeventyFivePm],
+                [csiAggregationWeightFiftyTwoAm, csiAggregationWeightSeventyFivePm],
                 [WeightFactor.HOUROFDAY, WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set, csiConfiguration)
 
         assertEquals(2, weightedValues.size())
@@ -423,7 +423,7 @@ class WeightingServiceTests {
         //tests with hourofday and page as WeightFactors
 
         weightedValues = serviceUnderTest.getWeightedCsiValues(
-                [measuredValueWeightFiftyTwoAm, measuredValueWeightSeventyFivePm],
+                [csiAggregationWeightFiftyTwoAm, csiAggregationWeightSeventyFivePm],
                 [WeightFactor.HOUROFDAY, WeightFactor.PAGE] as Set, csiConfiguration)
 
         assertEquals(2, weightedValues.size())
@@ -445,7 +445,7 @@ class WeightingServiceTests {
         //tests with browserConnectivity and page as WeightFactors
 
         weightedValues = serviceUnderTest.getWeightedCsiValues(
-                [measuredValueWeightFiftyTwoAm, measuredValueWeightSeventyFivePm],
+                [csiAggregationWeightFiftyTwoAm, csiAggregationWeightSeventyFivePm],
                 [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION, WeightFactor.PAGE] as Set, csiConfiguration)
 
         assertEquals(2, weightedValues.size())
@@ -467,7 +467,7 @@ class WeightingServiceTests {
         //tests without WeightFactors
 
         weightedValues = serviceUnderTest.getWeightedCsiValues(
-                [measuredValueWeightFiftyTwoAm, measuredValueWeightSeventyFivePm],
+                [csiAggregationWeightFiftyTwoAm, csiAggregationWeightSeventyFivePm],
                 [] as Set, csiConfiguration)
 
         assertEquals(1, weightedValues.size())
@@ -482,32 +482,32 @@ class WeightingServiceTests {
 
     }
 
-    void testGetWeightedCsiValuesFromMeasuredValuesByCsiSystem() {
-        CsiAggregation measuredValue1 = new CsiAggregation(
+    void testGetWeightedCsiValuesFromCsiAggregationsByCsiSystem() {
+        CsiAggregation csiAggregation1 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 tag: jobGroup1.ident(),
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50,
         )
-        measuredValue1.addAllToUnderlyingEventResultsByWptDocComplete([1l, 2l, 3l])
-        measuredValue1.save(validate: false)
-        TestDataUtil.createUpdateEvent(measuredValue1.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
-        CsiAggregation measuredValue2 = new CsiAggregation(
+        csiAggregation1.addAllToUnderlyingEventResultsByWptDocComplete([1l, 2l, 3l])
+        csiAggregation1.save(validate: false)
+        TestDataUtil.createUpdateEvent(csiAggregation1.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+        CsiAggregation csiAggregation2 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 20d,
                 tag: jobGroup2.ident(),
                 started: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 connectivityProfile: connectivityProfile_70
         )
-        measuredValue2.addAllToUnderlyingEventResultsByWptDocComplete([4l, 5l, 6l])
-        measuredValue2.save(validate: false)
-        TestDataUtil.createUpdateEvent(measuredValue2.ident(), MeasuredValueUpdateEvent.UpdateCause.CALCULATED)
+        csiAggregation2.addAllToUnderlyingEventResultsByWptDocComplete([4l, 5l, 6l])
+        csiAggregation2.save(validate: false)
+        TestDataUtil.createUpdateEvent(csiAggregation2.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
         //test specific mocks
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         //tests with all three WeightFactors
         List<WeightedCsiValue> weightedValues = serviceUnderTest.getWeightedCsiValues(
-                [measuredValue1, measuredValue2], csiSystem)
+                [csiAggregation1, csiAggregation2], csiSystem)
 
         assertEquals(2, weightedValues.size())
 
@@ -527,9 +527,9 @@ class WeightingServiceTests {
         assertEquals(20d,weightedCsiValue2.weightedValue.value, DELTA)
     }
 
-    void testGetWeightedCsiValuesFromMeasuredValuesByVisuallyCompleteForCsiSystem() {
+    void testGetWeightedCsiValuesFromCsiAggregationsByVisuallyCompleteForCsiSystem() {
         // data for this test
-        CsiValue measuredValueWithVisuallyComplete1 = new CsiAggregation(
+        CsiValue csiAggregationWithVisuallyComplete1 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 csByWptVisuallyCompleteInPercent: 10d,
                 tag: jobGroup1.ident(),
@@ -537,7 +537,7 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithVisuallyComplete2 = new CsiAggregation(
+        CsiValue csiAggregationWithVisuallyComplete2 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 csByWptVisuallyCompleteInPercent: 20d,
                 tag: jobGroup1.ident(),
@@ -545,7 +545,7 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithVisuallyComplete3 = new CsiAggregation(
+        CsiValue csiAggregationWithVisuallyComplete3 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 csByWptVisuallyCompleteInPercent: 20d,
                 tag: jobGroup2.ident(),
@@ -553,14 +553,14 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithoutVisuallyComplete1 = new CsiAggregation(
+        CsiValue csiAggregationWithoutVisuallyComplete1 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 tag: jobGroup1.ident(),
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithoutVisuallyComplete2 = new CsiAggregation(
+        CsiValue csiAggregationWithoutVisuallyComplete2 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 tag: jobGroup2.ident(),
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
@@ -568,33 +568,33 @@ class WeightingServiceTests {
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
 
-        measuredValueWithVisuallyComplete1.metaClass.isCsiRelevant = {
+        csiAggregationWithVisuallyComplete1.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithVisuallyComplete2.metaClass.isCsiRelevant = {
+        csiAggregationWithVisuallyComplete2.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithVisuallyComplete3.metaClass.isCsiRelevant = {
+        csiAggregationWithVisuallyComplete3.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
+        csiAggregationWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
+        csiAggregationWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
             return true
         }
 
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         // execution
-        // test all underlying measuredValues have csByWptVisuallyCompleteInPercent
-        List<WeightedCsiValue> weightedCsiValuesAllHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithVisuallyComplete2, measuredValueWithVisuallyComplete3], csiSystem)
+        // test all underlying csiAggregations have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesAllHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([csiAggregationWithVisuallyComplete1, csiAggregationWithVisuallyComplete2, csiAggregationWithVisuallyComplete3], csiSystem)
 
-        // test some underlying measuredValues have csByWptVisuallyCompleteInPercent
-        List<WeightedCsiValue> weightedCsiValuesSomeHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithoutVisuallyComplete1], csiSystem)
+        // test some underlying csiAggregations have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesSomeHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([csiAggregationWithVisuallyComplete1, csiAggregationWithoutVisuallyComplete1], csiSystem)
 
-        // test no underlying measuredValues have csByWptVisuallyCompleteInPercent
-        List<WeightedCsiValue> weightedCsiValuesNoHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithoutVisuallyComplete1, measuredValueWithoutVisuallyComplete2], csiSystem)
+        // test no underlying csiAggregations have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesNoHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([csiAggregationWithoutVisuallyComplete1, csiAggregationWithoutVisuallyComplete2], csiSystem)
 
         // expectations
         assertEquals(2, weightedCsiValuesAllHaveVisuallyComplete.size())
@@ -611,9 +611,9 @@ class WeightingServiceTests {
         assertEquals(new WeightedValue(value: 10.0, weight: 0.5), weightedCsiValuesSomeHaveVisuallyComplete[0].weightedValue)
     }
 
-    void testGetWeightedCsiValuesFromMeasuredValuesByVisuallyComplete() {
+    void testGetWeightedCsiValuesFromCsiAggregationsByVisuallyComplete() {
         // data for this test
-        CsiValue measuredValueWithVisuallyComplete1 = new CsiAggregation(
+        CsiValue csiAggregationWithVisuallyComplete1 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 csByWptVisuallyCompleteInPercent: 10d,
                 tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
@@ -621,7 +621,7 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithVisuallyComplete2 = new CsiAggregation(
+        CsiValue csiAggregationWithVisuallyComplete2 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 csByWptVisuallyCompleteInPercent: 20d,
                 tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
@@ -629,7 +629,7 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithVisuallyComplete3 = new CsiAggregation(
+        CsiValue csiAggregationWithVisuallyComplete3 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 csByWptVisuallyCompleteInPercent: 20d,
                 tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
@@ -637,14 +637,14 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_70,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithoutVisuallyComplete1 = new CsiAggregation(
+        CsiValue csiAggregationWithoutVisuallyComplete1 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 tag: TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT,
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
                 connectivityProfile: connectivityProfile_50,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-        CsiValue measuredValueWithoutVisuallyComplete2 = new CsiAggregation(
+        CsiValue csiAggregationWithoutVisuallyComplete2 = new CsiAggregation(
                 csByWptDocCompleteInPercent: 10d,
                 tag: TAG_INDICATING_WEIGHT_OF_SEVENTY_PERCENT,
                 started: SHOULD_BE_MAPPED_TO_TWO_A_CLOCK_AM.toDate(),
@@ -652,33 +652,33 @@ class WeightingServiceTests {
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
 
-        measuredValueWithVisuallyComplete1.metaClass.isCsiRelevant = {
+        csiAggregationWithVisuallyComplete1.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithVisuallyComplete2.metaClass.isCsiRelevant = {
+        csiAggregationWithVisuallyComplete2.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithVisuallyComplete3.metaClass.isCsiRelevant = {
+        csiAggregationWithVisuallyComplete3.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
+        csiAggregationWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
             return true
         }
-        measuredValueWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
+        csiAggregationWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
             return true
         }
 
-        mockMeasuredValueTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
+        mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         // execution
-        // test all underlying measuredValues have csByWptVisuallyCompleteInPercent
-        List<WeightedCsiValue> weightedCsiValuesAllHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithVisuallyComplete2, measuredValueWithVisuallyComplete3], [WeightFactor.PAGE] as Set, csiConfiguration)
+        // test all underlying csiAggregations have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesAllHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([csiAggregationWithVisuallyComplete1, csiAggregationWithVisuallyComplete2, csiAggregationWithVisuallyComplete3], [WeightFactor.PAGE] as Set, csiConfiguration)
 
-        // test some underlying measuredValues have csByWptVisuallyCompleteInPercent
-        List<WeightedCsiValue> weightedCsiValuesSomeHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithVisuallyComplete1, measuredValueWithoutVisuallyComplete1], [WeightFactor.PAGE] as Set, csiConfiguration)
+        // test some underlying csiAggregations have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesSomeHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([csiAggregationWithVisuallyComplete1, csiAggregationWithoutVisuallyComplete1], [WeightFactor.PAGE] as Set, csiConfiguration)
 
-        // test no underlying measuredValues have csByWptVisuallyCompleteInPercent
-        List<WeightedCsiValue> weightedCsiValuesNoHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([measuredValueWithoutVisuallyComplete1, measuredValueWithoutVisuallyComplete2], [WeightFactor.PAGE] as Set, csiConfiguration)
+        // test no underlying csiAggregations have csByWptVisuallyCompleteInPercent
+        List<WeightedCsiValue> weightedCsiValuesNoHaveVisuallyComplete = serviceUnderTest.getWeightedCsiValuesByVisuallyComplete([csiAggregationWithoutVisuallyComplete1, csiAggregationWithoutVisuallyComplete2], [WeightFactor.PAGE] as Set, csiConfiguration)
 
         // expectations
         assertEquals(2, weightedCsiValuesAllHaveVisuallyComplete.size())
@@ -861,11 +861,11 @@ class WeightingServiceTests {
     }
 
     /**
-     * Mocks used methods of {@link MeasuredValueTagService}.
+     * Mocks used methods of {@link de.iteratec.osm.result.CsiAggregationTagService}.
      */
-    private void mockMeasuredValueTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
-        def measuredValueTagService = mockFor(MeasuredValueTagService, true)
-        measuredValueTagService.demand.findBrowserOfHourlyEventTag(0..10000) { String hourlyEventMvTag ->
+    private void mockCsiAggregationTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
+        def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+        csiAggregationTagService.demand.findBrowserOfHourlyEventTag(0..10000) { String hourlyEventMvTag ->
             Browser browser
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
                 browser = browserToReturn_50
@@ -875,7 +875,7 @@ class WeightingServiceTests {
             }
             return browser
         }
-        measuredValueTagService.demand.findPageByPageTag(0..10000) { String hourlyEventMvTag ->
+        csiAggregationTagService.demand.findPageByPageTag(0..10000) { String hourlyEventMvTag ->
             Page page
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
                 page = pageToReturn_50
@@ -885,27 +885,27 @@ class WeightingServiceTests {
             }
             return page
         }
-        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { String tag ->
+        csiAggregationTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { String tag ->
             try {
                 return Long.valueOf(tag)
             } catch(NumberFormatException e) {
                 return 1
             }
         }
-        measuredValueTagService.demand.getJobGroupIdFromWeeklyOrDailyShopTag(0..100000) { String tag ->
+        csiAggregationTagService.demand.getJobGroupIdFromWeeklyOrDailyShopTag(0..100000) { String tag ->
             try {
                 return Long.valueOf(tag)
             } catch(NumberFormatException e) {
                 return 1
             }
         }
-        measuredValueTagService.demand.findJobGroupIdOfHourlyEventTag(0..100000) { String tag ->
+        csiAggregationTagService.demand.findJobGroupIdOfHourlyEventTag(0..100000) { String tag ->
             try {
                 return Long.valueOf(tag)
             } catch(NumberFormatException e) {
                 return 1
             }
         }
-        serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock();
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock();
     }
 }

@@ -45,12 +45,12 @@ import static org.junit.Assert.assertNotNull
  * Test-suite of {@link CustomerSatisfactionHighChartService}.
  */
 @TestFor(CustomerSatisfactionHighChartService)
-@Mock([AggregatorType, CsiAggregation, MeasuredValueInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
+@Mock([AggregatorType, CsiAggregation, CsiAggregationInterval, Page, Job, CsTargetValue, CsTargetGraph, JobGroup, MeasuredEvent, Browser, Location,
 	Script, WebPageTestServer])
 class CustomerSatisfactionHighChartServiceTests extends Specification{
 
-    @Shared MeasuredValueInterval hourly
-    @Shared MeasuredValueInterval weekly
+    @Shared CsiAggregationInterval hourly
+    @Shared CsiAggregationInterval weekly
 
     @Shared AggregatorType measured_event
     @Shared AggregatorType page
@@ -73,15 +73,15 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	 * So it contains 2EXP5=32 {@link CsiAggregation}s with respective tags.<br>
 	 * <em>Note:</em>
 	 * The id's of these domains are concatenated to the tag of hourly event-{@link CsiAggregation}s.
-	 * @see #createMeasuredValues()
+	 * @see #createCsiAggregations()
 	 * @see CsiAggregation#tag
 	 */
-    @Shared List<CsiAggregation> measuredValueForEventHourlyList = []
-    @Shared List<CsiAggregation> measuredValueForPageWeeklyList = []
-    @Shared List<CsiAggregation> measuredValueForShopWeeklyList = []
-    @Shared List<CsiAggregation> measuredValueForShopWeeklyWithNullList = []
-    @Shared List<CsiAggregation> measuredValueListWithValuesLowerThanOne = []
-    @Shared List<CsiAggregation> measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
+    @Shared List<CsiAggregation> csiAggregationForEventHourlyList = []
+    @Shared List<CsiAggregation> csiAggregationForPageWeeklyList = []
+    @Shared List<CsiAggregation> csiAggregationForShopWeeklyList = []
+    @Shared List<CsiAggregation> csiAggregationForShopWeeklyWithNullList = []
+    @Shared List<CsiAggregation> csiAggregationListWithValuesLowerThanOne = []
+    @Shared List<CsiAggregation> csiAggregationListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = []
 
     @Shared List<String> expectedJobLabels = ['job1', 'job2']
 
@@ -115,7 +115,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
 	}
 
-    void "correct graph labels get created for hourly event measured values"(){
+    void "correct graph labels get created for hourly event csiAggregations"(){
 
         expect:
         serviceUnderTest.getMapLabel(mv, CsiType.doc_complete) == expectedLabel
@@ -149,7 +149,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
 	}
 
-	void "correct graph labels get created for weekly page measured values"(){
+	void "correct graph labels get created for weekly page csiAggregations"(){
 
         expect:
         serviceUnderTest.getMapLabel(mv, CsiType.visually_complete) == expectedLabel
@@ -180,7 +180,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
 	}
 
-	void "correct graph labels get created for weekly shop measured values"(){
+	void "correct graph labels get created for weekly shop csiAggregations"(){
 
         expect:
         serviceUnderTest.getMapLabel(mv, CsiType.doc_complete) == expectedLabel
@@ -205,17 +205,17 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
 	}
 
-	void "build osm chart graphs correctly from hourly event measured values"() {
+	void "build osm chart graphs correctly from hourly event csiAggregations"() {
 
         setup:
 		//create test-specific data
 		MvQueryParams irrelevantQueryParamsCauseUsingFunctionalityIsMocked = new MvQueryParams()
 		//mock inner service
-		mockGenerator.mockEventMeasuredValueService(serviceUnderTest, measuredValueForEventHourlyList)
+		mockGenerator.mockEventCsiAggregationService(serviceUnderTest, csiAggregationForEventHourlyList)
         Integer numberOfExistingCombinations_JobgroupPageMeasuredeventBrowserLocation = 32
 
         when:
-		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
 				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked, [CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
@@ -226,7 +226,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
 	}
 
-	void "build osm chart graphs correctly from page measured values"() {
+	void "build osm chart graphs correctly from page csiAggregations"() {
 
         setup:
 		//create test-specific data
@@ -235,12 +235,12 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		Integer numberOfValuesInGraphOfGroupPageCombination_12 = 2
 		String expectedGraphLabelOfGroupPageCombination_11 = "${expectedPageNames[0]}"
 		String expectedGraphLabelOfGroupPageCombination_12 = "${expectedPageNames[1]}"
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
+        CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
 		//mock inner service
-		mockGenerator.mockPageMeasuredValueService(serviceUnderTest, measuredValueForPageWeeklyList)
+		mockGenerator.mockPageCsiAggregationService(serviceUnderTest, csiAggregationForPageWeeklyList)
 
 		when:
-		OsmRickshawChart chart = serviceUnderTest.getCalculatedPageMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedPageCsiAggregationsAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 new MvQueryParams(),
                 weekly,
@@ -265,17 +265,17 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
 	}
 
-	void "build osm chart graphs correctly from shop measured values"() {
+	void "build osm chart graphs correctly from shop csiAggregations"() {
 
         setup:
 		//create test-specific data
-		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
+		String expectedLabel =  expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
+        CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
 		//mock inner service
-		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
+		mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
 
         when:
-		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
@@ -289,23 +289,23 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		graphs != null
 		graphs.size() == 1
 
-        points.size() == measuredValueForShopWeeklyList.size()
-        points.every{point -> point.measuredValue > 0}
+        points.size() == csiAggregationForShopWeeklyList.size()
+        points.every{point -> point.csiAggregation > 0}
         pointsTimes == pointsTimes.sort()
 
 	}
 
-	void "build osm chart graphs correctly from shop measured values with null in data source"() {
+	void "build osm chart graphs correctly from shop csiAggregations with null in data source"() {
 
         setup:
 		//create test-specific data
 		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
+        CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
 		//mock inner service
-		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyWithNullList)
+		mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyWithNullList)
 
 		when:
-		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
@@ -319,23 +319,23 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		graphs != null
 		graphs.size() == 1
 
-        points.size() == measuredValueForShopWeeklyWithNullList.size() - 1
-        points.every{point -> point.measuredValue > 0}
+        points.size() == csiAggregationForShopWeeklyWithNullList.size() - 1
+        points.every{point -> point.csiAggregation > 0}
         pointsTimes == pointsTimes.sort()
 
 	}
 
-	void "build osm chart graphs correctly from shop measured values with values lower than one in data source"() {
+	void "build osm chart graphs correctly from shop csiAggregations with values lower than one in data source"() {
 
         setup:
 		//create test-specific data
 		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
+        CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
 		//mock inner service
-		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
+		mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
 
 		when:
-		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
@@ -349,23 +349,23 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
         graphs != null
         graphs.size() == 1
 
-        points.size() == measuredValueListWithValuesLowerThanOne.size()
-        points.every{point -> point.measuredValue > 1}
+        points.size() == csiAggregationListWithValuesLowerThanOne.size()
+        points.every{point -> point.csiAggregation > 1}
         pointsTimes == pointsTimes.sort()
 
 	}
 
-	void "build osm chart graphs correctly from shop measured values with values lower than one and with more than two decimal places in data source"() {
+	void "build osm chart graphs correctly from shop csiAggregations with values lower than one and with more than two decimal places in data source"() {
 
         setup:
 		//create test-specific data
 		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
+        CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
 		//mock inner service
-		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
+		mockGenerator.mockShopCsiAggregationService(serviceUnderTest, csiAggregationForShopWeeklyList)
 
 		when:
-		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopMeasuredValuesAsHighChartMap(
+		OsmRickshawChart chart = serviceUnderTest.getCalculatedShopCsiAggregationsAsHighChartMap(
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
@@ -379,10 +379,10 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
         graphs != null
         graphs.size() == 1
 
-        points.size() == measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces.size()
+        points.size() == csiAggregationListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces.size()
         points.every{point ->
-            point.measuredValue > 1 &&
-                    String.valueOf(point.measuredValue).split("\\.")[1].length() <= 2
+            point.csiAggregation > 1 &&
+                    String.valueOf(point.csiAggregation).split("\\.")[1].length() <= 2
         }
 
         pointsTimes == pointsTimes.sort()
@@ -400,9 +400,9 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		List<OsmChartGraph> highcharts = serviceUnderTest.getCsRelevantStaticGraphsAsResultMapForChart(fromDate, toDate)
         List<OsmChartPoint> points = findGraphByLabel(highcharts, graphLabel).getPoints();
         OsmChartPoint threeMonthsAgo = points[0]
-        double threeMonthsAgoDeviationDueToRounding = Math.abs(threeMonthsAgo.measuredValue - 82.5)
+        double threeMonthsAgoDeviationDueToRounding = Math.abs(threeMonthsAgo.csiAggregation - 82.5)
         OsmChartPoint oneMonthAgo = points[1]
-        double oneMonthAgoDeviationDueToRounding = Math.abs(oneMonthAgo.measuredValue - 87.5)
+        double oneMonthAgoDeviationDueToRounding = Math.abs(oneMonthAgo.csiAggregation - 87.5)
 
 		then:
 		highcharts.size() == 1
@@ -434,16 +434,16 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		createAggregatorTypesAndIntervals()
 		createJobs()
 		createPages()
-		createMeasuredValues()
+		createCsiAggregations()
 		createCsTargetGraphs()
 
 	}
 	private void createAggregatorTypesAndIntervals(){
-		hourly = new MeasuredValueInterval(
-				intervalInMinutes: MeasuredValueInterval.HOURLY
+		hourly = new CsiAggregationInterval(
+				intervalInMinutes: CsiAggregationInterval.HOURLY
 				).save(failOnError: true, validate: false)
-		weekly = new MeasuredValueInterval(
-				intervalInMinutes: MeasuredValueInterval.WEEKLY
+		weekly = new CsiAggregationInterval(
+				intervalInMinutes: CsiAggregationInterval.WEEKLY
 				).save(failOnError: true, validate: false)
 		measured_event = new AggregatorType(
 				name: AggregatorType.MEASURED_EVENT
@@ -476,14 +476,14 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		assertNotNull( Page.findByName(expectedPageNames[0]))
 		assertNotNull( Page.findByName(expectedPageNames[1]))
 	}
-	private void createMeasuredValues(){
-		measuredValueForEventHourlyList.clear()
+	private void createCsiAggregations(){
+		csiAggregationForEventHourlyList.clear()
 		2.times{zeroBasedIndexJobGroup ->
 			2.times {zeroBasedIndexPage ->
 				2.times {zeroBasedIndexMeasuredEvent ->
 					2.times {zeroBasedIndexBrowser ->
 						2.times {zeroBasedIndexLocation ->
-							measuredValueForEventHourlyList.add(
+							csiAggregationForEventHourlyList.add(
 									new CsiAggregation(
 									started: now,
 									interval: hourly,
@@ -494,7 +494,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 									))
 						}}}}}
 
-		measuredValueForPageWeeklyList = [
+		csiAggregationForPageWeeklyList = [
 			new CsiAggregation(
 			started: now,
 			interval: hourly,
@@ -537,7 +537,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 			)
 		]
 
-		measuredValueForShopWeeklyList = [
+		csiAggregationForShopWeeklyList = [
 			new CsiAggregation(
 				started: now,
 				interval: hourly,
@@ -564,7 +564,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 			)
 		]
 
-		measuredValueForShopWeeklyWithNullList = [
+		csiAggregationForShopWeeklyWithNullList = [
 			new CsiAggregation(
 				started: now,
 				interval: weekly,
@@ -591,7 +591,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 			)
 		]
 
-		measuredValueListWithValuesLowerThanOne = [
+		csiAggregationListWithValuesLowerThanOne = [
 			new CsiAggregation(
 				started: now,
 				interval: weekly,
@@ -618,7 +618,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 			)
 		]
 
-		measuredValueListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = [
+		csiAggregationListWithValuesLowerThanOneAndWithMoreThanTwoDecimalPlaces = [
 			new CsiAggregation(
 				started: now,
 				interval: weekly,
@@ -690,11 +690,11 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 return new URL('http://measuredvalue.example.com/'+mv.id);
             }
         }
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService()
+        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService()
         mockGenerator = ServiceMocker.create()
         mockGenerator.mockCsTargetGraphDaoService(serviceUnderTest, graphLabel)
         mockGenerator.mockLinkGenerator(serviceUnderTest, 'http://www.iteratec.de')
-        mockGenerator.mockMeasuredValueTagService(
+        mockGenerator.mockCsiAggregationTagService(
                 serviceUnderTest,
                 ['1' : new JobGroup(id: 1, name: expectedJobGroupNames[0]), '2' : new JobGroup(id: 2, name: expectedJobGroupNames[1])],
                 ['1' : new MeasuredEvent(id: 1, name: expectedMeasuredEventNames[0]), '2' : new MeasuredEvent(id: 2, name: expectedMeasuredEventNames[1])],

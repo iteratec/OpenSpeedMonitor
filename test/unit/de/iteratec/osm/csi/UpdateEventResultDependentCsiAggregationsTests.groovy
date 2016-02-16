@@ -51,11 +51,11 @@ import static org.junit.Assert.assertEquals
  * Tests the updating of hourly event-{@link CsiAggregation}s when a new {@link EventResult} is coming in.
  */
 @TestMixin(GrailsUnitTestMixin)
-@TestFor(EventMeasuredValueService)
-@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, MeasuredValueInterval,
-	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, MeasuredValueUpdateEvent,
+@TestFor(EventCsiAggregationService)
+@Mock([Browser, BrowserAlias, JobGroup, Location, MeasuredEvent, Page, WebPageTestServer, CsiAggregation, CsiAggregationInterval,
+	AggregatorType, Location, EventResult, JobResult, Job, OsmConfiguration, CsiDay, Script, CsiAggregationUpdateEvent,
 	ConnectivityProfile, CsiConfiguration])
-class UpdateEventResultDependentMeasuredValuesTests {
+class UpdateEventResultDependentCsiAggregationsTests {
 
 	static final double DELTA = 1e-15
 	static final DateTime resultsExecutionTime = new DateTime(2012,1,1,0,0,0, DateTimeZone.UTC)
@@ -71,7 +71,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	static final String group1Name = 'group1'
 	static final String group2Name = 'group2'
 	
-	MeasuredValueInterval hourly
+	CsiAggregationInterval hourly
 	AggregatorType measuredEvent
 	ConnectivityProfile connectivityProfile
 	EventResult result1OfCsiGroup1
@@ -79,7 +79,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	EventResult result1OfCsiGroup2
 	EventResult result2OfCsiGroup2
 	
-	EventMeasuredValueService serviceUnderTest
+	EventCsiAggregationService serviceUnderTest
 	ServiceMocker mockGenerator
 
     void setUp() {
@@ -93,13 +93,13 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		mockGenerator.mockEventResultService(serviceUnderTest)
 		mockGenerator.mockJobResultDaoService(serviceUnderTest)
 		mockGenerator.mockBrowserService(serviceUnderTest)
-		mockGenerator.mockMeasuredValueUpdateEventDaoService(serviceUnderTest)
+		mockGenerator.mockCsiAggregationUpdateEventDaoService(serviceUnderTest)
 		Map idAsStringToJobGroupMap_irrelevantCauseNotUsedInTheseTests = [:]
 		Map idAsStringToMeasuredEventMap_irrelevantCauseNotUsedInTheseTests = [:]
 		Map idAsStringToPageMap_irrelevantCauseNotUsedInTheseTests = [:]
 		Map idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests = [:]
 		Map idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests = [:]
-		mockGenerator.mockMeasuredValueTagService(
+		mockGenerator.mockCsiAggregationTagService(
 			serviceUnderTest,
 			idAsStringToJobGroupMap_irrelevantCauseNotUsedInTheseTests,
 			idAsStringToMeasuredEventMap_irrelevantCauseNotUsedInTheseTests,
@@ -122,7 +122,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	 * Tests the update of dependent hourly event-{@link CsiAggregation}s.
 	 */
 	@Test
-	void testUpdateDependentMeasuredValues() {
+	void testUpdateDependentCsiAggregations() {
 		
 		//create test-specific data
 		JobResult run = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
@@ -169,7 +169,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	 * Tests the update of dependent hourly event-{@link CsiAggregation}s for different CSI-{@link JobGroup}s.
 	 */
 	@Test
-	void testUpdateDependentMeasuredValuesForMultipleCsiGroups() {
+	void testUpdateDependentCsiAggregationsForMultipleCsiGroups() {
 		//create test-specific data
 		
 		JobResult runOfJobOfCsiGroup1 = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
@@ -289,7 +289,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	private void createTestDataForAllTests(){
 		createConnectivityProfile()
 		createOsmConfiguration()
-		createMeasuredValueIntervals()
+		createCsiAggregationIntervals()
 		createAggregatorTypes()
 		createPages()
 		createBrowsers()
@@ -300,7 +300,7 @@ class UpdateEventResultDependentMeasuredValuesTests {
 		createMeasuredEvents()
 	}
 	private void initializeFields(){
-		hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
+		hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
 		measuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 	}
 
@@ -335,10 +335,10 @@ class UpdateEventResultDependentMeasuredValuesTests {
 	private void createAggregatorTypes(){
 		new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 	}
-	private void createMeasuredValueIntervals(){
-		new MeasuredValueInterval(
+	private void createCsiAggregationIntervals(){
+		new CsiAggregationInterval(
 			name: "hourly",
-			intervalInMinutes: MeasuredValueInterval.HOURLY
+			intervalInMinutes: CsiAggregationInterval.HOURLY
 			).save(failOnError: true)
 	}
 	private void createPages(){

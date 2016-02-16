@@ -33,7 +33,7 @@ import org.mockito.Mockito
 
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.measurement.schedule.Job
@@ -43,7 +43,7 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -62,7 +62,7 @@ import de.iteratec.osm.util.I18nService
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
-@Mock([Job, JobResult, MeasuredEvent, CsiAggregation, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script])
+@Mock([Job, JobResult, MeasuredEvent, CsiAggregation, CsiAggregationInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script])
 class EventResultDashboardServiceTests {
 
     EventResultDashboardService serviceUnderTest
@@ -118,7 +118,7 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockMeasuredValueTagService()
+        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -131,7 +131,7 @@ class EventResultDashboardServiceTests {
         Date endTime = runDate.withMinuteOfHour(15).withSecondOfMinute(35).toDate()
 
         Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
-        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         assertEquals(1, resultGraphs.size())
@@ -140,7 +140,7 @@ class EventResultDashboardServiceTests {
         }
         assertEquals(1, resultGraphsWithCorrectLabel.size())
         assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
     }
 
     @Test
@@ -152,7 +152,7 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockMeasuredValueTagService()
+        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -170,7 +170,7 @@ class EventResultDashboardServiceTests {
 
         assertEquals(2, aggregatorTypes.size());
 
-        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 assertEquals(2, resultGraphs.size())
@@ -185,14 +185,14 @@ class EventResultDashboardServiceTests {
         }
         assertEquals(1, resultsCsi1.size())
         assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+        assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
         }
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
+        assertTrue(resultsCsi2[0].points.findAll({ it.csiAggregation == 20.0d }).size() == 1);
     }
 
     @Test
@@ -204,7 +204,7 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockMeasuredValueTagService()
+        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -223,7 +223,7 @@ class EventResultDashboardServiceTests {
 
         assertEquals(1, aggregatorTypes.size());
 
-        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         assertEquals(1, resultGraphs.size())
@@ -238,7 +238,7 @@ class EventResultDashboardServiceTests {
         }
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
+        assertTrue(resultsCsi2[0].points.findAll({ it.csiAggregation == 20.0d }).size() == 1);
     }
 
     @Test
@@ -250,7 +250,7 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockMeasuredValueTagService()
+        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -268,7 +268,7 @@ class EventResultDashboardServiceTests {
 
         assertEquals(1, aggregatorTypes.size());
 
-        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.RAW, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.RAW, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         assertEquals(1, resultGraphs.size())
@@ -278,7 +278,7 @@ class EventResultDashboardServiceTests {
         }
         assertEquals(1, resultsCsi1.size())
         assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+        assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_CACHED_DOM_TIME} | ${group2Name} | ${event1Name} | ${location1Location} | ${predefinedConnectivityName}"
@@ -292,12 +292,12 @@ class EventResultDashboardServiceTests {
         //mocks
         mockEventResultDaoService()
         mockPerformanceLoggingService()
-        mockMeasuredValueUtilService()
+        mockCsiAggregationUtilService()
         mockJobGroupDaoService()
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockMeasuredValueTagService()
+        mockCsiAggregationTagService()
         mockAggregatorTypeDaoService()
 
         //test-specific data
@@ -314,7 +314,7 @@ class EventResultDashboardServiceTests {
         Collection<AggregatorType> aggregatorTypes = AggregatorType.findAllByName(AggregatorType.RESULT_CACHED_DOM_TIME) as List
 
         //test-execution
-        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.HOURLY, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
         //assertions
@@ -324,7 +324,7 @@ class EventResultDashboardServiceTests {
         }
         assertEquals(1, resultGraphsWithCorrectLabel.size())
         assertEquals(1, resultGraphsWithCorrectLabel.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+        assertTrue(resultGraphsWithCorrectLabel[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
     }
 
     @Test
@@ -333,12 +333,12 @@ class EventResultDashboardServiceTests {
         //mocks
         mockEventResultDaoService()
         mockPerformanceLoggingService()
-        mockMeasuredValueUtilService()
+        mockCsiAggregationUtilService()
         mockJobGroupDaoService()
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockMeasuredValueTagService()
+        mockCsiAggregationTagService()
         mockAggregatorTypeDaoService()
 
         //test-specific data
@@ -358,7 +358,7 @@ class EventResultDashboardServiceTests {
         assertEquals(2, aggregatorTypes.size());
 
         //test-execution
-        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, MeasuredValueInterval.HOURLY, aggregatorTypes, queryParams);
+        OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(startTime, endTime, CsiAggregationInterval.HOURLY, aggregatorTypes, queryParams);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 //assertions
@@ -369,14 +369,14 @@ class EventResultDashboardServiceTests {
         }
         assertEquals(1, resultsCsi1.size())
         assertEquals(1, resultsCsi1.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi1[0].points.findAll({ it.measuredValue == 2.0d }).size() == 1);
+        assertTrue(resultsCsi1[0].points.findAll({ it.csiAggregation == 2.0d }).size() == 1);
 
         List<OsmChartGraph> resultsCsi2 = resultGraphs.findAll {
             it.label == "${AggregatorType.RESULT_UNCACHED_DOM_TIME} | ${group2Name}"
         }
         assertEquals(1, resultsCsi2.size())
         assertEquals(1, resultsCsi2.findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }.size())
-        assertTrue(resultsCsi2[0].points.findAll({ it.measuredValue == 20.0d }).size() == 1);
+        assertTrue(resultsCsi2[0].points.findAll({ it.csiAggregation == 20.0d }).size() == 1);
     }
 
     public void testTryToBuildTestsDetailsURL_OneSingleResult() {
@@ -389,14 +389,14 @@ class EventResultDashboardServiceTests {
 
     private void tryToBuildTestsDetailsURL(String resultIDs, Integer resultIDsCount, final URL expectedURL) {
         // Create some data:
-        final CsiAggregation measuredValue = new CsiAggregation(
+        final CsiAggregation csiAggregation = new CsiAggregation(
                 underlyingEventResultsByWptDocComplete: resultIDs
         ) {
             public Long getId() {
                 return 4;
             }
         };
-        assertEquals(resultIDsCount, measuredValue.countUnderlyingEventResultsByWptDocComplete());
+        assertEquals(resultIDsCount, csiAggregation.countUnderlyingEventResultsByWptDocComplete());
 
         // Simulate GrailsLinkGenerator
         LinkGenerator grailsLinkGeneratorMock = Mockito.mock(LinkGenerator.class);
@@ -406,7 +406,7 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.grailsLinkGenerator = grailsLinkGeneratorMock;
 
         // Run the (whitebox-)test:
-        URL result = serviceUnderTest.tryToBuildTestsDetailsURL(measuredValue);
+        URL result = serviceUnderTest.tryToBuildTestsDetailsURL(csiAggregation);
 
         // Verify result:
         // - is the URL the expected one?
@@ -426,13 +426,13 @@ class EventResultDashboardServiceTests {
         assertTrue(paramsEntry instanceof Map);
 
         Map paramsMap = (Map) paramsEntry;
-        assertEquals('4', paramsMap.get('measuredValueId'));
+        assertEquals('4', paramsMap.get('csiAggregationId'));
         assertEquals(String.valueOf(resultIDsCount), paramsMap.get('lastKnownCountOfAggregatedResultsOrNull'));
     }
 
     private void mocksCommonToAllTests(){
-        serviceUnderTest.resultMeasuredValueService = new ResultMeasuredValueService()
-        serviceUnderTest.resultMeasuredValueService.eventResultDaoService = new EventResultDaoService()
+        serviceUnderTest.resultCsiAggregationService = new ResultCsiAggregationService()
+        serviceUnderTest.resultCsiAggregationService.eventResultDaoService = new EventResultDaoService()
         serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
         serviceUnderTest.jobResultDaoService = Mockito.mock(JobResultDaoService.class);
         serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
@@ -452,7 +452,7 @@ class EventResultDashboardServiceTests {
     }
 
     private void createTestdataCommonForAllTests(){
-        createMeasuredValueInterval();
+        createCsiAggregationInterval();
         createBrowser();
         createLocations();
         createCSIGroups();
@@ -462,14 +462,14 @@ class EventResultDashboardServiceTests {
         createEventResults();
     }
 
-    void createMeasuredValueInterval() {
-        new MeasuredValueInterval(
+    void createCsiAggregationInterval() {
+        new CsiAggregationInterval(
                 name: "RAW",
-                intervalInMinutes: MeasuredValueInterval.RAW
+                intervalInMinutes: CsiAggregationInterval.RAW
         ).save(failOnError: true)
-        new MeasuredValueInterval(
+        new CsiAggregationInterval(
                 name: "HOURLY",
-                intervalInMinutes: MeasuredValueInterval.HOURLY
+                intervalInMinutes: CsiAggregationInterval.HOURLY
         ).save(failOnError: true)
         new AggregatorType(
                 name: AggregatorType.RESULT_CACHED_DOM_TIME,
@@ -653,7 +653,7 @@ class EventResultDashboardServiceTests {
     //mocking inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Mocks {@linkplain EventMeasuredValueService#eventResultDaoService}.
+     * Mocks {@linkplain EventCsiAggregationService#eventResultDaoService}.
      */
     private void mockEventResultDaoService() {
         def eventResultDaoService = mockFor(EventResultDaoService, true)
@@ -703,7 +703,7 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.eventResultDaoService = eventResultDaoService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#performanceLoggingService}.
+     * Mocks {@linkplain EventCsiAggregationService#performanceLoggingService}.
      */
     private void mockPerformanceLoggingService() {
         def performanceLoggingService = mockFor(PerformanceLoggingService, true)
@@ -714,18 +714,18 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.performanceLoggingService = performanceLoggingService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#performanceLoggingService}.
+     * Mocks {@linkplain EventCsiAggregationService#performanceLoggingService}.
      */
-    private void mockMeasuredValueUtilService() {
-        def measuredValueUtilService = mockFor(MeasuredValueUtilService, true)
-        measuredValueUtilService.demand.resetToStartOfActualInterval(1..10000) {
+    private void mockCsiAggregationUtilService() {
+        def csiAggregationUtilService = mockFor(CsiAggregationUtilService, true)
+        csiAggregationUtilService.demand.resetToStartOfActualInterval(1..10000) {
             DateTime dateWithinInterval, Integer intervalInMinutes ->
                 return runDateHourlyStart
         }
-        serviceUnderTest.measuredValueUtilService = measuredValueUtilService.createMock()
+        serviceUnderTest.csiAggregationUtilService = csiAggregationUtilService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#jobGroupDaoService}.
+     * Mocks {@linkplain EventCsiAggregationService#jobGroupDaoService}.
      */
     private void mockJobGroupDaoService() {
         def jobGroupDaoService = mockFor(DefaultJobGroupDaoService, true)
@@ -735,7 +735,7 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.jobGroupDaoService = jobGroupDaoService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#pageDaoService}.
+     * Mocks {@linkplain EventCsiAggregationService#pageDaoService}.
      */
     private void mockPageDaoService() {
         def pageDaoService = mockFor(DefaultPageDaoService, true)
@@ -745,7 +745,7 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.pageDaoService = pageDaoService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#browserDaoService}.
+     * Mocks {@linkplain EventCsiAggregationService#browserDaoService}.
      */
     private void mockBrowserDaoService() {
         def browserDaoService = mockFor(DefaultBrowserDaoService, true)
@@ -755,7 +755,7 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.browserDaoService = browserDaoService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#locationDaoService}.
+     * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
      */
     private void mockLocationDaoService() {
         def locationDaoService = mockFor(DefaultLocationDaoService, true)
@@ -765,31 +765,31 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.locationDaoService = locationDaoService.createMock()
     }
     /**
-     * Mocks {@linkplain EventMeasuredValueService#locationDaoService}.
+     * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
      */
-    private void mockMeasuredValueTagService() {
-        def measuredValueTagService = mockFor(MeasuredValueTagService, true)
-        measuredValueTagService.demand.findJobGroupIdOfHourlyEventTag(1..10000) {
+    private void mockCsiAggregationTagService() {
+        def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+        csiAggregationTagService.demand.findJobGroupIdOfHourlyEventTag(1..10000) {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[0]) as Serializable
         }
-        measuredValueTagService.demand.findPageIdOfHourlyEventTag(1..10000) {
+        csiAggregationTagService.demand.findPageIdOfHourlyEventTag(1..10000) {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[1]) as Serializable
         }
-        measuredValueTagService.demand.findMeasuredEventIdOfHourlyEventTag(1..10000) {
+        csiAggregationTagService.demand.findMeasuredEventIdOfHourlyEventTag(1..10000) {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[2]) as Serializable
         }
-        measuredValueTagService.demand.findBrowserIdOfHourlyEventTag(1..10000) {
+        csiAggregationTagService.demand.findBrowserIdOfHourlyEventTag(1..10000) {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[3]) as Serializable
         }
-        measuredValueTagService.demand.findLocationIdOfHourlyEventTag(1..10000) {
+        csiAggregationTagService.demand.findLocationIdOfHourlyEventTag(1..10000) {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[4]) as Serializable
         }
-        serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock()
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
     }
 
     private void mockI18nService() {

@@ -34,7 +34,7 @@ class InMemoryConfigService {
     /** If false no measurements get started at all (even for active {@link Job}s). If true the active attribute of each {@link Job} decides whether or not it runs measurements. */
     Boolean measurementsGenerallyEnabled = DEFAULT_MEASUREMENTS_GENERALLY_ENABLED
 
-    /** If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldMeasuredValuesWithDependenciesJob}) */
+    /** If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldCsiAggregationsWithDependenciesJob}) */
     Boolean databaseCleanupEnabled = DEFAULT_DATABASE_CLEANUP_ENABLED
 
     /**
@@ -85,7 +85,7 @@ class InMemoryConfigService {
 
     /**
      * Get status of databaseCleanupEnabled
-     * If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldMeasuredValuesWithDependenciesJob})
+     * If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldCsiAggregationsWithDependenciesJob})
      * @return Whether the nightly database cleanup is enabled or not
      */
     boolean isDatabaseCleanupEnabled(){

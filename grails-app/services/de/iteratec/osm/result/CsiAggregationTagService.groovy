@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.util.PerformanceLoggingService
-
 import static Contract.*
 
 import java.util.regex.Pattern
@@ -34,12 +32,12 @@ import de.iteratec.osm.measurement.environment.Location
 /**
  * <p>
  * A service to create an inspect tags used to identify and group 
- * {@link MeasuredValue}s.
+ * {@link CsiAggregation}s.
  * </p>
  *
  * <p>
- * Measured values identified by an tag, which is just text, to be 
- * decoupled from the data the measured value is based on. This service
+ * CsiAggregations identified by an tag, which is just text, to be
+ * decoupled from the data the CsiAggregation is based on. This service
  * provides methods to create tags (starting with {@code create}) and
  * to inspect tags (starting with {@code get} or {@code find}).
  * </p>
@@ -51,7 +49,7 @@ import de.iteratec.osm.measurement.environment.Location
  * @author nkuhn
  * @author mze
  */
-class MeasuredValueTagService {
+class CsiAggregationTagService {
 
 	/**
 	 * A fragment, a sub pattern matches all IDs. More formally it matches all
@@ -69,7 +67,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates a tag to mark hourly event-{@link MeasuredValue}s.
+	 * Creates a tag to mark hourly event-{@link CsiAggregation}s.
 	 * </p>
 	 *
 	 * <p>
@@ -130,7 +128,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates a tag to mark event result-{@link MeasuredValue}s.
+	 * Creates a tag to mark event result-{@link CsiAggregation}s.
 	 * </p>
 	 *
 	 * <p>
@@ -167,7 +165,7 @@ class MeasuredValueTagService {
 	}
 	/**
 	 * <p>
-	 * Creates an aggregator tag for page measured values.
+	 * Creates an aggregator tag for page CsiAggregations.
 	 * </p>
 	 *
 	 * <i>Notice:</i> Used generally, changed to page tag in IT-89
@@ -191,7 +189,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates an aggregator tag for weekly shop measured values.
+	 * Creates an aggregator tag for weekly shop CsiAggregations.
 	 * </p>
 	 *
 	 * @param group
@@ -620,7 +618,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates a tag-pattern to find weekly page {@link MeasuredValue}s by
+	 * Creates a tag-pattern to find weekly page {@link CsiAggregation}s by
 	 * {@link JobGroup}s and {@link Page}s.
 	 * </p>
 	 *
@@ -634,7 +632,7 @@ class MeasuredValueTagService {
 	 *
 	 * @return A tag-pattern, never <code>null</code>.
 	 */
-	public Pattern getTagPatternForWeeklyPageMvsWithJobGroupsAndPages(List<JobGroup> groups, List<Page> pages) {
+	public Pattern getTagPatternForWeeklyPageCasWithJobGroupsAndPages(List<JobGroup> groups, List<Page> pages) {
 		requiresArgumentNotNull("groups", groups)
 		requiresArgumentNotNull("pages", pages)
 
@@ -646,7 +644,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates a tag-pattern to find weekly shop {@link MeasuredValue}s by
+	 * Creates a tag-pattern to find weekly shop {@link CsiAggregation}s by
 	 * {@link JobGroup}s.
 	 * </p>
 	 *
@@ -659,7 +657,7 @@ class MeasuredValueTagService {
 	 *
 	 * @return A tag-pattern, never <code>null</code>.
 	 */
-	Pattern getTagPatternForWeeklyShopMvsWithJobGroups(List<JobGroup> groups){
+	Pattern getTagPatternForWeeklyShopCasWithJobGroups(List<JobGroup> groups){
 		requiresArgumentNotNull('groups', groups);
 
 		String groupsPattern = createSubPatternToMatchIDs(groups*.ident())
@@ -669,7 +667,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates a search pattern to find hourly {@link MeasuredValue}s matching
+	 * Creates a search pattern to find hourly {@link CsiAggregation}s matching
 	 * at least one of the elements in the corresponding collection of
 	 * elements.
 	 * </p>
@@ -696,7 +694,7 @@ class MeasuredValueTagService {
 	 * @since JIRA IT-40
 	 * @version 2 (since JIRA IT-85)
 	 */
-	public Pattern getTagPatternForHourlyMeasuredValues(MvQueryParams queryParams) {
+	public Pattern getTagPatternForHourlyCsiAggregations(MvQueryParams queryParams) {
 		requiresArgumentNotNull('queryParams', queryParams)
 
 		String jobGroupIDPattern = createSubPatternToMatchIDs(queryParams.jobGroupIds);
@@ -711,7 +709,7 @@ class MeasuredValueTagService {
 
 	/**
 	 * <p>
-	 * Creates a search pattern to find result {@link MeasuredValue}s matching
+	 * Creates a search pattern to find result {@link CsiAggregation}s matching
 	 * at least one of the elements in the corresponding collection of
 	 * elements.
 	 * </p>
@@ -737,14 +735,14 @@ class MeasuredValueTagService {
 	 *         <code>null</code>.
 	 * @since JIRA IT-7
 	 */
-	public Pattern getTagPatternForResultMeasuredValues(MvQueryParams queryParams) {
-		return getTagPatternForHourlyMeasuredValues(queryParams);
+	public Pattern getTagPatternForResultCsiAggregations(MvQueryParams queryParams) {
+		return getTagPatternForHourlyCsiAggregations(queryParams);
 	}
 
 
 	/**
 	 * <p>
-	 * Creates a search tag to find {@link MeasuredValue}s matching
+	 * Creates a search tag to find {@link CsiAggregation}s matching
 	 * the exact tag.
 	 * </p>
 	 *
@@ -769,7 +767,7 @@ class MeasuredValueTagService {
 	 * @throws IllegalArgumentException if at least one queryParam size() is greater than 1!
 	 * @since JIRA IT-60
 	 */
-	public String getTagStringForResultMeasuredValues(Long jobGroup, Long measuredEvent, Long page, Long browser, Long location) {
+	public String getTagStringForResultCsiAggregations(Long jobGroup, Long measuredEvent, Long page, Long browser, Long location) {
 		requiresArgumentNotNull('queryParams', jobGroup)
 		requiresArgumentNotNull('queryParams', measuredEvent)
 		requiresArgumentNotNull('queryParams', page)

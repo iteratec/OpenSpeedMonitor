@@ -32,12 +32,12 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 
 @TestMixin(IntegrationTestMixin)
 class WeeklyShopIntTests extends IntTestWithDBCleanup {
@@ -45,17 +45,17 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	static transactional = false
 
 	/** injected by grails */
-	EventMeasuredValueService eventMeasuredValueService
-	ShopMeasuredValueService shopMeasuredValueService
+	EventCsiAggregationService eventCsiAggregationService
+	ShopCsiAggregationService shopCsiAggregationService
 	EventResultService eventResultService
 	JobService jobService
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 	WeightingService weightingService
 	MeanCalcService meanCalcService
-	MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
-	MeasuredValueInterval hourly
-	MeasuredValueInterval weekly
+	CsiAggregationInterval hourly
+	CsiAggregationInterval weekly
 
 	AggregatorType pageAggregatorMeasuredEvent
 	AggregatorType pageAggregatorType
@@ -94,7 +94,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 
 		//execute test
 
-		shopMeasuredValueService.calcMv(mvWeeklyShop)
+		shopCsiAggregationService.calcCa(mvWeeklyShop)
 
 		//assertions
 
@@ -140,7 +140,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 
 		//execute test
 
-		shopMeasuredValueService.calcMv(mvWeeklyShop)
+		shopCsiAggregationService.calcCa(mvWeeklyShop)
 
 		//assertions
 
@@ -171,14 +171,14 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		
 		List<CsiAggregation> createdHmvs = []
 		pagesToTest.each { String pageName ->
-			createdHmvs.addAll(TestDataUtil.precalculateHourlyMeasuredValues(
+			createdHmvs.addAll(TestDataUtil.precalculateHourlyCsiAggregations(
 				jobGroup, pageName, endOfWeek, currentDateTime, hourly, 
-				eventMeasuredValueService,
-				measuredValueTagService,
+				eventCsiAggregationService,
+				csiAggregationTagService,
 				eventResultService,
 				weightingService,
 				meanCalcService,
-				measuredValueUpdateEventDaoService)
+				csiAggregationUpdateEventDaoService)
 			)
 		}
 		return createdHmvs
@@ -191,7 +191,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		}
 		Page page
 		createdHmvs.each{ CsiAggregation hmv ->
-			page = measuredValueTagService.findPageOfHourlyEventTag(hmv.tag)
+			page = csiAggregationTagService.findPageOfHourlyEventTag(hmv.tag)
 			if (page && hmvsByPagename.containsKey(page.name)) {
 				hmvsByPagename[page.name].add(hmv)
 			}
@@ -210,7 +210,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	static void createTestData() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
-		TestDataUtil.createMeasuredValueIntervals()
+		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
 		TestDataUtil.createHoursOfDay()
 		System.out.println('Create some common test-data... DONE');
@@ -222,8 +222,8 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	
 	@Before
 	public void setUpServiceMockRlikeAndData() {
-		hourly= MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
-		weekly= MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+		hourly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+		weekly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
 		pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		pageAggregatorShop = AggregatorType.findByName(AggregatorType.SHOP)
 		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)

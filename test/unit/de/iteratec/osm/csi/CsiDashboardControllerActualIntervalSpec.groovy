@@ -17,9 +17,8 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
 import org.joda.time.DateTime
@@ -63,7 +62,7 @@ class CsiDashboardControllerActualIntervalSpec {
 
         //Mocks
         command = new CsiDashboardShowAllCommand()
-        command.measuredValueUtilService = new MeasuredValueUtilService()
+        command.csiAggregationUtilService = new CsiAggregationUtilService()
     }
 
     // daily page ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +117,7 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusDays(14)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
@@ -164,10 +163,10 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusHours(10)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
         params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
@@ -185,7 +184,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -305,7 +304,7 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusDays(14)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
@@ -351,10 +350,10 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusHours(10)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
         params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
@@ -372,7 +371,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -492,7 +491,7 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
@@ -538,10 +537,10 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusDays(4)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
         params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
@@ -559,7 +558,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -679,7 +678,7 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
@@ -725,10 +724,10 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusDays(4)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
         params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
@@ -746,7 +745,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
