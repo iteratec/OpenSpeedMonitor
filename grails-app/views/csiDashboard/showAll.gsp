@@ -221,20 +221,21 @@
                         <g:message code="csi.type.heading" default="CSI Type"/>
                     </legend>
                 </div>
-                <div class="span12">
-                    <div class="control-group">
-                        <div class="controls">
-                            <label class="checkbox" for="csiTypeDocComplete">
-                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" checked/>
-                                ${message(code: "de.iteratec.isr.measurand.docCompleteTimeInMillisecs", default: "Doc Complete")}
-                            </label>
-                            <label class="checkbox" for="csiTypeVisuallyComplete">
-                                <input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete"/>
-                                ${message(code: "de.iteratec.isr.measurand.visuallyCompleteInMillisecs", default: "Visually Complete")}
-                            </label>
-                        </div>
-                    </div>
-                </div>
+                %{--TODO feature toggle IT-732--}%
+                %{--<div class="span12">--}%
+                    %{--<div class="control-group">--}%
+                        %{--<div class="controls">--}%
+                            %{--<label class="checkbox" for="csiTypeDocComplete">--}%
+                                %{--<input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" checked/>--}%
+                                %{--${message(code: "de.iteratec.isr.measurand.docCompleteTimeInMillisecs", default: "Doc Complete")}--}%
+                            %{--</label>--}%
+                            %{--<label class="checkbox" for="csiTypeVisuallyComplete">--}%
+                                %{--<input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete"/>--}%
+                                %{--${message(code: "de.iteratec.isr.measurand.visuallyCompleteInMillisecs", default: "Visually Complete")}--}%
+                            %{--</label>--}%
+                        %{--</div>--}%
+                    %{--</div>--}%
+                %{--</div>--}%
             </div>
             <p>
                 <g:actionSubmit id="chart-submit"

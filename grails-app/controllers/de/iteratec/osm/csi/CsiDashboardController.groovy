@@ -247,7 +247,9 @@ class CsiDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
-
+        //---TODO remove with IT-732
+        if(!(cmd.csiTypeVisuallyComplete || cmd.csiTypeDocComplete)) cmd.csiTypeDocComplete=true
+        //---
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
@@ -694,7 +696,9 @@ class CsiDashboardController {
      * @see <a href="http://tools.ietf.org/html/rfc4180">http://tools.ietf.org/html/rfc4180</a>
      */
     public Map<String, Object> csiValuesCsv(CsiDashboardShowAllCommand cmd) {
-
+        //---TODO remove with IT-732
+        if(!(cmd.csiTypeVisuallyComplete || cmd.csiTypeDocComplete)) cmd.csiTypeDocComplete=true
+        //---
         Map<String, Object> modelToRender = new HashMap<String, Object>()
 
         if (request.queryString && cmd.validate()) {

@@ -353,11 +353,12 @@ public class CsiDashboardShowAllCommand {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiSystems']
             }
         })
-        csiTypeVisuallyComplete(validator: {boolean b , CsiDashboardShowAllCommand cmd ->
-            if(!(cmd.csiTypeDocComplete || cmd.csiTypeVisuallyComplete) ){
-                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiType']
-            }
-        })
+//        Feature toggle IT-732
+//        csiTypeVisuallyComplete(validator: {boolean b , CsiDashboardShowAllCommand cmd ->
+//            if(!(cmd.csiTypeDocComplete || cmd.csiTypeVisuallyComplete) ){
+//                return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiType']
+//            }
+//        })
 
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
