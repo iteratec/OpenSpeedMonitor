@@ -4,19 +4,17 @@ package de.iteratec.osm.csi
  * This enum is used to decide on which value the csi data should be based
  */
 enum CsiType {
-        visually_complete, doc_complete, both
+        visually_complete, doc_complete
 
-        public CsiType getCsiType(boolean vc, boolean dc) {
-            if (vc) {
-                if (dc) {
-                    return both
-                } else {
-                    return visually_complete
-                }
-            } else if (dc) {
-                return doc_complete
-            } else {
-                throw new UndefinedCsiTypeException(vc, dc)
-            }
+        public static List<CsiType> getCsiTypes(CsiDashboardShowAllCommand command) {
+           def csiTypes = []
+            if(command.csiTypeVisuallyComplete) csiTypes<< visually_complete
+            if(command.csiTypeDocComplete) csiTypes<< doc_complete
+            return csiTypes
         }
+
+    @Override
+    String toString() {
+        return super.toString().replaceAll("_"," ")
+    }
 }

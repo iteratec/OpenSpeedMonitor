@@ -215,28 +215,27 @@
                               'showExtendedConnectivitySettings': false]"/>
 
             <div style="clear:both;"></div>
-            %{--TODO activate with IT-732--}%
-            %{--<div class="row">--}%
-                %{--<div class="span12">--}%
-                    %{--<legend>--}%
-                        %{--<g:message code="csi.type.heading" default="CSI Type"/>--}%
-                    %{--</legend>--}%
-                %{--</div>--}%
-                %{--<div class="span12">--}%
-                    %{--<div class="control-group">--}%
-                        %{--<div class="controls">--}%
-                            %{--<label class="checkbox" for="csiTypeDocComplete">--}%
-                                %{--<input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" checked/>--}%
-                                %{--${message(code: "de.iteratec.isr.measurand.docCompleteTimeInMillisecs", default: "Doc Complete")}--}%
-                            %{--</label>--}%
-                            %{--<label class="checkbox" for="csiTypeVisuallyComplete">--}%
-                                %{--<input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete"/>--}%
-                                %{--${message(code: "de.iteratec.isr.measurand.visuallyCompleteInMillisecs", default: "Visually Complete")}--}%
-                            %{--</label>--}%
-                        %{--</div>--}%
-                    %{--</div>--}%
-                %{--</div>--}%
-            %{--</div>--}%
+            <div class="row">
+                <div class="span12">
+                    <legend>
+                        <g:message code="csi.type.heading" default="CSI Type"/>
+                    </legend>
+                </div>
+                <div class="span12">
+                    <div class="control-group">
+                        <div class="controls">
+                            <label class="checkbox" for="csiTypeDocComplete">
+                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" checked/>
+                                ${message(code: "de.iteratec.isr.measurand.docCompleteTimeInMillisecs", default: "Doc Complete")}
+                            </label>
+                            <label class="checkbox" for="csiTypeVisuallyComplete">
+                                <input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete"/>
+                                ${message(code: "de.iteratec.isr.measurand.visuallyCompleteInMillisecs", default: "Visually Complete")}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <p>
                 <g:actionSubmit id="chart-submit"
                                 value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
@@ -279,7 +278,7 @@
     </div>
 </div>
 
-<g:if test="${wptCustomerSatisfactionValues_doc_complete}">
+<g:if test="${wptCustomerSatisfactionValues}">
     <hr>
 
     <div class="row">
@@ -332,7 +331,7 @@
                 <g:render template="/highchart/chart"
                           model="[
                                   singleYAxis                  : 'false',
-                                  chartData                    : wptCustomerSatisfactionValues_doc_complete,
+                                  chartData                    : wptCustomerSatisfactionValues,
                                   chartTitle                   : chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                   initialChartWidth            : chartWidth,
@@ -347,7 +346,7 @@
                                   optimizeForExport            : 'false',
                                   openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
                                   annotations                  : annotations,
-                                  labelSummary                 : labelSummary_doc_complete
+                                  labelSummary                 : labelSummary
                                   ]"/>
             </div>
         </div>
@@ -358,12 +357,12 @@
                     <g:message error="${flash.tableDataError}"/>
                 </div>
             </g:if>
-            <g:if test="${wptCustomerSatisfactionValuesForTable_doc_complete != null}">
+            <g:if test="${wptCustomerSatisfactionValuesForTable != null}">
                 <table class="table table-bordered">
                     <tbody>
                     <tr>
                         <td class="text-info">
-                            ${wptCustomerSatisfactionValuesForTable_doc_complete.replace(';', '</td><td class="text-info">').replace('\n', '</td></tr><tr><td class="text-info">')}
+                            ${wptCustomerSatisfactionValuesForTable.replace(';', '</td><td class="text-info">').replace('\n', '</td></tr><tr><td class="text-info">')}
                         </td>
                     </tr>
                     </tbody>

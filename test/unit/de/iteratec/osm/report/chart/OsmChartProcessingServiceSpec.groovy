@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.csi.CsiType
 import de.iteratec.osm.util.I18nService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -64,6 +65,7 @@ class OsmChartProcessingServiceSpec extends Specification{
     public static final String MEASURED_STEP_4_NAME = 'step 4'
 
     public static final String I18N_LABEL_JOB_GROUP = 'Job Group'
+    public static final String I18N_LABEL_CSI_TYPE = 'Csi Type'
     public static final String I18N_LABEL_MEASURED_EVENT = 'Measured step'
     public static final String I18N_LABEL_LOCATION = 'Location'
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
@@ -103,12 +105,13 @@ class OsmChartProcessingServiceSpec extends Specification{
     void "event measured values, some legend parts in every graph the same, some different -> summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
         ]
         String expectedCommonLabel =
+                "<b>${I18N_LABEL_CSI_TYPE}</b>: ${CsiType.doc_complete.toString()} | " +
                 "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME} | " +
                         "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_1_NAME}"
 
@@ -181,10 +184,10 @@ class OsmChartProcessingServiceSpec extends Specification{
     void "page measured values, some legend parts in every graph the same, some different -> summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [JOB_GROUP_1_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.visually_complete.toString(), JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.visually_complete.toString(), JOB_GROUP_1_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER))
         ]
         String expectedCommonLabel = "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME}"
 
@@ -196,10 +199,10 @@ class OsmChartProcessingServiceSpec extends Specification{
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                PAGE_1_NAME,
-                PAGE_2_NAME,
-                PAGE_3_NAME,
-                PAGE_4_NAME
+                CsiType.doc_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_1_NAME,
+                CsiType.doc_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_2_NAME,
+                CsiType.visually_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_3_NAME,
+                CsiType.visually_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_4_NAME
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }
@@ -389,7 +392,8 @@ class OsmChartProcessingServiceSpec extends Specification{
                         'de.iteratec.osm.result.measured-event.label':I18N_LABEL_MEASURED_EVENT,
                         'job.location.label':I18N_LABEL_LOCATION,
                         'de.iteratec.result.measurand.label': I18N_LABEL_MEASURAND,
-                        'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY
+                        'de.iteratec.osm.result.connectivity.label': I18N_LABEL_CONNECTIVITY,
+                        'de.iteratec.osm.csi.type.heading':I18N_LABEL_CSI_TYPE
                     ]
                     return i18nKeysToValues[msgKey]
                 }

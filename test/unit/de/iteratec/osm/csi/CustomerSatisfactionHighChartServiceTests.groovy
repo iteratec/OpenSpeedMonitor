@@ -90,6 +90,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
     @Shared List<String>  expectedMeasuredEventNames = ['event1', 'event2']
     @Shared List<String>  expectedBrowserNames = ['browser1', 'browser2']
     @Shared List<String>  expectedLocationNames = ['location1', 'location2']
+    @Shared List<String>  expectedCsiTypes = [CsiType.doc_complete.toString(), CsiType.visually_complete.toString()]
 
     @Shared String graphLabel
     @Shared Double tolerableDeviationDueToRounding
@@ -117,7 +118,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
     void "correct graph labels get created for hourly event measured values"(){
 
         expect:
-        serviceUnderTest.getMapLabel(mv) == expectedLabel
+        serviceUnderTest.getMapLabel(mv, CsiType.doc_complete) == expectedLabel
 
         where:
         mv << [
@@ -132,15 +133,18 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                     tag: "2;2;2;2;2")
         ]
         expectedLabel << [
-            "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
-                "${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
-                "${expectedLocationNames[0]}",
-            "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
-                    "${expectedMeasuredEventNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
-                    "${expectedLocationNames[0]}",
-            "${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
-                    "${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
-                    "${expectedLocationNames[1]}"
+						"${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+						"${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                		"${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
+						"${expectedLocationNames[0]}",
+						"${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+            			"${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    	"${expectedMeasuredEventNames[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    	"${expectedLocationNames[0]}",
+						"${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
+            			"${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    	"${expectedMeasuredEventNames[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
+                    	"${expectedLocationNames[1]}"
         ]
 
 	}
@@ -148,7 +152,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	void "correct graph labels get created for weekly page measured values"(){
 
         expect:
-        serviceUnderTest.getMapLabel(mv) == expectedLabel
+        serviceUnderTest.getMapLabel(mv, CsiType.visually_complete) == expectedLabel
 
         where:
         mv << [
@@ -166,8 +170,11 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                         tag: "2;2")
         ]
         expectedLabel << [
+				"${expectedCsiTypes[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
                 "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[0]}",
+				"${expectedCsiTypes[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
                 "${expectedJobGroupNames[0]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}",
+				"${expectedCsiTypes[1]}${HIGHCHART_LEGEND_DELIMITTER}"+
                 "${expectedJobGroupNames[1]}${HIGHCHART_LEGEND_DELIMITTER}${expectedPageNames[1]}"
         ]
 
@@ -176,7 +183,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	void "correct graph labels get created for weekly shop measured values"(){
 
         expect:
-        serviceUnderTest.getMapLabel(mv) == expectedLabel
+        serviceUnderTest.getMapLabel(mv, CsiType.doc_complete) == expectedLabel
 
         where:
         mv << [
@@ -190,7 +197,9 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                         tag: "2")
         ]
         expectedLabel << [
+				"${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
                 "${expectedJobGroupNames[0]}",
+				"${expectedCsiTypes[0]}${HIGHCHART_LEGEND_DELIMITTER}"+
                 "${expectedJobGroupNames[1]}"
         ]
 
@@ -207,7 +216,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         when:
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
-				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked, CsiType.doc_complete
+				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked, [CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
@@ -235,7 +244,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 new MvQueryParams(),
                 weekly,
-				CsiType.doc_complete
+				[CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> pointsGroupPageCombination_11 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_11).getPoints();
@@ -260,7 +269,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         setup:
 		//create test-specific data
-		String expectedLabel = expectedJobGroupNames[0]
+		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
         MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
@@ -270,7 +279,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				CsiType.doc_complete
+				[CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -290,7 +299,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         setup:
 		//create test-specific data
-		String expectedLabel = expectedJobGroupNames[0]
+		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
         MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyWithNullList)
@@ -300,7 +309,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				CsiType.doc_complete
+				[CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -320,7 +329,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         setup:
 		//create test-specific data
-		String expectedLabel = expectedJobGroupNames[0]
+		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
         MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
@@ -330,7 +339,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				CsiType.doc_complete
+				[CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -350,7 +359,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         setup:
 		//create test-specific data
-		String expectedLabel = expectedJobGroupNames[0]
+		String expectedLabel = expectedCsiTypes[0]+HIGHCHART_LEGEND_DELIMITTER+expectedJobGroupNames[0]
         MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY);
 		//mock inner service
 		mockGenerator.mockShopMeasuredValueService(serviceUnderTest, measuredValueForShopWeeklyList)
@@ -360,7 +369,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				CsiType.doc_complete
+				[CsiType.doc_complete]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()

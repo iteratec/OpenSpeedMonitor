@@ -247,7 +247,6 @@ class CsiDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
-
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
@@ -287,7 +286,7 @@ class CsiDashboardController {
                 if (warnAboutLongProcessingTimeInsteadOfShowingData) {
                     modelToRender.put('warnAboutLongProcessingTime', true)
                 } else {
-                    fillWithAproximateMeasuredValueData(modelToRender, cmd, true)
+                    fillWithAproximateMeasuredValueData(modelToRender, cmd, true, CsiType.getCsiTypes(cmd))
                 }
             }
         }
@@ -312,7 +311,7 @@ class CsiDashboardController {
      *         the graphs in {@link modelToRender} else, if set to
      *         <code>false</code> not.
      */
-    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph) {
+    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
         requiresArgumentNotNull('modelToRender', modelToRender)
@@ -322,7 +321,7 @@ class CsiDashboardController {
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams()
-        CsiType csiType = CsiType.doc_complete
+
         switch (cmd.aggrGroupAndInterval) {
             case WEEKLY_AGGR_GROUP_PAGE:
                 MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
@@ -378,7 +377,7 @@ class CsiDashboardController {
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      */
-    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, CsiType csiType) {
+    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
@@ -400,10 +399,10 @@ class CsiDashboardController {
         //add / remove 5 Minutes
         modelToRender.put('fromTimestampForHighChart', (resetFromDate.toDate().getTime() - 300000))
         modelToRender.put('toTimestampForHighChart', (resetToDate.toDate().getTime() + 300000))
-        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(graphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues', graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -429,7 +428,7 @@ class CsiDashboardController {
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.
      */
-    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams, CsiType csiType) {
+    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY)
@@ -447,10 +446,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDate.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDate.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), chart.osmChartGraphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(chart.osmChartGraphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues', chart.osmChartGraphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(chart.osmChartGraphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', false)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -509,7 +508,7 @@ class CsiDashboardController {
             MvQueryParams measuredValuesQueryParams,
             boolean withTargetGraph,
             boolean moveGraphsByOneWeek,
-            CsiType csiType) {
+            List<CsiType> csiType) {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
@@ -540,10 +539,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(graphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues', graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -579,7 +578,7 @@ class CsiDashboardController {
             Set<Long> selectedCsiSystems,
             boolean withTargetGraph,
             boolean moveGraphsByOneWeek,
-            CsiType csiType) {
+            List<CsiType> csiType) {
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
@@ -611,10 +610,10 @@ class CsiDashboardController {
         boolean includeCsTargetGraphs = true
         modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
         modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
-        modelToRender.put('wptCustomerSatisfactionValues_'+csiType.toString(), graphs)
-        modelToRender.put('wptCustomerSatisfactionValuesForTable_'+csiType.toString(), formatForTable(graphs, includeCsTargetGraphs))
+        modelToRender.put('wptCustomerSatisfactionValues', graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
 
-        modelToRender.put('labelSummary_'+csiType.toString(), chart.osmChartGraphsCommonLabel);
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
 
         modelToRender.put('markerShouldBeEnabled', true)
         modelToRender.put('labelShouldBeEnabled', false)
@@ -697,7 +696,7 @@ class CsiDashboardController {
         Map<String, Object> modelToRender = new HashMap<String, Object>()
 
         if (request.queryString && cmd.validate()) {
-            fillWithAproximateMeasuredValueData(modelToRender, cmd, false)
+            fillWithAproximateMeasuredValueData(modelToRender, cmd, false, CsiType.getCsiTypes(cmd) )
             cmd.copyRequestDataToViewModelMap(modelToRender)
         } else {
             redirectWith303('showAll', params)
