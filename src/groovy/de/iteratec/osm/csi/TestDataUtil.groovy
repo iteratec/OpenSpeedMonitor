@@ -305,10 +305,12 @@ class TestDataUtil {
     }
 
     static JobGroupWeight createJobGroupWeight(
+            CsiSystem csiSystem,
             JobGroup jobGroup,
             double weight
     ) {
         return new JobGroupWeight(
+                csiSystem: csiSystem,
                 jobGroup: jobGroup,
                 weight: weight
         ).save(failOnError: true)

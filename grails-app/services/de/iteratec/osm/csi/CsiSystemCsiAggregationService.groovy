@@ -94,10 +94,12 @@ class CsiSystemCsiAggregationService {
      */
     void markCaAsOutdated(DateTime start, EventResult newResult, CsiAggregationInterval interval) {
 
-        List<JobGroupWeight> affectedJobGroupWeights = JobGroupWeight.findAllByJobGroup(newResult.jobResult.job.jobGroup)
-        List<CsiSystem> affectedCsiSystems = CsiSystem.findAllByJobGroupWeights(affectedJobGroupWeights)
+        JobGroup jobGroupOfResult = newResult.jobResult.job.jobGroup
 
-        if (affectedCsiSystems && jobGroup.groupType == JobGroupType.CSI_AGGREGATION) {
+        List<JobGroupWeight> affectedJobGroupWeights = JobGroupWeight.findAllByJobGroup(jobGroupOfResult)
+        List<CsiSystem> affectedCsiSystems = affectedJobGroupWeights*.csiSystem
+
+        if (affectedCsiSystems && jobGroupOfResult.groupType == JobGroupType.CSI_AGGREGATION) {
             affectedCsiSystems.each {
                 CsiAggregation csiSystemMv = ensurePresence(start, interval, it)
                 csiAggregationUpdateEventDaoService.

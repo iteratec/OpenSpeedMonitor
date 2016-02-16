@@ -318,4 +318,31 @@ databaseChangeLog = {
         addNotNullConstraint(columnDataType: "bigint", columnName: "csi_aggregation_id", tableName: "csi_aggregation_update_event")
     }
     // END [IT-885] rename *MeasuredValue* to *CsiAggregation*
+    // START create bidirectional connection CsiSystem <-> JobGroupWeight
+    changeSet(author: "birger (generated)", id: "1455561393941-1") {
+        addColumn(tableName: "job_group_weight") {
+            column(name: "csi_system_id", type: "bigint") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "birger (generated)", id: "1455561393941-2") {
+        dropForeignKeyConstraint(baseTableName: "csi_system_job_group_weight", baseTableSchemaName: "osm", constraintName: "FK588975446326A28C")
+    }
+
+    changeSet(author: "birger (generated)", id: "1455561393941-4") {
+        createIndex(indexName: "FK5044557AB8A7ADFB", tableName: "job_group_weight") {
+            column(name: "csi_system_id")
+        }
+    }
+
+    changeSet(author: "birger (generated)", id: "1455561393941-5") {
+        dropTable(tableName: "csi_system_job_group_weight")
+    }
+
+    changeSet(author: "birger (generated)", id: "1455561393941-3") {
+        addForeignKeyConstraint(baseColumnNames: "csi_system_id", baseTableName: "job_group_weight", constraintName: "FK5044557AB8A7ADFB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_system", referencesUniqueColumn: "false")
+    }
+    // END create bidirectional connection CsiSystem <-> JobGroupWeight
 }

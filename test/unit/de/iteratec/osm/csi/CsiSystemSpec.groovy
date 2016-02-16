@@ -21,12 +21,12 @@ class CsiSystemSpec extends Specification {
         weight2 = new JobGroupWeight(jobGroup: csiJobGroup2, weight: 10.7)
     }
 
-    void "test empty CsiSystem is not valid"() {
+    void "test empty CsiSystem is valid"() {
         when:
         CsiSystem system = new CsiSystem(label: "csiSystem")
 
         then:
-        !system.validate()
+        system.validate()
     }
 
     void "test a valid csiSystem"() {
@@ -39,12 +39,12 @@ class CsiSystemSpec extends Specification {
         system.validate()
     }
 
-    void "test csiSystem contains only one jobGroupWeight then validaton should fail"() {
+    void "test csiSystem contains only one jobGroupWeight then system is valid"() {
         when:
         CsiSystem system = new CsiSystem(label: "csiSytesm")
         system.addToJobGroupWeights(weight1)
 
         then:
-        !system.validate()
+        system.validate()
     }
 }
