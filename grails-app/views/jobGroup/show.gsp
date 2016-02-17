@@ -183,16 +183,18 @@
             <tr class="prop">
                 <td valign="top" class="name"><g:message code="jobGroup.groupType.label"
                                                          default="Csi Configuration"/></td>
-                <td>Name der Csi Configuration</td>
+                <td>${selectedCsiConfiguration.label} <br/><br/>
+                    <g:if test="${jobGroupInstance.csiConfiguration}">
+                        <g:set var="renderCsiConfiguration" value="true"></g:set>
+                        <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
+                                                                                   defaultTimeToCsMappings: defaultTimeToCsMappings]"/>
+                    </g:if>
+                </td>
             </tr>
         </g:if>
         </tbody>
     </table>
-    <g:if test="${jobGroupInstance.csiConfiguration}">
-        <g:set var="renderCsiConfiguration" value="true"></g:set>
-        <g:render template="/csiConfiguration/weightDetails" model="[readOnly               : true,
-                                                                     defaultTimeToCsMappings: defaultTimeToCsMappings]"/>
-    </g:if>
+
 </section>
 
 

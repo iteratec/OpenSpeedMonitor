@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.d3Data.BarChartData
 import de.iteratec.osm.d3Data.ChartEntry
 import de.iteratec.osm.d3Data.MatrixViewData
@@ -40,13 +41,21 @@ class JobGroupController {
 
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
+    TimeToCsMappingService timeToCsMappingService
 
     def save() {
+        String configurationLabel = params.remove("csiConfiguration")
         def jobGroupInstance = new JobGroup(params)
+
+        CsiConfiguration configuration = CsiConfiguration.findByLabel(configurationLabel)
+        if (configuration) {
+            jobGroupInstance.csiConfiguration = configuration
+        }
+
         if (!jobGroupInstance.save(flush: true)) {
             render(view: "create", model: [jobGroupInstance: jobGroupInstance])
             return
-        }else {
+        } else {
             // Tags can only be set after first successful save.
             // This is why Job needs to be saved again.
             jobGroupInstance.tags = params.list('tags')
@@ -99,12 +108,20 @@ class JobGroupController {
             def barChartJSON = barChartData as JSON
 
             MultiLineChart defaultTimeToCsMappingsChart = defaultTimeToCsMappingService.getDefaultMappingsAsChart(10000)
-            String selectedCsiConfiguration = config.label
 
-            modelToRender = [matrixViewData: matrixViewDataJSON,
-                             treemapData   : treemapDataJSON,
-                             barchartData  : barChartJSON,
-                             defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON]
+            // arrange page time to cs mapping chart data
+            MultiLineChart pageTimeToCsMappingsChart
+            if (config.timeToCsMappings) {
+                pageTimeToCsMappingsChart = timeToCsMappingService.getPageMappingsAsChart(10000, config)
+            }
+
+
+            modelToRender = [matrixViewData          : matrixViewDataJSON,
+                             treemapData             : treemapDataJSON,
+                             barchartData            : barChartJSON,
+                             defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
+                             selectedCsiConfiguration: config,
+                             pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON]
         }
 
         modelToRender.put("jobGroupInstance", jobGroupInstance)
@@ -132,7 +149,7 @@ class JobGroupController {
             }
         }
         String csiConfigLabel = params.remove("csiConfiguration")
-        if(csiConfigLabel != null) {
+        if (csiConfigLabel != null) {
             CsiConfiguration config = CsiConfiguration.findByLabel(csiConfigLabel)
             jobGroupInstance.csiConfiguration = config
         }
