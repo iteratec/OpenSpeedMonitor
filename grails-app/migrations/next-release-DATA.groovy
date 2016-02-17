@@ -55,9 +55,9 @@ databaseChangeLog = {
                 }
             }
         }
-        sql('''set @rownum = -1;
-                insert into csi_configuration_browser_connectivity_weight (csi_configuration_browser_connectivity_weights_id, browser_connectivity_weight_id, browser_connectivity_weights_idx)
-                select csi_configuration.id, browser_connectivity_weight.id, @rownum := @rownum +1
+        sql('''
+                insert into csi_configuration_browser_connectivity_weight (csi_configuration_browser_connectivity_weights_id, browser_connectivity_weight_id)
+                select csi_configuration.id, browser_connectivity_weight.id
                 from csi_configuration, browser_connectivity_weight
         ''')
     }
@@ -75,9 +75,9 @@ databaseChangeLog = {
                 }
             }
         }
-        sql('''set @rownum = -1;
-                insert into csi_configuration_page_weight (csi_configuration_page_weights_id, page_weight_id, page_weights_idx)
-                select csi_configuration.id, page_weight.id, @rownum := @rownum +1
+        sql('''
+                insert into csi_configuration_page_weight (csi_configuration_page_weights_id, page_weight_id)
+                select csi_configuration.id, page_weight.id
                 from csi_configuration, page_weight
         ''')
     }
@@ -95,9 +95,9 @@ databaseChangeLog = {
                 }
             }
         }
-        sql('''set @rownum = -1;
-                insert into csi_configuration_time_to_cs_mapping (csi_configuration_time_to_cs_mappings_id, time_to_cs_mapping_id, time_to_cs_mappings_idx)
-                select csi_configuration.id, time_to_cs_mapping.id, @rownum := @rownum +1
+        sql('''
+                insert into csi_configuration_time_to_cs_mapping (csi_configuration_time_to_cs_mappings_id, time_to_cs_mapping_id)
+                select csi_configuration.id, time_to_cs_mapping.id
                 from csi_configuration, time_to_cs_mapping
         ''')
     }
