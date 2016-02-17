@@ -404,4 +404,8 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "csi_configuration_time_to_cs_mappings_id", baseTableName: "csi_configuration_time_to_cs_mapping", constraintName: "FK7F5A89C070CB3FD6", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_configuration", referencesUniqueColumn: "false")
     }
     // END [IT-879] delete columns *.idx
+    changeSet(author: "bwo", id: "1455722758000-1") {
+        comment {'https://jira.grails.org/browse/GPDATABASEMIGRATION-16'}
+        renameColumn(tableName: "user", oldColumnName: "password", newColumnName: "passwd", columnDataType: "varchar(255)")
+    }
 }
