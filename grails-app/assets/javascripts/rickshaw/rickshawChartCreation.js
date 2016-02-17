@@ -140,6 +140,7 @@ function RickshawGraphBuilder(args) {
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
     $("#rickshaw_addons").width(args.width-70);
+    $("#rickshaw_addons").find("ul").width(args.width-70);
     $("#rickshaw_timeline").width(args.width-60);
     $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
     $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
@@ -151,6 +152,7 @@ function RickshawGraphBuilder(args) {
       width : widthOfChartSvg,
       height : args.height
     });
+    self.graph.update();
     self.graph.render();
   }
 
@@ -1012,8 +1014,6 @@ function ChartAdjuster(args) {
   var self = this;
   
   this.initialize = function(args) {
-    $('#dia-width').val(args.graph.width);
-    $('#dia-height').val(args.graph.height);
     $("#collapseAdjustment").collapse('hide');
     
     self.addFunctionalityAdjustingChartSize();

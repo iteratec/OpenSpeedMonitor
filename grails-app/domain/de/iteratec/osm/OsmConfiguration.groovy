@@ -29,7 +29,7 @@ class OsmConfiguration {
     static final Integer DEFAULT_MIN_DOCCOMPLETE_TIME_IN_MILLISECS = 250
     static final Integer DEFAULT_MAX_DOCCOMPLETE_TIME_IN_MILLISECS = 180000
     static final Integer DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS = 400
-    static final Integer DEFAULT_INITIAL_CHART_WIDTH_IN_PIXELS = 1000
+    static final Integer DEFAULT_INITIAL_CHART_WIDTH_IN_PIXELS = 1070
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
     static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
