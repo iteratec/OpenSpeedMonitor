@@ -126,8 +126,8 @@ databaseChangeLog = {
                 int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
                         "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
                         [aggregatorType,csiAggregationInterval])[0]
-                println "processing #" + amountMvsHourlyAndPage + " elements"
                 int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
+                println "processing #${amountMvsHourlyAndPage} elements in ${amountLoops} loops"
 
                 (0..amountLoops).each { loopNumber ->
                     Date startOfLoop = new Date()
@@ -137,25 +137,16 @@ databaseChangeLog = {
                             [aggregatorType,csiAggregationInterval],
                             [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
                     )
-                    println "before session handling ${currentHourlyCsiAggregations.size()} CsiAggregations"
                     CsiAggregation.withNewSession {
                         currentHourlyCsiAggregations.each { CsiAggregation ->
-                            println "##################"
-                            println "CsiAggregation=${CsiAggregation}"
                             List<EventResult> eventResultsOfCsiAggregation = EventResult.executeQuery(
                                 "from EventResult where id in :ids",
                                 [ids: CsiAggregation.underlyingEventResultsByWptDocCompleteAsList]
                             )
-                            println "eventResultsOfCsiAggregation.size()=${eventResultsOfCsiAggregation.size()}"
                             int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivityProfile.unique(false).size()
-                            println "amountDifferentConnectivityProfiles=${amountDifferentConnectivityProfiles}"
                             // simple case: if all results have same connectivity
                             if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.first().connectivityProfile != null) {
                                 // ... then add connectivity from any of its results to CsiAggregation
-                                println "eventResultsOfCsiAggregation=${eventResultsOfCsiAggregation}"
-                                println "eventResultsOfCsiAggregation.first()=${eventResultsOfCsiAggregation.first()}"
-                                println "eventResultsOfCsiAggregation.first().connectivityProfile=${eventResultsOfCsiAggregation.first().connectivityProfile}"
-                                println "CsiAggregation.id=${CsiAggregation.id}"
                                 CsiAggregation.executeUpdate(
                                     "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
                                     [cp: eventResultsOfCsiAggregation.first().connectivityProfile, mvId: CsiAggregation.id]
