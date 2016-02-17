@@ -7,6 +7,8 @@ class CsiSystem {
 
     String label
 
+    Collection<JobGroupWeight> jobGroupWeights = []
+
     static hasMany = [jobGroupWeights: JobGroupWeight]
     static mappedBy = [jobGroupWeights: 'csiSystem']
 
