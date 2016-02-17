@@ -411,6 +411,7 @@ environments {
                 asyncAppender.addAppender(rollingFileAppender)
                 appender asyncAppender
             }
+
             // Per default all is logged for application artefacts.
             // Appenders apply their own threshold level to limit logs.
             all(
@@ -418,7 +419,8 @@ environments {
                             'grails.app'
                     ],
                     asyncOsmAppenderDetails: [
-                            'grails.app'
+                            'grails.app',
+                            'liquibase'
                     ]
             )
             error(

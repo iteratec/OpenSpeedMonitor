@@ -1,14 +1,8 @@
 import de.iteratec.osm.csi.CsiAggregationUpdateService
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 databaseChangeLog = {
 
@@ -123,6 +117,7 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1453106072000-9") {
         grailsChange {
             change {
+
                 CsiAggregationUpdateService csiAggregationUpdateService = null
                 int maxItemsToProcess = 10000
                 AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
@@ -142,7 +137,7 @@ databaseChangeLog = {
                             [aggregatorType,csiAggregationInterval],
                             [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
                     )
-                    println "before session: currentHourlyCsiAggregations=${currentHourlyCsiAggregations}"
+                    println "before session handling ${currentHourlyCsiAggregations.size()} CsiAggregations"
                     CsiAggregation.withNewSession {
                         currentHourlyCsiAggregations.each { CsiAggregation ->
                             println "##################"
@@ -165,7 +160,7 @@ databaseChangeLog = {
                                     "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
                                     [cp: eventResultsOfCsiAggregation.first().connectivityProfile, mvId: CsiAggregation.id]
                                 )
-                            } else { // ... else remove mv and calc it again by service
+                            } else { // ... else remove csi aggregation and calc it again by service
                                 println "different connectivity profiles"
                                 if ( csiAggregationUpdateService == null) {
                                     println "initializing service"
@@ -173,12 +168,16 @@ databaseChangeLog = {
                                     println "initialized service DONE: ${csiAggregationUpdateService}"
                                 }
                                 CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [CsiAggregation.id])
-                                println "removed MaesuredValue"
+                                println "removed old csi aggregation"
                                 eventResultsOfCsiAggregation.each { eventResult ->
                                     if (eventResult.connectivityProfile != null){
-                                        println "adding EventResult via update service: ${eventResult}"
-                                        csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
-                                        println "adding EventResult via update service: ...DONE"
+                                        try{
+                                            println "try to add EventResult via update service: ${eventResult}"
+                                            csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
+                                        }catch(Exception e){
+                                            println "try to add EventResult via update service: An Exception occurred: ${e}\n\nStacktrace:\n${e.printStackTrace()}"
+                                        }
+                                        println "try to add EventResult via update service: ...DONE"
                                     }
                                 }
                             }
