@@ -9,35 +9,37 @@
 }
 
 .iteratec-grid-border-left {
-		margin-left: ((@gridGutterWidth - 4) / 2) !important; 
-		padding-left: ((@gridGutterWidth - 4) / 2) !important; 
-		border-left: 2px solid #cdcdcd;	
-		
-		height: 250px !important;
+  margin-left: ((@gridGutterWidth - 4) / 2) !important;
+  padding-left: ((@gridGutterWidth - 4) / 2) !important;
+  border-left: 2px solid #cdcdcd;
+
+  height: 250px !important;
 }
 
-.iteratec-element-select { 
-		height: 150px  !important; 
-		min-width: 100%  !important; 
-}
-.iteratec-element-select.default-not-visible { 
-	.iteratec-element-select;
-	display: none;
-}
-.iteratec-element-select-higher { 
-		height: 250px  !important; 
-		width: 95%  !important; 
+.iteratec-element-select {
+  height: 150px !important;
+  min-width: 100% !important;
 }
 
-.iteratec-default-not-visible { 
-	display: none;
+.iteratec-element-select.default-not-visible {
+  .iteratec-element-select;
+  display: none;
+}
+
+.iteratec-element-select-higher {
+  height: 250px !important;
+  width: 95% !important;
+}
+
+.iteratec-default-not-visible {
+  display: none;
 }
 
 .accordion-info {
   .text-info;
-	line-height: normal;
-	font-size:80%;
-	padding: 8px 0px;
+  line-height: normal;
+  font-size: 80%;
+  padding: 8px 0px;
 }
 
 .accordion-link {
@@ -55,14 +57,16 @@
 }
 
 .input-medium-height30 {
-	.input-medium;
-	height:24px !important;
-	padding:2px 6px !important;
+  .input-medium;
+  height: 24px !important;
+  padding: 2px 6px !important;
 }
+
 .content-box {
-	box-sizing:content-box;
-	-moz-box-sizing:content-box;
+  box-sizing: content-box;
+  -moz-box-sizing: content-box;
 }
+
 .chart-tiptext {
   color: @white;
   font-size: 10pt;
@@ -70,12 +74,12 @@
 }
 
 #highcharts-0 {
-    margin-left: auto;
-    margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .radio.inline, .checkbox.inline {
-    margin-right: 5px;
+  margin-right: 5px;
 }
 
 textarea,
@@ -94,7 +98,7 @@ input[type="search"],
 input[type="tel"],
 input[type="color"],
 .uneditable-input {
- // height: 25px !important;
+  // height: 25px !important;
   height: 24px;
   padding: 2px 6px !important;
   line-height: 24px !important;
@@ -108,24 +112,26 @@ select {
 }
 
 .width_31em {
-    width: 31em !important;
+  width: 31em !important;
 }
 
 .noIdent {
-    margin-left: 0 !important;
+  margin-left: 0 !important;
 }
 
 .input-append .add-on, .input-prepend .add-on {
-    height: 20px !important;
-    line-height: 20px !important;
+  height: 20px !important;
+  line-height: 20px !important;
 }
+
 .btn {
-    line-height: 25px !important;
+  line-height: 25px !important;
 }
 
 select[multiple], select[size] {
-    //height: auto !important;
+  //height: auto !important;
 }
+
 .dropdown-menu .scrollable {
   height: auto;
   max-height: 80vh;
@@ -133,7 +139,7 @@ select[multiple], select[size] {
 }
 
 a.dropdown-toggle {
-    position: relative;
+  position: relative;
 }
 
 i.clickable-icon {
@@ -157,6 +163,7 @@ input.ui-autocomplete-input {
   transform-origin: left top 0;
   float: left;
 }
+
 #rickshaw_slider {
   margin-top: 3px;
 }
@@ -194,18 +201,26 @@ input.ui-autocomplete-input {
   -moz-background-clip: padding;
   background-clip: padding-box;
   border: 1px solid #ccc;
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, .2);
   .border-radius(6px);
-  .box-shadow(0 5px 10px rgba(0,0,0,.2));
+  .box-shadow(0 5px 10px rgba(0, 0, 0, .2));
 
   // Overrides for proper insertion
   white-space: normal;
 
   // Offset the popover to account for the popover arrow
-  &.top     { margin-top: -10px; }
-  &.right   { margin-left: 10px; }
-  &.bottom  { margin-top: 10px; }
-  &.left    { margin-left: -10px; }
+  &.top {
+    margin-top: -10px;
+  }
+  &.right {
+    margin-left: 10px;
+  }
+  &.bottom {
+    margin-top: 10px;
+  }
+  &.left {
+    margin-left: -10px;
+  }
 }
 
 //bootstrap navbar
@@ -226,15 +241,19 @@ input.ui-autocomplete-input {
     text-decoration: none;
   }
 }
-.navbar img.logo	{ max-height: 39px !important; margin-top: -3px;}
+
+.navbar img.logo {
+  max-height: 39px !important;
+  margin-top: -3px;
+}
 
 //bootstrap variables
-@navbarBackgroundHighlight:       #AB0C0C;/*ffffff;*/
+@navbarBackgroundHighlight: #AB0C0C; /*ffffff;*/
 
 //bootstrap responsive-utilities
 // Required for Windows 8 Metro split-screen snapping with IE10
 // Source: http://timkadlec.com/2012/10/ie10-snap-mode-and-responsive-design/
-@-ms-viewport{
+@-ms-viewport {
   width: auto !important;
 }
 
@@ -242,15 +261,28 @@ input.ui-autocomplete-input {
 //was deleted with IT-508, removed body to remove behavior TODO maybe there is a better way
 .dropdown-submenu:hover > .dropdown-menu {
 }
-.spinner-content-spinner{
+
+.spinner-content-spinner {
   padding-top: 20px;
   padding-left: 40px;
 }
-.spinner-content-message{
+
+.spinner-content-message {
   padding-top: 10px;
 }
-.spinner-large-content-spinner{
+
+.spinner-large-content-spinner {
   margin-left: 50%;
   margin-top: 30%;
   position: absolute;
+}
+
+.iteratec-tab-content {
+  overflow: visible; // prevent chosen plugin to make a scrollbar in navtab
+}
+.iteratec-tab-content > .tab-pane {
+  display: none;
+}
+.iteratec-tab-content > .active {
+  display: block;
 }

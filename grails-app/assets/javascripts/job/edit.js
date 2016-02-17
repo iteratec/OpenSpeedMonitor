@@ -81,7 +81,7 @@ function initializeSelects() {
 	  }
 	  if ($('select#location').size() > 0) {
 		  $('select#location').chosen(chosenOptions);
-	  }		  
+	  }
 	  if ($('select#connectivityProfile').size() > 0) {
 		  $('select#connectivityProfile').chosen(chosenOptions);
 	  }

@@ -39,7 +39,7 @@
       <a href="#3" data-toggle="tab"><g:message code="job.form.advanced.label" default="Advanced" /></a>
     </li>            
   </ul>
-  <div class="tab-content">
+  <div class="iteratec-tab-content">
     <div class="tab-pane active" id="1">
 	  <g:render template="testSettingsTab" model="${['job': job, 'connectivites': connectivites]}" />
     </div>
