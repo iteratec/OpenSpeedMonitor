@@ -110,22 +110,14 @@ class CsiDashboardController {
 
     String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
     public final static int MONDAY_WEEKSTART = 1
-    // TODO: FEATURE TOGGLE, IT-727
-//    public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
-//                                                                DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
-//                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP,
-//                                                                DAILY_AGGR_GROUP_SYSTEM, WEEKLY_AGGR_GROUP_SYSTEM]
-//    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event',
-//                                                                'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page',
-//                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',
-//                                                                'de.iteratec.isocsi.csi.per.csi.system.daily', 'de.iteratec.isocsi.csi.per.csi.system.weekly']
-//
     public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
                                                                 DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
-                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP]
+                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP,
+                                                                DAILY_AGGR_GROUP_SYSTEM, WEEKLY_AGGR_GROUP_SYSTEM]
     public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event',
                                                                 'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page',
-                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group']
+                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',
+                                                                'de.iteratec.isocsi.csi.per.csi.system.daily', 'de.iteratec.isocsi.csi.per.csi.system.weekly']
 
     /**
      * <p>

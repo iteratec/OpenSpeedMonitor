@@ -177,21 +177,20 @@
                     </legend>
                 </div>
             </div>
-            %{-- TODO: FEATURE TOGGLE, IT-727--}%
-            %{--<div class="row">--}%
-                %{--<div class="span4" id="filter-navtab-csiSystem">--}%
-                    %{--<div style="padding-top: 60px;"></div>--}%
-                    %{--<label for="folderSelectCsiSystem">--}%
-                        %{--<strong>--}%
-                            %{--<g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CsiSystems:"/>--}%
-                        %{--</strong>--}%
-                    %{--</label>--}%
-                    %{--<g:select id="folderSelectCsiSystem" class="iteratec-element-select"--}%
-                              %{--name="selectedCsiSystems" from="${csiSystems}" optionKey="id"--}%
-                              %{--optionValue="label" value="${selectedCsiSystem}"--}%
-                              %{--multiple="true"/>--}%
-                %{--</div>--}%
-            %{--</div>--}%
+            <div class="row">
+                <div class="span4" id="filter-navtab-csiSystem">
+                    <div style="padding-top: 60px;"></div>
+                    <label for="folderSelectCsiSystem">
+                        <strong>
+                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CsiSystems:"/>
+                        </strong>
+                    </label>
+                    <g:select id="folderSelectCsiSystem" class="iteratec-element-select"
+                              name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
+                              optionValue="label" value="${selectedCsiSystem}"
+                              multiple="true"/>
+                </div>
+            </div>
             <g:render template="/eventResultDashboard/selectMeasurings"
                       model="[
                               'locationsOfBrowsers'            : locationsOfBrowsers,
@@ -316,13 +315,12 @@
                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>
         </g:elseif>
-        %{--TODO: FEATURE TOGGLE, IT-727--}%
-        %{--<g:elseif--}%
-                %{--test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">--}%
-            %{--<g:set var="chartTitle"--}%
-                   %{--value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>--}%
-            %{--<g:set var="openDataPointLinksInNewWindow" value="false"/>--}%
-        %{--</g:elseif>--}%
+        <g:elseif
+                test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">
+            <g:set var="chartTitle"
+                   value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
+            <g:set var="openDataPointLinksInNewWindow" value="false"/>
+        </g:elseif>
         <g:else>
             <g:set var="chartTitle" value="CSI"/>
             <g:set var="openDataPointLinksInNewWindow" value="false"/>

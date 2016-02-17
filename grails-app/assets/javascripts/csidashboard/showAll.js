@@ -87,13 +87,12 @@ var setFilterElementsVisibility = function () {
         $("#filter-complete-tabbable").fadeOut();
     }
 
-    //TODO: FEATURE TOGGLE, IT-727
-    //if (selectedAggrGroupAndInterval == 'daily_system' || selectedAggrGroupAndInterval == 'weekly_system') {
-    //    $("#filter-navtab-jobGroup").hide();
-    //    $("#filter-complete-tabbable").hide();
-    //    $("#filter-navtab-csiSystem").show();
-    //} else {
-    //    $("#filter-navtab-jobGroup").show();
-    //    $("#filter-navtab-csiSystem").hide();
-    //}
+    if (selectedAggrGroupAndInterval == 'daily_system' || selectedAggrGroupAndInterval == 'weekly_system') {
+        $("#filter-navtab-jobGroup").hide();
+        $("#filter-complete-tabbable").hide();
+        $("#filter-navtab-csiSystem").show();
+    } else {
+        $("#filter-navtab-jobGroup").show();
+        $("#filter-navtab-csiSystem").hide();
+    }
 };
