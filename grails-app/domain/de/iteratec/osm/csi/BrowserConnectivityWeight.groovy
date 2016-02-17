@@ -30,8 +30,6 @@ class BrowserConnectivityWeight {
     ConnectivityProfile connectivity
     Double weight
 
-    static belongsTo = [CsiConfiguration]
-
     static constraints = {
         browser()
         connectivity()

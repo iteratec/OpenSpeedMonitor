@@ -48,7 +48,8 @@ class Script {
     String description
     String navigationScript
     int measuredEventsCount = 0
-    List<Page> testedPages
+
+    Collection<Page> testedPages = []
 
     static hasMany = [ testedPages: Page ]
 

@@ -180,7 +180,7 @@ class TimeToCsMappingService {
         String yLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.yAxisLabel", "Kundenzufriedenheit in %")
         MultiLineChart multiLineChart = new MultiLineChart(xLabel: xLabel, yLabel: yLabel)
 
-        List<TimeToCsMapping> allTimeToCsMappings = csiConfiguration.timeToCsMappings.findAll { it.loadTimeInMilliSecs <= maxLoadTime }
+        Collection<TimeToCsMapping> allTimeToCsMappings = csiConfiguration.timeToCsMappings.findAll { it.loadTimeInMilliSecs <= maxLoadTime }
         Map<String, MultiLineChartLineData> map = new HashMap<>()
 
         allTimeToCsMappings.each { mapping ->

@@ -55,9 +55,9 @@ class DefaultTimeToCsMappingService {
         if (defaultMappingsToCopyToPage.size() == 0)
             throw new IllegalArgumentException("No default csi mapping with name ${nameOfDefaultMapping} exists!")
 
-        Integer actualMappingVersion = csiConfiguration.timeToCsMappings[0] ? csiConfiguration.timeToCsMappings[0].mappingVersion : 1
+        Integer actualMappingVersion = csiConfiguration.timeToCsMappings.isEmpty() ? 1 : csiConfiguration.timeToCsMappings.first().mappingVersion
         TimeToCsMapping.withTransaction {
-            List<TimeToCsMapping> csiConfigsToDelete = csiConfiguration.timeToCsMappings.findAll{it.page == page}
+            Collection<TimeToCsMapping> csiConfigsToDelete = csiConfiguration.timeToCsMappings.findAll{it.page == page}
             csiConfiguration.timeToCsMappings.removeAll(csiConfigsToDelete)
             csiConfigsToDelete*.delete()
             csiConfiguration.save(failOnError: true)

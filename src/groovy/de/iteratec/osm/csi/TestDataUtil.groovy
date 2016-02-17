@@ -332,7 +332,7 @@ class TestDataUtil {
         return csiDay
     }
 
-    static List<TimeToCsMapping> createTimeToCsMappingForAllPages(List<Page> allPages) {
+    static Collection<TimeToCsMapping> createTimeToCsMappingForAllPages(List<Page> allPages) {
         List<TimeToCsMapping> timeToCsMappingList = new ArrayList<>()
         allPages.each { page ->
             (0..10000).each { loadTime ->

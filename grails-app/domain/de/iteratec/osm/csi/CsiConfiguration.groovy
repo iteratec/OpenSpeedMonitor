@@ -23,12 +23,14 @@ class CsiConfiguration {
     String label
     String description
     CsiDay csiDay
-    List<BrowserConnectivityWeight> browserConnectivityWeights = []
-    List<PageWeight> pageWeights = []
-    List<TimeToCsMapping> timeToCsMappings = []
 
-    static hasMany = [browserConnectivityWeights:BrowserConnectivityWeight,
-                      pageWeights:PageWeight, timeToCsMappings:TimeToCsMapping]
+    Collection<BrowserConnectivityWeight> browserConnectivityWeights = []
+    Collection<PageWeight> pageWeights = []
+    Collection<TimeToCsMapping> timeToCsMappings = []
+
+    static hasMany = [browserConnectivityWeights: BrowserConnectivityWeight,
+                      pageWeights               : PageWeight,
+                      timeToCsMappings          : TimeToCsMapping]
 
 
     static mapping = {
@@ -64,6 +66,6 @@ class CsiConfiguration {
     }
 
     public List<TimeToCsMapping> getTimeToCsMappingByPage(Page page) {
-        return this.timeToCsMappings.findAll {it -> it.page.name == page.name}
+        return this.timeToCsMappings.findAll { it -> it.page.name == page.name }
     }
 }

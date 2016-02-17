@@ -318,6 +318,7 @@ databaseChangeLog = {
         addNotNullConstraint(columnDataType: "bigint", columnName: "csi_aggregation_id", tableName: "csi_aggregation_update_event")
     }
     // END [IT-885] rename *MeasuredValue* to *CsiAggregation*
+
     // START create bidirectional connection CsiSystem <-> JobGroupWeight
     changeSet(author: "birger (generated)", id: "1455561393941-1") {
         addColumn(tableName: "job_group_weight") {
@@ -345,4 +346,62 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "csi_system_id", baseTableName: "job_group_weight", constraintName: "FK5044557AB8A7ADFB", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_system", referencesUniqueColumn: "false")
     }
     // END create bidirectional connection CsiSystem <-> JobGroupWeight
+
+    // BEGIN [IT-879] delete columns *.idx
+    changeSet(author: "marcus (generated)", id: "1455551294234-2") {
+        createIndex(indexName: "FKED13118372634BEF", tableName: "script_page") {
+            column(name: "script_tested_pages_id")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455551294234-3") {
+        dropColumn(columnName: "tested_pages_idx", tableName: "script_page")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455551294234-1") {
+        addForeignKeyConstraint(baseColumnNames: "script_tested_pages_id", baseTableName: "script_page", constraintName: "FKED13118372634BEF", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "script", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-4") {
+        createIndex(indexName: "FKA5D3DA68CFECF0", tableName: "csi_configuration_browser_connectivity_weight") {
+            column(name: "csi_configuration_browser_connectivity_weights_id")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-5") {
+        createIndex(indexName: "FKCDAE2599F1CB472F", tableName: "csi_configuration_page_weight") {
+            column(name: "csi_configuration_page_weights_id")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-6") {
+        createIndex(indexName: "FK7F5A89C070CB3FD6", tableName: "csi_configuration_time_to_cs_mapping") {
+            column(name: "csi_configuration_time_to_cs_mappings_id")
+        }
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-7") {
+        dropColumn(columnName: "browser_connectivity_weights_idx", tableName: "csi_configuration_browser_connectivity_weight")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-8") {
+        dropColumn(columnName: "page_weights_idx", tableName: "csi_configuration_page_weight")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-9") {
+        dropColumn(columnName: "time_to_cs_mappings_idx", tableName: "csi_configuration_time_to_cs_mapping")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-1") {
+        addForeignKeyConstraint(baseColumnNames: "csi_configuration_browser_connectivity_weights_id", baseTableName: "csi_configuration_browser_connectivity_weight", constraintName: "FKA5D3DA68CFECF0", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_configuration", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-2") {
+        addForeignKeyConstraint(baseColumnNames: "csi_configuration_page_weights_id", baseTableName: "csi_configuration_page_weight", constraintName: "FKCDAE2599F1CB472F", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_configuration", referencesUniqueColumn: "false")
+    }
+
+    changeSet(author: "marcus (generated)", id: "1455697784147-3") {
+        addForeignKeyConstraint(baseColumnNames: "csi_configuration_time_to_cs_mappings_id", baseTableName: "csi_configuration_time_to_cs_mapping", constraintName: "FK7F5A89C070CB3FD6", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "csi_configuration", referencesUniqueColumn: "false")
+    }
+    // END [IT-879] delete columns *.idx
 }
