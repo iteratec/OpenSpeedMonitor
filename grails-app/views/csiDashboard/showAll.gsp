@@ -213,15 +213,15 @@
                               'selectedConnectivityProfiles'   : selectedConnectivityProfiles,
                               'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles,
                               'showExtendedConnectivitySettings': false]"/>
+            %{--TODO feature toggle IT-732--}%
+            %{--<div style="clear:both;"></div>--}%
+            %{--<div class="row">--}%
+                %{--<div class="span12">--}%
+                    %{--<legend>--}%
+                        %{--<g:message code="csi.type.heading" default="CSI Type"/>--}%
+                    %{--</legend>--}%
+                %{--</div>--}%
 
-            <div style="clear:both;"></div>
-            <div class="row">
-                <div class="span12">
-                    <legend>
-                        <g:message code="csi.type.heading" default="CSI Type"/>
-                    </legend>
-                </div>
-                %{--TODO feature toggle IT-732--}%
                 %{--<div class="span12">--}%
                     %{--<div class="control-group">--}%
                         %{--<div class="controls">--}%
@@ -236,7 +236,7 @@
                         %{--</div>--}%
                     %{--</div>--}%
                 %{--</div>--}%
-            </div>
+            %{--</div>--}%
             <p>
                 <g:actionSubmit id="chart-submit"
                                 value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
