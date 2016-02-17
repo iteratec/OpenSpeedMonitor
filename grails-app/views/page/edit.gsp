@@ -7,29 +7,6 @@
         <meta name="layout" content="kickstart" />
         <g:set var="entityName" value="${message(code: 'page.label', default: 'Page')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
-        <style>
-        %{--Styles for multi line chart--}%
-            .axis path,
-            .axis line {
-                fill: none;
-                stroke: black;
-                shape-rendering: crisp-edges ;
-            }
-            .line {
-                fill: none;
-                stroke-width: 2px;
-            }
-            .verticalLine,
-            .horizontalLine {
-                opacity: 0.3;
-                stroke-dasharray: 3,3;
-                stroke: blue;
-            }
-            .xTextContainer,
-            .tooltipTextContainer{
-                opacity: 0.5;
-            }
-        </style>
     </head>
 
     <body>

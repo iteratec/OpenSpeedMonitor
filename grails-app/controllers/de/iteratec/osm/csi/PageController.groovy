@@ -17,13 +17,7 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
-import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
-import de.iteratec.osm.d3Data.MultiLineChart
-import de.iteratec.osm.d3Data.MultiLineChartLineData
-import de.iteratec.osm.report.chart.RickshawHtmlCreater
 import de.iteratec.osm.util.I18nService
-import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -32,8 +26,6 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class PageController {
 
-    TimeToCsMappingCacheService timeToCsMappingCacheService
-    DefaultTimeToCsMappingService defaultTimeToCsMappingService
     I18nService i18nService
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -48,16 +40,7 @@ class PageController {
     }
 
     def create() {
-        List<DefaultTimeToCsMapping> defaultTimeToCsMappings = defaultTimeToCsMappingService.getAll().findAll {
-            it.loadTimeInMilliSecs <= 8000
-        }
-
-        def defaultTimeToCsMappingsChart = createMultiLineChartData(new ArrayList<Page>())
-
-        [pageInstance   : new Page(params),
-         defaultMappings: defaultTimeToCsMappings,
-         defaultMultiLineChart: defaultTimeToCsMappingsChart as JSON
-        ]
+        [pageInstance: new Page(params)]
     }
 
     def save() {
@@ -79,18 +62,8 @@ class PageController {
             redirect(action: "list")
             return
         }
-        List<TimeToCsMapping> timeToCsMappings = timeToCsMappingCacheService.getMappingsFor(pageInstance)
 
-        // Arrange chart data
-        List<Page> pages = new ArrayList<Page>()
-        pages.add(pageInstance)
-        MultiLineChart multiLineChart = createMultiLineChartData(pages)
-
-        return [
-                pageInstance  : pageInstance,
-                mappingsOfPage: timeToCsMappings,
-                multiLineChart: multiLineChart as JSON
-        ]
+        return [pageInstance: pageInstance]
     }
 
     def edit() {
@@ -101,24 +74,7 @@ class PageController {
             return
         }
 
-        // Arrange chart data
-        List<Page> pages = new ArrayList<Page>()
-        pages.add(pageInstance)
-        MultiLineChart multiLineChart = createMultiLineChartData(pages)
-
-        MultiLineChart defaultTimeToCsMappingsChart = createMultiLineChartData(new ArrayList<Page>())
-
-        List<TimeToCsMapping> timeToCsMappings = timeToCsMappingCacheService.getMappingsFor(pageInstance)
-        List<DefaultTimeToCsMapping> defaultTimeToCsMappings = defaultTimeToCsMappingService.getAll().findAll {
-            it.loadTimeInMilliSecs <= 8000
-        }
-        return [
-                pageInstance         : pageInstance,
-                mappingsOfPage       : timeToCsMappings,
-                defaultMappings      : defaultTimeToCsMappings,
-                multiLineChart       : multiLineChart as JSON,
-                defaultMultiLineChart: defaultTimeToCsMappingsChart as JSON
-        ]
+        return [pageInstance: pageInstance]
     }
 
     def update() {
@@ -168,62 +124,5 @@ class PageController {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'page.label', default: 'Page'), params.id])
             redirect(action: "show", id: params.id)
         }
-    }
-
-    /**
-     * Sends error message with given error httpStatus and message as http response and breaks action (no subsequent
-     * action code is executed).
-     * @param response
-     * @param httpStatus
-     * @param message
-     */
-    private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, Integer httpStatus, String message) {
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status = httpStatus
-
-        Writer textOut = new OutputStreamWriter(response.getOutputStream())
-        textOut.write(message)
-        response.status = httpStatus
-
-        textOut.flush()
-        response.getOutputStream().flush()
-
-        render ''
-    }
-
-    /**
-     * Creates the data for a multiLineChart with a line for each page.
-     * If pages.size == 0 or pages == null it creates chart for defaultTimeToCsMapping
-     * @param pages a list of pages to create the chart for
-     * @return the MultiLineChart
-     */
-    private MultiLineChart createMultiLineChartData(List<Page> pages) {
-        String xLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.xAxisLabel", "ms")
-        String yLabel = i18nService.msg("de.iteratec.osm.d3Data.multiLineChart.yAxisLabel", "Kundenzufriedenheit in %")
-        MultiLineChart multiLineChart = new MultiLineChart(xLabel: xLabel, yLabel: yLabel)
-
-        if (pages != null && pages.size() > 0) {
-            pages.each { p ->
-                List<TimeToCsMapping> timeToCsMappings = timeToCsMappingCacheService.getMappingsFor(p)
-                MultiLineChartLineData line = new MultiLineChartLineData(name: p.name)
-                timeToCsMappings.each { line.addDataPoint(it.loadTimeInMilliSecs, it.customerSatisfaction) }
-                multiLineChart.addLine(line)
-            }
-        } else {
-            List<DefaultTimeToCsMapping> defaultTimeToCsMappings = defaultTimeToCsMappingService.getAll().findAll { it.loadTimeInMilliSecs <= 8000 }
-            Map<String, MultiLineChartLineData> map = new HashMap<>()
-
-            defaultTimeToCsMappings.each { entry ->
-                if (!map.containsKey(entry.name)) {
-                    map.put(entry.name, new MultiLineChartLineData(name: entry.name, id:entry.id))
-                }
-                map.get(entry.name).addDataPoint(entry.loadTimeInMilliSecs, entry.customerSatisfactionInPercent)
-            }
-
-            // sort and add
-            map.values().sort{a,b -> a.name.compareTo(b.name)}.each{e -> multiLineChart.addLine(e)}
-        }
-
-        return multiLineChart
     }
 }
