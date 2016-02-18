@@ -70,7 +70,8 @@ function PostLoaded(dataFromGsp){
                 left: '50%' // Left position relative to parent in px
             };
             var spinner = new Spinner(opts).spin(document.getElementById('spinner-position'));
-            var text = domainDeleteConfirmation(this.i18n_deletionConfirmMessage, this.idOfItemToDelete, link);
+            //TODO find out why this. doesn't work
+            var text = domainDeleteConfirmation(dataFromGsp.i18n_deletionConfirmMessage, dataFromGsp.idOfItemToDelete, link);
             spinner.stop();
             $('#DeleteModal').find('p').html(text);
         },1);

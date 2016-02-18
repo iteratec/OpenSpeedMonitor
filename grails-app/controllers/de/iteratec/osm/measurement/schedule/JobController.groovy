@@ -231,7 +231,8 @@ class JobController {
     }
 
     def delete() {
-        Job job = Job.get(params.id)
+        //TODO find out why we get the same id twice
+        Job job = Job.get(params.list("id")[0]as long)
 
         Promise p = task {
             jobService.deleteJob(job)
