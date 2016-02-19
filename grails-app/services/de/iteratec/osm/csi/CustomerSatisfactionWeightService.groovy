@@ -210,30 +210,34 @@ class CustomerSatisfactionWeightService {
 
     private persistBrowserConnectivityWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {
         Integer lineCounter = 0
-        changedCsiConfiguration.browserConnectivityWeights.clear()
+        Collection<BrowserConnectivityWeight> existingWeights = changedCsiConfiguration.browserConnectivityWeights
         csv.eachLine { line ->
             if (lineCounter > 0) {
                 List tokenized = line.tokenize(";")
                 Browser browser = Browser.findByName(tokenized[0])
                 ConnectivityProfile connectivityProfile = ConnectivityProfile.findByName(tokenized[1])
 
-                BrowserConnectivityWeight browserConnectivityWeight = BrowserConnectivityWeight.findByBrowserAndConnectivity(browser, connectivityProfile)
+                BrowserConnectivityWeight browserConnectivityWeight = existingWeights.find{it.browser == browser && it.connectivity == connectivityProfile}
 
                 if (tokenized[2]) {
                     double newWeight = Double.parseDouble(tokenized[2])
-                    if (!browserConnectivityWeight) {
+                    if (!browserConnectivityWeight) { // It's a new weight
                         log.info("save new browser-weight: browser=${tokenized[0]}, connectivity=${tokenized[1]}, weight=${newWeight}")
                         browserConnectivityWeight = new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: Double.valueOf(newWeight)).save(failOnError: true)
+                        existingWeights.add(browserConnectivityWeight)
+                    } else { // update existing
+                        browserConnectivityWeight.weight = Double.valueOf(newWeight)
                     }
-                    changedCsiConfiguration.browserConnectivityWeights.add(browserConnectivityWeight)
                 } else {
                     if (browserConnectivityWeight) {
-                        browserConnectivityWeight.delete(flush: true)
+                        changedCsiConfiguration.removeFromBrowserConnectivityWeights(browserConnectivityWeight)
+                        browserConnectivityWeight.delete()
                     }
                 }
             }
             lineCounter++
         }
+        changedCsiConfiguration.save(failOnError: true)
     }
 
     private persistPageWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {

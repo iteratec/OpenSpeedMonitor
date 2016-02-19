@@ -172,13 +172,15 @@ class CsiConfigIOControllerSpec extends Specification{
         String csvContent = FileUtils.readFileToString(new File("test/resources/CsiData/BROWSER_CONNECTIVITY_COMBINATION_weights.csv"))
         def multipartFile = new GrailsMockMultipartFile('browserConnectivityCsv', csvContent.bytes)
         request.addFile(multipartFile)
+        assert csiConfigurationEmpty.browserConnectivityWeights.size() == 0
 
         when:
         params.selectedCsiConfigurationId = csiConfigurationEmpty.ident()
         controller.uploadBrowserConnectivityWeights()
 
         then:
-        csiConfigurationEmpty.browserConnectivityWeights*.id.containsAll(csiConfigurationFilled.browserConnectivityWeights*.id)
+        csiConfigurationEmpty.browserConnectivityWeights.size() == 2
+        csiConfigurationEmpty.browserConnectivityWeights*.weight.containsAll([45d, 12d])
     }
 
     void "upload BrowserConnectivityWeights-CSV should not create BrowserConnectivityWeights if existing"() {
