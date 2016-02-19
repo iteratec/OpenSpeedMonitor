@@ -511,6 +511,8 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('chartTitle', this.chartTitle)
         viewModelToCopyTo.put('chartWidth', this.chartWidth)
         viewModelToCopyTo.put('chartHeight', this.chartHeight)
+        viewModelToCopyTo.put('showDataLabels', this.showDataLabels)
+        viewModelToCopyTo.put('showDataMarkers', this.showDataMarkers)
         viewModelToCopyTo.put('loadTimeMaximum', this.loadTimeMaximum)
         viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
     }

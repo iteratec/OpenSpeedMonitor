@@ -774,7 +774,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(36, dataUnderTest.size());
+		assertEquals(38, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -833,7 +833,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(34, dataUnderTest.size());
+		assertEquals(36, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -894,7 +894,7 @@ class EventResultDashboardControllerTests {
 		command.copyRequestDataToViewModelMap(dataUnderTest);
 
 		// Verification:
-		assertEquals(36, dataUnderTest.size());
+		assertEquals(38, dataUnderTest.size());
 
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
