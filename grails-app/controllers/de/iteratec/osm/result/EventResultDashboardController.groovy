@@ -553,8 +553,16 @@ class EventResultDashboardController {
             redirectWith303('showAll', params)
             return
         }
+        String filename = ""
+        List<JobGroup> selectedJobGroups = JobGroup.findAllByIdInList(modelToRender['selectedFolder'])
 
-        String filename = modelToRender['aggrGroupAndInterval'] + '_' + modelToRender['fromFormatted'] + '_to_' + modelToRender['toFormatted'] + '.csv';
+        selectedJobGroups.each { jobGroup ->
+            filename += jobGroup.name + '_'
+        }
+        if(modelToRender['selectedInterval'] != -1) {
+            filename += modelToRender['selectedInterval'] + 'm_'
+        }
+        filename += Double.valueOf(modelToRender['fromTimestampForHighChart']/1000L).longValue() + '_to_' + Double.valueOf(modelToRender['toTimestampForHighChart']/1000L).longValue() + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename);
         response.setContentType("text/csv;header=present;charset=UTF-8");
