@@ -49,9 +49,14 @@ class CsiSystemController {
         boolean jobGroupsWeightsCorrect = true
 
         identifiers.each {
-            JobGroup jobGroup = JobGroup.get(params[it].jobGroup)
-            String weightString = params[it].weight
-            if (weightString && weightString.isDouble() && jobGroup) {
+            def identifier = params[it]
+            JobGroup jobGroup
+            String weightString
+            if (identifier) {
+                jobGroup = JobGroup.get(identifier.jobGroup)
+                weightString = identifier.weight
+            }
+            if (jobGroup && weightString && weightString.isDouble()) {
                 Double weight = Double.parseDouble(weightString)
                 csiSystemInstance.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup, weight: weight))
             } else {
@@ -59,8 +64,14 @@ class CsiSystemController {
             }
         }
 
+        if (!jobGroupsWeightsCorrect) {
+            flash.error = message(code: 'de.iteratec.osm.csi.CsiSystem.weightError', default: "Gewichtungen muessen vom Typ Double sein")
+            render(view: "create", model: [csiSystemInstance: csiSystemInstance])
+            return
+        }
 
-        if (!jobGroupsWeightsCorrect || !csiSystemInstance.save(flush: true)) {
+
+        if (!csiSystemInstance.save(flush: true)) {
             render(view: "create", model: [csiSystemInstance: csiSystemInstance])
             return
         }
@@ -113,49 +124,34 @@ class CsiSystemController {
         csiSystemInstance.label = params.label
         List<String> identifiers = params.jobGroupWeightIdentifiers.tokenize(',')
 
+        csiSystemInstance.jobGroupWeights.collect().each {
+            csiSystemInstance.removeFromJobGroupWeights(it)
+            it.delete()
+        }
+
         boolean jobGroupsWeightsHaveErrors = false
 
-        List<Long> updatedJobGroupWeightIds = []
-
         identifiers.each {
-            if (params[it].deleted == "false") {
-                JobGroup jobGroup = JobGroup.get(params[it].jobGroup)
-                String weightString = params[it].weight
-
-                if (weightString && weightString.isDouble() && jobGroup) {
-                    Double weight = Double.parseDouble(weightString)
-                    JobGroupWeight oldJobGroupWeight = csiSystemInstance.jobGroupWeights.find {
-                        it.jobGroup == jobGroup
-                    }
-                    if (oldJobGroupWeight && oldJobGroupWeight.weight != weight) {
-                        // An existing jobGroupWeight gets a new weight
-                        oldJobGroupWeight.weight = weight
-                        updatedJobGroupWeightIds.add(oldJobGroupWeight.id)
-                    } else if (!oldJobGroupWeight) {
-                        JobGroupWeight newWeight = new JobGroupWeight(jobGroup: jobGroup, weight: weight)
-                        // A new jobGroupWeight is added
-                        csiSystemInstance.addToJobGroupWeights(newWeight)
-                        updatedJobGroupWeightIds.add(newWeight.id)
-                    } else {    // an existing jobGroupWeight that doesn't have to be updated
-                        updatedJobGroupWeightIds.add(oldJobGroupWeight.id)
-                    }
-                } else {
-                    jobGroupsWeightsHaveErrors = true
-                }
+            JobGroup jobGroup
+            String weightString
+            def identifier = params[it]
+            if (identifier) {
+                jobGroup = JobGroup.get(identifier.jobGroup)
+                weightString = identifier.weight
+            }
+            if (jobGroup && weightString && weightString.isDouble()) {
+                Double weight = Double.parseDouble(weightString)
+                JobGroupWeight newWeight = new JobGroupWeight(jobGroup: jobGroup, weight: weight)
+                csiSystemInstance.addToJobGroupWeights(newWeight)
+            } else {
+                jobGroupsWeightsHaveErrors = true
             }
         }
 
         if (jobGroupsWeightsHaveErrors) {
-            flash.message = message(code: 'de.iteratec.osm.csi.CsiSystem.weightError', default: "Gewichtungen muessen vom Typ Double sein")
+            flash.error = message(code: 'de.iteratec.osm.csi.CsiSystem.weightError', default: "Gewichtungen muessen vom Typ Double sein")
             render(view: "edit", model: [csiSystemInstance: csiSystemInstance])
             return
-        }
-
-        // Delete all JobGroupWeights wich are deprecated
-        List<JobGroupWeight> toDelete = csiSystemInstance.jobGroupWeights.findAll { w -> !updatedJobGroupWeightIds.contains(w.id) }
-        toDelete.each { d ->
-            csiSystemInstance.removeFromJobGroupWeights(d)
-            d.delete()
         }
 
         if (!csiSystemInstance.save(flush: true)) {
@@ -163,7 +159,8 @@ class CsiSystemController {
             return
         }
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), csiSystemInstance.id])
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'csiSystem.label', default:
+                'CsiSystem'), csiSystemInstance.id])
         redirect(action: "show", id: csiSystemInstance.id)
     }
 
@@ -176,6 +173,10 @@ class CsiSystemController {
         }
 
         try {
+            csiSystemInstance.jobGroupWeights.collect().each {
+                csiSystemInstance.removeFromJobGroupWeights(it)
+                it.delete()
+            }
             csiSystemInstance.delete(flush: true)
             flash.message = message(code: 'default.deleted.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
@@ -185,4 +186,5 @@ class CsiSystemController {
             redirect(action: "show", id: params.id)
         }
     }
+
 }

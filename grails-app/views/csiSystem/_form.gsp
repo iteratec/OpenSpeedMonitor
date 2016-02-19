@@ -16,39 +16,49 @@
 
     <div class="controls">
 
-        <g:render template="jobGroupWeights" model="['csiSystemInstance':csiSystemInstance]" />
+        <g:render template="jobGroupWeights" model="['csiSystemInstance': csiSystemInstance]"/>
 
     </div>
 </div>
 
 <asset:script type="text/javascript">
-    function checkAllJobGroupsAreDifferent() {
+    function validateInput() {
         var errorDiv = document.getElementById('errorDiv');
         errorDiv.style.display = 'none';
         var identifiers = ${'jobGroupWeightIdentifiers'}.value;
-        if(identifiers == "[]") {
-            return true
+
+        var emptyList = false;
+        if (identifiers == "[]") {
+            emptyList = true;
         } else {
-            identifiers=identifiers.split(",");
+            identifiers = identifiers.split(",");
+        }
+
+        if (emptyList || identifiers.length <= 1) {
+            errorDiv.style.display = 'block';
+            var errorMessage = "${message(code: 'de.iteratec.osm.csi.CsiSystem.notEnoughJobGroups', default: 'at least two jobGroups')}";
+            errorDiv.innerHTML = errorMessage;
+            return false;
         }
 
         var jobGroups = [];
-        for(var x = 0; x < identifiers.length; x++) {
+        for (var x = 0; x < identifiers.length; x++) {
             var selector = identifiers[x] + '.jobGroup';
             var jobGroup = document.getElementById(selector).value;
             jobGroups.push(jobGroup)
         }
 
-        var unique=jobGroups.filter(function(itm,i,jobGroups){
-            return i==jobGroups.indexOf(itm);
+        var unique = jobGroups.filter(function (itm, i, jobGroups) {
+            return i == jobGroups.indexOf(itm);
         });
 
         var allDifferent = unique.length == jobGroups.length;
 
 
-        if(!allDifferent) {
+        if (!allDifferent) {
             errorDiv.style.display = 'block';
-            errorDiv.innerText = "JobGroups muessen unterschiedlich sein";
+            var errorMessage = "${message(code: 'de.iteratec.osm.csi.CsiSystem.jobGroupsDifferent', default: 'unterschiedliche jobGruppen')}";
+            errorDiv.innerHTML = errorMessage;
         }
 
         return allDifferent;

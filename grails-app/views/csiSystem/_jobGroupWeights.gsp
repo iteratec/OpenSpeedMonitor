@@ -1,78 +1,65 @@
 <asset:script type="text/javascript">
-    var childCount = ${csiSystemInstance?.jobGroupWeights.size()} + 0;
+    var childCount = ${csiSystemInstance?.jobGroupWeights.size()} +0;
 
-    function addJobGroupWeight(){
+    function addJobGroupWeight() {
         var clone = $("#jobGroupWeights__clone").clone();
-        var htmlId = 'jobGroupWeights_'+childCount;
+        var htmlId = 'jobGroupWeights_' + childCount;
         var jobGroupWeightInput = clone.find("input[id$=number]");
 
         clone.find("input[id$=id]")
-                .attr('id',htmlId + '.id')
-                .attr('name',htmlId + '.id');
-        clone.find("input[id$=deleted]")
-                .attr('id',htmlId + '.deleted')
-                .attr('name',htmlId + '.deleted');
-        clone.find("input[id$=new]")
-                .attr('id',htmlId + '.new')
-                .attr('name',htmlId + '.new')
-                .attr('value', 'true');
+                .attr('id', htmlId + '.id')
+                .attr('name', htmlId + '.id');
         clone.find("select[id$=jobGroup]")
                 .attr('id', htmlId + '.jobGroup')
-                .attr('name',htmlId + '.jobGroup');
+                .attr('name', htmlId + '.jobGroup');
         clone.find("input[id$=weight]")
                 .attr('id', htmlId + '.weight')
-                .attr('name',htmlId +'.weight');
-        jobGroupWeightInput.attr('id',htmlId + '.number')
-                .attr('name',htmlId + '.number');
+                .attr('name', htmlId + '.weight');
+        jobGroupWeightInput.attr('id', htmlId + '.number')
+                .attr('name', htmlId + '.number');
         clone.find("select[id$=type]")
-                .attr('id',htmlId + '.type')
-                .attr('name',htmlId + '.type');
+                .attr('id', htmlId + '.type')
+                .attr('name', htmlId + '.type');
 
         clone.find("input[id$=removeButton]")
-                .on('click', function() {
+                .on('click', function () {
                     deleteJobGroupWeight(htmlId);
                 });
 
-        clone.attr('id', 'jobGroupWeights_'+childCount);
+        clone.attr('id', 'jobGroupWeights_' + childCount);
         $("#childList").append(clone);
         clone.show();
         jobGroupWeightInput.focus();
         childCount++;
-    ${'jobGroupWeightCount'}.value = childCount;
-        var identifiers = ${'jobGroupWeightIdentifiers'}.value;
-        if(identifiers == "[]") {
+        ${'jobGroupWeightCount'}.
+        value = childCount;
+        var identifiers =
+        ${'jobGroupWeightIdentifiers'}.
+        value;
+        if (identifiers == "[]") {
             identifiers = JSON.parse(identifiers);
         } else {
-            identifiers=identifiers.split(",");
+            identifiers = identifiers.split(",");
         }
         identifiers.push(htmlId);
-    ${'jobGroupWeightIdentifiers'}.value = identifiers;
+        ${'jobGroupWeightIdentifiers'}.
+        value = identifiers;
     }
 
     function deleteJobGroupWeight(identifier) {
-        //check if this is still not persisted
-        var newValue = $('#' + identifier + "\\.new").attr('value');
-
-        //if it is new then i can safely remove from dom
-        if (newValue == 'true') {
-            $('#' + identifier).remove();
-            var identifiers = ${'jobGroupWeightIdentifiers'}.value;
-            if(identifiers == "[]") {
-                identifiers = JSON.parse(identifiers);
-            } else {
-                    identifiers=identifiers.split(",");
-            }
-            var index = identifiers.indexOf(identifier);
-            identifiers.splice(index, 1);
-            ${'jobGroupWeightIdentifiers'}.value = identifiers;
-
+        $('#' + identifier).remove();
+        var identifiers =
+        ${'jobGroupWeightIdentifiers'}.
+        value;
+        if (identifiers == "[]") {
+            identifiers = JSON.parse(identifiers);
         } else {
-            //set the deletedFlag to true
-            var delInput = $('#' + identifier + "\\.deleted");
-            delInput.attr('value', 'true');
-            //hide the div
-            $('#' + identifier).hide();
+            identifiers = identifiers.split(",");
         }
+        var index = identifiers.indexOf(identifier);
+        identifiers.splice(index, 1);
+        ${'jobGroupWeightIdentifiers'}.
+        value = identifiers;
     }
 
 </asset:script>
@@ -96,8 +83,6 @@
             document.getElementById(selector).onclick = function() {
                     deleteJobGroupWeight('jobGroupWeights_${i}');
             }
-            %{--${selector}.on('click, function() {--}%
-            %{--});--}%
         </asset:script>
     </g:each>
 </div>

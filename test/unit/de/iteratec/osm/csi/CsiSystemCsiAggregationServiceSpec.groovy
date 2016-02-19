@@ -61,7 +61,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     JobGroup jobGroup1, jobGroup2, jobGroup3
     Job job1
     ConnectivityProfile conn1
-    CsiSystem csiSystem1, csiSystem2, csiSystemWith3
+    CsiSystem csiSystem1, csiSystem2
 
     AggregatorType shop, csiSystemAggregator
 
@@ -120,17 +120,14 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         createCsiAggregations()
         List<CsiSystem> groups1 = [csiSystem1]
         List<CsiSystem> groups2 = [csiSystem2]
-        List<CsiSystem> groupsOnly3 = [csiSystemWith3]
 
         when:
         List<CsiAggregation> mvs1 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups1)
         List<CsiAggregation> mvs2 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups2)
-        List<CsiAggregation> mvsOnly3 = serviceUnderTest.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsOnly3)
 
         then:
         mvs1.size() == 1
         mvs2.size() == 1
-        mvsOnly3.size() == 1
     }
 
     /**
@@ -341,16 +338,17 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
         browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
 
-        csiSystem1 = TestDataUtil.createCsiSystem("system1",[])
-        TestDataUtil.createJobGroupWeight(csiSystem1,jobGroup1,1.0)
-        TestDataUtil.createJobGroupWeight(csiSystem1,jobGroup2,1.0)
-        TestDataUtil.createJobGroupWeight(csiSystem1,jobGroup3,1.0)
-        csiSystem2 = TestDataUtil.createCsiSystem("system2",[])
-        TestDataUtil.createJobGroupWeight(csiSystem2,jobGroup1,1.0)
-        TestDataUtil.createJobGroupWeight(csiSystem2,jobGroup2,2.0)
-        TestDataUtil.createJobGroupWeight(csiSystem2,jobGroup3,3.0)
-        csiSystemWith3 = TestDataUtil.createCsiSystem("system3",[])
-        TestDataUtil.createJobGroupWeight(csiSystemWith3,jobGroup3,3.0)
+        csiSystem1 = new CsiSystem(label: "system1")
+        csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0, csiSystem: csiSystem1))
+        csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 1.0, csiSystem: csiSystem1))
+        csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup3, weight: 1.0, csiSystem: csiSystem1))
+        csiSystem1.save(failOnError: true)
+
+        csiSystem2 = new CsiSystem(label: "system2")
+        csiSystem2.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0, csiSystem: csiSystem1))
+        csiSystem2.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 2.0, csiSystem: csiSystem1))
+        csiSystem2.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup3, weight: 3.0, csiSystem: csiSystem1))
+        csiSystem2.save(failOnError: true)
 
 
     }
@@ -359,7 +357,6 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         //with existing JobGroup:
         new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
         new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '3', csiSystem: csiSystemWith3, started: startDate.toDate()).save(validate: false)
         //not with existing CsiSystem:
         new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', csiSystem: null, started: startDate.toDate()).save(validate: false)
     }

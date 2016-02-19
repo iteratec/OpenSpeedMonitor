@@ -13,12 +13,17 @@
 
 <section id="edit-csiSystem" class="first">
 
-    <div class="alert alert-error" id="errorDiv" style="display: none"> </div>
-    <g:hasErrors bean="${csiSystemInstance}">
-        <div class="alert alert-error">
-            <g:renderErrors bean="${csiSystemInstance}" as="list"/>
-        </div>
-    </g:hasErrors>
+    <div class="alert alert-error" id="errorDiv" style="display: none" > </div>
+    <g:if test="${flash.error}">
+        <div class="alert alert-error" style="display: block">${flash.error}</div>
+    </g:if>
+    <g:else>
+        <g:hasErrors bean="${csiSystemInstance}">
+            <div class="alert alert-error">
+                <g:renderErrors bean="${csiSystemInstance}" as="list"/>
+            </div>
+        </g:hasErrors>
+    </g:else>
 
     <g:form method="post" class="form-horizontal">
         <g:hiddenField name="id" value="${csiSystemInstance?.id}"/>
@@ -30,7 +35,7 @@
         <div class="form-actions">
             <g:actionSubmit class="btn btn-primary" action="update"
                             value="${message(code: 'default.button.update.label', default: 'Update')}"
-                            onclick="return checkAllJobGroupsAreDifferent()"/>
+                            onclick="return validateInput()"/>
             <g:render template="/_common/modals/deleteSymbolLink"/>
             <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
         </div>
