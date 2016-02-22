@@ -4,13 +4,13 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="kickstart"/>
+    <meta name="layout" content="kickstart_osm"/>
     <g:set var="entityName" value="${message(code: 'csiSystem.label', default: 'CsiSystem')}"/>
     <title><g:message code="default.edit.label" args="[entityName]"/></title>
 </head>
 
 <body>
-
+<g:render template="/_menu/submenubarWithoutDelete"/>
 <section id="edit-csiSystem" class="first">
 
     <div class="alert alert-error" id="errorDiv" style="display: none" > </div>
@@ -36,7 +36,7 @@
             <g:actionSubmit class="btn btn-primary" action="update"
                             value="${message(code: 'default.button.update.label', default: 'Update')}"
                             onclick="return validateInput()"/>
-            <g:render template="/_common/modals/deleteSymbolLink"/>
+            <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink:createLink([controller: 'csiSystem', action: 'createDeleteConfirmationText', absolute: true])]"/>
             <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
         </div>
     </g:form>
@@ -44,7 +44,9 @@
 </section>
 
 <g:render template='jobGroupWeight' model="['jobGroupWeight': null, 'i': '_clone', 'hidden': true]"/>
+<script>
 
+</script>
 </body>
 
 </html>

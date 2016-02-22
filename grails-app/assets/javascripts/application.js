@@ -90,7 +90,25 @@ $.extend({
  * so you can override it for a specialised delete conformation for the given domain
  */
 function domainDeleteConfirmation(message,id,link){
-    return message;
+	var confirmMessage = "";
+	if(typeof link !== "undefined" && link !== null && link !== ""){
+		console.log("a");
+		jQuery.ajax({
+			type : 'GET',
+			url : link,
+			data: {id:id},
+			async:   false,
+			success: function(result) {
+				confirmMessage = message + "<br>" + result;
+			},
+			error: function(result) {
+				confirmMessage = message;
+			}});
+		return confirmMessage;
+	} else{
+		return message;
+	}
+
 }
 
 /**

@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.CsiAggregation
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -185,6 +186,33 @@ class CsiSystemController {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "show", id: params.id)
         }
+    }
+    /**
+     * Creates a text to represent which data will be gone if the job with the given id will be deleted
+     * @param id Job id
+     * @return
+     */
+    def createDeleteConfirmationText(int id) {
+        CsiSystem csiSystem1 = CsiSystem.get(id)
+        def query = CsiAggregation.where { csiSystem == csiSystem1 }
+        List<Date> dateList = CsiAggregation.createCriteria().get {
+            eq("csiSystem", csiSystem1)
+            projections {
+                min "started"
+                max "started"
+            }
+        }
+        Date minDate
+        Date maxDate
+        if (dateList.size() > 1) {
+            minDate = dateList[0]
+            maxDate = dateList[1]
+        }
+        int count = query.count()
+
+        String first = minDate ? "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.firstResult", default: "Date of first result")}: ${minDate.format('dd.MM.yy')} <br>" : ""
+        String last = maxDate ? "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.lastResult", default: "Date of last result")}: ${maxDate.format('dd.MM.yy')} <br>" : ""
+        render("$first$last" + "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.resultAmount", default: "Amount of results")}: ${count}")
     }
 
 }
