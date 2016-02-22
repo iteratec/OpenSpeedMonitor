@@ -183,10 +183,12 @@ class CustomerSatisfactionHighChartService {
 
 			if (getValue(eachCsiVal)) {
 
-				if(!tagToGraph.containsKey(eachCsiVal.getTag())) {
+				String valueTagToGraph = "" + eachCsiVal.getTag() + eachCsiVal.csiSystem ?: ""
+
+				if(!tagToGraph.containsKey(valueTagToGraph)) {
 					OsmChartGraph graph=new OsmChartGraph();
 					graph.setLabel(getMapLabel(eachCsiVal, csiType));
-					tagToGraph.put(eachCsiVal.getTag(), graph);
+					tagToGraph.put(valueTagToGraph, graph);
 					graphs.add(graph);
 				}
 
@@ -198,7 +200,7 @@ class CustomerSatisfactionHighChartService {
                         testingAgent: null
                 )
                 if(chartPoint.isValid())
-                    tagToGraph[eachCsiVal.getTag()].getPoints().add(chartPoint)
+                    tagToGraph[valueTagToGraph].getPoints().add(chartPoint)
 			}
 		}
 
