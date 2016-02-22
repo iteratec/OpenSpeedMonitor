@@ -211,17 +211,17 @@ class CsiDashboardController {
         def userspecificCSIDashboardInstance = UserspecificCsiDashboard.get(params.id)
         if (!userspecificCSIDashboardInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-            redirect(action: "list")
+            redirect(action: "showAll")
             return
         }
 
         try {
             userspecificCSIDashboardInstance.delete(flush: true)
             flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-            redirect(action: "list")
+            redirect(action: "showAll")
         } catch (DataIntegrityViolationException e) {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-            redirect(action: "show", id: params.id)
+            redirect(action: "showAll", id: params.id)
         }
 
         redirectWith303('showAll')
