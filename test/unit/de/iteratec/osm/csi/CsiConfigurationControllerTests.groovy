@@ -20,6 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -49,6 +50,7 @@ class CsiConfigurationControllerTests extends Specification{
         config2.save(failOnError: true)
 
         I18nService i18nService = Mock(I18nService)
+        controller.performanceLoggingService = new PerformanceLoggingService()
         controller.i18nService = i18nService
     }
 
