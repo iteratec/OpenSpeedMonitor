@@ -306,6 +306,8 @@ class CsiConfigurationController {
 
     def removePageMapping(){
 
+        response.setContentType('text/plain;charset=UTF-8')
+
         Page pageToRemoveMappingFrom = Page.findByName(params.pageName)
         CsiConfiguration csiConfigurationToRemovePageMappingFrom = CsiConfiguration.get(params.csiConfId)
 
@@ -355,7 +357,7 @@ class CsiConfigurationController {
                 "Removed ${toDelete.size()} Mappings of page ${pageToRemoveMappingFrom.name} from CsiConfiguration ${csiConfigurationToRemovePageMappingFrom.label}.",
                 [toDelete.size(), pageToRemoveMappingFrom.name, csiConfigurationToRemovePageMappingFrom.label]
         )
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "render mappings", PerformanceLoggingService.IndentationDepth.ONE){
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "render mappings", PerformanceLoggingService.IndentationDepth.ONE) {
             render successMessage
         }
 

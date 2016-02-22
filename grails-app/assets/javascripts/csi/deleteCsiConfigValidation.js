@@ -7,7 +7,7 @@ function validatedDeletion() {
     var deletingAllowed = false;
     $("#errorDeletingCsiConfiguration").hide();
 
-    var deleteConfirmationMsg = POSTLOADED.i18n_deleteCsiConfigurationConfirmation;
+    var deleteConfirmationMsg = POSTLOADED.i18n_deleteCsiConfigurationConfirmation + ":\n\n" + actualCsiConfigurationLabel;
     var deleteWarning = POSTLOADED.i18n_deleteCsiConfigurationWarning;
 
     $.ajax({

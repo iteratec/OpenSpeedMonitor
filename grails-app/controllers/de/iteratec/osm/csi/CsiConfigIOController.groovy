@@ -173,8 +173,8 @@ class CsiConfigIOController {
         MultipartFile csv = request.getFile('defaultTimeToCsMappingCsv')
         customerSatisfactionWeightService.persistNewDefaultMapping(csv.inputStream)
 
-        redirect(controller: 'CsiDashboard',
-                action: 'weights')
+        redirect(controller: 'CsiConfiguration',
+                action: 'configurations')
     }
 
     def getNamesOfDefaultCsiMappings() {

@@ -171,7 +171,7 @@
         </blockquote>
     </div>
 
-    <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner"></div>
+    <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner-25"></div>
     %{--dropdown button----------------------------------------------}%
     <div class="span2 offset1">
 
@@ -201,16 +201,14 @@
                         </li>
                     </sec:ifAnyGranted>
 
-                %{--submenu to show other configurations----------------------------}%
-                    <g:if test="${csiConfigurations.size() > 1}">
-                        <li class="dropdown-submenu">
-                            <a tabindex="-1" href="#">
-                                <i class="fa fa-share-square-o"></i>&nbsp;<g:message
-                                    code="de.iteratec.osm.csi.configuration.messages.select-different" default="Switch to..."/>
-                            </a>
-                            <ul class="dropdown-menu" id="csiConfigurationSwitchMenu"></ul>
-                        </li>
-                    </g:if>
+                    %{--submenu to show other configurations----------------------------}%
+                    <li class="dropdown-submenu" id="otherConfigsSubmenu">
+                        <a tabindex="-1" href="#">
+                            <i class="fa fa-share-square-o"></i>&nbsp;<g:message
+                                code="de.iteratec.osm.csi.configuration.messages.select-different" default="Switch to..."/>
+                        </a>
+                        <ul class="dropdown-menu" id="csiConfigurationSwitchMenu"></ul>
+                    </li>
                 </ul>
             </div>
 
@@ -235,6 +233,7 @@
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
+    <asset:javascript src="csi/defaultMappingCsvValidator.js"/>
     <asset:script type="text/javascript">
 
         var registerEventHandlers = function () {
@@ -294,11 +293,14 @@
             } else {
                 $("#btn-csi-mapping").click();
             }
-        }
+        };
 
         var prepareConfigurationListAndCopy = function(){
             return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
-        }
+        };
+
+        var osm = {};
+        osm.actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
 
         var actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
         var actualCsiConfigurationLabel = '${selectedCsiConfiguration.label}';
@@ -306,21 +308,25 @@
 
         function refreshCsiConfigurationSwitchMenu() {
 
-            var listOfOtherCsiConfigurations = document.getElementById('csiConfigurationSwitchMenu');
-            listOfOtherCsiConfigurations.innerHTML = "";
-
-            allCsiConfigurations.forEach(function(csiConfig){
-                if(csiConfig.id != actualCsiConfigurationId){
-                    var anchor = document.createElement('a');
-                    anchor.addEventListener("click", function() {
-                        changeCsiConfiguration(csiConfig.id);
-                    });
-                    anchor.innerHTML = csiConfig.label;
-                    var li = document.createElement('li');
-                    li.appendChild(anchor);
-                    listOfOtherCsiConfigurations.appendChild(li);
-                }
-            });
+            if(allCsiConfigurations.length <= 1){
+                $('#otherConfigsSubmenu').hide();
+            }else {
+                var listOfOtherCsiConfigurations = document.getElementById('csiConfigurationSwitchMenu');
+                listOfOtherCsiConfigurations.innerHTML = "";
+                allCsiConfigurations.forEach(function(csiConfig){
+                    if(csiConfig.id != actualCsiConfigurationId){
+                        var anchor = document.createElement('a');
+                        anchor.addEventListener("click", function() {
+                            changeCsiConfiguration(csiConfig.id);
+                        });
+                        anchor.innerHTML = csiConfig.label;
+                        var li = document.createElement('li');
+                        li.appendChild(anchor);
+                        listOfOtherCsiConfigurations.appendChild(li);
+                    }
+                });
+                $('#otherConfigsSubmenu').show();
+            }
 
         }
 

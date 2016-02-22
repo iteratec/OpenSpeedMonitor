@@ -38,7 +38,6 @@
     </div>
     <g:if test="${!readOnly}">
         <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadBrowserConnectivityWeights', absolute: true)}')">
-                id="${selectedCsiConfiguration.ident()}">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
         </button>
 
@@ -335,7 +334,7 @@
                                     <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                                 </a>
                                 <button type="submit" class="btn" id="defaultMappingUploadButton"
-                                        onclick="showSpinner()">
+                                        onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);">
                                     <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
                                 </button>
                             </div>

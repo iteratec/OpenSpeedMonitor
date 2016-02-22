@@ -54,7 +54,6 @@ function copyCsiConfiguration(csiConfigurations) {
                 $('#uploadHourOfDayWeightsCsiConfigurationId').val(actualCsiConfigurationId);
 
                 refreshCsiConfigurationSwitchMenu();
-
                 runningSpinner.stop();
 
             }
