@@ -37,16 +37,16 @@
         </div>
     </div>
     <g:if test="${!readOnly}">
-        <g:link controller="csiConfigIO" action="downloadBrowserConnectivityWeights"
+        <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadBrowserConnectivityWeights', absolute: true)}')">
                 id="${selectedCsiConfiguration.ident()}">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-        </g:link>
+        </button>
 
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:uploadForm controller="csiConfigIO" action="uploadBrowserConnectivityWeights">
                 <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv"
                        style="display:none">
-                <input id="selectedCsiConfigurationId" type="text" name="selectedCsiConfigurationId"
+                <input id="uploadBrowserConnectivityWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
                        value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
@@ -76,13 +76,13 @@
         <g:message code="de.iteratec.isocsi.page_weight" default="Page"/>
     </h3>
     <g:if test="${!readOnly}">
-        <g:link controller="csiConfigIO" action="downloadPageWeights" id="${selectedCsiConfiguration.ident()}">
+        <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadPageWeights', absolute: true)}')">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-        </g:link>
+        </button>
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:uploadForm controller="csiConfigIO" action="uploadPageWeights">
                 <input id="thePageCsvFile" type="file" name="pageCsv" style="display:none">
-                <input id="selectedCsiConfigurationId" type="text" name="selectedCsiConfigurationId"
+                <input id="uploadPageWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
                        value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
@@ -113,13 +113,13 @@
         <g:message code="de.iteratec.isocsi.hour_weight" default="Tageszeit"/>
     </h3>
     <g:if test="${!readOnly}">
-        <g:link controller="csiConfigIO" action="downloadHourOfDayWeights" id="${selectedCsiConfiguration.ident()}">
+        <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadHourOfDayWeights', absolute: true)}')">
             <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-        </g:link>
+        </button>
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
             <g:uploadForm controller="csiConfigIO" action="uploadHourOfDayWeights">
                 <input id="theHourOfDayCsvFile" type="file" name="hourOfDayCsv" style="display:none">
-                <input id="selectedCsiConfigurationId" type="text" name="selectedCsiConfigurationId"
+                <input id="uploadHourOfDayWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
                        value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
@@ -213,7 +213,7 @@
                             <button href="#" type="button" class="btn btn-primary" style="display: none;"
                                     id="removePageMapping"
                                     onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping', absolute: true)}',
-                                            ${selectedCsiConfiguration.ident()});">
+                                            actualCsiConfigurationId);">
                                 <g:message code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
                                            default="Remove Mapping"/>
                             </button>

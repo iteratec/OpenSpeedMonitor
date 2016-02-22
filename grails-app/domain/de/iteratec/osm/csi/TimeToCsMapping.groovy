@@ -32,6 +32,9 @@ class TimeToCsMapping implements RickshawTransformableCsMapping {
     }
 
     static TimeToCsMapping copyTimeToCsMapping(TimeToCsMapping source) {
+
+
+
         return new TimeToCsMapping(page: source.page, loadTimeInMilliSecs: source.loadTimeInMilliSecs,
                 customerSatisfaction: source.customerSatisfaction, mappingVersion: source.mappingVersion)
     }

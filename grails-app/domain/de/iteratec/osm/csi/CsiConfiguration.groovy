@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.util.PerformanceLoggingService
+
 
 class CsiConfiguration {
 
@@ -44,22 +46,58 @@ class CsiConfiguration {
 
     static CsiConfiguration copyConfiguration(CsiConfiguration source) {
         CsiConfiguration configToReturn = new CsiConfiguration()
-        configToReturn.with {
-            label = source.label
-            description = source.description
-            csiDay = CsiDay.copyDay(source.csiDay)
+
+        PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
+
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "creating CsiConfiguration with hour of day weights",
+                PerformanceLoggingService.IndentationDepth.TWO
+        ){
+            configToReturn.with {
+                label = source.label
+                description = source.description
+                csiDay = CsiDay.copyDay(source.csiDay)
+            }
+        }
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "copy browser weights",
+                PerformanceLoggingService.IndentationDepth.TWO
+        ){
+            source.browserConnectivityWeights.each {
+                configToReturn.addToBrowserConnectivityWeights(BrowserConnectivityWeight.copyBrowserConnectivityWeight(it))
+            }
         }
 
-        source.browserConnectivityWeights.each {
-            configToReturn.addToBrowserConnectivityWeights(BrowserConnectivityWeight.copyBrowserConnectivityWeight(it))
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "copy page weights",
+                PerformanceLoggingService.IndentationDepth.TWO
+        ){
+            source.pageWeights.each {
+                configToReturn.addToPageWeights(PageWeight.copyPageWeight(it))
+            }
         }
 
-        source.pageWeights.each {
-            configToReturn.addToPageWeights(PageWeight.copyPageWeight(it))
-        }
+//        configToReturn.save(failOnError: true)
 
-        source.timeToCsMappings.each {
-            configToReturn.addToTimeToCsMappings(TimeToCsMapping.copyTimeToCsMapping(it))
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "copy time to cs mappings",
+                PerformanceLoggingService.IndentationDepth.TWO
+        ){
+
+//            TimeToCsMapping.executeUpdate(
+//                    "update CsiConfiguration set timeToCsMappings=:sourceTimeToCsMappings where id=:newCsiConfId",
+//                    [newCsiConfId: configToReturn.id, sourceTimeToCsMappings: source.timeToCsMappings]
+////                    "insert into TimeToCsMapping(page, loadTimeInMilliSecs, customerSatisfaction, mappingVersion) select  from TimeToCsMapping where id in :sourceIds",
+////                    [sourceIds: source.timeToCsMappings*.ident()]
+//            )
+
+            source.timeToCsMappings.each {
+                configToReturn.addToTimeToCsMappings(TimeToCsMapping.copyTimeToCsMapping(it))
+            }
         }
 
         return configToReturn

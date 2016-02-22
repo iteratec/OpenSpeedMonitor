@@ -42,11 +42,15 @@ function PostLoaded(dataFromGsp){
     this.i18n_deletePageMappingProcessing = dataFromGsp.i18n_deletePageMappingProcessing;
     this.i18n_nameAlreadyExistMsg = dataFromGsp.i18n_nameAlreadyExistMsg;
     this.i18n_overwritingWarning = dataFromGsp.i18n_overwritingWarning;
+    this.i18n_deleteCsiConfigurationConfirmation = dataFromGsp.i18n_deleteCsiConfigurationConfirmation;
+    this.i18n_deleteCsiConfigurationWarning = dataFromGsp.i18n_deleteCsiConfigurationWarning;
+    this.i18n_showMsg = dataFromGsp.i18n_showMsg;
     this.link_getNamesOfDefaultMappings = dataFromGsp.link_getNamesOfDefaultMappings;
     this.link_validateDeletionOfCsiConfiguration = dataFromGsp.link_validateDeletionOfCsiConfiguration;
     this.link_getJobGroupsUsingCsiConfiguration = dataFromGsp.link_getJobGroupsUsingCsiConfiguration;
     this.link_CsiConfigurationSaveCopy = dataFromGsp.link_CsiConfigurationSaveCopy;
     this.link_CsiConfigurationConfigurations = dataFromGsp.link_CsiConfigurationConfigurations;
+    this.link_CsiConfigurationDeletion = dataFromGsp.link_CsiConfigurationDeletion;
     this.idOfItemToDelete = dataFromGsp.idOfItemToDelete;
 
     this.setDeleteConfirmationInformations = function(link){

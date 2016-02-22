@@ -60,7 +60,7 @@
             type: 'POST',
             url: '${createLink(controller: 'csiConfiguration', action: 'updateConfiguration', absolute: true)}',
             data: {
-                csiConfId: ${selectedCsiConfiguration.ident()},
+                csiConfId: actualCsiConfigurationId,
                 csiConfNewLabel: csiConfLabel,
                 csiConfNewDescription: csiConfDescription
             },

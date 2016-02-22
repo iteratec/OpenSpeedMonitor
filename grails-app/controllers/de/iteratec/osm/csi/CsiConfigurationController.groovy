@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.api.json.JSONLocationBox
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.d3Data.*
@@ -24,6 +25,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.Validateable
@@ -37,6 +39,7 @@ class CsiConfigurationController {
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
+    PerformanceLoggingService performanceLoggingService
 
     def configurations() {
         CsiConfiguration config
@@ -106,7 +109,7 @@ class CsiConfigurationController {
         }
 
         List csi_configurations = []
-        CsiConfiguration.list().each { csi_configurations << [it.id, it.label] }
+        CsiConfiguration.list().each { csi_configurations << ['id':it.id, 'label':it.label] }
 
         [errorMessagesCsi        : params.list('errorMessagesCsi'),
          showCsiWeights          : params.get('showCsiWeights') ?: false,
@@ -126,21 +129,56 @@ class CsiConfigurationController {
      * @return redirects to the configurations view showing the created copy
      */
     def saveCopy() {
-        if (CsiConfiguration.findByLabel(params.label)) {
-            throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
+
+        CsiConfiguration sourceConfig
+
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "Getting source CSI Configuration",
+                PerformanceLoggingService.IndentationDepth.ONE
+        ){
+            if (CsiConfiguration.findByLabel(params.label)) {
+                throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
+            }
+
+            sourceConfig = CsiConfiguration.findByLabel(params.sourceCsiConfigLabel)
+
+            if(!sourceConfig) {
+                throw new IllegalArgumentException("no csi configuration with name " + params.sourceCsiConfigLabel + " found")
+            }
         }
 
-        CsiConfiguration sourceConfig = CsiConfiguration.findByLabel(params.sourceCsiConfigLabel)
-
-        if(!sourceConfig) {
-            throw new IllegalArgumentException("no csi configuration with name " + params.sourceCsiConfigLabel + " found")
+        CsiConfiguration newCsiConfig
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "coppy CSI Configuration",
+                PerformanceLoggingService.IndentationDepth.ONE
+        ){
+            newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
         }
 
-        CsiConfiguration newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
-        newCsiConfig.label = params.label
-        newCsiConfig.save(failOnError: true, flush: true)
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "saave copieed CSI Configuration",
+                PerformanceLoggingService.IndentationDepth.ONE
+        ){
+            newCsiConfig.label = params.label
+            newCsiConfig.save(failOnError: true, flush: true)
+        }
 
-        redirect(action: 'configurations', params: [id: newCsiConfig.id])
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.DEBUG,
+                "redirect",
+                PerformanceLoggingService.IndentationDepth.ONE
+        ) {
+            List csi_configurations = []
+            CsiConfiguration.list().each { csi_configurations << ['id':it.id, 'label':it.label] }
+            render ([
+                'newCsiConfigLabel': newCsiConfig.label,
+                'newCsiConfigId': newCsiConfig.ident(),
+                'allCsiConfigurations': csi_configurations
+            ] as JSON)
+        }
     }
 
     /**
@@ -317,7 +355,9 @@ class CsiConfigurationController {
                 "Removed ${toDelete.size()} Mappings of page ${pageToRemoveMappingFrom.name} from CsiConfiguration ${csiConfigurationToRemovePageMappingFrom.label}.",
                 [toDelete.size(), pageToRemoveMappingFrom.name, csiConfigurationToRemovePageMappingFrom.label]
         )
-        render successMessage
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "render mappings", PerformanceLoggingService.IndentationDepth.ONE){
+            render successMessage
+        }
 
     }
 }
