@@ -188,9 +188,10 @@ class BootStrap {
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
+        createAggregatorTypeIfMissing(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
 
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
@@ -202,9 +203,10 @@ class BootStrap {
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
-        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
         createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
+        createAggregatorTypeIfMissing(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
 
         log.info "initChartData ends"
     }

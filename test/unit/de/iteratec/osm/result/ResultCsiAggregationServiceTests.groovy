@@ -157,7 +157,7 @@ class ResultCsiAggregationServiceTests {
 		loadTime=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_LOAD_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		startRender=new AggregatorType(name: AggregatorType.RESULT_UNCACHED_START_RENDER, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 
-		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT, measurandGroup: MeasurandGroup.PERCENTAGES).save(failOnError: true)
+		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, measurandGroup: MeasurandGroup.PERCENTAGES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_SPEED_INDEX, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		
@@ -171,7 +171,7 @@ class ResultCsiAggregationServiceTests {
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_LOAD_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_START_RENDER, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
-		new AggregatorType(name: AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT, measurandGroup: MeasurandGroup.PERCENTAGES).save(failOnError: true)
+		new AggregatorType(name: AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, measurandGroup: MeasurandGroup.PERCENTAGES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_SPEED_INDEX, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 		new AggregatorType(name: AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, measurandGroup: MeasurandGroup.LOAD_TIMES).save(failOnError: true)
 
@@ -433,18 +433,18 @@ class ResultCsiAggregationServiceTests {
 	void testGetAggregatorTypeCachedViewType_CACHED() {
 		/* Set up types to check */
 		List<String> cached=[
-			AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES,
-			AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS,
-			AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES,
-			AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME,
-			AggregatorType.RESULT_CACHED_DOM_TIME,
-			AggregatorType.RESULT_CACHED_FIRST_BYTE,
-			AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT,
-			AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME,
-			AggregatorType.RESULT_CACHED_LOAD_TIME,
-			AggregatorType.RESULT_CACHED_START_RENDER,
-			AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT,
-			AggregatorType.RESULT_CACHED_SPEED_INDEX,
+				AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES,
+				AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS,
+				AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES,
+				AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME,
+				AggregatorType.RESULT_CACHED_DOM_TIME,
+				AggregatorType.RESULT_CACHED_FIRST_BYTE,
+				AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT,
+				AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME,
+				AggregatorType.RESULT_CACHED_LOAD_TIME,
+				AggregatorType.RESULT_CACHED_START_RENDER,
+				AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT,
+				AggregatorType.RESULT_CACHED_SPEED_INDEX,
 				AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE
 		];
 
@@ -467,18 +467,18 @@ class ResultCsiAggregationServiceTests {
 	void testGetAggregatorTypeCachedViewType_UNCACHED() {
 		/* Set up types to check */
 		List<AggregatorType> uncached=[
-			AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES,
-			AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS,
-			AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES,
-			AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
-			AggregatorType.RESULT_UNCACHED_DOM_TIME,
-			AggregatorType.RESULT_UNCACHED_FIRST_BYTE,
-			AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT,
-			AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME,
-			AggregatorType.RESULT_UNCACHED_LOAD_TIME,
-			AggregatorType.RESULT_UNCACHED_START_RENDER,
-			AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT,
-			AggregatorType.RESULT_UNCACHED_SPEED_INDEX,
+				AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES,
+				AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS,
+				AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES,
+				AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME,
+				AggregatorType.RESULT_UNCACHED_DOM_TIME,
+				AggregatorType.RESULT_UNCACHED_FIRST_BYTE,
+				AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT,
+				AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME,
+				AggregatorType.RESULT_UNCACHED_LOAD_TIME,
+				AggregatorType.RESULT_UNCACHED_START_RENDER,
+				AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT,
+				AggregatorType.RESULT_UNCACHED_SPEED_INDEX,
 				AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE
 		];
 
