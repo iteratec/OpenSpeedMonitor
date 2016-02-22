@@ -32,15 +32,28 @@
     </div>
 </div>
 
-    <div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'groupType', 'error')}">
-        <label for="csiConfiguration" class="control-label"><g:message code="jobGroup.csi_configuration.label"
-                                                                       default="CSI Configuration"/></label>
-
-        <div class="controls" id="csiConfigurationSelection">
-            <g:select name="csiConfiguration" from="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
-                      keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
-                      value="${jobGroupInstance?.csiConfiguration?.label}"
-                      noSelection="${[null:g.message(code: 'jobGroup.csi_configuration.emptyLabel', default: 'Select one...')]}"/>
-        </div>
+<div class="control-group fieldcontain">
+    <label for="tags" class="control-label">
+        <g:message code="job.tags.label" default="tags" />
+    </label>
+    <div class="controls">
+        <ul name="tags" id="tags" style="margin-left:0px;" class="width_31em">
+            <g:each in="${jobGroupInstance?.tags}">
+                <li>${it}</li>
+            </g:each>
+        </ul>
     </div>
+</div>
+
+<div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'groupType', 'error')}">
+    <label for="csiConfiguration" class="control-label"><g:message code="jobGroup.csi_configuration.label"
+                                                                   default="CSI Configuration"/></label>
+
+    <div class="controls" id="csiConfigurationSelection">
+        <g:select name="csiConfiguration" from="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
+                  keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
+                  value="${jobGroupInstance?.csiConfiguration?.label}"
+                  noSelection="${[null:g.message(code: 'jobGroup.csi_configuration.emptyLabel', default: 'Select one...')]}"/>
+    </div>
+</div>
 
