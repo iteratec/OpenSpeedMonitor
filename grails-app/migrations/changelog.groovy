@@ -13,8 +13,7 @@ databaseChangeLog = {
     include file: '2015-12-23-DATA-convert-hoursOfDay-to-CsiDay.groovy'
     include file: '2015-12-23-SCHEME-added-csiConfiguration-to-jobGroup.groovy'
     include file: '2016-01-04-DATA-create-initial-browser-connectivity-weights.groovy'
-
-    include file: 'next-release-SCHEME.groovy'
-    include file: 'next-release-DATA.groovy'
+    include file: '2016-02-22-SCHEME-v3.4.0.groovy'
+    include file: '2016-02-22-DATA-v3.4.0.groovy'
 
 }
