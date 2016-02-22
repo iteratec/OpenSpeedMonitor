@@ -15,6 +15,7 @@
 * limitations under the License.
 */
 
+
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
@@ -30,8 +31,6 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -39,7 +38,6 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.I18nService
 import grails.util.Environment
 import org.joda.time.DateTime
-import de.iteratec.osm.csi.CsiTransformation
 
 class BootStrap {
 

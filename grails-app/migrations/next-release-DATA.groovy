@@ -200,4 +200,14 @@ databaseChangeLog = {
         ''')
     }
 
+    // ### rename AggregatorType ###
+    changeSet(author: "mmi", id: "1456135825000-1") {
+        grailsChange {
+            change {
+                AggregatorType.findByName("customerSatisfactionInPercentCached")?.setName(AggregatorType.RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT)
+                AggregatorType.findByName("customerSatisfactionInPercentUncached")?.setName(AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT)
+            }
+        }
+    }
+
 }
