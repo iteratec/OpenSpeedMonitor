@@ -194,10 +194,9 @@
                             </a>
                         </li>
                         <li>
-                            <a href="${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration',
-                                    params: [sourceCsiConfigLabel: selectedCsiConfiguration.label, label: selectedCsiConfiguration.label])}"
-                               onclick="return validateDeleting('${selectedCsiConfiguration.label}', '${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete.js', args: [selectedCsiConfiguration.label], default: 'delete?')}', '${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning.js', default: 'Overwriting')}')">
-                                <i class="fa fa-remove"></i>&nbsp;${message(code: 'de.iteratec.osm.csi.ui.delete.label', args: [selectedCsiConfiguration.label], default: 'delete')}
+                            <a href="#"
+                               onclick="return validatedDeletion()" id="deleteCsiConfigurationHref">
+                                <i class="fa fa-remove"></i>&nbsp;${message(code: 'de.iteratec.osm.csi.ui.delete.label', default: 'delete')}
                             </a>
                         </li>
                     </sec:ifAnyGranted>
@@ -207,21 +206,9 @@
                         <li class="dropdown-submenu">
                             <a tabindex="-1" href="#">
                                 <i class="fa fa-share-square-o"></i>&nbsp;<g:message
-                                    code="de.iteratec.osm.csi.configuration.messages.select-different" default="leave"/>
+                                    code="de.iteratec.osm.csi.configuration.messages.select-different" default="Switch to..."/>
                             </a>
-                            <ul class="dropdown-menu">
-                                <g:each in="${csiConfigurations.findAll { it[0] != selectedCsiConfiguration.ident() }}"
-                                        var="conf">
-                                    <li>
-                                        <a id="button_${conf}"
-                                           onclick="changeCsiConfiguration(this.getAttribute('value'))"
-                                           value="${conf[0]}">
-                                            <g:message code="de.iteratec.osm.csi.ui.show.label" args="${[conf[1]]}"
-                                                       default="show ${conf[1]}"/>
-                                        </a>
-                                    </li>
-                                </g:each>
-                            </ul>
+                            <ul class="dropdown-menu" id="csiConfigurationSwitchMenu"></ul>
                         </li>
                     </g:if>
                 </ul>
@@ -313,9 +300,31 @@
             return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
         }
 
-        $(document).ready(function () {
+        var actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
+        var actualCsiConfigurationLabel = '${selectedCsiConfiguration.label}';
+        var allCsiConfigurations = ${csiConfigurations as grails.converters.JSON};
 
-            actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
+        function refreshCsiConfigurationSwitchMenu() {
+
+            var listOfOtherCsiConfigurations = document.getElementById('csiConfigurationSwitchMenu');
+            listOfOtherCsiConfigurations.innerHTML = "";
+
+            allCsiConfigurations.forEach(function(csiConfig){
+                if(csiConfig.id != actualCsiConfigurationId){
+                    var anchor = document.createElement('a');
+                    anchor.addEventListener("click", function() {
+                        changeCsiConfiguration(csiConfig.id);
+                    });
+                    anchor.innerHTML = csiConfig.label;
+                    var li = document.createElement('li');
+                    li.appendChild(anchor);
+                    listOfOtherCsiConfigurations.appendChild(li);
+                }
+            });
+
+        }
+
+        $(document).ready(function () {
 
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
@@ -324,6 +333,7 @@
             registerEventHandlers();
 
             initializeSomeControls();
+            refreshCsiConfigurationSwitchMenu();
 
         });
         $( window ).load(function() {

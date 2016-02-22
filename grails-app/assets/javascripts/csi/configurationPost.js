@@ -22,10 +22,11 @@
 function changeCsiConfiguration(id) {
     window.location.href=POSTLOADED.link_CsiConfigurationConfigurations + "/" + id;
 }
-function validateDeleting(label, sureDeleteMessage, overwriteWarningMessage) {
-    $("#errorDeletingCsiConfiguration").hide();
 
-    return validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage);
+function callControllerActionWithId(controllerActionLink) {
+    controllerActionLink += "/" + actualCsiConfigurationId;
+
+    window.location.href=controllerActionLink;
 }
 function copyCsiConfiguration(csiConfigurations) {
 
@@ -42,10 +43,20 @@ function copyCsiConfiguration(csiConfigurations) {
                 spinnerParent.appendChild(runningSpinner.el);
             },
             complete: function(xhr, textStatus) {
-                document.open();
-                document.write(xhr.responseText);
-                document.close();
+
+                $('#headerCsiConfLabel').text(xhr.responseJSON.newCsiConfigLabel);
+                actualCsiConfigurationId = xhr.responseJSON.newCsiConfigId;
+                actualCsiConfigurationLabel = xhr.responseJSON.newCsiConfigLabel;
+                allCsiConfigurations = xhr.responseJSON.allCsiConfigurations;
+
+                $('#uploadBrowserConnectivityWeightsCsiConfigurationId').val(actualCsiConfigurationId);
+                $('#uploadPageWeightsCsiConfigurationId').val(actualCsiConfigurationId);
+                $('#uploadHourOfDayWeightsCsiConfigurationId').val(actualCsiConfigurationId);
+
+                refreshCsiConfigurationSwitchMenu();
+
                 runningSpinner.stop();
+
             }
         })
     }

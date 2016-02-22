@@ -2,8 +2,13 @@
  * You are allowed to delete a csi configuration only if
  *  there is at least one other csiConfiguration left after deleting
  */
-function validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage) {
+function validatedDeletion() {
+
     var deletingAllowed = false;
+    $("#errorDeletingCsiConfiguration").hide();
+
+    var deleteConfirmationMsg = POSTLOADED.i18n_deleteCsiConfigurationConfirmation;
+    var deleteWarning = POSTLOADED.i18n_deleteCsiConfigurationWarning;
 
     $.ajax({
         type: 'POST',
@@ -20,7 +25,7 @@ function validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage) {
                 window.scrollTo(0,0);
                 deletingAllowed = false;
             } else {
-                deletingAllowed = getUserConfirmation(label, sureDeleteMessage, overwriteWarningMessage);
+                deletingAllowed = getUserConfirmation(actualCsiConfigurationLabel, deleteConfirmationMsg, deleteWarning);
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -31,7 +36,16 @@ function validatedDeletion(label, sureDeleteMessage, overwriteWarningMessage) {
         }
     });
 
+    if (deletingAllowed){
+        setDeletionLinkHref()
+    }
     return deletingAllowed;
+}
+
+function setDeletionLinkHref(){
+    var linkDeletion = POSTLOADED.link_CsiConfigurationDeletion;
+    var params = $.param( { label:actualCsiConfigurationLabel } );
+    $('#deleteCsiConfigurationHref').attr('href',linkDeletion + '?' + params);
 }
 
 /**
