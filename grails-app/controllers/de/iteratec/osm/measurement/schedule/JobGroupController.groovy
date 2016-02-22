@@ -152,6 +152,8 @@ class JobGroupController {
         if (csiConfigLabel != null) {
             CsiConfiguration config = CsiConfiguration.findByLabel(csiConfigLabel)
             jobGroupInstance.csiConfiguration = config
+        } else {
+            jobGroupInstance.csiConfiguration = null
         }
 
         jobGroupInstance.properties = params

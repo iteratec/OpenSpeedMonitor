@@ -135,7 +135,8 @@
     .tooltipTextContainer {
         opacity: 0.5;
     }
-    #defaultMultilineGraphButtonLine{
+
+    #defaultMultilineGraphButtonLine {
         margin-bottom: 30px;
     }
     </style>
@@ -150,6 +151,7 @@
     <strong>
         <g:message code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/>
     </strong>
+
     <p id="deletingCsiConfiguratioinErrors"></p>
 </div>
 
@@ -173,16 +175,17 @@
     %{--dropdown button----------------------------------------------}%
     <div class="span2 offset1">
 
-        <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size()>1}">
+        <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
 
             <div class="btn-group pull-left">
                 <button class="btn btn-small btn-info dropdown-toggle text-right" data-toggle="dropdown">
-                    <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration" default="This Configuration..."></g:message>
+                    <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration"
+                               default="This Configuration..."></g:message>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
 
-                    %{--features for actual configuration----------------------------}%
+                %{--features for actual configuration----------------------------}%
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
                         <li>
                             <a href="#"
@@ -193,26 +196,28 @@
                         <li>
                             <a href="${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration',
                                     params: [sourceCsiConfigLabel: selectedCsiConfiguration.label, label: selectedCsiConfiguration.label])}"
-                               onclick="return validateDeleting('${selectedCsiConfiguration.label}','${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete.js', args: [selectedCsiConfiguration.label], default: 'delete?')}','${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning.js', default: 'Overwriting')}')">
+                               onclick="return validateDeleting('${selectedCsiConfiguration.label}', '${message(code: 'de.iteratec.osm.csiConfiguration.sureDelete.js', args: [selectedCsiConfiguration.label], default: 'delete?')}', '${message(code: 'de.iteratec.osm.csiConfiguration.overwriteWarning.js', default: 'Overwriting')}')">
                                 <i class="fa fa-remove"></i>&nbsp;${message(code: 'de.iteratec.osm.csi.ui.delete.label', args: [selectedCsiConfiguration.label], default: 'delete')}
                             </a>
                         </li>
                     </sec:ifAnyGranted>
 
-                    %{--submenu to show other configurations----------------------------}%
-                    <g:if test="${csiConfigurations.size()>1}">
+                %{--submenu to show other configurations----------------------------}%
+                    <g:if test="${csiConfigurations.size() > 1}">
                         <li class="dropdown-submenu">
                             <a tabindex="-1" href="#">
                                 <i class="fa fa-share-square-o"></i>&nbsp;<g:message
                                     code="de.iteratec.osm.csi.configuration.messages.select-different" default="leave"/>
                             </a>
                             <ul class="dropdown-menu">
-                                <g:each in="${csiConfigurations.findAll{it[0]!=selectedCsiConfiguration.ident()}}" var="conf">
+                                <g:each in="${csiConfigurations.findAll { it[0] != selectedCsiConfiguration.ident() }}"
+                                        var="conf">
                                     <li>
                                         <a id="button_${conf}"
-                                            onclick="changeCsiConfiguration(this.getAttribute('value'))"
-                                            value="${conf[0]}" >
-                                            <g:message code="de.iteratec.osm.csi.ui.show.label" args="${[conf[1]]}" default="show ${conf[1]}"/>
+                                           onclick="changeCsiConfiguration(this.getAttribute('value'))"
+                                           value="${conf[0]}">
+                                            <g:message code="de.iteratec.osm.csi.ui.show.label" args="${[conf[1]]}"
+                                                       default="show ${conf[1]}"/>
                                         </a>
                                     </li>
                                 </g:each>
@@ -228,10 +233,11 @@
 </div>
 
 %{--mapping and weights details----------------------------------------------}%
-<g:render template="confDetails" model="[readOnly               : false,
-                                           errorMessagesCsi       : errorMessagesCsi,
-                                           defaultTimeToCsMappings: defaultTimeToCsMappings,
-                                           selectedCsiConfiguration: selectedCsiConfiguration ]" />
+<g:render template="confDetails" model="[readOnly                : false,
+                                         showDefaultMappings     : true,
+                                         errorMessagesCsi        : errorMessagesCsi,
+                                         defaultTimeToCsMappings : defaultTimeToCsMappings,
+                                         selectedCsiConfiguration: selectedCsiConfiguration]"/>
 
 %{--initially invisible modal dialog to update csi configuratuion via ajax---------------}%
 <g:render template="/_common/modals/csi/updateCsiConfiguration"/>

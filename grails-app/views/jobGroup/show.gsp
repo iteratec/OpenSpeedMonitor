@@ -187,6 +187,7 @@
                     <g:if test="${jobGroupInstance.csiConfiguration}">
                         <g:set var="renderCsiConfiguration" value="true"></g:set>
                         <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
+                                                                                   showDefaultMappings    : false,
                                                                                    defaultTimeToCsMappings: defaultTimeToCsMappings]"/>
                     </g:if>
                 </td>
