@@ -178,6 +178,9 @@ class CsiSystemController {
                 csiSystemInstance.removeFromJobGroupWeights(it)
                 it.delete()
             }
+
+            CsiAggregation.findAllByCsiSystem(csiSystemInstance)*.delete()
+
             csiSystemInstance.delete(flush: true)
             flash.message = message(code: 'default.deleted.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
