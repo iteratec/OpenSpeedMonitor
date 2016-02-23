@@ -24,50 +24,84 @@
 //= require chosen/chosen.jquery.min.js
 //= require_self
 
-if (typeof jQuery !== 'undefined') {
-    (function($) {
-        $('#spinner').ajaxStart(function() {
-            $(this).fadeIn();
-        }).ajaxStop(function() {
-            $(this).fadeOut();
-        });
-    })(jQuery);
-}
+/**
+ * Global namespace for OpenSpeedMonitor application.
+ */
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
-function stringToBoolean(string) {
-	if(!string) return false;
-	switch(string.toLowerCase()){
-		case "true": case "yes": case "1": case "on": return true;
-		case "false": case "no": case "0": case "off": case null: return false;
-		default: return false;
-	}
-}
-function setCookie(key, value, path, shouldExpireInMillisecsFromNow) {
-	var expires = new Date();
-	expires.setTime(expires.getTime() + shouldExpireInMillisecsFromNow);
-	var cookieToSet = key + '=' + btoa(value)  + ';expires=' + expires.toUTCString() + ';path=' + path;
-	console.log(cookieToSet);
-	document.cookie = cookieToSet;
-}
-function getCookie(key) {
-	var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-	return keyValue ? atob(keyValue[2]) : null;
-}
-function setToLocalStorage(key, value) {
-	try{
-		localStorage.setItem(key, value)
-	}catch(e){
-		console.log('Can\'t write data to local storage: ' + e.message);
-	}
-}
-function getFromLocalStorage(key) {
-	try{
-		return localStorage.getItem(key);
-	}catch(e){
-		console.log('Can\'t read data from local storage: ' + e.message);
-	}
-	return null;
-}
+/**
+ * Global string utilities module.
+ * @returns {{
+ *      stringToBoolean: publicApi.stringToBoolean}}
+ */
+OpenSpeedMonitor.stringUtils = function(){
+    var publicApi = {
+        stringToBoolean: function(string) {
+
+            if (!string) {
+                return false;
+            }
+            switch (string.toLowerCase()) {
+                case "true":
+                case "yes":
+                case "1":
+                case "on":
+                    return true;
+                case "false":
+                case "no":
+                case "0":
+                case "off":
+                case null:
+                    return false;
+                default:
+                    return false;
+            }
+        }
+    };
+    return publicApi;
+};
+
+/**
+ * Global module providing functionalities for storage of data in the browser.
+ *
+ * @returns {{
+ *      setCookie: publicAPI.setCookie,
+ *      getCookie: publicAPI.getCookie,
+ *      setToLocalStorage: publicAPI.setToLocalStorage,
+ *      getFromLocalStorage: publicAPI.getFromLocalStorage}}
+ */
+OpenSpeedMonitor.clientSideStorageUtils = function(){
+    var publicAPI = {
+        setCookie: function(key, value, path, shouldExpireInMillisecsFromNow) {
+            var expires = new Date();
+            expires.setTime(expires.getTime() + shouldExpireInMillisecsFromNow);
+            var cookieToSet = key + '=' + btoa(value)  + ';expires=' + expires.toUTCString() + ';path=' + path;
+            console.log(cookieToSet);
+            document.cookie = cookieToSet;
+        },
+        getCookie: function(key) {
+            var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+            return keyValue ? atob(keyValue[2]) : null;
+        },
+        setToLocalStorage: function(key, value) {
+            try{
+                localStorage.setItem(key, value)
+            }catch(e){
+                console.log('Can\'t write data to local storage: ' + e.message);
+            }
+        },
+        getFromLocalStorage: function(key) {
+            try{
+                return localStorage.getItem(key);
+            }catch(e){
+                console.log('Can\'t read data from local storage: ' + e.message);
+            }
+            return null;
+        }
+    }
+    return publicAPI;
+};
+
 $.extend({
 	getUrlVars: function(){
 		var vars = [], hash;

@@ -44,9 +44,6 @@
 </section>
 
 <g:render template='jobGroupWeight' model="['jobGroupWeight': null, 'i': '_clone', 'hidden': true]"/>
-<script>
-
-</script>
 </body>
 
 </html>

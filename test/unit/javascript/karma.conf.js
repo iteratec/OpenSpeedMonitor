@@ -12,27 +12,22 @@ module.exports = function (config) {
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
         frameworks: ['jasmine'],
 
-
         // list of files / patterns to load in the browser
         files: [
-            'grails-app/assets/javascripts/csi/defaultMappingCsvValidator.js',
-            'test/unit/javascript/specs/**/*.js'
+            { pattern: 'target/plugins/jquery-*/web-app/js/jquery/jquery-*.js', watched: false },
+            { pattern: 'grails-app/assets/javascripts/application.js', watched: true },
+            { pattern: 'grails-app/assets/javascripts/csi/defaultMappingCsvValidator.js', watched: true },
+            { pattern: 'test/unit/javascript/specs/**/*.js', watched: true },
         ],
 
         // test results reporter to use
         // possible values: 'dots', 'progress'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress', 'junit'],
-        junitReporter: {
-            outputDir: 'target/test-reports/javascript',
-            outputFile: 'test-results.xml',
-            useBrowserName: false,
-            suite: ''
+        reporters: ['remote'],
+        remoteReporter: {
+            host: 'localhost',
+            port: '9889'
         },
-        //remoteReporter: {
-        //    host: 'localhost',
-        //    port: '9889'
-        //},
 
 
         // enable / disable colors in the output (reporters and logs)
@@ -45,7 +40,7 @@ module.exports = function (config) {
 
 
         // enable / disable watching file and executing tests whenever any file changes
-        autoWatch: false,
+        autoWatch: true,
 
 
         // start these browsers
@@ -64,8 +59,7 @@ module.exports = function (config) {
         plugins: [
             'karma-jasmine',
             'karma-phantomjs-launcher',
-            'karma-remote-reporter',
-            'karma-junit-reporter'
+            'karma-remote-reporter'
         ]
     })
 };
