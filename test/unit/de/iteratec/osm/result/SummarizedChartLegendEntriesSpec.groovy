@@ -667,7 +667,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES)
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS)
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT, MeasurandGroup.PERCENTAGES)
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES)
 
         TestDataUtil.createCsiAggregationIntervals()
         List<Browser> browsers = TestDataUtil.createBrowsersAndAliases()
