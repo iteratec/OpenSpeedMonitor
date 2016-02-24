@@ -84,8 +84,8 @@ class CsiConfigurationController {
         // arrange treemap data
         TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
         List<Page> csiConfigPages = config.pageWeights*.page
-        Page.list().each {page ->
-            if(!csiConfigPages.contains(page)) {
+        Page.list().each { page ->
+            if (!csiConfigPages.contains(page)) {
                 treemapData.addNode(new ChartEntry(name: page.name, weight: 0))
             }
         }
@@ -104,12 +104,16 @@ class CsiConfigurationController {
 
         // arrange page time to cs mapping chart data
         MultiLineChart pageTimeToCsMappingsChart
+        boolean pageMappingsExist = false;
         if (config.timeToCsMappings) {
             pageTimeToCsMappingsChart = timeToCsMappingService.getPageMappingsAsChart(10000, config)
+            pageMappingsExist = true;
+        } else {
+            pageTimeToCsMappingsChart = new MultiLineChart()
         }
 
         List csi_configurations = []
-        CsiConfiguration.list().each { csi_configurations << ['id':it.id, 'label':it.label] }
+        CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
 
         [errorMessagesCsi        : params.list('errorMessagesCsi'),
          showCsiWeights          : params.get('showCsiWeights') ?: false,
@@ -121,7 +125,8 @@ class CsiConfigurationController {
          barchartData            : barChartJSON,
          defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
          pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON,
-         pages                   : Page.list()]
+         pages                   : Page.list(),
+         pageMappingsExist       : pageMappingsExist]
     }
 
     /**
@@ -136,14 +141,14 @@ class CsiConfigurationController {
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "Getting source CSI Configuration",
                 PerformanceLoggingService.IndentationDepth.ONE
-        ){
+        ) {
             if (CsiConfiguration.findByLabel(params.label)) {
                 throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
             }
 
             sourceConfig = CsiConfiguration.findByLabel(params.sourceCsiConfigLabel)
 
-            if(!sourceConfig) {
+            if (!sourceConfig) {
                 throw new IllegalArgumentException("no csi configuration with name " + params.sourceCsiConfigLabel + " found")
             }
         }
@@ -153,7 +158,7 @@ class CsiConfigurationController {
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "coppy CSI Configuration",
                 PerformanceLoggingService.IndentationDepth.ONE
-        ){
+        ) {
             newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
         }
 
@@ -161,7 +166,7 @@ class CsiConfigurationController {
                 PerformanceLoggingService.LogLevel.DEBUG,
                 "saave copieed CSI Configuration",
                 PerformanceLoggingService.IndentationDepth.ONE
-        ){
+        ) {
             newCsiConfig.label = params.label
             newCsiConfig.save(failOnError: true, flush: true)
         }
@@ -172,11 +177,11 @@ class CsiConfigurationController {
                 PerformanceLoggingService.IndentationDepth.ONE
         ) {
             List csi_configurations = []
-            CsiConfiguration.list().each { csi_configurations << ['id':it.id, 'label':it.label] }
-            render ([
-                'newCsiConfigLabel': newCsiConfig.label,
-                'newCsiConfigId': newCsiConfig.ident(),
-                'allCsiConfigurations': csi_configurations
+            CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
+            render([
+                    'newCsiConfigLabel'   : newCsiConfig.label,
+                    'newCsiConfigId'      : newCsiConfig.ident(),
+                    'allCsiConfigurations': csi_configurations
             ] as JSON)
         }
     }
@@ -243,10 +248,10 @@ class CsiConfigurationController {
      */
     def deleteDefaultCsiMapping(String name) {
         defaultTimeToCsMappingService.deleteDefaultTimeToCsMapping(name)
-        redirect action:'configurations'
+        redirect action: 'configurations'
     }
 
-    def applyNewMappingToPage(ApplyMappingCommand applyMappingCommand){
+    def applyNewMappingToPage(ApplyMappingCommand applyMappingCommand) {
         defaultTimeToCsMappingService.copyDefaultMappingToPage(applyMappingCommand.getPage(),
                 applyMappingCommand.getDefaultMappingName(), applyMappingCommand.getCsiConfiguration())
         render ""
@@ -262,13 +267,13 @@ class CsiConfigurationController {
      *          New description to set.
      * @return Plain text response.
      */
-    def updateConfiguration(Long csiConfId, String csiConfNewLabel, String csiConfNewDescription){
+    def updateConfiguration(Long csiConfId, String csiConfNewLabel, String csiConfNewDescription) {
 
         response.setContentType('text/plain;charset=UTF-8')
 
         CsiConfiguration csiConf = CsiConfiguration.get(csiConfId)
 
-        if (csiConf == null){
+        if (csiConf == null) {
             response.status = 404
             render i18nService.msg(
                     'de.iteratec.osm.csi.configuration.update.error.wrong-id',
@@ -277,7 +282,7 @@ class CsiConfigurationController {
             )
             return null
         }
-        if (csiConfNewLabel == null){
+        if (csiConfNewLabel == null) {
             response.status = 400
             render i18nService.msg(
                     'de.iteratec.osm.csi.configuration.update.error.null-label',
@@ -285,7 +290,7 @@ class CsiConfigurationController {
             )
             return null
         }
-        if (csiConf.label != csiConfNewLabel && CsiConfiguration.findByLabel(csiConfNewLabel)){
+        if (csiConf.label != csiConfNewLabel && CsiConfiguration.findByLabel(csiConfNewLabel)) {
             response.status = 400
             render i18nService.msg(
                     'de.iteratec.osm.csi.configuration.update.error.label-already-exist',
@@ -304,14 +309,14 @@ class CsiConfigurationController {
 
     }
 
-    def removePageMapping(){
+    def removePageMapping() {
 
         response.setContentType('text/plain;charset=UTF-8')
 
         Page pageToRemoveMappingFrom = Page.findByName(params.pageName)
         CsiConfiguration csiConfigurationToRemovePageMappingFrom = CsiConfiguration.get(params.csiConfId)
 
-        if ( pageToRemoveMappingFrom == null ){
+        if (pageToRemoveMappingFrom == null) {
             response.status = 404
             render i18nService.msg(
                     'de.iteratec.osm.csi.configuration.remove-page-mapppings.page-doesnt-exist',
@@ -320,7 +325,7 @@ class CsiConfigurationController {
             )
             return null
         }
-        if ( csiConfigurationToRemovePageMappingFrom == null ){
+        if (csiConfigurationToRemovePageMappingFrom == null) {
             response.status = 404
             render i18nService.msg(
                     'de.iteratec.osm.csi.configuration.remove-page-mapppings.csiconf-doesnt-exist',
@@ -334,7 +339,7 @@ class CsiConfigurationController {
         toDelete.addAll(csiConfigurationToRemovePageMappingFrom.timeToCsMappings.findAll {
             it.page.ident() == pageToRemoveMappingFrom.ident()
         })
-        if ( toDelete.size() == 0 ){
+        if (toDelete.size() == 0) {
             response.status = 404
             render i18nService.msg(
                     'de.iteratec.osm.csi.configuration.remove-page-mapppings.csiconf-doesnt-has-mappings-for-page',
@@ -345,7 +350,7 @@ class CsiConfigurationController {
         }
 
         log.info("Delete ${toDelete.size()} Mappings...")
-        toDelete.each {mappingToDelete ->
+        toDelete.each { mappingToDelete ->
             csiConfigurationToRemovePageMappingFrom.removeFromTimeToCsMappings(mappingToDelete)
             mappingToDelete.delete()
         }
@@ -378,11 +383,11 @@ class ApplyMappingCommand {
         pageId(nullable: false, min: 1l)
     }
 
-   public Page getPage(){
-       return Page.findById(pageId)
-   }
+    public Page getPage() {
+        return Page.findById(pageId)
+    }
 
-    public CsiConfiguration getCsiConfiguration(){
+    public CsiConfiguration getCsiConfiguration() {
         return CsiConfiguration.findById(csiConfigurationId)
     }
 

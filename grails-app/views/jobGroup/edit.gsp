@@ -5,7 +5,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="kickstart" />
-	<title><g:message code="default.edit.label" args="[entityName]" /></title>
+	<title><g:message code="default.edit.label" args="[jobGroupInstance.name]" /></title>
 
     <asset:stylesheet src="tagit.css"/>
     <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" />

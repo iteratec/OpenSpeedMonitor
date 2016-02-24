@@ -188,7 +188,8 @@
                         <g:set var="renderCsiConfiguration" value="true"></g:set>
                         <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
                                                                                    showDefaultMappings    : false,
-                                                                                   defaultTimeToCsMappings: defaultTimeToCsMappings]"/>
+                                                                                   defaultTimeToCsMappings: defaultTimeToCsMappings,
+                                                                                   pageMappingsExist      : pageMappingsExist]"/>
                     </g:if>
                 </td>
             </tr>

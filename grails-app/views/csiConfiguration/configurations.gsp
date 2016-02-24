@@ -201,11 +201,12 @@
                         </li>
                     </sec:ifAnyGranted>
 
-                    %{--submenu to show other configurations----------------------------}%
+                %{--submenu to show other configurations----------------------------}%
                     <li class="dropdown-submenu" id="otherConfigsSubmenu">
                         <a tabindex="-1" href="#">
                             <i class="fa fa-share-square-o"></i>&nbsp;<g:message
-                                code="de.iteratec.osm.csi.configuration.messages.select-different" default="Switch to..."/>
+                                code="de.iteratec.osm.csi.configuration.messages.select-different"
+                                default="Switch to..."/>
                         </a>
                         <ul class="dropdown-menu" id="csiConfigurationSwitchMenu"></ul>
                     </li>
@@ -222,7 +223,8 @@
                                          showDefaultMappings     : true,
                                          errorMessagesCsi        : errorMessagesCsi,
                                          defaultTimeToCsMappings : defaultTimeToCsMappings,
-                                         selectedCsiConfiguration: selectedCsiConfiguration]"/>
+                                         selectedCsiConfiguration: selectedCsiConfiguration,
+                                         pageMappingsExist       : pageMappingsExist]"/>
 
 %{--initially invisible modal dialog to update csi configuratuion via ajax---------------}%
 <g:render template="/_common/modals/csi/updateCsiConfiguration"/>

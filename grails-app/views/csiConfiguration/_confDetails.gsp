@@ -195,7 +195,7 @@
             </span>
         </div>
     </div>
-    <g:if test="${pageTimeToCsMappings}">
+    <g:if test="${pageMappingsExist}">
         <div class="row">
             <div class="span12">
                 <g:render template="/chart/csi-mappings"
@@ -309,7 +309,7 @@
                       model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
             <g:if test="${!readOnly}">
                 <g:render template="/_common/modals/chooseCsiMapping"
-                          model="[defaultMultiLineChart: defaultTimeToCsMappings, pages: pages, pageData: pageTimeToCsMappings]"/>
+                          model="[defaultMultiLineChart: defaultTimeToCsMappings, pages: pages, pageData: pageTimeToCsMappings ?: '[]']"/>
             </g:if>
         </sec:ifAllGranted>
 

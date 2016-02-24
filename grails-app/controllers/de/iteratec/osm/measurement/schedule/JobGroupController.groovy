@@ -121,7 +121,8 @@ class JobGroupController {
                              barchartData            : barChartJSON,
                              defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
                              selectedCsiConfiguration: config,
-                             pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON]
+                             pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON,
+                             pageMappingsExist       : pageTimeToCsMappingsChart ? true : false]
         }
 
         modelToRender.put("jobGroupInstance", jobGroupInstance)
