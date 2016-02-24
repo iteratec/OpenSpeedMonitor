@@ -212,6 +212,9 @@ class UserspecificCsiDashboard {
     boolean showDataMarkers
     boolean showDataLabels
 
+    boolean csiTypeDocComplete
+    boolean csiTypeVisuallyComplete
+
     /**
      * toggle formatting rickshaw export to wide screen format
      */
@@ -303,6 +306,8 @@ class UserspecificCsiDashboard {
         loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
         showDataMarkers = cmd.showDataMarkers
         showDataLabels = cmd.showDataLabels
+        csiTypeDocComplete = cmd.csiTypeDocComplete
+        csiTypeVisuallyComplete = cmd.csiTypeVisuallyComplete
     }
 
     /**
@@ -413,6 +418,8 @@ class UserspecificCsiDashboard {
                 link += "&loadTimeMaximum=${board.loadTimeMaximum}"
                 link += "&showDataMarkers=${board.showDataMarkers}"
                 link += "&showDataLabels=${board.showDataLabels}"
+                link += "&csiTypeVisuallyComplete=${board.csiTypeVisuallyComplete}"
+                link += "&csiTypeDocComplete=${board.csiTypeDocComplete}"
                 result.add([dashboardName: board.dashboardName, link: link])
             }
         }

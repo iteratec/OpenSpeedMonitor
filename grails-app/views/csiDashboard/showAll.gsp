@@ -218,17 +218,19 @@
                     <legend>
                         <g:message code="csi.type.heading" default="CSI Type"/>
                     </legend>
-                </div>
-
                 <div class="span12">
                     <div class="control-group">
                         <div class="controls">
                             <label class="checkbox" for="csiTypeDocComplete">
-                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" checked/>
+                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if test="${csiTypeDocComplete}">
+                                    checked
+                                </g:if>/>
                                 ${message(code: "de.iteratec.isr.measurand.docCompleteTimeInMillisecs", default: "Doc Complete")}
                             </label>
                             <label class="checkbox" for="csiTypeVisuallyComplete">
-                                <input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete"/>
+                                <input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
+                                checked
+                                </g:if>/>
                                 ${message(code: "de.iteratec.isr.measurand.visuallyCompleteInMillisecs", default: "Visually Complete")}
                             </label>
                         </div>

@@ -514,6 +514,8 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('showDataMarkers', this.showDataMarkers)
         viewModelToCopyTo.put('loadTimeMaximum', this.loadTimeMaximum)
         viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
+        viewModelToCopyTo.put('csiTypeVisuallyComplete',this.csiTypeVisuallyComplete)
+        viewModelToCopyTo.put('csiTypeDocComplete',this.csiTypeDocComplete)
     }
 
     /**

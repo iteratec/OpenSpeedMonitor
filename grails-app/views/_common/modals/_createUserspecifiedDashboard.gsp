@@ -119,6 +119,8 @@
             objectData["loadTimeMinimum"] = $("#dia-y-axis-min").val();
             objectData["showDataMarkers"] = $("#to-enable-marker").is(':checked');
             objectData["showDataLabels"] = $("#to-enable-label").is(':checked');
+            objectData["csiTypeDocComplete"] = $("#csiTypeDocComplete").is(':checked');
+            objectData["csiTypeVisuallyComplete"] = $("#csiTypeVisuallyComplete").is(':checked');
 
             json_data = JSON.stringify(objectData);
 

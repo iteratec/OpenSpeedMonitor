@@ -758,7 +758,9 @@ class CsiDashboardController {
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
                 includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
-                chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers)
+                chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
+                showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
+                csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()

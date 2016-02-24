@@ -15,5 +15,6 @@ databaseChangeLog = {
     include file: '2016-01-04-DATA-create-initial-browser-connectivity-weights.groovy'
     include file: '2016-02-22-SCHEME-v340.groovy'
     include file: '2016-02-22-DATA-v340.groovy'
-
+	include file: '2016-02-24-SCHEME-v341.groovy'
+	include file: '2016-02-24-DATA-v341.groovy'
 }
