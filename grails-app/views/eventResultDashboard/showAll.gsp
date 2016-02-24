@@ -271,7 +271,7 @@
 
                                 <div class="span3">
                                     <h6><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES"
-                                                   default="Ladezeiten [s]"/></h6>
+                                                   default="Ladezeiten [ms]"/></h6>
 
                                     <div class="input-append">
                                         <label for="appendedInputBelowLoadTimes">

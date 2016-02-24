@@ -157,7 +157,7 @@ class RickshawHtmlCreater {
             def url = "undefined"
 			def csiAggregation = eachPoint.csiAggregation
 
-            if(measurandGroup == "LOAD_TIMES" || measurandGroup == "REQUEST_SIZES" ) {
+            if(measurandGroup == "REQUEST_SIZES" ) {
                 csiAggregation = csiAggregation / 1000;
             }
 
