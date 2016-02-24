@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
@@ -88,6 +89,7 @@ class CsiDashboardController {
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
     ConfigService configService
+    CustomDashboardService customDashboardService
 
     /**
      * The Grails engine to generate links.
@@ -739,16 +741,11 @@ class CsiDashboardController {
         // Parse data for command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
-        Collection<Long> selectedFolder = []
-        dashboardValues.selectedFolder.each { l -> selectedFolder.add(Long.parseLong(l)) }
-        Collection<Long> selectedPages = []
-        dashboardValues.selectedPages.each { l -> selectedPages.add(Long.parseLong(l)) }
-        Collection<Long> selectedMeasuredEventIds = []
-        dashboardValues.selectedMeasuredEventIds.each { l -> selectedMeasuredEventIds.add(Long.parseLong(l)) }
-        Collection<Long> selectedBrowsers = []
-        dashboardValues.selectedBrowsers.each { l -> selectedBrowsers.add(Long.parseLong(l)) }
-        Collection<Long> selectedLocations = []
-        dashboardValues.selectedLocations.each { l -> selectedLocations.add(Long.parseLong(l)) }
+        Collection<Long> selectedFolder =  customDashboardService.getValuesFromJSON(dashboardValues,"selectedFolder")
+        Collection<Long> selectedPages =  customDashboardService.getValuesFromJSON(dashboardValues,"selectedPages")
+        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues,"selectedMeasuredEventIds")
+        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues,"selectedBrowsers")
+        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues,"selectedLocations")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
         // Create command vor validation
