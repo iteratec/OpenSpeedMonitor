@@ -14,6 +14,7 @@ Installation
 Prerequisites
 ---------------------
 * Java runtime environment (JRE), version 7.
+    Java 8 is not supported, yet.
 * [optional, but recommended] Dedicated servlet container.
 
     Mainly tested with Apache Tomcat, version 7. Should run on most servlet containers. See [full list of supported Java EE containers][11] in grails documentation for further details.
@@ -54,6 +55,23 @@ or on Windows:
     ./grailsw.bat prod run-war
 
 See grails documentation for details on [grails run-war command][9].
+
+Configuration
+=====================
+Grails framework implements convention over configuration pattern. So a lot of configuration settings are preset with sensible defaults and you won't have to touch them ever. Default configuration files are located in `./grails-app/conf/`.
+
+Configuration settings you have to change from defaults should be located in an external configuration file. A sample for such an external config file can be found in `./grails-app/config/OpenSpeedMonitor-config.groovy.sample`. A copy of that file can be located in
+
+    ~/.grails/OpenSpeedMonitor-config.groovy
+
+Settings in that external config file will override defaults configured in `./grails-app/conf/` on startup.
+
+In develop mode there are two users created for testing purposes:
+
+* admin with password admin
+* root with password root
+
+If you're going to run OpenSpeedMonitor in prod-mode, you have to declare your admin and root in the external configuration file.
 
 Usage
 =====================
@@ -145,6 +163,7 @@ Trends in time of wpt results are available in _Measurement results_ section. Me
         * time to first byte
         * start render time
         * doc complete time
+        * visually complete time
         * dom time
         * fully loaded time
     * Count of requests
@@ -154,7 +173,8 @@ Trends in time of wpt results are available in _Measurement results_ section. Me
         * until doc complete
         * until fully loaded
     * Percentages
-        * customer satisfaction
+        * customer satisfaction for doc complete
+        * customer satisfaction for visually complete
     * Others
         * speed index
 
@@ -165,16 +185,6 @@ Usually different pages of your application are of greatest interest regarding p
 To take that fact into account OpenSpeedMonitor can translate load times of every test result into a percentage of customers who would be satisfied with that load time. To use that feature you will have to collect necessary mapping data for the translation of load times into percentage of satisfaction. This mapping should be specific for every page of your application. OpenSpeedMonitor comes without this page type based mapping.
 
 If you imported such mapping data, OpenSpeedMonitor provides possibility to calculate aggregated customer satisfaction indices for all the pages of your application and for the whole application altogether. Results factored in the calculation of the pages csi get weighted by browser and hour of day regarding their importance for your application. Results factored in the calculation of applications csi get weighted by pages regarding their importance for your application.
-
-Configuration
-=====================
-Grails framework implements convention over configuration pattern. So a lot of configuration settings are preset with sensible defaults and you won't have to touch them ever. Default configuration files are located in `./grails-app/conf/`.
-
-Configuration settings you have to change from defaults should be located in an external configuration file. A sample for such an external config file can be found in `./grails-app/config/OpenSpeedMonitor-config.groovy.sample`. A copy of that file can be located in
-
-    ~/.grails/OpenSpeedMonitor-config.groovy
-
-Settings in that external config file will override defaults configured in `./grails-app/conf/` on startup.
 
 
 License
@@ -191,16 +201,6 @@ As IDE you can use [Groovy/Grails Tool Suite][16] from SpringSource, which is an
 
 Although it works with an H2 in memory database out of the box it's highly recommended to develop and test with a relational database server like MySQL.
 
-Authors
-=====================
-
-* Nils Kuhn
-* David Rieger
-* Matthias Zeimer
-* Rüdiger Heins
-* Florian Pavkovic
-* Wilhelm Stephan
-
 [1]: http://webpagetest.org/    "WebPagetest"
 [2]: http://groovy.codehaus.org/    "groovy programming language"
 [3]: http://grails.org/ "grails"
@@ -208,10 +208,10 @@ Authors
 [5]: https://sites.google.com/a/webpagetest.org/docs/system-design/overview "system overview WebPagetest"
 [6]: https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis "rest api WebPagetest"
 [7]: https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting "Scripting DSL WebPagetest"
-[8]: http://grails.org/doc/latest/ref/Command%20Line/run-app.html "grails documentation: run-app"
-[9]: http://grails.org/doc/latest/ref/Command%20Line/run-war.html "grails documentation: run-war"
-[10]: http://grails.org/doc/latest/ref/Command%20Line/war.html "grails documentation: war"
-[11]: http://grails.org/doc/2.3.x/guide/gettingStarted.html#supportedJavaEEContainers "grails: supported servlet containers"
+[8]: http://grails.github.io/grails-doc/2.5.0/ref/Command%20Line/run-app.html "grails documentation: run-app"
+[9]: http://grails.github.io/grails-doc/2.5.0/ref/Command%20Line/run-war.html "grails documentation: run-war"
+[10]: http://grails.org/doc/2.5.0/ref/Command%20Line/war.html "grails documentation: war"
+[11]: http://grails.org/doc/2.5.0/guide/gettingStarted.html#supportedJavaEEContainers "grails: supported servlet containers"
 [12]: http://www.apache.org/licenses/LICENSE-2.0 "Apache License 2.0"
 [13]: https://www.debian.org/ "debian"
 [14]: https://github.com/WPO-Foundation/webpagetest/pull/151 "pull request multistep"
