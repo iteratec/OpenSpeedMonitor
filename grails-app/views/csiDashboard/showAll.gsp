@@ -216,22 +216,22 @@
             <div class="row">
                 <div class="span12">
                     <legend>
-                        <g:message code="csi.type.heading" default="CSI Type"/>
+                        <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
                     </legend>
                 <div class="span12">
                     <div class="control-group">
                         <div class="controls">
                             <label class="checkbox" for="csiTypeDocComplete">
-                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if test="${csiTypeDocComplete}">
+                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if test="${csiTypeDocComplete||(!csiTypeDocComplete&&!csiTypeVisuallyComplete)}">
                                     checked
                                 </g:if>/>
-                                ${message(code: "de.iteratec.isr.measurand.docCompleteTimeInMillisecs", default: "Doc Complete")}
+                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
                             </label>
                             <label class="checkbox" for="csiTypeVisuallyComplete">
                                 <input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
                                 checked
                                 </g:if>/>
-                                ${message(code: "de.iteratec.isr.measurand.visuallyCompleteInMillisecs", default: "Visually Complete")}
+                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
                             </label>
                         </div>
                     </div>
