@@ -20,6 +20,7 @@ if("${bamboo_jira_version}") {
   newVersion = "${bamboo_jira_version}"
 } else {
   println 'None release-version given from jira'
+  println '... increasing patch-number'
   patch++
   newVersion = "${major}.${minor}.${patch}"
 }
