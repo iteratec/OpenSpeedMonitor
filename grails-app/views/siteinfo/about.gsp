@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title><g:message code="default.about.title" args="[meta(name:'app.name')]"/></title>
+	<title><g:message code="de.iteratec.osm.about.label" default="about" locale="${lang}"/> ${meta(name:'app.name')}</title>
 	<meta name="layout" content="kickstart_osm" />
 </head>
 
