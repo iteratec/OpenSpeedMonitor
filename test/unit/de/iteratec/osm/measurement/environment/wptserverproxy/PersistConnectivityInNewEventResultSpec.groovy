@@ -33,8 +33,6 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -49,7 +47,7 @@ import spock.lang.Specification
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry, ConnectivityProfile])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, ConnectivityProfile])
 class PersistConnectivityInNewEventResultSpec extends Specification{
 
     public static final String PROXY_IDENTIFIER_WPT_SERVER = 'dev.server02.wpt.iteratec.de'

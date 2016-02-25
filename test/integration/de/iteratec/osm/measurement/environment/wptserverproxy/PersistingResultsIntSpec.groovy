@@ -29,7 +29,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.measurement.environment.Browser
@@ -88,9 +87,6 @@ class PersistingResultsIntSpec extends IntTestWithDBCleanup {
 		int cachedViews = 2
 		int expectedNumberOfResults = runs * events * cachedViews
 		assertThat(EventResult.list().size, is(expectedNumberOfResults))
-		
-		List<WebPerformanceWaterfall> waterfalls = WebPerformanceWaterfall.list()
-		assertThat(waterfalls.size(), is(0))
     }
 	
 	@Test

@@ -29,8 +29,6 @@ import de.iteratec.issc.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
@@ -48,7 +46,7 @@ import static org.junit.Assert.*
  * 
  */
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 class PersistingLocationsTests {
 
 	WebPageTestServer server1, server2

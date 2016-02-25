@@ -18,7 +18,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 
@@ -65,8 +64,8 @@ public enum CachedView {
  * </p>
  * 
  * <p>
- * For job-results in WPT-multistep this is the result of one page-load
- * with its waterfall-data. It is assigned to one and only one job-result 
+ * For job-results in WPT-multistep this is the result of one page-load.
+ * It is assigned to one and only one job-result
  * and grouped by a {@link MeasuredEvent}.
  * An event-result could be a cached (repeated view) or un-cached (first view)
  * execution (see {#cachedView}).
@@ -135,7 +134,6 @@ class EventResult implements CsiValue {
 	Date lastStatusUpdate
 	String validationState
 	String tag
-	WebPerformanceWaterfall webPerformanceWaterfall
 
 	// from JobResult 
 	Date jobResultDate
@@ -196,7 +194,6 @@ class EventResult implements CsiValue {
 		jobResultJobConfigId()
 
 		tag(nullable: true)
-		webPerformanceWaterfall(nullable: true)
 
         testAgent(nullable: true)
 
@@ -300,7 +297,7 @@ class EventResult implements CsiValue {
 
 	/**
 	 * <p>
-	 * Build up an URL to display details (and jump to Waterfall) of the given {@link EventResult}s.
+	 * Build up an URL to display details of the given {@link EventResult}s.
 	 * </p>
 	 * @param jobRun
 	 * 			The associated {@link JobResult} of the given {@link EventResult}s

@@ -27,7 +27,6 @@ import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.dao.EventResultDaoService
 
@@ -44,61 +43,6 @@ class DbCleanupService {
     PerformanceLoggingService performanceLoggingService
 
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-
-	/**
-	 * Deletes all {@link WebPerformanceWaterfall}s and associated {@link WaterfallEntry}s before date toDeleteBefore.
-	 * @param toDeleteBefore	All Waterfalls before this date get deleted. 
-	 */
-    void deleteWaterfallsBefore(Date toDeleteBefore) {
-		
-		log.info "Deleting all waterfalls before: ${toDeleteBefore}"
-		
-//		deleteWaterfallsBeforeViaHql(toDeleteBefore)
-//		deleteWaterfallsBeforeViaGormBatching(JobtoDeleteBefore)
-		
-		log.info "... DONE"
-    }
-	
-	/**
-	 * Uses HQL.
-	 * @param toDeleteBefore
-	 */
-	void deleteWaterfallsBeforeViaHql(Date toDeleteBefore){
-		//remove Waterfalls from EventResults
-		EventResult.executeUpdate("update EventResult res set res.webPerformanceWaterfall=:null " +
-			"where res.jobResultDate<:toDeleteBefore", [toDeleteBefore: toDeleteBefore])
-		//delete waterfalls
-		EventResult.executeUpdate("delete WebPerformanceWaterfall wf where wf.startDate<:toDeleteBefore",
-			[toDeleteBefore: toDeleteBefore])
-	}
-	/**
-	 * Uses gorm-batching.
-	 * @param toDeleteBefore
-	 * @see http://stackoverflow.com/questions/18848067/what-is-the-best-way-to-process-a-large-list-of-domain-objects
-	 */
-	void deleteWaterfallsBeforeViaGormBatching(Date toDeleteBefore){
-		def dc = new DetachedCriteria(WebPerformanceWaterfall).build{
-			lt 'startDate', toDeleteBefore
-		}
-		def count = dc.count()
-
-		// Optional:
-		// dc = dc.build{
-		//     projections { property('username') }
-		// }
-		
-		def batchSize = 50 // Hibernate Doc recommends 10..50
-		0.step(count, batchSize){ offset->
-			dc.list(offset:offset, max:batchSize).each{
-			   // doSmthWithTransaction(it)
-			}
-			//clear the first-level cache
-			//def hiberSession = sessionFactory.getCurrentSession()
-			//hiberSession.clear()
-			// or
-			WebPerformanceWaterfall.withSession { session -> session.clear() }
-		}
-	}
 
     /**
      * Deletes all {@link EventResult}s {@link JobResult}s {@link HttpArchive}s before date toDeleteBefore.

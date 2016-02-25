@@ -48,7 +48,6 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.detail.HarParserService
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -242,19 +241,7 @@ class LocationAndResultPersisterService implements iListener{
 	void persistResultsForAllTeststeps(JobResult jobRun, WptResultXml resultXml, Job job, String har){
 		
 		Integer testStepCount = resultXml.getTestStepCount()
-		
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap = [:]
-		//TODO: remove this block if detail data persistance is integrated via mongodb
-		/*
-		try {
-			if (testStepCount>0 && har) {
-				pageidToWaterfallMap = harParserService.getWaterfalls(har)
-			}
-			pageidToWaterfallMap = harParserService.removeWptMonitorSuffixAndPagenamePrefixFromEventnames(pageidToWaterfallMap)
-		} catch (Exception e) {
-			log.error("Failed to parse http-archive: ${har}\n${e.toString()}")
-		}
-		*/
+
 		log.debug("starting persistance of ${testStepCount} event results for test steps")
 		List<EventResult> resultsOfTeststep = []
 		testStepCount.times{nullBasedTeststepIndex ->
@@ -262,7 +249,7 @@ class LocationAndResultPersisterService implements iListener{
 			//TODO: possible to catch non median results at this position  and check if they should persist or not
 
             try{
-                resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
+                resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job))
             } catch (Exception e) {
                 log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
             }
@@ -272,7 +259,7 @@ class LocationAndResultPersisterService implements iListener{
 	}
 
 	protected List<EventResult> persistResultsOfOneTeststep(
-		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap){
+		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job){
 
 		log.debug('getting event name from xml result ...')
 		String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
@@ -292,12 +279,12 @@ class LocationAndResultPersisterService implements iListener{
 		resultXml.getRunCount().times {Integer runNumber ->
             if( resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex)) ) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, waterfallAnchor)
                 if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
             }
             if( resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex)) ) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, waterfallAnchor)
                 if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
             }
 		}
@@ -315,12 +302,11 @@ class LocationAndResultPersisterService implements iListener{
 	 * @return Persisted result. Null if the view node is empty, i.e. the test was a "first view only" and this is the repeated view node
 	 */
 	private EventResult persistSingleResult(
-		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, 
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor) {
+		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, String waterfallAnchor) {
 
 		EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
-        result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
+        result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, waterfallAnchor)
 
 		return result
 	}
@@ -336,11 +322,10 @@ class LocationAndResultPersisterService implements iListener{
 	 * @return
 	 */
 	protected EventResult persistResult(
-		JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, 
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
+		JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, String waterfallAnchor){
 
 		EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult()
-		return saveResult(result, jobRun, event, view, run, median, viewTag, pageidToWaterfallMap, waterfallAnchor)
+		return saveResult(result, jobRun, event, view, run, median, viewTag, waterfallAnchor)
 
 	}
 
@@ -365,16 +350,13 @@ class LocationAndResultPersisterService implements iListener{
      *          Whether or not the {@link EventResult} is a median result. Always true for tests with just one run.
      * @param viewTag
      *          Xml node with all the result data for the new {@link EventResult}.
-     * @param pageidToWaterfallMap
-     *          <code>Deprecated<code> map. Deprecated because waterfalls won't get persisted in relational db.
-     *          They will get persisted in mongodb in near future.
      * @param waterfallAnchor
      *          String to build webpagetest server link for this {@link EventResult} from.
      * @return  Saved {@link EventResult}.
      */
     @Transactional(noRollbackFor = [Exception])
 	protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run,Boolean median,
-			GPathResult viewTag, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
+			GPathResult viewTag, String waterfallAnchor){
 
 		log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
 		Integer docCompleteTime = viewTag.docTime.toInteger()
@@ -407,18 +389,6 @@ class LocationAndResultPersisterService implements iListener{
 		if(!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0 ){
 			result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
 		}
-		//TODO: remove this block if detail data persistance is integrated via mongodb
-		/*
-		WebPerformanceWaterfall waterfall = pageidToWaterfallMap[
-			harParserService.createPageIdFrom(
-				run, 
-				xmlResultVersion == WptXmlResultVersion.BEFORE_MULTISTEP ? null : step.name,
-				view
-			 )
-		]
-		result.webPerformanceWaterfall = waterfall?waterfall.save(failOnError: true):null
-		*/
-		result.webPerformanceWaterfall = null
 		try {
 			result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
 		} catch (MalformedURLException mue) {

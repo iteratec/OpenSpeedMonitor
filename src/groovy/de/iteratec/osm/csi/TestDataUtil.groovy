@@ -41,8 +41,6 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.CachedView
@@ -184,8 +182,6 @@ class TestDataUtil {
                 CsiDay.class,
                 EventResult.class,
                 JobResult.class,
-                WaterfallEntry.class,
-                WebPerformanceWaterfall.class,
                 Job.class,
                 Script.class,
                 JobGroup.class,
@@ -361,43 +357,6 @@ class TestDataUtil {
     static OsmConfiguration createOsmConfiguration(int detailDataStorageTimeInWeeks) {
         return new OsmConfiguration(
                 detailDataStorageTimeInWeeks: detailDataStorageTimeInWeeks
-        ).save(failOnError: true)
-    }
-
-    static WebPerformanceWaterfall createWebPerformanceWaterfall() {
-        return new WebPerformanceWaterfall(
-                url: '',
-                startDate: new Date(),
-                title: '',
-                numberOfWptRun: 1,
-                cachedView: CachedView.UNCACHED,
-                startRenderInMillisecs: 1,
-                docCompleteTimeInMillisecs: 1,
-                domTimeInMillisecs: 1,
-                fullyLoadedTimeInMillisecs: 1,
-        ).save(failOnError: true)
-    }
-
-    static WaterfallEntry createWaterfallEntry() {
-        return new WaterfallEntry(
-                httpStatus: 200,
-                path: '',
-                host: '',
-                mimeType: '',
-                startOffset: 0,
-                oneBasedIndexInWaterfall: 1,
-                dnsLookupTimeStartInMillisecs: 0,
-                initialConnectTimeStartInMillisecs: 0,
-                sslNegotationTimeStartInMillisecs: 0,
-                timeToFirstByteStartInMillisecs: 0,
-                downloadTimeStartInMillisecs: 0,
-                dnsLookupTimeEndInMillisecs: 0,
-                initialConnectTimeEndInMillisecs: 0,
-                sslNegotationTimeEndInMillisecs: 0,
-                timeToFirstByteEndInMillisecs: 0,
-                downloadTimeEndInMillisecs: 0,
-                downloadedBytes: 0,
-                uploadedBytes: 0,
         ).save(failOnError: true)
     }
 

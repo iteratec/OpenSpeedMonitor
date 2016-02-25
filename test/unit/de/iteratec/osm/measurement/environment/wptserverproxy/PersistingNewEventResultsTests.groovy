@@ -33,8 +33,6 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.detail.HarParserService
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -56,7 +54,7 @@ import static org.junit.Assert.*
  * TODO: This test is to complicated - make it simpler!
  */
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry, CsiConfiguration, TimeToCsMapping])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping])
 class PersistingNewEventResultsTests {
 	private static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
 
@@ -916,14 +914,6 @@ class PersistingNewEventResultsTests {
 	}
 	private void mockHarParserService(){
 		def harParserService = mockFor(HarParserService, true)
-		harParserService.demand.getWaterfalls(0..100) {
-			String har ->
-			return [:]	//not the concern of this test
-		}
-		harParserService.demand.removeWptMonitorSuffixAndPagenamePrefixFromEventnames(0..100) {
-			Map<String, WebPerformanceWaterfall> pageidToWaterfallMap ->
-			return [:]	//not the concern of this test
-		}
 		harParserService.demand.createPageIdFrom(0..100) {
 			Integer run, String eventName, CachedView cachedView ->
 			return 'page_1_eventName_0'
