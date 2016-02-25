@@ -136,7 +136,7 @@ class CustomerSatisfactionWeightService {
         List<Integer> hoursOfDay = []
         lines.each { line ->
             if (lineCounter != 0) {
-                def tokenized = line.tokenize(';')
+                List<String> tokenized = line.tokenize(';')
                 tokenized[0].isInteger() ? hoursOfDay.add(new Integer(tokenized[0])) : hoursOfDay.add(-1)
             }
             lineCounter++

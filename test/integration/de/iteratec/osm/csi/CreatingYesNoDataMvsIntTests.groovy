@@ -154,7 +154,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     }
 
     private static void createJobGroups() {
-        def csiGroupName = 'CSI'
+        String csiGroupName = 'CSI'
         JobGroup.findByName(csiGroupName) ?: new JobGroup(
                 name: csiGroupName,
                 groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
@@ -165,8 +165,8 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
         Location locationFf = Location.findByLabel('ffLocationLabel')
         Location locationIe = Location.findByLabel('ieLocationLabel')
         JobGroup jobGroup = JobGroup.findByName('CSI')
-        def pageHp = Page.findByName('HP')
-        def pageMes = Page.findByName('MES')
+        Page pageHp = Page.findByName('HP')
+        Page pageMes = Page.findByName('MES')
 
         Job testjob_HP = new Job(
                 label: 'testjob_HP',

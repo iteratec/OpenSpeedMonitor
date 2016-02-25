@@ -322,7 +322,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends Specification {
         def returnForGetDailyPagesByStartDate = [:].withDefault { [] }
         def returnForGetWeeklyJobGroupsByStartDate = [:].withDefault { [] }
         def returnForGetWeeklyPagesByStartDate = [:].withDefault { [] }
-        def page = new Page(id: 1)
+        Page page = new Page(id: 1)
         def hCsiAggregationsByCsiGroupPageCombination = [:].withDefault {[]}
         hCsiAggregationsByCsiGroupPageCombination.put(CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).started.toString(), CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndOutdated))
         def returnForCreateContainerFor = new CsiAggregationCachingContainer(csiGroupToCalcCsiAggregationFor: null,

@@ -143,10 +143,10 @@ class ShopCsiServiceTests {
 		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
 		JobGroup jobGroup2 = new JobGroup(name: "rawDataJobGroup", groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
 
-		def paramsWithCsiConfiguration = new MvQueryParams()
+		MvQueryParams paramsWithCsiConfiguration = new MvQueryParams()
 		paramsWithCsiConfiguration.jobGroupIds.add(jobGroup.getId())
 
-		def paramsWithoutCsiConfiguration = new MvQueryParams()
+		MvQueryParams paramsWithoutCsiConfiguration = new MvQueryParams()
 		paramsWithoutCsiConfiguration.jobGroupIds.add(jobGroup2.getId())
 
 		List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [

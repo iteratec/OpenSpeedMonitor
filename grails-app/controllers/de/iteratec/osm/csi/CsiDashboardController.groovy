@@ -42,6 +42,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -84,7 +85,7 @@ class CsiDashboardController {
     CsiAggregationUtilService csiAggregationUtilService
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
-    def springSecurityService
+    SpringSecurityService springSecurityService
     ConnectivityProfileDaoService connectivityProfileDaoService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
@@ -210,7 +211,7 @@ class CsiDashboardController {
      */
     Map<String, Object> delete() {
 
-        def userspecificCSIDashboardInstance = UserspecificCsiDashboard.get(params.id)
+        UserspecificCsiDashboard userspecificCSIDashboardInstance = UserspecificCsiDashboard.get(params.id)
         if (!userspecificCSIDashboardInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
             redirect(action: "showAll")
@@ -732,7 +733,7 @@ class CsiDashboardController {
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Check if dashboardName is unique
-        def dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
+        List<UserspecificCsiDashboard> dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
         if (dashboards) {
             response.sendError(302, 'dashboard by that name exists already')
             return null
@@ -749,7 +750,7 @@ class CsiDashboardController {
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
         // Create command vor validation
-        def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
                 toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,

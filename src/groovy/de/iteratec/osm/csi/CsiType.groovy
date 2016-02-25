@@ -7,7 +7,7 @@ enum CsiType {
         visually_complete, doc_complete
 
         public static List<CsiType> getCsiTypes(CsiDashboardShowAllCommand command) {
-           def csiTypes = []
+           List<CsiType> csiTypes = []
             if(command.csiTypeVisuallyComplete) csiTypes<< visually_complete
             if(command.csiTypeDocComplete) csiTypes<< doc_complete
             return csiTypes

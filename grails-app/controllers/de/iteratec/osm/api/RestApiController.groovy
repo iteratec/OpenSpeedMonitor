@@ -494,7 +494,7 @@ class RestApiController {
         Job job = Job.get(params.id)
         if (job == null) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
 
-        def jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
+        JsonSlurper jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
         String schedule = jsonSlurper.executionSchedule
         if (schedule == null) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
 
