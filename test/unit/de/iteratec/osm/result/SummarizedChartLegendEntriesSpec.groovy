@@ -17,17 +17,8 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
-import de.iteratec.osm.report.chart.OsmChartProcessingService
-import de.iteratec.osm.report.chart.OsmRickshawChart
-import de.iteratec.osm.util.I18nService
-
-import static de.iteratec.osm.util.Constants.*
-
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.HourOfDay
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
@@ -37,12 +28,9 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.OsmChartGraph
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -52,12 +40,14 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Specification
 
+import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
+
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(EventResultDashboardService)
-@Mock([Job, JobResult, MeasuredEvent, MeasuredValue, MeasuredValueInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile, HourOfDay])
+@Mock([Job, JobResult, MeasuredEvent, CsiAggregation, CsiAggregationInterval, Location, Browser, BrowserAlias, Page, JobGroup, AggregatorType, WebPageTestServer, EventResult, Script, ConnectivityProfile])
 class SummarizedChartLegendEntriesSpec extends Specification{
 
     EventResultDashboardService serviceUnderTest
@@ -119,7 +109,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
-                MeasuredValueInterval.RAW,
+                CsiAggregationInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
@@ -150,7 +140,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
-                MeasuredValueInterval.RAW,
+                CsiAggregationInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
@@ -181,7 +171,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
-                MeasuredValueInterval.RAW,
+                CsiAggregationInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
@@ -214,7 +204,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.toDate(),
                 RUN_DATE.plusHours(1).toDate(),
-                MeasuredValueInterval.RAW,
+                CsiAggregationInterval.RAW,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                 AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
@@ -251,11 +241,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.HOURLY,
+                CsiAggregationInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
-        TestDataUtil.createHoursOfDay()
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 then:
@@ -282,7 +271,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.HOURLY,
+                CsiAggregationInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
@@ -313,7 +302,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.HOURLY,
+                CsiAggregationInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
@@ -346,7 +335,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.HOURLY,
+                CsiAggregationInterval.HOURLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
@@ -383,11 +372,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.DAILY,
+                CsiAggregationInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
-        TestDataUtil.createHoursOfDay()
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 then:
@@ -414,7 +402,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.DAILY,
+                CsiAggregationInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS);
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
@@ -445,7 +433,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.DAILY,
+                CsiAggregationInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS
         );
@@ -479,7 +467,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.DAILY,
+                CsiAggregationInterval.DAILY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS
@@ -517,11 +505,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.WEEKLY,
+                CsiAggregationInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS);
-        TestDataUtil.createHoursOfDay()
         List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
                 then:
@@ -548,7 +535,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.WEEKLY,
+                CsiAggregationInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS
         )
@@ -579,7 +566,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.WEEKLY,
+                CsiAggregationInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME)],
                 QUERY_PARAMS
         )
@@ -613,7 +600,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         OsmRickshawChart chart = serviceUnderTest.getEventResultDashboardHighchartGraphs(
                 RUN_DATE.minusDays(7).toDate(),
                 RUN_DATE.plusDays(7).toDate(),
-                MeasuredValueInterval.WEEKLY,
+                CsiAggregationInterval.WEEKLY,
                 [AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME),
                  AggregatorType.findByName(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS)],
                 QUERY_PARAMS
@@ -652,14 +639,14 @@ class SummarizedChartLegendEntriesSpec extends Specification{
     }
 
     void prepareMocksCommonForAllTests() {
-        serviceUnderTest.resultMeasuredValueService = new ResultMeasuredValueService()
-        serviceUnderTest.resultMeasuredValueService.eventResultDaoService = new EventResultDaoService()
+        serviceUnderTest.resultCsiAggregationService = new ResultCsiAggregationService()
+        serviceUnderTest.resultCsiAggregationService.eventResultDaoService = new EventResultDaoService()
         MOCKER.mockLinkGenerator(serviceUnderTest, 'http://not-the-concern-of-this-test.org')
         serviceUnderTest.jobResultDaoService = new JobResultDaoService()
         MOCKER.mockI18nService(serviceUnderTest)
         MOCKER.mockPerformanceLoggingService(serviceUnderTest)
-        serviceUnderTest.measuredValueTagService = new MeasuredValueTagService()
-        serviceUnderTest.measuredValueUtilService = new MeasuredValueUtilService()
+        serviceUnderTest.csiAggregationTagService = new CsiAggregationTagService()
+        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService()
         serviceUnderTest.aggregatorTypeDaoService = new DefaultAggregatorTypeDaoService()
         serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
         serviceUnderTest.osmChartProcessingService.i18nService = [
@@ -680,9 +667,9 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES)
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS)
-        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT, MeasurandGroup.PERCENTAGES)
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES)
 
-        TestDataUtil.createMeasuredValueIntervals()
+        TestDataUtil.createCsiAggregationIntervals()
         List<Browser> browsers = TestDataUtil.createBrowsersAndAliases()
 
         WebPageTestServer server = TestDataUtil.createWebPageTestServer('server', 'proxyIdentifier', true, 'http://baseurl.org')

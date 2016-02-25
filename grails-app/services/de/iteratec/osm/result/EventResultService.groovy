@@ -323,9 +323,9 @@ class EventResultService {
 	 * To be relevant ...
 	 * <ul>
 	 * <li>customerSatisfactionInPercent of toProof has to be set</li>
-	 * <li>docCompleteTimeInMillisecs of toProof has to be set</li>
-	 * <li>docCompleteTimeInMillisecs of toProof has to be greater than minDocTimeInMillisecs</li>
-	 * <li>docCompleteTimeInMillisecs of toProof has to be smaller than maxDocTimeInMillisecs</li>
+	 * <li>loadTimeInMillisecs of toProof has to be set</li>
+	 * <li>loadTimeInMillisecs of toProof has to be greater than minDocTimeInMillisecs</li>
+	 * <li>loadTimeInMillisecs of toProof has to be smaller than maxDocTimeInMillisecs</li>
 	 * </ul> 
 	 * </p>
 	 * 
@@ -337,7 +337,7 @@ class EventResultService {
 	 */
 	@Deprecated
 	public Boolean isCsiRelevant(EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs){
-		return toProof.customerSatisfactionInPercent && toProof.docCompleteTimeInMillisecs &&
+		return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
 			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
 	}

@@ -2,6 +2,7 @@ package de.iteratec.osm.util
 
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventService
+import groovy.json.StringEscapeUtils
 
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -37,10 +38,12 @@ class AnnotationUtil {
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.S");
             Date date = dateFormat.parse("$item.eventDate");
             long unixTime = (long)date.getTime()/1000;
-            String description = item.description.replaceAll("(\r\n|\n)", "<br />");
-            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>$item.shortName:</strong><br/>$description'}")
+            String description = (item.description)?:""
+            description = description.replaceAll("(\r\n|\n)", "<br />");
+            annotations.add("{x: '$unixTime', text: '$item.eventDate<br><strong>${StringEscapeUtils.escapeJavaScript(item.shortName)}:</strong><br/>${StringEscapeUtils.escapeJavaScript(description)}'}")
         }
         modelToRender.put('annotations', annotations)
 
     }
+
 }

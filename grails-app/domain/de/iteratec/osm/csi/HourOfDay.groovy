@@ -17,12 +17,16 @@
 
 package de.iteratec.osm.csi
 
-
+@Deprecated
 class HourOfDay {
-	int fullHour
-	Double weight
-	
-	static constraints = {
-		fullHour(unique:true, min:0, max:23)
-	}
+    int fullHour
+    Double weight
+
+    static constraints = {
+        fullHour(min: 0, max: 23)
+    }
+
+    static HourOfDay copyHourOfDay(HourOfDay source) {
+        return new HourOfDay(fullHour: source.fullHour, weight: source.weight)
+    }
 }

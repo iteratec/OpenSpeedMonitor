@@ -29,14 +29,14 @@ import org.junit.Test
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.JobResultDaoService
 
 
@@ -46,21 +46,21 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	static transactional = false
 
 	/** injected by grails */
-	EventMeasuredValueService eventMeasuredValueService
-	MeasuredValueTagService measuredValueTagService
+	EventCsiAggregationService eventCsiAggregationService
+	CsiAggregationTagService csiAggregationTagService
 	EventResultService eventResultService
 	WeightingService weightingService
 	MeanCalcService meanCalcService
-	MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
-	PageMeasuredValueService pageMeasuredValueService
+	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+	PageCsiAggregationService pageCsiAggregationService
 	JobService jobService
-	MeasuredValueUpdateService measuredValueUpdateService
+	CsiAggregationUpdateService csiAggregationUpdateService
 	Map<Long, JobResult> mapToFindJobResultByEventResult
 
 	
 
-	MeasuredValueInterval hourly
-	MeasuredValueInterval weekly
+	CsiAggregationInterval hourly
+	CsiAggregationInterval weekly
 	Map<String, Double> targetValues
 	Map<String, Integer> targetResultCounts
 
@@ -79,7 +79,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		TestDataUtil.cleanUpDatabase()
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
-		TestDataUtil.createMeasuredValueIntervals()
+		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
 		TestDataUtil.createHoursOfDay()
 		System.out.println('Create some common test-data... DONE');
@@ -94,7 +94,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	void setUp() {
 		
 		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, measuredValueTagService);
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
 		System.out.println('Loading CSV-data... DONE');
 		
 //		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
@@ -119,8 +119,8 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		targetResultCounts = ['weekly_page_KW50_2012.csv':['SE':1346], 'weekly_page.csv':['SE':122]]
 
 
-		hourly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
-		weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+		hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+		weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
 
 		System.out.println('Set-up... DONE');
 	}
@@ -137,7 +137,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	/**
 	 * The target weekly page-values were taken from the old excel-evaluation: .\test\resources\SR_2.44.0_Kundenzufriedenheit.xlsx. 
 	 * The CSV read is {@code weekly_page_KW50_2012.csv}.
-	 * Calculating weekly page-values via {@link PageMeasuredValueService} should provide (nearly) the same results!
+	 * Calculating weekly page-values via {@link PageCsiAggregationService} should provide (nearly) the same results!
 	 */
 	private void calculatingWeeklyPageValuesForPageTest(String pageName, List<EventResult> results) {
 		
@@ -154,11 +154,11 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		JobGroup jobGroup = JobGroup.findByName("CSI")
 		
 		results.each { EventResult result ->
-			measuredValueUpdateService.createOrUpdateDependentMvs(result)
+			csiAggregationUpdateService.createOrUpdateDependentMvs(result)
 		}
 
-		List<MeasuredValue> wpmvsOfOneGroupPageCombination = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
-		MeasuredValue mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
+		List<CsiAggregation> wpmvsOfOneGroupPageCombination = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
+		CsiAggregation mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
 
 		assertEquals(startDate, mvWeeklyPage.started)
 		assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)
@@ -168,7 +168,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		// TODO mze-2013-08-15: Check this:
 		// Disabled reason: Values differ may from data
 		// int targetResultCount = targetResultCounts[csvName][pageName]?:-1
-		// assertEquals(targetResultCount, mvWeeklyPage.countResultIds())
+		// assertEquals(targetResultCount, mvWeeklyPage.countUnderlyingEventResultsByWptDocComplete())
 		assertNotNull(mvWeeklyPage.value)
 
 		double expectedValue = targetValues[csvName][pageName]?:-1

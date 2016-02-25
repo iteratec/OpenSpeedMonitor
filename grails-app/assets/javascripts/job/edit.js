@@ -16,7 +16,6 @@
 */
 //= require prettycron/prettycronManifest.js
 //= require tagit/tagit.js
-//= require tagit/tagit.js
 //= require_self
 function doOnDomReady(
     newJob,
@@ -82,7 +81,7 @@ function initializeSelects() {
 	  }
 	  if ($('select#location').size() > 0) {
 		  $('select#location').chosen(chosenOptions);
-	  }		  
+	  }
 	  if ($('select#connectivityProfile').size() > 0) {
 		  $('select#connectivityProfile').chosen(chosenOptions);
 	  }
@@ -293,26 +292,7 @@ function getCustomConnNameFromDom(){
     return "Custom (" + bwDownOrEmpty + "/" + bwUpOrEmpty + " Kbps, " + latencyOrEmpty + "ms, " + plrOrEmpty + "% PLR)";
 }
 
-function domainDeleteConfirmation(message,id,link){
-    var confirmMessage = "";
-    if(link != null || link == ""){
-        jQuery.ajax({
-            type : 'GET',
-            url : link,
-            data: {id:id},
-            async:   false,
-            success: function(result) {
-                confirmMessage = message + "<br>" + result;
-            },
-            error: function(result) {
-                confirmMessage = message;
-            }});
-        return confirmMessage;
-    } else{
-        return message;
-    }
 
-}
 function toggleCronInstructions(){
     var cronInstructions = document.querySelector('#cron-instructions');
     cronInstructions.style.display=="none" ?

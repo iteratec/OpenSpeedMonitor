@@ -94,7 +94,7 @@ class JobLinkService {
                     ])
             csiChartUrl = grailsLinkGenerator.link(controller: 'csiDashboard', action: 'showAll', absolute: true,
                     params: [
-                            'aggrGroup':'measuredEvent',
+                            'aggrGroupAndInterval':'measuredEvent',
                             'selectedTimeFrameInterval': 0,
                             'from': fromFormatted,
                             'fromHour': fromHourFormatted,

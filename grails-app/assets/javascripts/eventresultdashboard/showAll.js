@@ -258,12 +258,12 @@ function setChevron(accordionElement) {
 }
 function initIntervalSelect() {
 	//initialization///////////////////////
-	var lastIntervalSelection = getFromLocalStorage('de.iteratec.osm.result.dashboard.intervalselection');
+	var lastIntervalSelection = OpenSpeedMonitor.clientSideStorageUtils().getFromLocalStorage('de.iteratec.osm.result.dashboard.intervalselection');
 	var intervalSelectionFromQueryParam = $.getUrlVar('selectedInterval');
 	if(intervalSelectionFromQueryParam != null) $('#selectedIntervalHtmlId').val(intervalSelectionFromQueryParam);
 	else if(lastIntervalSelection != null) $('#selectedIntervalHtmlId').val(lastIntervalSelection);
 	//register events///////////////////////
 	$('#selectedIntervalHtmlId').on("change", function(event){
-		setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
+		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
 	});
 }

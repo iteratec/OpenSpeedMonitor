@@ -30,6 +30,7 @@
         $(document).ready(function(){
 
             var cookieKeyCsiDashboardTitle = '${de.iteratec.osm.util.Constants.COOKIE_KEY_CSI_DASHBOARD_TITLE}';
+            var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
 
             //defining handlers
             $('#modal-p13n').bind("shown", function(){
@@ -39,10 +40,10 @@
                     $('#modal-p13n-warning').append('<div class="alert alert-error">'+'${g.message(code: 'de.iteratec.osm.p13n.cookiebased.warning')}'+'</div>');
                 }
                 //csi dashboard default chart title
-                $('#input-default-csi-dashboard-title').val(getCookie(cookieKeyCsiDashboardTitle));
+                $('#input-default-csi-dashboard-title').val(osmClientSideStorageUtils.getCookie(cookieKeyCsiDashboardTitle));
             });
             $('#modal-p13n-save-btn').bind("click", function(){
-                setCookie(cookieKeyCsiDashboardTitle, $('#input-default-csi-dashboard-title').val(), '/', (365*24*60*60*1000));
+                osmClientSideStorageUtils.setCookie(cookieKeyCsiDashboardTitle, $('#input-default-csi-dashboard-title').val(), '/', (365*24*60*60*1000));
             });
 
         });

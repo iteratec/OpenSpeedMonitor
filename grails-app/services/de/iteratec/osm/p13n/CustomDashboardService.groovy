@@ -47,4 +47,23 @@ class CustomDashboardService {
             return null
         }
     }
+
+    /**
+     * Parse a list of longs from a json entry. If this entry is not a list, this entry will be returned in a list.
+     * @param json
+     * @param name
+     * @return
+     */
+    public Collection<Long> getValuesFromJSON(def json, String name){
+        def collection = []
+        def content = json?."$name"
+        if(content){
+            if(content instanceof String){
+                collection << content
+            } else{
+                collection.addAll(content*.toLong())
+            }
+        }
+        return collection
+    }
 }

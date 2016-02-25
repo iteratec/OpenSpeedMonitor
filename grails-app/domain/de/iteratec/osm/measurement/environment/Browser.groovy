@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.environment
 
+import de.iteratec.osm.csi.BrowserConnectivityWeight
+
 
 class Browser {
 
@@ -27,6 +29,10 @@ class Browser {
     public static final String UNDEFINED = 'undefined'
 
     String name
+    /**
+     * @deprecated Replaced by {@link BrowserConnectivityWeight}.
+     */
+    @Deprecated
     Double weight
     static final Double minWeight = 0
 

@@ -20,9 +20,9 @@ package de.iteratec.osm.result
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -38,7 +38,7 @@ import de.iteratec.osm.result.dao.EventResultDaoService
  */
 class HighchartPointDetailsController {
 
-	MeasuredValueDaoService measuredValueDaoService;
+	CsiAggregationDaoService csiAggregationDaoService;
 	EventResultDaoService eventResultDaoService
 	JobResultDaoService jobResultDaoService;
 	/**
@@ -71,29 +71,29 @@ class HighchartPointDetailsController {
 	/**
 	 * <p>
 	 * Lists aggregated {@linkplain de.iteratec.osm.result.JobResult results} for a {@link
-	 * MeasuredValue} mostly afterwards a user clicked on an {@link 
+	 * CsiAggregation} mostly afterwards a user clicked on an {@link
 	 * HighchartPoint}.
 	 * </p>
 	 * 
 	 * <p>
 	 * The user is a list shown which contains all results that where 
 	 * aggregated to calculate the value of the measured value specified by 
-	 * {@code measuredValueId}.
+	 * {@code csiAggregationId}.
 	 * </p>
 	 * 
 	 * <p>
-	 * If the {@link MeasuredValue#countResultIds() count of results} in the 
+	 * If the {@link CsiAggregation#countUnderlyingEventResultsByWptDocComplete() count of results} in the
 	 * measured value differs from {@code lastKnownCountOfAggregatedResults} 
 	 * a waring in shown to the user.
 	 * </p>
 	 * 
-	 * @param measuredValueId 
-	 *         The database id of the {@link MeasuredValue} for which the 
+	 * @param csiAggregationId
+	 *         The database id of the {@link de.iteratec.osm.report.chart.CsiAggregation} for which the
 	 *         aggregated {@linkplain de.iteratec.osm.result.JobResult job results} should be listed.
 	 *         Passing <code>null</code> results in a "HTTP 400 Bad Request".
 	 * @param lastKnownCountOfAggregatedResultsOrNull 
 	 *         The last known count of job results from which the measured 
-	 *         value with id {@code measuredValueId} was aggregated. This is
+	 *         value with id {@code csiAggregationId} was aggregated. This is
 	 *         the count known as the chart in which the user clicks, was 
 	 *         generated. This value is passed to identify concurrent 
 	 *         modifications on a value to communicate an possible change of 
@@ -165,16 +165,16 @@ class HighchartPointDetailsController {
 	 *                 This value is a {@link Date} and is never 
 	 *                 <code>null</code>. 
 	 *             </dd>
-	 *             <dt>aggregatedMeasuredValue</dt>
+	 *             <dt>aggregatedCsiAggregation</dt>
 	 *             <dd>
 	 *                 The aggregated value as {@link Double} and is never 
 	 *                 <code>null</code>.
 	 *             </dd>
 	 *         </dl>
 	 */
-	public Map<String, Object> listAggregatedResults (Long measuredValueId, Integer lastKnownCountOfAggregatedResultsOrNull, Boolean showAll) {
+	public Map<String, Object> listAggregatedResults (Long csiAggregationId, Integer lastKnownCountOfAggregatedResultsOrNull, Boolean showAll) {
 
-		if( measuredValueId == null || measuredValueId < 0 || lastKnownCountOfAggregatedResultsOrNull == null || lastKnownCountOfAggregatedResultsOrNull < 0 ) {
+		if( csiAggregationId == null || csiAggregationId < 0 || lastKnownCountOfAggregatedResultsOrNull == null || lastKnownCountOfAggregatedResultsOrNull < 0 ) {
 			render(status: 400, message: "Bad Request");
 			return null;
 		}
@@ -190,9 +190,9 @@ class HighchartPointDetailsController {
 		Map<String, Object> modelToRender = Collections.checkedMap(new HashMap(), String.class, Object.class);
 
 		// Load relevant data:
-		MeasuredValue valueThatResultsShouldBeListed = measuredValueDaoService.tryToFindById(measuredValueId);
+		CsiAggregation valueThatResultsShouldBeListed = csiAggregationDaoService.tryToFindById(csiAggregationId);
 		
-		Collection<Long> resultIds = valueThatResultsShouldBeListed.getResultIdsAsList();
+		Collection<Long> resultIds = valueThatResultsShouldBeListed.getUnderlyingEventResultsByWptDocCompleteAsList();
 		
 		addWaringIfResultCountDiffersFromExpectation(lastKnownCountOfAggregatedResultsOrNull, resultIds.size(), modelToRender);
 		
@@ -247,7 +247,7 @@ class HighchartPointDetailsController {
 		}
 
 		modelToRender.put('measuringOfValueStartedAt', valueThatResultsShouldBeListed.started ?: new Date(0));
-		modelToRender.put('aggregatedMeasuredValue', valueThatResultsShouldBeListed.value ?: 0.0d);
+		modelToRender.put('aggregatedCsiAggregation', valueThatResultsShouldBeListed.value ?: 0.0d);
 		
 		return modelToRender;
 	}
@@ -285,7 +285,7 @@ class HighchartPointDetailsController {
 	 * 
 	 * <p>
 	 * Note: This action does not hold a measured value, so the model
-	 * returned will contain the key {@code aggregatedMeasuredValue} 
+	 * returned will contain the key {@code aggregatedCsiAggregation}
 	 * assigned to <code>null</code>. This is a special situation need 
 	 * to handled in views. For more details about the returned model 
 	 * refer the documentation of 
@@ -431,8 +431,8 @@ class HighchartPointDetailsController {
 		
 		modelToRender.put('measuringOfValueStartedAt', fromDate);
 		//leads to NPE at java.util.Collections$CheckedMap.typeCheck(Collections.java:2558) ???
-//		modelToRender.put('aggregatedMeasuredValue', null);
-		modelToRender.put('aggregatedMeasuredValue', -999d);
+//		modelToRender.put('aggregatedCsiAggregation', null);
+		modelToRender.put('aggregatedCsiAggregation', -999d);
 		
 		render([model: modelToRender, view: 'listAggregatedResults']);
 		return null;

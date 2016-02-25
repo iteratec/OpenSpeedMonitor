@@ -64,4 +64,5 @@ class ConnectivityProfile {
     public String toString() {
         return "${name}: ${connectivityProfileService.getConnectivitySpecificationFor(bandwidthDown, bandwidthUp, latency, packetLoss)}"
     }
+
 }

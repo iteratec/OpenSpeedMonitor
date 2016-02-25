@@ -29,7 +29,7 @@ import org.joda.time.DateTime
  * <p>
  * This point has an x- and y-coordinate. The x-coordinate is the
  * {@linkplain #time time} when the value was measured. The y-coordinate is the
- * {@linkplain #measuredValue measured value}. Additionally this value may have
+ * {@linkplain #csiAggregation measured value}. Additionally this value may have
  * an {@linkplain #sourceURL source URL} where details of this value might be
  * found (reachable through a click in the graph).
  * </p>
@@ -46,7 +46,7 @@ class OsmChartPoint{
 
 	/**
 	 * <p>
-	 * The count of aggregated values to receive {@link #measuredValue}. 
+	 * The count of aggregated values to receive {@link #csiAggregation}.
 	 * </p>
 	 * 
 	 * <p>
@@ -67,11 +67,11 @@ class OsmChartPoint{
 	 * 
 	 * @see #countOfAggregatedResults
 	 */
-	double measuredValue
+	double csiAggregation
 
 	/**
 	 * <p>
-	 * An {@link URL} which represents the source of the {@link #measuredValue}.
+	 * An {@link URL} which represents the source of the {@link #csiAggregation}.
 	 * This URL is optional. Details of the value may be available from this
 	 * URL.
 	 * </p>
@@ -95,7 +95,7 @@ class OsmChartPoint{
 	 * This value is intended to be the x-coordinate of a Highchart graph.
 	 * </p>
 	 * 
-	 * @see #measuredValue
+	 * @see #csiAggregation
 	 * @see Date#getTime()
 	 */
 	long time
@@ -123,14 +123,14 @@ class OsmChartPoint{
 	}
 
 	/**
-	 * Only points with a {@link #time} greater 0 and a {@link #measuredValue} not null are valid. 
-	 * @return <code>true</code> if {@link #time} is greater than 0 and {@link #measuredValue} is not null.
+	 * Only points with a {@link #time} greater 0 and a {@link #csiAggregation} not null are valid.
+	 * @return <code>true</code> if {@link #time} is greater than 0 and {@link #csiAggregation} is not null.
 	 */
     public boolean isValid(){
-        return (this.time > 0 && this.measuredValue != null)
+        return (this.time > 0 && this.csiAggregation != null)
     }
 
 	public String toString(){
-		return "${new DateTime(time)} | ${measuredValue}"
+		return "${new DateTime(time)} | ${csiAggregation}"
 	}
 }

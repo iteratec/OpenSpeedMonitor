@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
+import groovy.json.StringEscapeUtils
 
 /**
  * Represents an arbitrary event to be shown in dashboard diagrams as vertical lines with info text as hover info.
@@ -46,9 +47,21 @@ class Event {
     }
 
     def beforeValidate() {
-        //remove all html tags, because we don't want arbitrary links to get injected into the gui of osm
-        if(shortName != null) shortName = shortName.replaceAll(/<!--.*?-->/, '').replaceAll(/<.*?>/, '')
-        if(description != null) description = description?.replaceAll(/<!--.*?-->/, '')?.replaceAll(/<.*?>/, '')
+        shortName = removeCharacter(shortName)
+        description = removeCharacter(description)
+    }
+    /**
+     * Remove all html tags, because we don't want arbitrary links to get injected into the gui of osm.
+     * Additionally we remove all paragraphs and single quotes, to prevent failures
+     * @param str
+     * @return clean String
+     */
+    def removeCharacter(String str){
+        if(str != null){
+            str = str.replaceAll(/<!--.*?-->/, '')
+                    .replaceAll(/<.*?>/, '')
+        }
+        return str
     }
 
 	static constraints = {

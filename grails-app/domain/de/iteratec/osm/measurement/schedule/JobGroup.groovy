@@ -17,8 +17,11 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
+import org.grails.taggable.Taggable
 
+@Deprecated
 public enum JobGroupType {
     /**
      * Just results with this type get factored in calculation for customer satisfaction index.
@@ -27,7 +30,7 @@ public enum JobGroupType {
     /**
      * To group results of several (not csi relevant) jobs that belong together. For more convenient selection in osm-dashboards.
      */
-    RAW_DATA_SELECTION,
+            RAW_DATA_SELECTION,
 }
 
 /**
@@ -35,7 +38,7 @@ public enum JobGroupType {
  * @author nkuhn
  *
  */
-class JobGroup {
+class JobGroup implements Taggable{
 
     /**
      * The name for an undefined JobGroup, respectively CSI. Please use {@link #isUndefinedCsiJobGroup()}
@@ -47,16 +50,19 @@ class JobGroup {
 
     JobGroupType groupType
 
+    CsiConfiguration csiConfiguration
+
     /**
      * Graphite-Servers to which results of this JobGroup should be sent.
      */
     Collection<GraphiteServer> graphiteServers = []
-    static hasMany = [graphiteServers:GraphiteServer]
+    static hasMany = [graphiteServers: GraphiteServer]
 
     static constraints = {
         name(unique: true, maxSize: 255)
         groupType(maxSize: 255)
         graphiteServers()
+        csiConfiguration(nullable: true)
     }
 
     @Override

@@ -20,8 +20,6 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
-import groovy.util.slurpersupport.GPathResult
-
 import org.apache.commons.lang.time.DateUtils
 import org.junit.*
 
@@ -403,7 +401,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 1),
+					csByWptDocCompleteInPercent: (100 - j * 1),
 					jobResult: runOfCurJob_now,
 					jobResultDate: runOfCurJob_now.date,
 					jobResultJobConfigId: runOfCurJob_now.job.ident(),
@@ -435,7 +433,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 2),
+					csByWptDocCompleteInPercent: (100 - j * 2),
 					jobResult: runOfCurJob_1HoursAgo,
 					jobResultDate: runOfCurJob_1HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_1HoursAgo.job.ident(),
@@ -468,7 +466,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 3),
+					csByWptDocCompleteInPercent: (100 - j * 3),
 					jobResult: runOfCurJob_2HoursAgo,
 					jobResultDate: runOfCurJob_2HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_2HoursAgo.job.ident(),
@@ -498,7 +496,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 4),
+					csByWptDocCompleteInPercent: (100 - j * 4),
 					jobResult: runOfCurJob_3HoursAgo,
 					jobResultDate: runOfCurJob_3HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_3HoursAgo.job.ident(),

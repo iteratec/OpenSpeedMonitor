@@ -21,20 +21,16 @@ import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEvent
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.dao.EventResultDaoService
-import org.quartz.core.QuartzScheduler
 
 //import org.springframework.transaction.TransactionDefinition
-import org.springframework.transaction.support.DefaultTransactionDefinition
-
 /**
  * Provides methods for cleanup db. Can be used by quartz-jobs.
  */
@@ -47,61 +43,6 @@ class DbCleanupService {
     PerformanceLoggingService performanceLoggingService
 
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
-
-	/**
-	 * Deletes all {@link WebPerformanceWaterfall}s and associated {@link WaterfallEntry}s before date toDeleteBefore.
-	 * @param toDeleteBefore	All Waterfalls before this date get deleted. 
-	 */
-    void deleteWaterfallsBefore(Date toDeleteBefore) {
-		
-		log.info "Deleting all waterfalls before: ${toDeleteBefore}"
-		
-//		deleteWaterfallsBeforeViaHql(toDeleteBefore)
-//		deleteWaterfallsBeforeViaGormBatching(JobtoDeleteBefore)
-		
-		log.info "... DONE"
-    }
-	
-	/**
-	 * Uses HQL.
-	 * @param toDeleteBefore
-	 */
-	void deleteWaterfallsBeforeViaHql(Date toDeleteBefore){
-		//remove Waterfalls from EventResults
-		EventResult.executeUpdate("update EventResult res set res.webPerformanceWaterfall=:null " +
-			"where res.jobResultDate<:toDeleteBefore", [toDeleteBefore: toDeleteBefore])
-		//delete waterfalls
-		EventResult.executeUpdate("delete WebPerformanceWaterfall wf where wf.startDate<:toDeleteBefore",
-			[toDeleteBefore: toDeleteBefore])
-	}
-	/**
-	 * Uses gorm-batching.
-	 * @param toDeleteBefore
-	 * @see http://stackoverflow.com/questions/18848067/what-is-the-best-way-to-process-a-large-list-of-domain-objects
-	 */
-	void deleteWaterfallsBeforeViaGormBatching(Date toDeleteBefore){
-		def dc = new DetachedCriteria(WebPerformanceWaterfall).build{
-			lt 'startDate', toDeleteBefore
-		}
-		def count = dc.count()
-
-		// Optional:
-		// dc = dc.build{
-		//     projections { property('username') }
-		// }
-		
-		def batchSize = 50 // Hibernate Doc recommends 10..50
-		0.step(count, batchSize){ offset->
-			dc.list(offset:offset, max:batchSize).each{
-			   // doSmthWithTransaction(it)
-			}
-			//clear the first-level cache
-			//def hiberSession = sessionFactory.getCurrentSession()
-			//hiberSession.clear()
-			// or
-			WebPerformanceWaterfall.withSession { session -> session.clear() }
-		}
-	}
 
     /**
      * Deletes all {@link EventResult}s {@link JobResult}s {@link HttpArchive}s before date toDeleteBefore.
@@ -148,70 +89,71 @@ class DbCleanupService {
 
 
     /**
-     * Deletes all {@link MeasuredValue}s {@link MeasuredValueUpdateEvent}s before date toDeleteBefore.
+     * Deletes all {@link CsiAggregation}s {@link CsiAggregationUpdateEvent}s before date toDeleteBefore.
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
-    void deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore(Date toDeleteBefore, boolean createBatchActivity = true){
-        log.info "begin with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
+    void deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore(Date toDeleteBefore, boolean createBatchActivity = true){
+        log.info "begin with deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore"
 
-        def measuredValueDetachedCriteria = new DetachedCriteria(MeasuredValue).build {
+        def csiAggregationDetachedCriteria = new DetachedCriteria(CsiAggregation).build {
             lt 'started', toDeleteBefore
         }
-        int measuredValueCount = measuredValueDetachedCriteria.count()
-        log.info "MeasuredValue - Count : ${measuredValueCount}"
+        int csiAggregationCount = csiAggregationDetachedCriteria.count()
+        log.info "CsiAggregation - Count : ${csiAggregationCount}"
 
-        def measuredValueUpdateEventDetachedCriteria = new DetachedCriteria(MeasuredValueUpdateEvent).build {
-            'in'('measuredValueId', measuredValueDetachedCriteria.list()*.id )
+        def csiAggregationUpdateEventDetachedCriteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
+            'in'('csiAggregationId', csiAggregationDetachedCriteria.list()*.id )
         }
-        int measuredValueUpdateEventsCount = measuredValueUpdateEventDetachedCriteria.count()
-        log.info "MeasuredValueUpdateEvent - Count : ${measuredValueUpdateEventsCount}"
+        int csiAggregationUpdateEventsCount = csiAggregationUpdateEventDetachedCriteria.count()
+        log.info "CsiAggregationUpdateEvent - Count : ${csiAggregationUpdateEventsCount}"
 
-        int globalCount = measuredValueCount + measuredValueUpdateEventsCount
+        int globalCount = csiAggregationCount + csiAggregationUpdateEventsCount
 
         //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
-        if(measuredValueCount > 0 && !batchActivityService.runningBatch(this.class, 2)) {
-            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of MeasuredValues and MeasuredValueUpdateEvents",createBatchActivity )
+        if(csiAggregationCount > 0 && !batchActivityService.runningBatch(this.class, 2)) {
+            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of CsiAggregations and CsiAggregationUpdateEvents",createBatchActivity )
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
-            log.debug('Starting deletion of MeasuredValueUpdateEvents and MeasuredValues')
+            log.debug('Starting deletion of CsiAggregationUpdateEvents and CsiAggregations')
 
-            //First clean MeasuredValueUpdateEvents
-            0.step(measuredValueUpdateEventsCount, batchSize){ int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete MeasuredValueUpdateEvents'])
-                MeasuredValueUpdateEvent.withNewTransaction {
-                    measuredValueUpdateEventDetachedCriteria.list(max: batchSize).each{ MeasuredValueUpdateEvent measuredValueUpdateEvent ->
+            //First clean CsiAggregationUpdateEvents
+            0.step(csiAggregationUpdateEventsCount, batchSize){ int offset ->
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete CsiAggregationUpdateEvents'])
+                CsiAggregationUpdateEvent.withNewTransaction {
+                    csiAggregationUpdateEventDetachedCriteria.list(max: batchSize).each{ CsiAggregationUpdateEvent csiAggregationUpdateEvent
+                        ->
                         try {
-                            measuredValueUpdateEvent.delete()
+                            csiAggregationUpdateEvent.delete()
                         }
                         catch(Exception e){
                         }
                     }
                 }
                 //clear hibernate session first-level cache
-                MeasuredValueUpdateEvent.withSession { session -> session.clear() }
+                CsiAggregationUpdateEvent.withSession { session -> session.clear() }
             }
 
-            log.debug('Deletion of MeasuredValueUpdateEvents finished')
+            log.debug('Deletion of CsiAggregationUpdateEvents finished')
 
-            //After then clean MeasuredValues
-            0.step(measuredValueCount, batchSize) { int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(measuredValueCount, offset+measuredValueUpdateEventsCount), 'stage': 'delete MeasuredValues'])
-                MeasuredValue.withNewTransaction {
-                    measuredValueDetachedCriteria.list(max: batchSize).each { MeasuredValue measuredValue ->
+            //After then clean CsiAggregations
+            0.step(csiAggregationCount, batchSize) { int offset ->
+                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(csiAggregationCount, offset+csiAggregationUpdateEventsCount), 'stage': 'delete CsiAggregations'])
+                CsiAggregation.withNewTransaction {
+                    csiAggregationDetachedCriteria.list(max: batchSize).each { CsiAggregation csiAggregation ->
                         try {
-                            measuredValue.delete()
+                            csiAggregation.delete()
                         } catch (Exception e) {
                         }
                     }
                 }
                 //clear hibernate session first-level cache
-                MeasuredValue.withSession { session -> session.clear() }
+                CsiAggregation.withSession { session -> session.clear() }
             }
             batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
-            log.debug('Deletion of MeasuredValues finished')
+            log.debug('Deletion of CsiAggregations finished')
         }
 
-        log.info "end with deleteMeasuredValuesAndMeasuredValueUpdateEventsBefore"
+        log.info "end with deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore"
     }
 }
 
