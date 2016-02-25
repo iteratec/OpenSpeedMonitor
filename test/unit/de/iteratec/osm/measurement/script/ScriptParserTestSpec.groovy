@@ -148,8 +148,7 @@ class ScriptParserTestSpec extends Specification {
         parser.measuredEventsCount == 2
         parser.steps == [5, 7, 18, 20]
         parser.eventNames.size() == 3
-        parser.warnings.size() == 1
-        parser.warnings[0].type == ScriptEventNameCmdWarningType.DANGLING_SETEVENTNAME_STATEMENT
+        parser.warnings.size() == 0
     }
 
     void "allPageLoadEvents includes logData0 events" () {
