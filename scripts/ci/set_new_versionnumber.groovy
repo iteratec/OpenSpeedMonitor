@@ -3,7 +3,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Properties props = new Properties()
-File propsFile = new File('../application.properties')
+File propsFile = new File('../../application.properties')
 props.load(propsFile.newDataInputStream())
 
 String appVersion = props.getProperty('app.version')
