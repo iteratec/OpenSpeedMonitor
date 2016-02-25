@@ -13,6 +13,10 @@ Integer minor = Integer.valueOf(tokenizedVersion[1])
 Integer patch = Integer.valueOf(tokenizedVersion[2])
 String oldVersion = "${major}.${minor}.${patch}"
 
+def bamboo_jira_version = System.getenv("bamboo_jira_version") ?: "0"
+def bamboo_jira_version_mit_Punkt = System.getenv("bamboo.jira.version") ?: "0"
+println bamboo_jira_version
+println bamboo_jira_version_mit_Punkt
 String newVersion = ""
 if("${bamboo_jira_version}") {
   newVersion = "${bamboo_jira_version}"
