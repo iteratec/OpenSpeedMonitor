@@ -10,13 +10,14 @@
 			<td>
 				<strong><a
 					href="${createLink(action: 'edit', id: job.id, absolute: true)}" class="jobName ${job.active==false?'inactiveJob':''}"> ${job.label}
-				</a></strong> 
+				</a></strong>
 				<g:if test="${tags}">
-				<ul class="tags">
-					<g:each in="${tags}">
-						<li>${it}</li>
-					</g:each>
-				</ul> 
+					<br/>
+					<ul class="tags">
+						<g:each in="${tags}">
+							<li>${it}</li>
+						</g:each>
+					</ul>
 				</g:if>
 				<g:if test="${job.script}">
 					<br />
@@ -25,7 +26,7 @@
 						${job.script.label}
 					</a>
 					<span title="${message(code: 'script.measuredEventsCount.label')}">(${job.script.measuredEventsCount})</span>
-				</g:if> 
+				</g:if>
 				<span class="status" id="runningstatus-${job.id}"> </span> 
 				<span class="status"> ${ massExecutionResults ? (massExecutionResults[job.id]?.message ? "<br />" + massExecutionResults[job.id].message : '' ) : '' }</span>
 			</td>
