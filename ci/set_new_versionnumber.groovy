@@ -14,8 +14,8 @@ Integer patch = Integer.valueOf(tokenizedVersion[2])
 String oldVersion = "${major}.${minor}.${patch}"
 
 String newVersion = ""
-if("${bamboo.jira.version}") {
-  newVersion = "${bamboo.jira.version}"
+if("${bamboo_jira_version}") {
+  newVersion = "${bamboo_jira_version}"
 } else {
   patch++
   newVersion = "${major}.${minor}.${patch}"
