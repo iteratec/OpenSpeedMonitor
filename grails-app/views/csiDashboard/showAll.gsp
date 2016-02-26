@@ -182,7 +182,7 @@
                     <div style="padding-top: 60px;"></div>
                     <label for="folderSelectCsiSystem">
                         <strong>
-                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CsiSystems:"/>
+                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>:
                         </strong>
                     </label>
                     <g:select id="folderSelectCsiSystem" class="iteratec-element-select"

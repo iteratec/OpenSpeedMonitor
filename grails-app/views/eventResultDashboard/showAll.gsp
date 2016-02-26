@@ -171,7 +171,7 @@
 
                                         <div class="span2 accordion-info text-right">
                                             <g:message code="de.iteratec.isr.wptrd.labels.filterFolder"
-                                                       default="Job Group:"/><br>
+                                                       default="Job Group"/>:<br>
                                             <g:message code="de.iteratec.osm.result.page.label"
                                                        default="Page"/>&nbsp;|&nbsp;<g:message
                                                     code="de.iteratec.osm.result.measured-event.label"

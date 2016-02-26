@@ -26,7 +26,7 @@ GSP-Template Mappings:
         <div style="padding-top: 60px;"></div>
         <label for="folderSelectHtmlId">
             <strong>
-                <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder:"/>
+                <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>:
             </strong>
         </label>
         <g:select id="folderSelectHtmlId" class="iteratec-element-select"
