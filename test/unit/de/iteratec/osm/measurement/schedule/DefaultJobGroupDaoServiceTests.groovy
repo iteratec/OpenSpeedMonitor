@@ -51,10 +51,14 @@ class DefaultJobGroupDaoServiceTests {
 		CsiConfiguration csiConfiguration1 = TestDataUtil.createCsiConfiguration()
 		csiConfiguration1.label = 'conf1'
 		csiGroup1.csiConfiguration = csiConfiguration1
+		csiGroup1.save()
+
 		JobGroup csiGroup2 = new JobGroup(name: 'CSI-Group2').save(failOnError: true)
 		CsiConfiguration csiConfiguration2 = TestDataUtil.createCsiConfiguration()
-		csiConfiguration2.label = 'conf1'
+		csiConfiguration2.label = 'conf2'
 		csiGroup2.csiConfiguration = csiConfiguration2
+		csiGroup2.save()
+
 		new JobGroup(name: 'Another-Group').save(failOnError: true)
 		
 		Set<JobGroup> result = serviceUnderTest.findCSIGroups()
