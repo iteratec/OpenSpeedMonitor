@@ -23,7 +23,7 @@ import java.util.regex.Pattern
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -218,7 +218,7 @@ class CsiAggregationTagService {
 		if (job) {
 			JobGroup jobGroup = jobService.getCsiJobGroupOf(job)
 			if (newResult.getMeasuredEvent() && newResult.getMeasuredEvent().getTestedPage()
-			&& jobGroup && jobGroup.groupType == JobGroupType.CSI_AGGREGATION) {
+			&& jobGroup && jobGroup.csiConfiguration != null) {
 				pageTag = "${jobGroup.ident()};${newResult.getMeasuredEvent().getTestedPage().ident()}"
 			}
 		}

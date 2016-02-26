@@ -3,7 +3,6 @@ package de.iteratec.osm.api
 import de.iteratec.osm.filters.SecureApiFunctionsFilters
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import grails.test.mixin.Mock
@@ -32,8 +31,8 @@ class EventCreationViaRestApiSpec extends Specification {
         ApiKey.withTransaction {
             new ApiKey(secretKey: apiKeyAllowed, valid: true, allowedForCreateEvent: true).save(failOnError: true)
             new ApiKey(secretKey: apiKeyNotAllowed, valid: true, allowedForCreateEvent: false).save(failOnError: true)
-            group1 = new JobGroup(name: 'JobGroup1', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
-            group2 = new JobGroup(name: 'JobGroup2', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+            group1 = new JobGroup(name: 'JobGroup1').save(failOnError: true)
+            group2 = new JobGroup(name: 'JobGroup2').save(failOnError: true)
         }
         //mocks common for all tests
         EventDaoService eventDaoService = new EventDaoService()

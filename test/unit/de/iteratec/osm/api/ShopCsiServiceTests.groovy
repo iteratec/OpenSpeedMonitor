@@ -22,7 +22,7 @@ import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
@@ -53,7 +53,7 @@ class ShopCsiServiceTests {
 		serviceUnderTest = service
         mocksCommonToAllTests()
 		CsiConfiguration csiConfiguration = new CsiConfiguration(label: "csi configuration", csiDay: new CsiDay())
-		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration).save(failOnError: true)
 		queryParamsIrrelevantCauseDbQueriesAreMocked = new MvQueryParams()
 		queryParamsIrrelevantCauseDbQueriesAreMocked.jobGroupIds.add(jobGroup.getId())
     }
@@ -140,8 +140,8 @@ class ShopCsiServiceTests {
 
 	void testRetrieveSystemCsiByRawDataUsesCorrectCsiConfiguration() {
 		CsiConfiguration csiConfiguration = new CsiConfiguration(csiDay: new CsiDay(), label: "a csi configuration").save(failOnError: true)
-		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		JobGroup jobGroup2 = new JobGroup(name: "rawDataJobGroup", groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+		JobGroup jobGroup = new JobGroup(name: "csiJobGroup", csiConfiguration: csiConfiguration).save(failOnError: true)
+		JobGroup jobGroup2 = new JobGroup(name: "rawDataJobGroup").save(failOnError: true)
 
 		MvQueryParams paramsWithCsiConfiguration = new MvQueryParams()
 		paramsWithCsiConfiguration.jobGroupIds.add(jobGroup.getId())

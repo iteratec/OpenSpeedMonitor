@@ -28,7 +28,7 @@ import org.junit.*
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -79,9 +79,9 @@ class ShopCsiAggregationServiceTests {
         page = new AggregatorType(name: AggregatorType.PAGE).save(validate: false)
         new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 
-        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+        jobGroup1 = new JobGroup(name: jobGroupName1).save(validate: false)
+        jobGroup2 = new JobGroup(name: jobGroupName2).save(validate: false)
+        jobGroup3 = new JobGroup(name: jobGroupName3).save(validate: false)
 
         page1 = new Page(name: "page1", weight: 1).save(failOnError: true)
 

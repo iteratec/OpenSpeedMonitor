@@ -28,7 +28,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
@@ -70,8 +70,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         ).save(failOnError: true, validate: false)
 
         undefinedJobGroup=new JobGroup(
-                name: JobGroup.UNDEFINED_CSI,
-                groupType: JobGroupType.CSI_AGGREGATION
+                name: JobGroup.UNDEFINED_CSI
         );
         undefinedJobGroup.save(failOnError: true);
 

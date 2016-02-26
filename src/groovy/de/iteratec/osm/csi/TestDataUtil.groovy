@@ -33,7 +33,7 @@ import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
@@ -663,7 +663,7 @@ class TestDataUtil {
         JobGroup jobGroup = csiAggregationTagService.findJobGroupOfHourlyEventTag(toBeCalculated.tag)
         Location location = csiAggregationTagService.findLocationOfHourlyEventTag(toBeCalculated.tag)
 
-        if (!measuredEvent || !jobGroup || jobGroup.groupType != JobGroupType.CSI_AGGREGATION || !location) {
+        if (!measuredEvent || !jobGroup || !jobGroup.hasCsiConfiguration() || !location) {
             return toBeCalculated
         }
         List<EventResult> results = []
@@ -872,21 +872,17 @@ class TestDataUtil {
 
     static List<JobGroup> createJobGroups() {
         JobGroup group1 = new JobGroup(
-                name: "CSI",
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+                name: "CSI").save(failOnError: true)
         JobGroup group2 = new JobGroup(
-                name: 'csiGroup1',
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+                name: 'csiGroup1').save(failOnError: true)
         JobGroup group3 = new JobGroup(
-                name: 'csiGroup2',
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+                name: 'csiGroup2').save(failOnError: true)
         return [group1, group2, group3]
     }
 
-    static JobGroup createJobGroup(String groupName, JobGroupType groupType) {
+    static JobGroup createJobGroup(String groupName) {
         return new JobGroup(
-                name: groupName,
-                groupType: groupType
+                name: groupName
         ).save(failOnError: true)
     }
 

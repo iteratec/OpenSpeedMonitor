@@ -25,7 +25,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultP
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -222,8 +222,7 @@ class BootStrap {
 
         def csiGroupName = JobGroup.UNDEFINED_CSI
         JobGroup.findByName(csiGroupName) ?: new JobGroup(
-                name: csiGroupName,
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+                name: csiGroupName).save(failOnError: true)
 
         // here you can initialize the weights of the hours of the csiDay for csi calculation  (see de.iteratec.osm.csi.PageCsiAggregationService)
         if (CsiDay.count <= 0) {

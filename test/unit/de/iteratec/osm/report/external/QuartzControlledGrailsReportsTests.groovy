@@ -352,7 +352,6 @@ class QuartzControlledGrailsReportsTests {
 				}
 			}
 			jobGroupWithGraphiteServers.setName(jobGroupWithServersName)
-			jobGroupWithGraphiteServers.setGroupType(JobGroupType.CSI_AGGREGATION)
 			jobGroupWithGraphiteServers.setGraphiteServers(getGraphiteServers())
 			
 			JobGroup jobGroupWithoutGraphiteServers = new JobGroup() {
@@ -362,7 +361,6 @@ class QuartzControlledGrailsReportsTests {
 				}
 			}
 			jobGroupWithoutGraphiteServers.setName(jobGroupWithoutServersName)
-			jobGroupWithoutGraphiteServers.setGroupType(JobGroupType.CSI_AGGREGATION)
 			jobGroupWithoutGraphiteServers.setGraphiteServers([])
 			
 			return [

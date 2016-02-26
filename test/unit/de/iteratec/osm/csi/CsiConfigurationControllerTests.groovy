@@ -18,7 +18,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
@@ -88,7 +87,7 @@ class CsiConfigurationControllerTests extends Specification{
     void "test deleteCsiConfiguration when jobGroup using this configuration" () {
         given:
         int csiConfigurationCountBeforeDeleting = CsiConfiguration.count
-        JobGroup jobGroup = new JobGroup(name: "jobGroup", groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: config1)
+        JobGroup jobGroup = new JobGroup(name: "jobGroup", csiConfiguration: config1)
         jobGroup.save()
 
         when:

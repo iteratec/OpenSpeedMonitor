@@ -17,6 +17,9 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.TestDataUtil
+
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
@@ -29,7 +32,6 @@ import org.junit.Test
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
@@ -43,7 +45,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author mze
  */
 @TestFor(CsiAggregationTagService)
-@Mock([Job, JobResult, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, WebPageTestServer])
+@Mock([Job, JobResult, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, WebPageTestServer, CsiConfiguration])
 class CsiAggregationTagServiceTests {
 
 	static final Integer eventResultStatus = 200
@@ -73,7 +75,7 @@ class CsiAggregationTagServiceTests {
 		Browser browser2 = new Browser(name: browserName2).save(validate: false)
 		Location location = new Location(browser: browser1).save(validate: false)
 
-		JobGroup jobGroup = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+		JobGroup jobGroup = new JobGroup(name: jobGroupName1).save(validate: false)
 		Job job = new Job(label: jobLabel, location: location, jobGroup: jobGroup).save(validate: false)
 		JobResult jobResult = new JobResult(job: job, testId: testId).save(validate: false)
 		MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page).save(validate: false)
@@ -82,14 +84,14 @@ class CsiAggregationTagServiceTests {
 		
 		jobResult.save(failOnError: true, validate: false)
 
-		new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
-		new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+		new JobGroup(name: jobGroupName2).save(validate: false)
+		new JobGroup(name: jobGroupName3).save(validate: false)
 	}
 
 	@Test
 	public void testCreateHourlyAggregatorTag() {
 		// Create some data:
-		JobGroup jobGroup = new JobGroup(name: 'Lhoste CSI', groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+		JobGroup jobGroup = new JobGroup(name: 'Lhoste CSI').save(validate: false)
 		Page page = new Page(name: 'Homepage').save(validate: false)
 		MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page).save(validate: false)
 		Browser browser = new Browser(name: 'Firefox').save(validate: false)
@@ -148,7 +150,7 @@ class CsiAggregationTagServiceTests {
 	@Test(expected=NullPointerException.class)
 	public void testCreateHourlyAggregatorTag_LocationIsNull() {
 		// Create some data:
-		JobGroup jobGroup = new JobGroup(name: 'Lhoste CSI', groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+		JobGroup jobGroup = new JobGroup(name: 'Lhoste CSI').save(validate: false)
 		Page page = new Page(name: 'Homepage').save(validate: false)
 		MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page).save(validate: false)
 		Browser browser = new Browser(name: 'Firefox').save(validate: false)
@@ -161,7 +163,7 @@ class CsiAggregationTagServiceTests {
 	@Test(expected=IllegalArgumentException.class)
 	public void testCreateHourlyAggregatorTag_LocationNotSavedBefore() {
 		// Create some data:
-		JobGroup jobGroup = new JobGroup(name: 'Lhoste CSI', groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+		JobGroup jobGroup = new JobGroup(name: 'Lhoste CSI').save(validate: false)
 		Page page = new Page(name: 'Homepage').save(validate: false)
 		MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page).save(validate: false)
 		Browser browser = new Browser(name: 'Firefox').save(validate: false)
@@ -235,6 +237,8 @@ class CsiAggregationTagServiceTests {
 	void testCreatePageAggregatorTagByEventResultSuccessfully() {
 		// Select test data:
 		JobGroup group = JobGroup.findByName(jobGroupName1)
+		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+		group.csiConfiguration = csiConfiguration
 		EventResult result = EventResult.findByWptStatus(eventResultStatus)
 
 		// Mock required services
@@ -259,7 +263,7 @@ class CsiAggregationTagServiceTests {
 		EventResult result = EventResult.findByWptStatus(eventResultStatus)
 
 		// Mock required services
-		mockJobService(new JobGroup(name: 'bla', groupType: 'not csi'))
+		mockJobService(new JobGroup(name: 'bla'))
 		mockJobResultService(JobResult.findByTestId(testId))
 
 		// Run the test:

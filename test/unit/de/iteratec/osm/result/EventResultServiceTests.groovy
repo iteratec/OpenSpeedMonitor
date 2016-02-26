@@ -25,7 +25,6 @@ import org.junit.*
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
@@ -136,7 +135,7 @@ class EventResultServiceTests {
 				wptServer: server1
 				).save(failOnError: true)
 
-		jobGroupUndefined = new JobGroup(name: 'undefined', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError:true)
+		jobGroupUndefined = new JobGroup(name: 'undefined').save(failOnError:true)
 				
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
@@ -706,7 +705,7 @@ class EventResultServiceTests {
 		MeasuredEvent anotherEventNotOfInterest = new MeasuredEvent(name: 'Testevent-2', testedPage: pageOfEvent).save(failOnError:true);
 
 		// Define a group:
-		JobGroup jobGroupCsiLhotse = new JobGroup(name: 'CSI Lhotse', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError:true);
+		JobGroup jobGroupCsiLhotse = new JobGroup(name: 'CSI Lhotse').save(failOnError:true);
 		
 		// Define a Browser and a Location (not relevant, because query works on copied data, but required on constraints):
 		Browser browser = new Browser(name: 'FF-w0', weight:0).save(failOnError:true);

@@ -22,7 +22,7 @@ import org.joda.time.DateTime
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -108,7 +108,7 @@ class ShopCsiAggregationService {
         JobGroup jobGroup = jobService.getCsiJobGroupOf(jobResult.job)
         String shopTag = csiAggregationTagService.createShopAggregatorTag(jobGroup)
 
-        if (jobGroup && jobGroup.groupType == JobGroupType.CSI_AGGREGATION && shopTag) {
+        if (jobGroup && jobGroup.hasCsiConfiguration() && shopTag) {
             CsiAggregation shopMv = ensurePresence(start, interval, shopTag)
             csiAggregationUpdateEventDaoService.createUpdateEvent(shopMv.ident(), CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
         }
@@ -276,6 +276,6 @@ class ShopCsiAggregationService {
      */
     List<CsiAggregation> getOrCalculateWeeklyShopCsiAggregations(Date fromDate, Date toDate) {
         CsiAggregationInterval mvInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-        return getOrCalculateShopCsiAggregations(fromDate, toDate, mvInterval, JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION))
+        return getOrCalculateShopCsiAggregations(fromDate, toDate, mvInterval, JobGroup.findAllByCsiConfigurationIsNotNull())
     }
 }

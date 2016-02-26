@@ -33,7 +33,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
@@ -90,7 +90,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     }
 
     void createTestDataCommonForAllTests() {
-        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI, JobGroupType.CSI_AGGREGATION)
+        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
         Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
         Browser ie = TestDataUtil.createBrowser('IE', 1d)

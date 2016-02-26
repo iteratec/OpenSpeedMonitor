@@ -35,7 +35,7 @@ import org.junit.Test
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -555,9 +555,9 @@ class PageCsiAggregationServiceTests {
         csiConfiguration.label = 'csiConf'
         csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages([page1,page2,page3])
 
-        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
-        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
-        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION, csiConfiguration: csiConfiguration).save(failOnError: true)
+        jobGroup1 = new JobGroup(name: jobGroupName1, csiConfiguration: csiConfiguration).save(failOnError: true)
+        jobGroup2 = new JobGroup(name: jobGroupName2, csiConfiguration: csiConfiguration).save(failOnError: true)
+        jobGroup3 = new JobGroup(name: jobGroupName3, csiConfiguration: csiConfiguration).save(failOnError: true)
 
         //with existing JobGroup and Page:
         new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, tag: '1;1', started: startDate.toDate()).save(validate: false)

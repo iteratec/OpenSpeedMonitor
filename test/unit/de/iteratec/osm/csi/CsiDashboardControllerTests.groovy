@@ -25,7 +25,6 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -887,8 +886,8 @@ class CsiDashboardControllerTests {
         //		] as Set);
 
         when(jobGroupDaoServiceMock.findCSIGroups()).thenReturn([
-                new JobGroup(name: 'Group2', groupType: JobGroupType.CSI_AGGREGATION),
-                new JobGroup(name: 'Group1', groupType: JobGroupType.CSI_AGGREGATION)
+                new JobGroup(name: 'Group2'),
+                new JobGroup(name: 'Group1')
         ] as Set);
 
         Page page1 = new Page(name: 'Page1', weight: 0) {
@@ -1056,8 +1055,8 @@ class CsiDashboardControllerTests {
         //		] as Set);
 
         when(jobGroupDaoServiceMock.findCSIGroups()).thenReturn([
-                new JobGroup(name: 'Group2', groupType: JobGroupType.CSI_AGGREGATION),
-                new JobGroup(name: 'Group1', groupType: JobGroupType.CSI_AGGREGATION)
+                new JobGroup(name: 'Group2'),
+                new JobGroup(name: 'Group1')
         ] as Set);
 
         Page page1 = new Page(name: 'Page1', weight: 0) {

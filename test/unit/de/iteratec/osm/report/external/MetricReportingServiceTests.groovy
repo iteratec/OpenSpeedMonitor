@@ -30,7 +30,7 @@ import org.joda.time.DateTime
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.measurement.schedule.JobGroupType;
+
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
@@ -632,7 +632,7 @@ class MetricReportingServiceTests {
 		csiAggregationTagService.demand.findJobGroupOfHourlyEventTag(1..10000) {
 			String hourlyEventMvTag ->
 			
-			JobGroup group = new JobGroup(name: jobGroupName, groupType: JobGroupType.CSI_AGGREGATION)
+			JobGroup group = new JobGroup(name: jobGroupName)
 			
 			GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
 			graphiteServer.setServerAdress('monitoring.hh.iteratec.de')
@@ -674,7 +674,7 @@ class MetricReportingServiceTests {
 		def jobGroupDaoService = mockFor(JobGroupDaoService, true)
 		jobGroupDaoService.demand.findCSIGroups(1..10000) { ->
 			
-			JobGroup group = new JobGroup(name: jobGroupName, groupType: JobGroupType.CSI_AGGREGATION)
+			JobGroup group = new JobGroup(name: jobGroupName)
 			
 			GraphiteServer graphiteServer = new GraphiteServer(port: 2003)
 			graphiteServer.setServerAdress('monitoring.hh.iteratec.de')

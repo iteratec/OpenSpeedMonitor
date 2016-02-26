@@ -33,7 +33,6 @@ import org.junit.*
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -251,7 +250,7 @@ class EventCsiAggregationServiceTests {
 			String hourlyEventMvTag ->
 			return eventToReturn
 		}
-		JobGroup jobGroupToReturn = new JobGroup(name: 'csiGroup', groupType: JobGroupType.CSI_AGGREGATION)
+		JobGroup jobGroupToReturn = new JobGroup(name: 'csiGroup')
 		csiAggregationTagService.demand.findJobGroupOfHourlyEventTag(1..10000) {
 			String hourlyEventMvTag ->
 			return jobGroupToReturn

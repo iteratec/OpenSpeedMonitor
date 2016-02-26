@@ -49,7 +49,7 @@ class DefaultJobGroupDaoService implements JobGroupDaoService {
 	@Override
 	public Set<JobGroup> findCSIGroups() {
 		Set<JobGroup> result = Collections.checkedSet(new HashSet<JobGroup>(), JobGroup.class);
-		result.addAll(JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION));
+		result.addAll(JobGroup.findAllByCsiConfigurationIsNotNull());
 		return Collections.unmodifiableSet(result);
 	}
 

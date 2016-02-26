@@ -31,7 +31,7 @@ import org.junit.BeforeClass
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -156,8 +156,7 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     private static void createJobGroups() {
         String csiGroupName = 'CSI'
         JobGroup.findByName(csiGroupName) ?: new JobGroup(
-                name: csiGroupName,
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+                name: csiGroupName).save(failOnError: true)
     }
 
     private static void createJobs() {

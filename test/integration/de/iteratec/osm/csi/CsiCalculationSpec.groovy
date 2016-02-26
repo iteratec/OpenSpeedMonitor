@@ -24,7 +24,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
@@ -93,8 +93,8 @@ class CsiCalculationSpec extends Specification {
         server1 = TestDataUtil.createServer()
         testLocation = TestDataUtil.createLocation(server1, 'otto-prod-hetzner:Firefox', Browser.findByName('FF'), true)
         testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
-        TestDataUtil.createJobGroup(jobGroupName_csi_1,JobGroupType.CSI_AGGREGATION)
-        TestDataUtil.createJobGroup(jobGroupName_csi_05,JobGroupType.CSI_AGGREGATION)
+        TestDataUtil.createJobGroup(jobGroupName_csi_1)
+        TestDataUtil.createJobGroup(jobGroupName_csi_05)
 
         createCsiConfigurations()
     }

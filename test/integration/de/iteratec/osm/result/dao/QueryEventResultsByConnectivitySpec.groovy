@@ -9,7 +9,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.dao.CriteriaSorting
@@ -357,7 +357,7 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         WebPageTestServer server =
             TestDataUtil.createWebPageTestServer('server 1 - wpt server', 'server 1 - wpt server', true, 'http://server1.wpt.server.de')
 
-        JobGroup jobGroup = TestDataUtil.createJobGroup("TestGroup", JobGroupType.CSI_AGGREGATION)
+        JobGroup jobGroup = TestDataUtil.createJobGroup("TestGroup")
 
         Browser fireFoxBrowser = TestDataUtil.createBrowser('FF', 0.55d)
 

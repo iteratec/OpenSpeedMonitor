@@ -10,17 +10,6 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'groupType', 'error')} required">
-    <label for="groupType" class="control-label"><g:message code="jobGroup.groupType.label" default="Group Type"/><span
-            class="required-indicator">*</span></label>
-
-    <div class="controls" id="groupTypeSelection">
-        <g:select name="groupType" from="${de.iteratec.osm.measurement.schedule.JobGroupType?.values()}"
-                  keys="${de.iteratec.osm.measurement.schedule.JobGroupType.values()*.name()}" required=""
-                  value="${jobGroupInstance?.groupType?.name()}"/>
-    </div>
-</div>
-
 <div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'graphiteServers', 'error')} ">
     <label for="graphiteServers" class="control-label"><g:message code="jobGroup.graphiteServers.label"
                                                                   default="Graphite Servers"/></label>

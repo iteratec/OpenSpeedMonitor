@@ -38,7 +38,6 @@ import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
@@ -526,11 +525,9 @@ class EventResultDashboardServiceTests {
 
     void createCSIGroups() {
         jobGroup = new JobGroup(
-                name: group1Name,
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true);
+                name: group1Name).save(failOnError: true);
         new JobGroup(
-                name: group2Name,
-                groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+                name: group2Name).save(failOnError: true)
     }
 
     void createMeasuredEvents() {

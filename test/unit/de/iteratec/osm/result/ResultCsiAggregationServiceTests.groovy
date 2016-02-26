@@ -30,7 +30,7 @@ import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
@@ -111,8 +111,7 @@ class ResultCsiAggregationServiceTests {
 				).save(failOnError: true);
 
 		JobGroup jobGroup = new JobGroup(
-				name: "TestGroup",
-				groupType: JobGroupType.CSI_AGGREGATION
+				name: "TestGroup"
 				).save(failOnError: true)
 
 		Browser fireFoxBrowser = new Browser(

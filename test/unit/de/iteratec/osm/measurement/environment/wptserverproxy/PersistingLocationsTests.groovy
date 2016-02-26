@@ -77,8 +77,7 @@ class PersistingLocationsTests {
 		).save(failOnError: true, validate: false)
 		
 		undefinedJobGroup=new JobGroup(
-			name: JobGroup.UNDEFINED_CSI,
-			groupType: JobGroupType.CSI_AGGREGATION
+			name: JobGroup.UNDEFINED_CSI
 			);
 		undefinedJobGroup.save(failOnError: true);
 		

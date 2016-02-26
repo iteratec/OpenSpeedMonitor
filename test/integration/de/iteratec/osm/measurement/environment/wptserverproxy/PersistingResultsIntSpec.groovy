@@ -26,7 +26,7 @@ import org.junit.Before
 import org.junit.Test
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.IntTestWithDBCleanup
@@ -134,8 +134,7 @@ class PersistingResultsIntSpec extends IntTestWithDBCleanup {
 	
 	private createJobGroups(){
 		undefinedJobGroup=new JobGroup(
-			name: JobGroup.UNDEFINED_CSI,
-			groupType: JobGroupType.CSI_AGGREGATION
+			name: JobGroup.UNDEFINED_CSI
 			);
 		undefinedJobGroup.save(failOnError: true);
 	}

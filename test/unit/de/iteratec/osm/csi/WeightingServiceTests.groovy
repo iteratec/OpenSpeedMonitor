@@ -24,7 +24,7 @@ import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -814,8 +814,8 @@ class WeightingServiceTests {
                 pageWeights: [new PageWeight(page: page_50, weight: 0.5d), new PageWeight(page: page_70, weight: 0.7d)]
         )
 
-        jobGroup1 = new JobGroup(name: "jobGroup1", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-        jobGroup2 = new JobGroup(name: "jobGroup2", csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+        jobGroup1 = new JobGroup(name: "jobGroup1", csiConfiguration: csiConfiguration).save(failOnError: true)
+        jobGroup2 = new JobGroup(name: "jobGroup2", csiConfiguration: csiConfiguration).save(failOnError: true)
 
         csiSystem = new CsiSystem(jobGroupWeights: [
                 new JobGroupWeight(jobGroup: jobGroup1, weight: 0.5),

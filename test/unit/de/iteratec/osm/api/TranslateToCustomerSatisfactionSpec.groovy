@@ -6,8 +6,6 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
-import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -35,7 +33,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
                 timeToCsMappings: timeToCsMappings)
         csiConfiguration.save()
 
-        jobGroup = new JobGroup(csiConfiguration: csiConfiguration, groupType: JobGroupType.CSI_AGGREGATION, name: "jobGroup").save(failOnError: true)
+        jobGroup = new JobGroup(csiConfiguration: csiConfiguration, name: "jobGroup").save(failOnError: true)
 
         mockTimeToCsMappingsService()
     }

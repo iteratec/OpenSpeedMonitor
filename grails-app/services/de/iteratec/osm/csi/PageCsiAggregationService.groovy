@@ -26,7 +26,7 @@ import org.joda.time.DateTime
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -349,7 +349,7 @@ class PageCsiAggregationService {
     @Deprecated
     List<CsiAggregation> getOrCalculateWeeklyPageCsiAggregations(Date fromDate, Date toDate) {
         CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
-        return getOrCalculatePageCsiAggregations(fromDate, toDate, weeklyInterval, JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION), Page.list())
+        return getOrCalculatePageCsiAggregations(fromDate, toDate, weeklyInterval, JobGroup.findAllByCsiConfigurationIsNotNull(), Page.list())
     }
 
     /**

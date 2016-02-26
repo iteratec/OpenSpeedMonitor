@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CachedView
@@ -329,11 +328,11 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
         CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
 
-        jobGroup1 = new JobGroup(name: jobGroupName1, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+        jobGroup1 = new JobGroup(name: jobGroupName1).save(validate: false)
         jobGroup1.csiConfiguration = csiConfiguration
-        jobGroup2 = new JobGroup(name: jobGroupName2, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+        jobGroup2 = new JobGroup(name: jobGroupName2).save(validate: false)
         jobGroup2.csiConfiguration = csiConfiguration
-        jobGroup3 = new JobGroup(name: jobGroupName3, groupType: JobGroupType.CSI_AGGREGATION).save(validate: false)
+        jobGroup3 = new JobGroup(name: jobGroupName3).save(validate: false)
         jobGroup3.csiConfiguration = csiConfiguration
 
         browser = new Browser(name: "Test", weight: 1).save(failOnError: true);

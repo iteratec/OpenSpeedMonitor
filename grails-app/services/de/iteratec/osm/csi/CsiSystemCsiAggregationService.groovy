@@ -20,7 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
@@ -99,7 +99,7 @@ class CsiSystemCsiAggregationService {
         List<JobGroupWeight> affectedJobGroupWeights = JobGroupWeight.findAllByJobGroup(jobGroupOfResult)
         List<CsiSystem> affectedCsiSystems = affectedJobGroupWeights*.csiSystem
 
-        if (affectedCsiSystems && jobGroupOfResult.groupType == JobGroupType.CSI_AGGREGATION) {
+        if (affectedCsiSystems && jobGroupOfResult.csiConfiguration != null) {
             affectedCsiSystems.each {
                 CsiAggregation csiSystemMv = ensurePresence(start, interval, it)
                 csiAggregationUpdateEventDaoService.

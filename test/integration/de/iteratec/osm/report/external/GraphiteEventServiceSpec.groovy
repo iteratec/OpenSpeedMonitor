@@ -24,7 +24,6 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -93,7 +92,6 @@ class GraphiteEventServiceSpec extends Specification{
         )
         JobGroup jobGroup = new JobGroup(
                 name: jobGroupName,
-                groupType: JobGroupType.CSI_AGGREGATION,
                 graphiteServers: [server],
         )
         GraphiteEventSourcePath eventSourcePath = new GraphiteEventSourcePath(

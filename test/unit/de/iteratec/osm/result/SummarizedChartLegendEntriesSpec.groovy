@@ -26,7 +26,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -679,10 +679,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         TestDataUtil.createLocation(server, LOCATION_3_UNIQUE_IDENTIFIER, browsers[0], true)
         TestDataUtil.createLocation(server, LOCATION_4_UNIQUE_IDENTIFIER, browsers[0], true)
 
-        JobGroup jobGroup1 = TestDataUtil.createJobGroup(JOB_GROUP_1_NAME, JobGroupType.RAW_DATA_SELECTION)
-        TestDataUtil.createJobGroup(JOB_GROUP_2_NAME, JobGroupType.RAW_DATA_SELECTION)
-        TestDataUtil.createJobGroup(JOB_GROUP_3_NAME, JobGroupType.RAW_DATA_SELECTION)
-        TestDataUtil.createJobGroup(JOB_GROUP_4_NAME, JobGroupType.RAW_DATA_SELECTION)
+        JobGroup jobGroup1 = TestDataUtil.createJobGroup(JOB_GROUP_1_NAME)
+        TestDataUtil.createJobGroup(JOB_GROUP_2_NAME)
+        TestDataUtil.createJobGroup(JOB_GROUP_3_NAME)
+        TestDataUtil.createJobGroup(JOB_GROUP_4_NAME)
 
         Page page = TestDataUtil.createPage('pageName', 12d)
 

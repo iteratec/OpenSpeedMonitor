@@ -119,7 +119,6 @@ class JobProcessingServiceSpec extends IntTestWithDBCleanup{
 				weight: 1.0).save(failOnError: true)
 		jobGroup = new JobGroup(
 				name: 'Unnamed group',
-				groupType: JobGroupType.CSI_AGGREGATION,
 				graphiteServers: []).save(failOnError: true)
 
 		script = Script.createDefaultScript('Unnamed job').save(failOnError: true)

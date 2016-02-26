@@ -35,8 +35,8 @@ class JobService {
 
     /**
      * <p>
-     * Returns the group of a job, if it was assigned to a group and the groups
-     * type is equivalent to the CSI-groups type.
+     * Returns the group of a job, if it was assigned to a group and the group
+     * has a CsiConfiguration.
      * </p>
      *
      * @param job The Job, not <code>null</code>
@@ -51,7 +51,7 @@ class JobService {
          * A Job could not be assigned to a group if the Job is unknown before
          * and was never manually(!) assigned.
          */
-        if (group != null && group.getGroupType() == JobGroupType.CSI_AGGREGATION) {
+        if (group != null && group.hasCsiConfiguration()) {
             return group
         } else {
             return null
@@ -59,13 +59,13 @@ class JobService {
     }
 
     private List<Job> findByJobGroup(JobGroup group) {
-        return Job.findAllByJobGroup(group).asList()
+        return Job.findAllByJobGroup(group)
     }
 
     List<Job> getAllCsiJobs() {
         List<Job> csiJobs = []
-        JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION).each {
-            csiJobs.addAll(findByJobGroup(it).asList())
+        JobGroup.findAllByCsiConfigurationIsNotNull().each {
+            csiJobs.addAll(findByJobGroup(it))
         }
         return csiJobs
     }

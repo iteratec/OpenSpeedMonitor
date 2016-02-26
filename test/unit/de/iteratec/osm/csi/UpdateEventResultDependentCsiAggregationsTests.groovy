@@ -28,7 +28,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CachedView
@@ -325,11 +325,9 @@ class UpdateEventResultDependentCsiAggregationsTests {
 		//create JobGroups
 		JobGroup.findByName(group1Name)?:new JobGroup(
 				name:group1Name,
-				groupType: JobGroupType.CSI_AGGREGATION,
 				csiConfiguration: csiConfiguration).save(failOnError: true)
 		JobGroup.findByName(group2Name)?:new JobGroup(
 			name:group2Name,
-			groupType: JobGroupType.CSI_AGGREGATION,
 			csiConfiguration: csiConfiguration).save(failOnError: true)
 	}
 	private void createAggregatorTypes(){

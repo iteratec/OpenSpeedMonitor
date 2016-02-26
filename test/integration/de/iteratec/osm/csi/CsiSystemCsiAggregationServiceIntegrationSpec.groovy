@@ -5,7 +5,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -337,9 +337,9 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         csiConfiguration.pageWeights = [TestDataUtil.createPageWeight(page1,1.0),TestDataUtil.createPageWeight(page2,1.0)]
         csiConfiguration.browserConnectivityWeights = [TestDataUtil.createBrowserConnectivityWeight(browser1,connectivityProfile,1.0),TestDataUtil.createBrowserConnectivityWeight(browser2,connectivityProfile,1.0)]
 
-        jobGroup1 = TestDataUtil.createJobGroup(jobGroupName1,JobGroupType.CSI_AGGREGATION)
+        jobGroup1 = TestDataUtil.createJobGroup(jobGroupName1)
         jobGroup1.csiConfiguration = csiConfiguration
-        jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2,JobGroupType.CSI_AGGREGATION)
+        jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2)
         jobGroup2.csiConfiguration = csiConfiguration
 
         csiSystem = TestDataUtil.createCsiSystem("label",[TestDataUtil.createJobGroupWeight(jobGroup1,1.0),TestDataUtil.createJobGroupWeight(jobGroup2,1.0)])
