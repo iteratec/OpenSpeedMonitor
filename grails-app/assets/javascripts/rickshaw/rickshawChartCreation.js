@@ -254,12 +254,14 @@ function RickshawGraphBuilder(args) {
       graph : self.graph
     });
 		hoverDetail.formatter = function(series, x, y, formattedX, formattedY, d, testingAgent) {
-			return "<table border=\"0\" class=\"chart-tiptext\">" +
-                "<tr>" + "<td>Timestamp: </td>" + "<td>" + formattedX + "</td>" + "</tr>" +
-                "<tr>" + "<td>Label: </td>" + "<td>" + series.name + "</td>" + "</tr>" +
-                "<tr>" + "<td>Value: </td>" + "<td>" + formattedY + "</td>" + "</tr>" +
-                "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
-                "</table>";
+          var measurandGroup = d.series.measurandGroup;
+          var scale =$.grep(self.yAxes, function(e){ return e.measurandGroup == measurandGroup; })[0];
+          return "<table border=\"0\" class=\"chart-tiptext\">" +
+              "<tr>" + "<td>Timestamp: </td>" + "<td>" + formattedX + "</td>" + "</tr>" +
+              "<tr>" + "<td>Label: </td>" + "<td>" + series.name + "</td>" + "</tr>" +
+              "<tr>" + "<td>Value: </td>" + "<td>" + scale.scale.invert(y).toFixed(0) + "</td>" + "</tr>" +
+              "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
+              "</table>";
     };
   }
 
