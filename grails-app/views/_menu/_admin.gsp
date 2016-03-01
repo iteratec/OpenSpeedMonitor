@@ -15,6 +15,12 @@
             </li>
             <sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
                 <li class="">
+                    <a href="<g:createLink controller="osmConfiguration" action="show" id="1" />">
+                        <i class="fa fa-tasks"></i>
+                        <g:message code="de.iteratec.osm.configuration.show.label" locale="${lang}"/>
+                    </a>
+                </li>
+                <li class="">
                     <a href="${createLink(controller: 'batchActivity')}">
                         <i class="fa fa-tasks"></i>
                         <g:message code="de.iteratec.osm.batch.batchactivity.list.heading" locale="${lang}"/>
@@ -50,7 +56,6 @@
                                      'JobGroupController',
                                      'LocationController',
                                      'MeasuredEventController',
-                                     'OsmConfigurationController',
                                      'PageController',
                                      'UserspecificCsiDashboardController',
                                      'UserspecificEventResultDashboardController',
