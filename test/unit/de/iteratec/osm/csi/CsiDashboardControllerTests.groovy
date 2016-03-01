@@ -1749,6 +1749,15 @@ class CsiDashboardControllerTests {
         );
     }
 
+    @Test
+    public void testGetControlnameForCsiType(){
+        assertEquals(CsiDashboardShowAllCommand.getControlnameFor(CsiType.DOC_COMPLETE), 'csiTypeDocComplete')
+        assertEquals(CsiDashboardShowAllCommand.getControlnameFor(CsiType.VISUALLY_COMPLETE), 'csiTypeVisuallyComplete')
+        shouldFail(IllegalArgumentException){
+            CsiDashboardShowAllCommand.getControlnameFor(CsiType.valueOf('NOT_EXISTANT'))
+        }
+    }
+
     /**
      * <p>
      * Asserts that a value is contained in a {@link Map}, that the value is

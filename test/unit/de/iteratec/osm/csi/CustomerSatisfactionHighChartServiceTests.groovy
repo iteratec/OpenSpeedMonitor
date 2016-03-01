@@ -90,7 +90,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
     @Shared List<String>  expectedMeasuredEventNames = ['event1', 'event2']
     @Shared List<String>  expectedBrowserNames = ['browser1', 'browser2']
     @Shared List<String>  expectedLocationNames = ['location1', 'location2']
-    @Shared List<String>  expectedCsiTypes = [CsiType.doc_complete.toString(), CsiType.visually_complete.toString()]
+    @Shared List<String>  expectedCsiTypes = [CsiType.DOC_COMPLETE.toString(), CsiType.VISUALLY_COMPLETE.toString()]
 
     @Shared String graphLabel
     @Shared Double tolerableDeviationDueToRounding
@@ -118,7 +118,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
     void "correct graph labels get created for hourly event csiAggregations"(){
 
         expect:
-        serviceUnderTest.getMapLabel(mv, CsiType.doc_complete) == expectedLabel
+        serviceUnderTest.getMapLabel(mv, CsiType.DOC_COMPLETE) == expectedLabel
 
         where:
         mv << [
@@ -152,7 +152,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	void "correct graph labels get created for weekly page csiAggregations"(){
 
         expect:
-        serviceUnderTest.getMapLabel(mv, CsiType.visually_complete) == expectedLabel
+        serviceUnderTest.getMapLabel(mv, CsiType.VISUALLY_COMPLETE) == expectedLabel
 
         where:
         mv << [
@@ -183,7 +183,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	void "correct graph labels get created for weekly shop csiAggregations"(){
 
         expect:
-        serviceUnderTest.getMapLabel(mv, CsiType.doc_complete) == expectedLabel
+        serviceUnderTest.getMapLabel(mv, CsiType.DOC_COMPLETE) == expectedLabel
 
         where:
         mv << [
@@ -216,7 +216,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 
         when:
 		OsmRickshawChart chart = serviceUnderTest.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
-				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked, [CsiType.doc_complete]
+				now, tomorrow, irrelevantQueryParamsCauseUsingFunctionalityIsMocked, [CsiType.DOC_COMPLETE]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
@@ -244,7 +244,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 new MvQueryParams(),
                 weekly,
-				[CsiType.doc_complete]
+				[CsiType.DOC_COMPLETE]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> pointsGroupPageCombination_11 = findGraphByLabel(graphs, expectedGraphLabelOfGroupPageCombination_11).getPoints();
@@ -279,7 +279,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				[CsiType.doc_complete]
+				[CsiType.DOC_COMPLETE]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -309,7 +309,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				[CsiType.doc_complete]
+				[CsiType.DOC_COMPLETE]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -339,7 +339,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				[CsiType.doc_complete]
+				[CsiType.DOC_COMPLETE]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()
@@ -369,7 +369,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 new Interval(now.getTime(), tomorrow.getTime()),
                 weekly,
                 new MvQueryParams(),
-				[CsiType.doc_complete]
+				[CsiType.DOC_COMPLETE]
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
         List<OsmChartPoint> points = findGraphByLabel(graphs, expectedLabel).getPoints()

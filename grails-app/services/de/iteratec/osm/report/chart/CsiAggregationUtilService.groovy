@@ -249,7 +249,7 @@ class CsiAggregationUtilService {
 		}else if (intervalInMinutes == CsiAggregationInterval.WEEKLY) {
 			return toAddTo.plusWeeks(1)
 		}else{
-			throw new IllegalArgumentException("Unnknown interval: ${interval}")
+			throw new IllegalArgumentException("Unnknown interval: ${intervalInMinutes}")
 		}
 	}
 	

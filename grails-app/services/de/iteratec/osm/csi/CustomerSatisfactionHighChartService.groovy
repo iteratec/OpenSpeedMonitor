@@ -196,7 +196,7 @@ class CustomerSatisfactionHighChartService {
                         time: getHighchartCompatibleTimestampFrom(eachCsiVal.started),
                         csiAggregation: formatPercentage(getValue(eachCsiVal)),
                         countOfAggregatedResults: eachCsiVal.countUnderlyingEventResultsByWptDocComplete(),
-                        sourceURL: getLinkFor(eachCsiVal),
+                        sourceURL: getLinkFor(eachCsiVal, csiType),
                         testingAgent: null
                 )
                 if(chartPoint.isValid())
@@ -210,11 +210,11 @@ class CustomerSatisfactionHighChartService {
 	}
 
 	private List<OsmChartGraph> convertToHighchartGraphListVisuallyCompleteBased(Collection<CsiAggregation> csiValues ){
-		return convertToHighchartGraphListTemplate(csiValues, CsiType.visually_complete){CsiAggregation it -> it.csByWptVisuallyCompleteInPercent}
+		return convertToHighchartGraphListTemplate(csiValues, CsiType.VISUALLY_COMPLETE){ CsiAggregation it -> it.csByWptVisuallyCompleteInPercent}
 	}
 
 	private List<OsmChartGraph> convertToHighchartGraphListDocCompleteBased(Collection<CsiAggregation> csiValues){
-		return convertToHighchartGraphListTemplate(csiValues, CsiType.doc_complete){CsiAggregation it -> it.csByWptDocCompleteInPercent}
+		return convertToHighchartGraphListTemplate(csiValues, CsiType.DOC_COMPLETE){ CsiAggregation it -> it.csByWptDocCompleteInPercent}
 	}
 	/**
 	 * <p>
@@ -230,9 +230,9 @@ class CustomerSatisfactionHighChartService {
 	 */
  	private List<OsmChartGraph> convertToHighchartGraphList(Collection<CsiAggregation> csiValues, List<CsiType> csiType){
 		List<OsmChartGraph> graphs = []
-			if(csiType.contains(CsiType.doc_complete))
+			if(csiType.contains(CsiType.DOC_COMPLETE))
 				graphs.addAll(convertToHighchartGraphListDocCompleteBased(csiValues));
-			if(csiType.contains(CsiType.visually_complete))
+			if(csiType.contains(CsiType.VISUALLY_COMPLETE))
 				graphs.addAll(convertToHighchartGraphListVisuallyCompleteBased(csiValues))
 
 		sortPointsInAllGraphsByTime(graphs)
@@ -266,11 +266,15 @@ class CustomerSatisfactionHighChartService {
 	 * @return
 	 * @see https://seu.hh.iteratec.de:8444/browse/IT-381
 	 */
-	private URL getLinkFor(CsiAggregation csiValue){
+	private URL getLinkFor(CsiAggregation csiValue, CsiType csiType){
 		URL linkForPoint
 
-		if (csiValue.aggregator.name.equals(AggregatorType.PAGE) || csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
-			def paramsToSend = getParamsForLink(csiValue)
+		if (csiValue.aggregator.name.equals(AggregatorType.PAGE) ||
+                csiValue.aggregator.name.equals(AggregatorType.SHOP) ||
+                csiValue.aggregator.name.equals(AggregatorType.CSI_SYSTEM)
+        ) {
+			Map paramsToSend = getParamsForLink(csiValue)
+            paramsToSend[CsiDashboardShowAllCommand.getControlnameFor(csiType)] = 'on'
 			String testsDetailURLAsString = grailsLinkGenerator.link([
 				'controller': 'csiDashboard',
 				'action':'showAll',
@@ -285,28 +289,44 @@ class CustomerSatisfactionHighChartService {
 	}
 
 	private Map getParamsForLink(CsiAggregation csiValue){
+
 		DateTime startOfInterval = new DateTime(csiValue.started)
-		DateTime endOfInterval = csiAggregationUtilService.addOneInterval(startOfInterval, csiValue.interval.intervalInMinutes)
-		Map paramsToSend = [
-			'from': LINK_PARAMS_DATE_TIME_FORMAT.print(startOfInterval),
-			'fromHour': '0',
-			'fromMinute': '0',
-			'to': LINK_PARAMS_DATE_TIME_FORMAT.print(endOfInterval),
-			'toHour': '0',
-			'toMinute': '0',
-			'selectedAllBrowsers': 'on',
-			'selectedAllLocations': 'on',
-			'selectedAllMeasuredEvents': 'on',
+        DateTime endOfInterval = csiAggregationUtilService.addOneInterval(startOfInterval, csiValue.interval.intervalInMinutes)
+        Map paramsToSend = [
+            'from': LINK_PARAMS_DATE_TIME_FORMAT.print(startOfInterval),
+            'fromHour': '0:00',
+            'to': LINK_PARAMS_DATE_TIME_FORMAT.print(endOfInterval),
+            'toHour': '0:00',
+            'selectedAllBrowsers': 'on',
+            'selectedAllLocations': 'on',
+            'selectedAllMeasuredEvents': 'on',
             '_action_showAll': 'Show'
-		]
-		if (csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
+        ]
+
+        if (csiValue.aggregator.name.equals(AggregatorType.CSI_SYSTEM)) {
+
+            if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
+                paramsToSend['selectedCsiSystems'] = csiValue.csiSystem.ident()
+                paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM
+                paramsToSend['selectedTimeFrameInterval'] = "0"
+            }else if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.DAILY) {
+                paramsToSend['to'] = LINK_PARAMS_DATE_TIME_FORMAT.print(startOfInterval)
+                paramsToSend['toHour'] = '23:59'
+                paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+                paramsToSend['selectedFolder'] = csiValue.csiSystem.getAffectedJobGroups()*.ident()
+                paramsToSend['selectedTimeFrameInterval'] = "0"
+            }
+
+        }else if (csiValue.aggregator.name.equals(AggregatorType.SHOP)) {
 
 			if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
 				paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
 				paramsToSend['selectedFolder'] = csiAggregationTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.DAILY) {
-				paramsToSend['aggrGroupAndInterval'] = AggregatorType.MEASURED_EVENT
+                paramsToSend['to'] = LINK_PARAMS_DATE_TIME_FORMAT.print(startOfInterval)
+                paramsToSend['toHour'] = '23:59'
+				paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
 				paramsToSend['selectedFolder'] = csiAggregationTagService.findJobGroupOfWeeklyShopTag(csiValue.tag).ident()
 				paramsToSend['selectedPages'] = Page.list()*.ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
@@ -320,7 +340,7 @@ class CustomerSatisfactionHighChartService {
 				paramsToSend['selectedPages'] = csiAggregationTagService.findPageByPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"
 			}else if (csiValue.interval.intervalInMinutes == CsiAggregationInterval.DAILY) {
-				paramsToSend['aggrGroupAndInterval'] = AggregatorType.MEASURED_EVENT
+				paramsToSend['aggrGroupAndInterval'] = CsiDashboardController.HOURLY_MEASURED_EVENT
 				paramsToSend['selectedFolder'] = csiAggregationTagService.findJobGroupOfWeeklyPageTag(csiValue.tag).ident()
 				paramsToSend['selectedPages'] = csiAggregationTagService.findPageByPageTag(csiValue.tag).ident()
                 paramsToSend['selectedTimeFrameInterval'] = "0"

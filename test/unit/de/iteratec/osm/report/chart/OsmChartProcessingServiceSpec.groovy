@@ -105,13 +105,13 @@ class OsmChartProcessingServiceSpec extends Specification{
     void "event csiAggregations, some legend parts in every graph the same, some different -> summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_1_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_2_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_3_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, EVENT_1_NAME, LOCATION_4_UNIQUE_IDENTIFIER].join(HIGHCHART_LEGEND_DELIMITTER))
         ]
         String expectedCommonLabel =
-                "<b>${I18N_LABEL_CSI_TYPE}</b>: ${CsiType.doc_complete.toString()} | " +
+                "<b>${I18N_LABEL_CSI_TYPE}</b>: ${CsiType.DOC_COMPLETE.toString()} | " +
                 "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME} | " +
                         "<b>${I18N_LABEL_MEASURED_EVENT}</b>: ${EVENT_1_NAME}"
 
@@ -184,10 +184,10 @@ class OsmChartProcessingServiceSpec extends Specification{
     void "page csiAggregations, some legend parts in every graph the same, some different -> summarization"(){
         setup:
         List<OsmChartGraph> graphs = [
-                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.doc_complete.toString(), JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.visually_complete.toString(), JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
-                new OsmChartGraph(label: [CsiType.visually_complete.toString(), JOB_GROUP_1_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER))
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_1_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.DOC_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_2_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.VISUALLY_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_3_NAME].join(HIGHCHART_LEGEND_DELIMITTER)),
+                new OsmChartGraph(label: [CsiType.VISUALLY_COMPLETE.toString(), JOB_GROUP_1_NAME, PAGE_4_NAME].join(HIGHCHART_LEGEND_DELIMITTER))
         ]
         String expectedCommonLabel = "<b>${I18N_LABEL_JOB_GROUP}</b>: ${JOB_GROUP_1_NAME}"
 
@@ -199,10 +199,10 @@ class OsmChartProcessingServiceSpec extends Specification{
         resultGraphs.size() == 4
         List<String> graphLables = resultGraphs*.label
         graphLables.containsAll([
-                CsiType.doc_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_1_NAME,
-                CsiType.doc_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_2_NAME,
-                CsiType.visually_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_3_NAME,
-                CsiType.visually_complete.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_4_NAME
+                CsiType.DOC_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_1_NAME,
+                CsiType.DOC_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_2_NAME,
+                CsiType.VISUALLY_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_3_NAME,
+                CsiType.VISUALLY_COMPLETE.toString()+HIGHCHART_LEGEND_DELIMITTER+PAGE_4_NAME
         ])
         chart.osmChartGraphsCommonLabel == expectedCommonLabel
     }

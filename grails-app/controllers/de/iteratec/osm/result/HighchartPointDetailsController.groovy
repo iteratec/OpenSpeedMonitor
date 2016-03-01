@@ -247,7 +247,8 @@ class HighchartPointDetailsController {
 		}
 
 		modelToRender.put('measuringOfValueStartedAt', valueThatResultsShouldBeListed.started ?: new Date(0));
-		modelToRender.put('aggregatedCsiAggregation', valueThatResultsShouldBeListed.value ?: 0.0d);
+		modelToRender.put('aggregatedCsiAggregationDocComplete', valueThatResultsShouldBeListed.csByWptDocCompleteInPercent ?: 0.0d);
+        modelToRender.put('aggregatedCsiAggregationVisuallyComplete', valueThatResultsShouldBeListed.csByWptVisuallyCompleteInPercent ?: 0.0d);
 		
 		return modelToRender;
 	}

@@ -577,4 +577,14 @@ public class CsiDashboardShowAllCommand {
         }
         return interval
     }
+
+    public static String getControlnameFor(CsiType csiType){
+        if(csiType == CsiType.DOC_COMPLETE){
+            return 'csiTypeDocComplete'
+        }else if(csiType == CsiType.VISUALLY_COMPLETE){
+            return 'csiTypeVisuallyComplete'
+        }else{
+            throw new IllegalArgumentException("The following ")
+        }
+    }
 }
