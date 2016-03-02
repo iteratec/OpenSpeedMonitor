@@ -5,10 +5,10 @@
 #################
 
 # make external config file available as env variable
-if [ -e "./$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE" ]
+if [ -e "./credentials/$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE" ]
   then export bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE=$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE
   else
-    echo "External config file $bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE does not exist in osm_creadentials repository!"
+    echo "External config file $bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE does not exist in osm_credentials repository!"
     exit 1;
 fi
 
