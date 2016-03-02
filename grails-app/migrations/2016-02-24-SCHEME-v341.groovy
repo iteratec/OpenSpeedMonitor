@@ -22,11 +22,11 @@ databaseChangeLog = {
 	}
 
 	changeSet(author: "birger (generated)", id: "1456401696309-2") {
-		dropForeignKeyConstraint(baseTableName: "web_performance_waterfall_waterfall_entry", constraintName: "FK297D11DE5F1B69E4")
+		dropForeignKeyConstraint(baseTableName: "web_performance_waterfall_waterfall_entry", constraintName: "FK297D11DE57993D8B")
 	}
 
 	changeSet(author: "birger (generated)", id: "1456401696309-3") {
-		dropForeignKeyConstraint(baseTableName: "web_performance_waterfall_waterfall_entry", constraintName: "FK297D11DEBD83B85")
+		dropForeignKeyConstraint(baseTableName: "web_performance_waterfall_waterfall_entry", constraintName: "FK297D11DE903CE91E")
 	}
 
 	changeSet(author: "birger (generated)", id: "1456401696309-4") {
