@@ -26,12 +26,10 @@ import org.junit.Before
 import org.junit.Test
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.csi.IntTestWithDBCleanup
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -78,7 +76,7 @@ class PersistingResultsIntSpec extends IntTestWithDBCleanup {
 		String har = new File("test/resources/HARs/invalid.har").getText()
 		
 		//test specific mocks
-		mockMeasuredValueUpdateService(false)
+		mockCsiAggregationUpdateService(false)
 		
 		//test execution
 		locationAndResultPersisterService.listenToResult(xmlResult, har, server1)
@@ -89,20 +87,17 @@ class PersistingResultsIntSpec extends IntTestWithDBCleanup {
 		int cachedViews = 2
 		int expectedNumberOfResults = runs * events * cachedViews
 		assertThat(EventResult.list().size, is(expectedNumberOfResults))
-		
-		List<WebPerformanceWaterfall> waterfalls = WebPerformanceWaterfall.list()
-		assertThat(waterfalls.size(), is(0))
     }
 	
 	@Test
-	void testPersistingOfResultsAfterFailedDependentMeasuredValueCalculation() {
+	void testPersistingOfResultsAfterFailedDependentCsiAggregationCalculation() {
 		
 		//create test-specific data
 		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
 		String harInconsistentButNotTheConcernOfThisTest = new File("test/resources/HARs/multistep_1Run_6Events_FirstAndRepeatedView.har").getText()
 		
 		//test specific mocks
-		mockMeasuredValueUpdateService(true)
+		mockCsiAggregationUpdateService(true)
 		
 		//test execution
 		locationAndResultPersisterService.listenToResult(xmlResult, harInconsistentButNotTheConcernOfThisTest, server1)
@@ -139,8 +134,7 @@ class PersistingResultsIntSpec extends IntTestWithDBCleanup {
 	
 	private createJobGroups(){
 		undefinedJobGroup=new JobGroup(
-			name: JobGroup.UNDEFINED_CSI,
-			groupType: JobGroupType.CSI_AGGREGATION
+			name: JobGroup.UNDEFINED_CSI
 			);
 		undefinedJobGroup.save(failOnError: true);
 	}
@@ -203,8 +197,8 @@ class PersistingResultsIntSpec extends IntTestWithDBCleanup {
 			return 42 //not the concern of this tests
 		}
 	}
-	void mockMeasuredValueUpdateService(Boolean shouldFail){
-		locationAndResultPersisterService.measuredValueUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result -> 
+	void mockCsiAggregationUpdateService(Boolean shouldFail){
+		locationAndResultPersisterService.csiAggregationUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result ->
 			if(shouldFail) throw new RuntimeException()
 		}	
 	}

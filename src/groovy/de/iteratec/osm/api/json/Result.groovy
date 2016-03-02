@@ -120,8 +120,8 @@ public final class Result {
 	public final String httpArchiveUrl
 	
 	public Result(EventResult eventResult) {
-		this.csiValue = eventResult.customerSatisfactionInPercent != null ?
-				API_DECIMAL_FORMAT.format( (double)eventResult.customerSatisfactionInPercent ) :
+		this.csiValue = eventResult.csByWptDocCompleteInPercent != null ?
+				API_DECIMAL_FORMAT.format( (double)eventResult.csByWptDocCompleteInPercent ) :
 				"not calculated"
 		this.browser = eventResult.jobResult.locationBrowser;
 		this.location = eventResult.jobResult.locationUniqueIdentifierForServer;

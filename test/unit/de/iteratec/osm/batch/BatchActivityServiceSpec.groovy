@@ -44,9 +44,6 @@ class BatchActivityServiceSpec extends Specification {
             serviceUnderTest.updateActivities()
 
         then:
-        //The Activity should be persisted after it's first update, so at this point there should be no BatchActivity received
-            BatchActivity.list().size() == 0
-        //But it should exist
             batchActivity != null
     }
 

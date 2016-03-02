@@ -52,12 +52,12 @@ public class EventResultDashboardService {
     JobGroupDaoService jobGroupDaoService
     PageDaoService pageDaoService
     LocationDaoService locationDaoService
-    ResultMeasuredValueService resultMeasuredValueService
+    ResultCsiAggregationService resultCsiAggregationService
     I18nService i18nService
-    MeasuredValueTagService measuredValueTagService
+    CsiAggregationTagService csiAggregationTagService
     JobResultDaoService jobResultDaoService
     EventResultDaoService eventResultDaoService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationUtilService csiAggregationUtilService
     PerformanceLoggingService performanceLoggingService
     AggregatorTypeDaoService aggregatorTypeDaoService
     ConnectivityProfileDaoService connectivityProfileDaoService
@@ -171,7 +171,7 @@ public class EventResultDashboardService {
         Map<String, Number> gtValues = [:]
         Map<String, Number> ltValues = [:]
         aggregators.each { AggregatorType aggregator ->
-            String associatedEventResultAttributeName = resultMeasuredValueService.getEventResultAttributeNameFromMeasurand(aggregator)
+            String associatedEventResultAttributeName = resultCsiAggregationService.getEventResultAttributeNameFromMeasurand(aggregator)
             if (aggregator.measurandGroup == MeasurandGroup.LOAD_TIMES) {
                 if (queryParams.minLoadTimeInMillisecs) {
                     gtValues[associatedEventResultAttributeName] = queryParams.minLoadTimeInMillisecs
@@ -217,7 +217,7 @@ public class EventResultDashboardService {
     /**
      * <p>
      * Transforms given eventResults to a list of {@link de.iteratec.osm.report.chart.OsmChartGraph}s respective given measurands (aggregators) and interval.
-     * If interval is not {@link MeasuredValueInterval#RAW} the values for the measurands will be aggregated respective interval.
+     * If interval is not {@link CsiAggregationInterval#RAW} the values for the measurands will be aggregated respective interval.
      * </p>
      *
      * @param eventResults
@@ -228,7 +228,7 @@ public class EventResultDashboardService {
     private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval) {
         Map<String, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', IndentationDepth.ONE) {
-            if (interval == MeasuredValueInterval.RAW) {
+            if (interval == CsiAggregationInterval.RAW) {
                 calculatedResultMap = calculateResultMapForRawData(aggregators, eventResults)
             } else {
                 calculatedResultMap = calculateResultMapForAggregatedData(aggregators, eventResults, interval)
@@ -253,7 +253,7 @@ public class EventResultDashboardService {
 
         aggregators.each { AggregatorType aggregator ->
 
-            CachedView aggregatorTypeCachedView = resultMeasuredValueService.getAggregatorTypeCachedViewType(aggregator)
+            CachedView aggregatorTypeCachedView = resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator)
 
             eventResults.each { EventResult eventResult ->
 
@@ -265,10 +265,10 @@ public class EventResultDashboardService {
                 }
 
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
-                    Double value = resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
+                    Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
                     if (value != null) {
                         String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
-                        OsmChartPoint chartPoint = new OsmChartPoint(time: eventResult.getJobResultDate().getTime(), measuredValue: value, countOfAggregatedResults: 1, sourceURL: testsDetailsURL, testingAgent: eventResult.testAgent)
+                        OsmChartPoint chartPoint = new OsmChartPoint(time: eventResult.getJobResultDate().getTime(), csiAggregation: value, countOfAggregatedResults: 1, sourceURL: testsDetailsURL, testingAgent: eventResult.testAgent)
                         if (chartPoint.isValid())
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
                     }
@@ -286,11 +286,11 @@ public class EventResultDashboardService {
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', IndentationDepth.TWO) {
             eventResults.each { EventResult eventResult ->
                 aggregators.each { AggregatorType aggregator ->
-                    if (isCachedViewEqualToAggregatorTypesView(eventResult, resultMeasuredValueService.getAggregatorTypeCachedViewType(aggregator))) {
-                        Double value = resultMeasuredValueService.getEventResultPropertyForCalculation(aggregator, eventResult)
+                    if (isCachedViewEqualToAggregatorTypesView(eventResult, resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator))) {
+                        Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
                         if (value != null) {
                             String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
-                            Long millisStartOfInterval = measuredValueUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
+                            Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}${UNIQUE_STRING_DELIMITTER}${connectivity}"] << value
                         }
                     }
@@ -335,7 +335,7 @@ public class EventResultDashboardService {
                     if (countValues > 0) {
                         sum = 0
                         value.each { singleValue -> sum += singleValue }
-                        OsmChartPoint chartPoint = new OsmChartPoint(time: millisStartOfInterval, measuredValue: sum / countValues, countOfAggregatedResults: countValues, sourceURL: testsDetailsURL, testingAgent: null)
+                        OsmChartPoint chartPoint = new OsmChartPoint(time: millisStartOfInterval, csiAggregation: sum / countValues, countOfAggregatedResults: countValues, sourceURL: testsDetailsURL, testingAgent: null)
                         if (chartPoint.isValid())
                             highchartPointsForEachGraph[graphLabel] << chartPoint
                     }
@@ -384,11 +384,11 @@ public class EventResultDashboardService {
 
             String tag = tokenizedGraphLabel[1]
             if (tag) {
-                Long jobGroupId = Long.valueOf(measuredValueTagService.findJobGroupIdOfHourlyEventTag(tag))
+                Long jobGroupId = Long.valueOf(csiAggregationTagService.findJobGroupIdOfHourlyEventTag(tag))
                 JobGroup group = jobGroupMap[jobGroupId] ?: JobGroup.get(jobGroupId)
-                Long eventId = Long.valueOf(measuredValueTagService.findMeasuredEventIdOfHourlyEventTag(tag))
+                Long eventId = Long.valueOf(csiAggregationTagService.findMeasuredEventIdOfHourlyEventTag(tag))
                 MeasuredEvent measuredEvent = measuredEventMap[eventId] ?: MeasuredEvent.get(eventId)
-                Long locationId = Long.valueOf(measuredValueTagService.findLocationIdOfHourlyEventTag(tag))
+                Long locationId = Long.valueOf(csiAggregationTagService.findLocationIdOfHourlyEventTag(tag))
                 Location location = locationMap[locationId] ?: Location.get(locationId)
 
                 if (group && measuredEvent && location) {
@@ -417,7 +417,7 @@ public class EventResultDashboardService {
 
     /**
      * <p>
-     * Builds up an URL where details to the specified {@link MeasuredValue}
+     * Builds up an URL where details to the specified {@link CsiAggregation}
      * are available if possible.
      * </p>
      *
@@ -427,9 +427,9 @@ public class EventResultDashboardService {
      * @return The created URL or <code>null</code> if not possible to
      *         build up an URL.
      */
-    public URL tryToBuildTestsDetailsURL(MeasuredValue mv) {
+    public URL tryToBuildTestsDetailsURL(CsiAggregation mv) {
         URL result = null;
-        List<Long> eventResultIds = mv.resultIdsAsList;
+        List<Long> eventResultIds = mv.underlyingEventResultsByWptDocCompleteAsList;
 
         if (!eventResultIds.isEmpty()) {
             String testsDetaialsURLAsString = grailsLinkGenerator.link([
@@ -437,7 +437,7 @@ public class EventResultDashboardService {
                     'action'    : 'listAggregatedResults',
                     'absolute'  : true,
                     'params'    : [
-                            'measuredValueId'                        : String.valueOf(mv.id),
+                            'csiAggregationId'                        : String.valueOf(mv.id),
                             'lastKnownCountOfAggregatedResultsOrNull': String.valueOf(eventResultIds.size())
                     ]
             ]);

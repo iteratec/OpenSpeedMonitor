@@ -18,23 +18,23 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMappingService
+import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.detail.HarParserService
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
@@ -47,15 +47,16 @@ import static org.junit.Assert.*
 
 /**
  * Tests the saving of locations and results. These functions are used in proxy-mechanism.
- * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link MeasuredValue}s is not the concern of the tests in this class. 
+ * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link CsiAggregation}s is not the concern of the tests in this class.
  * @author nkuhn
  * @see {@link ProxyService}
  * 
- * @deprecated This test is to complicated - make it simpler!
+ * TODO: This test is to complicated - make it simpler!
  */
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping])
 class PersistingNewEventResultsTests {
+	private static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
 
 	WebPageTestServer server1, server2
 	
@@ -172,6 +173,7 @@ class PersistingNewEventResultsTests {
         createTestDataCommonForAllTests()
 		
 		//mocks common for all tests
+		SERVICE_MOCKER.mockTTCsMappingService(serviceUnderTest)
 		mockMetricReportingService()
 		mockHarParserService()
 		
@@ -219,11 +221,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -253,7 +255,7 @@ class PersistingNewEventResultsTests {
 			it.medianValue == true && it.cachedView == CachedView.UNCACHED
 		}
 		assertEquals('Count of median uncached-EventResults for event 4 - ', 1, medianUncachedResultsOfEvent4.size())
-		assertEquals('docCompleteTimeInMillisecs of median uncached-EventResults for event 4 - ', 2218, medianUncachedResultsOfEvent4[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median uncached-EventResults for event 4 - ', 2218, medianUncachedResultsOfEvent4[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median uncached-EventResults for event 4 - ', 29, medianUncachedResultsOfEvent4[0].docCompleteRequests)
 		assertEquals('wptStatus of median uncached-EventResults for event 4 - ', 99999, medianUncachedResultsOfEvent4[0].wptStatus)
 		
@@ -261,7 +263,7 @@ class PersistingNewEventResultsTests {
 			it.medianValue == true && it.cachedView == CachedView.CACHED && it.numberOfWptRun == 1
 		}
 		assertEquals('Count of median cached-EventResults for event 2, first run - ', 1, medianCachedResultsOfEvent2Run1.size())
-		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for event 2, first run  - ', 931, medianCachedResultsOfEvent2Run1[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median cached-EventResults for event 2, first run  - ', 931, medianCachedResultsOfEvent2Run1[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median cached-EventResults for event 2, first run  - ', 6, medianCachedResultsOfEvent2Run1[0].docCompleteRequests)
 		assertEquals('wptStatus of median cached-EventResults for event 2, first run  - ', 99999, medianCachedResultsOfEvent2Run1[0].wptStatus)
 
@@ -292,11 +294,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -326,7 +328,7 @@ class PersistingNewEventResultsTests {
 			it.medianValue == true && it.cachedView == CachedView.UNCACHED
 		}
 		assertEquals('Count of median uncached-EventResults for event 4 - ', 1, medianUncachedResultsOfEvent4.size())
-		assertEquals('docCompleteTimeInMillisecs of median uncached-EventResults for event 4 - ', 2218, medianUncachedResultsOfEvent4[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median uncached-EventResults for event 4 - ', 2218, medianUncachedResultsOfEvent4[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median uncached-EventResults for event 4 - ', 29, medianUncachedResultsOfEvent4[0].docCompleteRequests)
 		assertEquals('wptStatus of median uncached-EventResults for event 4 - ', 99999, medianUncachedResultsOfEvent4[0].wptStatus)
 		
@@ -334,7 +336,7 @@ class PersistingNewEventResultsTests {
 			it.medianValue == true && it.cachedView == CachedView.CACHED && it.numberOfWptRun == 1
 		}
 		assertEquals('Count of median cached-EventResults for event 2, first run - ', 1, medianCachedResultsOfEvent2Run1.size())
-		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for event 2, first run - ', 931, medianCachedResultsOfEvent2Run1[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median cached-EventResults for event 2, first run - ', 931, medianCachedResultsOfEvent2Run1[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median cached-EventResults for event 2, first run - ', 6, medianCachedResultsOfEvent2Run1[0].docCompleteRequests)
 		assertEquals('wptStatus of median cached-EventResults for event 2, first run - ', 99999, medianCachedResultsOfEvent2Run1[0].wptStatus)
 		
@@ -353,6 +355,44 @@ class PersistingNewEventResultsTests {
 		assertTrue(tokensCached[2].contains("1"))
 		assertTrue(tokensCached[3].contains("1#waterfall_viewHPArtikel suchen"))
 	}
+
+	@Test
+	void testCreatedEventsAfterListeningToMultistepResultHasCsByVisuallyComplete(){
+
+		//create test-specific data
+		String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
+		File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+		GPathResult xmlResult = new XmlSlurper().parse(file)
+		String har = new File('test/resources/HARs/singleResult.har').getText()
+		createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
+
+		//mocking of inner services
+
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
+		mockPageService()
+		mockJobService()
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
+		deleteAllRelevantDomains()
+
+		//test execution
+
+		serviceUnderTest.listenToResult(xmlResult, har, server1)
+
+		//assertions
+
+		List<EventResult> events = EventResult.list()
+		assertEquals('Count of events', 15, events.size())
+
+
+		//check all EventResults have visualComplete
+		boolean allHaveVisualComplete = !events.any { it.visuallyCompleteInMillisecs == null }
+		assertTrue(allHaveVisualComplete)
+
+		//check all EventResults have set csByVisualComplete
+		boolean allHaveCsByVisualComplete = !events.any { it.csByWptVisuallyCompleteInPercent == null }
+		assertTrue(allHaveCsByVisualComplete)
+	}
 	
 	@Test
 	void testPageAssignement(){
@@ -366,11 +406,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -400,11 +440,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -423,7 +463,7 @@ class PersistingNewEventResultsTests {
 			it.medianValue == true && it.cachedView == CachedView.UNCACHED
 		}
 		assertEquals('Count of median uncached-EventResults for single event - ', 1, medianUncachedResultsOfsingleEvent.size())
-		assertEquals('docCompleteTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median uncached-EventResults for single event - ', 157, medianUncachedResultsOfsingleEvent[0].docCompleteRequests)
 		assertEquals('wptStatus of median uncached-EventResults for single event - ', 0, medianUncachedResultsOfsingleEvent[0].wptStatus)
 		
@@ -431,7 +471,7 @@ class PersistingNewEventResultsTests {
 			it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
 		}
 		assertEquals('Count of median cached-EventResults for single event, third run - ', 1, medianCachedResultsOfsingleEventRun3.size())
-		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
 		assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
 		
@@ -462,11 +502,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
@@ -485,7 +525,7 @@ class PersistingNewEventResultsTests {
 			it.medianValue == true && it.cachedView == CachedView.UNCACHED
 		}
 		assertEquals('Count of median uncached-EventResults for single event - ', 1, medianUncachedResultsOfsingleEvent.size())
-		assertEquals('docCompleteTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median uncached-EventResults for single event - ', 157, medianUncachedResultsOfsingleEvent[0].docCompleteRequests)
 		assertEquals('wptStatus of median uncached-EventResults for single event - ', 0, medianUncachedResultsOfsingleEvent[0].wptStatus)
 		
@@ -493,7 +533,7 @@ class PersistingNewEventResultsTests {
 			it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
 		}
 		assertEquals('Count of median cached-EventResults for single event, third run - ', 1, medianCachedResultsOfsingleEventRun3.size())
-		assertEquals('docCompleteTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
+		assertEquals('loadTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
 		assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
 		assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
 		
@@ -567,11 +607,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		mockProxyService(xmlResult.data.location.toString())
 		
 		deleteAllRelevantDomains() // No Locations left!
@@ -596,11 +636,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
 		//test execution
@@ -628,11 +668,11 @@ class PersistingNewEventResultsTests {
 
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
 		//test execution
@@ -769,11 +809,11 @@ class PersistingNewEventResultsTests {
 	private void mockInnerServices() {
 		//mocking of inner services
 	
-		mockMeasuredValueUpdateService()
-		mockTimeToCsMappingService()
+		mockCsiAggregationUpdateService()
+		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
 		mockJobService()
-		mockMeasuredValueTagService('notTheConcernOfThisTest')
+		mockCsiAggregationTagService('notTheConcernOfThisTest')
 	}
 
 	private void createLocationIfNotExistent(String locationIdentifier, Browser browser, WebPageTestServer server) {
@@ -815,26 +855,13 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.browserService = browserService.createMock()
 	}
-	private void mockTimeToCsMappingService(){
-		def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage ->
-			//not the concern of this test
-		}
-		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
-			//not the concern of this test
-		}
-        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
-            //not the concern of this test
-        }
-		serviceUnderTest.timeToCsMappingService = timeToCsMappingService.createMock()
-	}
-	private void mockMeasuredValueUpdateService(){
-		def measuredValueUpdateServiceMocked = mockFor(MeasuredValueUpdateService, true)
-		measuredValueUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
+	private void mockCsiAggregationUpdateService(){
+		def csiAggregationUpdateServiceMocked = mockFor(CsiAggregationUpdateService, true)
+		csiAggregationUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
 			//not the concern of this test
 			return 34d
 		}
-		serviceUnderTest.measuredValueUpdateService = measuredValueUpdateServiceMocked.createMock()
+		serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.createMock()
 	}
 	private void mockPageService(){
 		def pageServiceMocked = mockFor(PageService, true)
@@ -861,9 +888,9 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.jobService = jobServiceMocked.createMock()
 	}
-	private void mockMeasuredValueTagService(String tagToReturn){
-		def measuredValueTagService = mockFor(MeasuredValueTagService, true)
-		measuredValueTagService.demand.createEventResultTag(0..100) { 
+	private void mockCsiAggregationTagService(String tagToReturn){
+		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+		csiAggregationTagService.demand.createEventResultTag(0..100) {
 			JobGroup jobGroup,
 			MeasuredEvent measuredEvent,
 			Page page,
@@ -871,11 +898,11 @@ class PersistingNewEventResultsTests {
 			Location location ->
 			return tagToReturn
 		}
-		measuredValueTagService.demand.findJobGroupOfEventResultTag(0..100) {
+		csiAggregationTagService.demand.findJobGroupOfEventResultTag(0..100) {
 			String tag ->
 			return undefinedJobGroup
 		}
-		serviceUnderTest.measuredValueTagService = measuredValueTagService.createMock()
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
 	}
 	private void mockMetricReportingService(){
 		def metricReportingService = mockFor(MetricReportingService, true)
@@ -887,14 +914,6 @@ class PersistingNewEventResultsTests {
 	}
 	private void mockHarParserService(){
 		def harParserService = mockFor(HarParserService, true)
-		harParserService.demand.getWaterfalls(0..100) {
-			String har ->
-			return [:]	//not the concern of this test
-		}
-		harParserService.demand.removeWptMonitorSuffixAndPagenamePrefixFromEventnames(0..100) {
-			Map<String, WebPerformanceWaterfall> pageidToWaterfallMap ->
-			return [:]	//not the concern of this test
-		}
 		harParserService.demand.createPageIdFrom(0..100) {
 			Integer run, String eventName, CachedView cachedView ->
 			return 'page_1_eventName_0'
@@ -971,8 +990,7 @@ class PersistingNewEventResultsTests {
         ).save(failOnError: true, validate: false)
 
         undefinedJobGroup=new JobGroup(
-                name: JobGroup.UNDEFINED_CSI,
-                groupType: JobGroupType.CSI_AGGREGATION
+                name: JobGroup.UNDEFINED_CSI
         );
         undefinedJobGroup.save(failOnError: true);
 
@@ -989,5 +1007,10 @@ class PersistingNewEventResultsTests {
         TestDataUtil.createJob('IE_otto_hp_singlestep', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
         TestDataUtil.createJob('HP:::FF_BV1_Step01_Homepage - netlab', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
         TestDataUtil.createJob('example.de - Multiple steps with event names + dom elements', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+		TestDataUtil.createJob('FF_Otto_multistep', testScript, testLocation, undefinedJobGroup, '', 1 , false, 60)
+
+		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+		csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages(Page.list())
+		undefinedJobGroup.csiConfiguration = csiConfiguration
     }
 }

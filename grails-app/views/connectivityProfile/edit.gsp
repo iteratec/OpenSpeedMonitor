@@ -28,7 +28,7 @@
 
                 <div class="form-actions">
                     <%-- Save as copy--%>
-                    <g:actionSubmit class="btn btn-primary" action="save" value="${message(code: 'default.button.save.label', default: 'Save')}"/>
+                    <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}"/>
 
                     <%-- Deactivate --%>
                     <g:actionSubmit class="btn btn-danger" action="deactivate" value="${message(code: 'default.button.deactivate.label', default: 'Deactivate')}" />

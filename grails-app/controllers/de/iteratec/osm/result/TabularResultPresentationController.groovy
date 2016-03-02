@@ -90,7 +90,6 @@ class TabularResultPresentationController {
                 if (cmd instanceof ListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
                             ((ListResultsCommand)cmd).createMvQueryParams(),
-                            ((ListResultsCommand)cmd),
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
@@ -328,10 +327,10 @@ class TabularResultPresentationController {
         }
 
         /**
-         * Returns a {@link DateTime} of the first day in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
+         * Returns a {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
          * @param timeWithOrWithoutMeridian
          * 		The format can be with or without meridian (e.g. "04:45", "16:12" without or "02:00 AM", "11:23 PM" with meridian)
-         * @return A {@link DateTime} of the first day in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
+         * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
          * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
          */
         public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException{
@@ -589,12 +588,12 @@ class TabularResultPresentationController {
          * with this command.
          * </p>
          *
-         * @param measuredValueTagService
-         *         The {@link de.iteratec.osm.result.MeasuredValueTagService} to create the tag with.
+         * @param csiAggregationTagService
+         *         The {@link CsiAggregationTagService} to create the tag with.
          * @return Never <code>null</code>.
          */
-        public Pattern createResultsQueryPattern(MeasuredValueTagService measuredValueTagService) {
-            return measuredValueTagService.getTagPatternForHourlyMeasuredValues(createMvQueryParams());
+        public Pattern createResultsQueryPattern(CsiAggregationTagService csiAggregationTagService) {
+            return csiAggregationTagService.getTagPatternForHourlyCsiAggregations(createMvQueryParams());
         }
 
         /**
@@ -741,6 +740,7 @@ class TabularResultPresentationController {
         result.put("weekStart", MONDAY_WEEKSTART)
 
         result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
+        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result;

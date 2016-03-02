@@ -32,9 +32,10 @@ grails.databinding.dateFormats = [
  * 	config files can be ConfigSlurper scripts, Java properties files, or classes
  * 	in the classpath in ConfigSlurper format
  */
-if (System.properties["osm_config_location"]) {
-    log.info('system property for external configuration found')
-    grails.config.locations = ["file:" + System.properties["osm_config_location"]]
+def osmConfLocationBasedOnEnvVar = System.properties["osm_config_location"]
+if (osmConfLocationBasedOnEnvVar) {
+    log.info("sytem property for external configuration found: ${osmConfLocationBasedOnEnvVar}")
+    grails.config.locations = ["file:" +  osmConfLocationBasedOnEnvVar]
 } else {
     grails.config.locations = [
             "classpath:${appName}-config.properties",
@@ -117,54 +118,56 @@ grails.plugin.springsecurity.interceptUrlMap = [
 //////////////////////////////////////////////////////////////////
 //free for all (even guests not logged in)
 //////////////////////////////////////////////////////////////////
-'/static/**'                                  : ["permitAll"],
-'/static/*'                                   : ["permitAll"],
-'/css/**'                                     : ["permitAll"],
-'/js/**'                                      : ["permitAll"],
-'/images/**'                                  : ["permitAll"],
-'/less/**'                                    : ["permitAll"],
-'/'                                           : ["permitAll"],
-'/proxy/**'                                   : ["permitAll"],
-'/wptProxy/**'                                : ["permitAll"],
-'/csiDashboard/index'                         : ["permitAll"],
-'/csiDashboard/showAll'                       : ["permitAll"],
-'/csiDashboard/csiValuesCsv'                  : ["permitAll"],
-'/csiDashboard/showDefault'                   : ["permitAll"],
-'/csiDashboard/weights'                       : ["permitAll"],
-'/csiDashboard/downloadBrowserWeights'        : ["permitAll"],
-'/csiDashboard/downloadPageWeights'           : ["permitAll"],
-'/csiDashboard/downloadHourOfDayWeights'      : ["permitAll"],
-'/eventResultDashboard/**'                    : ["permitAll"],
-'/tabularResultPresentation/**'                             : ["permitAll"],
-'/highchartPointDetails/**'                   : ["permitAll"],
-'/rest/**'                                    : ["permitAll"],
-'/login/**'                                   : ["permitAll"],
-'/logout/**'                                  : ["permitAll"],
-'/job/list'                                   : ["permitAll"],
-'/job/saveJobSet'                             : ["permitAll"],
-'/job/getRunningAndRecentlyFinishedJobs'      : ["permitAll"],
-'/job/nextExecution'                          : ["permitAll"],
-'/job/getLastRun'                             : ["permitAll"],
-'/script/list'                                : ["permitAll"],
-'/queueStatus/list'                           : ["permitAll"],
-'/queueStatus/refresh'                        : ["permitAll"],
-'/jobSchedule/schedules'                      : ["permitAll"],
-'/connectivityProfile/list'                   : ["permitAll"],
-'/about'                                      : ["permitAll"],
-'/cookie/**'                                  : ["permitAll"],
-'/csiDashboard/storeCustomDashboard'          : ["permitAll"],
-'/csiDashboard/validateDashboardName'         : ["permitAll"],
-'/csiDashboard/validateAndSaveDashboardValues': ["permitAll"],
-'/i18n/getAllMessages'                        : ["permitAll"],
+'/static/**'                                     : ["permitAll"],
+'/static/*'                                      : ["permitAll"],
+'/css/**'                                        : ["permitAll"],
+'/js/**'                                         : ["permitAll"],
+'/images/**'                                     : ["permitAll"],
+'/less/**'                                       : ["permitAll"],
+'/'                                              : ["permitAll"],
+'/proxy/**'                                      : ["permitAll"],
+'/wptProxy/**'                                   : ["permitAll"],
+'/csiDashboard/index'                            : ["permitAll"],
+'/csiDashboard/showAll'                          : ["permitAll"],
+'/csiDashboard/csiValuesCsv'                     : ["permitAll"],
+'/csiDashboard/showDefault'                      : ["permitAll"],
+'/csiConfiguration/configurations/**'            : ["permitAll"],
+'/csiConfigIO/downloadBrowserWeights'            : ["permitAll"],
+'/csiConfigIO/downloadPageWeights'               : ["permitAll"],
+'/csiConfigIO/downloadHourOfDayWeights'          : ["permitAll"],
+'/csiConfigIO/downloadBrowserConnectivityWeights': ["permitAll"],
+'/csiConfigIO/downloadDefaultTimeToCsMappings'   : ["permitAll"],
+'/eventResultDashboard/**'                       : ["permitAll"],
+'/tabularResultPresentation/**'                  : ["permitAll"],
+'/highchartPointDetails/**'                      : ["permitAll"],
+'/rest/**'                                       : ["permitAll"],
+'/login/**'                                      : ["permitAll"],
+'/logout/**'                                     : ["permitAll"],
+'/job/list'                                      : ["permitAll"],
+'/job/saveJobSet'                                : ["permitAll"],
+'/job/getRunningAndRecentlyFinishedJobs'         : ["permitAll"],
+'/job/nextExecution'                             : ["permitAll"],
+'/job/getLastRun'                                : ["permitAll"],
+'/script/list'                                   : ["permitAll"],
+'/queueStatus/list'                              : ["permitAll"],
+'/queueStatus/refresh'                           : ["permitAll"],
+'/jobSchedule/schedules'                         : ["permitAll"],
+'/connectivityProfile/list'                      : ["permitAll"],
+'/about'                                         : ["permitAll"],
+'/cookie/**'                                     : ["permitAll"],
+'/csiDashboard/storeCustomDashboard'             : ["permitAll"],
+'/csiDashboard/validateDashboardName'            : ["permitAll"],
+'/csiDashboard/validateAndSaveDashboardValues'   : ["permitAll"],
+'/i18n/getAllMessages'                           : ["permitAll"],
 //////////////////////////////////////////////////////////////////
 //SUPER_ADMIN only
 //////////////////////////////////////////////////////////////////
-'/console/**'                                 : ['ROLE_SUPER_ADMIN'],
-'/apiKey/**'                                  : ['ROLE_SUPER_ADMIN'],
+'/console/**'                                    : ['ROLE_SUPER_ADMIN'],
+'/apiKey/**'                                     : ['ROLE_SUPER_ADMIN'],
 //////////////////////////////////////////////////////////////////
 //ADMIN or SUPER_ADMIN log in
 //////////////////////////////////////////////////////////////////
-'/**'                                         : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
+'/**'                                            : ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']
 ]
 
 /*
@@ -190,7 +193,7 @@ grails.assets.excludes = ["openspeedmonitor.less"]
 grails.assets.minifyJs = true
 grails.assets.minifyCss = true
 
-grails.i18n.locales = ['en','de']
+grails.i18n.locales = ['en', 'de']
 
 grails.plugin.databasemigration.updateOnStart = true
 grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
@@ -207,9 +210,10 @@ environments {
 
         // grails console-plugin, see https://github.com/sheehan/grails-console
         grails.plugin.console.enabled = true
-        grails.plugin.console.fileStore.remote.enabled = false // Whether to include the remote file store functionality. Default is true.
+        grails.plugin.console.fileStore.remote.enabled = false
+        // Whether to include the remote file store functionality. Default is true.
 
-        grails.assets.bundle=true
+        grails.assets.bundle = true
 
         log4j = {
 
@@ -268,7 +272,7 @@ environments {
                         fileName: "logs/${appNameForLog4jConfig}Details.log",
                         layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
                         maxFileSize: '20MB',
-                        maxBackupIndex: 5,
+                        maxBackupIndex: 10,
                         threshold: org.apache.log4j.Level.DEBUG
                 )
                 appender rollingFileAppender
@@ -407,6 +411,7 @@ environments {
                 asyncAppender.addAppender(rollingFileAppender)
                 appender asyncAppender
             }
+
             // Per default all is logged for application artefacts.
             // Appenders apply their own threshold level to limit logs.
             all(
@@ -414,7 +419,8 @@ environments {
                             'grails.app'
                     ],
                     asyncOsmAppenderDetails: [
-                            'grails.app'
+                            'grails.app',
+                            'liquibase'
                     ]
             )
             error(
@@ -466,14 +472,17 @@ environments {
         grails.plugin.console.fileStore.remote.enabled = true
         // Whether to include the remote file store functionality. Default is true.
 
+        grails.plugin.databasemigration.dropOnStart = true
+        grails.plugin.databasemigration.autoMigrateScripts = 'TestApp'
+        grails.plugin.databasemigration.forceAutoMigrate = true
+
         log4j = {
             appenders {
                 console name: 'stdout', layout: pattern(conversionPattern: '%c{2} %m%n')
             }
-
-            info(stdout: ['grails.app', 'co.freeside.betamax'])
-
+            
             info(stdout: [
+                    'grails.app',
                     'org.codehaus.groovy.grails.web.servlet',        // controllers
                     'org.codehaus.groovy.grails.web.pages',          // GSP
                     'org.codehaus.groovy.grails.web.sitemesh',       // layouts
@@ -484,7 +493,8 @@ environments {
                     'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
                     'org.springframework',
                     'org.hibernate',
-                    'net.sf.ehcache.hibernate'])
+                    'net.sf.ehcache.hibernate',
+                    'co.freeside.betamax'])
 
         }
     }

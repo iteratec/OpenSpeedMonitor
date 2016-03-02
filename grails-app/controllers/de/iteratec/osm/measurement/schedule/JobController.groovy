@@ -69,7 +69,6 @@ class JobController {
 
     private Map getListModel(boolean forceShowAllJobs = false) {
         List<Job> jobs
-        boolean onlyActiveJobs = false
         // custom sort for nextExecutionTime necessary due to it being neither persisted in the
         // database nor derived. Thus it cannot be passed to database layer sorting
         if (params.sort == 'nextExecutionTime') {
@@ -87,14 +86,12 @@ class JobController {
                 jobs = Job.list(params)
             }
         } else {
-            jobs = Job.findAllByActive(true)
-            onlyActiveJobs = true
+            jobs = Job.list()
         }
         def model = [
                 jobs                                           : jobs,
                 jobsWithTags                                   : jobService.listJobsWithTags(),
                 jobSets                                        : JobSet.findAll(),
-                onlyActiveJobs                                 : onlyActiveJobs,
                 filters                                        : params.filters,
                 measurementsEnabled                            : inMemoryConfigService.areMeasurementsGenerallyEnabled(),
                 lastNMinutesToShowSuccessfulResultsInJoblist   : LAST_N_MINUTES_TO_SHOW_SUCCESSFUL_RESULTS_IN_JOBLIST,
@@ -234,7 +231,8 @@ class JobController {
     }
 
     def delete() {
-        Job job = Job.get(params.id)
+        //TODO find out why we get the same id twice
+        Job job = Job.get(params.list("id")[0]as long)
 
         Promise p = task {
             jobService.deleteJob(job)

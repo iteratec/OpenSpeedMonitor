@@ -26,7 +26,7 @@ import org.mockito.Mockito
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
 import de.iteratec.osm.result.TabularResultPresentationController.ListResultsForSpecificJobCommand
 import de.iteratec.osm.report.ui.PaginationListing
@@ -86,12 +86,10 @@ class PaginationServiceTest {
 
 		jobGroupName = 'CSI'
 		JobGroup group = new JobGroup(
-			name: jobGroupName,
-			groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+			name: jobGroupName).save(failOnError: true)
 			
 		JobGroup nonCSIgroup = new JobGroup(
-			name: 'nonCSIgroup',
-			groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+			name: 'nonCSIgroup').save(failOnError: true)
 				
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		//lastRun: 07.08.2014 - 16:00

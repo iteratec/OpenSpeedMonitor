@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.api.json
 
-import de.iteratec.osm.api.json.Result;
-
 import static org.junit.Assert.*
 
 import org.junit.*
@@ -76,7 +74,7 @@ class ResultTests {
 					}
 				};
 		eventResult.measuredEvent = event;
-		eventResult.customerSatisfactionInPercent = 1.5112d;
+		eventResult.csByWptDocCompleteInPercent = 1.5112d;
 
 		JobResult jobResult = new JobResult();
 		eventResult.jobResult = jobResult;

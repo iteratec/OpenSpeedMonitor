@@ -1,13 +1,10 @@
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 
-<%
-    def userspecificCSIDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificCsiDashboard').newInstance()
-    def userspecificEventResultDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificEventResultDashboard').newInstance()
-%>
 <%-- determine main-tab an set variable respectively --%>
 <g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation')}"><g:set
         var="mainTab" value="results"/></g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
+<g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('job')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:elseif test="${controllerName.equals('queueStatus')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -76,33 +73,7 @@
                                                               default="Einzelergebnisse"/></g:link>
             </li>
 
-            <div class="btn-toolbar" style="margin: 0;">
-                <div class="btn-group">
-                    <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                                   default="Dashboard-Ansicht ausw&auml;hlen"/>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" id="customDashBoardSelection">
-                        <g:set var="availableDashboards"
-                               value="${userspecificEventResultDashboardService.getListOfAvailableDashboards()}"/>
-                        <g:if test="${availableDashboards.size() > 0}">
-                            <g:each in="${availableDashboards}" var="availableDashboard">
-                                <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
-                            </g:each>
-                        </g:if>
-                        <g:else>
-                            <g:set var="anchorDashboardCreation" value="#"/>
-                            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                            </sec:ifAnyGranted>
-                            <li><a href="${anchorDashboardCreation}"><g:message
-                                    code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                                    default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
-                        </g:else>
-                    </ul>
-                </div>
-            </div>
+
         </g:elseif>
 
     <%-- CSI --%>
@@ -112,42 +83,9 @@
                 <g:link controller="csiDashboard" action="showAll"><i class="fa fa-signal"></i> <g:message
                         code="de.iteratec.isocsi.csiDashboard" default="Dashboard"/></g:link>
             </li>
-
-            <div class="btn-group">
-                <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                               default="Dashboard-Ansicht ausw&auml;hlen"/>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu">
-                    <g:set var="availableDashboards"
-                           value="${userspecificCSIDashboardService.getListOfAvailableDashboards()}"/>
-
-                    <g:if test="${availableDashboards.size() > 0}">
-                        <g:each in="${availableDashboards}" var="availableDashboard">
-                            <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
-                        </g:each>
-                    </g:if>
-                    <g:else>
-                        <g:set var="anchorDashboardCreation" value="#"/>
-                        <sec:ifLoggedIn>
-                            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                            </sec:ifAnyGranted>
-                        </sec:ifLoggedIn>
-                        <li><a href="${anchorDashboardCreation}"><g:message
-                                code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                                default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
-                    </g:else>
-                </ul>
-            </div>
-            <li class="controller ${actionName.equals('showDefault') ? 'active' : ''}">
-                <g:link controller="csiDashboard" action="showDefault"><i class="fa fa-picture-o"></i> <g:message
-                        code="de.iteratec.isocsi.csi.linktext.staticDashboard" default="Statische Ansicht"/></g:link>
-            </li>
-            <li class="controller ${actionName.equals('weights') ? 'active' : ''}">
-                <g:link controller="csiDashboard" action="weights"><i class="fa fa-tasks"></i> <g:message
-                        code="de.iteratec.isocsi.weight" default="Gewichtung"/></g:link>
+            <li class="controller ${actionName.equals('configurations') ? 'active' : ''}">
+                <g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
+                        code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>
             </li>
         </g:elseif>
     </ul>

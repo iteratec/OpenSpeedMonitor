@@ -17,18 +17,19 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.weighting.WeightFactor
-import de.iteratec.osm.d3Data.*
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
@@ -41,6 +42,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
+import grails.plugin.springsecurity.SpringSecurityService
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -50,7 +52,6 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -79,14 +80,18 @@ class CsiDashboardController {
     I18nService i18nService
 
     EventResultService eventResultService
-    CustomerSatisfactionWeightService customerSatisfactionWeightService
     CustomerSatisfactionHighChartService customerSatisfactionHighChartService
     CsiHelperService csiHelperService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationUtilService csiAggregationUtilService
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
-    def springSecurityService
+    SpringSecurityService springSecurityService
     ConnectivityProfileDaoService connectivityProfileDaoService
+    DefaultTimeToCsMappingService defaultTimeToCsMappingService
+    TimeToCsMappingService timeToCsMappingService
+    ConfigService configService
+    CustomDashboardService customDashboardService
+
     /**
      * The Grails engine to generate links.
      *
@@ -100,15 +105,22 @@ class CsiDashboardController {
 
     public static final String DAILY_AGGR_GROUP_PAGE = 'daily_page'
     public static final String DAILY_AGGR_GROUP_SHOP = 'daily_shop'
+    public static final String DAILY_AGGR_GROUP_SYSTEM = 'daily_system'
+    public static final String WEEKLY_AGGR_GROUP_PAGE = 'weekly_page'
+    public static final String WEEKLY_AGGR_GROUP_SHOP = 'weekly_shop'
+    public static final String WEEKLY_AGGR_GROUP_SYSTEM = 'weekly_system'
+    public static final String HOURLY_MEASURED_EVENT = "measured_event"
 
     String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
     public final static int MONDAY_WEEKSTART = 1
-    public final
-    static List<String> AGGREGATOR_GROUP_VALUES = [AggregatorType.MEASURED_EVENT, DAILY_AGGR_GROUP_PAGE, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
-                                                   AggregatorType.PAGE, DAILY_AGGR_GROUP_SHOP, // TODO mze-2013-11-06: Dirty, constants from AggregatorType should be used. Similar like in IT-210.
-                                                   AggregatorType.SHOP]
-    public final
-    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event', 'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',]
+    public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
+                                                                DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
+                                                                DAILY_AGGR_GROUP_SHOP, WEEKLY_AGGR_GROUP_SHOP,
+                                                                DAILY_AGGR_GROUP_SYSTEM, WEEKLY_AGGR_GROUP_SYSTEM]
+    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.measured_event',
+                                                                'de.iteratec.isocsi.csi.per.page.daily', 'de.iteratec.isocsi.csi.per.page',
+                                                                'de.iteratec.isocsi.csi.per.csi.group.daily', 'de.iteratec.isocsi.csi.per.csi.group',
+                                                                'de.iteratec.isocsi.csi.per.csi.system.daily', 'de.iteratec.isocsi.csi.per.csi.system.weekly']
 
     /**
      * <p>
@@ -199,20 +211,20 @@ class CsiDashboardController {
      */
     Map<String, Object> delete() {
 
-        def userspecificCSIDashboardInstance = UserspecificCsiDashboard.get(params.id)
+        UserspecificCsiDashboard userspecificCSIDashboardInstance = UserspecificCsiDashboard.get(params.id)
         if (!userspecificCSIDashboardInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-            redirect(action: "list")
+            redirect(action: "showAll")
             return
         }
 
         try {
             userspecificCSIDashboardInstance.delete(flush: true)
             flash.message = message(code: 'default.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-            redirect(action: "list")
+            redirect(action: "showAll")
         } catch (DataIntegrityViolationException e) {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'custom.dashboard.label', default: 'Custom dashboard'), params.id])
-            redirect(action: "show", id: params.id)
+            redirect(action: "showAll", id: params.id)
         }
 
         redirectWith303('showAll')
@@ -230,6 +242,9 @@ class CsiDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
+        cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
+        cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
         cmd.copyRequestDataToViewModelMap(modelToRender)
 
@@ -248,19 +263,7 @@ class CsiDashboardController {
                         countOfSelectedEvents = ((Collection) modelToRender.get('measuredEvents')).size()
                     }
 
-                    int selectedAggregationIntervallInMintues = MeasuredValueInterval.HOURLY
-                    switch (cmd.aggrGroup) {
-                        case AggregatorType.PAGE:
-                        case DAILY_AGGR_GROUP_PAGE:
-                            selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
-                            break
-                        case AggregatorType.SHOP:
-                        case DAILY_AGGR_GROUP_SHOP:
-                            selectedAggregationIntervallInMintues = MeasuredValueInterval.WEEKLY
-                            break
-                        default: // do nothing, take default.
-                            break
-                    }
+                    int selectedAggregationIntervallInMintues = cmd.getSelectedMeasuredIntervalInMinutes()
 
                     int countOfSelectedBrowser = cmd.selectedBrowsers.size()
                     if (countOfSelectedBrowser < 1) {
@@ -278,7 +281,7 @@ class CsiDashboardController {
                 if (warnAboutLongProcessingTimeInsteadOfShowingData) {
                     modelToRender.put('warnAboutLongProcessingTime', true)
                 } else {
-                    fillWithAproximateMeasuredValueData(modelToRender, cmd, true)
+                    fillWithAproximateCsiAggregationData(modelToRender, cmd, true, CsiType.getCsiTypes(cmd))
                 }
             }
         }
@@ -289,7 +292,7 @@ class CsiDashboardController {
     /**
      * <p>
      * Fills the specified map with approximate data based on {@linkplain
-     * MeasuredValue measured values} correspond to the selection in
+     * CsiAggregation measured values} correspond to the selection in
      * specified {@linkplain CsiDashboardShowAllCommand command object}.
      * </p>
      *
@@ -303,7 +306,7 @@ class CsiDashboardController {
      *         the graphs in {@link modelToRender} else, if set to
      *         <code>false</code> not.
      */
-    private void fillWithAproximateMeasuredValueData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph) {
+    private void fillWithAproximateCsiAggregationData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
         requiresArgumentNotNull('modelToRender', modelToRender)
@@ -312,33 +315,44 @@ class CsiDashboardController {
         Interval timeFrame = cmd.getSelectedTimeFrame()
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
-        Set<JobGroup> csiGroups = jobGroupDaoService.findCSIGroups()
-        Set<Long> csiGroupIds = csiGroups
+        MvQueryParams csiAggregationsQueryParams = cmd.createMvQueryParams()
 
-        MvQueryParams measuredValuesQueryParams = cmd.createMvQueryParams()
-
-        switch (cmd.aggrGroup) {
-            case AggregatorType.PAGE:
-                MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph)
+        switch (cmd.aggrGroupAndInterval) {
+            case WEEKLY_AGGR_GROUP_PAGE:
+                CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, csiAggregationsQueryParams, withTargetGraph, csiType)
                 break
             case DAILY_AGGR_GROUP_PAGE:
-                MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph)
+                CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, csiAggregationsQueryParams, withTargetGraph,csiType)
                 break
-            case AggregatorType.SHOP:
-                MeasuredValueInterval weeklyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, measuredValuesQueryParams, withTargetGraph, false)
+            case WEEKLY_AGGR_GROUP_SHOP:
+                CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, csiAggregationsQueryParams, withTargetGraph, false, csiType)
                 break
             case DAILY_AGGR_GROUP_SHOP:
-                MeasuredValueInterval dailyInterval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.DAILY)
-                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, measuredValuesQueryParams, withTargetGraph, false)
+                CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+                fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, csiAggregationsQueryParams, withTargetGraph, false, csiType)
+                break
+            case WEEKLY_AGGR_GROUP_SYSTEM:
+                CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, weeklyInterval, cmd.selectedCsiSystems, withTargetGraph, false, csiType)
+                break
+            case DAILY_AGGR_GROUP_SYSTEM:
+                CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
+                fillWithCsiSystemValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, cmd.selectedCsiSystems, withTargetGraph, false, csiType)
                 break
             default: // AggregatorType.MEASURED_EVENT
-                fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, measuredValuesQueryParams)
+                fillWithHourlyValuesAsHighChartMap(modelToRender, timeFrame, csiAggregationsQueryParams, csiType)
                 break
         }
-        fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
+        if (cmd.aggrGroupAndInterval == WEEKLY_AGGR_GROUP_SYSTEM || cmd.aggrGroupAndInterval == DAILY_AGGR_GROUP_SYSTEM) {
+            List<JobGroup> jobGroups = CsiSystem.getAll(cmd.selectedCsiSystems)*.affectedJobGroups
+            Collection<Long> jobGroupsIds = jobGroups*.id.flatten().unique(false)
+            fillWithAnnotations(modelToRender, timeFrame, jobGroupsIds)
+        } else {
+            fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
+        }
     }
 
     /**
@@ -354,17 +368,17 @@ class CsiDashboardController {
      * @param modelToRender
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.
-     * @param measuredValuesQueryParams
+     * @param csiAggregationsQueryParams
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      */
-    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MeasuredValueInterval interval, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph) {
+    private void fillWithPageValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, CsiAggregationInterval interval, MvQueryParams csiAggregationsQueryParams, boolean withTargetGraph, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
 
-        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedPageMeasuredValuesAsHighChartMap(fixedTimeFrame, measuredValuesQueryParams, interval)
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedPageCsiAggregationsAsHighChartMap(fixedTimeFrame, csiAggregationsQueryParams, interval, csiType)
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
@@ -405,18 +419,18 @@ class CsiDashboardController {
      *         not <code>null</code>.
      * @param queryParams
      *         The query parameters to find corresponding {@linkplain
-     * MeasuredValue measured vales}.
+     * CsiAggregation measured vales}.
      * @param modelToRender
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.
      */
-    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams) {
+    private void fillWithHourlyValuesAsHighChartMap(Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams queryParams, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
-        Interval fixedTimeFrame = fixTimeFrame(timeFrame, MeasuredValueInterval.HOURLY)
+        Interval fixedTimeFrame = fixTimeFrame(timeFrame, CsiAggregationInterval.HOURLY)
 
-        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedHourlyEventMeasuredValuesAsHighChartMap(
-                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
+                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams, csiType
         )
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
@@ -453,7 +467,7 @@ class CsiDashboardController {
             Map<String, Object> modelToRender,
             Interval timeFrame,
             Collection<Long> selectedFolder) {
-        MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+        CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
         AnnotationUtil.fillWithAnnotations(modelToRender, fixedTimeFrame, selectedFolder, eventService)
     }
@@ -475,7 +489,7 @@ class CsiDashboardController {
      *         The interval of measured values to include in calculation and
      *         used for "fixing" the time-frame boundaries to find all measured
      *         values in this interval, not <code>null</code>.
-     * @param measuredValuesQueryParams
+     * @param csiAggregationsQueryParams
      *         The {@linkplain MvQueryParams filter} to select relevant
      *         measured values, not <code>null</code>.
      * @param withTargetGraph
@@ -486,17 +500,18 @@ class CsiDashboardController {
     private void fillWithShopValuesAsHighChartMap(
             Map<String, Object> modelToRender,
             Interval timeFrame,
-            MeasuredValueInterval interval,
-            MvQueryParams measuredValuesQueryParams,
+            CsiAggregationInterval interval,
+            MvQueryParams csiAggregationsQueryParams,
             boolean withTargetGraph,
-            boolean moveGraphsByOneWeek) {
+            boolean moveGraphsByOneWeek,
+            List<CsiType> csiType) {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
 
-        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedShopMeasuredValuesAsHighChartMap(
-                fixedTimeFrame, interval, measuredValuesQueryParams
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedShopCsiAggregationsAsHighChartMap(
+                fixedTimeFrame, interval, csiAggregationsQueryParams, csiType
         )
         List<OsmChartGraph> graphs = chart.osmChartGraphs
 
@@ -506,7 +521,7 @@ class CsiDashboardController {
             resetToDate = resetToDate.plusWeeks(1)
         }
 
-        Integer oneDayOffset = Math.round(MeasuredValueInterval.DAILY)
+        Integer oneDayOffset = Math.round(CsiAggregationInterval.DAILY)
         DateTime resetFromDateWithOffsetChange = resetFromDate.minusMinutes(oneDayOffset)
         Integer rightOffset = oneDayOffset
         DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
@@ -531,27 +546,73 @@ class CsiDashboardController {
 
     /**
      * <p>
-     * Fills the view-model-map with weekly shop values. Calling this method
-     * should not be mixed with other operations than weekly shop depended
-     * ones.
+     * Fills the view-model-map with csiSystem values.
      * </p>
      *
-     * @param timeFrame
-     *         The time-frame for that data should be calculated,
-     *         not <code>null</code>.
      * @param modelToRender
      *         The map to be filled. Previously added entries are overridden.
      *         This map should not be <code>null</code>.
-     * @param measuredValuesQueryParams
-     *         The {@linkplain MvQueryParams filter} to select relevant
+     * @param timeFrame
+     *         The time-frame for that data should be calculated,
+     *         not <code>null</code>.
+     * @param interval
+     *         The interval of measured values to include in calculation and
+     *         used for "fixing" the time-frame boundaries to find all measured
+     *         values in this interval, not <code>null</code>.
+     * @param selectedCsiSystems
+     *         The {@linkplain CsiSystem} to select relevant
      *         measured values, not <code>null</code>.
+     * @param withTargetGraph
+     *  		Whether or not to include {@link CsTargetGraph}s.
      * @param moveGraphsByOneWeek
-     * 			if true: moves the graph by one week (CSI-Default-View)
+     *  		Whether or not to move all {@link OsmChartPoint}s to the end of their interval (in default-CSI-dashboard this is the default-behaviour).
      */
-    private void fillWithWeeklyShopValuesAsHighChartMap(
-            Map<String, Object> modelToRender, Interval timeFrame, MvQueryParams measuredValuesQueryParams, boolean withTargetGraph, boolean moveGraphsByOneWeek) {
-        MeasuredValueInterval weekly = MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
-        fillWithShopValuesAsHighChartMap(modelToRender, timeFrame, weekly, measuredValuesQueryParams, withTargetGraph, moveGraphsByOneWeek)
+    private void fillWithCsiSystemValuesAsHighChartMap(
+            Map<String, Object> modelToRender,
+            Interval timeFrame,
+            CsiAggregationInterval interval,
+            Set<Long> selectedCsiSystems,
+            boolean withTargetGraph,
+            boolean moveGraphsByOneWeek,
+            List<CsiType> csiType) {
+
+        Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
+
+        DateTime resetFromDate = fixedTimeFrame.getStart()
+        DateTime resetToDate = fixedTimeFrame.getEnd()
+
+        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedCsiSystemCsiAggregationsAsHighChartMap(
+                fixedTimeFrame, interval, selectedCsiSystems, csiType
+        )
+        List<OsmChartGraph> graphs = chart.osmChartGraphs
+
+        if (moveGraphsByOneWeek == true) {
+            moveDataPointsOneWeekForward(graphs)
+            resetFromDate = resetFromDate.plusWeeks(1)
+            resetToDate = resetToDate.plusWeeks(1)
+        }
+
+        Integer oneDayOffset = Math.round(CsiAggregationInterval.DAILY)
+        DateTime resetFromDateWithOffsetChange = resetFromDate.minusMinutes(oneDayOffset)
+        Integer rightOffset = oneDayOffset
+        DateTime resetToDateWithOffsetChange = resetToDate.plusMinutes(rightOffset)
+
+        if (withTargetGraph) {
+            graphs.addAll(customerSatisfactionHighChartService.getCsRelevantStaticGraphsAsResultMapForChart(
+                    resetFromDateWithOffsetChange.minusDays(1), resetToDateWithOffsetChange.plusDays(1))
+            )
+        }
+
+        boolean includeCsTargetGraphs = true
+        modelToRender.put('fromTimestampForHighChart', resetFromDateWithOffsetChange.toDate().getTime())
+        modelToRender.put('toTimestampForHighChart', resetToDateWithOffsetChange.toDate().getTime())
+        modelToRender.put('wptCustomerSatisfactionValues', graphs)
+        modelToRender.put('wptCustomerSatisfactionValuesForTable', formatForTable(graphs, includeCsTargetGraphs))
+
+        modelToRender.put('labelSummary', chart.osmChartGraphsCommonLabel);
+
+        modelToRender.put('markerShouldBeEnabled', true)
+        modelToRender.put('labelShouldBeEnabled', false)
     }
 
     /**
@@ -560,56 +621,7 @@ class CsiDashboardController {
      * @return The fixed time frame, never <code>null</code>.
      */
     private Interval fixTimeFrame(Interval timeFrameToFix, int intervalRangeInMinutes) {
-        return measuredValueUtilService.fixTimeFrameToMatchIntervalRange(timeFrameToFix, intervalRangeInMinutes)
-    }
-
-    /**
-     * Thats a view showing a graph for static defined criteria for the
-     * current weeks CSI data. This page is intended to be used by the
-     * management and marketing group. There is nothing changeable on
-     * this page and no further selection are possible.
-     *
-     * @return A CSI model map to be used by the corresponding GSP,
-     * 	       not <code>null</code> and never
-     * {@linkplain Map#isEmpty() empty}.
-     */
-    Map<String, Object> showDefault() {
-
-        DateTime toDate
-        if (params.includeInterval) {
-            toDate = new DateTime()
-        } else {
-            toDate = measuredValueUtilService.subtractOneInterval(new DateTime(), MeasuredValueInterval.WEEKLY)
-        }
-        DateTime fromDate = toDate.minusMonths(3)
-
-        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-        Interval timeFrame = new Interval(fromDate, toDate)
-
-        MvQueryParams queryParams = new MvQueryParams()
-
-        List<String> namesOfCsiGroupsAndStaticGraphsToShow = ['otto.de_Desktop', i18nService.msg('de.iteratec.isocsi.targetcsi.label', 'Ziel-Kundenzufriedenheit')]
-        Set<JobGroup> csiGroupsToShow = jobGroupDaoService.findCSIGroups().findAll {
-            namesOfCsiGroupsAndStaticGraphsToShow.contains(it.name)
-        }
-        Set<Long> csiGroupIds = csiGroupsToShow.collect({ it.id })
-        queryParams.jobGroupIds.addAll(csiGroupIds)
-
-        fillWithWeeklyShopValuesAsHighChartMap(modelToRender, timeFrame, queryParams, true, true)
-//        fillWithAnnotations(modelToRender, timeFrame)
-
-        modelToRender.put('dateFormatString', DATE_FORMAT_STRING_FOR_HIGH_CHART)
-        modelToRender.put('weekStart', MONDAY_WEEKSTART)
-        modelToRender.put('from', fromDate)
-        modelToRender.put('to', toDate)
-        modelToRender.put('fromFormatted', SIMPLE_DATE_FORMAT.format(fromDate.toDate()))
-        modelToRender.put('toFormatted', SIMPLE_DATE_FORMAT.format(toDate.toDate()))
-        modelToRender.put('markerShouldBeEnabled', true)
-        modelToRender.put('labelShouldBeEnabled', true)
-        modelToRender.put('debug', params.debug ? true : false)
-        modelToRender.put('namesOfCsiGroupsAndStaticGraphsToShow', namesOfCsiGroupsAndStaticGraphsToShow)
-
-        return modelToRender
+        return csiAggregationUtilService.fixTimeFrameToMatchIntervalRange(timeFrameToFix, intervalRangeInMinutes)
     }
 
     /**
@@ -632,7 +644,7 @@ class CsiDashboardController {
                 DateTime time = new DateTime(point.time)
                 time = time.plusWeeks(1)
 
-                OsmChartPoint movedPoint = new OsmChartPoint(time: time.toDate().getTime(), measuredValue: point.measuredValue, countOfAggregatedResults: point.countOfAggregatedResults, sourceURL: point.sourceURL, testingAgent: point.testingAgent)
+                OsmChartPoint movedPoint = new OsmChartPoint(time: time.toDate().getTime(), csiAggregation: point.csiAggregation, countOfAggregatedResults: point.countOfAggregatedResults, sourceURL: point.sourceURL, testingAgent: point.testingAgent)
                 if (movedPoint.isValid())
                     graph.getPoints().add(movedPoint)
             }
@@ -676,18 +688,17 @@ class CsiDashboardController {
      * @see <a href="http://tools.ietf.org/html/rfc4180">http://tools.ietf.org/html/rfc4180</a>
      */
     public Map<String, Object> csiValuesCsv(CsiDashboardShowAllCommand cmd) {
-
         Map<String, Object> modelToRender = new HashMap<String, Object>()
 
         if (request.queryString && cmd.validate()) {
-            fillWithAproximateMeasuredValueData(modelToRender, cmd, false)
+            fillWithAproximateCsiAggregationData(modelToRender, cmd, false, CsiType.getCsiTypes(cmd))
             cmd.copyRequestDataToViewModelMap(modelToRender)
         } else {
             redirectWith303('showAll', params)
             return
         }
 
-        String filename = modelToRender['aggrGroup'] + '_' + modelToRender['fromFormatted'] + '_to_' + modelToRender['toFormatted'] + '.csv'
+        String filename = modelToRender['aggrGroupAndInterval'] + '_' + modelToRender['fromFormatted'] + '_to_' + modelToRender['toFormatted'] + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename)
         response.setContentType("text/csv;header=present;charset=UTF-8")
@@ -722,7 +733,7 @@ class CsiDashboardController {
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Check if dashboardName is unique
-        def dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
+        List<UserspecificCsiDashboard> dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
         if (dashboards) {
             response.sendError(302, 'dashboard by that name exists already')
             return null
@@ -731,25 +742,28 @@ class CsiDashboardController {
         // Parse data for command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
-        Collection<Long> selectedFolder = []
-        dashboardValues.selectedFolder.each { l -> selectedFolder.add(Long.parseLong(l)) }
-        Collection<Long> selectedPages = []
-        dashboardValues.selectedPages.each { l -> selectedPages.add(Long.parseLong(l)) }
-        Collection<Long> selectedMeasuredEventIds = []
-        dashboardValues.selectedMeasuredEventIds.each { l -> selectedMeasuredEventIds.add(Long.parseLong(l)) }
-        Collection<Long> selectedBrowsers = []
-        dashboardValues.selectedBrowsers.each { l -> selectedBrowsers.add(Long.parseLong(l)) }
-        Collection<Long> selectedLocations = []
-        dashboardValues.selectedLocations.each { l -> selectedLocations.add(Long.parseLong(l)) }
+        Collection<Long> selectedFolder =  customDashboardService.getValuesFromJSON(dashboardValues,"selectedFolder")
+        Collection<Long> selectedPages =  customDashboardService.getValuesFromJSON(dashboardValues,"selectedPages")
+        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues,"selectedMeasuredEventIds")
+        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues,"selectedBrowsers")
+        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues,"selectedLocations")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
         // Create command vor validation
-        def cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
-                toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroup: dashboardValues.aggrGroup, selectedFolder: selectedFolder,
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
+                toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
-                includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour)
+                includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
+                chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
+                showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
+                csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete)
+
+        if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
+        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
+        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
+        if (dashboardValues.chartWidth) cmd.chartWidth = dashboardValues.chartWidth.toInteger()
 
         if (!cmd.validate()) {
             //send errors
@@ -843,11 +857,11 @@ class CsiDashboardController {
             for (String eachGraphLabel : graphLabelsInOrderOfHeader) {
                 OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel)
                 if (point != null) {
-                    row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue)))
+                    row.add(csvCSIValueFormat.format(roundDouble(point.csiAggregation)))
                     if (repeatCSITargetValueColumns) {
                         row.add(csvCSIValueFormat.format(roundDouble(targetValue)))
                     }
-                    row.add(csvCSIValueFormat.format(roundDouble(point.measuredValue - targetValue)))
+                    row.add(csvCSIValueFormat.format(roundDouble(point.csiAggregation - targetValue)))
                 } else {
                     row.add("")
                     if (repeatCSITargetValueColumns) {
@@ -926,6 +940,10 @@ class CsiDashboardController {
         // ConnectivityProfiles
         result['connectivityProfiles'] = connectivityProfileDaoService.findAll().sort(false, { it.name.toLowerCase() });
 
+        // CsiSystems
+        List<CsiSystem> csiSystems = CsiSystem.findAll().sort(false, { it.label })
+        result.put('csiSystems', csiSystems)
+
         // JavaScript-Utility-Stuff:
         result.put("dateFormatString", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         result.put("weekStart", MONDAY_WEEKSTART)
@@ -962,124 +980,10 @@ class CsiDashboardController {
         }
         result.put('locationsOfBrowsers', locationsOfBrowsers)
         result.put('defaultChartTitle', csiHelperService.getCsiChartDefaultTitle())
+        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result
-    }
-
-    def downloadBrowserWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}browser_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('name;weight\n')
-        browserDaoService.findAll().each {
-            builder.append("${it.name};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
-
-    def downloadPageWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}page_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('name;weight\n')
-        pageDaoService.findAll().each {
-            builder.append("${it.name};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
-
-    def downloadHourOfDayWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}HourOfDays_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('fullHour;weight\n')
-        // FIXME Change to use a DAO
-        HourOfDay.list().each {
-            builder.append("${it.fullHour};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
-
-    def weights() {
-        CsiDashboardController.log.info("params=$params")
-        //		List<String> params.errorMessagesCsi instanceof String?[params.errorMessagesCsi]:params.errorMessagesCsi
-
-        //Labels for charts
-        String zeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.zeroWeightLabel", "Pages ohne Gewichtung")
-        String dataLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.dataLabel", "Page")
-        String weightLabel = i18nService.msg("de.iteratec.osm.d3Data.treemap.weightLabel", "Gewichtung")
-        String xAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.xAxisLabel", "Tageszeit")
-        String yAxisLabel = i18nService.msg("de.iteratec.osm.d3Data.barChart.yAxisLabel", "Gewichtung")
-        String matrixViewXLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.xLabel", "Browser")
-        String matrixViewYLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.yLabel", "Conn")
-        String matrixViewWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.weightLabel", "Weight")
-        String colorBrightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.colorBrightLabel", "less")
-        String colorDarkLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.colorDarkLabel", "more")
-        String matrixZeroWeightLabel = i18nService.msg("de.iteratec.osm.d3Data.matrixView.zeroWeightLabel", "Im CSI nicht berücksichtigt")
-
-        // arrange matrixViewData
-        MatrixViewData matrixViewData = new MatrixViewData(weightLabel: matrixViewWeightLabel, rowLabel: matrixViewYLabel, columnLabel: matrixViewXLabel, colorBrightLabel: colorBrightLabel, colorDarkLabel: colorDarkLabel, zeroWeightLabel: matrixZeroWeightLabel)
-        matrixViewData.addColumns(Browser.findAll()*.name as Set)
-        matrixViewData.addRows(ConnectivityProfile.findAll()*.name as Set)
-        BrowserConnectivityWeight.findAll().each {matrixViewData.addEntry(new MatrixViewEntry(weight: it.weight, columnName: it.browser.name, rowName: it.connectivity.name))}
-        def matrixViewDataJSON = matrixViewData as JSON
-
-        // arrange treemap data
-        TreemapData treemapData = new TreemapData(zeroWeightLabel: zeroWeightLabel, dataName: dataLabel, weightName: weightLabel);
-        pageDaoService.findAll().each { p -> treemapData.addNode(new ChartEntry(name: p.name, weight: p.weight)) }
-        def treemapDataJSON = treemapData as JSON
-
-        // arrange barchart data
-        BarChartData barChartData = new BarChartData(xLabel: xAxisLabel, yLabel: yAxisLabel)
-        HourOfDay.findAll().each { h -> barChartData.addDatum(new ChartEntry(name: h.fullHour.toString(), weight: h.weight)) }
-        def barChartJSON = barChartData as JSON
-
-        [browsers        : browserDaoService.findAll(),
-         pages           : pageDaoService.findAll(),
-         // FIXME Change to use a DAO
-         hoursOfDay      : HourOfDay.findAll(),
-         errorMessagesCsi: params.list('errorMessagesCsi'),
-         matrixViewData  : matrixViewDataJSON,
-         treemapData     : treemapDataJSON,
-         barchartData    : barChartJSON]
-    }
-
-    def uploadBrowserWeights() {
-        MultipartFile csv = request.getFile('browserCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.BROWSER, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.BROWSER, csv.getInputStream())
-        }
-        CsiDashboardController.log.info("errorMessagesCsiValidation=$errorMessagesCsiValidation")
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
-    }
-
-    def uploadPageWeights() {
-        MultipartFile csv = request.getFile('pageCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.PAGE, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.PAGE, csv.getInputStream())
-        }
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
-    }
-
-    def uploadHourOfDayWeights() {
-        MultipartFile csv = request.getFile('hourOfDayCsv')
-        List<String> errorMessagesCsiValidation = customerSatisfactionWeightService.validateWeightCsv(WeightFactor.HOUROFDAY, csv.getInputStream())
-        if (!errorMessagesCsiValidation) {
-            customerSatisfactionWeightService.persistNewWeights(WeightFactor.HOUROFDAY, csv.getInputStream())
-        }
-        redirect(action: 'weights',
-                params: [errorMessagesCsi: errorMessagesCsiValidation])
     }
 
     /**
@@ -1123,20 +1027,21 @@ class CsiDashboardController {
     /**
      * Checks if hours between given fromDate and toDate is greater than 4 months.
      *
+     *
      * @param fromDate TODO Doc: Inclusive? Eclusive?
      * @param toDate TODO Doc: Inclusive? Eclusive?
      * @return TODO Doc
      * @deprecated TODO Currently unused -> Discuss if this range check is required or just should be done in UI.
      */
     @Deprecated
-    private boolean exceedsTimeframeBoundary(Date fromDate, Date toDate, MeasuredValueInterval interval) {
+    private boolean exceedsTimeframeBoundary(Date fromDate, Date toDate, CsiAggregationInterval interval) {
         Days daysBetween = Days.daysBetween(new DateTime(fromDate), new DateTime(toDate))
         Integer maxDays
         switch (interval.intervalInMinutes) {
-            case MeasuredValueInterval.WEEKLY:
+            case CsiAggregationInterval.WEEKLY:
                 maxDays = 26 * 7
                 break
-            case MeasuredValueInterval.DAILY:
+            case CsiAggregationInterval.DAILY:
                 maxDays = 6 * 7
                 break
             default:
@@ -1170,5 +1075,4 @@ class CsiDashboardController {
         }
         return csvAsString
     }
-
 }

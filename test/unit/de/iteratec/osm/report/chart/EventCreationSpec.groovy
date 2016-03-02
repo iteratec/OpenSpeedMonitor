@@ -20,7 +20,6 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.api.ApiKey
 import de.iteratec.osm.api.CreateEventCommand
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import grails.test.mixin.*
 import grails.validation.ValidationException
 import org.joda.time.DateTime
@@ -43,8 +42,8 @@ class EventCreationSpec extends Specification{
         serviceUnderTest = service
         //test data common to all tests
         JobGroup.withTransaction {
-            group1 = new JobGroup(name: 'JobGroup1', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
-            group2 = new JobGroup(name: 'JobGroup2', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+            group1 = new JobGroup(name: 'JobGroup1').save(failOnError: true)
+            group2 = new JobGroup(name: 'JobGroup2').save(failOnError: true)
         }
     }
 

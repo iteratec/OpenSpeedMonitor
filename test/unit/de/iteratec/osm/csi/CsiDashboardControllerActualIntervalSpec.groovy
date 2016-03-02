@@ -17,9 +17,8 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
 import org.joda.time.DateTime
@@ -63,7 +62,7 @@ class CsiDashboardControllerActualIntervalSpec {
 
         //Mocks
         command = new CsiDashboardShowAllCommand()
-        command.measuredValueUtilService = new MeasuredValueUtilService()
+        command.csiAggregationUtilService = new CsiAggregationUtilService()
     }
 
     // daily page ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +79,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
         params.toHour = '12:00'
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
         params.includeInterval = true
 
         // request args necessary to validate the command object
@@ -90,6 +89,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -117,12 +117,12 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusDays(14)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -134,6 +134,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -162,13 +163,13 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusHours(10)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -180,9 +181,10 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -216,7 +218,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDateExpected.minusDays(14)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -228,6 +230,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -263,7 +266,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
         params.toHour = '12:00'
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
         params.includeInterval = true
 
         // request args necessary to validate the command object
@@ -273,6 +276,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -300,12 +304,12 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusDays(14)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -317,6 +321,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -345,13 +350,13 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusHours(10)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.DAILY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -363,9 +368,10 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -399,7 +405,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDateExpected.minusDays(14)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.DAILY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -411,6 +417,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -446,7 +453,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
         params.toHour = '12:00'
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = true
 
         // request args necessary to validate the command object
@@ -456,6 +463,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -483,12 +491,12 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -500,6 +508,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -528,13 +537,13 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusDays(4)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -546,9 +555,10 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -582,7 +592,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDateExpected.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.PAGE
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -594,6 +604,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -629,7 +640,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
         params.toHour = '12:00'
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = true
 
         // request args necessary to validate the command object
@@ -639,6 +650,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -666,12 +678,12 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime()
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDateExpected = toDate.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -683,6 +695,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -711,13 +724,13 @@ class CsiDashboardControllerActualIntervalSpec {
     {
         // request args important for this test
         DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
-        DateTime toDateExpected = toDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusDays(4)
-        DateTime fromDateExpected = fromDate.minusMinutes(MeasuredValueInterval.WEEKLY)
+        DateTime fromDateExpected = fromDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.from = FORMATTER_ddMMyyyy.print(fromDate);
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -729,9 +742,10 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
-        command.measuredValueUtilService.metaClass.isInActualInterval = {DateTime dateTime, Integer interval ->
+        command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
             //should be true here to simulate fix interval as actual
             return true
         }
@@ -765,7 +779,7 @@ class CsiDashboardControllerActualIntervalSpec {
         DateTime fromDateExpected = toDateExpected.minusWeeks(12)
         params.from = FORMATTER_ddMMyyyy.print(fromDateExpected);
 
-        params.aggrGroup = AggregatorType.SHOP
+        params.aggrGroupAndInterval = CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP
         params.includeInterval = false
         params.fromHour = '12:00'
         params.toHour = '12:00'
@@ -777,6 +791,7 @@ class CsiDashboardControllerActualIntervalSpec {
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
+        params.csiTypeDocComplete = true
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)

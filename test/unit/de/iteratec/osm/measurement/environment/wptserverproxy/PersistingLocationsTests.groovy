@@ -18,9 +18,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.MeasuredValueUpdateService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.BrowserService
@@ -30,15 +28,10 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.issc.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.schedule.*
-import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.HarParserService
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
-import org.joda.time.DateTime
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -47,13 +40,13 @@ import static org.junit.Assert.*
 
 /**
  * Tests the saving of locations and results. These functions are used in proxy-mechanism.
- * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link MeasuredValue}s is not the concern of the tests in this class. 
+ * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link CsiAggregation}s is not the concern of the tests in this class.
  * @author nkuhn
  * @see {@link ProxyService}
  * 
  */
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 class PersistingLocationsTests {
 
 	WebPageTestServer server1, server2
@@ -84,8 +77,7 @@ class PersistingLocationsTests {
 		).save(failOnError: true, validate: false)
 		
 		undefinedJobGroup=new JobGroup(
-			name: JobGroup.UNDEFINED_CSI,
-			groupType: JobGroupType.CSI_AGGREGATION
+			name: JobGroup.UNDEFINED_CSI
 			);
 		undefinedJobGroup.save(failOnError: true);
 		

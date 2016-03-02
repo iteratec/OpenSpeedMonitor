@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
 
@@ -199,11 +200,25 @@ class UserspecificCsiDashboard {
      */
     String selectedAggrGroupValuesUnCached = ""
 
+    //#####Chart Adjustments#####
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum
+    boolean showDataMarkers
+    boolean showDataLabels
+
+    boolean csiTypeDocComplete
+    boolean csiTypeVisuallyComplete
 
     /**
      * toggle formatting rickshaw export to wide screen format
      */
-    Boolean wideScreenDiagramMontage
+    Boolean wideScreenDiagramMontage = false
 
     static mapping = {
     }
@@ -239,7 +254,7 @@ class UserspecificCsiDashboard {
     UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, String publiclyVisible,
                              String wideScreenDiagramMontage, String dashboardName, String username) {
         this.publiclyVisible = publiclyVisible
-        this.wideScreenDiagramMontage = wideScreenDiagramMontage
+        this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
         this.dashboardName = dashboardName
         this.username = username
 
@@ -249,7 +264,7 @@ class UserspecificCsiDashboard {
         toDate = cmd.to
         fromHour = cmd.fromHour
         toHour = cmd.toHour
-        aggrGroup = cmd.aggrGroup
+        aggrGroup = cmd.aggrGroupAndInterval
         selectedTimeFrameInterval = cmd.selectedTimeFrameInterval
         includeInterval = cmd.includeInterval
         setFromHour = cmd.setFromHour
@@ -284,6 +299,15 @@ class UserspecificCsiDashboard {
         selectedMeasuredEventIds = selectedMeasuredEventIdsString
         selectedBrowsers = selectedBrowsersString
         selectedLocations = selectedLocationsString
+        chartTitle = cmd.chartTitle
+        chartWidth = cmd.chartWidth
+        chartHeight = cmd.chartHeight
+        loadTimeMinimum = cmd.loadTimeMinimum
+        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        showDataMarkers = cmd.showDataMarkers
+        showDataLabels = cmd.showDataLabels
+        csiTypeDocComplete = cmd.csiTypeDocComplete
+        csiTypeVisuallyComplete = cmd.csiTypeVisuallyComplete
     }
 
     /**
@@ -315,15 +339,15 @@ class UserspecificCsiDashboard {
 
     def getListOfAvailableDashboards() {
         List result = []
-        List fullList = []
-        fullList = UserspecificCsiDashboard.findAll()
+        List<UserspecificCsiDashboard> fullList = []
+        fullList = UserspecificCsiDashboard.findAll().sort {it.dashboardName}
 
         String currentUser = ""
         if (springSecurityService.isLoggedIn()) {
             currentUser = springSecurityService.authentication.principal.getUsername()
         }
         for (board in fullList) {
-            if ((board.publiclyVisible == true) || (board.username == currentUser)) {
+            if ((board.publiclyVisible) || (board.username == currentUser)) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
@@ -379,13 +403,23 @@ class UserspecificCsiDashboard {
                 link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                if (board.wideScreenDiagramMontage == true) {
-                    link += "&wideScreenDiagramMontage=on"
-                }
-                link += "&aggrGroup=" + board.aggrGroup
+                link += "&wideScreenDiagramMontage=$wideScreenDiagramMontage"
+                link += "&aggrGroupAndInterval=" + board.aggrGroup
                 if (board.includeInterval != null) {
                     link += "&includeInterval=on"
                 }
+                link += "&chartTitle="
+                if(board.chartTitle){
+                    link += board.chartTitle
+                }
+                link += "&chartWidth=${board.chartWidth}"
+                link += "&chartHeight=${board.chartHeight}"
+                link += "&loadTimeMinimum=${board.loadTimeMinimum}"
+                link += "&loadTimeMaximum=${board.loadTimeMaximum}"
+                link += "&showDataMarkers=${board.showDataMarkers}"
+                link += "&showDataLabels=${board.showDataLabels}"
+                link += "&csiTypeVisuallyComplete=${board.csiTypeVisuallyComplete}"
+                link += "&csiTypeDocComplete=${board.csiTypeDocComplete}"
                 result.add([dashboardName: board.dashboardName, link: link])
             }
         }

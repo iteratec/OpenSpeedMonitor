@@ -24,7 +24,7 @@ import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 /**
- * Test-suite for {@link de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService}.
+ * Test-suite for {@link DefaultMeasuredEventDaoService}.
  */
 @TestFor(DefaultMeasuredEventDaoService)
 @Mock([Page, MeasuredEvent])

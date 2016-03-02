@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import grails.test.mixin.*
 
@@ -26,7 +28,7 @@ import org.junit.*
  * Test-suite for {@link de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService}.
  */
 @TestFor(DefaultJobGroupDaoService)
-@Mock([JobGroup])
+@Mock([JobGroup, CsiConfiguration])
 class DefaultJobGroupDaoServiceTests {
 
 	public static final String nameGroup1OfType1 = 'group1type1'
@@ -45,9 +47,19 @@ class DefaultJobGroupDaoServiceTests {
 	
 	@Test
 	void testFindCSIGroups() {
-		new JobGroup(name: 'CSI-Group1', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		new JobGroup(name: 'CSI-Group2', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		new JobGroup(name: 'Another-Group', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+		JobGroup csiGroup1 = new JobGroup(name: 'CSI-Group1').save(failOnError: true)
+		CsiConfiguration csiConfiguration1 = TestDataUtil.createCsiConfiguration()
+		csiConfiguration1.label = 'conf1'
+		csiGroup1.csiConfiguration = csiConfiguration1
+		csiGroup1.save()
+
+		JobGroup csiGroup2 = new JobGroup(name: 'CSI-Group2').save(failOnError: true)
+		CsiConfiguration csiConfiguration2 = TestDataUtil.createCsiConfiguration()
+		csiConfiguration2.label = 'conf2'
+		csiGroup2.csiConfiguration = csiConfiguration2
+		csiGroup2.save()
+
+		new JobGroup(name: 'Another-Group').save(failOnError: true)
 		
 		Set<JobGroup> result = serviceUnderTest.findCSIGroups()
 		
@@ -59,8 +71,8 @@ class DefaultJobGroupDaoServiceTests {
 	
 	@Test
 	void testFindAll() {
-		new JobGroup(name: 'Group1', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		new JobGroup(name: 'Group2', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+		new JobGroup(name: 'Group1').save(failOnError: true)
+		new JobGroup(name: 'Group2').save(failOnError: true)
 		
 		Set<JobGroup> result = serviceUnderTest.findAll();
 		
@@ -69,7 +81,7 @@ class DefaultJobGroupDaoServiceTests {
 		assertEquals(1, result.count( { it.name == 'Group1' } ));
 		assertEquals(1, result.count( { it.name == 'Group2' } ));
 		
-		new JobGroup(name: 'Group3', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+		new JobGroup(name: 'Group3').save(failOnError: true)
 		
 		Set<JobGroup> resultAfterAdding = serviceUnderTest.findAll();
 		
@@ -86,13 +98,13 @@ class DefaultJobGroupDaoServiceTests {
 		//create test-specific data
 		
 		//group type 1
-		JobGroup group1OfType1 = new JobGroup(name: nameGroup1OfType1, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		JobGroup group2OfType1 = new JobGroup(name: nameGroup2OfType1, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
-		JobGroup group3OfType1 = new JobGroup(name: nameGroup3OfType1, groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+		JobGroup group1OfType1 = new JobGroup(name: nameGroup1OfType1).save(failOnError: true)
+		JobGroup group2OfType1 = new JobGroup(name: nameGroup2OfType1).save(failOnError: true)
+		JobGroup group3OfType1 = new JobGroup(name: nameGroup3OfType1).save(failOnError: true)
 		//group type 2
-		JobGroup group1OfType2 = new JobGroup(name: nameGroup1OfType2, groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
-		JobGroup group2OfType2 = new JobGroup(name: nameGroup2OfType2, groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
-		JobGroup group3OfType2 = new JobGroup(name: nameGroup3OfType2, groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+		JobGroup group1OfType2 = new JobGroup(name: nameGroup1OfType2).save(failOnError: true)
+		JobGroup group2OfType2 = new JobGroup(name: nameGroup2OfType2).save(failOnError: true)
+		JobGroup group3OfType2 = new JobGroup(name: nameGroup3OfType2).save(failOnError: true)
 		
 		//execute test
 		

@@ -41,7 +41,7 @@ class QueueAndJobStatusService {
     static transactional = true
 
     HttpRequestService httpRequestService
-    MeasuredValueTagService measuredValueTagService
+    CsiAggregationTagService csiAggregationTagService
     EventResultDaoService eventResultDaoService
     I18nService i18nService
     JobService jobService

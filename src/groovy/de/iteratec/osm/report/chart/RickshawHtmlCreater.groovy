@@ -49,11 +49,11 @@ class RickshawHtmlCreater {
      * to place its components. Additional a javascript function
      * will be called, which is responsible to draw the rickshaw graph.
      */
-    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations ->
+    def generateHtmlForMultipleYAxisGraph = { String divId, List<OsmChartGraph> graphs, boolean dataLabelsActivated, String heightOfChart, String width, List<OsmChartAxis> yAxesLabels, String title, String labelSummary, boolean markerEnabled, List annotations ->
 
         def sw = new StringWriter()
         def data = transformData(graphs, yAxesLabels)
-        def height = transformHeightOfChart(heightOfChart)
+        def height = heightOfChart
 
         if (divId == null || divId == "") {
             divId = "rickshaw_all"
@@ -91,7 +91,8 @@ class RickshawHtmlCreater {
                     divId: "${divId}",
                     title: "${title}",
                     data : ${data},
-                    heightOfChart :  ${height},
+                    height: ${height},
+                    width: ${width},
                     dataLabelsActivated : ${dataLabelsActivated},
                     NUMBER_OF_YAXIS_TICKS : 5,
                     drawPointMarkers: ${markerEnabled},
@@ -102,14 +103,14 @@ class RickshawHtmlCreater {
         </script>"""
     }
 
-    /**
-     * Removes "px" from height of chart. So the height can be
-     * treated like an integer in javascript.
-     */
-    def transformHeightOfChart = { String heightOfChart ->
-        def height = heightOfChart.split("px")[0];
-        return height;
-    }
+//    /**
+//     * Removes "px" from height of chart. So the height can be
+//     * treated like an integer in javascript.
+//     */
+//    def transformHeightOfChart = { String heightOfChart ->
+//        def height = heightOfChart.split("px")[0];
+//        return height;
+//    }
 
     /**
      * Transforms the data stored in a List of HighchartGraphs
@@ -154,10 +155,10 @@ class RickshawHtmlCreater {
 		graph.getPoints().each {eachPoint ->
 
             def url = "undefined"
-			def measuredValue = eachPoint.measuredValue
+			def csiAggregation = eachPoint.csiAggregation
 
-            if(measurandGroup == "LOAD_TIMES" || measurandGroup == "REQUEST_SIZES" ) {
-                measuredValue = measuredValue / 1000;
+            if(measurandGroup == "REQUEST_SIZES" ) {
+                csiAggregation = csiAggregation / 1000;
             }
 
 			if (eachPoint.sourceURL != null) {
@@ -165,7 +166,7 @@ class RickshawHtmlCreater {
             }
 
             testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
-			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${measuredValue}, url: "${url}" ${testingAgent}}"""
+			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${csiAggregation}, url: "${url}" ${testingAgent}}"""
             prefix = ","
         }
         sw << """ ]"""

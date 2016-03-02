@@ -139,14 +139,16 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [GET: "translateToCustomerSatisfaction"]
 		}
-		"/rest/csi/frustrations" {
-			controller = "RestApi"
-			action = [GET: "getCsiFrustrationTimings"]
-		}
 		"/rest/job/$id/resultUrls/$timestampFrom/$timestampTo" {
 			controller = "RestApi"
 			action = [GET: "getResultUrls"]
 		}
+		/* Since IT-723 */
+		"/rest/$system/csi/translateToCustomerSatisfaction" {
+			controller = "RestApi"
+			action = [GET: "translateToCustomerSatisfaction"]
+		}
+
 		/*
 		 * Following PUT/POST rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by
 		 * naming convention of action methods.
@@ -177,6 +179,16 @@ class UrlMappings {
             action = [PUT: "securedViaApiKeySetMeasurementActivation"]
             activationToSet = false
         }
+		"/rest/config/activateNightlyDatabaseCleanup" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
+			activationToSet = true
+		}
+		"/rest/config/deactivateNightlyDatabaseCleanup" {
+			controller = "RestApi"
+			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
+			activationToSet = false
+		}
 
 	}
 }

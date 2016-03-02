@@ -98,7 +98,7 @@ class BatchActivity {
      *      <li>"endDate": Date</li>
      */
     public void updateStatus(Map<String, Object> map) {
-        def allowed = ["errors", "failures", "lastFailureMessage", "progress", "progressWithinStage", "stage", "status", "successfulActions", "endDate"]
+        List<String> allowed = ["errors", "failures", "lastFailureMessage", "progress", "progressWithinStage", "stage", "status", "successfulActions", "endDate"]
         map.each { key, value ->
             if (allowed.contains(key)) {
                 this[key] = value

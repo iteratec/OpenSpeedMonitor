@@ -24,13 +24,15 @@
 					<div class ="row">
 						<div class="span2 text-right"><g:message code="de.iteratec.chart.size.name"/></div>
 						<div class="span9">
-							<div class="input-prepend">
+							<div class="input-prepend input-append">
 								<span class="add-on"><g:message code="de.iteratec.chart.width.name"/></span>
 								<input class="span1 content-box" id="dia-width" type="text" value="${initialChartWidth}">
+								<span class="add-on">px</span>
 							</div>
-							<div class="input-prepend">
+							<div class="input-prepend input-append">
 								<span class="add-on"><g:message code="de.iteratec.chart.height.name"/></span>
 								<input class="span1 content-box" id="dia-height" type="text" value="${initialChartHeight}">
+								<span class="add-on">px</span>
 							</div>
 							<button class="btn" id="dia-change-chartsize" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.apply.name"/></button>
 						</div>
@@ -40,13 +42,15 @@
                     <div id="adjust_chart_y_axis" class ="row">
                         <div class="span2 text-right"><g:message code="de.iteratec.chart.axis.y.name"/></div>
                         <div class="span9">
-                            <div class="input-prepend">
+                            <div class="input-prepend input-append ">
                                 <span class="add-on"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
                                 <input class="span1 content-box" id="dia-y-axis-min" type="text" value="${yAxisMin?:'' }">
+								<span class="add-on" id="minimumUnit"></span>
                             </div>
-                            <div class="input-prepend">
+                            <div class="input-append input-prepend">
                                 <span class="add-on"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
                                 <input class="span1 content-box" id="dia-y-axis-max" type="text" value="${yAxisMax?:'' }">
+								<span class="add-on" id="maximumUnit"></span>
                             </div>
                             <button class="btn" id="dia-change-yaxis" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.apply.name"/></button>
                         </div>
@@ -61,7 +65,7 @@
                       </div>
                     <div class ="row">
                         <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.wideScreenDiagramMontage" default="Exportierte Diagramme für Breitbild-Darstellung optimieren"/></div>
-                        <div class="span9"><g:checkBox id="wide-screen-diagram-montage" name="wideScreenDiagramMontage" checked="${params.wideScreenDiagramMontage?true:false}" /></div>
+                        <div class="span9"><g:checkBox id="wide-screen-diagram-montage" name="wideScreenDiagramMontage" checked="${params.wideScreenDiagramMontage}" /></div>
                     </div>
 				</div>
 			</div>

@@ -49,7 +49,25 @@ class DefaultJobGroupDaoService implements JobGroupDaoService {
 	@Override
 	public Set<JobGroup> findCSIGroups() {
 		Set<JobGroup> result = Collections.checkedSet(new HashSet<JobGroup>(), JobGroup.class);
-		result.addAll(JobGroup.findAllByGroupType(JobGroupType.CSI_AGGREGATION));
+		result.addAll(JobGroup.findAllByCsiConfigurationIsNotNull());
 		return Collections.unmodifiableSet(result);
 	}
+
+    @Override
+    public List<String> getAllUniqueTags(){
+        return JobGroup.allTags
+    }
+
+    @Override
+    public List<String> getMaxUniqueTags(int maxNumberOfTags){
+        return JobGroup.findAllTagsWithCriteria([max:maxNumberOfTags]) {}
+    }
+
+    @Override
+    public Map<String, List<String>> getTagToJobGroupNameMap(){
+        return getAllUniqueTags().inject([:]){map, tag->
+            map[tag] = JobGroup.findAllByTag(tag)*.name
+            return map
+        }
+    }
 }

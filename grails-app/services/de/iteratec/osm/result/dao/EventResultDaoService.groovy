@@ -20,11 +20,9 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.dao.CriteriaAggregator
 import de.iteratec.osm.dao.CriteriaSorting
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import org.hibernate.criterion.CriteriaSpecification
 
 import java.util.regex.Pattern
@@ -40,7 +38,7 @@ public class EventResultDaoService {
 		
 	OsmDataSourceService osmDataSourceService
 	JobResultDaoService jobResultDaoService
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 
 	/**
 	 * <p>
@@ -98,7 +96,7 @@ public class EventResultDaoService {
             Date fromDate, Date toDate, Set<CachedView> cachedViews, MvQueryParams mvQueryParams
     ){
 
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams)
+		Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams)
 		return getMedianEventResultsBy(fromDate, toDate, cachedViews, rlikePattern.pattern)
 
 	}
@@ -148,7 +146,7 @@ public class EventResultDaoService {
         CriteriaSorting sorting
     ){
 		
-		Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(queryParams)
+		Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(queryParams)
 
         if(osmDataSourceService.getRLikeSupport()){
 
@@ -425,7 +423,7 @@ public class EventResultDaoService {
             Date fromDate, Date toDate, Collection<CachedView> cachedViews, MvQueryParams mvQueryParams
     ){
 
-        Pattern rlikePattern=measuredValueTagService.getTagPatternForHourlyMeasuredValues(mvQueryParams);
+        Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams);
 
 		def criteria = EventResult.createCriteria()
 		if(osmDataSourceService.getRLikeSupport()) {
@@ -449,13 +447,4 @@ public class EventResultDaoService {
 	public Collection<EventResult> getEventResultsByJob(Job _job, Date fromDate, Date toDate, Integer max, Integer offset){
 		return EventResult.where { jobResultJobConfigId == _job.id && jobResultDate >= fromDate && jobResultDate <= toDate }.list(sort: 'jobResultDate', order: 'desc', max: max, offset: offset)
 	}
-
-    /**
-     * Gets all {@link EventResult}s from db associated with {@link WebPerformanceWaterfall} waterfall.
-     * @param waterfall
-     * @return List of {@link EventResult}s associated with {@link WebPerformanceWaterfall} waterfall.
-     */
-    public List<EventResult> findEventResultsAssociatedTo(WebPerformanceWaterfall waterfall) {
-        return EventResult.findAllByWebPerformanceWaterfall(waterfall)
-    }
 }

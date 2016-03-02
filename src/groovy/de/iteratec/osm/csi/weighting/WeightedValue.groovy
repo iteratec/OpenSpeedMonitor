@@ -20,7 +20,7 @@ package de.iteratec.osm.csi.weighting
 /**
  * A value with a weight for building weighted means.
  * @author nkuhn
- * @see de.iteratec.isocsi.MeasuredValueService
+ * @see de.iteratec.isocsi.CsiAggregationService
  *
  */
 class WeightedValue {
@@ -31,5 +31,24 @@ class WeightedValue {
 	@Override
 	public String toString() {
 		return "WeightedValue [value=${value}, weight=${weight}]"
+	}
+
+	boolean equals(o) {
+		if (this.is(o)) return true
+		if (getClass() != o.class) return false
+
+		WeightedValue that = (WeightedValue) o
+
+		if (value != that.value) return false
+		if (weight != that.weight) return false
+
+		return true
+	}
+
+	int hashCode() {
+		int result
+		result = (value != null ? value.hashCode() : 0)
+		result = 31 * result + (weight != null ? weight.hashCode() : 0)
+		return result
 	}
 }

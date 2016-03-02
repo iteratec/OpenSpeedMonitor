@@ -25,17 +25,14 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.detail.WaterfallEntry
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -50,7 +47,7 @@ import spock.lang.Specification
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, WebPerformanceWaterfall, WaterfallEntry, ConnectivityProfile])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, ConnectivityProfile])
 class PersistConnectivityInNewEventResultSpec extends Specification{
 
     public static final String PROXY_IDENTIFIER_WPT_SERVER = 'dev.server02.wpt.iteratec.de'
@@ -81,7 +78,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     }
 
     void createTestDataCommonForAllTests() {
-        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI, JobGroupType.CSI_AGGREGATION)
+        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
         Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
         Browser ie = TestDataUtil.createBrowser('IE', 1d)
@@ -104,7 +101,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         mocker.mockProxyService(serviceUnderTest)
         mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
         serviceUnderTest.pageService = new PageService()
-        mocker.mockMeasuredValueTagService(serviceUnderTest, [:], [:], [:], [:], [:])
+        mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }

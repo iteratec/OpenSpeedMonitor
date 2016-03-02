@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
@@ -35,7 +37,7 @@ import static org.junit.Assert.*
  * Test-suite of {@link JobService}.
  */
 @TestFor(JobService)
-@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script])
+@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration])
 class JobServiceTests {
 
 	WebPageTestServer server1
@@ -224,12 +226,13 @@ class JobServiceTests {
 
 		jobGroupName = 'CSI'
 		JobGroup group = new JobGroup(
-				name: jobGroupName,
-				groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true)
+				name: jobGroupName).save(failOnError: true)
+		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+		group.csiConfiguration = csiConfiguration
+		group.save()
 
 		JobGroup nonCSIgroup = new JobGroup(
-				name: 'nonCSIgroup',
-				groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError: true)
+				name: 'nonCSIgroup').save(failOnError: true)
 
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 

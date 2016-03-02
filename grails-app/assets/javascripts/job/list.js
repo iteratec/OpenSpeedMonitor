@@ -124,10 +124,10 @@ JobStatusUpdater = function() {
 	}
 }();
 
-//TODO IT-703
 function filterJobSet(selectedJobSetName, selectedJobSetJobs) {
-	setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs', selectedJobSetJobs);
-	setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetName', selectedJobSetName);
+    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs', selectedJobSetJobs);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobSetName', selectedJobSetName);
 	$('#jobSetButton').html(selectedJobSetName + ' <span class="caret"></span>');
 	filterJobList();
 }
@@ -143,27 +143,28 @@ function saveJobSet () {
 }
 
 function filterJobList() {
+    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
     var filterText = $.trim($('#filterByLabel').val());
-    setToLocalStorage('de.iteratec.osm.job.list.filters.jobname',filterText);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobname',filterText);
     var filterJobGroup = $.trim($('#filterByJobGroup').val());
-    setToLocalStorage('de.iteratec.osm.job.list.filters.jobgroup',filterJobGroup);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.jobgroup',filterJobGroup);
     var filterLocation = $.trim($('#filterByLocation').val());
-    setToLocalStorage('de.iteratec.osm.job.list.filters.location',filterLocation);    
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.location',filterLocation);
     var filterSkript = $.trim($('#filterBySkript').val());
-    setToLocalStorage('de.iteratec.osm.job.list.filters.skript',filterSkript);    
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.skript',filterSkript);
     var filterBrowser = $.trim($('#filterByBrowser').val());
-    setToLocalStorage('de.iteratec.osm.job.list.filters.browser',filterBrowser);    
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.browser',filterBrowser);
     var filterCheckedJobs = $('#filterCheckedJobs').prop('checked');
-    setToLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs',filterCheckedJobs);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs',filterCheckedJobs);
     var filterInactiveJobs = $('#filterInactiveJobs').prop('checked');
-    setToLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs',filterInactiveJobs);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs',filterInactiveJobs);
     var filterHighlightedJobs = $('#filterHighlightedJobs').prop('checked');
-    setToLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs',filterHighlightedJobs);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs',filterHighlightedJobs);
     var filterRunningJobs = $('#filterRunningJobs').prop('checked');
-    setToLocalStorage('de.iteratec.osm.job.list.filters.runningjobs',filterRunningJobs);
+    osmClientSideStorageUtils.setToLocalStorage('de.iteratec.osm.job.list.filters.runningjobs',filterRunningJobs);
     var checkedTags = $('#filterTags').val();
     $('#filterTags_chosen > ul > li.search-choice').size();
-	var filterJobSetJobs = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs');
+	var filterJobSetJobs = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobSetJobs');
 	console.log("Storage: " + filterJobSetJobs);
 
     var reText = new RegExp(filterText, 'i');
@@ -173,34 +174,34 @@ function filterJobList() {
     var reSkript = new RegExp(filterSkript, 'i');
     
 	$('table tbody tr').each(function() {
-		var tr = $(this);
-		var jobName = $('.jobName', tr).text();
-		var jobGroup = $('.jobgroup', tr).text();
-    var location = $('.location', tr).text();
-    var browser = $('.browser', tr).text();
-    var skript = $('.skript', tr).text();
-    	var showRow = true;
-		if (showRow && filterJobSetJobs) {showRow = filterJobSetJobs.indexOf($.trim(jobName)) >= 0}
-    	if (showRow && filterHighlightedJobs) { showRow = tr.hasClass('highlight'); }
-    	if (showRow && filterCheckedJobs) { showRow = $('.jobCheckbox', tr).prop('checked'); }
-    	if (showRow && !filterInactiveJobs) { showRow = $('.job_active', tr).val() == 'true'; }
-    	if (showRow && filterRunningJobs) { showRow = $('.running', tr).length > 0; }
-    	
-    	if (showRow && filterJobGroup !== '') { showRow = jobGroup.search(reJobGroup) > -1; }
-      if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
-      if (showRow && filterBrowser !== '') { showRow = browser.search(reBrowser) > -1; }
-      if (showRow && filterSkript !== '') { showRow = skript.search(reSkript) > -1; }
-    	if (showRow && filterText !== '') { showRow = jobName.search(reText) > -1; }
-    	
-    	if (showRow && checkedTags) {
-    		showRow = false;
-    		checkedTags.map(function(currentTag) {
-    			var usedTags = tr.attr('data-tags');
-    			if (usedTags && usedTags.split(',').indexOf(currentTag) > -1)
-    				showRow = true;
-    		}); 
-    	}
-    	tr.toggle(showRow);
+        var tr = $(this);
+        var jobName = $('.jobName', tr).text();
+        var jobGroup = $('.jobgroup', tr).text();
+        var location = $('.location', tr).text();
+        var browser = $('.browser', tr).text();
+        var skript = $('.skript', tr).text();
+        var showRow = true;
+        if (showRow && filterJobSetJobs) {showRow = filterJobSetJobs.indexOf($.trim(jobName)) >= 0}
+        if (showRow && filterHighlightedJobs) { showRow = tr.hasClass('highlight'); }
+        if (showRow && filterCheckedJobs) { showRow = $('.jobCheckbox', tr).prop('checked'); }
+        if (showRow && !filterInactiveJobs) { showRow = $('.job_active', tr).val() == 'true'; }
+        if (showRow && filterRunningJobs) { showRow = $('.running', tr).length > 0; }
+
+        if (showRow && filterJobGroup !== '') { showRow = jobGroup.search(reJobGroup) > -1; }
+        if (showRow && filterLocation !== '') { showRow = location.search(reLocation) > -1; }
+        if (showRow && filterBrowser !== '') { showRow = browser.search(reBrowser) > -1; }
+        if (showRow && filterSkript !== '') { showRow = skript.search(reSkript) > -1; }
+        if (showRow && filterText !== '') { showRow = jobName.search(reText) > -1; }
+
+        if (showRow && checkedTags) {
+            showRow = false;
+            checkedTags.map(function(currentTag) {
+                var usedTags = tr.attr('data-tags');
+                if (usedTags && usedTags.split(',').indexOf(currentTag) > -1)
+                    showRow = true;
+            });
+        }
+        tr.toggle(showRow);
     });
 }
 
@@ -234,7 +235,11 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 				top: 'auto', // Top position relative to parent in px
 				left: '50%' // Left position relative to parent in px
 		};
-		var spinner = new Spinner(opts).spin(document.getElementById('jobtable'));
+
+        var spinnerParent = document.getElementById('spinner-joblist');
+        var spinner = new Spinner(opts).spin();
+        spinnerParent.appendChild(spinner);
+
 		jQuery.ajax({
 			type : 'POST',
 			url : listJobsLink,
@@ -266,15 +271,6 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 	}
 };
 
-function stringToBoolean(string) {
-	if(!string) return false;
-	switch(string.toLowerCase()){
-		case "true": case "yes": case "1": return true;
-		case "false": case "no": case "0": case null: return false;
-		default: return false;
-	}
-}
-
 /**
  * Called on jquerys DOM-ready.
  * Initializes DOM-nodes and registers events. 
@@ -283,9 +279,10 @@ function doOnDomReady(
 	getRunningAndRecentlyFinishedJobsLink,
 	cancelJobRunLink,
 	getLastRunLink,
-	showOnlyActiveJobs,
-	nextExecutionLink,
-	listLink){
+	nextExecutionLink){
+
+    var stringUtils = OpenSpeedMonitor.stringUtils();
+    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
 	
 	$('#updateHints').popover();
 	$('#checkAll').on('click', function() {
@@ -304,23 +301,23 @@ function doOnDomReady(
 		$('#filterTags').chosen({ no_results_text: '' }).change(filterJobList);
 	}
 	
-	var filterValueJobname = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
-	var filterValueJobgroup = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
-  var filterValueLocation = getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
-  var filterValueSkript = getFromLocalStorage('de.iteratec.osm.job.list.filters.skript');
-  var filterValueBrowser = getFromLocalStorage('de.iteratec.osm.job.list.filters.browser');
-	var filterJobSetName = getFromLocalStorage('de.iteratec.osm.job.list.filters.jobSetName');
+    var filterValueJobname = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
+    var filterValueJobgroup = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
+    var filterValueLocation = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
+    var filterValueSkript = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.skript');
+    var filterValueBrowser = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.browser');
+    var filterJobSetName = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobSetName');
+
+	var filterValueCheckedJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs'));
+	var filterValueInactiveJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
+	var filterValueHighlightedJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs'));
+	var filterValueRunningJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.runningjobs'));
 	
-	var filterValueCheckedJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.checkedjobs'));
-	var filterValueInactiveJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
-	var filterValueHighlightedJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs'));
-	var filterValueRunningJobs = stringToBoolean(getFromLocalStorage('de.iteratec.osm.job.list.filters.runningjobs'));
-	
-	if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
-	if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);
-  if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
-  if(filterValueSkript != null) $('#filterBySkript').val(filterValueSkript);
-  if(filterValueBrowser != null) $('#filterByBrowser').val(filterValueBrowser);
+    if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
+    if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);
+    if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
+    if(filterValueSkript != null) $('#filterBySkript').val(filterValueSkript);
+    if(filterValueBrowser != null) $('#filterByBrowser').val(filterValueBrowser);
 	
 	if(filterValueCheckedJobs != null) $('#filterCheckedJobs').prop("checked",filterValueCheckedJobs);
 	if(filterValueInactiveJobs != null) $('#filterInactiveJobs').prop("checked",filterValueInactiveJobs);
@@ -334,29 +331,19 @@ function doOnDomReady(
 			getRunningAndRecentlyFinishedJobsLink,
 			cancelJobRunLink,
 			getLastRunLink,
-			5000);
+			5000
+    );
 	 
 	$('.table-fixed-header').fixedHeader();
 	
-	
-	// when only active jobs were loaded, either issue an AJAX request to load all jobs
-	// immediately (if "Show inactive jobs" checkbox is checked) or set an event handler
-	// to load all jobs asynchronously when checking the checkbox for the first time.
-	var inactiveJobLoader = new InactiveJobLoader(listLink, nextExecutionLink);
-	if(showOnlyActiveJobs){
-		if ($('#filterInactiveJobs').prop('checked')) {
-			inactiveJobLoader.loadJobs();
-		} else {
-			$('#filterInactiveJobs').one('click', inactiveJobLoader.loadJobs);
-		}
-	}
-	
 }
 
-$(window).load(function() {
-	if ($("tr.highlight").length > 0) {
-		$('html, body').animate({
-			scrollTop : $("tr.highlight").offset().top - 100
-		}, 1000);
-	}
-});
+function doOnWindowLoad(listLink, nextExecutionLink){
+
+    if ($("tr.highlight").length > 0) {
+        $('html, body').animate({
+            scrollTop : $("tr.highlight").offset().top - 100
+        }, 1000);
+    }
+
+}

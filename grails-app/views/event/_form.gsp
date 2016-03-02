@@ -45,13 +45,13 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')}</> ">
+<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')} ">
     <label for="globallyVisible" class="control-label"><g:message code="event.globallyVisible.label"
                                                                   default="Globally Visible"/></label>
 
     <div class="controls">
-        <input type="checkBox" name="globallyVisible" value="${eventInstance?.globallyVisible}"/>
-        %{--<bs:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}"/>--}%
+        %{--<input type="checkBox" name="globallyVisible" value="${eventInstance?.globallyVisible}"/>--}%
+        <g:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}"/>
     </div>
 </div>
 

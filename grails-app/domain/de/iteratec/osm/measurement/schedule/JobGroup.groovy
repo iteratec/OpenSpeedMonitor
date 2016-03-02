@@ -17,25 +17,17 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
+import org.grails.taggable.Taggable
 
-public enum JobGroupType {
-    /**
-     * Just results with this type get factored in calculation for customer satisfaction index.
-     */
-    CSI_AGGREGATION,
-    /**
-     * To group results of several (not csi relevant) jobs that belong together. For more convenient selection in osm-dashboards.
-     */
-    RAW_DATA_SELECTION,
-}
 
 /**
  * Groups {@link Job}s for different reasons.
  * @author nkuhn
  *
  */
-class JobGroup {
+class JobGroup implements Taggable{
 
     /**
      * The name for an undefined JobGroup, respectively CSI. Please use {@link #isUndefinedCsiJobGroup()}
@@ -45,23 +37,25 @@ class JobGroup {
 
     String name
 
-    JobGroupType groupType
+    CsiConfiguration csiConfiguration
 
     /**
      * Graphite-Servers to which results of this JobGroup should be sent.
      */
     Collection<GraphiteServer> graphiteServers = []
-    static hasMany = [graphiteServers:GraphiteServer]
+    static hasMany = [graphiteServers: GraphiteServer]
 
     static constraints = {
         name(unique: true, maxSize: 255)
-        groupType(maxSize: 255)
         graphiteServers()
+        csiConfiguration(nullable: true)
     }
 
     @Override
     public String toString() {
-        return name + ' (' + groupType + ')';
+        String result = name;
+        result += csiConfiguration != null ? ' (' + csiConfiguration.ident() + ')' : ""
+        return result
     }
     static transients = ['undefinedCsiJobGroup']
     /**
@@ -76,5 +70,9 @@ class JobGroup {
      */
     public boolean isUndefinedCsiJobGroup() {
         return this.name.equals(JobGroup.UNDEFINED_CSI)
+    }
+
+    public boolean hasCsiConfiguration() {
+        return csiConfiguration != null
     }
 }

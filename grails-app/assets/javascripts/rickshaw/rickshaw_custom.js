@@ -2595,9 +2595,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		// invert the scale if this series displays using a scale
 		var series = point.series;
-		var actualY = series.scale ? series.scale.invert(point.value.y) : point.value.y;
 
-		item.innerHTML = this.formatter(series, point.value.x, actualY, formattedXValue, formattedYValue, point, point.testAgent);
+		item.innerHTML = this.formatter(series, point.value.x, point.value.y, formattedXValue, formattedYValue, point, point.testAgent);
 		item.style.top = this.graph.y(point.value.y0 + point.value.y) + 'px';
 
 		this.element.appendChild(item);

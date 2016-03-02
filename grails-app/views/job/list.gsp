@@ -105,11 +105,16 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <g:each in="${jobSets}" var="jobSet">
-                                    <li><a id="${jobSet.name}" href="#"
-                                           onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>
-                                    </li>
-                                </g:each>
+                                <g:if test="${jobSets.size > 0}">
+                                    <g:each in="${jobSets}" var="jobSet">
+                                        <li><a id="${jobSet.name}" href="#"
+                                               onclick="filterJobSet('${jobSet.name}', '${jobSet.jobs*.toString()}')">${jobSet.name}</a>
+                                        </li>
+                                    </g:each>
+                                </g:if>
+                                <g:else>
+                                    <li><g:message code="de.iteratec.osm.job.filterNoJobSet" default="Kein JobSet"/> </li>
+                                </g:else>
                             </ul>
                         </div>
                         <a class="close pull-left" href="#"
@@ -180,6 +185,7 @@
             <a class="close" data-dismiss="alert">×</a>
             <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
         </div>
+        <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
         <table class="table-striped table-fixed-header" id="jobtable">
             <thead class="header">
             <tr>
@@ -213,13 +219,17 @@
         $(document).ready(
             doOnDomReady(
                 '${createLink(action: 'getRunningAndRecentlyFinishedJobs', absolute: true)}',
-                    '${createLink(action: 'cancelJobRun', absolute: true)}',
-                    '${createLink(action: 'getLastRun', absolute: true)}',
-        ${onlyActiveJobs},
-                    "${createLink(action: 'nextExecution', absolute: true)}",
-                    '${createLink(action: 'list', absolute: true)}'
-                )
-		    );
+                '${createLink(action: 'cancelJobRun', absolute: true)}',
+                '${createLink(action: 'getLastRun', absolute: true)}',
+                "${createLink(action: 'nextExecution', absolute: true)}"
+            )
+        );
+        $(window).load(function() {
+            doOnWindowLoad(
+                '${createLink(action: 'list', absolute: true)}',
+                "${createLink(action: 'nextExecution', absolute: true)}"
+            );
+        });
     </asset:script>
     <asset:deferredScripts/>
 </content>

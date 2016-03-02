@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfigCacheService
 import grails.test.mixin.*
 import org.junit.Assert
 import org.junit.Before

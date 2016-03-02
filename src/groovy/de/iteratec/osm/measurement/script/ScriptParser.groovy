@@ -269,6 +269,7 @@ class ScriptParser {
 					if (setEventNameStmtFound)
 //						reportStepNotRecorded(stmt)
 						possibleUnrecordedSteps << i
+					setEventNameStmtFound = false
 				} else {
 					if (possibleUnrecordedSteps.size() > 0) {
 						if (!setEventNameStmtFound)

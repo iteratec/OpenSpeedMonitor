@@ -36,7 +36,7 @@ class OsmChartGraph {
 	List<OsmChartPoint> points = []
 	
 	
-	public Double getMaxMeasuredValue()
+	public Double getMaxCsiAggregation()
 	{
 		if (points == null || points.size() <= 0)
 		{
@@ -46,16 +46,16 @@ class OsmChartGraph {
 		Double max = Double.MIN_VALUE
 		for (OsmChartPoint p : points)
 		{
-			if (p.measuredValue > max)
+			if (p.csiAggregation > max)
 			{
-				max = p.measuredValue
+				max = p.csiAggregation
 			}
 		}	
 		
 		return max
 	}
 	
-	public Double getMinMeasuredValue()
+	public Double getMinCsiAggregation()
 	{
 		if (points == null || points.size() <= 0)
 		{
@@ -65,9 +65,9 @@ class OsmChartGraph {
 		Double min = Double.MAX_VALUE
 		for (OsmChartPoint p : points)
 		{
-			if (p.measuredValue < min)
+			if (p.csiAggregation < min)
 			{
-				min = p.measuredValue
+				min = p.csiAggregation
 			}
 		}
 		

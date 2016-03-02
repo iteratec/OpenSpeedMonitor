@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -26,6 +27,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
+import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificEventResultDashboard
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
@@ -59,15 +61,15 @@ class EventResultDashboardController {
     PageDaoService pageDaoService
     BrowserDaoService browserDaoService
     LocationDaoService locationDaoService
-    EventResultService eventResulshowatService
-    MeasuredValueUtilService measuredValueUtilService
+    CsiAggregationUtilService csiAggregationUtilService
     EventResultDashboardService eventResultDashboardService
     PageService pageService
     I18nService i18nService
     CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
     def springSecurityService
-
+    ConfigService configService
+    CustomDashboardService customDashboardService
     /**
      * The Grails engine to generate links.
      *
@@ -77,12 +79,12 @@ class EventResultDashboardController {
 
     public final static Integer EXPECTED_RESULTS_PER_DAY = 50;
     public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultMeasuredValueService.getAggregatorMapForOptGroupSelect()
+    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
     public final
     static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
 
-    List<Long> measuredValueIntervals = [MeasuredValueInterval.RAW, MeasuredValueInterval.HOURLY, MeasuredValueInterval.DAILY, MeasuredValueInterval.WEEKLY]
+    List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
 
     public final static String DATE_FORMAT_STRING = 'dd.mm.yyyy';
@@ -132,6 +134,9 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+        cmd.loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        cmd.chartHeight = cmd.chartHeight>0?cmd.chartHeight:configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth>0?cmd.chartWidth:configService.getInitialChartWidthInPixels()
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
         cmd.copyRequestDataToViewModelMap(modelToRender);
@@ -159,7 +164,7 @@ class EventResultDashboardController {
                 if (warnAboutLongProcessingTimeInsteadOfShowingData) {
                     modelToRender.put('warnAboutLongProcessingTime', true)
                 } else {
-                    fillWithMeasuredValueData(modelToRender, cmd);
+                    fillWithCsiAggregationData(modelToRender, cmd);
                 }
             }
         }
@@ -199,16 +204,11 @@ class EventResultDashboardController {
         // Parse JSON Data for Command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
-        Collection<Long> selectedFolder = []
-        dashboardValues.selectedFolder.each { l -> selectedFolder.add(Long.parseLong(l)) }
-        Collection<Long> selectedPages = []
-        dashboardValues.selectedPages.each { l -> selectedPages.add(Long.parseLong(l)) }
-        Collection<Long> selectedMeasuredEventIds = []
-        dashboardValues.selectedMeasuredEventIds.each { l -> selectedMeasuredEventIds.add(Long.parseLong(l)) }
-        Collection<Long> selectedBrowsers = []
-        dashboardValues.selectedBrowsers.each { l -> selectedBrowsers.add(Long.parseLong(l)) }
-        Collection<Long> selectedLocations = []
-        dashboardValues.selectedLocations.each { l -> selectedLocations.add(Long.parseLong(l)) }
+        Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues,"selectedFolder")
+        Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues,"selectedPages")
+        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues,"selectedMeasuredEventIds")
+        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues,"selectedBrowser")
+        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues,"selectedLocations")
 
         Collection<String> selectedAggrGroupValuesCached = []
         // String or List<String>
@@ -243,7 +243,8 @@ class EventResultDashboardController {
                 selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
                 overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
                 includeCustomConnectivity: dashboardValues.includeCustomConnectivity, includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
-                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles)
+                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles, chartTitle: dashboardValues.chartTitle?:"",
+                loadTimeMaximum: dashboardValues.loadTimeMaximum?:"auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers)
 
         // Parse IntegerValues if they exist
         if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()
@@ -255,7 +256,10 @@ class EventResultDashboardController {
         if (dashboardValues.trimBelowRequestCounts) cmd.trimBelowRequestCounts = dashboardValues.trimBelowRequestCounts.toInteger()
         if (dashboardValues.trimAboveLoadTimes) cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes.toInteger()
         if (dashboardValues.trimBelowLoadTimes) cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()
-
+        if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
+        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
+        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
+        if (dashboardValues.chartWidth) cmd.chartWidth = dashboardValues.chartWidth.toInteger()
         // Check validation and send errors if needed
         if (!cmd.validate()) {
             //send errors
@@ -273,7 +277,7 @@ class EventResultDashboardController {
         }
     }
 
-    private void fillWithMeasuredValueData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
+    private void fillWithCsiAggregationData(Map<String, Object> modelToRender, EventResultDashboardShowAllCommand cmd) {
         Interval timeFrame = cmd.getSelectedTimeFrame();
 
         List<String> aggregatorNames = [];
@@ -512,7 +516,7 @@ class EventResultDashboardController {
             for (String eachGraphLabel : graphLabelsInOrderOfHeader) {
                 OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel);
                 if (point != null) {
-                    row.add(valueFormat.format(roundDouble(point.measuredValue)));
+                    row.add(valueFormat.format(roundDouble(point.csiAggregation)));
                 } else {
                     row.add("");
                 }
@@ -540,14 +544,22 @@ class EventResultDashboardController {
         Map<String, Object> modelToRender = new HashMap<String, Object>();
 
         if (request.queryString && cmd.validate()) {
-            fillWithMeasuredValueData(modelToRender, cmd);
+            fillWithCsiAggregationData(modelToRender, cmd);
             cmd.copyRequestDataToViewModelMap(modelToRender)
         } else {
             redirectWith303('showAll', params)
             return
         }
+        String filename = ""
+        List<JobGroup> selectedJobGroups = JobGroup.findAllByIdInList(modelToRender['selectedFolder'])
 
-        String filename = modelToRender['aggrGroup'] + '_' + modelToRender['fromFormatted'] + '_to_' + modelToRender['toFormatted'] + '.csv';
+        selectedJobGroups.each { jobGroup ->
+            filename += jobGroup.name + '_'
+        }
+        if(modelToRender['selectedInterval'] != -1) {
+            filename += modelToRender['selectedInterval'] + 'm_'
+        }
+        filename += Double.valueOf(modelToRender['fromTimestampForHighChart']/1000L).longValue() + '_to_' + Double.valueOf(modelToRender['toTimestampForHighChart']/1000L).longValue() + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename);
         response.setContentType("text/csv;header=present;charset=UTF-8");
@@ -595,7 +607,7 @@ class EventResultDashboardController {
         int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes();
 
         long expectedPointsOfEachGraph;
-        if (interval == MeasuredValueInterval.RAW || interval == 0 || interval == null) {
+        if (interval == CsiAggregationInterval.RAW || interval == 0 || interval == null) {
             //50 results per Day
             expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / 60 / 24 * EXPECTED_RESULTS_PER_DAY);
         } else {
@@ -638,7 +650,7 @@ class EventResultDashboardController {
         result.put('aggrGroupValuesUnCached', AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED))
 
         // Intervals
-        result.put('measuredValueIntervals', measuredValueIntervals)
+        result.put('csiAggregationIntervals', csiAggregationIntervals)
 
         // JobGroups
         List<JobGroup> jobGroups = eventResultDashboardService.getAllJobGroups()
@@ -701,6 +713,8 @@ class EventResultDashboardController {
 
         result.put("selectedChartType", 0);
         result.put("warnAboutExceededPointsPerGraphLimit", false);
+
+        result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
         // Done! :)
         return result;

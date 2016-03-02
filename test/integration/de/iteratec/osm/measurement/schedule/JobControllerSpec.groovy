@@ -86,7 +86,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
      */
     private void createData() {
         WebPageTestServer server = createWebPageTestServer("server - wpt server", "server - wpt server", true, "http://iteratec.de")
-        JobGroup group = createJobGroup("Testgroup", JobGroupType.CSI_AGGREGATION)
+        JobGroup group = createJobGroup("Testgroup")
         Browser browser = createBrowser("FF", 0.55)
         Location ffAgent1 = createLocation(server, "1", browser, true)
         Page homepage = createPages(["homepage"]).get(0)
@@ -150,7 +150,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 lastStatusUpdate: jobResult.date,
                 wptStatus: 0,
                 validationState: 'validationState',
-                customerSatisfactionInPercent: 1,
+                csByWptDocCompleteInPercent: 1,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: 1,
                 measuredEvent: null,

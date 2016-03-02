@@ -31,13 +31,13 @@ import org.junit.Test
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
-import de.iteratec.osm.report.chart.MeasuredValueUpdateEventDaoService
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 
 @TestMixin(IntegrationTestMixin)
 class WeeklyShopIntTests extends IntTestWithDBCleanup {
@@ -45,17 +45,17 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	static transactional = false
 
 	/** injected by grails */
-	EventMeasuredValueService eventMeasuredValueService
-	ShopMeasuredValueService shopMeasuredValueService
+	EventCsiAggregationService eventCsiAggregationService
+	ShopCsiAggregationService shopCsiAggregationService
 	EventResultService eventResultService
 	JobService jobService
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 	WeightingService weightingService
 	MeanCalcService meanCalcService
-	MeasuredValueUpdateEventDaoService measuredValueUpdateEventDaoService
+	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 
-	MeasuredValueInterval hourly
-	MeasuredValueInterval weekly
+	CsiAggregationInterval hourly
+	CsiAggregationInterval weekly
 
 	AggregatorType pageAggregatorMeasuredEvent
 	AggregatorType pageAggregatorType
@@ -83,18 +83,18 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		Date startDate = new DateTime(2012,01,12,0,0, DateTimeZone.UTC).toDate()
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
 
-		MeasuredValue mvWeeklyShop = new MeasuredValue(
+		CsiAggregation mvWeeklyShop = new CsiAggregation(
 				started: startDate,
 				interval: weekly,
 				aggregator: pageAggregatorShop,
 				tag: csiGroup.ident().toString(),
-				value: null,
-				resultIds: ''
+				csByWptDocCompleteInPercent: null,
+				underlyingEventResultsByWptDocComplete: ''
 				).save(failOnError:true)
 
 		//execute test
 
-		shopMeasuredValueService.calcMv(mvWeeklyShop)
+		shopCsiAggregationService.calcCa(mvWeeklyShop)
 
 		//assertions
 
@@ -103,13 +103,13 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 		assertEquals(pageAggregatorShop.name, mvWeeklyShop.aggregator.name)
 		assertEquals(csiGroup.ident().toString(), mvWeeklyShop.tag)
 		assertTrue(mvWeeklyShop.isCalculated())
-		assertEquals(0, mvWeeklyShop.countResultIds())
+		assertEquals(0, mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete())
 		assertNull(mvWeeklyShop.value)
 	}
 
 	/**
-	 * Tests the calculation of one weekly-shop-{@link MeasuredValue}. Databasis for calculation are weekly page-{@link MeasuredValue}s. These get calculated 
-	 * on-the-fly while calculating the respective weekly-shop-{@link MeasuredValue}. The hourly-event-{@link MeasuredValue}s of the period have to exist (they
+	 * Tests the calculation of one weekly-shop-{@link CsiAggregation}. Databasis for calculation are weekly page-{@link CsiAggregation}s. These get calculated
+	 * on-the-fly while calculating the respective weekly-shop-{@link CsiAggregation}. The hourly-event-{@link CsiAggregation}s of the period have to exist (they
 	 * won't get calculated on-the-fly. Therefore these get precalculated in test here. 
 	 */
 	@Test
@@ -123,24 +123,24 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 
 		//create test-specific data
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
-		List<MeasuredValue> createdHmvs = precalcHourlyJobMvs(csiGroup)
-		Map<String, List<MeasuredValue>> hmvsByPagename = getHmvsByPagenameMap(createdHmvs)
+		List<CsiAggregation> createdHmvs = precalcHourlyJobMvs(csiGroup)
+		Map<String, List<CsiAggregation>> hmvsByPagename = getHmvsByPagenameMap(createdHmvs)
 
 		Double expectedValue = 61.30
 
 
-		MeasuredValue mvWeeklyShop = new MeasuredValue(
+		CsiAggregation mvWeeklyShop = new CsiAggregation(
 				started: startDate,
 				interval: weekly,
 				aggregator: pageAggregatorShop,
 				tag: csiGroup.ident().toString(),
-				value: null,
-				resultIds: ''
+				csByWptDocCompleteInPercent: null,
+				underlyingEventResultsByWptDocComplete: ''
 				).save(failOnError:true)
 
 		//execute test
 
-		shopMeasuredValueService.calcMv(mvWeeklyShop)
+		shopCsiAggregationService.calcCa(mvWeeklyShop)
 
 		//assertions
 
@@ -164,34 +164,34 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	 * 
 	 * @return A collection of pre-calculated hourly values.
 	 */
-	private List<MeasuredValue> precalcHourlyJobMvs(JobGroup jobGroup){
+	private List<CsiAggregation> precalcHourlyJobMvs(JobGroup jobGroup){
 
 		DateTime currentDateTime = startOfWeek
 		DateTime endOfWeek = startOfWeek.plusWeeks(1)
 		
-		List<MeasuredValue> createdHmvs = []
+		List<CsiAggregation> createdHmvs = []
 		pagesToTest.each { String pageName ->
-			createdHmvs.addAll(TestDataUtil.precalculateHourlyMeasuredValues(
+			createdHmvs.addAll(TestDataUtil.precalculateHourlyCsiAggregations(
 				jobGroup, pageName, endOfWeek, currentDateTime, hourly, 
-				eventMeasuredValueService,
-				measuredValueTagService,
+				eventCsiAggregationService,
+				csiAggregationTagService,
 				eventResultService,
 				weightingService,
 				meanCalcService,
-				measuredValueUpdateEventDaoService)
+				csiAggregationUpdateEventDaoService)
 			)
 		}
 		return createdHmvs
 	}
 	
-	private getHmvsByPagenameMap(List<MeasuredValue> createdHmvs){
-		Map<String, List<MeasuredValue>> hmvsByPagename = [:]
+	private getHmvsByPagenameMap(List<CsiAggregation> createdHmvs){
+		Map<String, List<CsiAggregation>> hmvsByPagename = [:]
 		pagesToTest.each{
 			hmvsByPagename[it] = []
 		}
 		Page page
-		createdHmvs.each{MeasuredValue hmv ->
-			page = measuredValueTagService.findPageOfHourlyEventTag(hmv.tag)
+		createdHmvs.each{ CsiAggregation hmv ->
+			page = csiAggregationTagService.findPageOfHourlyEventTag(hmv.tag)
 			if (page && hmvsByPagename.containsKey(page.name)) {
 				hmvsByPagename[page.name].add(hmv)
 			}
@@ -210,7 +210,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	static void createTestData() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
-		TestDataUtil.createMeasuredValueIntervals()
+		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
 		TestDataUtil.createHoursOfDay()
 		System.out.println('Create some common test-data... DONE');
@@ -222,8 +222,8 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	
 	@Before
 	public void setUpServiceMockRlikeAndData() {
-		hourly= MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.HOURLY)
-		weekly= MeasuredValueInterval.findByIntervalInMinutes(MeasuredValueInterval.WEEKLY)
+		hourly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+		weekly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
 		pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		pageAggregatorShop = AggregatorType.findByName(AggregatorType.SHOP)
 		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)

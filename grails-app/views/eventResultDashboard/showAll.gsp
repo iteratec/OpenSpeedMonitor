@@ -2,7 +2,7 @@
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <%
-    def userspecificDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificEventResultDashboard').newInstance()
+    def userspecificEventResultDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificEventResultDashboard').newInstance()
 %>
 <html>
 <head>
@@ -18,6 +18,39 @@
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
 
+<%-- userspecific dashboards --%>
+<div class="row">
+    <div class="span12">
+        <div class="btn-toolbar" style="margin: 0;">
+            <div class="btn-group">
+                <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
+                               default="Dashboard-Ansicht ausw&auml;hlen"/>
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" id="customDashBoardSelection">
+                    <g:set var="availableDashboards"
+                           value="${userspecificEventResultDashboardService.getListOfAvailableDashboards()}"/>
+                    <g:if test="${availableDashboards.size() > 0}">
+                        <g:each in="${availableDashboards}" var="availableDashboard">
+                            <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
+                        </g:each>
+                    </g:if>
+                    <g:else>
+                        <g:set var="anchorDashboardCreation" value="#"/>
+                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                            <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
+                        </sec:ifAnyGranted>
+                        <li><a href="${anchorDashboardCreation}"><g:message
+                                code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
+                                default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
+                    </g:else>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
 <div class="row">
     <div class="span12">
         <g:if test="${command}">
@@ -108,7 +141,7 @@
 
                                     <div class="span2">
                                         <g:select id="selectedIntervalHtmlId" class="input-medium"
-                                                  name="selectedInterval" from="${measuredValueIntervals}"
+                                                  name="selectedInterval" from="${csiAggregationIntervals}"
                                                   valueMessagePrefix="de.iteratec.isr.wptrd.intervals"
                                                   value="${selectedInterval}"/>
                                     </div>
@@ -138,7 +171,7 @@
 
                                         <div class="span2 accordion-info text-right">
                                             <g:message code="de.iteratec.isr.wptrd.labels.filterFolder"
-                                                       default="Job Group:"/><br>
+                                                       default="Job Group"/>:<br>
                                             <g:message code="de.iteratec.osm.result.page.label"
                                                        default="Page"/>&nbsp;|&nbsp;<g:message
                                                     code="de.iteratec.osm.result.measured-event.label"
@@ -176,7 +209,6 @@
                                                 'connectivityProfiles'            : connectivityProfiles,
                                                 'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
                                                 'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                                'showConnectivitySettings'        : true,
                                                 'showExtendedConnectivitySettings': true]}"/>
                         </div>
                     </div>
@@ -239,7 +271,7 @@
 
                                 <div class="span3">
                                     <h6><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES"
-                                                   default="Ladezeiten [s]"/></h6>
+                                                   default="Ladezeiten [ms]"/></h6>
 
                                     <div class="input-append">
                                         <label for="appendedInputBelowLoadTimes">
@@ -335,7 +367,7 @@
                                         </sec:ifAnyGranted>
                                     </sec:ifLoggedIn>
                                     <g:if test="${params.id}">
-                                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                                        <g:if test="${userspecificEventResultDashboardService.isCurrentUserDashboardOwner(params.bid)}">
                                             <g:render template="/_common/modals/deleteCustomDashboard"/>
 
                                         </g:if>
@@ -393,7 +425,8 @@
                                   chartData                    : wptCustomerSatisfactionValues,
                                   chartTitle                   : chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : '100%',
+                                  initialChartWidth            : chartWidth,
+                                  initialChartHeight           : chartHeight,
                                   chartUnit                    : '%',
                                   globalLineWidth              : '2',
                                   xAxisMin                     : fromTimestampForHighChart,
@@ -440,6 +473,28 @@
             </g:if>
         </g:each>
 
+        function setAdjustments(){
+            var chartTitle = "${chartTitle}";
+            var chartWidth = "${chartWidth}";
+            var chartHeight = "${chartHeight}";
+            var loadTimeMinimum = "${loadTimeMinimum}";
+            var loadTimeMaximum = "${loadTimeMaximum}";
+            var showDataMarkers = "${showDataMarkers}";
+            var showDataLabels = "${showDataLabels}";
+            var optimizeForWideScreen = "${showDataLabels}"
+            $("#dia-title").val(chartTitle);
+            $("#dia-width").val(chartWidth);
+            $("#dia-height").val(chartHeight);
+            $("#dia-y-axis-max").val(loadTimeMaximum);
+            $("#dia-y-axis-min").val(loadTimeMinimum);
+            if(eval(showDataMarkers)){
+                $("#to-enable-marker").click();
+            }
+            if(eval(showDataLabels)){
+                $("#to-enable-label").click();
+            }
+        }
+
         $(document).ready(function(){
 
             initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
@@ -457,7 +512,7 @@
                     $("#dia-save-chart-as-png").attr( "title", "<g:message
             code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
                 }
-
+            setAdjustments();
             });
 
     </asset:script>

@@ -46,16 +46,16 @@ class OsmChartTagLib {
 		Boolean optimizeForExport = attrs['optimizeForExport']!=null ? Boolean.valueOf(attrs['optimizeForExport']) : false
 		Boolean openDatapointLinksInNewWindow = attrs['openDataPointLinksInNewWindow']!=null ? Boolean.valueOf(attrs['openDataPointLinksInNewWindow'])  : true
         List annotations = attrs["annotations"]
+		String heightOfChart  = attrs["heightOfChart"]
 
-        String heightOfChart = "${configService.getInitialChartHeightInPixels()}px"
-        data.each {
+		data.each {
             it.measurandGroup = MeasurandGroup.PERCENTAGES
         }
         List<OsmChartAxis> highChartLabels = new LinkedList<OsmChartAxis>();
         highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
 
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, highChartLabels, title, labelSummary, markerEnabled, annotations)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, highChartLabels, title, labelSummary, markerEnabled, annotations)
 
 		return out.toString()
 	}
@@ -89,9 +89,10 @@ class OsmChartTagLib {
 			title = "";
 		}
 
-        String heightOfChart = attrs["heightOfChart"] ?: "${configService.getInitialChartHeightInPixels()}px"
+		String heightOfChart = attrs["heightOfChart"]
+
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart, yAxesLabels, title, labelSummary, markerEnabled, annotations)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, yAxesLabels, title, labelSummary, markerEnabled, annotations)
 
 		return out.toString()
 	}

@@ -37,9 +37,10 @@ class OsmChartProcessingService {
 
         if (graphs.size > 1) {
 
-            checkIfAllLabelsHaveEqualSectionCount(1,3, graphs)
+            checkIfAllLabelsHaveEqualSectionCount(1,4, graphs)
 
-            final List<String> graphLabelSectionKeys = [i18nService.msg('job.jobGroup.label', 'Job Group'),
+            final List<String> graphLabelSectionKeys = [i18nService.msg('de.iteratec.osm.csi.type.heading', 'Csi Type'),
+                                                        i18nService.msg('job.jobGroup.label', 'Job Group'),
                                        i18nService.msg('de.iteratec.osm.result.measured-event.label', 'Measured step'),
                                        i18nService.msg('job.location.label', 'Location')]
 

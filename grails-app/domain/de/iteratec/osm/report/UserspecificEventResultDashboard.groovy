@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.result.EventResultDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.web.json.JSONObject
@@ -183,7 +184,7 @@ class UserspecificEventResultDashboard {
     Boolean setToHour
 
     /**
-     * The time of the {@link MeasuredValueInterval}.
+     * The time of the {@link CsiAggregationInterval}.
      */
     Integer selectedInterval
 
@@ -229,10 +230,23 @@ class UserspecificEventResultDashboard {
      */
     Integer trimAboveRequestSizes
 
+    //#####Chart Adjustments#####
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum
+    boolean showDataMarkers
+    boolean showDataLabels
+
     /**
      * toggle formatting rickshaw export to wide screen format
      */
-    Boolean wideScreenDiagramMontage
+    Boolean wideScreenDiagramMontage = false
+    //###########################
 
     Boolean includeNativeConnectivity
     Boolean selectedAllConnectivityProfiles
@@ -280,6 +294,8 @@ class UserspecificEventResultDashboard {
         customConnectivityName(nullable: true)
         selectedConnectivityProfiles(nullable: true)
         includeCustomConnectivity(nullable: true)
+        chartTitle(nullable: true)
+        loadTimeMaximum(nullable: true)
     }
 
     /**
@@ -294,7 +310,7 @@ class UserspecificEventResultDashboard {
 
         this.dashboardName = dashboardName
         this.publiclyVisible = publiclyVisible
-        this.wideScreenDiagramMontage = wideScreenDiagramMontage
+        this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
         this.username = username
 
         // Get Data from command
@@ -321,6 +337,13 @@ class UserspecificEventResultDashboard {
         includeNativeConnectivity = cmd.includeNativeConnectivity
         customConnectivityName = cmd.customConnectivityName
         selectedAllConnectivityProfiles = cmd.selectedAllConnectivityProfiles
+        chartTitle = cmd.chartTitle
+        chartWidth = cmd.chartWidth
+        chartHeight = cmd.chartHeight
+        loadTimeMinimum = cmd.loadTimeMinimum
+        loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
+        showDataMarkers = cmd.showDataMarkers
+        showDataLabels = cmd.showDataLabels
 
         // generate Strings for db
         String selectedFolderString = ""
@@ -391,15 +414,15 @@ class UserspecificEventResultDashboard {
 
     def getListOfAvailableDashboards() {
         List result = []
-        List fullList = []
-        fullList = UserspecificEventResultDashboard.findAll()
+        List<UserspecificEventResultDashboard> fullList = []
+        fullList = UserspecificEventResultDashboard.findAll().sort{it.dashboardName}
 
         String currentUser = ""
         if (springSecurityService.isLoggedIn()) {
             currentUser = springSecurityService.authentication.principal.getUsername()
         }
         for (board in fullList) {
-            if ((board.publiclyVisible == true) || (board.username == currentUser)) {
+            if ((board.publiclyVisible) || (board.username == currentUser)) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
@@ -452,12 +475,10 @@ class UserspecificEventResultDashboard {
                         link += "&selectedLocations=" + item
                     }
                 }
-                link += "&_action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
+                link += "&action_showAll=Show&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
                 link += "&id=" + board.id
                 link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                if (board.wideScreenDiagramMontage == true) {
-                    link += "&wideScreenDiagramMontage=on"
-                }
+                link += "&wideScreenDiagramMontage=$board.wideScreenDiagramMontage"
                 link += "&selectedInterval=" + board.selectedInterval
 
                 if ((board.selectedAggrGroupValuesUnCached != null) && (board.selectedAggrGroupValuesUnCached.size() > 0)) {
@@ -494,12 +515,13 @@ class UserspecificEventResultDashboard {
                 if (board.trimAboveRequestSizes != null) {
                     link += board.trimAboveRequestSizes
                 }
-                if(board.includeNativeConnectivity == true) {
+                link += "&_includeNativeConnectivity="
+                if(board.includeNativeConnectivity) {
                     link += "&includeNativeConnectivity=on"
                 }
-                link += "&selectedAllConnectivityProfiles="
-                if(board.selectedAllConnectivityProfiles == true) {
-                    link += "on"
+                link += "&_selectedAllConnectivityProfiles="
+                if(board.selectedAllConnectivityProfiles) {
+                    link += "&selectedAllConnectivityProfiles=on"
                 }
                 link += "&customConnectivityName="
                 if(board.customConnectivityName != null){
@@ -510,13 +532,20 @@ class UserspecificEventResultDashboard {
                         link += "&selectedConnectivityProfiles=" + item
                     }
                 }
-                link += "&includeCustomConnectivity="
-                if(board.includeCustomConnectivity == true) {
-                    link += "on"
+                link += "&_includeCustomConnectivity="
+                if(board.includeCustomConnectivity) {
+                    link += "&includeCustomConnectivity=on"
                 }
-
-
-
+                link += "&chartTitle="
+                if(board.chartTitle){
+                    link += board.chartTitle
+                }
+                link += "&chartWidth=${board.chartWidth}"
+                link += "&chartHeight=${board.chartHeight}"
+                link += "&loadTimeMinimum=${board.loadTimeMinimum}"
+                link += "&loadTimeMaximum=${board.loadTimeMaximum}"
+                link += "&showDataMarkers=${board.showDataMarkers}"
+                link += "&showDataLabels=${board.showDataLabels}"
                 result.add([dashboardName: board.dashboardName, link: link])
             }
         }

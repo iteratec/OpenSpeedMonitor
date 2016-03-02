@@ -20,12 +20,10 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 
 import static org.junit.Assert.*
-
-import java.util.Date;
 
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
@@ -142,7 +140,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 	
 	void createEventResult(MeasuredEvent event, String tag, double value){
 		//data is needed to create a JobResult
-		JobGroup group = TestDataUtil.createJobGroup("Group${groups}",JobGroupType.CSI_AGGREGATION)
+		JobGroup group = TestDataUtil.createJobGroup("Group${groups}")
 		Script script = TestDataUtil.createScript("label${groups}","description","navigationScript",true)
 		WebPageTestServer webPageTestServer = TestDataUtil.createWebPageTestServer("label","1",true,"http://www.url.de")
 		Browser browser = TestDataUtil.createBrowser("browser${groups}",1)
@@ -163,7 +161,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 			jobResultJobConfigId: 1,
 			tag: tag,
 			speedIndex: 1,
-			customerSatisfactionInPercent: value,
+			csByWptDocCompleteInPercent: value,
 			docCompleteTimeInMillisecs: 1000
 		).save(failOnError: true)
 	}

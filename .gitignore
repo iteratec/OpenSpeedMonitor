@@ -30,7 +30,7 @@ web-app/WEB-INF/classes/
 # ignore temp files of common text editors
 *~
 *.orig
-# ignore .gradle 
+# ignore .gradle
 .gradle/
 
 # ignore .groovy
@@ -44,9 +44,15 @@ src/java/logging.properties
 
 # misc
 testorder*.txt
+test/resources/**/private_*
+node_modules/
 
 # ignore h2 dumps
 *.h2.gzip
+testDb*
 
 #ignore  dataSource-Config
 OpenSpeedMonitor-config.groovy
+
+# ignore karma-install
+node_modules/

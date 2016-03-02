@@ -32,7 +32,6 @@ function RickshawGraphBuilder(args) {
   this.dataLabelsHaveBeenAdded = false;
   
   this.initialize = function(args) {
-    
     if ((args.hasOwnProperty("dataLabelsActivated")) && (args.dataLabelsActivated == true)) { //display dataLabels
       this.dataLabelsActivated = true;
     }
@@ -131,7 +130,7 @@ function RickshawGraphBuilder(args) {
     }
 
     $("#rickshaw_main").width(args.width);
-    var widthOfChartSvg = $(rickshawGraphBuilder.graph.element).width();
+    var widthOfChartSvg = $(self.graph.element).width();
 
     // set height of html components
     $("#rickshaw_chart_title").width(args.width);
@@ -140,6 +139,7 @@ function RickshawGraphBuilder(args) {
     $("#rickshaw_y-axes_right").height(args.height);
     $("#rickshaw_chart").height(args.height);
     $("#rickshaw_addons").width(args.width-70);
+    $("#rickshaw_addons").find("ul").width(args.width-70);
     $("#rickshaw_timeline").width(args.width-60);
     $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
     $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
@@ -151,6 +151,7 @@ function RickshawGraphBuilder(args) {
       width : widthOfChartSvg,
       height : args.height
     });
+    self.graph.update();
     self.graph.render();
   }
 
@@ -253,12 +254,14 @@ function RickshawGraphBuilder(args) {
       graph : self.graph
     });
 		hoverDetail.formatter = function(series, x, y, formattedX, formattedY, d, testingAgent) {
-			return "<table border=\"0\" class=\"chart-tiptext\">" +
-                "<tr>" + "<td>Timestamp: </td>" + "<td>" + formattedX + "</td>" + "</tr>" +
-                "<tr>" + "<td>Label: </td>" + "<td>" + series.name + "</td>" + "</tr>" +
-                "<tr>" + "<td>Value: </td>" + "<td>" + formattedY + "</td>" + "</tr>" +
-                "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
-                "</table>";
+          var measurandGroup = d.series.measurandGroup;
+          var scale =$.grep(self.yAxes, function(e){ return e.measurandGroup == measurandGroup; })[0];
+          return "<table border=\"0\" class=\"chart-tiptext\">" +
+              "<tr>" + "<td>Timestamp: </td>" + "<td>" + formattedX + "</td>" + "</tr>" +
+              "<tr>" + "<td>Label: </td>" + "<td>" + series.name + "</td>" + "</tr>" +
+              "<tr>" + "<td>Value: </td>" + "<td>" + scale.scale.invert(y).toFixed(0) + "</td>" + "</tr>" +
+              "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
+              "</table>";
     };
   }
 
@@ -372,6 +375,7 @@ function RickshawGraphBuilder(args) {
   }
 
   this.initialize(args);
+  self.updateSize(args);
 }
 
 function XAxis(args) {
@@ -819,23 +823,22 @@ function YValueFormatter() {
     var result = {};
     var dif = measurandGroup.currentScale.tickMax
         - measurandGroup.currentScale.tickMin;
-    dif = Math.abs(dif);
-
+    dif = Math.abs(dif/1000);
     if (dif >= measurandGroup.NUMBER_OF_YAXIS_TICKS) {
       result.forAxis = function(y) {
-        return y;
+        return y/1000;
       };
       result.forAxis.unit = "[s]";
       result.forHoverDetail = function(y) {
-        return parseFloat(y).toFixed(3);
+        return parseFloat(y/1000).toFixed(3);
       };
     } else {
       result.forAxis = function(y) {
-        return y * 1000;
+        return y;
       };
       result.forAxis.unit = "[ms]";
       result.forHoverDetail = function(y) {
-        return parseFloat(y * 1000).toFixed(0);
+        return parseFloat(y).toFixed(0);
       };
     }
     return result;
@@ -912,7 +915,7 @@ function HtmlProvider(args) {
   this.numberOfMeasurandGroups;
 
   this.initialize = function(args) {
-    self.HEIGHT_OF_CHART = args.heightOfChart;
+    self.HEIGHT_OF_CHART = args.height;
     self.numberOfMeasurandGroups = args.series.numberOfMeasurandGroups;
 
     self._generateLeftYAxis();
@@ -1011,8 +1014,6 @@ function ChartAdjuster(args) {
   var self = this;
   
   this.initialize = function(args) {
-    $('#dia-width').val(args.graph.width);
-    $('#dia-height').val(args.graph.height);
     $("#collapseAdjustment").collapse('hide');
     
     self.addFunctionalityAdjustingChartSize();
@@ -1084,19 +1085,24 @@ function ChartAdjuster(args) {
     var parentContainer= $("#collapseAdjustment > .accordion-inner > .span11");
     var blankYAxisAdjuster = $("[id=adjust_chart_y_axis]");
     measurandGroups.forEach(function(mg) {
+      var unit = mg.label.match(/\[.*]/);
+      if(unit != null && unit[0] != null) unit = unit[0].replace("\[",""). replace("]","");
       var yAxisAdjuster = blankYAxisAdjuster.clone();
       parentContainer.append(yAxisAdjuster);
       var button = yAxisAdjuster.find("button");
       var yAxisAdjusterLabel = yAxisAdjuster.find(".span2.text-right");
-      yAxisAdjusterLabel.html(yAxisAdjusterLabel.html() + ": " + mg.label);
+      yAxisAdjusterLabel.html(yAxisAdjusterLabel.html() + ": " + mg.label.replace("["+unit+"]",""));
       button[0].measurandGroup = mg.name;
-      
+
       var inputMin = button.parent().find("#dia-y-axis-min");
+      yAxisAdjuster.find("#minimumUnit").html(unit);
+      yAxisAdjuster.find("#maximumUnit").html(unit);
+
       var inputMax = button.parent().find("#dia-y-axis-max");
       // TODO: werte dynamisch ermitteln
       inputMin.val(0);
       inputMax.val("auto");
-      
+
       self.addFunctionalityAdjustYAxis(button);
 
     });

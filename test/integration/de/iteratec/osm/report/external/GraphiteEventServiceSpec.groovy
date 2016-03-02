@@ -24,16 +24,14 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 import org.junit.Rule
 import spock.lang.Specification
 
@@ -62,9 +60,9 @@ class GraphiteEventServiceSpec extends Specification{
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
         serviceUnderTest.batchActivityService = new BatchActivityService()
         serviceUnderTest.eventDaoService = new EventDaoService()
-        MeasuredValueUtilService mockedMeasuredValueUtilService = new MeasuredValueUtilService()
-        mockedMeasuredValueUtilService.metaClass.getNowInUtc = {-> untilDateTime }
-        serviceUnderTest.measuredValueUtilService = mockedMeasuredValueUtilService
+        CsiAggregationUtilService mockedCsiAggregationUtilService = new CsiAggregationUtilService()
+        mockedCsiAggregationUtilService.metaClass.getNowInUtc = {-> untilDateTime }
+        serviceUnderTest.csiAggregationUtilService = mockedCsiAggregationUtilService
         mockHttpBuilderToUseBetamax()
 
     }
@@ -94,7 +92,6 @@ class GraphiteEventServiceSpec extends Specification{
         )
         JobGroup jobGroup = new JobGroup(
                 name: jobGroupName,
-                groupType: JobGroupType.CSI_AGGREGATION,
                 graphiteServers: [server],
         )
         GraphiteEventSourcePath eventSourcePath = new GraphiteEventSourcePath(

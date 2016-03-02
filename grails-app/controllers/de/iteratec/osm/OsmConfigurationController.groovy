@@ -22,5 +22,20 @@ package de.iteratec.osm
  */
 class OsmConfigurationController {
 
-    static scaffold=true
+    static scaffold=OsmConfiguration
+
+    def create() {
+        redirect(action: 'list')
+    }
+
+    def delete(){
+        def osmConfiguration = OsmConfiguration.get(params.id)
+        if(OsmConfiguration.count() == 1) {
+            flash.message = message(code: 'de.iteratec.osm.configuration.deletion.not_allowed')
+            redirect(action: "show", id: params.id)
+        } else {
+            osmConfiguration.delete(flush:true)
+            redirect(action: 'list')
+        }
+    }
 }

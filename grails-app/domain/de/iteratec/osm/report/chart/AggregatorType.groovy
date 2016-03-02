@@ -75,6 +75,11 @@ class AggregatorType {
 	 * The name of the aggregation by shop (means by {@link JobGroup} of groupType {@link JobGroup#TYPE_CSI}).
 	 */
 	public static final String SHOP = "shop"
+
+	/**
+	 * The name of the aggregation by a {@link csiSystem}
+	 */
+	public static final String CSI_SYSTEM = "csiSystem"
 	
 	/**
 	 * The Aggegation Type for uncached results
@@ -90,10 +95,12 @@ class AggregatorType {
 	public static final String RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES = "docCompleteIncomingBytes${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_DOC_COMPLETE_REQUESTS = "docCompleteRequests${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES = "fullyLoadedIncomingBytes${UNCACHED_SUFFIX}"
-	public static final String RESULT_UNCACHED_CUSTOMER_SATISFACTION_IN_PERCENT = "customerSatisfactionInPercent${UNCACHED_SUFFIX}"
+	public static final String RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT = "csByWptDocCompleteInPercent${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_SPEED_INDEX = "speedIndex${UNCACHED_SUFFIX}"
 	public static final String RESULT_UNCACHED_VISUALLY_COMPLETE = "visuallyCompleteInMillisecs${UNCACHED_SUFFIX}"
-	
+	public static final String RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT = "csByWptVisuallyCompleteInPercent${UNCACHED_SUFFIX}"
+
+
 	/**
 	 * The Aggegation Type for cached results
 	 */
@@ -108,10 +115,11 @@ class AggregatorType {
 	public static final String RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES = "docCompleteIncomingBytes${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_DOC_COMPLETE_REQUESTS = "docCompleteRequests${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES = "fullyLoadedIncomingBytes${CACHED_SUFFIX}"
-	public static final String RESULT_CACHED_CUSTOMER_SATISFACTION_IN_PERCENT = "customerSatisfactionInPercent${CACHED_SUFFIX}"
+	public static final String RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT = "csByWptDocCompleteInPercent${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_SPEED_INDEX = "speedIndex${CACHED_SUFFIX}"
 	public static final String RESULT_CACHED_VISUALLY_COMPLETE = "visuallyCompleteInMillisecs${CACHED_SUFFIX}"
-	
+	public static final String RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT = "csByWptVisuallyCompleteInPercent${CACHED_SUFFIX}"
+
 	String name
 	MeasurandGroup measurandGroup
 	

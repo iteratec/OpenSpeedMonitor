@@ -18,26 +18,36 @@
 package de.iteratec.osm.csi
 
 class TimeToCsMapping implements RickshawTransformableCsMapping {
-	Page page
-	Integer loadTimeInMilliSecs
-	Double customerSatisfaction
-	/** each investigation of customer satisfaction with different load-times will provide a new set of TimeToCiMapping's */
-	Integer mappingVersion
+    Page page
+    Integer loadTimeInMilliSecs
+    Double customerSatisfaction
+    /** each investigation of customer satisfaction with different load-times will provide a new set of TimeToCiMapping's */
+    Integer mappingVersion
 
     static constraints = {
-		page()
-		loadTimeInMilliSecs()
-		customerSatisfaction()
-		mappingVersion()
+        page()
+        loadTimeInMilliSecs()
+        customerSatisfaction()
+        mappingVersion()
     }
 
-    public String retrieveGroupingCriteria(){
+    static TimeToCsMapping copyTimeToCsMapping(TimeToCsMapping source) {
+
+
+
+        return new TimeToCsMapping(page: source.page, loadTimeInMilliSecs: source.loadTimeInMilliSecs,
+                customerSatisfaction: source.customerSatisfaction, mappingVersion: source.mappingVersion)
+    }
+
+    public String retrieveGroupingCriteria() {
         return page.name
     }
-    public Integer retrieveLoadTimeInMilliSecs(){
+
+    public Integer retrieveLoadTimeInMilliSecs() {
         return loadTimeInMilliSecs
     }
-    public Double retrieveCustomerSatisfactionInPercent(){
+
+    public Double retrieveCustomerSatisfactionInPercent() {
         return customerSatisfaction
     }
 }

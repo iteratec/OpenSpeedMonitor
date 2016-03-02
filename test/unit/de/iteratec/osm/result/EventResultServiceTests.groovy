@@ -20,14 +20,11 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
-import groovy.util.slurpersupport.GPathResult
-
 import org.apache.commons.lang.time.DateUtils
 import org.junit.*
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
@@ -138,7 +135,7 @@ class EventResultServiceTests {
 				wptServer: server1
 				).save(failOnError: true)
 
-		jobGroupUndefined = new JobGroup(name: 'undefined', groupType: JobGroupType.RAW_DATA_SELECTION).save(failOnError:true)
+		jobGroupUndefined = new JobGroup(name: 'undefined').save(failOnError:true)
 				
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
@@ -403,7 +400,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 1),
+					csByWptDocCompleteInPercent: (100 - j * 1),
 					jobResult: runOfCurJob_now,
 					jobResultDate: runOfCurJob_now.date,
 					jobResultJobConfigId: runOfCurJob_now.job.ident(),
@@ -435,7 +432,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 2),
+					csByWptDocCompleteInPercent: (100 - j * 2),
 					jobResult: runOfCurJob_1HoursAgo,
 					jobResultDate: runOfCurJob_1HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_1HoursAgo.job.ident(),
@@ -468,7 +465,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 3),
+					csByWptDocCompleteInPercent: (100 - j * 3),
 					jobResult: runOfCurJob_2HoursAgo,
 					jobResultDate: runOfCurJob_2HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_2HoursAgo.job.ident(),
@@ -498,7 +495,7 @@ class EventResultServiceTests {
 					wptStatus: 0,
 					validationState : 'validationState',
 					harData: 'harData',
-					customerSatisfactionInPercent: (100 - j * 4),
+					csByWptDocCompleteInPercent: (100 - j * 4),
 					jobResult: runOfCurJob_3HoursAgo,
 					jobResultDate: runOfCurJob_3HoursAgo.date,
 					jobResultJobConfigId: runOfCurJob_3HoursAgo.job.ident(),
@@ -708,7 +705,7 @@ class EventResultServiceTests {
 		MeasuredEvent anotherEventNotOfInterest = new MeasuredEvent(name: 'Testevent-2', testedPage: pageOfEvent).save(failOnError:true);
 
 		// Define a group:
-		JobGroup jobGroupCsiLhotse = new JobGroup(name: 'CSI Lhotse', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError:true);
+		JobGroup jobGroupCsiLhotse = new JobGroup(name: 'CSI Lhotse').save(failOnError:true);
 		
 		// Define a Browser and a Location (not relevant, because query works on copied data, but required on constraints):
 		Browser browser = new Browser(name: 'FF-w0', weight:0).save(failOnError:true);

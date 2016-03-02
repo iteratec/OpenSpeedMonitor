@@ -14,10 +14,14 @@
     <h3><g:message code="de.iteratec.result.value.calculated.from.infomessage" /></h3>
 
     <p>
-        Measuring stated: ${measuringOfValueStartedAt}
-        <g:if test="${!aggregatedMeasuredValue.equals('unassigned')}">
-        <br />
-        Aggregated value: ${aggregatedMeasuredValue}
+        <g:message code="de.iteratec.osm.interval.start.label" default="Start"/>: ${measuringOfValueStartedAt}
+        <g:if test="${!aggregatedCsiAggregationDocComplete.equals('unassigned')}">
+            <br />
+            <g:message code="de.iteratec.osm.csByWptDocCompleteInPercent.label" default="Customer Satisfaction (by doc complete)"/> : ${aggregatedCsiAggregationDocComplete}
+        </g:if>
+        <g:if test="${!aggregatedCsiAggregationVisuallyComplete.equals('unassigned')}">
+            <br />
+            <g:message code="de.iteratec.osm.csByWptVisuallyCompleteInPercent.label" default="Customer Satisfaction (by visually complete)"/> : ${aggregatedCsiAggregationVisuallyComplete}
         </g:if>
     </p>
 
@@ -74,8 +78,8 @@
 		<g:else>
 			<%-- need to send next request to listAggregatedResults --%>
 			<g:form method="GET">
-				<g:hiddenField name="measuredValueId"
-					value="${params.measuredValueId}" />
+				<g:hiddenField name="csiAggregationId"
+					value="${params.csiAggregationId}" />
 				<g:hiddenField name="lastKnownCountOfAggregatedResultsOrNull"
 					value="${params.lastKnownCountOfAggregatedResultsOrNull}" />
 				<g:hiddenField name="showAll" value="${true}" />

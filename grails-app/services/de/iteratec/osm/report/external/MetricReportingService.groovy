@@ -27,25 +27,24 @@ import grails.transaction.Transactional
 
 import org.joda.time.DateTime
 
-import de.iteratec.osm.report.chart.MeasuredValueUtilService
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
-import de.iteratec.osm.csi.EventMeasuredValueService
-import de.iteratec.osm.csi.PageMeasuredValueService
-import de.iteratec.osm.csi.ShopMeasuredValueService
+import de.iteratec.osm.csi.EventCsiAggregationService
+import de.iteratec.osm.csi.PageCsiAggregationService
+import de.iteratec.osm.csi.ShopCsiAggregationService
 import de.iteratec.osm.result.Contract
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.ResultMeasuredValueService
+import de.iteratec.osm.result.ResultCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.util.I18nService
@@ -60,15 +59,15 @@ class MetricReportingService {
 	private static final List<String> INVALID_GRAPHITE_PATH_CHARACTERS = ['.', ' ']
 	private static final String REPLACEMENT_FOR_INVALID_GRAPHITE_PATH_CHARACTERS = '_'
 
-	MeasuredValueTagService measuredValueTagService
-	ResultMeasuredValueService resultMeasuredValueService
+	CsiAggregationTagService csiAggregationTagService
+	ResultCsiAggregationService resultCsiAggregationService
 	GraphiteSocketProvider graphiteSocketProvider
 	I18nService i18nService
-	EventMeasuredValueService eventMeasuredValueService
+	EventCsiAggregationService eventCsiAggregationService
 	JobGroupDaoService jobGroupDaoService
-	MeasuredValueUtilService measuredValueUtilService
-	PageMeasuredValueService pageMeasuredValueService
-	ShopMeasuredValueService shopMeasuredValueService
+	CsiAggregationUtilService csiAggregationUtilService
+	PageCsiAggregationService pageCsiAggregationService
+	ShopCsiAggregationService shopCsiAggregationService
 	ConfigService configService
 	InMemoryConfigService inMemoryConfigService
 	BatchActivityService batchActivityService
@@ -91,16 +90,16 @@ class MetricReportingService {
 
 		log.info("reporting Eventresult");
 
-		JobGroup jobGroup = measuredValueTagService.findJobGroupOfHourlyEventTag(result.tag)
+		JobGroup jobGroup = csiAggregationTagService.findJobGroupOfHourlyEventTag(result.tag)
 		Collection<GraphiteServer> servers = jobGroup.graphiteServers
 		if (servers.size()<1) {
 			return
 		}
 
-		MeasuredEvent event = measuredValueTagService.findMeasuredEventOfHourlyEventTag(result.tag);
-		Page page = measuredValueTagService.findPageOfHourlyEventTag(result.tag);
-		Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(result.tag);
-		Location location = measuredValueTagService.findLocationOfHourlyEventTag(result.tag);
+		MeasuredEvent event = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(result.tag);
+		Page page = csiAggregationTagService.findPageOfHourlyEventTag(result.tag);
+		Browser browser = csiAggregationTagService.findBrowserOfHourlyEventTag(result.tag);
+		Location location = csiAggregationTagService.findLocationOfHourlyEventTag(result.tag);
 
 		servers.each{GraphiteServer graphiteServer ->
 			log.debug("Sending results to the following GraphiteServer: ${graphiteServer.getServerAdress()}: ")
@@ -119,11 +118,11 @@ class MetricReportingService {
 
 				Boolean resultOfSameCachedViewAsGraphitePath = 
 					eachPath.getMeasurand().isCachedCriteriaApplicable() &&
-					resultMeasuredValueService.getAggregatorTypeCachedViewType(eachPath.getMeasurand()).equals(result.getCachedView());
+					resultCsiAggregationService.getAggregatorTypeCachedViewType(eachPath.getMeasurand()).equals(result.getCachedView());
 					
 				if(resultOfSameCachedViewAsGraphitePath){
 
-					Double value=resultMeasuredValueService.getEventResultPropertyForCalculation(eachPath.getMeasurand(), result);
+					Double value=resultCsiAggregationService.getEventResultPropertyForCalculation(eachPath.getMeasurand(), result);
 					if (value!=null) {
 
 						String measurandName = i18nService.msg(
@@ -194,16 +193,16 @@ class MetricReportingService {
 			activity.updateStatus(["progress":batchActivityService.calculateProgress(size, index+1)])
 			MvQueryParams queryParams = new MvQueryParams()
 			queryParams.jobGroupIds.add(eachJobGroup.getId())
-			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
-				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, MeasuredValueInterval.HOURLY), 
-				MeasuredValueInterval.HOURLY)
-				.toDate();
-			List<MeasuredValue> mvs = eventMeasuredValueService.getHourylMeasuredValues(startOfLastClosedInterval, startOfLastClosedInterval, queryParams).findAll{MeasuredValue hmv ->
-				hmv.value != null && hmv.countResultIds() > 0 
+			Date startOfLastClosedInterval = csiAggregationUtilService.resetToStartOfActualInterval(
+				csiAggregationUtilService.subtractOneInterval(reportingTimeStamp, CsiAggregationInterval.HOURLY),
+				CsiAggregationInterval.HOURLY)
+																	  .toDate();
+			List<CsiAggregation> mvs = eventCsiAggregationService.getHourlyCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, queryParams).findAll{ CsiAggregation hmv ->
+				hmv.csByWptDocCompleteInPercent != null && hmv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
 
-			if(log.debugEnabled) log.debug("MeasuredValues to report for last hour: ${mvs}")
-			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
+			if(log.debugEnabled) log.debug("CsiAggregations to report for last hour: ${mvs}")
+			reportAllCsiAggregationsFor(eachJobGroup, AggregatorType.MEASURED_EVENT, mvs)
 			activity.updateStatus( ["successfulActions": ++activity.getSuccessfulActions()])
 		}
 		activity.updateStatus(["stage": "", "endDate": new Date(), "status": Status.DONE])
@@ -231,7 +230,7 @@ class MetricReportingService {
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day page CSI Values: ${reportingTimeStamp}",createBatchActivity)
-		reportPageCSIValues(MeasuredValueInterval.DAILY, reportingTimeStamp, activity)
+		reportPageCSIValues(CsiAggregationInterval.DAILY, reportingTimeStamp, activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 
 
@@ -258,7 +257,7 @@ class MetricReportingService {
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week page CSI Values: ${reportingTimeStamp}",createBatchActivity)
-		reportPageCSIValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
+		reportPageCSIValues(CsiAggregationInterval.WEEKLY, reportingTimeStamp, activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
 
@@ -270,19 +269,19 @@ class MetricReportingService {
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
 			activity.updateStatus(["progress":batchActivityService.calculateProgress(size,index+1)])
 
-			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
-				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
+			Date startOfLastClosedInterval = csiAggregationUtilService.resetToStartOfActualInterval(
+				csiAggregationUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes),
 				intervalInMinutes)
-				.toDate();
+																	  .toDate();
 
 			if(log.debugEnabled) log.debug("getting page csi-values to report to graphite: startOfLastClosedInterval=${startOfLastClosedInterval}")
-			MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(intervalInMinutes)
-			List<MeasuredValue> pmvsWithData = pageMeasuredValueService.getOrCalculatePageMeasuredValues(startOfLastClosedInterval, startOfLastClosedInterval, interval, [eachJobGroup]).findAll{MeasuredValue pmv ->
-				pmv.value != null && pmv.countResultIds() > 0 
+			CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(intervalInMinutes)
+			List<CsiAggregation> pmvsWithData = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, interval, [eachJobGroup]).findAll{ CsiAggregation pmv ->
+				pmv.csByWptDocCompleteInPercent != null && pmv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
 
 			if(log.debugEnabled) log.debug("reporting ${pmvsWithData.size()} page csi-values with intervalInMinutes ${intervalInMinutes} for JobGroup: ${eachJobGroup}");
-			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.PAGE, pmvsWithData)
+			reportAllCsiAggregationsFor(eachJobGroup, AggregatorType.PAGE, pmvsWithData)
 			activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
@@ -307,7 +306,7 @@ class MetricReportingService {
 
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last day shop CSI Values: ${reportingTimeStamp}",createBatchActivity)
-		reportShopCSIMeasuredValues(MeasuredValueInterval.DAILY, reportingTimeStamp,activity)
+		reportShopCSICsiAggregations(CsiAggregationInterval.DAILY, reportingTimeStamp,activity)
 		activity.updateStatus(["stage": "","endDate": new Date(), "status": Status.DONE])
 	}
 
@@ -332,34 +331,34 @@ class MetricReportingService {
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,0,Activity.UPDATE,"Report last week shop CSI Values: ${reportingTimeStamp}",createBatchActivity)
-		reportShopCSIMeasuredValues(MeasuredValueInterval.WEEKLY, reportingTimeStamp, activity)
+		reportShopCSICsiAggregations(CsiAggregationInterval.WEEKLY, reportingTimeStamp, activity)
 		activity.updateStatus( ["stage": "","endDate": new Date(), "status": Status.DONE])
 
 	}
 
-	private void reportShopCSIMeasuredValues(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivity activity) {
+	private void reportShopCSICsiAggregations(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivity activity) {
 		if(log.debugEnabled) log.debug("reporting shop csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
 			activity.updateStatus(["progress":batchActivityService.calculateProgress(size,index+1)])
-			Date startOfLastClosedInterval = measuredValueUtilService.resetToStartOfActualInterval(
-				measuredValueUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes), 
+			Date startOfLastClosedInterval = csiAggregationUtilService.resetToStartOfActualInterval(
+				csiAggregationUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes),
 				intervalInMinutes)
-				.toDate();
+																	  .toDate();
 
 			if(log.debugEnabled) log.debug("getting shop csi-values to report to graphite: startOfLastClosedInterval=${startOfLastClosedInterval}")
-			MeasuredValueInterval interval = MeasuredValueInterval.findByIntervalInMinutes(intervalInMinutes)
-			List<MeasuredValue> smvsWithData = shopMeasuredValueService.getOrCalculateShopMeasuredValues(startOfLastClosedInterval, startOfLastClosedInterval, interval, [eachJobGroup]).findAll {MeasuredValue smv ->
-				smv.value != null && smv.countResultIds() > 0
+			CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(intervalInMinutes)
+			List<CsiAggregation> smvsWithData = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, interval, [eachJobGroup]).findAll { CsiAggregation smv ->
+				smv.csByWptDocCompleteInPercent != null && smv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
 
-			reportAllMeasuredValuesFor(eachJobGroup, AggregatorType.SHOP, smvsWithData)
+			reportAllCsiAggregationsFor(eachJobGroup, AggregatorType.SHOP, smvsWithData)
 			activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
 		}
 	}
 
-	private void reportAllMeasuredValuesFor(JobGroup jobGroup, String aggregatorName, List<MeasuredValue> mvs) {
+	private void reportAllCsiAggregationsFor(JobGroup jobGroup, String aggregatorName, List<CsiAggregation> mvs) {
 		jobGroup.graphiteServers.each {eachGraphiteServer ->
 			eachGraphiteServer.graphitePaths.findAll { it.measurand.name.equals(aggregatorName) }.each {GraphitePath measuredEventGraphitePath ->
 
@@ -368,43 +367,43 @@ class MetricReportingService {
 					socket = graphiteSocketProvider.getSocket(eachGraphiteServer)
 				} catch (Exception e){
 					//TODO: java.net.UnknownHostException can't be catched explicitly! Maybe groovy wraps the exception? But the stacktrace says java.net.UnknownHostException  ...
-					if (log.errorEnabled) {log.error("GraphiteServer ${eachGraphiteServer} couldn't be reached. ${mvs.size()} MeasuredValues couldn't be sent.")}
+					if (log.errorEnabled) {log.error("GraphiteServer ${eachGraphiteServer} couldn't be reached. ${mvs.size()} CsiAggregations couldn't be sent.")}
 					return
 				}
 				
-				if(log.debugEnabled) log.debug("${mvs.size()} MeasuredValues should be sent to:\nJobGroup=${jobGroup}\nGraphiteServer=${eachGraphiteServer.getServerAdress()}\nGraphitePath=${measuredEventGraphitePath}")
-				mvs.each {MeasuredValue mv ->
+				if(log.debugEnabled) log.debug("${mvs.size()} CsiAggregations should be sent to:\nJobGroup=${jobGroup}\nGraphiteServer=${eachGraphiteServer.getServerAdress()}\nGraphitePath=${measuredEventGraphitePath}")
+				mvs.each { CsiAggregation mv ->
 					if(log.debugEnabled) log.debug("Sending ${mv.interval.name} ${aggregatorName}-csi-value for:\nJobGroup=${jobGroup}\nGraphiteServer=${eachGraphiteServer.getServerAdress()}\nGraphitePath=${measuredEventGraphitePath}")
-					reportMeasuredValue(measuredEventGraphitePath.getPrefix(), jobGroup, mv, socket)
+					reportCsiAggregation(measuredEventGraphitePath.getPrefix(), jobGroup, mv, socket)
 				}
 			}
 		}
 	}
 
 
-	private void reportMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket){
-		if (mv.interval.intervalInMinutes == MeasuredValueInterval.HOURLY && mv.aggregator.name.equals(AggregatorType.MEASURED_EVENT)) {
-			reportHourlyMeasuredValue(prefix, jobGroup, mv, socket)
-		}else if (mv.interval.intervalInMinutes == MeasuredValueInterval.DAILY){
+	private void reportCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket){
+		if (mv.interval.intervalInMinutes == CsiAggregationInterval.HOURLY && mv.aggregator.name.equals(AggregatorType.MEASURED_EVENT)) {
+			reportHourlyCsiAggregation(prefix, jobGroup, mv, socket)
+		}else if (mv.interval.intervalInMinutes == CsiAggregationInterval.DAILY){
 			if (mv.aggregator.name.equals(AggregatorType.PAGE)) {
-				reportDailyPageMeasuredValue(prefix, jobGroup, mv, socket)
+				reportDailyPageCsiAggregation(prefix, jobGroup, mv, socket)
 			} else if (mv.aggregator.name.equals(AggregatorType.SHOP)) {
-				reportDailyShopMeasuredValue(prefix, jobGroup, mv, socket)
+				reportDailyShopCsiAggregation(prefix, jobGroup, mv, socket)
 			}
-		} else if (mv.interval.intervalInMinutes == MeasuredValueInterval.WEEKLY){
+		} else if (mv.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY){
 			if (mv.aggregator.name.equals(AggregatorType.PAGE)) {
-				reportWeeklyPageMeasuredValue(prefix, jobGroup, mv, socket)
+				reportWeeklyPageCsiAggregation(prefix, jobGroup, mv, socket)
 			} else if (mv.aggregator.name.equals(AggregatorType.SHOP)) {
-				reportWeeklyShopMeasuredValue(prefix, jobGroup, mv, socket)
+				reportWeeklyShopCsiAggregation(prefix, jobGroup, mv, socket)
 			}
 		}
 	}
 
-	private void reportHourlyMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
-		Page page = measuredValueTagService.findPageOfHourlyEventTag(mv.tag)
-		MeasuredEvent event = measuredValueTagService.findMeasuredEventOfHourlyEventTag(mv.tag)
-		Browser browser = measuredValueTagService.findBrowserOfHourlyEventTag(mv.tag)
-		Location location = measuredValueTagService.findLocationOfHourlyEventTag(mv.tag)
+	private void reportHourlyCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
+		Page page = csiAggregationTagService.findPageOfHourlyEventTag(mv.tag)
+		MeasuredEvent event = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(mv.tag)
+		Browser browser = csiAggregationTagService.findBrowserOfHourlyEventTag(mv.tag)
+		Location location = csiAggregationTagService.findLocationOfHourlyEventTag(mv.tag)
 		
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))
@@ -417,13 +416,13 @@ class MetricReportingService {
 		pathElements.add('csi')
 		
 		GraphitePathName finalPathName=GraphitePathName.valueOf(pathElements.toArray(new String[pathElements.size()]));
-		double valueAsPercentage = mv.value * 100
-		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as hourly MeasuredValue to graphite-path ${finalPathName}")
+		double valueAsPercentage = mv.csByWptDocCompleteInPercent * 100
+		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as hourly CsiAggregation to graphite-path ${finalPathName}")
 		socket.sendDate(finalPathName, valueAsPercentage, mv.started)
 	}
 
-	private void reportDailyPageMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
-		Page page = measuredValueTagService.findPageOfDailyPageTag(mv.tag)
+	private void reportDailyPageCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
+		Page page = csiAggregationTagService.findPageByPageTag(mv.tag)
 
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))
@@ -433,12 +432,12 @@ class MetricReportingService {
 		pathElements.add('csi')
 		
 		GraphitePathName finalPathName=GraphitePathName.valueOf(pathElements.toArray(new String[pathElements.size()]));
-		double valueAsPercentage = mv.value * 100
-		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as daily page-MeasuredValue to graphite-path ${finalPathName}")
+		double valueAsPercentage = mv.csByWptDocCompleteInPercent * 100
+		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as daily page-CsiAggregation to graphite-path ${finalPathName}")
 		socket.sendDate(finalPathName, valueAsPercentage, mv.started)
 	}
 
-	private void reportDailyShopMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
+	private void reportDailyShopCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))
 		pathElements.add(replaceInvalidGraphitePathCharacters(jobGroup.name))
@@ -446,13 +445,13 @@ class MetricReportingService {
 		pathElements.add('csi')
 		
 		GraphitePathName finalPathName=GraphitePathName.valueOf(pathElements.toArray(new String[pathElements.size()]));
-		double valueAsPercentage = mv.value * 100
-		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as daily shop- MeasuredValue to graphite-path ${finalPathName}")
+		double valueAsPercentage = mv.csByWptDocCompleteInPercent * 100
+		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as daily shop- CsiAggregation to graphite-path ${finalPathName}")
 		socket.sendDate(finalPathName, valueAsPercentage, mv.started)
 	}
 
-	private void reportWeeklyPageMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
-		Page page = measuredValueTagService.findPageOfWeeklyPageTag(mv.tag)
+	private void reportWeeklyPageCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
+		Page page = csiAggregationTagService.findPageByPageTag(mv.tag)
 		
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))
@@ -462,12 +461,12 @@ class MetricReportingService {
 		pathElements.add('csi')
 		
 		GraphitePathName finalPathName=GraphitePathName.valueOf(pathElements.toArray(new String[pathElements.size()]));
-		double valueAsPercentage = mv.value * 100
-		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as weekly page-MeasuredValue to graphite-path ${finalPathName}")
+		double valueAsPercentage = mv.csByWptDocCompleteInPercent * 100
+		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as weekly page-CsiAggregation to graphite-path ${finalPathName}")
 		socket.sendDate(finalPathName, valueAsPercentage, mv.started)
 	}
 
-	private void reportWeeklyShopMeasuredValue(String prefix, JobGroup jobGroup, MeasuredValue mv, GraphiteSocket socket) {
+	private void reportWeeklyShopCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
 		List<String> pathElements = []
 		pathElements.addAll(prefix.tokenize('.'))
 		pathElements.add(replaceInvalidGraphitePathCharacters(jobGroup.name))
@@ -475,8 +474,8 @@ class MetricReportingService {
 		pathElements.add('csi')
 		
 		GraphitePathName finalPathName=GraphitePathName.valueOf(pathElements.toArray(new String[pathElements.size()]));
-		double valueAsPercentage = mv.value * 100
-		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as weekly shop-MeasuredValue to graphite-path ${finalPathName}")
+		double valueAsPercentage = mv.csByWptDocCompleteInPercent * 100
+		if(log.debugEnabled) log.debug("Sending ${mv.started}|${valueAsPercentage} as weekly shop-CsiAggregation to graphite-path ${finalPathName}")
 		socket.sendDate(finalPathName, valueAsPercentage, mv.started)
 	}
 	

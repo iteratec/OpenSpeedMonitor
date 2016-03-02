@@ -15,7 +15,10 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.csi;
+package de.iteratec.osm.csi
+
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.result.EventResult;
 
 /**
  * A value for calculation of customer satisfaction indices. 
@@ -23,39 +26,55 @@ package de.iteratec.osm.csi;
  *
  */
 public interface CsiValue {
-	/**
-	 * Delivers csi-relevant value of this {@link CsiValue}.
-	 */
-	public Double retrieveValue()
-	
-	/**
-	 * Delivers csi-relevant date of this {@link CsiValue}.
-	 * @return
-	 */
-	public Date retrieveDate()
-	
-	/**
-	 * Delivers csi-tag.
-	 * @see MeasuredValueTagService
-	 */
-	public String retrieveTag()
-	
-	/**
-	 * Delivers the id's of all {@link EventResult}s which underly this CsiValue. 
-	 * @return
-	 */
-	public List<Long> retrieveUnderlyingEventResultIds()
-	
-	/**
-	 * Whether or not this value should be factored in csi-calculations.
-	 * <ul>
-	 * <li>{@link EventResult}s are relevant if they have set a docCompleteTimeInMillisecs and customerSatisfactionInPercent and customerSatisfactionInPercent
-	 * is within valid range.</li>
-	 * <li>{@link MesauredValue}s are relevant if they have a state of {@link Calculated#Yes}</li>
-	 * </ul>
-	 * @return
-	 * @see CsiConfigCacheService
-	 */
-	public boolean isCsiRelevant()
-	
+    /**
+     * Delivers csi-relevant value calculated by docComplete-time
+     */
+    public Double retrieveCsByWptDocCompleteInPercent()
+
+    /**
+     * Delivers csi-relevant value calculated by visuallyComplete-time
+     */
+    public Double retrieveCsByWptVisuallyCompleteInPercent()
+
+    /**
+     * Delivers csi-relevant date of this {@link CsiValue}.
+     * @return
+     */
+    public Date retrieveDate()
+
+    /**
+     * Delivers csi-tag.
+     * @see CsiAggregationTagService
+     */
+    public String retrieveTag()
+
+    /**
+     * Delivers connectivity Profile
+     */
+    public ConnectivityProfile retrieveConnectivityProfile()
+
+    /**
+     * Delivers the id's of all {@link EventResult}s which underly this csByWptDocCompleteInPercent-value.
+     * @return
+     */
+    public List<Long> retrieveUnderlyingEventResultsByDocComplete()
+
+    /**
+     * Delivers all EventResults which underly this csByWptVisuallyCompleteInPercent-value.
+     * @return
+     */
+    public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete()
+
+    /**
+     * Whether or not this value should be factored in csi-calculations.
+     * <ul>
+     * <li>{@link EventResult}s are relevant if they have set a loadTimeInMillisecs and customerSatisfactionInPercent and customerSatisfactionInPercent
+     * is within valid range.</li>
+     * <li>{@link MesauredValue}s are relevant if they have a state of {@link Calculated#Yes}</li>
+     * </ul>
+     * @return
+     * @see CsiConfigCacheService
+     */
+    public boolean isCsiRelevant()
+
 }

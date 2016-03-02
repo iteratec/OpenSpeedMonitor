@@ -1,7 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.DateValueConverter
 import grails.validation.Validateable
 import org.joda.time.DateTime
@@ -69,7 +69,7 @@ public class EventResultDashboardShowAllCommand {
     String aggrGroup
 
     /**
-     * The time of the {@link de.iteratec.osm.report.chart.MeasuredValueInterval}.
+     * The time of the {@link CsiAggregationInterval}.
      */
     Integer selectedInterval
 
@@ -258,6 +258,18 @@ public class EventResultDashboardShowAllCommand {
      */
     String customConnectivityName
 
+    String chartTitle
+    int chartWidth
+    int chartHeight
+    int loadTimeMinimum
+    /**
+     * The maximum load time could be set to 'auto', so we handle it as a string
+     */
+    String loadTimeMaximum = "auto"
+    boolean showDataMarkers
+    boolean showDataLabels
+
+
     /**
      * Constraints needs to fit.
      */
@@ -317,6 +329,8 @@ public class EventResultDashboardShowAllCommand {
 
         customConnectivityName(nullable: true)
 
+        chartTitle(nullable: true)
+        loadTimeMaximum(nullable: true)
         //TODO: validators for trimAbove's and -Below's
 
     }
@@ -372,10 +386,10 @@ public class EventResultDashboardShowAllCommand {
     }
 
     /**
-     * Returns a {@link DateTime} of the first day in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
+     * Returns a {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
      * @param timeWithOrWithoutMeridian
      * 		The format can be with or without meridian (e.g. "04:45", "16:12" without or "02:00 AM", "11:23 PM" with meridian)
-     * @return A {@link DateTime} of the first day in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
+     * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
      * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
      */
     public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException {
@@ -409,7 +423,7 @@ public class EventResultDashboardShowAllCommand {
     public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
 
         viewModelToCopyTo.put('selectedTimeFrameInterval', this.selectedTimeFrameInterval)
-        viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: MeasuredValueInterval.RAW)
+        viewModelToCopyTo.put('selectedInterval', this.selectedInterval ?: CsiAggregationInterval.RAW)
 
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
         viewModelToCopyTo.put('selectedPages', this.selectedPages)
@@ -455,7 +469,13 @@ public class EventResultDashboardShowAllCommand {
         viewModelToCopyTo.put('debug', this.debug ?: false)
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)
-
+        viewModelToCopyTo.put('chartTitle', this.chartTitle)
+        viewModelToCopyTo.put('chartWidth', this.chartWidth)
+        viewModelToCopyTo.put('chartHeight', this.chartHeight)
+        viewModelToCopyTo.put('showDataLabels', this.showDataLabels)
+        viewModelToCopyTo.put('showDataMarkers', this.showDataMarkers)
+        viewModelToCopyTo.put('loadTimeMaximum', this.loadTimeMaximum)
+        viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
     }
 
     /**

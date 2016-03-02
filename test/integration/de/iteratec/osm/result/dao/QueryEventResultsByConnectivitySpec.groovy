@@ -9,7 +9,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
+
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.dao.CriteriaSorting
@@ -17,7 +17,7 @@ import de.iteratec.osm.result.ErQueryParams
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -357,7 +357,7 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         WebPageTestServer server =
             TestDataUtil.createWebPageTestServer('server 1 - wpt server', 'server 1 - wpt server', true, 'http://server1.wpt.server.de')
 
-        JobGroup jobGroup = TestDataUtil.createJobGroup("TestGroup", JobGroupType.CSI_AGGREGATION)
+        JobGroup jobGroup = TestDataUtil.createJobGroup("TestGroup")
 
         Browser fireFoxBrowser = TestDataUtil.createBrowser('FF', 0.55d)
 
@@ -378,7 +378,7 @@ class QueryEventResultsByConnectivitySpec extends Specification {
 
         JobResult jobRun = TestDataUtil.createJobResult('1', runDate.toDate(), job, job.location)
 
-        MeasuredValueTagService tagService = new MeasuredValueTagService()
+        CsiAggregationTagService tagService = new CsiAggregationTagService()
         withPredefinedProfile1 = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
         withPredefinedProfile1.connectivityProfile = predefinedProfile1
         withPredefinedProfile1.customConnectivityName = null

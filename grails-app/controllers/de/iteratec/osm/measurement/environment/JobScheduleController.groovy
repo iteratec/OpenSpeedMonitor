@@ -32,7 +32,7 @@ class JobScheduleController {
     }
 
     def schedules() {
-        // Interval which is observed (1 day from now)
+        // Interval which is observed (1 csiDay from now)
         DateTime start = new DateTime();
         DateTime end = start.plusDays(1);
 

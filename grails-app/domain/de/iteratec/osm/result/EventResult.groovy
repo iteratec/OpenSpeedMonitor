@@ -18,8 +18,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
-import de.iteratec.osm.csi.OsmConfigCacheService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 
 
@@ -65,8 +64,8 @@ public enum CachedView {
  * </p>
  * 
  * <p>
- * For job-results in WPT-multistep this is the result of one page-load
- * with its waterfall-data. It is assigned to one and only one job-result 
+ * For job-results in WPT-multistep this is the result of one page-load.
+ * It is assigned to one and only one job-result
  * and grouped by a {@link MeasuredEvent}.
  * An event-result could be a cached (repeated view) or un-cached (first view)
  * execution (see {#cachedView}).
@@ -106,7 +105,8 @@ class EventResult implements CsiValue {
 	Integer fullyLoadedTimeInMillisecs
 	Integer loadTimeInMillisecs
 	Integer startRenderInMillisecs
-	Double customerSatisfactionInPercent
+	Double csByWptDocCompleteInPercent
+	Double csByWptVisuallyCompleteInPercent
 
 	/**
 	 * The WPT speed index received from WPT server.
@@ -134,7 +134,6 @@ class EventResult implements CsiValue {
 	Date lastStatusUpdate
 	String validationState
 	String tag
-	WebPerformanceWaterfall webPerformanceWaterfall
 
 	// from JobResult 
 	Date jobResultDate
@@ -180,7 +179,8 @@ class EventResult implements CsiValue {
 		fullyLoadedTimeInMillisecs(nullable: true)
 		loadTimeInMillisecs(nullable: true)
 		startRenderInMillisecs(nullable: true)
-		customerSatisfactionInPercent(nullable: true)
+		csByWptDocCompleteInPercent(nullable: true)
+		csByWptVisuallyCompleteInPercent(nullable: true)
 		speedIndex(nullable: true)
 		visuallyCompleteInMillisecs(nullable: true)
 
@@ -194,7 +194,6 @@ class EventResult implements CsiValue {
 		jobResultJobConfigId()
 
 		tag(nullable: true)
-		webPerformanceWaterfall(nullable: true)
 
         testAgent(nullable: true)
 
@@ -237,20 +236,14 @@ class EventResult implements CsiValue {
 	}
 
 	static mapping = {
-		jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
+
+		jobResultDate(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx,GetLimitedMedianEventResultsBy')
 		jobResultJobConfigId(index: 'jobResultDate_and_jobResultJobConfigId_idx,wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		medianValue(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
 		cachedView(index: 'wJRD_and_wJRJCId_and_mV_and_cV_idx')
-		tag(index: 'EventResultTagIndex')
-
-
-		jobResultDate(index: 'GetLimitedMedianEventResultsBy')
-		tag(index: 'GetLimitedMedianEventResultsBy')
-		medianValue(index: 'GetLimitedMedianEventResultsBy')
-		cachedView(index: 'GetLimitedMedianEventResultsBy')
-        connectivityProfile(index: 'GetLimitedMedianEventResultsBy')
 
         noTrafficShapingAtAll(defaultValue: false)
+
 	}
 
 	static transients = ['csiRelevant', 'osmConfigCacheService']
@@ -261,14 +254,20 @@ class EventResult implements CsiValue {
 	 */
 	@Override
 	public boolean isCsiRelevant() {
-		return this.customerSatisfactionInPercent && this.docCompleteTimeInMillisecs &&
+		return this.csByWptDocCompleteInPercent && this.docCompleteTimeInMillisecs &&
 				(this.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
-						this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24))
+					this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
+				jobResult.job.jobGroup.csiConfiguration != null
 	}
 
 	@Override
-	public Double retrieveValue() {
-		return customerSatisfactionInPercent
+	public Double retrieveCsByWptDocCompleteInPercent() {
+		return csByWptDocCompleteInPercent
+	}
+
+	@Override
+	public Double retrieveCsByWptVisuallyCompleteInPercent() {
+		return csByWptVisuallyCompleteInPercent
 	}
 
 	@Override
@@ -282,13 +281,23 @@ class EventResult implements CsiValue {
 	}
 
 	@Override
-	public List<Long> retrieveUnderlyingEventResultIds() {
+	ConnectivityProfile retrieveConnectivityProfile() {
+		return this.connectivityProfile
+	}
+
+	@Override
+	public List<Long> retrieveUnderlyingEventResultsByDocComplete() {
 		return [this.id]
+	}
+
+	@Override
+	public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete() {
+		return [this]
 	}
 
 	/**
 	 * <p>
-	 * Build up an URL to display details (and jump to Waterfall) of the given {@link EventResult}s.
+	 * Build up an URL to display details of the given {@link EventResult}s.
 	 * </p>
 	 * @param jobRun
 	 * 			The associated {@link JobResult} of the given {@link EventResult}s
@@ -325,7 +334,7 @@ class EventResult implements CsiValue {
 				"\t\tfullyLoadedTimeInMillisecs=${this.fullyLoadedTimeInMillisecs}\n" +
 				"\t\tloadTimeInMillisecs=${this.loadTimeInMillisecs}\n" +
 				"\t\tstartRenderInMillisecs=${this.startRenderInMillisecs}\n" +
-				"\t\tcustomerSatisfactionInPercent=${this.customerSatisfactionInPercent}\n" +
+				"\t\tcustomerSatisfactionInPercent=${this.csByWptDocCompleteInPercent}\n" +
 				"\t\tspeedIndex=${this.speedIndex}\n" +
 				"\t\tdownloadAttempts=${this.downloadAttempts}\n" +
 				"\t\tfirstStatusUpdate=${this.firstStatusUpdate}\n" +

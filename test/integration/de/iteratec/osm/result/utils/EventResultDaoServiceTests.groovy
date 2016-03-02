@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
@@ -140,9 +139,7 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
         ).save(failOnError: true);
 
         JobGroup jobGroup = new JobGroup(
-                name: "TestGroup",
-                groupType: JobGroupType.CSI_AGGREGATION
-        ).save(failOnError: true)
+                name: "TestGroup").save(failOnError: true)
 
         Browser fireFoxBrowser = new Browser(
                 name:'FF',
@@ -248,7 +245,7 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
                 wptStatus: 0,
                 validationState : 'validationState',
                 harData: 'harData',
-                customerSatisfactionInPercent:  1,
+                csByWptDocCompleteInPercent:  1,
                 jobResult: jobRunDatePlus_Zero,
                 jobResultDate: jobRunDatePlus_Zero.date,
                 jobResultJobConfigId: jobRunDatePlus_Zero.job.ident(),
@@ -295,7 +292,7 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
                 wptStatus: 0,
                 validationState : 'validationState',
                 harData: 'harData',
-                customerSatisfactionInPercent:  1,
+                csByWptDocCompleteInPercent:  1,
                 jobResult: jobRunDatePlus_Ten,
                 jobResultDate: jobRunDatePlus_Ten.date,
                 jobResultJobConfigId: jobRunDatePlus_Ten.job.ident(),
@@ -342,7 +339,7 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
                 wptStatus: 0,
                 validationState : 'validationState',
                 harData: 'harData',
-                customerSatisfactionInPercent:  1,
+                csByWptDocCompleteInPercent:  1,
                 jobResult: jobRunDatePlus_Twenty,
                 jobResultDate: jobRunDatePlus_Twenty.date,
                 jobResultJobConfigId: jobRunDatePlus_Twenty.job.ident(),
@@ -389,7 +386,7 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
                 wptStatus: 0,
                 validationState : 'validationState',
                 harData: 'harData',
-                customerSatisfactionInPercent:  1,
+                csByWptDocCompleteInPercent:  1,
                 jobResult: jobRunDatePlus_Thirty,
                 jobResultDate: jobRunDatePlus_Thirty.date,
                 jobResultJobConfigId: jobRunDatePlus_Thirty.job.ident(),
@@ -437,7 +434,7 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
                 wptStatus: 0,
                 validationState : 'validationState',
                 harData: 'harData',
-                customerSatisfactionInPercent:  1,
+                csByWptDocCompleteInPercent:  1,
                 jobResult: jobRunDatePlus_Day,
                 jobResultDate: jobRunDatePlus_Day.date,
                 jobResultJobConfigId: jobRunDatePlus_Day.job.ident(),

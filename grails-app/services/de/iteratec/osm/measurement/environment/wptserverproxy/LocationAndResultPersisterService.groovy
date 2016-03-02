@@ -17,8 +17,10 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 
 import java.util.zip.GZIPOutputStream
@@ -26,16 +28,15 @@ import java.util.zip.GZIPOutputStream
 import org.springframework.transaction.TransactionStatus
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.MeasuredValueUpdateService
+import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TimeToCsMappingService
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobGroupType
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
@@ -44,10 +45,9 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.MeasuredValueTagService
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.detail.HarParserService
-import de.iteratec.osm.result.detail.WebPerformanceWaterfall
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -63,12 +63,12 @@ class LocationAndResultPersisterService implements iListener{
 	public static final String STATIC_PART_WATERFALL_ANCHOR = '#waterfall_view'
 	
 	BrowserService browserService
-	MeasuredValueUpdateService measuredValueUpdateService
+	CsiAggregationUpdateService csiAggregationUpdateService
 	TimeToCsMappingService timeToCsMappingService
 	PageService pageService
 	JobService jobService
 	EventResultService eventResultService
-	MeasuredValueTagService measuredValueTagService
+	CsiAggregationTagService csiAggregationTagService
 	ProxyService proxyService
 	MetricReportingService metricReportingService
 	HarParserService harParserService
@@ -114,7 +114,7 @@ class LocationAndResultPersisterService implements iListener{
 
 	/**
 	 * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
-	 * Dependent {@link de.iteratec.isocsi.MeasuredValue}s will be created/marked/calculated.
+	 * Dependent {@link de.iteratec.isocsi.CsiAggregation}s will be created/marked/calculated.
 	 * Persisted {@link EventResult} will be reported to graphite if configured respectively.
 	 * <br><b>Note:</b> Persistance of the {@link EventResult}s of one test step (i.e. for one {@link MeasuredEvent}) is wrapped into a transaction. So ANY other downstream operations may not rollback the persistance 
 	 * of the {@link EventResult}s
@@ -241,40 +241,25 @@ class LocationAndResultPersisterService implements iListener{
 	void persistResultsForAllTeststeps(JobResult jobRun, WptResultXml resultXml, Job job, String har){
 		
 		Integer testStepCount = resultXml.getTestStepCount()
-		
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap = [:]
-		//TODO: enable parsing of waterfalls again, if nightly deletion is working (see de.iteratec.osm.persistence.DbCleanupService)
-		/*
-		try {
-			if (testStepCount>0 && har) {
-				pageidToWaterfallMap = harParserService.getWaterfalls(har)
-			}
-			pageidToWaterfallMap = harParserService.removeWptMonitorSuffixAndPagenamePrefixFromEventnames(pageidToWaterfallMap)
-		} catch (Exception e) {
-			log.error("Failed to parse http-archive: ${har}\n${e.toString()}")
-		}
-		*/
+
 		log.debug("starting persistance of ${testStepCount} event results for test steps")
 		List<EventResult> resultsOfTeststep = []
 		testStepCount.times{nullBasedTeststepIndex ->
+
 			//TODO: possible to catch non median results at this position  and check if they should persist or not
 
-			EventResult.withTransaction { TransactionStatus status ->
-                log.debug("Persisting EventResults of jobRun: ${jobRun}: Start of transaction, transaction status=${status}")
-				try{
-					resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job, pageidToWaterfallMap))
-                    log.debug("Persisting EventResults of jobRun: ${jobRun}: End of transaction, transaction status=${status}")
-				} catch (Exception e) {
-					status.setRollbackOnly()
-					log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
-				}
-			}
+            try{
+                resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job))
+            } catch (Exception e) {
+                log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
+            }
+
 		}
 		informDependents(resultsOfTeststep)
 	}
-	
+
 	protected List<EventResult> persistResultsOfOneTeststep(
-		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap){
+		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job){
 
 		log.debug('getting event name from xml result ...')
 		String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
@@ -294,27 +279,15 @@ class LocationAndResultPersisterService implements iListener{
 		resultXml.getRunCount().times {Integer runNumber ->
             if( resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex)) ) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, waterfallAnchor)
                 if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
             }
             if( resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex)) ) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
+                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, waterfallAnchor)
                 if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
             }
 		}
-		/*
-		resultXml.getRunNodes().each{GPathResult run ->
-			
-			EventResult firstViewOfTeststep = persistSingleRunResult(run.firstView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
-			if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
-			
-			EventResult repeatedViewOfTeststep = persistSingleRunResult(run.repeatView, testStepZeroBasedIndex, jobRun, event, pageidToWaterfallMap, waterfallAnchor)
-			if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
-			
-		}
-		*/
-		
 		return resultsOfTeststep
 	}
 		
@@ -329,14 +302,11 @@ class LocationAndResultPersisterService implements iListener{
 	 * @return Persisted result. Null if the view node is empty, i.e. the test was a "first view only" and this is the repeated view node
 	 */
 	private EventResult persistSingleResult(
-		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, 
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor) {
-
-		jobRun.getJob().getConnectivityProfile()
+		WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, String waterfallAnchor) {
 
 		EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
-        result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, pageidToWaterfallMap, waterfallAnchor)
+        result = persistResult(jobRun, event, cachedView, runZeroBasedIndex+1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, waterfallAnchor)
 
 		return result
 	}
@@ -352,17 +322,41 @@ class LocationAndResultPersisterService implements iListener{
 	 * @return
 	 */
 	protected EventResult persistResult(
-		JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, 
-		Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
+		JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, String waterfallAnchor){
 
 		EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult()
-		return saveResult(result, jobRun, event, view, run, median, viewTag, pageidToWaterfallMap, waterfallAnchor)
+		return saveResult(result, jobRun, event, view, run, median, viewTag, waterfallAnchor)
 
 	}
-	
-	protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run,Boolean median,
-			GPathResult viewTag, Map<String, WebPerformanceWaterfall> pageidToWaterfallMap, String waterfallAnchor){
 
+    /**
+     * Storing single {@link EventResult}.
+     *
+     * Should be persisted even if some subdata couldn't get determined (e.g.
+     * customer satisfaction or determination fails with an exception. Therefore transaction must not be rollbacked
+     * even if an arbitrary exception is thrown.
+     *
+     * @param result
+     *          {@link EventResult} to save. A new unpersisted object in most of the cases.
+     * @param jobRun
+     *          {@link JobResult} of the {@link EventResult} to save.
+     * @param step
+     *          {@link MeasuredEvent} of the {@link EventResult} to save.
+     * @param view
+     *          {@link CachedView} of the {@link EventResult} to save.
+     * @param run
+     *          Run number of the {@link EventResult} to save.
+     * @param median
+     *          Whether or not the {@link EventResult} is a median result. Always true for tests with just one run.
+     * @param viewTag
+     *          Xml node with all the result data for the new {@link EventResult}.
+     * @param waterfallAnchor
+     *          String to build webpagetest server link for this {@link EventResult} from.
+     * @return  Saved {@link EventResult}.
+     */
+    @Transactional(noRollbackFor = [Exception])
+	protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run,Boolean median,
+			GPathResult viewTag, String waterfallAnchor){
 
 		log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
 		Integer docCompleteTime = viewTag.docTime.toInteger()
@@ -386,7 +380,7 @@ class LocationAndResultPersisterService implements iListener{
 		result.jobResultDate=jobRun.date
 		result.jobResultJobConfigId=jobRun.job.ident()
 		JobGroup csiGroup = jobRun.job.jobGroup?:JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-		result.tag = measuredValueTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
+		result.tag = csiAggregationTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
 		if(!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0 ){
 			result.speedIndex = viewTag.SpeedIndex.toInteger()
 		}else {
@@ -395,18 +389,6 @@ class LocationAndResultPersisterService implements iListener{
 		if(!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0 ){
 			result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
 		}
-		//TODO: enable saving of waterfalls again, if nightly deletion is working (see de.iteratec.osm.persistence.DbCleanupService)
-		/*
-		WebPerformanceWaterfall waterfall = pageidToWaterfallMap[
-			harParserService.createPageIdFrom(
-				run, 
-				xmlResultVersion == WptXmlResultVersion.BEFORE_MULTISTEP ? null : step.name,
-				view
-			 )
-		]
-		result.webPerformanceWaterfall = waterfall?waterfall.save(failOnError: true):null
-		*/
-		result.webPerformanceWaterfall = null
 		try {
 			result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
 		} catch (MalformedURLException mue) {
@@ -417,7 +399,12 @@ class LocationAndResultPersisterService implements iListener{
 		try{
 			log.debug("step=${step}")
 			log.debug("step.testedPage=${step.testedPage}")
-            result.customerSatisfactionInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage)
+			CsiConfiguration csiConfigurationOfResult = result.jobResult.job.jobGroup.csiConfiguration
+			log.debug("result.CsiConfiguration=${csiConfigurationOfResult}")
+            result.csByWptDocCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(docCompleteTime, step.testedPage,csiConfigurationOfResult)
+			if(result.visuallyCompleteInMillisecs) {
+				result.csByWptVisuallyCompleteInPercent = timeToCsMappingService.getCustomerSatisfactionInPercent(result.visuallyCompleteInMillisecs, step.testedPage,csiConfigurationOfResult)
+			}
 		}catch(Exception e){
 			log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
 		}
@@ -460,7 +447,7 @@ class LocationAndResultPersisterService implements iListener{
 			
 			if (result.cachedView==CachedView.UNCACHED) {
 				log.debug('informing dependent measured values ...')
-				informDependentMeasuredValues(result)
+				informDependentCsiAggregations(result)
 				log.debug('informing dependent measured values ... DONE')
 			}
 			log.debug('reporting persisted event result ...')
@@ -470,12 +457,13 @@ class LocationAndResultPersisterService implements iListener{
 		}
 	}
 	
-	void informDependentMeasuredValues(EventResult result){
+	void informDependentCsiAggregations(EventResult result){
 		try{
-			boolean isCsiRelevant = measuredValueTagService.findJobGroupOfEventResultTag(result.tag).groupType == JobGroupType.CSI_AGGREGATION
-			if (isCsiRelevant) measuredValueUpdateService.createOrUpdateDependentMvs(result)
+			if (result.isCsiRelevant()) {
+				csiAggregationUpdateService.createOrUpdateDependentMvs(result)
+			}
 		}catch(Exception e){
-			log.error("An error occurred while creating EventResult-dependent MeasuredValues for result: ${result}", e)
+			log.error("An error occurred while creating EventResult-dependent CsiAggregations for result: ${result}", e)
 		}
 	}
 	

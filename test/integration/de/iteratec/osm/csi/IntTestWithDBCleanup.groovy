@@ -20,10 +20,10 @@ package de.iteratec.osm.csi
 import org.junit.AfterClass
 import org.junit.BeforeClass
 
-import de.iteratec.osm.report.chart.MeasuredValueDaoService
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasuredValue
-import de.iteratec.osm.report.chart.MeasuredValueInterval
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 
 /**
  * Common base class for all integration tests which empties the database after execution of a test class.
@@ -53,15 +53,15 @@ class IntTestWithDBCleanup {
 	}
 	
 	/**
-	 * Substitutes function MeasuredValueDaoService.getMvs(...)
+	 * Substitutes function CsiAggregationDaoService.getMvs(...)
 	 * The original behavior is retained. Only the rlike clause from the original query is replaced by a
 	 * manual regex filtering (grep()) since the tested combination of H2, Hibernate and GORM did not
 	 * reliably support the rlike clause.  
 	 */
 	public static void substituteGetMvs() {
-		MeasuredValueDaoService.metaClass.getMvs = { Date fromDate, Date toDate, String rlikePattern, MeasuredValueInterval interval, AggregatorType aggregator ->
-			def criteria = MeasuredValue.createCriteria()
-			List<MeasuredValue> mvs = criteria.list {
+		CsiAggregationDaoService.metaClass.getMvs = { Date fromDate, Date toDate, String rlikePattern, CsiAggregationInterval interval, AggregatorType aggregator ->
+			def criteria = CsiAggregation.createCriteria()
+			List<CsiAggregation> mvs = criteria.list {
 				between("started", fromDate, toDate)
 				eq("interval", interval)
 				eq("aggregator", aggregator)

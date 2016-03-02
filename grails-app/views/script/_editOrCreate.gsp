@@ -43,7 +43,7 @@
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>
                         <g:actionSubmit class="btn btn-primary" action="save"
                                         value="${message(code: 'de.iteratec.actions.duplicate', default: 'Kopie speichern')}"
-                                        onclick="return POSTLOADED.promptForDuplicateName();"/>
+                                        onclick="return promptForDuplicateName();"/>
                     </g:if>
                     <g:elseif test="${mode == 'create'}">
                         <g:actionSubmit class="btn btn-primary" action="save"
@@ -64,7 +64,7 @@
         <content tag="include.bottom">
             <asset:javascript src="codemirror/codemirrorManifest.js"/>
             <asset:javascript src="prettycron/prettycronManifest.js"/>
-            <script type="text/javascript">
+            <asset:script type="text/javascript">
                 var editor = new CodemirrorEditor({
                     idCodemirrorElement: "navigationScript",
                     i18nMessage_NO_STEPS_FOUND: '${message(code: 'script.NO_STEPS_FOUND.warning')}',
@@ -77,7 +77,19 @@
                     linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
                     readonly: false
                 });
-            </script>
+                function promptForDuplicateName() {
+                    var newName = prompt(
+                            encodeURIComponent(POSTLOADED.i18n_duplicatePrompt),
+                            encodeURIComponent($('input#label').val() + POSTLOADED.i18n_duplicateSuffix)
+                    );
+                    if (newName != null && newName != '') {
+                        $('input#label').val(newName);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            </asset:script>
         </content>
     </body>
 </html>

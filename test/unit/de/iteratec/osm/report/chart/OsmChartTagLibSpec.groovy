@@ -56,10 +56,10 @@ class OsmChartTagLibSpec extends Specification {
 		Date oneHourAfterNow = new Date(1373635396000L);
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
-		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), measuredValue: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), csiAggregation: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/now"), testingAgent: null);
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), measuredValue: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), measuredValue: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), csiAggregation: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
+		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), csiAggregation: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/twoHoursAfterNow"), testingAgent: null);
 
 		OsmChartGraph graph=new OsmChartGraph();
@@ -90,14 +90,14 @@ class OsmChartTagLibSpec extends Specification {
 			measurementUnit: 'ms',
 			markerEnabled: 'true',
 			dataLabelsActivated: 'false',
-			yAxisScalable: 'true'
-
+			yAxisScalable: 'true',
+			initialChartHeight: "400"
 		]
 
 		when:
 
 		String actualHtml = applyTemplate(
-				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"800px\" '+
+				'<iteratec:singleYAxisChart divId=\"${targetDivId}\" data=\"${data}\" heightOfChart=\"400\" '+
 				'title=\"${chartTitle}\" yType=\"${targetYType}\" width=\"${targetWidth}\" xAxisMin=\"${xAxisMin}\" xAxisMax=\"${xAxisMax}\" yAxisMin=\"${yAxisMin}\" yAxisMax=\"${yAxisMax}\"' +
 				' measurementUnit=\"${measurementUnit}\" markerEnabled=\"${markerEnabled}\" dataLabelsActivated=\"${dataLabelsActivated}\" yAxisScalable=\"${yAxisScalable}\" labelSummary=""/>',
 				model).stripIndent()
@@ -135,7 +135,7 @@ class OsmChartTagLibSpec extends Specification {
         javascriptLines[1] == 'var rickshawGraphBuilder;'
         javascriptLines[4] == "divId: \"myDivId\","
         javascriptLines[6] == "data : [ { measurandGroup: \"PERCENTAGES\",   yAxisLabel: \"Antwortzeit [ms]\", name: \"job1\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] } ],"
-        javascriptLines[7] == "heightOfChart :  400,"
+        javascriptLines[7] == "height: 400,"
 
 	}
 
@@ -154,10 +154,10 @@ class OsmChartTagLibSpec extends Specification {
 		Date oneHourAfterNow = new Date(1373635396000L);
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
-		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), measuredValue: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), csiAggregation: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/now"), testingAgent: null);
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), measuredValue: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), measuredValue: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), csiAggregation: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
+		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), csiAggregation: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
 				"https://www.example.com/twoHoursAfterNow"), testingAgent: null);
 
 		OsmChartGraph graph1=new OsmChartGraph();
@@ -200,7 +200,7 @@ class OsmChartTagLibSpec extends Specification {
 			markerEnabled: 'true',
 			dataLabelsActivated: 'false',
 			yAxisScalable: 'true',
-			heightOfChart: '200px',
+			heightOfChart: '200',
 			highChartLabels: highChartLabels
 		]
 
@@ -208,7 +208,7 @@ class OsmChartTagLibSpec extends Specification {
 		when:
 
 		String actualHtml = applyTemplate(
-				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600px\" '+
+				'<iteratec:multipleAxisChart divId=\"${divId}\" data=\"${data}\" heightOfChart=\"600\" '+
 				'title=\"${title}\" highChartLabels=\"${highChartLabels}\" labelSummary="" />',
 				model).stripIndent()
 
@@ -246,8 +246,8 @@ class OsmChartTagLibSpec extends Specification {
         javascriptLines[0] == 'var CHARTLIB="RICKSHAW";'
         javascriptLines[1] == 'var rickshawGraphBuilder;'
         javascriptLines[4] == "divId: \"myDivId\","
-        javascriptLines[6] == "data : [ { measurandGroup: \"LOAD_TIMES\",   yAxisLabel: \"Load Times\", name: \"job1\",  data: [  { x: 1373631796, y: 0.0015, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 0.003, url: \"undefined\" }, { x: 1373638996, y: 0.0023, url: \"https://www.example.com/twoHoursAfterNow\" } ] },  { measurandGroup: \"PERCENTAGES\",   yAxisLabel: \"Percentages\", name: \"job2\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] } ],"
-        javascriptLines[7] == "heightOfChart :  600,"
+        javascriptLines[6] == "data : [ { measurandGroup: \"LOAD_TIMES\",   yAxisLabel: \"Load Times\", name: \"job1\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] },  { measurandGroup: \"PERCENTAGES\",   yAxisLabel: \"Percentages\", name: \"job2\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] } ],"
+        javascriptLines[7] == "height: 600,"
 
 	}
 

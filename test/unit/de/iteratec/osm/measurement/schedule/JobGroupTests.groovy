@@ -17,6 +17,9 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.TestDataUtil
+
 import static org.junit.Assert.*
 
 import grails.test.mixin.*
@@ -27,24 +30,24 @@ import org.junit.*
  * Test-suite of {@link JobGroup}.
  */
 @TestFor(JobGroup)
-@Mock([JobGroup])
+@Mock([JobGroup, CsiConfiguration])
 class JobGroupTests {
 
 	@Test
 	public void testToString_CSI_group() {
 		JobGroup out = new JobGroup(
-				name: 'Test-Group-1', groupType: JobGroupType.CSI_AGGREGATION
-				);
+				name: 'Test-Group-1');
+		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
+		out.csiConfiguration = csiConfiguration
 
-		assertEquals('Test-Group-1 (CSI_AGGREGATION)', out.toString());
+		assertEquals('Test-Group-1 (' + csiConfiguration.ident() + ')', out.toString());
 	}
 
 	@Test
 	public void testToString_SYSTEM_group() {
 		JobGroup out = new JobGroup(
-				name: 'Test-Group-2', groupType: JobGroupType.RAW_DATA_SELECTION
-				);
+				name: 'Test-Group-2');
 
-		assertEquals('Test-Group-2 (RAW_DATA_SELECTION)', out.toString());
+		assertEquals('Test-Group-2', out.toString());
 	}
 }
