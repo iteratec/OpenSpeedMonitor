@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
@@ -167,9 +168,7 @@ class PersistingNewEventResultsTests {
 
 	@Before 
 	void setUp() {
-		
 		serviceUnderTest = service
-
         createTestDataCommonForAllTests()
 		
 		//mocks common for all tests
@@ -1012,5 +1011,8 @@ class PersistingNewEventResultsTests {
 		CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
 		csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages(Page.list())
 		undefinedJobGroup.csiConfiguration = csiConfiguration
+		ServiceMocker mockGenerator = ServiceMocker.create()
+		serviceUnderTest.csiValueService = new CsiValueService()
+		mockGenerator.mockOsmConfigCacheService(serviceUnderTest.csiValueService)
     }
 }
