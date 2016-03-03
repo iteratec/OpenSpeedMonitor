@@ -47,4 +47,8 @@ databaseChangeLog = {
             }
         }
     }
+
+    changeSet(author: "nkuhn (generated)", id: "1457032106256-1") {
+        dropColumn(columnName: "group_type", tableName: "job_group")
+    }
 }
