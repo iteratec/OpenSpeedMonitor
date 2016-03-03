@@ -445,19 +445,19 @@
             initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
 
             doOnDomReady(
-                    'dd.mm.yyyy',
-        ${weekStart},
-                            '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
-                    )
-                    if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
-                        $("#dia-save-chart-as-png").removeClass("btn-primary");
-                        $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
-                        $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
-                        $("#dia-save-chart-as-png").attr( "title", "<g:message
-            code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
-                    }
-                    setAdjustments();
-                });
+                'dd.mm.yyyy',
+                ${weekStart},
+                '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
+            )
+            if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
+                $("#dia-save-chart-as-png").removeClass("btn-primary");
+                $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
+                $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
+                $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
+            }
+            setAdjustments();
+
+        });
     </asset:script>
 </content>
 

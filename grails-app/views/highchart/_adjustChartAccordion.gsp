@@ -68,13 +68,14 @@
                                     code="de.iteratec.ism.ui.button.apply.name"/></button>
                         </div>
                     </div>
-                    %{-- graph aliases --}%
                     <div class="row">
-                        <div class="span2 text-right"><g:message code="de.iteratec.chart.adjustment.aliases" default="aliases"/> <i id="addAliasButton" class="fa fa-plus-circle clickable-icon" onclick="addAlias();"> </i></div>
+                        <div class="span2 text-right">
+                            <g:message code="de.iteratec.chart.adjustment.aliases" default="aliases"/>
+                            <i id="addAliasButton" class="fa fa-plus-circle clickable-icon" onclick="addAlias();"></i>
+                        </div>
 
-                        <div class="span9" id="graphAliasChildlist"/>
+                        <div class="span9" id="graphAliasChildlist"></div>
                     </div>
-
                     <div class="row">
                         <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datamarkers"
                                                                  default="Datenpunkte anzeigen"/></div>
@@ -82,7 +83,6 @@
                         <div class="span9"><g:checkBox id="to-enable-marker" name="toEnableMarker"
                                                        checked="${markerShouldBeEnabled}"/></div>
                     </div>
-
                     <div class="row">
                         <div class="span2 text-right"><g:message code="de.iteratec.isocsi.csi.show.datalabels"
                                                                  default="Datenlabels anzeigen"/></div>
@@ -90,7 +90,6 @@
                         <div class="span9"><g:checkBox id="to-enable-label" name="toEnableLabel"
                                                        checked="${labelShouldBeEnabled}"/></div>
                     </div>
-
                     <div class="row">
                         <div class="span2 text-right"><g:message
                                 code="de.iteratec.isocsi.csi.show.wideScreenDiagramMontage"
