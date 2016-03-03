@@ -138,6 +138,18 @@ class EventResultDashboardController {
         cmd.chartHeight = cmd.chartHeight>0?cmd.chartHeight:configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth>0?cmd.chartWidth:configService.getInitialChartWidthInPixels()
 
+        // get graph aliases
+        if(params.id) {
+            UserspecificEventResultDashboard savedDashboard = UserspecificEventResultDashboard.get(params.id)
+            if(savedDashboard.graphNameAliases.size() > 0) {
+                cmd.graphNameAliases = savedDashboard.graphNameAliases
+            }
+            if(savedDashboard.graphColors.size() > 0) {
+                cmd.graphColors = savedDashboard.graphColors
+            }
+        }
+
+
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
@@ -244,7 +256,8 @@ class EventResultDashboardController {
                 overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
                 includeCustomConnectivity: dashboardValues.includeCustomConnectivity, includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
                 selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles, chartTitle: dashboardValues.chartTitle?:"",
-                loadTimeMaximum: dashboardValues.loadTimeMaximum?:"auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers)
+                loadTimeMaximum: dashboardValues.loadTimeMaximum?:"auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
+                graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
 
         // Parse IntegerValues if they exist
         if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()

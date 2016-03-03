@@ -205,6 +205,11 @@ class UserspecificCsiDashboard {
     int chartWidth
     int chartHeight
     int loadTimeMinimum
+
+    // If map is not specified, it acts as a string/string mapping (gorm default)
+    Map graphNameAliases = [:]
+    Map graphColors = [:]
+
     /**
      * The maximum load time could be set to 'auto', so we handle it as a string
      */
@@ -272,6 +277,8 @@ class UserspecificCsiDashboard {
         selectedAllMeasuredEvents = cmd.selectedAllMeasuredEvents
         selectedAllBrowsers = cmd.selectedAllBrowsers
         selectedAllLocations = cmd.selectedAllLocations
+        graphNameAliases = cmd.graphNameAliases
+        graphColors = cmd.graphColors
 
         // Create strings for db
         String selectedFolderString = ""

@@ -23,7 +23,7 @@
 </g:if>
 <g:else>
 	<iteratec:multipleAxisChart
-        data="${eventResultValues}"
+        data="${chartData}"
         title="${chartTitle}"
 		labelSummary="${labelSummary}"
 		lineType="${selectedCharttypeForHighchart}"

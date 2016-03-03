@@ -1,9 +1,11 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MvQueryParams
+import grails.converters.JSON
 import grails.validation.Validateable
 import org.joda.time.DateTime
 import org.joda.time.Interval
@@ -213,6 +215,9 @@ public class CsiDashboardShowAllCommand {
     int chartWidth
     int chartHeight
     int loadTimeMinimum
+    // If map is not specified, it acts as a string/string mapping (gorm default)
+    Map graphNameAliases = [:]
+    Map graphColors = [:]
     /**
      * The maximum load time could be set to 'auto', so we handle it as a string
      */
@@ -343,7 +348,7 @@ public class CsiDashboardShowAllCommand {
 
         })
 
-        selectedCsiSystems(nullable: false, validator: {Collection currentCollection, CsiDashboardShowAllCommand cmd ->
+        selectedCsiSystems(nullable: false, validator: { Collection currentCollection, CsiDashboardShowAllCommand cmd ->
             boolean correctBecauseHourlyEventAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.HOURLY_MEASURED_EVENT)
             boolean correctBecausePageAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_PAGE)
             boolean correctBecauseShopAggregator = cmd.aggrGroupAndInterval.equals(CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP) || cmd.aggrGroupAndInterval.equals(CsiDashboardController.DAILY_AGGR_GROUP_SHOP)
@@ -353,8 +358,8 @@ public class CsiDashboardShowAllCommand {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiSystems']
             }
         })
-        csiTypeVisuallyComplete(validator: {boolean b , CsiDashboardShowAllCommand cmd ->
-            if(!(cmd.csiTypeDocComplete || cmd.csiTypeVisuallyComplete) ){
+        csiTypeVisuallyComplete(validator: { boolean b, CsiDashboardShowAllCommand cmd ->
+            if (!(cmd.csiTypeDocComplete || cmd.csiTypeVisuallyComplete)) {
                 return ['de.iteratec.isocsi.CsiDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedCsiType']
             }
         })
@@ -514,8 +519,10 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('showDataMarkers', this.showDataMarkers)
         viewModelToCopyTo.put('loadTimeMaximum', this.loadTimeMaximum)
         viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
-        viewModelToCopyTo.put('csiTypeVisuallyComplete',this.csiTypeVisuallyComplete)
-        viewModelToCopyTo.put('csiTypeDocComplete',this.csiTypeDocComplete)
+        viewModelToCopyTo.put('csiTypeVisuallyComplete', this.csiTypeVisuallyComplete)
+        viewModelToCopyTo.put('csiTypeDocComplete', this.csiTypeDocComplete)
+        viewModelToCopyTo.put('graphNameAliases', this.graphNameAliases as JSON)
+        viewModelToCopyTo.put('graphColors', this.graphColors as JSON)
     }
 
     /**

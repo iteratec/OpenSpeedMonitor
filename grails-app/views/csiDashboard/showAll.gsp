@@ -146,7 +146,8 @@
                                            default="Aggregator"/></legend>
 
                         <div>
-                            <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}" values="${aggrGroupValues}"
+                            <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
+                                          values="${aggrGroupValues}"
                                           value="${aggrGroupAndInterval}">
                                 <p>${it.radio} <g:message code="${it.label}"/></p>
                             </g:radioGroup>
@@ -177,6 +178,7 @@
                     </legend>
                 </div>
             </div>
+
             <div class="row">
                 <div class="span4" id="filter-navtab-csiSystem">
                     <div style="padding-top: 60px;"></div>
@@ -193,88 +195,95 @@
             </div>
             <g:render template="/eventResultDashboard/selectMeasurings"
                       model="[
-                              'locationsOfBrowsers'            : locationsOfBrowsers,
-                              'eventsOfPages'                  : eventsOfPages,
-                              'folders'                        : folders,
-                              'selectedFolder'                 : selectedFolder,
-                              'pages'                          : pages,
-                              'selectedPages'                  : selectedPages,
-                              'measuredEvents'                 : measuredEvents,
-                              'selectedAllMeasuredEvents'      : selectedAllMeasuredEvents,
-                              'selectedMeasuredEvents'         : selectedMeasuredEvents,
-                              'browsers'                       : browsers,
-                              'selectedBrowsers'               : selectedBrowsers,
-                              'selectedAllBrowsers'            : selectedAllBrowsers,
-                              'locations'                      : locations,
-                              'selectedLocations'              : selectedLocations,
-                              'selectedAllLocations'           : selectedAllLocations,
-                              'connectivityProfiles'           : connectivityProfiles,
-                              'selectedConnectivityProfiles'   : selectedConnectivityProfiles,
-                              'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles,
+                              'locationsOfBrowsers'             : locationsOfBrowsers,
+                              'eventsOfPages'                   : eventsOfPages,
+                              'folders'                         : folders,
+                              'selectedFolder'                  : selectedFolder,
+                              'pages'                           : pages,
+                              'selectedPages'                   : selectedPages,
+                              'measuredEvents'                  : measuredEvents,
+                              'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
+                              'selectedMeasuredEvents'          : selectedMeasuredEvents,
+                              'browsers'                        : browsers,
+                              'selectedBrowsers'                : selectedBrowsers,
+                              'selectedAllBrowsers'             : selectedAllBrowsers,
+                              'locations'                       : locations,
+                              'selectedLocations'               : selectedLocations,
+                              'selectedAllLocations'            : selectedAllLocations,
+                              'connectivityProfiles'            : connectivityProfiles,
+                              'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
+                              'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
                               'showExtendedConnectivitySettings': false]"/>
             <div style="clear:both;"></div>
+
             <div class="row">
                 <div class="span12">
                     <legend>
                         <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
                     </legend>
-                <div class="span12">
-                    <div class="control-group">
-                        <div class="controls">
-                            <label class="checkbox" for="csiTypeDocComplete">
-                                <input type="checkbox"  name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if test="${csiTypeDocComplete||(!csiTypeDocComplete&&!csiTypeVisuallyComplete)}">
-                                    checked
-                                </g:if>/>
-                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
-                            </label>
-                            <label class="checkbox" for="csiTypeVisuallyComplete">
-                                <input type="checkbox"  name="csiTypeVisuallyComplete" id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
-                                checked
-                                </g:if>/>
-                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
-                            </label>
+
+                    <div class="span12">
+                        <div class="control-group">
+                            <div class="controls">
+                                <label class="checkbox" for="csiTypeDocComplete">
+                                    <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
+                                            test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
+                                        checked
+                                    </g:if>/>
+                                    &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
+                                </label>
+                                <label class="checkbox" for="csiTypeVisuallyComplete">
+                                    <input type="checkbox" name="csiTypeVisuallyComplete"
+                                           id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
+                                        checked
+                                    </g:if>/>
+                                    &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <p>
-                <g:actionSubmit id="chart-submit"
-                                value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                                action="showAll" class="btn btn-primary" style="margin-top: 16px;"/>
-                <g:actionSubmit
-                        value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
-                        action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;"/>
-                <sec:ifLoggedIn>
-                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                        <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
-                           data-toggle="modal"
-                           style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-                    </sec:ifAnyGranted>
-                </sec:ifLoggedIn>
-                <g:if test="${params.id}">
-                    <g:if test="${userspecificCSIDashboardService.isCurrentUserDashboardOwner(params.bid)}">
-                        <g:render template="/_common/modals/deleteCustomDashboard"/>
+
+                <p>
+                    <g:actionSubmit id="chart-submit"
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
+                                    action="showAll" class="btn btn-primary" style="margin-top: 16px;"/>
+                    <g:actionSubmit
+                            value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
+                            action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;"/>
+                    <sec:ifLoggedIn>
+                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                            <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
+                               data-toggle="modal"
+                               style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
+                        </sec:ifAnyGranted>
+                    </sec:ifLoggedIn>
+                    <g:if test="${params.id}">
+                        <g:if test="${userspecificCSIDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                            <g:render template="/_common/modals/deleteCustomDashboard"/>
+                        </g:if>
                     </g:if>
+                </p>
+                <g:if test="${exceedsTimeframeBoundary}">
+                    <g:if test="${selectedInterval.intervalInMinutes == 60}">
+                        <p class="text-error"><g:message
+                                code="de.iteratec.isocsi.csi.timeframe.boundary.hourly.exceeded"
+                                default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                    </g:if>
+                    <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
+                        <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
+                                                         default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                    </g:elseif>
+                    <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
+                        <p class="text-error"><g:message
+                                code="de.iteratec.isocsi.csi.timeframe.boundary.weekly.exceeded"
+                                default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                    </g:elseif>
+                    <g:else>
+                        <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
+                                                         default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                    </g:else>
                 </g:if>
-            </p>
-            <g:if test="${exceedsTimeframeBoundary}">
-                <g:if test="${selectedInterval.intervalInMinutes == 60}">
-                    <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.hourly.exceeded"
-                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:if>
-                <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
-                    <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
-                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:elseif>
-                <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
-                    <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.weekly.exceeded"
-                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:elseif>
-                <g:else>
-                    <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
-                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                </g:else>
-            </g:if>
         </form>
     </div>
 </div>
@@ -346,8 +355,8 @@
                                   optimizeForExport            : 'false',
                                   openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
                                   annotations                  : annotations,
-                                  labelSummary                 : labelSummary
-                                  ]"/>
+                                  labelSummary                 : labelSummary,
+                          ]"/>
             </div>
         </div>
         <%-- table --%>
@@ -413,7 +422,9 @@
             var loadTimeMaximum = "${loadTimeMaximum}";
             var showDataMarkers = "${showDataMarkers}";
             var showDataLabels = "${showDataLabels}";
-            var optimizeForWideScreen = "${showDataLabels}"
+            var optimizeForWideScreen = "${showDataLabels}";
+            var graphNameAliases = ${graphNameAliases};
+            var graphColors = ${graphColors}
             $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);
@@ -425,6 +436,8 @@
             if(eval(showDataLabels)){
                 $("#to-enable-label").click();
             }
+            initGraphNameAliases(graphNameAliases);
+            initGraphColors(graphColors);
         }
 
         $(document).ready(function(){

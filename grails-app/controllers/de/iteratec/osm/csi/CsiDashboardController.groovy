@@ -246,8 +246,19 @@ class CsiDashboardController {
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-        cmd.copyRequestDataToViewModelMap(modelToRender)
 
+        // get graph aliases
+        if(params.id) {
+            UserspecificCsiDashboard savedDashboard = UserspecificCsiDashboard.get(params.id)
+            if(savedDashboard.graphNameAliases.size() > 0) {
+                cmd.graphNameAliases = savedDashboard.graphNameAliases
+            }
+            if(savedDashboard.graphColors.size() > 0) {
+                cmd.graphColors = savedDashboard.graphColors
+            }
+        }
+
+        cmd.copyRequestDataToViewModelMap(modelToRender)
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
         if (!ControllerUtils.isEmptyRequest(params)) {
             if (!cmd.validate()) {
@@ -724,7 +735,6 @@ class CsiDashboardController {
      * @return nothing , immediately sends HTTP response codes to client.
      */
     def validateAndSaveDashboardValues(String values) {
-
         JSONObject dashboardValues = JSON.parse(values)
 
         String dashboardName = dashboardValues.dashboardName
@@ -758,7 +768,8 @@ class CsiDashboardController {
                 includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
                 chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
                 showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
-                csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete)
+                csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete,
+                graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()

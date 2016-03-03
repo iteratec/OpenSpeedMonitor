@@ -422,7 +422,7 @@
             <div class="span12 well">
                 <g:render template="/highchart/chart"
                           model="[
-                                  chartData                    : wptCustomerSatisfactionValues,
+                                  chartData                    : eventResultValues,
                                   chartTitle                   : chartTitle,
                                   yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
                                   initialChartWidth            : chartWidth,
@@ -482,11 +482,16 @@
             var showDataMarkers = "${showDataMarkers}";
             var showDataLabels = "${showDataLabels}";
             var optimizeForWideScreen = "${showDataLabels}"
+            var graphNameAliases = ${graphNameAliases}
+            var graphColors = ${graphColors}
             $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
             $("#dia-y-axis-min").val(loadTimeMinimum);
+            initGraphNameAliases(graphNameAliases);
+            initGraphColors(graphColors);
+
             if(eval(showDataMarkers)){
                 $("#to-enable-marker").click();
             }

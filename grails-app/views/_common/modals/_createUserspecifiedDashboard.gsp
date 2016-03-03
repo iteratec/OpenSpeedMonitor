@@ -46,7 +46,7 @@
 </div>
 <asset:script type="text/javascript">
 
-    function startSpinner(spinnerElement){
+    function startSpinner(spinnerElement) {
         var opts = {
             lines: 15, // The number of lines to draw
             length: 20, // The length of each line
@@ -67,13 +67,13 @@
         };
         return new Spinner(opts).spin(spinnerElement);
     }
-    function hideMessages(){
-        $( "#saveDashboardSuccessDiv" ).hide();
-        $( "#saveDashboardErrorDiv" ).hide();
-        $( "#validateDashboardNameErrorDiv" ).hide();
+    function hideMessages() {
+        $("#saveDashboardSuccessDiv").hide();
+        $("#saveDashboardErrorDiv").hide();
+        $("#validateDashboardNameErrorDiv").hide();
     }
 
-    function saveCustomDashboard(){
+    function saveCustomDashboard() {
 
         hideMessages()
 
@@ -88,30 +88,29 @@
             arrayData = $('#dashBoardParamsForm').serializeArray();
             objectData = {};
 
-            $.each(arrayData, function() {
-              var value;
+            $.each(arrayData, function () {
+                var value;
 
-              if (this.value != null) {
-                value = this.value;
-              } else {
-                value = '';
-              }
-
-              if (objectData[this.name] != null) {
-                if (!objectData[this.name].push) {
-                  objectData[this.name] = [objectData[this.name]];
+                if (this.value != null) {
+                    value = this.value;
+                } else {
+                    value = '';
                 }
 
-                objectData[this.name].push(value);
-              } else {
-                objectData[this.name] = value;
-              }
+                if (objectData[this.name] != null) {
+                    if (!objectData[this.name].push) {
+                        objectData[this.name] = [objectData[this.name]];
+                    }
+
+                    objectData[this.name].push(value);
+                } else {
+                    objectData[this.name] = value;
+                }
             });
 
             objectData["dashboardName"] = dashboardName;
             objectData["publiclyVisible"] = document.getElementById("publiclyVisibleFromModal").checked;
             objectData["wideScreenDiagramMontage"] = $("#wide-screen-diagram-montage").is(':checked');
-            console.log(objectData["wideScreenDiagramMontage"]);
             objectData["chartTitle"] = $("#dia-title").val();
             objectData["chartWidth"] = $("#dia-width").val();
             objectData["chartHeight"] = $("#dia-height").val();
@@ -122,12 +121,31 @@
             objectData["csiTypeDocComplete"] = $("#csiTypeDocComplete").is(':checked');
             objectData["csiTypeVisuallyComplete"] = $("#csiTypeVisuallyComplete").is(':checked');
 
+            var aliases = {};
+            var colors = {};
+            $(".graphAlias-div").each(function () {
+                var id = $(this).attr("id");
+                if (id != "graphAlias_clone") {
+                    var name = $(this).find("#graphName").val();
+                    var alias = $(this).find("#alias").val();
+                    var color = $(this).find("#color").val();
+                    aliases[name] = alias;
+                    // ignore white color
+                    if (color != "#FFFFFF" && color != "#ffffff") {
+                        colors[name] = color;
+                    }
+                }
+            });
+
+            objectData["graphAliases"] = aliases;
+            objectData["graphColors"] = colors;
+
             json_data = JSON.stringify(objectData);
 
             $.ajax({
                 type: 'POST',
                 url: '${createLink(action: 'validateAndSaveDashboardValues', absolute: true)}',
-                data: { values: json_data},
+                data: {values: json_data},
                 statusCode: {
                     200: function (response) {
                         $("#saveDashboardSuccessDiv").show();
@@ -146,35 +164,35 @@
                         return false;
                     },
                     500: function (response) {
-                        $( "#saveDashboardErrorDiv" ).show();
+                        $("#saveDashboardErrorDiv").show();
                         document.all.saveDashboardErrorDiv.innerHTML = "${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.error.save', default: 'An error occured while saving - please try again!')}";
                         $('#CreateUserspecifiedDashboardModal').modal('hide');
                         window.scrollTo(0, 0);
                         return false;
                     },
                     302: function (response) {
-                        $( "#validateDashboardNameErrorDiv" ).show();
+                        $("#validateDashboardNameErrorDiv").show();
                         document.all.validateDashboardNameErrorDiv.innerHTML = "${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.error.uniqueness', default: 'Please enter a unique name.')}";
                         window.scrollTo(0, 0);
                         return false;
                     }
                 },
-                success : function(data) {
+                success: function (data) {
                     $('#CreateUserspecifiedDashboardModal').modal('hide');
                     spinner.stop();
                     window.scrollTo(0, 0);
                     return false;
                 },
-                error: function(result) {
+                error: function (result) {
                     spinner.stop();
                     window.scrollTo(0, 0);
                     return false;
                 }
             });
-      } else {
-        $( "#validateDashboardNameErrorDiv" ).show();
-        document.all.validateDashboardNameErrorDiv.innerHTML = "${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.error.missing', default: 'Please enter a non-empty name.')}";
-        return false;
-      }
+        } else {
+            $("#validateDashboardNameErrorDiv").show();
+            document.all.validateDashboardNameErrorDiv.innerHTML = "${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.error.missing', default: 'Please enter a non-empty name.')}";
+            return false;
+        }
     }
 </asset:script>
