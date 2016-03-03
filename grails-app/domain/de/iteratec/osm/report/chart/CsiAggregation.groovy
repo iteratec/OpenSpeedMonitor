@@ -284,11 +284,6 @@ class CsiAggregation implements CsiValue {
     }
 
     @Override
-    public boolean isCsiRelevant(){
-        return this.isCalculated() && this.csByWptDocCompleteInPercent != null
-    }
-
-    @Override
     public Double retrieveCsByWptDocCompleteInPercent() {
         return csByWptDocCompleteInPercent
     }

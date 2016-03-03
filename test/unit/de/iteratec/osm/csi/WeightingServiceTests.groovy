@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
@@ -27,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -63,6 +66,7 @@ class WeightingServiceTests {
     @Before
     void setUp() {
         serviceUnderTest = service
+        serviceUnderTest.csiValueService = new CsiValueService()
         mocksCommonToAllTests()
         createTestDataCommonToAllTests()
     }
@@ -259,13 +263,6 @@ class WeightingServiceTests {
                 jobResultDate: SHOULD_BE_MAPPED_TO_FIVE_A_CLOCK_PM.toDate(),
                 docCompleteTimeInMillisecs: 1000,
                 connectivityProfile: connectivityProfile_70).save(validate: false)
-
-        eventResultWeightFiftyTwoAm.metaClass.isCsiRelevant = { ->
-            return true
-        }
-        eventResultWeightSeventyFivePm.metaClass.isCsiRelevant = { ->
-            return true
-        }
 
         //test specific mocks
         mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, this.page_50, this.page_70)
@@ -568,22 +565,6 @@ class WeightingServiceTests {
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
 
-        csiAggregationWithVisuallyComplete1.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithVisuallyComplete2.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithVisuallyComplete3.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
-            return true
-        }
-
         mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
         // execution
@@ -651,22 +632,6 @@ class WeightingServiceTests {
                 connectivityProfile: connectivityProfile_70,
                 underlyingEventResultsByVisuallyComplete: "1L,2L"
         )
-
-        csiAggregationWithVisuallyComplete1.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithVisuallyComplete2.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithVisuallyComplete3.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithoutVisuallyComplete1.metaClass.isCsiRelevant = {
-            return true
-        }
-        csiAggregationWithoutVisuallyComplete2.metaClass.isCsiRelevant = {
-            return true
-        }
 
         mockCsiAggregationTagService(browserToReturn_50, browserToReturn_70, page_50, page_70)
 
@@ -755,10 +720,13 @@ class WeightingServiceTests {
         mockCustomerSatisfactionWeightService()
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
         // into the domain EventResult injected service csiConfigCacheService would be null so we have to use metaclass to implement isCsiRelevant()-method for tests
-        EventResult.metaClass.isCsiRelevant = { ->
+        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = {CsiValue csiValue ->
             return true
         }
-        CsiAggregation.metaClass.isCsiRelevant = { ->
+        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = {CsiAggregation csiValue ->
+            return true
+        }
+        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = {EventResult csiValue ->
             return true
         }
     }

@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -75,6 +76,7 @@ class LocationAndResultPersisterService implements iListener{
 	ConfigService configService
     PerformanceLoggingService performanceLoggingService
     ConnectivityProfileService connectivityProfileService
+	CsiValueService csiValueService
 
 
     /**
@@ -459,7 +461,7 @@ class LocationAndResultPersisterService implements iListener{
 	
 	void informDependentCsiAggregations(EventResult result){
 		try{
-			if (result.isCsiRelevant()) {
+			if (csiValueService.isCsiRelevant(result)) {
 				csiAggregationUpdateService.createOrUpdateDependentMvs(result)
 			}
 		}catch(Exception e){

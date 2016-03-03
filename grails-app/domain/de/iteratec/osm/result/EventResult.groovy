@@ -248,18 +248,6 @@ class EventResult implements CsiValue {
 
 	static transients = ['csiRelevant', 'osmConfigCacheService']
 
-	/**
-	 * <b>note:</b> This method is surrogated through groovy-metaclass in unit-tests. If this method has to be changed the analogical implementations in tests has to be updated respectively!
-	 * @see HemvCalculationTests
-	 */
-	@Override
-	public boolean isCsiRelevant() {
-		return this.csByWptDocCompleteInPercent && this.docCompleteTimeInMillisecs &&
-				(this.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
-					this.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
-				jobResult.job.jobGroup.csiConfiguration != null
-	}
-
 	@Override
 	public Double retrieveCsByWptDocCompleteInPercent() {
 		return csByWptDocCompleteInPercent

@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.Contract
 import de.iteratec.osm.result.CsiAggregationTagService
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import org.joda.time.DateTime
@@ -38,6 +39,7 @@ class WeightingService {
     CsiAggregationTagService csiAggregationTagService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
     PerformanceLoggingService performanceLoggingService
+    CsiValueService csiValueService
 
     /**
      * Weights all csiValues respective given weightFactors. Delivers a list of all {@link de.iteratec.osm.csi.weighting.WeightedCsiValue}s.
@@ -47,7 +49,7 @@ class WeightingService {
      * @return
      */
     public List<WeightedCsiValue> getWeightedCsiValues(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
-        List<CsiValue> csiRelevantValues = csiValues.findAll { it.isCsiRelevant() }
+        List<CsiValue> csiRelevantValues = csiValues.findAll { csiValueService.isCsiRelevant(it) }
 
         return getWeightedAndFlattenedCsiValues(csiRelevantValues, weightFactors, csiConfiguration, {CsiValue value -> value.retrieveCsByWptDocCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete()})
     }
@@ -59,7 +61,7 @@ class WeightingService {
      * @return
      */
     public List<WeightedCsiValue> getWeightedCsiValues(List<CsiValue> csiValues, CsiSystem csiSystem) {
-        List<CsiValue> csiRelevantValues = csiValues.findAll { it.isCsiRelevant() }
+        List<CsiValue> csiRelevantValues = csiValues.findAll { csiValueService.isCsiRelevant(it) }
 
         return getWeightedAndFlattenedCsiValuesForCsiSystem(csiRelevantValues, csiSystem, {CsiValue value -> value.retrieveCsByWptDocCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete()})
     }
@@ -72,7 +74,7 @@ class WeightingService {
      */
     public List<WeightedCsiValue> getWeightedCsiValuesByVisuallyComplete(List<CsiValue> csiValues, CsiSystem csiSystem) {
         List<CsiValue> mvsWithVisuallyCompleteValue = csiValues.findAll {
-            it.retrieveCsByWptVisuallyCompleteInPercent() != null && it.isCsiRelevant()
+            it.retrieveCsByWptVisuallyCompleteInPercent() != null && csiValueService.isCsiRelevant(it)
         }
 
         return getWeightedAndFlattenedCsiValuesForCsiSystem(mvsWithVisuallyCompleteValue, csiSystem, {CsiValue value -> value.retrieveCsByWptVisuallyCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByVisuallyComplete()})
@@ -87,7 +89,7 @@ class WeightingService {
      */
     List<WeightedCsiValue> getWeightedCsiValuesByVisuallyComplete(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
         List<CsiValue> mvsWithVisuallyCompleteValue = csiValues.findAll {
-            it.retrieveCsByWptVisuallyCompleteInPercent() != null && it.isCsiRelevant()
+            it.retrieveCsByWptVisuallyCompleteInPercent() != null && csiValueService.isCsiRelevant(it)
         }
 
         return getWeightedAndFlattenedCsiValues(mvsWithVisuallyCompleteValue, weightFactors, csiConfiguration, {CsiValue value -> value.retrieveCsByWptVisuallyCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByVisuallyComplete()})

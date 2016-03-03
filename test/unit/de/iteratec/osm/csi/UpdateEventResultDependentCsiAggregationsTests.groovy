@@ -19,6 +19,8 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -32,6 +34,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
@@ -107,6 +110,9 @@ class UpdateEventResultDependentCsiAggregationsTests {
 			idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests,
 			idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests
         )
+		serviceUnderTest.csiValueService = new CsiValueService()
+		serviceUnderTest.csiValueService.osmConfigCacheService = new OsmConfigCacheService()
+		serviceUnderTest.csiValueService.osmConfigCacheService.configService = new ConfigService()
 		createTestDataForAllTests()
 		initializeFields()
 

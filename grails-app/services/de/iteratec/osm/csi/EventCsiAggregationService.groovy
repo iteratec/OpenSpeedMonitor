@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.result.CsiValueService
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
@@ -52,6 +53,7 @@ class EventCsiAggregationService {
 	WeightingService weightingService
 	MeanCalcService meanCalcService
 	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+	CsiValueService csiValueService
 	
 	/**
 	 * Just gets CsiAggregations from DB. No creation or calculation.
@@ -175,7 +177,7 @@ class EventCsiAggregationService {
 		Integer countUnderlyingEventResultsByWptVisuallyComplete = toBeCalculated.underlyingEventResultsByVisuallyComplete.size()
 		Double newCsByWptDocCompleteInPercent
 		Double newCsByWptVisuallyCompleteInPercent
-		if(newResult.isCsiRelevant()){
+		if(csiValueService.isCsiRelevant(newResult)){
 			// add value for csByDocComplete
 			if(!toBeCalculated.containsInUnderlyingEventResultsByWptDocComplete(newResult.ident())) {
 				if (countUnderlyingEventResultsByWptDocComplete > 0 && newResult.csByWptDocCompleteInPercent != null) {
