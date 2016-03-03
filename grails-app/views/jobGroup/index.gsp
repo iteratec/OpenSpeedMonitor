@@ -25,14 +25,19 @@
 					<tr>
 					
 						<g:sortableColumn property="name" title="${message(code: 'jobGroup.name.label', default: 'Name')}" />
-					
-					</tr>
+
+                        <g:sortableColumn property="csiConfiguration" title="${message(code: 'de.iteratec.osm.csi.configuration.label', default: 'CSI Configuration')}" />
+
+
+                    </tr>
 				</thead>
 				<tbody>
 				<g:each in="${jobGroupInstanceList}" status="i" var="jobGroupInstance">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
 						<td><g:link action="show" id="${jobGroupInstance.id}">${fieldValue(bean: jobGroupInstance, field: "name")}</g:link></td>
+
+                        <td>${fieldValue(bean: jobGroupInstance, field: "csiConfiguration")}</td>
 					
 					</tr>
 				</g:each>
