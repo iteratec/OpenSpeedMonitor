@@ -26,8 +26,6 @@
 					
 						<g:sortableColumn property="name" title="${message(code: 'jobGroup.name.label', default: 'Name')}" />
 					
-						<g:sortableColumn property="groupType" title="${message(code: 'jobGroup.groupType.label', default: 'Group Type')}" />
-					
 					</tr>
 				</thead>
 				<tbody>
@@ -35,8 +33,6 @@
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
 						<td><g:link action="show" id="${jobGroupInstance.id}">${fieldValue(bean: jobGroupInstance, field: "name")}</g:link></td>
-					
-						<td>${fieldValue(bean: jobGroupInstance, field: "groupType")}</td>
 					
 					</tr>
 				</g:each>

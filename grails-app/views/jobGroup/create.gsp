@@ -38,22 +38,7 @@
 		$(document).ready(function() {
 
             $("ul[name='tags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags', absolute: true)}'});
-
-            changeCsiConfigurationSelectionStatus();
-
-            $("#groupTypeSelection").change(function () {
-                changeCsiConfigurationSelectionStatus();
-            })
         });
-
-        function changeCsiConfigurationSelectionStatus() {
-            if ($("select[name=groupType]").serialize() == 'groupType=CSI_AGGREGATION') {
-                $("#csiConfigurationSelection").children().prop('disabled', false);
-            } else {
-                $("#csiConfigurationSelection").children().prop('disabled', true);
-                $("select[name=csiConfiguration]").val('null');
-            }
-        }
 	</asset:script>
 </content>
 		

@@ -34,7 +34,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'groupType', 'error')}">
+<div class="control-group fieldcontain">
     <label for="csiConfiguration" class="control-label"><g:message code="jobGroup.csi_configuration.label"
                                                                    default="CSI Configuration"/></label>
 

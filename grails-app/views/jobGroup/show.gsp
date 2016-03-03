@@ -157,13 +157,6 @@
         </tr>
 
         <tr class="prop">
-            <td valign="top" class="name"><g:message code="jobGroup.groupType.label" default="Group Type"/></td>
-
-            <td valign="top" class="value">${jobGroupInstance?.groupType?.encodeAsHTML()}</td>
-
-        </tr>
-
-        <tr class="prop">
             <td valign="top" class="name"><g:message code="jobGroup.graphiteServers.label"
                                                      default="Graphite Servers"/></td>
 
@@ -181,7 +174,7 @@
         <g:if test="${jobGroupInstance.csiConfiguration}">
 
             <tr class="prop">
-                <td valign="top" class="name"><g:message code="jobGroup.groupType.label"
+                <td valign="top" class="name"><g:message code="jobGroup.csiConfiguration.label"
                                                          default="Csi Configuration"/></td>
                 <td>${selectedCsiConfiguration.label} <br/><br/>
                     <g:if test="${jobGroupInstance.csiConfiguration}">
