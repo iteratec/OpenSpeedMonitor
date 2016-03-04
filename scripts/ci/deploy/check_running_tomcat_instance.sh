@@ -32,9 +32,9 @@ if [ ${#ports[*]} -eq 0 ];
     then
       export PORT_TO_UNDEPLOY=${ports[0]}
       ((PORT_TO_DEPLOY=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_PORT2 : $bamboo_tomcat_TOMCAT_PORT1 ))
-      ((TOMCAT_SERVER_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $TOMCAT_SERVER_PORT2 : $bamboo_tomcat_TOMCAT_SERVER_PORT1 ))
-      ((TOMCAT_AJP_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $TOMCAT_AJP_PORT2 : $bamboo_tomcat_TOMCAT_AJP_PORT1 ))
-      ((TOMCAT_TLS_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $TOMCAT_TLS_PORT2 : $bamboo_tomcat_TOMCAT_TLS_PORT1 ))
+      ((TOMCAT_SERVER_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_SERVER_PORT2 : $bamboo_tomcat_TOMCAT_SERVER_PORT1 ))
+      ((TOMCAT_AJP_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_AJP_PORT2 : $bamboo_tomcat_TOMCAT_AJP_PORT1 ))
+      ((TOMCAT_TLS_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_TLS_PORT2 : $bamboo_tomcat_TOMCAT_TLS_PORT1 ))
       export PORT_TO_DEPLOY
       export TOMCAT_SERVER_PORT_TO_WAIT_FOR
       export TOMCAT_AJP_PORT_TO_WAIT_FOR
