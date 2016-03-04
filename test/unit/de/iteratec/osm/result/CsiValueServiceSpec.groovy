@@ -75,17 +75,21 @@ class CsiValueServiceSpec {
     @Test
     void testEventResultMaxDocCompleteTime(){
         eventResult.docCompleteTimeInMillisecs = maxDocComplete
-        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
+        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
         eventResult.docCompleteTimeInMillisecs = maxDocComplete-1
         assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
+        eventResult.docCompleteTimeInMillisecs = maxDocComplete+1
+        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
     }
 
     @Test
     void testEventResultMinDocCompleteTime(){
         eventResult.docCompleteTimeInMillisecs = minDocComplete
-        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
+        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
         eventResult.docCompleteTimeInMillisecs = minDocComplete+1
         assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
+        eventResult.docCompleteTimeInMillisecs = minDocComplete-1
+        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
     }
 
     @Test

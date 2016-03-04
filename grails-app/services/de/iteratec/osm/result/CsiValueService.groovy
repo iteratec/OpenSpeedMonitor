@@ -47,8 +47,8 @@ class CsiValueService {
 
     public boolean isCsiRelevant(EventResult eventResult) {
         return eventResult.csByWptDocCompleteInPercent && eventResult.docCompleteTimeInMillisecs &&
-                (eventResult.docCompleteTimeInMillisecs > osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
-                        eventResult.docCompleteTimeInMillisecs < osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
+                (eventResult.docCompleteTimeInMillisecs >= osmConfigCacheService.getCachedMinDocCompleteTimeInMillisecs(24) &&
+                        eventResult.docCompleteTimeInMillisecs <= osmConfigCacheService.getCachedMaxDocCompleteTimeInMillisecs(24)) &&
                 eventResult.jobResult.job.jobGroup.csiConfiguration != null
     }
 
