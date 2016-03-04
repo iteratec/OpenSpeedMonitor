@@ -3,6 +3,7 @@
 # configure_deployment_*.sh-script must be run in front of this script
 # else variables will be missing
 #################
+properties_file="./deploy.properties"
 
 # make external config file available as env variable
 bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE="credentials/$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE"
@@ -28,6 +29,11 @@ if [ ${#ports[*]} -eq 0 ];
       export TOMCAT_AJP_PORT_TO_WAIT_FOR=$bamboo_tomcat_TOMCAT_AJP_PORT1
       export TOMCAT_TLS_PORT_TO_WAIT_FOR=$bamboo_tomcat_TOMCAT_TLS_PORT1
       export PORT_TO_UNDEPLOY=-1
+      
+      echo "$PORT_TO_DEPLOY" >> $properties_file
+      echo "$TOMCAT_SERVER_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "$TOMCAT_AJP_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "$TOMCAT_TLS_PORT_TO_WAIT_FOR" >> $properties_file
   elif [ ${#ports[*]} -eq 1 ];
     then
       export PORT_TO_UNDEPLOY=${ports[0]}
@@ -35,10 +41,10 @@ if [ ${#ports[*]} -eq 0 ];
       ((TOMCAT_SERVER_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_SERVER_PORT2 : $bamboo_tomcat_TOMCAT_SERVER_PORT1 ))
       ((TOMCAT_AJP_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_AJP_PORT2 : $bamboo_tomcat_TOMCAT_AJP_PORT1 ))
       ((TOMCAT_TLS_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_TLS_PORT2 : $bamboo_tomcat_TOMCAT_TLS_PORT1 ))
-      export PORT_TO_DEPLOY
-      export TOMCAT_SERVER_PORT_TO_WAIT_FOR
-      export TOMCAT_AJP_PORT_TO_WAIT_FOR
-      export TOMCAT_TLS_PORT_TO_WAIT_FOR
+      echo "$PORT_TO_DEPLOY" >> $properties_file
+      echo "$TOMCAT_SERVER_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "$TOMCAT_AJP_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "$TOMCAT_TLS_PORT_TO_WAIT_FOR" >> $properties_file
   else
     echo "OpenSpeedMonitor is deployed on both tomcats"
     exit 1;
