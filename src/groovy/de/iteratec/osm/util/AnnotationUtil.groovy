@@ -31,7 +31,7 @@ class AnnotationUtil {
         Date resetFromDate = timeFrame.getStart().toDate()
         Date resetToDate = timeFrame.getEnd().toDate()
 
-        List<Event> annotationContent = eventService.retrieveEventsByDateRangeAndVisibilityAndJobGroup(resetFromDate, resetToDate, selectedFolder)
+        List<Event> annotationContent = eventService.retrieveEventsByDateRangeAndVisibilityAndJobGroup(resetFromDate, resetToDate, selectedFolder).unique()
         ArrayList<String> annotations = new ArrayList<String>()
 
         annotationContent.eachWithIndex { item, index ->
@@ -45,5 +45,4 @@ class AnnotationUtil {
         modelToRender.put('annotations', annotations)
 
     }
-
 }

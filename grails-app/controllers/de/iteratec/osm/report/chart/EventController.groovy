@@ -44,12 +44,12 @@ class EventController {
 
     def save() {
         combineDateAndTime(params)
-        eventService.saveEvent(params){
-            action.success={ Event eventInstance->
+        eventService.saveEvent(params) {
+            action.success = { Event eventInstance ->
                 flash.message = message(code: 'default.created.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
                 redirect(action: "show", id: eventInstance.id)
             }
-            action.failure={Event eventInstance->
+            action.failure = { Event eventInstance ->
                 render(view: "create", model: [eventInstance: eventInstance])
             }
         }
@@ -59,7 +59,7 @@ class EventController {
     def show() {
         def eventInstance = Event.get(params.id)
         if (!eventInstance) {
-			flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
+            flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
             redirect(action: "list")
             return
         }
@@ -84,11 +84,11 @@ class EventController {
             redirect(action: "list")
             return
         }
-        if (!(params?.jobGroups)) {
-            eventInstance.jobGroups.clear()
-        }
+
+        eventInstance.jobGroups.clear()
         combineDateAndTime(params)
-        eventService.updateEvent(eventInstance, params.clone()){
+
+        eventService.updateEvent(eventInstance, params.clone()) {
             action.success = {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'event.label', default: 'Event'), eventInstance.id])
                 redirect(action: "show", id: eventInstance.id)
@@ -107,12 +107,12 @@ class EventController {
             return
         }
 
-        eventService.deleteEvent(eventInstance){
+        eventService.deleteEvent(eventInstance) {
             action.success = {
                 flash.message = message(code: 'default.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
                 redirect(action: "list")
             }
-            action.failure = {exception->
+            action.failure = { exception ->
                 flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'event.label', default: 'Event'), params.id])
                 redirect(action: "show", id: params.id)
             }
@@ -123,21 +123,21 @@ class EventController {
      * Combines time and date within the param list, where time ist 'time' and date is 'eventDate'
      * @param params
      */
-    private void combineDateAndTime(def params){
+    private void combineDateAndTime(def params) {
         //Convert english date format to german, for passing validation
         //The gsp passes the time and the date separately so we need to combine these two
-        params['eventDate'] = params['eventDate']+" "+params['time']
+        params['eventDate'] = params['eventDate'] + " " + params['time']
         def formatter
         params.remove('time')
         def locale = RequestContextUtils.getLocale(request)
-        switch (locale){
+        switch (locale) {
             case Locale.GERMANY:
             case Locale.GERMAN:
-                formatter =  "dd.MM.yyyy HH:mm"
+                formatter = "dd.MM.yyyy HH:mm"
                 break;
             default:
                 formatter = "yyyy-MM-dd HH:mm"
         }
-        params['eventDate'] = Date.parse(formatter,params['eventDate'] as String)
+        params['eventDate'] = Date.parse(formatter, params['eventDate'] as String)
     }
 }

@@ -478,9 +478,7 @@ class CsiDashboardController {
             Map<String, Object> modelToRender,
             Interval timeFrame,
             Collection<Long> selectedFolder) {
-        CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-        Interval fixedTimeFrame = fixTimeFrame(timeFrame, interval.getIntervalInMinutes())
-        AnnotationUtil.fillWithAnnotations(modelToRender, fixedTimeFrame, selectedFolder, eventService)
+        AnnotationUtil.fillWithAnnotations(modelToRender, timeFrame, selectedFolder, eventService)
     }
 
     /**
