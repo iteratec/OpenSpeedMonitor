@@ -189,7 +189,7 @@
                     </label>
                     <g:select id="folderSelectCsiSystem" class="iteratec-element-select"
                               name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
-                              optionValue="label" value="${selectedCsiSystem}"
+                              optionValue="label" value="${selectedCsiSystems}"
                               multiple="true"/>
                 </div>
             </div>
@@ -402,19 +402,25 @@
 
         var pagesToEvents = [];
         <g:each var="page" in="${pages}">
-            <g:if test="${eventsOfPages[page.id] != null}">
-                pagesToEvents[${page.id}]= [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
-            </g:if>
+        <g:if test="${eventsOfPages[page.id] != null}">
+        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
+        </g:if>
         </g:each>
 
         var browserToLocation = [];
         <g:each var="browser" in="${browsers}">
-            <g:if test="${locationsOfBrowsers[browser.id] != null}">
-                browserToLocation[${browser.id}]=[ <g:each var="location"
-                                                           in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
-            </g:if>
+        <g:if test="${locationsOfBrowsers[browser.id] != null}">
+        browserToLocation[${browser.id}] = [<g:each var="location"
+                                                           in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
+        </g:if>
         </g:each>
-        function setAdjustments(){
+
+        var selectedCsiSystems = [];
+        <g:each var="csiSystem" in="${selectedCsiSystems}">
+            selectedCsiSystems.push(${csiSystem});
+        </g:each>
+
+        function setAdjustments() {
             var chartTitle = "${chartTitle}";
             var chartWidth = "${chartWidth}";
             var chartHeight = "${chartHeight}";
@@ -425,39 +431,40 @@
             var optimizeForWideScreen = "${showDataLabels}";
             var graphNameAliases = ${graphNameAliases};
             var graphColors = ${graphColors}
-            $("#dia-title").val(chartTitle);
+                    $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
             $("#dia-y-axis-min").val(loadTimeMinimum);
-            if(eval(showDataMarkers)){
+            if (eval(showDataMarkers)) {
                 $("#to-enable-marker").click();
             }
-            if(eval(showDataLabels)){
+            if (eval(showDataLabels)) {
                 $("#to-enable-label").click();
             }
             initGraphNameAliases(graphNameAliases);
             initGraphColors(graphColors);
         }
 
-        $(document).ready(function(){
+        $(document).ready(function () {
 
             initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
 
             doOnDomReady(
-                'dd.mm.yyyy',
-                ${weekStart},
-                '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
+                    'dd.mm.yyyy',
+                    ${weekStart},
+                    '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             )
             if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
                 $("#dia-save-chart-as-png").removeClass("btn-primary");
                 $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
-                $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
-                $("#dia-save-chart-as-png").attr( "title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
+                $("#dia-save-chart-as-png").attr("disabled", "disabled");
+                $("#dia-save-chart-as-png").attr("title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>");
             }
             setAdjustments();
 
         });
+
     </asset:script>
 </content>
 

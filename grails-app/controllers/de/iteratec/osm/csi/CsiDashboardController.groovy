@@ -757,13 +757,14 @@ class CsiDashboardController {
         Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues,"selectedMeasuredEventIds")
         Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues,"selectedBrowsers")
         Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues,"selectedLocations")
+        Collection<Long> selectedCsiSystems = customDashboardService.getValuesFromJSON(dashboardValues, "selectedCsiSystems")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
         // Create command vor validation
         CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
                 toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
-                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations,
+                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
                 includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
                 chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",

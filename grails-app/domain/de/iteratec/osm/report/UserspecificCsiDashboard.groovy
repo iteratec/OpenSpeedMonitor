@@ -200,6 +200,11 @@ class UserspecificCsiDashboard {
      */
     String selectedAggrGroupValuesUnCached = ""
 
+    /**
+     * The selected csiSystem Ids
+     */
+    String selectedCsiSystems = ""
+
     //#####Chart Adjustments#####
     String chartTitle
     int chartWidth
@@ -254,6 +259,7 @@ class UserspecificCsiDashboard {
         includeInterval(nullable: true)
         selectedAggrGroupValuesUnCached(nullable: true)
         wideScreenDiagramMontage(nullable: true)
+        selectedCsiSystems(nullable: true)
     }
 
     UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, String publiclyVisible,
@@ -286,6 +292,7 @@ class UserspecificCsiDashboard {
         String selectedMeasuredEventIdsString = ""
         String selectedBrowsersString = ""
         String selectedLocationsString = ""
+        String selectedCsiSystemsString = ""
 
         // generate Strings for db
         cmd.selectedFolder.each {f -> selectedFolderString += f + ","}
@@ -300,12 +307,15 @@ class UserspecificCsiDashboard {
         if(selectedBrowsersString.length() > 0) selectedBrowsersString = selectedBrowsersString.substring(0, selectedBrowsersString.length()-1)
         cmd.selectedLocations.each {f -> selectedLocationsString += f + ","}
         if(selectedLocationsString.length() > 0) selectedLocationsString = selectedLocationsString.substring(0, selectedLocationsString.length()-1)
+        cmd.selectedCsiSystems.each {f -> selectedCsiSystemsString += f + ","}
+        if(selectedCsiSystemsString.length() > 0) selectedCsiSystemsString = selectedCsiSystemsString.substring(0, selectedCsiSystemsString.length()-1)
 
         selectedFolder = selectedFolderString
         selectedPages = selectedPagesString
         selectedMeasuredEventIds = selectedMeasuredEventIdsString
         selectedBrowsers = selectedBrowsersString
         selectedLocations = selectedLocationsString
+        selectedCsiSystems = selectedCsiSystemsString
         chartTitle = cmd.chartTitle
         chartWidth = cmd.chartWidth
         chartHeight = cmd.chartHeight
@@ -405,6 +415,11 @@ class UserspecificCsiDashboard {
                 if ((board.selectedLocations != null) && (board.selectedLocations.size() > 0)) {
                     for (item in board.selectedLocations.tokenize(',')) {
                         link += "&selectedLocations=" + item
+                    }
+                }
+                if ((board.selectedCsiSystems != null) && (board.selectedCsiSystems.size() > 0)) {
+                    for (item in board.selectedCsiSystems.tokenize(',')) {
+                        link += "&selectedCsiSystems=" + item
                     }
                 }
                 link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"

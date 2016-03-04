@@ -495,6 +495,7 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
         viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
         viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
+        viewModelToCopyTo.put('selectedCsiSystems', this.selectedCsiSystems)
 
         viewModelToCopyTo.put('from', this.from)
         if (!this.fromHour.is(null)) {
