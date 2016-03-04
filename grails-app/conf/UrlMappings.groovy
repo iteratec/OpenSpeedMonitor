@@ -148,6 +148,11 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [GET: "translateToCustomerSatisfaction"]
 		}
+		/* Since IT-977 */
+		"/rest/csi/csiConfiguration" {
+			controller = "RestApi"
+			action = [GET: "getCsiConfiguration"]
+		}
 
 		/*
 		 * Following PUT/POST rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by

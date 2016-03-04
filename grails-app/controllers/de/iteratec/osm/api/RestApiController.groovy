@@ -18,6 +18,8 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.api.dto.JsonCsiConfiguration
+import de.iteratec.osm.api.dto.JsonJobGroup
 import de.iteratec.osm.api.json.Result
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
@@ -33,6 +35,7 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.EventDaoService
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
@@ -154,7 +157,8 @@ class RestApiController {
      */
     public Map<String, Object> allSystems() {
         Set<JobGroup> systems = jobGroupDaoService.findCSIGroups();
-        return sendObjectAsJSON(systems, params.pretty && params.pretty == 'true');
+        Set<JsonJobGroup> systemsAsJson= JsonJobGroup.create(systems)
+        render systemsAsJson as JSON
     }
 
     /**
@@ -437,6 +441,27 @@ class RestApiController {
                 ]
         return sendObjectAsJSON(
                 objectToSend += visualizingLinks,
+                params.pretty && params.pretty == 'true'
+        )
+    }
+
+    /**
+     * Gets csiConfiguration by id as JSON.
+     * @param id
+     * @return
+     */
+    public Map<String, Object> getCsiConfiguration() {
+
+        JsonCsiConfiguration jsonCsiConfiguration
+        CsiConfiguration csiConfiguration = CsiConfiguration.get(params.id)
+        if (csiConfiguration != null) {
+            jsonCsiConfiguration = JsonCsiConfiguration.create(csiConfiguration)
+        } else {
+            sendSimpleResponseAsStream(response, 400, "CsiConfiguration with id ${params.id} doesn't exist!")
+        }
+
+        return sendObjectAsJSON(
+                jsonCsiConfiguration,
                 params.pretty && params.pretty == 'true'
         )
     }

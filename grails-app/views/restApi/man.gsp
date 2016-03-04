@@ -15,6 +15,7 @@
 					<li><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
 					<li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
 					<li><a href="#csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI</a></li>
+					<li><a href="#getCsiConfiguration">&raquo;&nbsp;<strong>GET</strong>&nbsp;Get CsiConfiguration as JSON</a></li>
 					<li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
 					<li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
 					<li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
@@ -229,6 +230,44 @@
 							details is attached as response.
 							<br />
 							The response is of type text/plain (encoding UTF-8).</dd>
+					</dl>
+
+					<hr>
+
+				</div>
+
+				<div id="getCsiConfiguration">
+
+					<h2>GET Method:&nbsp;<span class="text-info">Get CsiConfiguration</span></h2>
+
+					<h3>Request signature</h3>
+					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/csi/csiConfiguration</code></p>
+					<p>
+						The request URL consists of <a href="#rest_base_path">REST-base-path</a> the word <em>csi</em> and the name of the method <em>csiConfiguration</em>.
+					</p>
+					<h4>Parameters</h4>
+					<dl>
+						<dt>id</dt>
+						<dd>
+							MANDATORY<br>The unique id of the csiConfiguration
+						</dd>
+					</dl>
+
+					<h3>Potential outcomes of a request</h3>
+					<dl>
+						<dt>HTTP status 200 OK</dt>
+						<dd>
+							The request handled successfully, a result in JSON notation is
+							returned. It contains the complete csiConfiguration. <br><br>
+							For this REST-method is no example-response given, because it's too long for this side.
+
+							The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.
+						</dd>
+						<dt>HTTP status 400 Bad Request</dt>
+						<dd>One of the query arguments is missing. An error message with details is attached as response.
+							<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
 					</dl>
 
 					<hr>
