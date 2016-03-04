@@ -30,10 +30,10 @@ if [ ${#ports[*]} -eq 0 ];
       export TOMCAT_TLS_PORT_TO_WAIT_FOR=$bamboo_tomcat_TOMCAT_TLS_PORT1
       export PORT_TO_UNDEPLOY=-1
 
-      echo "$PORT_TO_DEPLOY" >> $properties_file
-      echo "$TOMCAT_SERVER_PORT_TO_WAIT_FOR" >> $properties_file
-      echo "$TOMCAT_AJP_PORT_TO_WAIT_FOR" >> $properties_file
-      echo "$TOMCAT_TLS_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "PORT_TO_DEPLOY=$PORT_TO_DEPLOY" >> $properties_file
+      echo "TOMCAT_SERVER_PORT_TO_WAIT_FOR=$TOMCAT_SERVER_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "TOMCAT_AJP_PORT_TO_WAIT_FOR=$TOMCAT_AJP_PORT_TO_WAIT_FOR" >> $properties_file
+      echo "TOMCAT_TLS_PORT_TO_WAIT_FOR=$TOMCAT_TLS_PORT_TO_WAIT_FOR" >> $properties_file
   elif [ ${#ports[*]} -eq 1 ];
     then
       export PORT_TO_UNDEPLOY=${ports[0]}
