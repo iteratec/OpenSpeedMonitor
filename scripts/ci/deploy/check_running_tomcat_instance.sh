@@ -6,7 +6,7 @@
 properties_file="./deploy.properties"
 
 # make external config file available as env variable
-bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE="credentials/$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE"
+bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE="credentials/$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FOLDER/$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE"
 if [ -e "$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE" ]
   then export bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE=$bamboo_tomcat_EXTERNAL_OSM_CONFIG_FILE
   else
