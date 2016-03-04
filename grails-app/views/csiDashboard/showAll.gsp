@@ -308,33 +308,34 @@
 
     <div class="row">
         <%-- chart --%>
+        <g:set var="openDataPointLinksInNewWindow" value="false"/>
         <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
-            <g:set var="chartTitle"
-                   value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.measured_steps.title')}"/>
             <g:set var="openDataPointLinksInNewWindow" value="true"/>
         </g:if>
-        <g:elseif
-                test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_PAGE}">
-            <g:set var="chartTitle"
-                   value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.pages.title')}"/>
-            <g:set var="openDataPointLinksInNewWindow" value="false"/>
-        </g:elseif>
-        <g:elseif
-                test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SHOP}">
-            <g:set var="chartTitle"
-                   value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
-            <g:set var="openDataPointLinksInNewWindow" value="false"/>
-        </g:elseif>
-        <g:elseif
-                test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">
-            <g:set var="chartTitle"
-                   value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
-            <g:set var="openDataPointLinksInNewWindow" value="false"/>
-        </g:elseif>
-        <g:else>
-            <g:set var="chartTitle" value="CSI"/>
-            <g:set var="openDataPointLinksInNewWindow" value="false"/>
-        </g:else>
+
+        %{-- chart title--}%
+        <g:if test="${!chartTitle}">
+            <g:if test="${aggrGroupAndInterval == CsiDashboardController.HOURLY_MEASURED_EVENT}">
+                <g:set var="chartTitle"
+                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.measured_steps.title')}"/>
+                <g:set var="openDataPointLinksInNewWindow" value="true"/>
+            </g:if>
+            <g:elseif
+                    test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_PAGE || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_PAGE}">
+                <g:set var="chartTitle"
+                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.pages.title')}"/>
+            </g:elseif>
+            <g:elseif
+                    test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SHOP || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SHOP}">
+                <g:set var="chartTitle"
+                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.shops.title')}"/>
+            </g:elseif>
+            <g:elseif
+                    test="${aggrGroupAndInterval == CsiDashboardController.WEEKLY_AGGR_GROUP_SYSTEM || aggrGroupAndInterval == CsiDashboardController.DAILY_AGGR_GROUP_SYSTEM}">
+                <g:set var="chartTitle"
+                       value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
+            </g:elseif>
+        </g:if>
         <div id="chartbox">
             <div class="span12 well">
                 <g:render template="/highchart/chart"
@@ -402,17 +403,17 @@
 
         var pagesToEvents = [];
         <g:each var="page" in="${pages}">
-        <g:if test="${eventsOfPages[page.id] != null}">
-        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
-        </g:if>
+            <g:if test="${eventsOfPages[page.id] != null}">
+                pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
+            </g:if>
         </g:each>
 
         var browserToLocation = [];
         <g:each var="browser" in="${browsers}">
-        <g:if test="${locationsOfBrowsers[browser.id] != null}">
-        browserToLocation[${browser.id}] = [<g:each var="location"
-                                                           in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
-        </g:if>
+            <g:if test="${locationsOfBrowsers[browser.id] != null}">
+                browserToLocation[${browser.id}] = [<g:each var="location"
+                                                            in="${locationsOfBrowsers[browser.id]}">${location},</g:each>];
+            </g:if>
         </g:each>
 
         var selectedCsiSystems = [];
@@ -430,8 +431,8 @@
             var showDataLabels = "${showDataLabels}";
             var optimizeForWideScreen = "${showDataLabels}";
             var graphNameAliases = ${graphNameAliases};
-            var graphColors = ${graphColors}
-                    $("#dia-title").val(chartTitle);
+            var graphColors = ${graphColors};
+            $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
@@ -452,14 +453,15 @@
 
             doOnDomReady(
                     'dd.mm.yyyy',
-                    ${weekStart},
+        ${weekStart},
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             )
             if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
                 $("#dia-save-chart-as-png").removeClass("btn-primary");
                 $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
                 $("#dia-save-chart-as-png").attr("disabled", "disabled");
-                $("#dia-save-chart-as-png").attr("title", "<g:message code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>");
+                $("#dia-save-chart-as-png").attr("title", "<g:message
+            code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>");
             }
             setAdjustments();
 
