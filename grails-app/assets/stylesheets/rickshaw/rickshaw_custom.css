@@ -117,7 +117,7 @@
 	position: absolute;
 	top: 0;
 	z-index: 2;
-	background: rgba(0, 0, 0, 0.1);
+	background: rgba(0, 0, 0, 0.32);
 	bottom: 0;
 	width: 1px;
 	transition: opacity 0.25s linear;
@@ -186,7 +186,8 @@
 
 .rickshaw_graph .detail .item.active {
 	opacity: 1;
-	background: rgba(0, 0, 0, 0.8);
+	background: rgba(0, 0, 0, 0.6);
+	pointer-events: none;
 }
 
 .rickshaw_graph .detail .item:after {
