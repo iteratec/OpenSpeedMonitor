@@ -31,6 +31,7 @@ if [ ${#ports[*]} -eq 0 ];
       export PORT_TO_UNDEPLOY=-1
 
       echo "PORT_TO_DEPLOY=$PORT_TO_DEPLOY" >> $properties_file
+      echo "PORT_TO_UNDEPLOY=$PORT_TO_UNDEPLOY" >> $properties_file
       echo "TOMCAT_SERVER_PORT_TO_WAIT_FOR=$TOMCAT_SERVER_PORT_TO_WAIT_FOR" >> $properties_file
       echo "TOMCAT_AJP_PORT_TO_WAIT_FOR=$TOMCAT_AJP_PORT_TO_WAIT_FOR" >> $properties_file
       echo "TOMCAT_TLS_PORT_TO_WAIT_FOR=$TOMCAT_TLS_PORT_TO_WAIT_FOR" >> $properties_file
@@ -42,6 +43,7 @@ if [ ${#ports[*]} -eq 0 ];
       ((TOMCAT_AJP_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_AJP_PORT2 : $bamboo_tomcat_TOMCAT_AJP_PORT1 ))
       ((TOMCAT_TLS_PORT_TO_WAIT_FOR=PORT_TO_UNDEPLOY==$bamboo_tomcat_TOMCAT_PORT1 ? $bamboo_tomcat_TOMCAT_TLS_PORT2 : $bamboo_tomcat_TOMCAT_TLS_PORT1 ))
       echo "PORT_TO_DEPLOY=$PORT_TO_DEPLOY" >> $properties_file
+      echo "PORT_TO_UNDEPLOY=$PORT_TO_UNDEPLOY" >> $properties_file
       echo "TOMCAT_SERVER_PORT_TO_WAIT_FOR=$TOMCAT_SERVER_PORT_TO_WAIT_FOR" >> $properties_file
       echo "TOMCAT_AJP_PORT_TO_WAIT_FOR=$TOMCAT_AJP_PORT_TO_WAIT_FOR" >> $properties_file
       echo "TOMCAT_TLS_PORT_TO_WAIT_FOR=$TOMCAT_TLS_PORT_TO_WAIT_FOR" >> $properties_file
