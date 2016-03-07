@@ -18,8 +18,12 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.api.dto.JsonBrowser
 import de.iteratec.osm.api.dto.JsonCsiConfiguration
 import de.iteratec.osm.api.dto.JsonJobGroup
+import de.iteratec.osm.api.dto.JsonLocation
+import de.iteratec.osm.api.dto.JsonMeasuredEvent
+import de.iteratec.osm.api.dto.JsonPage
 import de.iteratec.osm.api.json.Result
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
@@ -157,8 +161,8 @@ class RestApiController {
      */
     public Map<String, Object> allSystems() {
         Set<JobGroup> systems = jobGroupDaoService.findCSIGroups();
-        Set<JsonJobGroup> systemsAsJson= JsonJobGroup.create(systems)
-        render systemsAsJson as JSON
+        Set<JsonJobGroup> systemsAsJson = JsonJobGroup.create(systems)
+        return sendObjectAsJSON(systemsAsJson, params.pretty && params.pretty == 'true')
     }
 
     /**
@@ -171,7 +175,8 @@ class RestApiController {
      */
     public Map<String, Object> allSteps() {
         Set<MeasuredEvent> events = measuredEventDaoService.findAll();
-        return sendObjectAsJSON(events, params.pretty && params.pretty == 'true');
+        Set<JsonMeasuredEvent> eventsAsJson = JsonMeasuredEvent.create(events)
+        return sendObjectAsJSON(eventsAsJson, params.pretty && params.pretty == 'true');
     }
 
     /**
@@ -184,7 +189,8 @@ class RestApiController {
      */
     public Map<String, Object> allBrowsers() {
         Set<Browser> browsers = browserDaoService.findAll();
-        return sendObjectAsJSON(browsers, params.pretty && params.pretty == 'true');
+        Set<JsonBrowser> browsersAsJson = JsonBrowser.create(browsers)
+        return sendObjectAsJSON(browsersAsJson, params.pretty && params.pretty == 'true');
     }
 
     /**
@@ -197,7 +203,8 @@ class RestApiController {
      */
     public Map<String, Object> allPages() {
         Set<Page> pages = pageDaoService.findAll();
-        return sendObjectAsJSON(pages, params.pretty && params.pretty == 'true');
+        Set<JsonPage> pagesAsJson = JsonPage.create(pages)
+        return sendObjectAsJSON(pagesAsJson, params.pretty && params.pretty == 'true');
     }
 
     /**
@@ -210,7 +217,8 @@ class RestApiController {
      */
     public Map<String, Object> allLocations() {
         Collection<Location> locations = locationDaoService.findAll()
-        return sendObjectAsJSON(locations, params.pretty && params.pretty == 'true');
+        Set<JsonLocation> locationsAsJson = JsonLocation.create(locations)
+        return sendObjectAsJSON(locationsAsJson, params.pretty && params.pretty == 'true');
     }
 
     /**
@@ -614,11 +622,10 @@ class RestApiController {
      * @throws NullPointerException
      *         if {@code objectToSend} is <code>null</code>.
      */
-    private Object sendObjectAsJSON(Object objectToSend, boolean usePrettyPrintingFormat) {
+    private void sendObjectAsJSON(Object objectToSend, boolean usePrettyPrintingFormat) {
         JSON converter = new JSON(target: objectToSend)
         converter.setPrettyPrint(usePrettyPrintingFormat)
         render converter
-        return null
     }
 
     /**

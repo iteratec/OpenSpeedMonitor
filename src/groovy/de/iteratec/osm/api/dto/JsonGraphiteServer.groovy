@@ -2,10 +2,7 @@ package de.iteratec.osm.api.dto
 
 import de.iteratec.osm.report.external.GraphiteServer
 
-/**
- * Created by birger on 04/03/16.
- */
-class JsonGraphiteServer {
+class JsonGraphiteServer{
 
     long id
 

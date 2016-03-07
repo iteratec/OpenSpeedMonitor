@@ -3,7 +3,7 @@ package de.iteratec.osm.api.dto
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 
-class JsonJobGroup {
+class JsonJobGroup{
 
     long id
 
@@ -25,7 +25,7 @@ class JsonJobGroup {
 
         return result
     }
-    public static Set<JsonJobGroup> create(Set<JobGroup> jobGroups) {
+    public static Collection<JsonJobGroup> create(Collection<JobGroup> jobGroups) {
         Set<JsonJobGroup> result = []
 
         jobGroups.each {
