@@ -231,7 +231,6 @@
             );
         });
     </asset:script>
-    <asset:deferredScripts/>
 </content>
 </body>
 </html>
