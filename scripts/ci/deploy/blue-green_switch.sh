@@ -20,4 +20,6 @@ ssh -p $bamboo_tomcat_SSH_PORT_TO_HOST_TO_DEPLOY_TO -o "StrictHostKeyChecking no
 cat .\combined_output_on_local_host.txt
 
 # undeploy old version
+if [ PORT_TO_SWITCH_FROM -ne -1 ];
 curl -u $bamboo_tomcat_TOMCAT_ADMIN_USERNAME:$bamboo_tomcat_TOMCAT_ADMIN_PASSWORD http://$bamboo_tomcat_HOST_TO_DEPLOY_TO:$PORT_TO_SWITCH_FROM/manager/text/undeploy\?path\=/OpenSpeedMonitor
+fi
