@@ -61,6 +61,8 @@ class OsmConfiguration {
     Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
     /** Method of transformation from measured load time to percent of users which are satisfied by that load time used in the application. */
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
+    /** Set to true, if the detail data for job results should be fetched**/
+    Boolean detailFetchingEnabled = false
 
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
@@ -72,6 +74,7 @@ class OsmConfiguration {
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
+        detailFetchingEnabled defaultValue: false
     }
 
 

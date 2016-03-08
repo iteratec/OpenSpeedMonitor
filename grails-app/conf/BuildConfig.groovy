@@ -81,7 +81,7 @@ grails.project.dependency.resolution = {
         compile(
                 'org.mockito:mockito-all:1.9.5',
                 'net.sf.supercsv:super-csv:2.1.0',
-                'p6spy:p6spy:2.1.4',
+                'p6spy:p6spy:2.1.4'
         )
         build(
                 'net.sf.supercsv:super-csv:2.1.0',
@@ -122,7 +122,8 @@ grails.project.dependency.resolution = {
                 ':cookie:1.0.1',
                 ':codenarc:0.22',
                 ":asset-pipeline:2.3.9",
-                ":less-asset-pipeline:2.3.0"
+                ":less-asset-pipeline:2.3.0",
+                "org.grails.plugins:mongodb:3.0.3"
         )
         compile(':jquery-ui:1.10.4') {
             excludes "jquery"

@@ -33,6 +33,7 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
+import de.iteratec.osm.result.detail.HarFetchService
 import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
@@ -1014,5 +1015,7 @@ class PersistingNewEventResultsTests {
 		ServiceMocker mockGenerator = ServiceMocker.create()
 		serviceUnderTest.csiValueService = new CsiValueService()
 		mockGenerator.mockOsmConfigCacheService(serviceUnderTest.csiValueService)
+		serviceUnderTest.harFetchService = new HarFetchService()
+		serviceUnderTest.harFetchService.metaClass.addJobResultToQueue = {long id ->}
     }
 }

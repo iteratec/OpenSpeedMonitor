@@ -128,6 +128,10 @@ class ConfigService {
         return (CsiTransformation)retrieveConfigValue('csiTransformation')
     }
 
+	Boolean isDetailFetchingEnabled(){
+		return retrieveConfigValue("detailFetchingEnabled")
+	}
+
 	private Object retrieveConfigValue(String name) {
 		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
 		if (osmConfigs.size() != 1 || osmConfigs[0]."${name}" == null) {

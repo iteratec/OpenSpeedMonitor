@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.result.CsiValueService
+import de.iteratec.osm.result.detail.HarFetchService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -77,7 +78,7 @@ class LocationAndResultPersisterService implements iListener{
     PerformanceLoggingService performanceLoggingService
     ConnectivityProfileService connectivityProfileService
 	CsiValueService csiValueService
-
+	HarFetchService harFetchService
 
     /**
 	 * Persisting non-existent locations.
@@ -164,6 +165,7 @@ class LocationAndResultPersisterService implements iListener{
 					jobRun = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)?:
 						persistNewJobRun(jobConfig, resultXml).save(failOnError: true);
 					log.debug("persisting job result ... DONE")
+					harFetchService.addJobResultToQueue(jobRun.id)
 				} catch (Exception e) {
 					status.setRollbackOnly()
 					log.error("An error occurred while deleting pending and persisting new JobResult: " +

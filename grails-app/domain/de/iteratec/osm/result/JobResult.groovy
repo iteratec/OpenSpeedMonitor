@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.result.detail.HARStatus
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
@@ -103,6 +104,7 @@ class JobResult {
 	// only for migration
 	Long eventResultIdFromSqlite
 
+	HARStatus harStatus = HARStatus.NOT_PERSISTED
 
 	static constraints = {
 		testId()
@@ -144,6 +146,7 @@ class JobResult {
 		locationUniqueIdentifierForServer(nullable: true)
 		locationBrowser(nullable: true)
 		jobGroupName(nullable: false)
+		harStatus(nullable:false)
 
 		// only for migration
 		eventResultIdFromSqlite(nullable: true)
