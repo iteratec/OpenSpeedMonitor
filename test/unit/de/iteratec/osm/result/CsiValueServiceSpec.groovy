@@ -24,26 +24,125 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import grails.test.mixin.*
-import org.junit.*
+import spock.lang.Specification
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
 @TestFor(CsiValueService)
-class CsiValueServiceSpec {
+class CsiValueServiceSpec extends Specification{
 
     CsiValueService serviceUnderTest
-    int maxDocComplete = 400
-    int minDocComplete = 200
+
+    final int MAX_DOC_COMPLETE = 400
+    final int MIN_DOC_COMPLETE = 200
+
     EventResult eventResult
     CsiAggregation csiAggregation
 
-    @Before
-    void setUp() {
+    void setup() {
+
         serviceUnderTest = service
+
+        mocksCommonForAllTests()
+
+        prepareTestDataCommonForAllTests()
+
+    }
+
+    void "Different functionality is applied respective polymorphism of CsiValue implementations"() {
+        setup:
+        serviceUnderTest.metaClass.isCsiRelevant = { EventResult eventResult->
+            return true
+        }
+        serviceUnderTest.metaClass.isCsiRelevant = { CsiAggregation csiAggregation ->
+            return false
+        }
+
+        when:
+        CsiValue csiAgg = new CsiAggregation()
+        CsiValue eventResult = new EventResult()
+
+        then:
+        !serviceUnderTest.isCsiRelevant(csiAgg)
+        serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "Csi relevant EventResult is recognized as relevant"(){
+        when:
+        eventResult
+        then:
+        serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "EventResult which docCompleteTimeInMillisecs equals max doc complete time is relevant"(){
+        when:
+        eventResult.docCompleteTimeInMillisecs = MAX_DOC_COMPLETE
+        then:
+        serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "EventResult which docCompleteTimeInMillisecs lower than max doc complete time is relevant"(){
+        when:
+        eventResult.docCompleteTimeInMillisecs = MAX_DOC_COMPLETE-1
+        then:
+        serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "EventResult which docCompleteTimeInMillisecs greater than max doc complete time is not relevant"(){
+        when:
+        eventResult.docCompleteTimeInMillisecs = MAX_DOC_COMPLETE+1
+        then:
+        !serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "EventResult which docCompleteTimeInMillisecs equals min doc complete time is relevant"(){
+        when:
+        eventResult.docCompleteTimeInMillisecs = MIN_DOC_COMPLETE
+        then:
+        serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "EventResult which docCompleteTimeInMillisecs greater than min doc complete time is relevant"(){
+        when:
+        eventResult.docCompleteTimeInMillisecs = MIN_DOC_COMPLETE+1
+        then:
+        serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "EventResult which docCompleteTimeInMillisecs lower  than min doc complete time is not relevant"(){
+        when:
+        eventResult.docCompleteTimeInMillisecs = MIN_DOC_COMPLETE-1
+        then:
+        !serviceUnderTest.isCsiRelevant(eventResult)
+    }
+
+    void "EventResults without csi configuration are irrelevant"(){
+        when:
+        eventResult.jobResult.job.jobGroup.csiConfiguration = null
+        then:
+        !serviceUnderTest.isCsiRelevant(eventResult)
+    }
+    void "CsiAggregations not calculated are irrelevant"(){
+        when:
+        csiAggregation.metaClass.isCalculated = {return false}
+        then:
+        !serviceUnderTest.isCsiRelevant(csiAggregation)
+    }
+    void "Csi relevant CsiAggregation is recognized as relevant"(){
+        when:
+        csiAggregation.metaClass.isCalculated = {return true}
+        then:
+        serviceUnderTest.isCsiRelevant(csiAggregation)
+    }
+    void "CsiAggregation without csByWptDocCompleteInPercent is irrelevant"(){
+        when:
+        csiAggregation.metaClass.isCalculated = {return true}
+        csiAggregation.csByWptDocCompleteInPercent = null
+        then:
+        !serviceUnderTest.isCsiRelevant(csiAggregation)
+    }
+
+    void mocksCommonForAllTests(){
         serviceUnderTest.osmConfigCacheService = new OsmConfigCacheService()
-        serviceUnderTest.osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {int i -> return maxDocComplete}
-        serviceUnderTest.osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs= {int i -> return minDocComplete}
+        serviceUnderTest.osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {int i -> return MAX_DOC_COMPLETE}
+        serviceUnderTest.osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs= {int i -> return MIN_DOC_COMPLETE}
+    }
+
+    void prepareTestDataCommonForAllTests(){
         eventResult = new EventResult(csByWptDocCompleteInPercent: 50, docCompleteTimeInMillisecs: 300)
         eventResult.jobResult = new JobResult()
         eventResult.jobResult.job = new Job()
@@ -51,66 +150,5 @@ class CsiValueServiceSpec {
         eventResult.jobResult.job.jobGroup.csiConfiguration = new CsiConfiguration()
         csiAggregation = new CsiAggregation()
         csiAggregation.csByWptDocCompleteInPercent = 50.0
-
-    }
-
-
-    @Test
-    void testRightMethod() {
-        serviceUnderTest.metaClass.isCsiRelevant = { EventResult eventResult->
-            return true
-        }
-        serviceUnderTest.metaClass.isCsiRelevant = { CsiAggregation csiAggregation ->
-            return false
-        }
-        assertFalse(serviceUnderTest.isCsiRelevant(new CsiAggregation()))
-        assertTrue(serviceUnderTest.isCsiRelevant(new EventResult()))
-    }
-
-    @Test
-    void testRelevantEventResult(){
-        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
-    }
-
-    @Test
-    void testEventResultMaxDocCompleteTime(){
-        eventResult.docCompleteTimeInMillisecs = maxDocComplete
-        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
-        eventResult.docCompleteTimeInMillisecs = maxDocComplete-1
-        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
-        eventResult.docCompleteTimeInMillisecs = maxDocComplete+1
-        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
-    }
-
-    @Test
-    void testEventResultMinDocCompleteTime(){
-        eventResult.docCompleteTimeInMillisecs = minDocComplete
-        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
-        eventResult.docCompleteTimeInMillisecs = minDocComplete+1
-        assertTrue(serviceUnderTest.isCsiRelevant(eventResult))
-        eventResult.docCompleteTimeInMillisecs = minDocComplete-1
-        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
-    }
-
-    @Test
-    void testEventResultCsiConfiguration(){
-        eventResult.jobResult.job.jobGroup.csiConfiguration = null
-        assertFalse(serviceUnderTest.isCsiRelevant(eventResult))
-    }
-    @Test
-    void testCsiAggregationIsCalculated(){
-        csiAggregation.metaClass.isCalculated = {return false}
-        assertFalse(serviceUnderTest.isCsiRelevant(csiAggregation))
-    }
-    @Test
-    void testCsiAggregation(){
-        csiAggregation.metaClass.isCalculated = {return true}
-        assertTrue(serviceUnderTest.isCsiRelevant(csiAggregation))
-    }
-    @Test
-    void testCsiAggregationMissingCs(){
-        csiAggregation.metaClass.isCalculated = {return true}
-        csiAggregation.csByWptDocCompleteInPercent = null
-        assertFalse(serviceUnderTest.isCsiRelevant(csiAggregation))
     }
 }
