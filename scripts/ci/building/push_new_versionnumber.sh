@@ -15,6 +15,6 @@ else
   git status
 
   git tag $bamboo_ci_app_version
-  git pull --rebase
+  git pull --rebase origin/master
   git push
 fi
