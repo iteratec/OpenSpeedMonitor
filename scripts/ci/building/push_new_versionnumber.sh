@@ -6,7 +6,7 @@ if [ -z $bamboo_ci_app_version ]; then
 else
   echo "Found version-number: ${bamboo_ci_app_version}"
 
-  git config user.mail "jenkins@seu.hh.iteratec.de"
+  git config user.email "jenkins@seu.hh.iteratec.de"
   git config user.name "jenkins@seu"
 
   git add --all
