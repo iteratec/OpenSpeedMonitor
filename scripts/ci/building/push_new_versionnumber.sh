@@ -17,7 +17,7 @@ else
 
   git tag $bamboo_ci_app_version
   git remote add github $bamboo_planRepository_repositoryUrl
-  git pull --rebase github $bamboo_planRepository_branch
+  GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git pull --rebase github $bamboo_planRepository_branch
   git config push.default simple
-  git push github $bamboo_planRepository_branch
+  GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" git push github $bamboo_planRepository_branch
 fi
