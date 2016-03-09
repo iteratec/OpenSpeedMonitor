@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if[ -z "$bamboo_ci_app_version" ]; then
+if [ -z $bamboo_ci_app_version ]; then
   echo "No version-number found: ${bamboo_ci_app_version}"
   exit 1
 else
