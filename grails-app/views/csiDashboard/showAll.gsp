@@ -3,6 +3,7 @@
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <% def springSecurityService %>
+%{--TODOMARCUS braucht man das?--}%
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <%
     def userspecificCSIDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificCsiDashboard').newInstance()
@@ -260,6 +261,8 @@
                     </sec:ifLoggedIn>
                     <g:if test="${params.id}">
                         <g:if test="${userspecificCSIDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                            <a href="#" role="button" class="btn btn-primary"
+                               style="margin-top: 16px;" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                             <g:render template="/_common/modals/deleteCustomDashboard"/>
                         </g:if>
                     </g:if>

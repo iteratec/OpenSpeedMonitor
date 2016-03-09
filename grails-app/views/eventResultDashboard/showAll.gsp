@@ -368,6 +368,8 @@
                                     </sec:ifLoggedIn>
                                     <g:if test="${params.id}">
                                         <g:if test="${userspecificEventResultDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                                            <a href="#" role="button" class="btn btn-primary"
+                                               style="margin-top: 16px;" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                                             <g:render template="/_common/modals/deleteCustomDashboard"/>
 
                                         </g:if>

@@ -145,6 +145,7 @@ function domainDeleteConfirmation(message,id,link){
 
 }
 
+
 /**
  * Necessary to prevent Chosen dropdown from being cut off in tabs
  * @see http://stackoverflow.com/a/21375637

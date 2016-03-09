@@ -134,23 +134,27 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
-        cmd.loadTimeMaximum = cmd.loadTimeMaximum?:"auto"
-        cmd.chartHeight = cmd.chartHeight>0?cmd.chartHeight:configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth>0?cmd.chartWidth:configService.getInitialChartWidthInPixels()
+        cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
+        cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+
+        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         // get graph aliases
-        if(params.id) {
+        if (params.id) {
             UserspecificEventResultDashboard savedDashboard = UserspecificEventResultDashboard.get(params.id)
-            if(savedDashboard.graphNameAliases.size() > 0) {
-                cmd.graphNameAliases = savedDashboard.graphNameAliases
-            }
-            if(savedDashboard.graphColors.size() > 0) {
-                cmd.graphColors = savedDashboard.graphColors
+            if (savedDashboard) {
+                if (savedDashboard.graphNameAliases.size() > 0) {
+                    cmd.graphNameAliases = savedDashboard.graphNameAliases
+                }
+                if (savedDashboard.graphColors.size() > 0) {
+                    cmd.graphColors = savedDashboard.graphColors
+                }
+                modelToRender.put("dashboardName", savedDashboard.dashboardName)
+                modelToRender.put("publiclyVisible", savedDashboard.publiclyVisible)
             }
         }
 
-
-        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
         if (!ControllerUtils.isEmptyRequest(params)) {
@@ -191,8 +195,9 @@ class EventResultDashboardController {
     /**
      * <p>
      * Ajax service to validate and store custom dashboard settings.
+     * Note: It will overwrite existing dashboards with same name!
      * </p>
-     *
+     *k
      * @param values
      *         The dashboard settings, JSON encoded;
      *         not <code>null</code>.
@@ -206,21 +211,14 @@ class EventResultDashboardController {
         String publiclyVisible = dashboardValues.publiclyVisible
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
-        // Check if name is unique
-        def dashboards = UserspecificEventResultDashboard.findAllByDashboardName(dashboardName)
-        if (dashboards) {
-            response.sendError(302, 'dashboard by that name exists already')
-            return null
-        }
-
         // Parse JSON Data for Command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
-        Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues,"selectedFolder")
-        Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues,"selectedPages")
-        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues,"selectedMeasuredEventIds")
-        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues,"selectedBrowser")
-        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues,"selectedLocations")
+        Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
+        Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues, "selectedPages")
+        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues, "selectedMeasuredEventIds")
+        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues, "selectedBrowser")
+        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
 
         Collection<String> selectedAggrGroupValuesCached = []
         // String or List<String>
@@ -255,8 +253,8 @@ class EventResultDashboardController {
                 selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
                 overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
                 includeCustomConnectivity: dashboardValues.includeCustomConnectivity, includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
-                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles, chartTitle: dashboardValues.chartTitle?:"",
-                loadTimeMaximum: dashboardValues.loadTimeMaximum?:"auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
+                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles, chartTitle: dashboardValues.chartTitle ?: "",
+                loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
                 graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
 
         // Parse IntegerValues if they exist
@@ -280,13 +278,18 @@ class EventResultDashboardController {
             response.sendError(400, "beginErrorMessage" + errMsgList.toString() + "endErrorMessage")
             // Apache Tomcat will output the response as part of (HTML) error page
         } else {
+            // Remove old if existing
+            UserspecificEventResultDashboard existing = UserspecificEventResultDashboard.findByDashboardName(dashboardName)
+            if (existing) {
+                existing.delete(flush: true, failOnError: true)
+            }
+
             UserspecificEventResultDashboard newCustomDashboard = new UserspecificEventResultDashboard(cmd, dashboardName, publiclyVisible, wideScreenDiagramMontage, username)
 
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
-            } else {
-                response.sendError(200, 'OK')
             }
+            response.sendError(200, 'OK')
         }
     }
 
@@ -569,10 +572,10 @@ class EventResultDashboardController {
         selectedJobGroups.each { jobGroup ->
             filename += jobGroup.name + '_'
         }
-        if(modelToRender['selectedInterval'] != -1) {
+        if (modelToRender['selectedInterval'] != -1) {
             filename += modelToRender['selectedInterval'] + 'm_'
         }
-        filename += Double.valueOf(modelToRender['fromTimestampForHighChart']/1000L).longValue() + '_to_' + Double.valueOf(modelToRender['toTimestampForHighChart']/1000L).longValue() + '.csv'
+        filename += Double.valueOf(modelToRender['fromTimestampForHighChart'] / 1000L).longValue() + '_to_' + Double.valueOf(modelToRender['toTimestampForHighChart'] / 1000L).longValue() + '.csv'
 
         response.setHeader('Content-disposition', 'attachment; filename=' + filename);
         response.setContentType("text/csv;header=present;charset=UTF-8");
@@ -731,6 +734,20 @@ class EventResultDashboardController {
 
         // Done! :)
         return result;
+    }
+
+    public def checkDashboardNameUnique(String values) {
+        JSONObject dashboardValues = JSON.parse(values)
+        String dashboardName = dashboardValues.dashboardName
+
+        def answer
+        if (UserspecificEventResultDashboard.findByDashboardName(dashboardName)) {
+            answer = [result: 'false']
+        } else {
+            answer = [result: 'true']
+        }
+
+        render answer as JSON
     }
 
 }

@@ -32,6 +32,7 @@ function PostLoaded(dataFromGsp){
     this.i18n_duplicatePrompt = dataFromGsp.i18n_duplicatePrompt;
     this.i18n_duplicateSuffix = dataFromGsp.i18n_duplicateSuffix;
     this.i18n_deletionConfirmMessage = dataFromGsp.i18n_deletionConfirmMessage;
+    this.i18n_updateConfirmMessage = dataFromGsp.i18n_updateConfirmMessage;
     this.i18n_loadTimeIntegerError = dataFromGsp.i18n_loadTimeIntegerError;
     this.i18n_customerFrustrationDoubleError = dataFromGsp.i18n_customerFrustrationDoubleError;
     this.i18n_defaultMappingFormatError = dataFromGsp.i18n_defaultMappingFormatError;
@@ -52,6 +53,7 @@ function PostLoaded(dataFromGsp){
     this.link_CsiConfigurationConfigurations = dataFromGsp.link_CsiConfigurationConfigurations;
     this.link_CsiConfigurationDeletion = dataFromGsp.link_CsiConfigurationDeletion;
     this.idOfItemToDelete = dataFromGsp.idOfItemToDelete;
+    this.idOfItemToUpdate = dataFromGsp.idOfItemToUpdate;
 
     this.setDeleteConfirmationInformations = function(link){
         setTimeout(function(){
@@ -79,14 +81,15 @@ function PostLoaded(dataFromGsp){
             spinner.stop();
             $('#DeleteModal').find('p').html(text);
         },1);
-    }
+    };
+
 
     this.getSmallSpinner = function(color, relativePositionTop, relativePositionLeft){
         return this.getSpinner(color, 5, 1.5, 4, relativePositionTop, relativePositionLeft)
-    }
+    };
     this.getLargeSpinner = function(color, relativePositionTop, relativePositionLeft){
         return this.getSpinner(color, 20, 10, 30, relativePositionTop, relativePositionLeft)
-    }
+    };
 
     /**
      * Appends a spinner with color color to parent html element.
