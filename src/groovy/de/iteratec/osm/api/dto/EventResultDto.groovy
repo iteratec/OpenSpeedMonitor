@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.api.json
+package de.iteratec.osm.api.dto
 
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -33,7 +33,7 @@ import de.iteratec.osm.result.MeasuredEvent
  * @author mze
  * @since IT-81
  */
-public final class Result {
+public final class EventResultDto {
 	
 	public static final DecimalFormat API_DECIMAL_FORMAT = new DecimalFormat();
 	static {
@@ -119,7 +119,7 @@ public final class Result {
 	 */
 	public final String httpArchiveUrl
 	
-	public Result(EventResult eventResult) {
+	public EventResultDto(EventResult eventResult) {
 		this.csiValue = eventResult.csByWptDocCompleteInPercent != null ?
 				API_DECIMAL_FORMAT.format( (double)eventResult.csByWptDocCompleteInPercent ) :
 				"not calculated"

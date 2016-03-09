@@ -1,11 +1,11 @@
 package de.iteratec.osm.api
 
-import de.iteratec.osm.api.dto.JsonBrowser
-import de.iteratec.osm.api.dto.JsonCsiConfiguration
-import de.iteratec.osm.api.dto.JsonJobGroup
-import de.iteratec.osm.api.dto.JsonLocation
-import de.iteratec.osm.api.dto.JsonMeasuredEvent
-import de.iteratec.osm.api.dto.JsonPage
+import de.iteratec.osm.api.dto.BrowserDto
+import de.iteratec.osm.api.dto.CsiConfigurationDto
+import de.iteratec.osm.api.dto.JobGroupDto
+import de.iteratec.osm.api.dto.LocationDto
+import de.iteratec.osm.api.dto.MeasuredEventDto
+import de.iteratec.osm.api.dto.PageDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
@@ -19,10 +19,8 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
-import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -69,7 +67,7 @@ class RestApiControllerSpec extends Specification {
 
     void "get all JobGroups as JSON, which have a csiConfiguration, when existing"() {
         given:
-        Collection<JsonJobGroup> jobGroupsAsJson = JsonJobGroup.create([jobGroupWithCsiConfiguration1,jobGroupWithCsiConfiguration2])
+        Collection<JobGroupDto> jobGroupsAsJson = JobGroupDto.create([jobGroupWithCsiConfiguration1, jobGroupWithCsiConfiguration2])
 
         when:
         controllerUnderTest.allSystems()
@@ -87,7 +85,7 @@ class RestApiControllerSpec extends Specification {
         MeasuredEvent event1 = TestDataUtil.createMeasuredEvent("event1", page1)
         MeasuredEvent event2 = TestDataUtil.createMeasuredEvent("event2", page2)
 
-        Collection<JsonMeasuredEvent> measuredEventAsJson = JsonMeasuredEvent.create([event1,event2])
+        Collection<MeasuredEventDto> measuredEventAsJson = MeasuredEventDto.create([event1, event2])
 
         when:
         controllerUnderTest.allSteps()
@@ -102,7 +100,7 @@ class RestApiControllerSpec extends Specification {
 
     void "get all Browsers as JSON, when existing"() {
         given:
-        Collection<JsonBrowser> browserAsJson = JsonBrowser.create([browser1,browser2])
+        Collection<BrowserDto> browserAsJson = BrowserDto.create([browser1, browser2])
 
         when:
         controllerUnderTest.allBrowsers()
@@ -117,7 +115,7 @@ class RestApiControllerSpec extends Specification {
 
     void "get all Pages as JSON, when existing"() {
         given:
-        Collection<JsonPage> pagesAsJson = JsonPage.create([page1,page2])
+        Collection<PageDto> pagesAsJson = PageDto.create([page1, page2])
 
         when:
         controllerUnderTest.allPages()
@@ -136,7 +134,7 @@ class RestApiControllerSpec extends Specification {
         Location location1 = TestDataUtil.createLocation(server,"location1",browser1,true)
         Location location2 = TestDataUtil.createLocation(server,"location2",browser2,true)
 
-        Collection<JsonLocation> locationsAsJson = JsonLocation.create([location1,location2])
+        Collection<LocationDto> locationsAsJson = LocationDto.create([location1, location2])
 
         when:
         controllerUnderTest.allPages()
@@ -152,7 +150,7 @@ class RestApiControllerSpec extends Specification {
     void "existing csiConfiguration by id as JSON"() {
         given:
         int csiConfigurationId = csiConfiguration.id
-        JsonCsiConfiguration jsonCsiConfiguration = JsonCsiConfiguration.create(csiConfiguration)
+        CsiConfigurationDto jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
 
         when:
         params.id = csiConfigurationId

@@ -16,6 +16,7 @@
 */
 package de.iteratec.osm.api
 
+import de.iteratec.osm.api.dto.SystemCSIDto
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
@@ -72,7 +73,7 @@ class ShopCsiServiceTests {
 		
 		//test execution
 		shouldFail(IllegalArgumentException){
-			SystemCSI systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+			SystemCSIDto systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		}
 		
 	}
@@ -86,7 +87,7 @@ class ShopCsiServiceTests {
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		
 		//test execution
-		SystemCSI systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		SystemCSIDto systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		
 		//assertions
 		assertNotNull(systemCsi)
@@ -123,7 +124,7 @@ class ShopCsiServiceTests {
 
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		//test execution
-		SystemCSI systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		SystemCSIDto systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		
 		//assertions
 		assertNotNull(systemCsi)

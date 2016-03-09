@@ -15,29 +15,36 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.api.json
+package de.iteratec.osm.api.dto;
 
 /**
  * <p>
- * Using this box gives a simple string the key 'name' instead of the JSON 
- * default 'value' which makes results where a name was expected more 
- * readable. 
+ * Weighted CSI-mean of a system for a specific time period.
+ * Is returned as JSON to rest-calls to {@link de.iteratec.osm.api.RestApiController#getSystemCsi}.
  * </p>
  * 
+ * @author nkuhn
  * @author mze
- * @since IT-81
  */
-public final class JSONNameBox {
-	public final String name;
-	
-	public JSONNameBox(String name)
-	{
-		this.name = name;
-	}
+public class SystemCSIDto {
 
-	@Override
-	public String toString() {
-		return "JSONNameBox [name=" + name + "]";
-	}
-	
+	/**
+	 * CSI-mean of a system, weighted by shop-page and browser. 
+	 */
+	double csiValueAsPercentage;
+
+	/**
+	 * Target-CSI-value for the specified time period.
+	 */
+	double targetCsiAsPercentage;
+
+	/**
+	 * Difference between {@link #csiValue} and {@link #targetCSI}.
+	 */
+	double delta;
+
+	/**
+	 * Count of the {@link EventResult}s, underlying the calculation.
+	 */
+	int countOfMeasurings;
 }

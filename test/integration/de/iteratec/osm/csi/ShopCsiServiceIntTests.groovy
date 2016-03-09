@@ -34,7 +34,7 @@ import org.junit.Before
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.api.ShopCsiService
-import de.iteratec.osm.api.SystemCSI
+import de.iteratec.osm.api.dto.SystemCSIDto
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
@@ -119,7 +119,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 			((ieWeight * hpWeight) + (ieWeight * mesWeight) + (ffWeight * hpWeight) + (ffWeight * mesWeight))
 		
 		//test-execution ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		SystemCSI systemCsi = shopCsiService.retrieveSystemCsiByRawData(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		SystemCSIDto systemCsi = shopCsiService.retrieveSystemCsiByRawData(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		
 		//assertions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 		assertEquals(12, EventResult.list().size())

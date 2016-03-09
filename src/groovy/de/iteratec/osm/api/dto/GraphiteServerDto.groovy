@@ -1,8 +1,6 @@
 package de.iteratec.osm.api.dto
 
-import de.iteratec.osm.report.external.GraphiteServer
-
-class JsonGraphiteServer{
+class GraphiteServerDto {
 
     long id
 
@@ -10,8 +8,8 @@ class JsonGraphiteServer{
 
     int port
 
-    public static JsonGraphiteServer create(GraphiteServer graphiteServer) {
-        JsonGraphiteServer result = new JsonGraphiteServer()
+    public static GraphiteServerDto create(de.iteratec.osm.report.external.GraphiteServer graphiteServer) {
+        GraphiteServerDto result = new GraphiteServerDto()
 
         result.id = graphiteServer.id
         result.serverAddress = graphiteServer.serverAdress
@@ -19,8 +17,8 @@ class JsonGraphiteServer{
 
         return result
     }
-    public static Set<JsonGraphiteServer> create(Collection<GraphiteServer> graphiteServers) {
-        Set<JsonGraphiteServer> result = []
+    public static Set<GraphiteServerDto> create(Collection<de.iteratec.osm.report.external.GraphiteServer> graphiteServers) {
+        Set<GraphiteServerDto> result = []
 
         graphiteServers.each {
             result.add(create(it))

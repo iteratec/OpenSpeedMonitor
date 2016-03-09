@@ -190,7 +190,7 @@ public class EventResultDaoService {
             ErQueryParams queryParams
     ) {
 
-        List<EventResult> eventResults = criteria.list(listCriteriaRestrictionMap) {
+        List<EventResult> eventResults = EventResult.createCriteria().list(listCriteriaRestrictionMap) {
             between('jobResultDate', fromDate, toDate)
             eq('medianValue', true)
             'in'('cachedView', cachedViews)

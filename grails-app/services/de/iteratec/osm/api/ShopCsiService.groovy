@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.api.dto.SystemCSIDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -55,7 +56,7 @@ class ShopCsiService {
 	 * @param weightFactors	Factors, {@link EventResult}s should be weighted for.
 	 * @return Customer satisfaction index (CSI) for a hole system.
 	 */
-    public SystemCSI retrieveSystemCsiByRawData(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
+    public SystemCSIDto retrieveSystemCsiByRawData(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
 
         List<EventResult> eventResults
 		performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] get event results', PerformanceLoggingService.IndentationDepth.ONE){
@@ -75,7 +76,7 @@ class ShopCsiService {
             }
         }
 
-        SystemCSI systemCSI
+        SystemCSIDto systemCSI
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] calculate weighted mean and prepare return value', PerformanceLoggingService.IndentationDepth.ONE){
             if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
             if (weightedCsiValues.size()>0) {
@@ -85,7 +86,7 @@ class ShopCsiService {
                 if (targetGraph) {
                     targetCsi = targetGraph.getPercentOfDate(end)
                 }
-                systemCSI = new SystemCSI(
+                systemCSI = new SystemCSIDto(
                         csiValueAsPercentage: weightedValueAsPercentage,
                         targetCsiAsPercentage:  targetCsi,
                         delta: weightedValueAsPercentage - targetCsi,

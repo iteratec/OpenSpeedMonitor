@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.api.json
 
+import de.iteratec.osm.api.dto.EventResultDto
+
 import static org.junit.Assert.*
 
 import org.junit.*
@@ -30,7 +32,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 
 /**
- * Test-suite of {@link de.iteratec.osm.api.json.Result}.
+ * Test-suite of {@link EventResultDto}.
  *
  * @author mze
  * @since IT-81
@@ -42,19 +44,19 @@ class ResultTests {
 
 	@Test
 	public void testAPI_DECIMAL_FORMAT() {
-		assertEquals('1,50', Result.API_DECIMAL_FORMAT.format((double) 1.5d));
-		assertEquals('1,52', Result.API_DECIMAL_FORMAT.format((double) 1.52d));
-		assertEquals('1,52', Result.API_DECIMAL_FORMAT.format((double) 1.521d));
-		assertEquals('1,52', Result.API_DECIMAL_FORMAT.format((double) 1.524d));
-		assertEquals('1,53', Result.API_DECIMAL_FORMAT.format((double) 1.525d));
-		assertEquals('1,53', Result.API_DECIMAL_FORMAT.format((double) 1.529d));
+		assertEquals('1,50', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.5d));
+		assertEquals('1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.52d));
+		assertEquals('1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.521d));
+		assertEquals('1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.524d));
+		assertEquals('1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.525d));
+		assertEquals('1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.529d));
 
-		assertEquals('-1,50', Result.API_DECIMAL_FORMAT.format((double) -1.5d));
-		assertEquals('-1,52', Result.API_DECIMAL_FORMAT.format((double) -1.52d));
-		assertEquals('-1,52', Result.API_DECIMAL_FORMAT.format((double) -1.521d));
-		assertEquals('-1,52', Result.API_DECIMAL_FORMAT.format((double) -1.524d));
-		assertEquals('-1,53', Result.API_DECIMAL_FORMAT.format((double) -1.525d));
-		assertEquals('-1,53', Result.API_DECIMAL_FORMAT.format((double) -1.529d));
+		assertEquals('-1,50', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.5d));
+		assertEquals('-1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.52d));
+		assertEquals('-1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.521d));
+		assertEquals('-1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.524d));
+		assertEquals('-1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.525d));
+		assertEquals('-1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.529d));
 	}
 
 	@Test
@@ -87,7 +89,7 @@ class ResultTests {
 		jobResult.job = job 
 
 		// Run the test
-		Result out = new Result(eventResult);
+		EventResultDto out = new EventResultDto(eventResult);
 
 		// Verify results
 		assertEquals('1,51', out.csiValue);
@@ -128,7 +130,7 @@ class ResultTests {
 		jobResult.job = job
 
 		// Run the test
-		Result out = new Result(eventResult);
+		EventResultDto out = new EventResultDto(eventResult);
 
 		// Verify results
 		assertEquals('not calculated', out.csiValue);
