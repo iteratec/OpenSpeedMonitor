@@ -16,7 +16,7 @@ else
 
   git tag $bamboo_ci_app_version
   git remote add github $bamboo_planRepository_repositoryUrl
-  git pull --rebase github/$bamboo_planRepository_branch $bamboo_planRepository_branch
+  git pull --rebase github $bamboo_planRepository_branch
   git config push.default simple
-  git push github ${bamboo.planRepository.branch}
+  git push github $bamboo_planRepository_branch
 fi
