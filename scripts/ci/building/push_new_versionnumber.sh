@@ -4,6 +4,7 @@ if [ -z $bamboo_ci_app_version ]; then
   echo "No version-number found: ${bamboo_ci_app_version}"
   exit 1
 else
+  GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
   echo "Found version-number: ${bamboo_ci_app_version}"
 
   git config user.email "jenkins@seu.hh.iteratec.de"
