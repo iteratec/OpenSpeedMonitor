@@ -9,7 +9,7 @@ else
   git config user.email "jenkins@seu.hh.iteratec.de"
   git config user.name "jenkins@seu"
 
-  git checkout $bamboo_planRepository_1_branchName
+
   git add --all
   git commit -m "[${bamboo_ci_app_version}] version update"
 
