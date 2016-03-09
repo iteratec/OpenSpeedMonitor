@@ -9,7 +9,6 @@ else
   git config user.email "jenkins@seu.hh.iteratec.de"
   git config user.name "jenkins@seu"
 
-
   git add --all
   git commit -m "[${bamboo_ci_app_version}] version update"
 
@@ -18,5 +17,6 @@ else
   git tag $bamboo_ci_app_version
   git pull --rebase
   git config push.default simple
-  git push
+  git remote add github ${bamboo.planRepository.repositoryUrl}
+  git push github ${bamboo.planRepository.branch}
 fi
