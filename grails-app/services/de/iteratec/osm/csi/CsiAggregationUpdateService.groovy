@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -24,20 +25,35 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
+import org.springframework.transaction.annotation.Propagation
 
 /**
  * Provides methods for calculating and retrieving {@link CsiAggregation}s.
  * @author nkuhn, fpavkovic
  *
  */
+@Transactional
 class CsiAggregationUpdateService {
-	
+
 	EventCsiAggregationService eventCsiAggregationService
 	PageCsiAggregationService pageCsiAggregationService
 	ShopCsiAggregationService shopCsiAggregationService
 	CsiSystemCsiAggregationService csiSystemCsiAggregationService
 	CsiAggregationUtilService csiAggregationUtilService
 	JobResultDaoService jobResultDaoService
+
+    /**
+     *
+     * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResultId.
+     * Marks weekly {@link CsiAggregation}s which depend from param newResult as CsiAggregation.Calculated.Not.
+     *
+     * @param eventResultId
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    void createOrUpdateDependentMvs(long eventResultId) {
+        EventResult erToUpdateCsiAggregationsFor = EventResult.get(eventResultId)
+        if (erToUpdateCsiAggregationsFor) createOrUpdateDependentMvs(erToUpdateCsiAggregationsFor)
+    }
 	
 	/**
 	 * Calculates or recalculates hourly-job {@link CsiAggregation}s which depend from param newResult.
@@ -45,6 +61,7 @@ class CsiAggregationUpdateService {
 	 * @param newResult
 	 */
 	void createOrUpdateDependentMvs(EventResult newResult) {
+
 		JobResult jobResult = newResult.jobResult;
 		DateTime testCompletion = new DateTime(jobResult.date)
 		
@@ -65,6 +82,7 @@ class CsiAggregationUpdateService {
 		pageCsiAggregationService.markMvAsOutdated(startOfInterval, newResult, interval)
 		shopCsiAggregationService.markMvAsOutdated(startOfInterval, newResult, interval)
 		csiSystemCsiAggregationService.markCaAsOutdated(startOfInterval, newResult, interval)
+
 	}
 	
 }

@@ -67,8 +67,6 @@ enum TriggerGroup {
  */
 class JobProcessingService {
 
-	static transactional = false
-
 	ProxyService proxyService
 	def quartzScheduler
 	ConfigService configService
@@ -365,14 +363,16 @@ class JobProcessingService {
 	 * every pollDelaySeconds seconds is removed
 	 */
 	public int pollJobRun(Job job, String testId, String wptStatus = null) {
-		int statusCode = 400
+		int statusCode
 		try
 		{
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
                 statusCode = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
-                persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
+                if (statusCode < 200){
+                    persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
+                }
             }
 		} catch (Exception e) {
 			statusCode = 400

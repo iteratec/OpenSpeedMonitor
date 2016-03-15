@@ -235,21 +235,11 @@ class BootStrap {
 
         Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED).save(failOnError: true)
 
-        AggregatorType.findByName(AggregatorType.MEASURED_EVENT) ?: new AggregatorType(
-                name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.PAGE) ?: new AggregatorType(
-                name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.PAGE_AND_BROWSER) ?: new AggregatorType(
-                name: AggregatorType.PAGE_AND_BROWSER, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.SHOP) ?: new AggregatorType(
-                name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.CSI_SYSTEM) ?: new AggregatorType(
-                name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
+        createAggregatorTypeIfMissing(AggregatorType.MEASURED_EVENT, MeasurandGroup.NO_MEASURAND)
+        createAggregatorTypeIfMissing(AggregatorType.PAGE, MeasurandGroup.NO_MEASURAND)
+        createAggregatorTypeIfMissing(AggregatorType.PAGE_AND_BROWSER, MeasurandGroup.NO_MEASURAND)
+        createAggregatorTypeIfMissing(AggregatorType.SHOP, MeasurandGroup.NO_MEASURAND)
+        createAggregatorTypeIfMissing(AggregatorType.CSI_SYSTEM, MeasurandGroup.NO_MEASURAND)
 
         CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
                 name: "hourly",

@@ -23,6 +23,7 @@ import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
+import org.springframework.transaction.annotation.Propagation
 
 import java.util.zip.GZIPOutputStream
 
@@ -83,6 +84,7 @@ class LocationAndResultPersisterService implements iListener{
 	 * Persisting non-existent locations.
 	 */
 	@Override
+    @Transactional
 	public void listenToLocations(GPathResult result, WebPageTestServer wptserverForLocation) {
 		log.info("Location.count before creating non-existent= ${Location.count()}")
 		def query
@@ -152,31 +154,32 @@ class LocationAndResultPersisterService implements iListener{
 		
 		String testId = resultXml.getTestId()
 		log.debug("test-ID for which results should get persisted now=${testId}")
+
 		if(testId != null){
-			
-			JobResult jobRun
-			JobResult.withTransaction { TransactionStatus status ->
-				try{
-					log.debug("deleting results marked as pending or running ...")
-					deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
-					log.debug("deleting results marked as pending or running ... DONE")
-					log.debug("persisting job result ...")
-					jobRun = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId)?:
-						persistNewJobRun(jobConfig, resultXml).save(failOnError: true);
-					log.debug("persisting job result ... DONE")
-				} catch (Exception e) {
-					status.setRollbackOnly()
-					log.error("An error occurred while deleting pending and persisting new JobResult: " +
-                            "job=${jobConfig.label}, test-id=${testId}", e)
-				}
-			}
+
+            log.debug("Deleting pending JobResults and create finished ...")
+			JobResult jobRun = removePendingAndCreateFinishedJobResult(resultXml, testId, jobConfig)
+            log.debug("Deleting pending JobResults and create finished ... DONE")
 					
-			if (jobRun != null) persistResultsForAllTeststeps(jobRun, resultXml, jobConfig, har)
+			if (jobRun != null) {
+                List<EventResult> resultsOfAllTeststeps = persistResultsForAllTeststeps(jobRun, resultXml, jobConfig, har)
+                informDependents(resultsOfAllTeststeps)
+            }
 			
 		}
 	}
-	
-	/**
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    private JobResult removePendingAndCreateFinishedJobResult(resultXml, String testId, jobConfig) {
+
+        deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
+
+        return JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId, [fetch:[job: "eager"]]) ?:
+                persistNewJobRun(jobConfig, resultXml).save(failOnError: true);
+
+    }
+
+    /**
 	 * <p>
 	 * Checks ...
 	 * <ul>
@@ -204,6 +207,7 @@ class LocationAndResultPersisterService implements iListener{
 		}
 	}
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
 	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){
 
 		String testId = resultXml.getTestId()
@@ -216,7 +220,7 @@ class LocationAndResultPersisterService implements iListener{
 		Integer jobRunStatus = resultXml.getStatusCodeOfWholeTest()
 		Date testCompletion = resultXml.getCompletionDate()
 		jobConfig.lastRun = testCompletion
-		jobConfig.save(failOnError: true)
+        jobConfig.merge(failOnError: true)
 
 		JobResult result = new JobResult(
             job: jobConfig,
@@ -240,28 +244,32 @@ class LocationAndResultPersisterService implements iListener{
 		
 		return result
 	}
-	void persistResultsForAllTeststeps(JobResult jobRun, WptResultXml resultXml, Job job, String har){
+
+	List<EventResult> persistResultsForAllTeststeps(JobResult jobRun, WptResultXml resultXml, Job job, String har){
 		
 		Integer testStepCount = resultXml.getTestStepCount()
 
 		log.debug("starting persistance of ${testStepCount} event results for test steps")
-		List<EventResult> resultsOfTeststep = []
+		List<EventResult> resultsOfAllTeststeps = []
 		testStepCount.times{nullBasedTeststepIndex ->
 
 			//TODO: possible to catch non median results at this position  and check if they should persist or not
 
             try{
-                resultsOfTeststep.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job))
+                resultsOfAllTeststeps.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job))
             } catch (Exception e) {
                 log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
             }
 
 		}
-		informDependents(resultsOfTeststep)
+        return resultsOfAllTeststeps
 	}
 
+    @Transactional(noRollbackFor = [RuntimeException], propagation = Propagation.REQUIRES_NEW)
 	protected List<EventResult> persistResultsOfOneTeststep(
 		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job){
+
+        jobRun.merge(failOnError: true)
 
 		log.debug('getting event name from xml result ...')
 		String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
@@ -356,7 +364,6 @@ class LocationAndResultPersisterService implements iListener{
      *          String to build webpagetest server link for this {@link EventResult} from.
      * @return  Saved {@link EventResult}.
      */
-    @Transactional(noRollbackFor = [Exception])
 	protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run,Boolean median,
 			GPathResult viewTag, String waterfallAnchor){
 
@@ -413,11 +420,9 @@ class LocationAndResultPersisterService implements iListener{
         result.testAgent=jobRun.testAgent
         setConnectivity(result, jobRun)
 
-		// FIXME: 2014-01-27-nku
-		//The following line is necessary in unit-tests since Grails version 2.3, but isn't in production. Should be removed if this bug s fixed in grails.  
-		result.save(failOnError: true)
-		jobRun.save(flush: true, failOnError: true)
-		
+        jobRun.merge(failOnError: true)
+        result.save(failOnError: true)
+
 		return result
 		
 	}
@@ -462,7 +467,7 @@ class LocationAndResultPersisterService implements iListener{
 	void informDependentCsiAggregations(EventResult result){
 		try{
 			if (csiValueService.isCsiRelevant(result)) {
-				csiAggregationUpdateService.createOrUpdateDependentMvs(result)
+				csiAggregationUpdateService.createOrUpdateDependentMvs(result.ident())
 			}
 		}catch(Exception e){
 			log.error("An error occurred while creating EventResult-dependent CsiAggregations for result: ${result}", e)
@@ -481,13 +486,15 @@ class LocationAndResultPersisterService implements iListener{
 	
 	private Location getOrFetchLocation(WebPageTestServer wptserverOfResult, String locationIdentifier) {
 		
-		Location location=queryForLocation(wptserverOfResult, locationIdentifier);
+		Location location = queryForLocation(wptserverOfResult, locationIdentifier);
 		
-		if(location==null) {
+		if(location == null) {
+
 			log.warn("Location not found trying to refresh ${wptserverOfResult} and ${locationIdentifier}.")
 			proxyService.fetchLocations(wptserverOfResult);
 			
-			location=queryForLocation(wptserverOfResult, locationIdentifier);
+			location = queryForLocation(wptserverOfResult, locationIdentifier);
+
 		}
 		
 		if(location==null) {
@@ -498,7 +505,7 @@ class LocationAndResultPersisterService implements iListener{
 	}
 	
 	private Location queryForLocation(WebPageTestServer wptserverOfResult, String locationIdentifier) {
-		Location location;
+
 		def query = Location.where {
 			wptServer == wptserverOfResult && uniqueIdentifierForServer == locationIdentifier
 		}
