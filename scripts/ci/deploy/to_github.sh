@@ -2,11 +2,6 @@
 
 set -e
 
-GITHUB_API_ACCESS_TOKEN_ITERASPEED="0bbefd326aba056dc17afd66999dc2ab52058816"
-
-GITHUB_REPOSITORY_URL="ssh://git@github.com:22/IteraSpeed/OpenSpeedMonitor.git"
-
-GITHUB_RELEASE_URL="https://api.github.com/repos/IteraSpeed/OpenSpeedMonitor/releases"
 
 
 # create github release ###############################
