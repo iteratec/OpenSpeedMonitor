@@ -23,12 +23,11 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
-import de.iteratec.osm.result.HttpArchive
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.dao.EventResultDaoService
 
 //import org.springframework.transaction.TransactionDefinition
 /**
@@ -45,7 +44,7 @@ class DbCleanupService {
     def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     /**
-     * Deletes all {@link EventResult}s {@link JobResult}s {@link HttpArchive}s before date toDeleteBefore.
+     * Deletes all {@link EventResult}s {@link JobResult}s before date toDeleteBefore.
      * @param toDeleteBefore	All results-data before this date get deleted.
      */
     void deleteResultsDataBefore(Date toDeleteBefore, boolean createBatchActivity = true){
@@ -67,7 +66,6 @@ class DbCleanupService {
                 JobResult.withNewTransaction {
                     dc.list(max: batchSize).each { JobResult jobResult ->
                         try {
-                            HttpArchive.findAllByJobResult(jobResult)*.delete()
 
                             jobResult.getEventResults().each { EventResult eventResult ->
                                 eventResult.delete()

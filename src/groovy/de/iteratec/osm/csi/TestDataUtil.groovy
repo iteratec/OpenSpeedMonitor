@@ -17,44 +17,30 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
-
-import static org.junit.Assert.*
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-
-import java.util.regex.Pattern
-
-import org.joda.time.DateTime
-import org.springframework.transaction.TransactionStatus
-
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.external.GraphitePath
-import de.iteratec.osm.report.external.GraphiteServer
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.HttpArchive
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.external.GraphitePath
+import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.result.*
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import org.joda.time.DateTime
+import org.springframework.transaction.TransactionStatus
+
+import java.util.regex.Pattern
+
+import static org.junit.Assert.assertNotNull
 
 /**
  * <p>
@@ -176,7 +162,6 @@ class TestDataUtil {
                 CsTargetValue.class,
                 CustomerFrustration.class,
                 TimeToCsMapping.class,
-                HttpArchive.class,
                 OsmConfiguration.class,
                 CsiAggregation.class,
                 CsiDay.class,
@@ -346,12 +331,6 @@ class TestDataUtil {
         }
 
         return timeToCsMappingList
-    }
-
-    static createHttpArchive(JobResult jobResult) {
-        new HttpArchive(
-                jobResult: jobResult
-        ).save(failOnError: true)
     }
 
     static OsmConfiguration createOsmConfiguration(int detailDataStorageTimeInWeeks) {

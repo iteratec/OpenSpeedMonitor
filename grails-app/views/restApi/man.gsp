@@ -129,8 +129,7 @@
 		"step": "Homepage",
 		"browser": "Firefox",
 		"location": "prod-rz1:Firefox",
-		"detailUrl": "http://wptserver-url.com/result/test-id",
-		"httpArchiveUrl": "http://wptserver-url.com/export.php?test=test-id"
+		"detailUrl": "http://wptserver-url.com/result/test-id"
 	},
 	{
 		"executionTime": "2014-07-02T00:01:12Z",
@@ -142,8 +141,7 @@
 		"step": "Homepage",
 		"browser": "Firefox",
 		"location": "prod-rz2:Firefox",
-		"detailUrl": "http://wptserver-url.com/result/test-id",
-		"httpArchiveUrl": "http://wptserver-url.com/export.php?test=test-id"
+		"detailUrl": "http://wptserver-url.com/result/test-id"
 	}]</pre>
 							<br />
 							The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.<br>

@@ -7,7 +7,10 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 import org.joda.time.DateTime
@@ -46,10 +49,8 @@ class JobControllerSpec extends IntTestWithDBCleanup {
     @Test
     void delete() {
         List<JobResult> jobResults = JobResult.findAllByJob(deleteJob)
-        List<HttpArchive> httpArchives =  []
         List<EventResult> eventResults = []
         jobResults.each {
-            httpArchives.addAll(HttpArchive.findAllByJobResult(it))
             eventResults.addAll(it.eventResults)
         }
         int oldJobCount = Job.count()
@@ -57,22 +58,18 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         int oldMeasuredEventCount = MeasuredEvent.count()
         assert jobResults.size() == 1
         assert eventResults.size() == 1
-        assert httpArchives.size() == 1
         //The Controller will use a promise to run the deletion within another thread, so we just check if the service will delete the job
         controllerUnderTest.jobService.deleteJob(deleteJob)
 
         List<Job> allJobs = Job.list()
         List<JobResult> allJobResults = JobResult.list()
         List<EventResult> allEventResults = EventResult.list()
-        List<HttpArchive> allHttpArchives = HttpArchive.list()
 
-        assertThat(allHttpArchives as Iterable<ArrayList<HttpArchive>>, not(hasItems(httpArchives)))
         assertThat(allJobResults as Iterable<List<JobResult>>, not(hasItems(jobResults)))
         assertThat(allEventResults as Iterable<ArrayList<EventResult>>, not(hasItems(eventResults)))
 
         assert allJobResults.size() == 1
         assert allEventResults.size() == 1
-        assert allHttpArchives.size() == 1
         assert allJobs.size() == oldJobCount - 1
         assertThat(allJobs, not(hasItem(deleteJob)))
         assert MeasuredEvent.count() == oldMeasuredEventCount
@@ -107,10 +104,8 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         String eventResultTag = "$group.id;$measuredEvent.id;$homepage.id;$browser.id;$ffAgent1.id";
 
         createEventResult(jobResultWithBeforeCleanupDate, eventResultTag)
-        createHttpArchive(jobResultWithBeforeCleanupDate)
 
         createEventResult(jobResultWithAfterCleanupDate, eventResultTag)
-        createHttpArchive(jobResultWithAfterCleanupDate)
     }
 
     private JobResult createJobResult(Job job) {

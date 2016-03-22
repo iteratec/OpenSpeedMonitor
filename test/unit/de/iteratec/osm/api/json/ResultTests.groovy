@@ -18,18 +18,16 @@
 package de.iteratec.osm.api.json
 
 import de.iteratec.osm.api.dto.EventResultDto
-
-import static org.junit.Assert.*
-
-import org.junit.*
-
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import org.junit.Test
+
+import static org.junit.Assert.assertEquals
 
 /**
  * Test-suite of {@link EventResultDto}.
@@ -98,7 +96,6 @@ class ResultTests {
 		assertEquals('Firefox7', out.browser);
 		assertEquals('agent01:IE', out.location);
 		assertEquals("${WPT_SERVER_BASE_URL}result/${TEST_ID}".toString(), out.detailUrl)
-		assertEquals("${WPT_SERVER_BASE_URL}export.php?test=${TEST_ID}".toString(), out.httpArchiveUrl)
 	}
 
 	@Test
@@ -139,7 +136,6 @@ class ResultTests {
 		assertEquals('Firefox7', out.browser);
 		assertEquals('agent01:IE', out.location);
 		assertEquals("${WPT_SERVER_BASE_URL}result/${TEST_ID}".toString(), out.detailUrl)
-		assertEquals("${WPT_SERVER_BASE_URL}export.php?test=${TEST_ID}".toString(), out.httpArchiveUrl)
 	}
 
 }

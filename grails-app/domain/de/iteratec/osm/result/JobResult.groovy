@@ -17,10 +17,8 @@
 
 package de.iteratec.osm.result
 
-import org.grails.databinding.BindUsing
-
 import de.iteratec.osm.measurement.schedule.Job
-
+import org.grails.databinding.BindUsing
 
 /**
  * <p>
@@ -45,8 +43,6 @@ class JobResult {
 
 	Job job
 	static belongsTo = [job : Job]
-
-    static hasOne = HttpArchive
 
 	/** timestamp of execution */
 	Date date

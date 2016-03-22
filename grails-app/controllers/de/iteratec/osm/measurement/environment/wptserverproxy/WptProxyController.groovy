@@ -116,7 +116,7 @@ class WptProxyController {
 	/**
 	 * Persists all non-existent {@link EventResult}s the REST-call to /xmlResult.php of wptserver (specified by url-param params.wptserver) delivers.
 	 * The following result-dependent domains get persisted, too (if they didn't already exist before): {@link Job}, {@link MeasuredEvent}, 
-	 * {@link JobResult}, {@link CsiAggregation}, {@link HttpArchive}
+	 * {@link JobResult}, {@link CsiAggregation}
 	 *   
 	 * Redirects to /xmlResult.php of wptserver afterwards.
 	 * 
