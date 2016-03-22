@@ -3,6 +3,7 @@
 # configure_deployment_*.sh-script must be run in front of this script
 # else variables will be missing
 #################
+set -e
 properties_file="./deploy.properties"
 
 # make external config file available as env variable
