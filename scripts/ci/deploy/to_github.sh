@@ -2,6 +2,11 @@
 
 set -e
 
+GITHUB_API_ACCESS_TOKEN_ITERASPEED=$bamboo_github_API_ACCESS_TOKEN_ITERASPEED
+
+GITHUB_REPOSITORY_URL=$bamboo_github_REPOSITORY_URL
+
+GITHUB_RELEASE_URL=$bamboo_github_RELEASE_URL
 
 
 # create github release ###############################
