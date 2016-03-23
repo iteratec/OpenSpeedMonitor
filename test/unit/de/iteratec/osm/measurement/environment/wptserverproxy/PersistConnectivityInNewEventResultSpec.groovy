@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.CsiTransformation
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
@@ -27,7 +26,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
@@ -41,7 +39,6 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import groovy.util.slurpersupport.GPathResult
 import spock.lang.Specification
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
@@ -99,7 +96,6 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     void createMocksCommonForAllTests() {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
-        mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
         serviceUnderTest.pageService = new PageService()
         mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
@@ -115,14 +111,13 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.setPredefinedConnectivityForJob(
                 ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
                 Job.findByLabel(LABEL_MULTISTEP_JOB)
         )
 
         when:
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         then:
         List<EventResult> allResults = EventResult.getAll()
@@ -139,13 +134,12 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
         TestDataUtil.setCustomConnectivityForJob(multistepJob)
         multistepJob.refresh()
 
         when:
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         then:
         List<EventResult> allResults = EventResult.getAll()
@@ -162,13 +156,12 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
         TestDataUtil.setNativeConnectivityForJob(multistepJob)
         multistepJob.refresh()
 
         when:
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         then:
         List<EventResult> allResults = EventResult.getAll()
@@ -191,14 +184,13 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.setPredefinedConnectivityForJob(
                 ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
                 Job.findByLabel(LABEL_SINGLESTEP_JOB)
         )
 
         when:
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         then:
         List<EventResult> allResults = EventResult.getAll()
@@ -213,13 +205,12 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
         TestDataUtil.setCustomConnectivityForJob(multistepJob)
         multistepJob.refresh()
 
         when:
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         then:
         List<EventResult> allResults = EventResult.getAll()
@@ -234,13 +225,12 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
         TestDataUtil.setNativeConnectivityForJob(multistepJob)
         multistepJob.refresh()
 
         when:
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         then:
         List<EventResult> allResults = EventResult.getAll()

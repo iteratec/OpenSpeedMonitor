@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import org.quartz.CronExpression
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -355,11 +356,24 @@ class TestDataUtil {
                 bandwidthUp: 512,
                 latency: 50,
                 packetLoss: 0,
-                connectivityProfile: profile
+                connectivityProfile: profile,
+                executionSchedule: '0 0 */2 * * ? *'
         ).save(failOnError: true)
     }
 
-    static createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation) {
+    /**
+     * Creates script with default values for label, description, navigationScript and provideAuthenticateInformation.
+     * @return Default script.
+     */
+    static Script createScript(){
+        return createScript(
+            'script label',
+            'script description',
+            'navigate http://www.osm.org',
+            false
+        )
+    }
+    static Script createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation) {
         return new Script(
                 label: label,
                 description: description,
@@ -821,25 +835,9 @@ class TestDataUtil {
     }
 
     static List<Page> createPages(List<String> allPageNames) {
-        List<Page> allPages = []
-        allPageNames.each { String pageName ->
-            Double weight = 0
-            switch (pageName) {
-                case 'HP': weight = 1; break
-                case 'MES': weight = 1; break
-                case 'SE': weight = 1; break
-                case 'ADS': weight = 1; break
-                case 'WKBS': weight = 1; break
-                case 'WK': weight = 1; break
-            }
-            allPages.add(
-                    new Page(
-                            name: pageName,
-                            weight: weight
-                    ).save(failOnError: true)
-            )
+        return allPageNames.collect {pageName->
+            new Page(name: pageName).save(failOnError: true)
         }
-        return allPages
     }
 
     static Page createPage(String name, Double weight) {

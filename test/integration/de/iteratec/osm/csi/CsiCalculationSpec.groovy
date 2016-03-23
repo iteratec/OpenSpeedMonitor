@@ -81,7 +81,6 @@ class CsiCalculationSpec extends Specification {
         serviceMocker.mockProxyService(serviceUnderTest)
         serviceMocker.mockMetricReportingService(serviceUnderTest)
         serviceMocker.mockCsiAggregationUpdateService(serviceUnderTest)
-        serviceMocker.mockConfigService(serviceUnderTest.timeToCsMappingService, 'org.h2.Driver', 60, CsiTransformation.BY_MAPPING)
 
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.15_multistep_1Run_WithVideo.xml'
@@ -103,7 +102,7 @@ class CsiCalculationSpec extends Specification {
         setup: "persist result"
         JobGroup jobGroup = JobGroup.findByName(jobGroupName_csi_1)
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
-        serviceUnderTest.listenToResult(xmlResult,"",server1)
+        serviceUnderTest.listenToResult(xmlResult,server1)
         Collection<EventResult> results = EventResult.findAll {
             csByWptDocCompleteInPercent != null
         }
@@ -118,7 +117,7 @@ class CsiCalculationSpec extends Specification {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
         jobGroup.csiConfiguration = csiConfiguration_all_1
         and: "and persist result for calculating csi"
-        serviceUnderTest.listenToResult(xmlResult,"",server1)
+        serviceUnderTest.listenToResult(xmlResult,server1)
         double csiValue = EventResult.findAll {
             csByWptDocCompleteInPercent != null
         }.first().csByWptDocCompleteInPercent
@@ -133,7 +132,7 @@ class CsiCalculationSpec extends Specification {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
         jobGroup.csiConfiguration = csiConfiguration_all_05
         and: "and persist result for calculating csi"
-        serviceUnderTest.listenToResult(xmlResult,"",server1)
+        serviceUnderTest.listenToResult(xmlResult,server1)
         double csiValue = EventResult.findAll {
             csByWptDocCompleteInPercent != null
         }.first().csByWptDocCompleteInPercent

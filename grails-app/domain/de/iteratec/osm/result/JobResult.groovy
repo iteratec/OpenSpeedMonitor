@@ -153,6 +153,9 @@ class JobResult {
 		jobConfigLabel (index: 'testId_and_jobConfigLabel_idx')
 		wptStatus(type: 'text')
 	}
+
+    static transients = ['eventResults']
+
 	String toString(){
 		return (testId?:id)?:super.toString()
 	}

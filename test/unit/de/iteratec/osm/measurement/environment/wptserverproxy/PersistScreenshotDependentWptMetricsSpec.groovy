@@ -17,14 +17,6 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.CsiTransformation
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.PageService
-import de.iteratec.osm.util.PerformanceLoggingService
-
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.*
-
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
@@ -33,15 +25,18 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.*
+import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import groovy.util.slurpersupport.GPathResult
-import grails.test.mixin.*
-import grails.test.mixin.support.*
+
+import static org.hamcrest.Matchers.*
+import static org.junit.Assert.assertThat
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -106,7 +101,6 @@ class PersistScreenshotDependentWptMetricsSpec {
     void createMocksCommonForAllTests() {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
-        mocker.mockConfigService(serviceUnderTest, 'this.jdbc.driver.wont.support.rlike', 60, CsiTransformation.BY_RANK)
         mocker.mockMetricReportingService(serviceUnderTest)
         serviceUnderTest.pageService = new PageService()
         mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
@@ -133,12 +127,11 @@ class PersistScreenshotDependentWptMetricsSpec {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2, Page.findByName('SE'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3, Page.findByName('SE'))
         //test execution
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
         //assertions
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(3))
@@ -157,12 +150,11 @@ class PersistScreenshotDependentWptMetricsSpec {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2, Page.findByName('SE'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3, Page.findByName('SE'))
         //test execution
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
         //assertions
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(3))
@@ -180,13 +172,12 @@ class PersistScreenshotDependentWptMetricsSpec {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2, Page.findByName('SE'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3, Page.findByName('SE'))
 
         //test execution
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         //prepare expected results data for this test
         Map expectedScreenshotDependentMetrics = [
@@ -247,10 +238,9 @@ class PersistScreenshotDependentWptMetricsSpec {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME, Page.findByName('HP'))
         //test execution
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
         //assertions
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(2))
@@ -265,10 +255,9 @@ class PersistScreenshotDependentWptMetricsSpec {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO_EVENTNAME, Page.findByName('HP'))
         //test execution
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
         //assertions
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(2))
@@ -285,15 +274,14 @@ class PersistScreenshotDependentWptMetricsSpec {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO}")
         GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
-        String har = 'notTheConcernOfThisTest'
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO_EVENTNAME, Page.findByName('HP'))
 
         //test execution
-        serviceUnderTest.listenToResult(xmlResult, har, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
+        serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
 
         //assertions
         List<EventResult> allResults = EventResult.getAll()
-        assertThat(allResults.size(), is(10))
+            assertThat(allResults.size(), is(10))
 
         // fv
 

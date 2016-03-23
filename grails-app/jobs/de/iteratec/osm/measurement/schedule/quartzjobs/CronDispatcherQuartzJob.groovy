@@ -26,6 +26,9 @@ import de.iteratec.osm.measurement.schedule.TriggerGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 
 class CronDispatcherQuartzJob {
+
+    static transactional = false
+
 	JobProcessingService jobProcessingService
     PerformanceLoggingService performanceLoggingService
 
@@ -50,9 +53,9 @@ class CronDispatcherQuartzJob {
                     jobProcessingService.launchJobRun(job)
                 }
 			} else if (triggerGroup == TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value()) {
-                performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Polling of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE){
+//                performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Polling of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE){
                     jobProcessingService.pollJobRun(job, testId)
-                }
+//                }
 			} else if (triggerGroup == TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value()) {
                 performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Handle Job run timeout for job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE){
                     jobProcessingService.handleJobRunTimeout(job, testId)

@@ -17,20 +17,8 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
-import de.iteratec.osm.result.CsiValueService
-import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.Transactional
-import groovy.util.slurpersupport.GPathResult
-import org.springframework.transaction.annotation.Propagation
-
-import java.util.zip.GZIPOutputStream
-
-import org.springframework.transaction.TransactionStatus
-
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiAggregationUpdateService
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
@@ -39,20 +27,17 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.detail.HarParserService
+import de.iteratec.osm.result.*
+import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.Transactional
+import groovy.util.slurpersupport.GPathResult
+import org.springframework.transaction.annotation.Propagation
+
+import java.util.zip.GZIPOutputStream
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-
 /**
  * Persists locations and results. Observer of ProxyService.
  * @author rschuett, nkuhn
@@ -68,15 +53,10 @@ class LocationAndResultPersisterService implements iListener{
 	CsiAggregationUpdateService csiAggregationUpdateService
 	TimeToCsMappingService timeToCsMappingService
 	PageService pageService
-	JobService jobService
-	EventResultService eventResultService
 	CsiAggregationTagService csiAggregationTagService
 	ProxyService proxyService
 	MetricReportingService metricReportingService
-	HarParserService harParserService
-	ConfigService configService
     PerformanceLoggingService performanceLoggingService
-    ConnectivityProfileService connectivityProfileService
 	CsiValueService csiValueService
 
 
@@ -126,56 +106,64 @@ class LocationAndResultPersisterService implements iListener{
 	@Override
 	public void listenToResult(
 			GPathResult xmlResultResponse,
-			String har,
 			WebPageTestServer wptserverOfResult) {
 			
 		WptResultXml resultXml = new WptResultXml(xmlResultResponse)
-			
-        Job jobConfig
-        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
-            String jobLabel = resultXml.getLabel()
-            jobConfig = Job.findByLabel(jobLabel)
-            if (jobConfig == null) throw new RuntimeException("No measurement job could be found for label from result xml: ${jobLabel}")
+
+        try{
+
+            checkJobAndLocation(resultXml, wptserverOfResult)
+            persistJobResult(resultXml)
+            persistResultsForAllTeststeps(resultXml)
+            informDependents(resultXml)
+
+        }catch(OsmResultPersistanceException e){
+            log.error(e.message, e)
         }
 
-		if (jobConfig != null) {
-            performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult and EventResults for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
-                persistJobResultAndAssociatedEventResults(jobConfig, resultXml, wptserverOfResult, har)
-            }
-        }
-			
-	}
-			
-	void persistJobResultAndAssociatedEventResults(Job jobConfig, WptResultXml resultXml, WebPageTestServer wptserverOfResult, String har){
-		
-		log.debug('updating locations ...')
-		updateLocationIfNeededAndPossible(jobConfig, resultXml, wptserverOfResult);
-		log.debug('updating locations ... DONE')
-		
-		String testId = resultXml.getTestId()
-		log.debug("test-ID for which results should get persisted now=${testId}")
-
-		if(testId != null){
-
-            log.debug("Deleting pending JobResults and create finished ...")
-			JobResult jobRun = removePendingAndCreateFinishedJobResult(resultXml, testId, jobConfig)
-            log.debug("Deleting pending JobResults and create finished ... DONE")
-					
-			if (jobRun != null) {
-                List<EventResult> resultsOfAllTeststeps = persistResultsForAllTeststeps(jobRun, resultXml, jobConfig, har)
-                informDependents(resultsOfAllTeststeps)
-            }
-			
-		}
 	}
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private JobResult removePendingAndCreateFinishedJobResult(resultXml, String testId, jobConfig) {
+    void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult) throws OsmResultPersistanceException{
+        Job job
+        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+            String jobLabel = resultXml.getLabel()
+            job = Job.findByLabel(jobLabel)
+            if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for label from result xml: ${jobLabel}")
+        }
+        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+            updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+	void persistJobResult(WptResultXml resultXml) throws OsmResultPersistanceException{
+
+        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR){
+            String testId = resultXml.getTestId()
+            log.debug("test-ID for which results should get persisted now=${testId}")
+
+            if(testId == null){
+                throw new OsmResultPersistanceException("No test id in result xml file from wpt server!")
+            }
+
+            log.debug("Deleting pending JobResults and create finished ...")
+            removePendingAndCreateFinishedJobResult(resultXml, testId)
+            log.debug("Deleting pending JobResults and create finished ... DONE")
+        }
+		
+	}
+
+    private JobResult removePendingAndCreateFinishedJobResult(resultXml, String testId) {
+
+        String jobLabel = resultXml.getLabel()
+        Job job = Job.findByLabel(jobLabel)
+        if (job == null) throw new RuntimeException("No measurement job could be found for label from result xml: ${jobLabel}")
 
         deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
 
-        return JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId, [fetch:[job: "eager"]]) ?:
-                persistNewJobRun(jobConfig, resultXml).save(failOnError: true);
+        return JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), testId) ?:
+                persistNewJobRun(job, resultXml).save(failOnError: true);
 
     }
 
@@ -207,7 +195,6 @@ class LocationAndResultPersisterService implements iListener{
 		}
 	}
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
 	protected JobResult persistNewJobRun(Job jobConfig, WptResultXml resultXml){
 
 		String testId = resultXml.getTestId()
@@ -245,31 +232,41 @@ class LocationAndResultPersisterService implements iListener{
 		return result
 	}
 
-	List<EventResult> persistResultsForAllTeststeps(JobResult jobRun, WptResultXml resultXml, Job job, String har){
+	void persistResultsForAllTeststeps(WptResultXml resultXml){
 		
 		Integer testStepCount = resultXml.getTestStepCount()
 
 		log.debug("starting persistance of ${testStepCount} event results for test steps")
-		List<EventResult> resultsOfAllTeststeps = []
 		testStepCount.times{nullBasedTeststepIndex ->
 
 			//TODO: possible to catch non median results at this position  and check if they should persist or not
 
             try{
-                resultsOfAllTeststeps.addAll(persistResultsOfOneTeststep(nullBasedTeststepIndex, jobRun, resultXml, job))
+                persistResultsOfOneTeststep(nullBasedTeststepIndex,resultXml)
             } catch (Exception e) {
                 log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
             }
 
 		}
-        return resultsOfAllTeststeps
 	}
 
-    @Transactional(noRollbackFor = [RuntimeException], propagation = Propagation.REQUIRES_NEW)
-	protected List<EventResult> persistResultsOfOneTeststep(
-		Integer testStepZeroBasedIndex, JobResult jobRun, WptResultXml resultXml, Job job){
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+	protected List<EventResult> persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml) throws OsmResultPersistanceException{
 
-        jobRun.merge(failOnError: true)
+        String testId = resultXml.getTestId()
+        String labelInXml = resultXml.getLabel()
+        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(labelInXml, testId)
+        if (jobResult == null){
+            throw new OsmResultPersistanceException(
+                "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
+            )
+        }
+        Job job = Job.findByLabel(labelInXml)
+        if (job == null){
+            throw new OsmResultPersistanceException(
+                "No Job exists with label '${labelInXml}' while persting associated EventResults!"
+            )
+        }
 
 		log.debug('getting event name from xml result ...')
 		String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
@@ -289,12 +286,12 @@ class LocationAndResultPersisterService implements iListener{
 		resultXml.getRunCount().times {Integer runNumber ->
             if( resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex)) ) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobRun, event, waterfallAnchor)
+                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event, waterfallAnchor)
                 if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
             }
             if( resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex)) ) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobRun, event, waterfallAnchor)
+                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event, waterfallAnchor)
                 if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
             }
 		}
@@ -438,9 +435,17 @@ class LocationAndResultPersisterService implements iListener{
             }
         }
     }
-	private void informDependents(List<EventResult> results){
+	private void informDependents(WptResultXml resultXml){
+
+        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getTestId(), resultXml.getLabel())
+        if (jobResult == null){
+            throw new OsmResultPersistanceException(
+                    "JobResult couldn't be read from db while informing dependents!"
+            )
+        }
+        List<EventResult> results = jobResult.getEventResults()
 		
-		log.debug('informing event result dependents ...')
+		log.debug("informing event result dependents about ${results.size()} new results...")
 		results.each {EventResult result ->
 			informDependent(result)
 		}
