@@ -3,7 +3,6 @@
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <% def springSecurityService %>
-%{--TODOMARCUS braucht man das?--}%
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <%
     def userspecificCSIDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificCsiDashboard').newInstance()

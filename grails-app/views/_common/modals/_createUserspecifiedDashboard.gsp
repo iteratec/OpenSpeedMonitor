@@ -48,8 +48,7 @@
 
     </div>
 </div>
-%{--TODOMARCUS asset--}%
-<script type="text/javascript">
+<asset:script type="text/javascript">
 
     function startSpinner(spinnerElement) {
         var opts = {
@@ -247,4 +246,4 @@
             return false;
         }
     }
-</script>
+</asset:script>
