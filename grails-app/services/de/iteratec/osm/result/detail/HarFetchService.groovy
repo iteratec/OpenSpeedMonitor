@@ -67,9 +67,18 @@ class HarFetchService {
      * @param id
      */
     public void addJobResultToQueue(long id){
-        if(configService.isDetailFetchingEnabled()){
+        if(configService.isDetailFetchingEnabled() && shouldPersistHar(id)){
             new HARJob(jobResultIDs: [id]).save(failOnError: true)
         }
+    }
+
+    /**
+     * Decides if a JobResults HAR should be persisted
+     * @param id JobResult ID
+     * @return boolean
+     */
+    public boolean shouldPersistHar(long id){
+        JobResult.get(id).job.jobGroup.persistHar
     }
 
     /**

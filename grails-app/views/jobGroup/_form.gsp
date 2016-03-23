@@ -46,3 +46,13 @@
     </div>
 </div>
 
+<div>
+    <label for="csiConfiguration" class="control-label"><g:message code="job.jobGroup.persistHar.label"
+                                                                   default="Persist Detaildata"/></label>
+
+    <div class="controls">
+        <g:checkBox name="persistHar" />
+    </div>
+
+</div>
+
