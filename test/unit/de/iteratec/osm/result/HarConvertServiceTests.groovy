@@ -86,7 +86,7 @@ class   HarConvertServiceTests extends Specification{
             assetGroup.assets == assetList
             assetGroup.browser == simpleJob.location.browser.id
             assetGroup.jobResult == jobResult.id
-        
+
     }
 
 
