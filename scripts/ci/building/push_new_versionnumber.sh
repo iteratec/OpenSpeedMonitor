@@ -15,8 +15,8 @@ else
   echo "set remote $remote to '$remote_url'"
   git remote add -f $remote $remote_url
 
-  git config user.email "jenkins@seu.hh.iteratec.de"
-  git config user.name "jenkins@seu"
+  git config user.email "wpt@iteratec.de"
+  git config user.name "bamboo iteratec"
 
   git commit -am "[${bamboo_ci_app_version}] version update"
   git tag "${bamboo_ci_app_version}"
