@@ -440,7 +440,8 @@ class LocationAndResultPersisterService implements iListener{
         JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getTestId(), resultXml.getLabel())
         if (jobResult == null){
             throw new OsmResultPersistanceException(
-                    "JobResult couldn't be read from db while informing dependents!"
+                    "JobResult couldn't be read from db while informing dependents " +
+                            "(testId='${resultXml.getTestId()}', jobConfigLabel='${resultXml.getLabel()}')!"
             )
         }
         List<EventResult> results = jobResult.getEventResults()
