@@ -437,7 +437,7 @@ class LocationAndResultPersisterService implements iListener{
     }
 	private void informDependents(WptResultXml resultXml){
 
-        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getTestId(), resultXml.getLabel())
+        JobResult jobResult = JobResult.findByJobConfigLabelAndTestId(resultXml.getLabel(), resultXml.getTestId())
         if (jobResult == null){
             throw new OsmResultPersistanceException(
                     "JobResult couldn't be read from db while informing dependents " +

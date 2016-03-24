@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import org.quartz.CronExpression
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
@@ -131,7 +130,7 @@ class TestDataUtil {
 
             Job.withTransaction { TransactionStatus status ->
 
-                removeAssociatedDomainsFromCollections()
+                removeAssociatedDomainsFromCollections(domainClass)
                 domainClass.list()*.delete(flush: true)
 
                 status.flush()
@@ -140,11 +139,24 @@ class TestDataUtil {
         }
     }
 
-    public static void removeAssociatedDomainsFromCollections() {
-        GraphiteServer.list().each {
-            it.graphitePaths = []
-            it.save(failOnError: true)
+    public static void removeAssociatedDomainsFromCollections(domainClass) {
+        if (domainClass == GraphitePath.class){
+            GraphiteServer.list().each {
+                it.graphitePaths = []
+                it.save(failOnError: true)
+            }
+        }else if(domainClass == TimeToCsMapping.class){
+            CsiConfiguration.list().each {
+                it.timeToCsMappings = []
+                it.browserConnectivityWeights = []
+                it.pageWeights = []
+                it.save(failOnError: true)
+            }
+        }else if(domainClass == CsiConfiguration.class){
+
         }
+
+
     }
 
     public static int getCountOfAllObjectsInDatabase() {
@@ -163,14 +175,17 @@ class TestDataUtil {
                 CsTargetValue.class,
                 CustomerFrustration.class,
                 TimeToCsMapping.class,
+                PageWeight.class,
+                BrowserConnectivityWeight.class,
                 OsmConfiguration.class,
                 CsiAggregation.class,
-                CsiDay.class,
                 EventResult.class,
                 JobResult.class,
                 Job.class,
                 Script.class,
                 JobGroup.class,
+                CsiConfiguration.class,
+                CsiDay.class,
                 Location.class,
                 Browser.class,
                 BrowserAlias.class,
@@ -1269,7 +1284,8 @@ class TestDataUtil {
                 minDocCompleteTimeInMillisecs: 250,
                 maxDocCompleteTimeInMillisecs: 180000,
                 initialChartHeightInPixels: 400,
-                maxDataStorageTimeInMonths: 12
+                maxDataStorageTimeInMonths: 12,
+                csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
     }
 
