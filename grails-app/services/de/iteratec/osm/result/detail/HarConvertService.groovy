@@ -15,13 +15,11 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.persistence
+package de.iteratec.osm.result.detail
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.detail.Asset
-import de.iteratec.osm.result.detail.AssetGroup
 
 /**
  * HarConvertService
@@ -38,52 +36,31 @@ class HarConvertService {
             har.log.pages.each { page ->
                 String harPageId = page.id
                 List<Asset> assets = extractAssetListForPage(har, harPageId)
-                assetGroups.addAll(createAssetGroupsForPage(page,assets, result))
+                assetGroups.add(createAssetGroupForPage(page,assets, result))
             }
         }
         return assetGroups
     }
 
     /**
-     * Takes a page map and the matching asset list from har, merges them and persists the result
+     * Takes a page map and the matching asset list from har and merges them
      * @param page Page Map from HAR
      * @param assets Asset List from HAR
      * @param jobResult JobResult which belongs to the given har data
      */
-    private static List<AssetGroup> createAssetGroupsForPage(Map page, List<Asset> assets, JobResult jobResult){
-        Map<String, List<Asset>> assetMap = createAssetMediaTypeMap(assets)
-        List<AssetGroup> assetGroups = []
-        assetMap.each {
-           assetGroups << new AssetGroup(page:getPageIDFromEventName(page._eventName as String),
-                    jobGroup: jobResult.job.jobGroup.id,
-                    connectivity: getConnectivity(jobResult),
-                    jobResult: jobResult.id,
-                    location: jobResult.job.location.id,
-                    browser: jobResult.job.location.browser.id,
-                    assets:it.value,
-                    mediaType: it.key,
-                    date: jobResult.date.getTime()/1000,
-                    cached: page._cached,
-                    eventName: page._eventName,
-                    title: page._title
-            )
-        }
-        return assetGroups
-    }
-
-    /**
-     * Converts a List of Assets to a Map, where every media type from the given Assets will
-     * be one key and every asset with the same media type will be in a list, which is the value
-     *
-     * @param assets
-     * @return
-     */
-    private static Map<String, List<Asset>> createAssetMediaTypeMap(List<Asset> assets){
-        Map<String, List<Asset>> assetMap = [:].withDefault {[]}
-        assets.each {
-            assetMap[it.mediaType] << it
-        }
-        return assetMap
+    private static AssetGroup createAssetGroupForPage(Map page, List<Asset> assets, JobResult jobResult){
+        AssetGroup assetGroup = new AssetGroup(page:getPageIDFromEventName(page._eventName as String?:""),
+                jobGroup: jobResult.job.jobGroup.id,
+                connectivity: getConnectivity(jobResult),
+                jobResult: jobResult.id,
+                location: jobResult.job.location.id,
+                browser: jobResult.job.location.browser.id,
+                assets:assets,
+                date: jobResult.date.getTime()/1000,
+                cached: page._cached,
+                eventName: page._eventName,
+                title: page._title)
+        return assetGroup
     }
 
 
@@ -187,6 +164,7 @@ class HarConvertService {
                     timeToFirstByteMs: it._ttfb_ms,
                     mediaType: mimeType[0],
                     subtype: mimeType[1],
+                    sslNegotiationTimeMs: it._ssl_ms,
                     urlWithoutParams: createURLWithoutParams(it._full_url)
             )
         }

@@ -35,7 +35,6 @@ class AssetGroup {
     long browser
     //The Mongoplugin maps dates to a epoch time, but as String. So we manually persist it as long
     long date
-    String mediaType
     long _id
 
     List<Asset> assets

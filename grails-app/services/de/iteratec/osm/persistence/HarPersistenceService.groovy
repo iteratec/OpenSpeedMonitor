@@ -21,6 +21,7 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.detail.AssetGroup
 import de.iteratec.osm.result.detail.HARStatus
+import de.iteratec.osm.result.detail.HarConvertService
 
 /**
  */
