@@ -46,8 +46,9 @@ class HarPersistenceService {
             assetGroups.each {
                 it.save(failOnError: true)
             }
+            status = HARStatus.PERSISTED
         }
-        jobResultDaoService.changeHARStatus(result, status)
+        jobResultDaoService.changeHARStatus(result.id, status)
         log.debug("JobResult ${result.id} harStatus: $status")
     }
 

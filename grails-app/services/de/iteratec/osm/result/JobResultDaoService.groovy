@@ -52,7 +52,8 @@ class JobResultDaoService {
 	 * @param result Result to change
 	 * @param status new HARStatus
 	 */
-	public void changeHARStatus(JobResult result, HARStatus status){
+	public void changeHARStatus(long id, HARStatus status){
+		JobResult result = JobResult.lock(id)
 		result.harStatus = status
 		result.save(flush: true)
 	}
