@@ -1432,4 +1432,12 @@ class TestDataUtil {
         job.save()
     }
 
+    public static Job createSimpleJob(){
+        JobGroup group = createJobGroup("group")
+        Location location =  createLocation(createWebPageTestServer("label2","proxyId",true, "http://server1.iteratec.de/"),"veryUnique",
+                createBrowser("FF",1),true)
+        return createJob("label",createScript("label1", "description", "navi", false),
+                location, group, "description", 1, false, 10)
+    }
+
 }
