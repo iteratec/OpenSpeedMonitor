@@ -17,8 +17,13 @@
 
 package de.iteratec.osm.persistence
 
+import com.gmongo.GMongo
+import com.mongodb.AggregationOptions
+import com.mongodb.DB
+import com.mongodb.DBCollection
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
+import de.iteratec.osm.result.detail.Asset
 import de.iteratec.osm.result.detail.AssetGroup
 import de.iteratec.osm.result.detail.HARStatus
 import de.iteratec.osm.result.detail.HarConvertService
@@ -52,5 +57,41 @@ class HarPersistenceService {
         log.debug("JobResult ${result.id} harStatus: $status")
     }
 
+    public def getAssets(Date from, Date to, List<Long> jobGroups, List<Long> pages, List<Long> browser, List<Long> locations, List<String> connectivity){
+        Map matchList = [:]
+        GMongo mongo = new GMongo()
+        DB db = mongo.getDB("OpenSpeedMonitor")
+        matchList<<[date:[$gte:from.getTime(), $lte:to.getTime()]]
+        if(jobGroups) matchList["jobGroup"] = [$in:jobGroups]
+        if(pages) matchList << [pages:[$in:pages]]
+        if(browser) matchList << [browser:[$in:browser]]
+        if(locations) matchList << [location:[$in:locations]]
+        if(connectivity) matchList << [connectivity: [$in:connectivity]]
 
+        def options = AggregationOptions.builder().allowDiskUse(true).outputMode(AggregationOptions.OutputMode.CURSOR).build()
+        db.assetGroup.aggregate([[$match:matchList],
+                                 [$unwind:"\$assets"],
+                                 [$project:[
+                                         _id:0,
+                                         bytesIn:'\$assets.bytesIn',
+                                         bytesOut:'\$assets.bytesOut',
+                                         connectTime:'\$assets.connectTimeMs',
+                                         downloadTimeMs:'\$assets.downloadTimeMs',
+                                         loadTimeMs:'\$assets.loadTimeMs',
+                                         timeToFirstByteMs:'\$assets.timeToFirstByteMs',
+                                         indexWithinHar:'\$assets.indexWithinHar',
+                                         sslNegotiationTimeMs:'\$assets.sslNegotiationTimeMs',
+                                         url:1,
+                                         page:1,
+                                         //we rename this variable, because otherwise it may look like this specific asset was cached
+                                         //but the cached attribute belongs to the whole page
+                                         pageFromCache:'\$cached',
+                                         jobGroup:1,
+                                         connectivity:1,
+                                         location:1,
+                                         browser:1,
+                                         date:1
+                                 ]]
+        ],options)
+    }
 }

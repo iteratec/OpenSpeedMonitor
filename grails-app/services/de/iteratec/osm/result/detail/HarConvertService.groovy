@@ -56,7 +56,7 @@ class HarConvertService {
                 location: jobResult.job.location.id,
                 browser: jobResult.job.location.browser.id,
                 assets:assets,
-                date: jobResult.date.getTime()/1000,
+                date: jobResult.date.getTime(),
                 cached: page._cached,
                 eventName: page._eventName,
                 title: page._title)
