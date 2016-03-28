@@ -49,10 +49,10 @@ class BatchActivityService implements Observer {
                     stage: "0",
                     status: Status.ACTIVE,
                     startDate: new Date(),
-                    successfulActions: 0).save(flush: true)
+                    successfulActions: 0)
             if(observe){
+                batchActivity.save(failOnError: true, flush: true)
                 batchActivity.addObserver(this)
-//                batchActivity.save(failOnError: true, flush: true)
             }
         }
         return batchActivity

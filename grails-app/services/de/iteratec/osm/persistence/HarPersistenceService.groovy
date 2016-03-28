@@ -94,4 +94,8 @@ class HarPersistenceService {
                                  ]]
         ],options)
     }
+
+    public void deleteHarData(){
+
+    }
 }
