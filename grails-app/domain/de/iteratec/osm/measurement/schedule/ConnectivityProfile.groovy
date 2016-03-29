@@ -17,12 +17,15 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import groovy.transform.EqualsAndHashCode
+
 
 /**
  * Connection information for job runs.
  *
  * @author dri
  */
+@EqualsAndHashCode(includes = ['name', 'active', 'bandwidthDown', 'bandwidthUp', 'latency', 'packetLoss'])
 class ConnectivityProfile {
 
     ConnectivityProfileService connectivityProfileService

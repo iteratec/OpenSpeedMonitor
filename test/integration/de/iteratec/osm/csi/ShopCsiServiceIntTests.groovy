@@ -33,8 +33,8 @@ import org.joda.time.DateTimeZone
 import org.junit.Before
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.api.ShopCsiService
-import de.iteratec.osm.api.dto.SystemCSIDto
+import de.iteratec.osm.api.CsiByEventResultsService
+import de.iteratec.osm.api.dto.CsiByEventResultsDto
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
@@ -51,7 +51,7 @@ import de.iteratec.osm.measurement.schedule.Job
 class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 	
 	static final double DELTA = 1e-15
-	ShopCsiService shopCsiService
+	CsiByEventResultsService csiByEventResultsService
 	DateTime START = new DateTime(2014,1,1,0,0, DateTimeZone.UTC)
 	DateTime END = new DateTime(2014,12,31,0,0, DateTimeZone.UTC)
 	int groups = 0
@@ -63,7 +63,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 		createPagesAndEvents()
 		createBrowsers()
 		//mocks
-		shopCsiService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
+		csiByEventResultsService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
     }
 	
     void testRetrieveSystemCsiByRawData() {
@@ -119,7 +119,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 			((ieWeight * hpWeight) + (ieWeight * mesWeight) + (ffWeight * hpWeight) + (ffWeight * mesWeight))
 		
 		//test-execution ////////////////////////////////////////////////////////////////////////////////////////////////////////
-		SystemCSIDto systemCsi = shopCsiService.retrieveSystemCsiByRawData(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		
 		//assertions ////////////////////////////////////////////////////////////////////////////////////////////////////////
 		assertEquals(12, EventResult.list().size())
@@ -134,7 +134,7 @@ class ShopCsiServiceIntTests extends IntTestWithDBCleanup {
 		createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3)
 		
 		assertEquals(18, EventResult.list().size())
-		systemCsi = shopCsiService.retrieveSystemCsiByRawData(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		assertEquals(expectedCsi * 100, systemCsi.csiValueAsPercentage, DELTA)
     }
 	

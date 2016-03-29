@@ -24,7 +24,7 @@ import de.iteratec.osm.api.dto.JobGroupDto
 import de.iteratec.osm.api.dto.LocationDto
 import de.iteratec.osm.api.dto.MeasuredEventDto
 import de.iteratec.osm.api.dto.PageDto
-import de.iteratec.osm.api.dto.SystemCSIDto
+import de.iteratec.osm.api.dto.CsiByEventResultsDto
 import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
@@ -82,7 +82,7 @@ class RestApiController {
     MeasuredEventDaoService measuredEventDaoService;
     BrowserDaoService browserDaoService;
     LocationDaoService locationDaoService;
-    ShopCsiService shopCsiService
+    CsiByEventResultsService csiByEventResultsService
     TimeToCsMappingService timeToCsMappingService
     LinkGenerator grailsLinkGenerator
     JobService jobService
@@ -229,7 +229,7 @@ class RestApiController {
 
     /**
      * The maximum duration of time-frame sent to {@link
-     * # getSystemCsi ( ResultsRequestCommand )} in days.
+     * # getEventResultBasedCsi ( ResultsRequestCommand )} in days.
      */
     private static int MAX_TIME_FRAME_DURATION_IN_DAYS_CSI = 8;
 
@@ -316,13 +316,10 @@ class RestApiController {
         return sendObjectAsJSON(results, params.pretty && params.pretty == 'true');
     }
 
-    public Map<String, Object> getSystemCsi(ResultsRequestCommand cmd) {
+    public Map<String, Object> getEventResultBasedCsi(ResultsRequestCommand cmd) {
 
         DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
-
-        if (log.infoEnabled) {
-        }
 
         if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
             response.setContentType('text/plain;charset=UTF-8');
@@ -352,9 +349,6 @@ class RestApiController {
             return null;
         }
 
-        Date startTimeInclusive = startDateTimeInclusive.toDate();
-        Date endTimeInclusive = endDateTimeInclusive.toDate();
-
         MvQueryParams queryParams = null;
         try {
             queryParams = cmd.createMvQueryParams(jobGroupDaoService, pageDaoService, measuredEventDaoService, browserDaoService, locationDaoService);
@@ -371,9 +365,21 @@ class RestApiController {
             return null;
         }
 
-        SystemCSIDto systemCsiToReturn
+        CsiByEventResultsDto csiDtoToReturn
         try {
-            systemCsiToReturn = shopCsiService.retrieveSystemCsiByRawData(startDateTimeInclusive, endDateTimeInclusive, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            if (cmd.system && cmd.page) {
+                csiDtoToReturn = csiByEventResultsService.retrieveCsi(
+                        startDateTimeInclusive,
+                        endDateTimeInclusive,
+                        queryParams,
+                        [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            }else if (cmd.system) {
+                csiDtoToReturn = csiByEventResultsService.retrieveCsi(
+                        startDateTimeInclusive,
+                        endDateTimeInclusive,
+                        queryParams,
+                        [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            }
         } catch (IllegalArgumentException e) {
             response.setContentType('text/plain;charset=UTF-8');
             response.status = 404;
@@ -387,7 +393,11 @@ class RestApiController {
             return null;
         }
 
-        return sendObjectAsJSON(systemCsiToReturn, params.pretty && params.pretty == 'true');
+        return sendObjectAsJSON(csiDtoToReturn, params.pretty && params.pretty == 'true');
+
+    }
+
+    public Map<String, Object> getSystemPageCsi() {
 
     }
 

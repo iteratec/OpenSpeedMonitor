@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.api
 
-import de.iteratec.osm.api.dto.SystemCSIDto
+import de.iteratec.osm.api.dto.CsiByEventResultsDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -37,7 +37,7 @@ import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 
 @Transactional
-class ShopCsiService {
+class CsiByEventResultsService {
 	
 	EventResultDaoService eventResultDaoService
 	WeightingService weightingService
@@ -56,16 +56,16 @@ class ShopCsiService {
 	 * @param weightFactors	Factors, {@link EventResult}s should be weighted for.
 	 * @return Customer satisfaction index (CSI) for a hole system.
 	 */
-    public SystemCSIDto retrieveSystemCsiByRawData(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
+    public CsiByEventResultsDto retrieveCsi(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
 
         List<EventResult> eventResults
-		performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] get event results', PerformanceLoggingService.IndentationDepth.ONE){
+		performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] get event results', PerformanceLoggingService.IndentationDepth.ONE){
             eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(start.toDate(), end.toDate(), [CachedView.UNCACHED], queryParams)
         }
 
-        if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${eventResults.size()} EventResults building database for calculation.")}
+        if (log.infoEnabled) {log.info("retrieveCsi: ${eventResults.size()} EventResults building database for calculation.")}
         List<WeightedCsiValue> weightedCsiValues = []
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] weight event results', PerformanceLoggingService.IndentationDepth.ONE){
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] weight event results', PerformanceLoggingService.IndentationDepth.ONE){
             if (eventResults.size() > 0) {
                 JobGroup jobGroup = JobGroup.get(queryParams.jobGroupIds[0])
                 CsiConfiguration csiConfiguration = jobGroup ? jobGroup.csiConfiguration : null
@@ -76,9 +76,9 @@ class ShopCsiService {
             }
         }
 
-        SystemCSIDto systemCSI
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveSystemCsiByRawData] calculate weighted mean and prepare return value', PerformanceLoggingService.IndentationDepth.ONE){
-            if (log.infoEnabled) {log.info("retrieveSystemCsiByRawData: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
+        CsiByEventResultsDto csiDto
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] calculate weighted mean and prepare return value', PerformanceLoggingService.IndentationDepth.ONE){
+            if (log.infoEnabled) {log.info("retrieveCsi: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")}
             if (weightedCsiValues.size()>0) {
                 double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
                 double targetCsi = 100d
@@ -86,7 +86,7 @@ class ShopCsiService {
                 if (targetGraph) {
                     targetCsi = targetGraph.getPercentOfDate(end)
                 }
-                systemCSI = new SystemCSIDto(
+                csiDto = new CsiByEventResultsDto(
                         csiValueAsPercentage: weightedValueAsPercentage,
                         targetCsiAsPercentage:  targetCsi,
                         delta: weightedValueAsPercentage - targetCsi,
@@ -97,7 +97,7 @@ class ShopCsiService {
             }
         }
 
-        return systemCSI
+        return csiDto
 
 	}
 }

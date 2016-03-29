@@ -14,7 +14,8 @@
 				<ul class="nav nav-pills nav-stacked affix">
 					<li><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
 					<li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
-					<li><a href="#csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;CSI</a></li>
+					<li><a href="#system-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;JobGroup CSI</a></li>
+                    <li><a href="#page-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;Page CSI</a></li>
 					<li><a href="#getCsiConfiguration">&raquo;&nbsp;<strong>GET</strong>&nbsp;Get CsiConfiguration as JSON</a></li>
 					<li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
 					<li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
@@ -172,7 +173,7 @@
 
 				</div>
 
-				<div id="csi">
+				<div id="system-csi">
 
 					<h2>GET Method:&nbsp;<span class="text-info">CSI</span></h2>
 
@@ -234,6 +235,71 @@
 
 				</div>
 
+                <div id="page-csi">
+
+                    <h2>GET Method:&nbsp;<span class="text-info">CSI</span></h2>
+
+                    <h3>Request signature</h3>
+                    <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/[system]/[page]/csi/[timestampFrom]/[timestampTo]</code></p>
+                    <p>
+                        The request URL starts with the <a href="#rest_base_path">REST-base-path</a>
+                        followed by the system (aka JobGroup) name (remember special chars like whitespace need to be URL escaped which was left out here for readability),
+                        followed by the page name,
+                        followed by the methods name <em>/csi</em>,
+                    followed by the requested time-frame in the ISO 8601 format given as <em>/start/end</em>
+                    </p>
+                    <p>
+                        Example URI for system &quot;live&quot;, page &quot;homepage&quot; and the time-frame 1st January 2014, 0 AM to the 1st January 2014, 11 PM (UTC):
+                        <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/live/homepage/csi/20140101T000000Z/20140101T230000Z</code>
+                    </p>
+                    <p>
+                        You can obtain a list of all systems by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSystems</code>.
+                    As result a JSON list of system names is returned. You can obtain a list of all pages by sending a request to
+                    <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allPages</code>.
+                    As result a JSON list of page names is returned.
+                    </p>
+
+                    <h3>Potential outcomes of a request</h3>
+                    <dl>
+                        <dt>HTTP status 200 OK</dt>
+                        <dd>
+                            The request handled successfully, a result in JSON notation is
+                            returned. It contains the over-all customer satisfaction index for the requested system, page and period. <br><br>
+                            Response example:
+                            <pre>
+                                {
+                                "csiValueAsPercentage":90.5265687342499,
+                                "targetCsiAsPercentage":90,
+                                "delta":0.5265687342499064,
+                                "countOfMeasurings":174
+                                }</pre>
+                            <br />
+                            The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.
+                        </dd>
+                        <dt>HTTP status 400 Bad Request</dt>
+                        <dd>The end of the requested time frame is before the start of
+                        it. For sure, this is invalid. The end of the time-frame need to be
+                        after its start. An error message with details is attached
+                        as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                        <dt>HTTP status 413 Request Entity Too Large</dt>
+                        <dd>The requested time-frames duration in days is wider than 8
+                        days. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).</dd>
+                        <dt>HTTP status 404 Not Found</dt>
+                        <dd>If specified system or page were not found. An error message with
+                        details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).</dd>
+                    </dl>
+
+                    <hr>
+
+                </div>
+
 				<div id="getCsiConfiguration">
 
 					<h2>GET Method:&nbsp;<span class="text-info">Get CsiConfiguration</span></h2>
@@ -287,9 +353,9 @@
 						   <dd>
                                MANDATORY<br>The name of the page the doc complete time was measured for.
 						   </dd>
-						   <dt>docCompleteTimeInMillisecs</dt>
+						   <dt>loadTimeInMillisecs</dt>
 						   <dd>
-                               MANDATORY<br>Doc complete time to translate to customer satisfaction.
+                               MANDATORY<br>Load time to translate to customer satisfaction.
 						   </dd>
 						   <dt>csiConfiguration</dt>
 						   <dd>
@@ -302,12 +368,12 @@
 						<dt>HTTP status 200 OK</dt>
 						<dd>
 							The request handled successfully, a result in JSON notation is
-							returned. It contains the calculated customer satisfaction for the given doc complete time. <br><br>
+							returned. It contains the calculated customer satisfaction for the given load time. <br><br>
 							Response example:
 							<pre>
 	{"target":
 		{
-			"docCompleteTimeInMillisecs":3500,
+			"loadTimeInMillisecs":3500,
 			"customerSatisfactionInPercent":0.75837
 		}
 	}</pre>

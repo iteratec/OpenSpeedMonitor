@@ -19,14 +19,15 @@ package de.iteratec.osm.api.dto;
 
 /**
  * <p>
- * Weighted CSI-mean of a system for a specific time period.
- * Is returned as JSON to rest-calls to {@link de.iteratec.osm.api.RestApiController#getSystemCsi}.
+ * Weighted CSI-mean at different aggregation levels for a specific time period.
+ * CSI-mean is calculated by {@link EventResult}s.
+ * Is returned as JSON to rest-calls.
  * </p>
  * 
  * @author nkuhn
  * @author mze
  */
-public class SystemCSIDto {
+public class CsiByEventResultsDto {
 
 	/**
 	 * CSI-mean of a system, weighted by shop-page and browser. 
