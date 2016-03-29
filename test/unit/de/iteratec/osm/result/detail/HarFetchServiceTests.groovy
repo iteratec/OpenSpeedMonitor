@@ -13,6 +13,8 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.persistence.HarPersistenceService
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
@@ -28,12 +30,13 @@ import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 
 
 @TestFor(HarFetchService)
-@Mock([JobGroup, Job, HARJob, Script, WebPageTestServer, Browser, Location, JobResult])
+@Mock([JobGroup, Job, HARJob, Script, WebPageTestServer, Browser, Location, JobResult, EventResult])
 class HarFetchServiceTests extends Specification{
 
     @Rule public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
 
     def setup(){
+        //Workaround needed because of not matching versions of groovy and betamax
         TapePropertyUtils.metaClass.sort = { Set<Property> properties, List<String> names ->
             new LinkedHashSet(properties.sort(false, new OrderedPropertyComparator(names)))
         }
@@ -80,7 +83,30 @@ class HarFetchServiceTests extends Specification{
         then:
             HARJob.count() == 0
     }
-    
+
+    @Test
+    public void fetchHarsFromJobResultIDsTest(){
+        given:
+            Job job = TestDataUtil.createSimpleJob()
+            JobResult jobResult = TestDataUtil.createJobResult("TestID",new Date(),job,job.location)
+
+            HARJob harJob = new HARJob(jobResultIDs: [jobResult.id])
+            HarPersistenceService harPersistenceService = new HarPersistenceService()
+            JobResult jobResultFromTest
+            Map harMapFromTest
+            harPersistenceService.metaClass.saveHARDataForJobResults ={JobResult result, Map har ->
+                jobResultFromTest = result
+                harMapFromTest= har}
+            service.harPersistenceService = harPersistenceService
+        when:
+            service.fetchHarsFromJobResultIDs(harJob)
+
+        then:
+            jobResult == jobResultFromTest
+            harMapFromTest == null
+
+    }
+
     @Test
     @Betamax(tape = 'HarFetchServicesTests_FetchHarFromWPTInstanceTest')
     public void fetchHarFromWPTInstanceTest(){
