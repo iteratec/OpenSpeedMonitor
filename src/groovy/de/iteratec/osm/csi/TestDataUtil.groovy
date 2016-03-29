@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+import de.iteratec.osm.result.detail.AssetGroup
 
 import static org.junit.Assert.*
 import grails.test.mixin.TestMixin
@@ -1438,6 +1439,15 @@ class TestDataUtil {
                 createBrowser("FF",1),true)
         return createJob("label",createScript("label1", "description", "navi", false),
                 location, group, "description", 1, false, 10)
+    }
+    /**
+     * Creates a AssetGroup without Assets. Note that every id will be set to 1,
+     * regardless if an object with this id exists
+     * @return AssetGroup
+     */
+    public static AssetGroup createAssetGroup(Date date = new Date()){
+        return new AssetGroup(connectivity: "6.000 kb", url:"http://iteratec.de/picture.gif", browser: 1, cached: false,
+                assets: [], location: 1, eventName: "", jobGroup: 1, jobResult: 1, date: date.getTime())
     }
 
 }

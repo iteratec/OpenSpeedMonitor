@@ -38,7 +38,7 @@ import org.junit.*
 @TestFor(DbCleanupService)
 @Mock([JobResult, EventResult, HttpArchive, CsiAggregation, CsiAggregationUpdateEvent, BatchActivity])
 class DbCleanupServiceSpec {
-
+    //TODO SPOCK
     static transactional = false
 
     DbCleanupService serviceUnderTest
