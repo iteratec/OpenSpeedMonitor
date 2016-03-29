@@ -22,7 +22,7 @@ class HarCleanupTests extends Specification{
     }
 
     @Test
-    public void testDelete(){
+    public void testDeleteWithOldData(){
         given: "2 assets groups which are too old and 3 which are still in our time frame"
             AssetGroup toDelete1 = TestDataUtil.createAssetGroup(new Date(1459254288000)).save(failOnError: true)
             AssetGroup toDelete2 = TestDataUtil.createAssetGroup(new Date(1459254288000)).save(failOnError: true)
@@ -40,4 +40,18 @@ class HarCleanupTests extends Specification{
             deletedIds.each {AssetGroup.get(it) == null}
     }
 
+    @Test
+    public void testDeleteWithoutOldData(){
+        given: "Not Assets which are old enough to be deleted"
+            AssetGroup notToDelete1 =  TestDataUtil.createAssetGroup(new Date(1459254289000)).save(failOnError: true)
+            AssetGroup notToDelete2 =  TestDataUtil.createAssetGroup(new Date(1459254289000)).save(failOnError: true)
+            AssetGroup notToDelete3 =  TestDataUtil.createAssetGroup(new Date(1459254289000)).save(failOnError: true)
+            List<Long> remainingId = [notToDelete1.id,notToDelete2.id,notToDelete3.id]
+            Date maximumDate = new Date(1459254289000)
+        when: "We trigger the delete"
+            service.deleteHarDataBefore(maximumDate, false)
+        then: "There should be only the 3 AssetGroups remaining"
+            AssetGroup.count() == 3
+            remainingId.each {AssetGroup.get(it) != null}
+    }
 }
