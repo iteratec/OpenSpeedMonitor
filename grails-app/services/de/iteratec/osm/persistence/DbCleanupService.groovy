@@ -183,7 +183,7 @@ class DbCleanupService {
                     }
                 }
                 //clear hibernate session first-level cache
-                JobResult.withSession { session -> session.clear() }
+                AssetGroup.withSession { session -> session.clear() }
             }
             batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
         }

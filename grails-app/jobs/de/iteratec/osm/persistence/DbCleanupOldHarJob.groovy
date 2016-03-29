@@ -21,8 +21,7 @@ class DbCleanupOldHarJob {
 
     def execute() {
         if(configService.isDetailFetchingEnabled()&& inMemoryConfigService.isDatabaseCleanupEnabled()){
-            //TODO add an extra variable to declare time to persist har data
-            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxDataStorageTimeInMonths()).toDate()
+            Date toDeleteResultsBefore = new DateTime().minusMonths(configService.getMaxHarDataStorageTimeInMonths()).toDate()
             dbCleanupService.deleteHarDataBefore(toDeleteResultsBefore, createBatchActivity)
         }
     }
