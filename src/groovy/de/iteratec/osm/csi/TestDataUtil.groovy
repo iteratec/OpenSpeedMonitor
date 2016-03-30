@@ -326,7 +326,7 @@ class TestDataUtil {
                 csiDay.setHourWeight(hour,1.0)
             }
         }
-        return csiDay
+        return csiDay.save(failOnError: true)
     }
 
     static Collection<TimeToCsMapping> createTimeToCsMappingForAllPages(List<Page> allPages) {

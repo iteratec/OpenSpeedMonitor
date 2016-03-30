@@ -37,6 +37,9 @@ class CsiConfiguration {
 
     static mapping = {
         description type: 'text'
+        browserConnectivityWeights cascade: 'all-delete-orphan'
+        pageWeights cascade: 'all-delete-orphan'
+        timeToCsMappings cascade: 'all-delete-orphan'
     }
 
     static constraints = {
@@ -111,5 +114,11 @@ class CsiConfiguration {
     public String toString(){
         return label
     }
+
+//    def afterDelete() {
+//        withNewSession {
+//            this.csiDay.delete()
+//        }
+//    }
 
 }
