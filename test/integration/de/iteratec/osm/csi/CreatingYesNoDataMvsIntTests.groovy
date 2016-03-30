@@ -89,41 +89,39 @@ class CreatingYesNoDataMvsIntTests extends IntegrationSpec {
     /**
      * Creating weekly-page {@link CsiAggregation}s without data.
      */
-    @Test
     void "Creating weekly page values test"() {
         given:
-            DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
-            CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
-            Integer countPages = 7
-            Integer countWeeks = 2
+        DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
+        Integer countPages = 7
+        Integer countWeeks = 2
         when:
-            List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate(), weeklyInterval, JobGroup.findAllByCsiConfigurationIsNotNull(), Page.list())
+        List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate(), weeklyInterval, JobGroup.findAllByCsiConfigurationIsNotNull(), Page.list())
 
         then:
-            wpmvs.size() == countWeeks * countPages
-            wpmvs.each {
-                it.isCalculated()
+        wpmvs.size() == countWeeks * countPages
+        wpmvs.each {
+            it.isCalculated()
         }
     }
 
     /**
      * Creating weekly-shop {@link de.iteratec.osm.report.chart.CsiAggregation}s without data.
      */
-    @Test
     void "Creating weekly shop values test"() {
         given:
-            DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
-            Integer countWeeks = 2
-            Integer countPages = 7
+        DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
+        Integer countWeeks = 2
+        Integer countPages = 7
         when:
-            List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
-            Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
+        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
+        Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
         then:
-            wsmvs.size() == countWeeks
-            wsmvs.each {
-                it.isCalculated()
-            }
-            pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
+        wsmvs.size() == countWeeks
+        wsmvs.each {
+            it.isCalculated()
+        }
+        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
 
     }
 

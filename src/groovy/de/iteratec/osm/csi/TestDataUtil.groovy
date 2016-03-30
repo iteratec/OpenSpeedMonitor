@@ -1090,7 +1090,8 @@ class TestDataUtil {
             int docCompleteTimeInMillisecs,
             double customerSatisfactionInPercent,
             MeasuredEvent event,
-            CsiAggregationTagService csiAggregationTagService
+            CsiAggregationTagService csiAggregationTagService,
+            boolean withConnectivityProfile = true
                                         ) {
 
         JobGroup jobGroup = job.jobGroup
@@ -1112,7 +1113,8 @@ class TestDataUtil {
                 measuredEvent: event,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 tag: resultTag,
-                connectivityProfile: createConnectivityProfile('conn-profile-for-testing-purposes')
+                noTrafficShapingAtAll:job.noTrafficShapingAtAll,
+                connectivityProfile: withConnectivityProfile?createConnectivityProfile('conn-profile-for-testing-purposes'):null
         ).save(failOnError: true)
 
         return eventResult.save(failOnError: true)

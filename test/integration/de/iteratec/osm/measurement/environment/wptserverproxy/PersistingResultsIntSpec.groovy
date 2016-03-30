@@ -185,7 +185,7 @@ class PersistingResultsIntSpec extends IntegrationSpec {
                 script,
                 loc,
                 jobGroup,
-                'job description',
+                'jobWithPredefinedConnectivity description',
                 1,
                 true,
                 60
