@@ -252,7 +252,7 @@ class ServiceMocker {
 	 * @param serviceToMockIn 
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyPageCsiAggregations
-	 * 		List of {@link CsiAggregation}s, the method {@link PageCsiAggregationService#getOrCalculateWeeklyPageCsiAggregations(java.util.Date, java.util.Date)} should return.
+	 * 		List of {@link CsiAggregation}s, the method {@link PageCsiAggregationService#getOrCalculatePageCsiAggregations(java.util.Date, java.util.Date, CsiAggregationInterval,List<JobGroup>,List<Page>)} should return.
 	 */
 	void mockPageCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyPageCsiAggregations){
 		def pageCsiAggregationServiceMocked = mockFor(PageCsiAggregationService)
