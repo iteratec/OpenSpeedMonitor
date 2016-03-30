@@ -17,19 +17,10 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.OsmConfigCacheService
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiAggregationUpdateService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.*
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
@@ -175,12 +166,7 @@ class PersistingNewEventResultsTests {
 		//mocks common for all tests
 		SERVICE_MOCKER.mockTTCsMappingService(serviceUnderTest)
 		mockMetricReportingService()
-		mockHarParserService()
-		
-		serviceUnderTest.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
-										   getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
-        serviceUnderTest.connectivityProfileService = new ConnectivityProfileService()
 	}
 
 	@After
@@ -224,13 +210,12 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
 		
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		
@@ -297,13 +282,12 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
 		
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		
@@ -371,13 +355,12 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
 
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 
 		//assertions
 
@@ -409,12 +392,11 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		List<MeasuredEvent> events = MeasuredEvent.list()
@@ -443,12 +425,11 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		
@@ -505,12 +486,11 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 
 		//test execution
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		
@@ -610,14 +590,13 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		mockProxyService(xmlResult.data.location.toString())
 		
 		deleteAllRelevantDomains() // No Locations left!
 				
 		//test execution
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		Job job = Job.findByLabel('testjob')
@@ -639,13 +618,12 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
 		//test execution
 		
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//assertions
 		Job job = Job.findByLabel('testjob')
@@ -671,17 +649,16 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 		deleteAllRelevantDomains()
 		
 		//test execution
 		
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 		
 		//reset xmlResultID
 		xmlResult.data.testId=newTestId;
-		serviceUnderTest.listenToResult(xmlResult, har, server2)
+		serviceUnderTest.listenToResult(xmlResult, server2)
 		
 		System.out.println(xmlResult.data.testId);
 		
@@ -748,7 +725,7 @@ class PersistingNewEventResultsTests {
         createLocationIfNotExistent(xmlResult.data.location.toString(), undefinedBrowser, server1);
 
         //test execution
-		serviceUnderTest.listenToResult(xmlResult, har, server1)
+		serviceUnderTest.listenToResult(xmlResult, server1)
 
 		//check for job-runs
 		Collection<JobResult> jobRuns = JobResult.list()
@@ -812,7 +789,6 @@ class PersistingNewEventResultsTests {
 		mockCsiAggregationUpdateService()
 		ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
 		mockPageService()
-		mockJobService()
 		mockCsiAggregationTagService('notTheConcernOfThisTest')
 	}
 
@@ -880,14 +856,6 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.pageService = pageServiceMocked.createMock()
 	}
-	private void mockJobService(){
-		def jobServiceMocked = mockFor(JobService, true)
-		jobServiceMocked.demand.getCsiJobGroupOf(0..100) { Job job ->
-			//not the concern of this test
-			return null
-		}
-		serviceUnderTest.jobService = jobServiceMocked.createMock()
-	}
 	private void mockCsiAggregationTagService(String tagToReturn){
 		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
 		csiAggregationTagService.demand.createEventResultTag(0..100) {
@@ -911,14 +879,6 @@ class PersistingNewEventResultsTests {
 			// not the concern of this test
 		}
 		serviceUnderTest.metricReportingService = metricReportingService.createMock()
-	}
-	private void mockHarParserService(){
-		def harParserService = mockFor(HarParserService, true)
-		harParserService.demand.createPageIdFrom(0..100) {
-			Integer run, String eventName, CachedView cachedView ->
-			return 'page_1_eventName_0'
-		}
-		serviceUnderTest.harParserService = harParserService.createMock()
 	}
 
 	// create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

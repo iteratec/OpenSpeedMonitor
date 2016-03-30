@@ -17,22 +17,19 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
-import groovyx.net.http.*
+import groovyx.net.http.ContentType
+import groovyx.net.http.HttpResponseDecorator
 
 import java.util.concurrent.locks.ReentrantLock
-
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-
-import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 interface iListener {
 	public String getListenerName()
 	public void listenToLocations(GPathResult result, WebPageTestServer wptserver)
 	public void listenToResult(
 		GPathResult result,
-		String har,
 		WebPageTestServer wptserver
 	)
 }
@@ -149,28 +146,22 @@ class ProxyService {
 		
 		if (jobLabel.length() > 0 && statusCode >= 200 && xmlResultResponse.data.runs.toString().isInteger()) {
 
-			// nkuhn, 2015-01-22: disabled cause unused at the moment:
-//			def har = httpRequestService.getWptServerHttpGetResponse(wptserverOfResult, 'export.php', ['test': params.resultId], ContentType.TEXT, [Accept : 'application/json'])
-//			String harDate = har.data.str
-//			log.trace("har=${har.data.str}")
-
 			log.debug("${this.listener.size} iListener(s) listen to the fetching of results")
 
             try {
 
-                performanceLoggingService.logExecutionTime(DEBUG, "Start of listening to a new successful result of job ${jobLabel}: locking interruptibly", PerformanceLoggingService.IndentationDepth.THREE){
+//                performanceLoggingService.logExecutionTime(DEBUG, "Start of listening to a new successful result of job ${jobLabel}: locking interruptibly", PerformanceLoggingService.IndentationDepth.THREE){
                     lock.lockInterruptibly();
-                }
+//                }
 
-                performanceLoggingService.logExecutionTime(DEBUG, "Listening to a new successful result of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.THREE){
+//                performanceLoggingService.logExecutionTime(DEBUG, "Listening to a new successful result of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.THREE){
                     this.listener.each {
                         it.listenToResult(
                                 xmlResultResponse,
-                                '',
                                 wptserverOfResult
                         )
                     }
-                }
+//                }
 
             } finally {
                 lock.unlock();

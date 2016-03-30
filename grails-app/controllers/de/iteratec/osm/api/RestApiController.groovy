@@ -18,13 +18,14 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.api.dto.JsonBrowser
-import de.iteratec.osm.api.dto.JsonCsiConfiguration
-import de.iteratec.osm.api.dto.JsonJobGroup
-import de.iteratec.osm.api.dto.JsonLocation
-import de.iteratec.osm.api.dto.JsonMeasuredEvent
-import de.iteratec.osm.api.dto.JsonPage
-import de.iteratec.osm.api.json.Result
+import de.iteratec.osm.api.dto.BrowserDto
+import de.iteratec.osm.api.dto.CsiConfigurationDto
+import de.iteratec.osm.api.dto.JobGroupDto
+import de.iteratec.osm.api.dto.LocationDto
+import de.iteratec.osm.api.dto.MeasuredEventDto
+import de.iteratec.osm.api.dto.PageDto
+import de.iteratec.osm.api.dto.CsiByEventResultsDto
+import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
@@ -39,7 +40,6 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.EventDaoService
-import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
@@ -82,7 +82,7 @@ class RestApiController {
     MeasuredEventDaoService measuredEventDaoService;
     BrowserDaoService browserDaoService;
     LocationDaoService locationDaoService;
-    ShopCsiService shopCsiService
+    CsiByEventResultsService csiByEventResultsService
     TimeToCsMappingService timeToCsMappingService
     LinkGenerator grailsLinkGenerator
     JobService jobService
@@ -161,7 +161,7 @@ class RestApiController {
      */
     public Map<String, Object> allSystems() {
         Set<JobGroup> systems = jobGroupDaoService.findCSIGroups();
-        Set<JsonJobGroup> systemsAsJson = JsonJobGroup.create(systems)
+        Set<JobGroupDto> systemsAsJson = JobGroupDto.create(systems)
         return sendObjectAsJSON(systemsAsJson, params.pretty && params.pretty == 'true')
     }
 
@@ -175,7 +175,7 @@ class RestApiController {
      */
     public Map<String, Object> allSteps() {
         Set<MeasuredEvent> events = measuredEventDaoService.findAll();
-        Set<JsonMeasuredEvent> eventsAsJson = JsonMeasuredEvent.create(events)
+        Set<MeasuredEventDto> eventsAsJson = MeasuredEventDto.create(events)
         return sendObjectAsJSON(eventsAsJson, params.pretty && params.pretty == 'true');
     }
 
@@ -189,7 +189,7 @@ class RestApiController {
      */
     public Map<String, Object> allBrowsers() {
         Set<Browser> browsers = browserDaoService.findAll();
-        Set<JsonBrowser> browsersAsJson = JsonBrowser.create(browsers)
+        Set<BrowserDto> browsersAsJson = BrowserDto.create(browsers)
         return sendObjectAsJSON(browsersAsJson, params.pretty && params.pretty == 'true');
     }
 
@@ -203,7 +203,7 @@ class RestApiController {
      */
     public Map<String, Object> allPages() {
         Set<Page> pages = pageDaoService.findAll();
-        Set<JsonPage> pagesAsJson = JsonPage.create(pages)
+        Set<PageDto> pagesAsJson = PageDto.create(pages)
         return sendObjectAsJSON(pagesAsJson, params.pretty && params.pretty == 'true');
     }
 
@@ -217,7 +217,7 @@ class RestApiController {
      */
     public Map<String, Object> allLocations() {
         Collection<Location> locations = locationDaoService.findAll()
-        Set<JsonLocation> locationsAsJson = JsonLocation.create(locations)
+        Set<LocationDto> locationsAsJson = LocationDto.create(locations)
         return sendObjectAsJSON(locationsAsJson, params.pretty && params.pretty == 'true');
     }
 
@@ -229,7 +229,7 @@ class RestApiController {
 
     /**
      * The maximum duration of time-frame sent to {@link
-     * # getSystemCsi ( ResultsRequestCommand )} in days.
+     * # getEventResultBasedCsi ( ResultsRequestCommand )} in days.
      */
     private static int MAX_TIME_FRAME_DURATION_IN_DAYS_CSI = 8;
 
@@ -305,24 +305,21 @@ class RestApiController {
         response.setContentType("application/json;charset=UTF-8");
         response.status = 200;
 
-        List<Result> results = new LinkedList<Result>();
+        List<EventResultDto> results = new LinkedList<EventResultDto>();
 
         performanceLoggingService.logExecutionTime(LogLevel.INFO, 'assembling results for json', IndentationDepth.ONE) {
             Collection<EventResult> eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startTimeInclusive, endTimeInclusive, cmd.getCachedViewsToReturn(), queryParams)
             eventResults.each { eachEventResult ->
-                results.add(new Result(eachEventResult));
+                results.add(new EventResultDto(eachEventResult));
             }
         }
         return sendObjectAsJSON(results, params.pretty && params.pretty == 'true');
     }
 
-    public Map<String, Object> getSystemCsi(ResultsRequestCommand cmd) {
+    public Map<String, Object> getEventResultBasedCsi(ResultsRequestCommand cmd) {
 
         DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
-
-        if (log.infoEnabled) {
-        }
 
         if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
             response.setContentType('text/plain;charset=UTF-8');
@@ -352,9 +349,6 @@ class RestApiController {
             return null;
         }
 
-        Date startTimeInclusive = startDateTimeInclusive.toDate();
-        Date endTimeInclusive = endDateTimeInclusive.toDate();
-
         MvQueryParams queryParams = null;
         try {
             queryParams = cmd.createMvQueryParams(jobGroupDaoService, pageDaoService, measuredEventDaoService, browserDaoService, locationDaoService);
@@ -371,9 +365,21 @@ class RestApiController {
             return null;
         }
 
-        SystemCSI systemCsiToReturn
+        CsiByEventResultsDto csiDtoToReturn
         try {
-            systemCsiToReturn = shopCsiService.retrieveSystemCsiByRawData(startDateTimeInclusive, endDateTimeInclusive, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            if (cmd.system && cmd.page) {
+                csiDtoToReturn = csiByEventResultsService.retrieveCsi(
+                        startDateTimeInclusive,
+                        endDateTimeInclusive,
+                        queryParams,
+                        [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            }else if (cmd.system) {
+                csiDtoToReturn = csiByEventResultsService.retrieveCsi(
+                        startDateTimeInclusive,
+                        endDateTimeInclusive,
+                        queryParams,
+                        [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
+            }
         } catch (IllegalArgumentException e) {
             response.setContentType('text/plain;charset=UTF-8');
             response.status = 404;
@@ -387,7 +393,11 @@ class RestApiController {
             return null;
         }
 
-        return sendObjectAsJSON(systemCsiToReturn, params.pretty && params.pretty == 'true');
+        return sendObjectAsJSON(csiDtoToReturn, params.pretty && params.pretty == 'true');
+
+    }
+
+    public Map<String, Object> getSystemPageCsi() {
 
     }
 
@@ -460,10 +470,10 @@ class RestApiController {
      */
     public Map<String, Object> getCsiConfiguration() {
 
-        JsonCsiConfiguration jsonCsiConfiguration
+        CsiConfigurationDto jsonCsiConfiguration
         CsiConfiguration csiConfiguration = CsiConfiguration.get(params.id)
         if (csiConfiguration != null) {
-            jsonCsiConfiguration = JsonCsiConfiguration.create(csiConfiguration)
+            jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
         } else {
             sendSimpleResponseAsStream(response, 400, "CsiConfiguration with id ${params.id} doesn't exist!")
         }

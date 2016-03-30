@@ -18,7 +18,7 @@
 package de.iteratec.osm.batch
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.api.json.BatchActivityRow
+import de.iteratec.osm.api.dto.BatchActivityRowDto
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.joda.time.DateTime
@@ -94,7 +94,7 @@ class BatchActivityController {
                 BatchActivity batchActivity = BatchActivity.get(new Long(activeId as String))
                 if(batchActivity){
                     updates.add(
-                            new BatchActivityRow (
+                            new BatchActivityRowDto (
                                     htmlId: "batchActivity_${activeId}",
                                     activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
                                     status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),

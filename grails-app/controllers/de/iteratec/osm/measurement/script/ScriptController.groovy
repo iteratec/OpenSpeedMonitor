@@ -17,12 +17,10 @@
 
 package de.iteratec.osm.measurement.script
 
-import de.iteratec.osm.api.json.JSONLocationBox
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
 import grails.converters.JSON
-
 import org.springframework.dao.DataIntegrityViolationException
-import de.iteratec.osm.result.MeasuredEvent
 
 class ScriptController {
 

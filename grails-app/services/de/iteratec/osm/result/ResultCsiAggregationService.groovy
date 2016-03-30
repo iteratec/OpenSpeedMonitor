@@ -281,7 +281,7 @@ class ResultCsiAggregationService {
         } else if (AGGREGATORS.get(CachedView.UNCACHED).contains(aggregator.name)) {
             return CachedView.UNCACHED
         } else {
-            throw new IllegalArgumentException("AggregatorType is not bound to CACHED or UNCACHED view!");
+            throw new IllegalArgumentException("AggregatorType '${aggregator}' is not bound to CACHED or UNCACHED view!");
         }
 
     }

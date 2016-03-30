@@ -17,45 +17,31 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
-import de.iteratec.osm.result.detail.AssetGroup
-
-import static org.junit.Assert.*
-import grails.test.mixin.TestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-
-import java.util.regex.Pattern
-
-import org.joda.time.DateTime
-import org.springframework.transaction.TransactionStatus
-
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.external.GraphitePath
-import de.iteratec.osm.report.external.GraphiteServer
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.HttpArchive
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.external.GraphitePath
+import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.result.*
+import de.iteratec.osm.result.detail.AssetGroup
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import org.joda.time.DateTime
+import org.springframework.transaction.TransactionStatus
+
+import java.util.regex.Pattern
+
+import static org.junit.Assert.assertNotNull
 
 /**
  * <p>
@@ -145,7 +131,7 @@ class TestDataUtil {
 
             Job.withTransaction { TransactionStatus status ->
 
-                removeAssociatedDomainsFromCollections()
+                removeAssociatedDomainsFromCollections(domainClass)
                 domainClass.list()*.delete(flush: true)
 
                 status.flush()
@@ -154,11 +140,24 @@ class TestDataUtil {
         }
     }
 
-    public static void removeAssociatedDomainsFromCollections() {
-        GraphiteServer.list().each {
-            it.graphitePaths = []
-            it.save(failOnError: true)
+    public static void removeAssociatedDomainsFromCollections(domainClass) {
+        if (domainClass == GraphitePath.class){
+            GraphiteServer.list().each {
+                it.graphitePaths = []
+                it.save(failOnError: true)
+            }
+        }else if(domainClass == TimeToCsMapping.class){
+            CsiConfiguration.list().each {
+                it.timeToCsMappings = []
+                it.browserConnectivityWeights = []
+                it.pageWeights = []
+                it.save(failOnError: true)
+            }
+        }else if(domainClass == CsiConfiguration.class){
+
         }
+
+
     }
 
     public static int getCountOfAllObjectsInDatabase() {
@@ -177,15 +176,17 @@ class TestDataUtil {
                 CsTargetValue.class,
                 CustomerFrustration.class,
                 TimeToCsMapping.class,
-                HttpArchive.class,
+                PageWeight.class,
+                BrowserConnectivityWeight.class,
                 OsmConfiguration.class,
                 CsiAggregation.class,
-                CsiDay.class,
                 EventResult.class,
                 JobResult.class,
                 Job.class,
                 Script.class,
                 JobGroup.class,
+                CsiConfiguration.class,
+                CsiDay.class,
                 Location.class,
                 Browser.class,
                 BrowserAlias.class,
@@ -349,12 +350,6 @@ class TestDataUtil {
         return timeToCsMappingList
     }
 
-    static createHttpArchive(JobResult jobResult) {
-        new HttpArchive(
-                jobResult: jobResult
-        ).save(failOnError: true)
-    }
-
     static OsmConfiguration createOsmConfiguration(int detailDataStorageTimeInWeeks) {
         return new OsmConfiguration(
                 detailDataStorageTimeInWeeks: detailDataStorageTimeInWeeks
@@ -377,11 +372,24 @@ class TestDataUtil {
                 bandwidthUp: 512,
                 latency: 50,
                 packetLoss: 0,
-                connectivityProfile: profile
+                connectivityProfile: profile,
+                executionSchedule: '0 0 */2 * * ? *'
         ).save(failOnError: true)
     }
 
-    static createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation) {
+    /**
+     * Creates script with default values for label, description, navigationScript and provideAuthenticateInformation.
+     * @return Default script.
+     */
+    static Script createScript(){
+        return createScript(
+            'script label',
+            'script description',
+            'navigate http://www.osm.org',
+            false
+        )
+    }
+    static Script createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation) {
         return new Script(
                 label: label,
                 description: description,
@@ -843,25 +851,9 @@ class TestDataUtil {
     }
 
     static List<Page> createPages(List<String> allPageNames) {
-        List<Page> allPages = []
-        allPageNames.each { String pageName ->
-            Double weight = 0
-            switch (pageName) {
-                case 'HP': weight = 1; break
-                case 'MES': weight = 1; break
-                case 'SE': weight = 1; break
-                case 'ADS': weight = 1; break
-                case 'WKBS': weight = 1; break
-                case 'WK': weight = 1; break
-            }
-            allPages.add(
-                    new Page(
-                            name: pageName,
-                            weight: weight
-                    ).save(failOnError: true)
-            )
+        return allPageNames.collect {pageName->
+            new Page(name: pageName).save(failOnError: true)
         }
-        return allPages
     }
 
     static Page createPage(String name, Double weight) {
@@ -1293,7 +1285,8 @@ class TestDataUtil {
                 minDocCompleteTimeInMillisecs: 250,
                 maxDocCompleteTimeInMillisecs: 180000,
                 initialChartHeightInPixels: 400,
-                maxDataStorageTimeInMonths: 12
+                maxDataStorageTimeInMonths: 12,
+                csiTransformation: CsiTransformation.BY_MAPPING
         ).save(failOnError: true)
     }
 

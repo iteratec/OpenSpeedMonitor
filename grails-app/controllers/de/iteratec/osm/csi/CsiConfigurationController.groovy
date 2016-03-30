@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.api.json.JSONLocationBox
 import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.d3Data.*
@@ -27,7 +26,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
-import grails.plugin.springsecurity.annotation.Secured
 import grails.validation.Validateable
 
 /**

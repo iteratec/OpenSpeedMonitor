@@ -17,132 +17,129 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.result.PageService
-import de.iteratec.osm.util.ServiceMocker
 import groovy.util.slurpersupport.GPathResult
-import spock.lang.Shared
 import spock.lang.Specification
-
-import grails.test.mixin.*
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-
-@TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer,Location,Script,JobGroup, Browser,Job,JobResult, Page, MeasuredEvent, EventResult, CsiConfiguration, TimeToCsMapping])
 class CsiCalculationSpec extends Specification {
-    @Shared
+
+    static transactional = false //necessary because we test transactional service methods
+
+    LocationAndResultPersisterService locationAndResultPersisterService
+
     static final String jobGroupName_csi_1 = "jobGroup1"
-    @Shared
     static final String jobGroupName_csi_05 = "jobGroup2"
-    @Shared
     static final List<Page> allPages = ['HP', 'MES', 'PL','SE','HP_entry','ADS','WK',Page.UNDEFINED]
 
-    @Shared
-    LocationAndResultPersisterService serviceUnderTest
-    @Shared
     GPathResult xmlResult
-    @Shared
     CsiConfiguration csiConfiguration_all_1
-    @Shared
     CsiConfiguration csiConfiguration_all_05
 
     WebPageTestServer server1
     Location testLocation
     Script testScript
 
+    def setup() {
 
-    def setupSpec() {
+        createTestDataCommonForAllTests()
+        mocksCommonForAllTests()
+
     }
 
-    def setup() {
-        ServiceMocker serviceMocker = ServiceMocker.create()
-        serviceUnderTest = service
-        serviceUnderTest.jobService = new JobService()
-        serviceUnderTest.pageService = new PageService()
-        serviceUnderTest.csiAggregationTagService = new CsiAggregationTagService()
-        serviceUnderTest.timeToCsMappingService = new TimeToCsMappingService()
-        serviceMocker.mockPerformanceLoggingService(serviceUnderTest)
-        serviceMocker.mockProxyService(serviceUnderTest)
-        serviceMocker.mockMetricReportingService(serviceUnderTest)
-        serviceMocker.mockCsiAggregationUpdateService(serviceUnderTest)
-        serviceMocker.mockConfigService(serviceUnderTest.timeToCsMappingService, 'org.h2.Driver', 60, CsiTransformation.BY_MAPPING)
+    def cleanup(){
 
-        //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.15_multistep_1Run_WithVideo.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        xmlResult = new XmlSlurper().parse(file)
+        TestDataUtil.cleanUpDatabase() //necessary because our tests have to be non-transactional here
 
-        TestDataUtil.createBrowsersAndAliases()
-        createPages()
-        server1 = TestDataUtil.createServer()
-        testLocation = TestDataUtil.createLocation(server1, 'otto-prod-hetzner:Firefox', Browser.findByName('FF'), true)
-        testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
-        TestDataUtil.createJobGroup(jobGroupName_csi_1)
-        TestDataUtil.createJobGroup(jobGroupName_csi_05)
-
-        createCsiConfigurations()
     }
 
     void "csi won't be calculated without csi-configuration"() {
-        setup: "persist result"
-        JobGroup jobGroup = JobGroup.findByName(jobGroupName_csi_1)
-        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
-        serviceUnderTest.listenToResult(xmlResult,"",server1)
-        Collection<EventResult> results = EventResult.findAll {
+        setup: "prepare Job and JobGroup"
+        JobGroup jobGroupWithoutCsiConf = JobGroup.findByName(jobGroupName_csi_1)
+        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithoutCsiConf, '', 3 , false, 60)
+
+        when: "larpService listens to result of JobGroup without csi configuration"
+        locationAndResultPersisterService.listenToResult(xmlResult,server1)
+
+        then: "persisted EventResult has no csi value"
+        Collection<EventResult> resultsWithCsiCalculated = EventResult.findAll {
             csByWptDocCompleteInPercent != null
         }
-
-        expect:
-        results.empty
+        resultsWithCsiCalculated.size() == 0
     }
 
-    void "csi must be calculated with csi-configuration, all values are 1.0"() {
-        setup: "csiConfiguration_all_1 to JobGroup"
-        JobGroup jobGroup = JobGroup.findByName(jobGroupName_csi_1)
-        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
-        jobGroup.csiConfiguration = csiConfiguration_all_1
-        and: "and persist result for calculating csi"
-        serviceUnderTest.listenToResult(xmlResult,"",server1)
-        double csiValue = EventResult.findAll {
+    void "csi must be calculated with csi-configuration, all values are 100%"() {
+        setup: "prepare Job and JobGroup"
+        JobGroup.withNewTransaction {
+            JobGroup jobGroupWithCsiConf = JobGroup.findByName(jobGroupName_csi_1)
+            jobGroupWithCsiConf.csiConfiguration = csiConfiguration_all_1
+            jobGroupWithCsiConf.save(failOnError: true)
+            TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3 , false, 60)
+        }
+
+        when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
+        locationAndResultPersisterService.listenToResult(xmlResult,server1)
+
+        then: "persisted EventResult has csi value of 100%"
+        List<EventResult> results = EventResult.findAll {
             csByWptDocCompleteInPercent != null
-        }.first().csByWptDocCompleteInPercent
-
-        expect:
-        csiValue == 1.0
+        }
+        results.size() > 0
+        results*.csByWptDocCompleteInPercent.unique(false) == [100]
     }
 
-    void "csi must be calculated with csi-configuration, all values are 0.5"() {
-        setup: "csiConfiguration_all_05 to JobGroup"
+    void "csi must be calculated with csi-configuration, all values are 50%"() {
+        setup: "prepare Job and JobGroup"
         JobGroup jobGroup = JobGroup.findByName(jobGroupName_csi_05)
-        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
         jobGroup.csiConfiguration = csiConfiguration_all_05
-        and: "and persist result for calculating csi"
-        serviceUnderTest.listenToResult(xmlResult,"",server1)
-        double csiValue = EventResult.findAll {
-            csByWptDocCompleteInPercent != null
-        }.first().csByWptDocCompleteInPercent
+        jobGroup.save(failOnError: true)
+        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
 
-        expect:
-        csiValue == 0.5
+        when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
+        locationAndResultPersisterService.listenToResult(xmlResult,server1)
+
+        then: "persisted EventResult has csi value of 50%"
+        List<EventResult> results = EventResult.findAll {
+            csByWptDocCompleteInPercent != null
+        }
+        results.size() > 0
+        results*.csByWptDocCompleteInPercent.unique(false) == [50]
     }
 
-    private createPages(){
+    private void createTestDataCommonForAllTests(){
+
+        JobGroup.withNewTransaction {
+
+            TestDataUtil.createOsmConfig()
+
+            String nameOfResultXmlFile = 'Result_wptserver2.15_multistep_1Run_WithVideo.xml'
+            File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+            xmlResult = new XmlSlurper().parse(file)
+
+            TestDataUtil.createCsiAggregationIntervals()
+            TestDataUtil.createAggregatorTypes()
+            TestDataUtil.createBrowsersAndAliases()
+            createPages()
+            server1 = TestDataUtil.createServer()
+            testLocation = TestDataUtil.createLocation(server1, 'otto-prod-hetzner:Firefox', Browser.findByName('FF'), true)
+            testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+            TestDataUtil.createJobGroup(jobGroupName_csi_1)
+            TestDataUtil.createJobGroup(jobGroupName_csi_05)
+
+            createCsiConfigurations()
+
+        }
+
+    }
+
+    private void createPages(){
         allPages.each{pageName ->
             new Page(
                     name: pageName
@@ -150,44 +147,16 @@ class CsiCalculationSpec extends Specification {
         }
     }
 
-    private createCsiConfigurations() {
-        List<TimeToCsMapping> timeToCsMappingList1 = new ArrayList<>()
-        allPages.each { page ->
-            (0..10000).each { loadTime ->
-                if(loadTime % 20 == 0) {
-                    timeToCsMappingList1.add(
-                            new TimeToCsMapping(
-                                    page: Page.findByName(page),
-                                    loadTimeInMilliSecs: loadTime,
-                                    customerSatisfaction: 1.0,
-                                    mappingVersion: 1
-                            )
-                    )
-                }
-            }
-        }
-        csiConfiguration_all_1 = TestDataUtil.createCsiConfiguration()
-        csiConfiguration_all_1.label = "All 1"
-        csiConfiguration_all_1.timeToCsMappings = timeToCsMappingList1
+    private void createCsiConfigurations() {
+        csiConfiguration_all_1 = TestDataUtil.createCsiConfiguration("All 1")
+        csiConfiguration_all_05 = TestDataUtil.createCsiConfiguration("All 0.5")
+    }
 
-        List<TimeToCsMapping> timeToCsMappingList2 = new ArrayList<>()
-        timeToCsMappingList2.clear()
-        allPages.each { page ->
-            (0..10000).each { loadTime ->
-                if(loadTime % 20 == 0) {
-                    timeToCsMappingList2.add(
-                            new TimeToCsMapping(
-                                    page: Page.findByName(page),
-                                    loadTimeInMilliSecs: loadTime,
-                                    customerSatisfaction: 0.5,
-                                    mappingVersion: 1
-                            )
-                    )
-                }
-            }
+    private void mocksCommonForAllTests(){
+        locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = {
+            Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
+            if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
+            else if (csiConfiguration.label == csiConfiguration_all_1.label) return 100d
         }
-        csiConfiguration_all_05 = TestDataUtil.createCsiConfiguration()
-        csiConfiguration_all_05.label = "All 0.5"
-        csiConfiguration_all_05.timeToCsMappings = timeToCsMappingList2
     }
 }

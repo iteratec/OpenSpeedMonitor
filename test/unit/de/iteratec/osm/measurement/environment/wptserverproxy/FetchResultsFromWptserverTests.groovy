@@ -206,7 +206,6 @@ class FetchResultsFromWptserverTests {
 		public void listenToLocations(GPathResult result, WebPageTestServer wptserver){}
 		public void listenToResult(
 				GPathResult result,
-				String har,
 				WebPageTestServer wptserver
 		) {
 			resultOfLastListening = result

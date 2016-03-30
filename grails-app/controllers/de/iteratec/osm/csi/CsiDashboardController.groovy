@@ -248,13 +248,17 @@ class CsiDashboardController {
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
 
         // get graph aliases
-        if(params.id) {
+        if (params.id) {
             UserspecificCsiDashboard savedDashboard = UserspecificCsiDashboard.get(params.id)
-            if(savedDashboard.graphNameAliases.size() > 0) {
-                cmd.graphNameAliases = savedDashboard.graphNameAliases
-            }
-            if(savedDashboard.graphColors.size() > 0) {
-                cmd.graphColors = savedDashboard.graphColors
+            if (savedDashboard) {
+                if (savedDashboard.graphNameAliases.size() > 0) {
+                    cmd.graphNameAliases = savedDashboard.graphNameAliases
+                }
+                if (savedDashboard.graphColors.size() > 0) {
+                    cmd.graphColors = savedDashboard.graphColors
+                }
+                modelToRender.put("dashboardName", savedDashboard.dashboardName)
+                modelToRender.put("publiclyVisible", savedDashboard.publiclyVisible)
             }
         }
 
@@ -335,7 +339,7 @@ class CsiDashboardController {
                 break
             case DAILY_AGGR_GROUP_PAGE:
                 CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
-                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, csiAggregationsQueryParams, withTargetGraph,csiType)
+                fillWithPageValuesAsHighChartMap(modelToRender, timeFrame, dailyInterval, csiAggregationsQueryParams, withTargetGraph, csiType)
                 break
             case WEEKLY_AGGR_GROUP_SHOP:
                 CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
@@ -725,6 +729,7 @@ class CsiDashboardController {
     /**
      * <p>
      * Ajax service to validate and store custom dashboard settings.
+     * Note: It will overwrite existing dashboards with same name!
      * </p>
      *
      * @param values
@@ -740,21 +745,14 @@ class CsiDashboardController {
         String publiclyVisible = dashboardValues.publiclyVisible
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
-        // Check if dashboardName is unique
-        List<UserspecificCsiDashboard> dashboards = UserspecificCsiDashboard.findAllByDashboardName(dashboardName)
-        if (dashboards) {
-            response.sendError(302, 'dashboard by that name exists already')
-            return null
-        }
-
         // Parse data for command
         Date fromDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.from)
         Date toDate = SIMPLE_DATE_FORMAT.parse(dashboardValues.to)
-        Collection<Long> selectedFolder =  customDashboardService.getValuesFromJSON(dashboardValues,"selectedFolder")
-        Collection<Long> selectedPages =  customDashboardService.getValuesFromJSON(dashboardValues,"selectedPages")
-        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues,"selectedMeasuredEventIds")
-        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues,"selectedBrowsers")
-        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues,"selectedLocations")
+        Collection<Long> selectedFolder = customDashboardService.getValuesFromJSON(dashboardValues, "selectedFolder")
+        Collection<Long> selectedPages = customDashboardService.getValuesFromJSON(dashboardValues, "selectedPages")
+        Collection<Long> selectedMeasuredEventIds = customDashboardService.getValuesFromJSON(dashboardValues, "selectedMeasuredEventIds")
+        Collection<Long> selectedBrowsers = customDashboardService.getValuesFromJSON(dashboardValues, "selectedBrowsers")
+        Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
         Collection<Long> selectedCsiSystems = customDashboardService.getValuesFromJSON(dashboardValues, "selectedCsiSystems")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
@@ -782,7 +780,14 @@ class CsiDashboardController {
             // Apache Tomcat will output the response as part of (HTML) error page
             return null
         } else {
+            // Remove old if existing
+            UserspecificCsiDashboard existing = UserspecificCsiDashboard.findByDashboardName(dashboardName)
+            if (existing) {
+                existing.delete(flush: true, failOnError: true)
+            }
+
             UserspecificCsiDashboard newCustomDashboard = new UserspecificCsiDashboard(cmd, publiclyVisible, wideScreenDiagramMontage, dashboardName, username)
+
             if (!newCustomDashboard.save(failOnError: true, flush: true)) {
                 response.sendError(500, 'save error')
                 return null
@@ -1084,5 +1089,19 @@ class CsiDashboardController {
             csvAsString = csvAsString.substring(0, csvAsString.length() - 1)
         }
         return csvAsString
+    }
+
+    public def checkDashboardNameUnique(String values) {
+        JSONObject dashboardValues = JSON.parse(values)
+        String dashboardName = dashboardValues.dashboardName
+
+        def answer
+        if (UserspecificCsiDashboard.findByDashboardName(dashboardName)) {
+            answer = [result: 'false']
+        } else {
+            answer = [result: 'true']
+        }
+
+        render answer as JSON
     }
 }

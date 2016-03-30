@@ -15,36 +15,37 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.result
-
-
+package de.iteratec.osm.api.dto;
 
 /**
  * <p>
- * Contains zipped http-archive of a single {@link JobResult result}.
+ * Weighted CSI-mean at different aggregation levels for a specific time period.
+ * CSI-mean is calculated by {@link EventResult}s.
+ * Is returned as JSON to rest-calls.
  * </p>
- *  
+ * 
  * @author nkuhn
  * @author mze
- * 
- * @see JobResult
  */
-class HttpArchive {
-	
-	Byte[] harData
-	
-	/**
-	 * The {@link JobResult} this HTTP archive (HAR) belongs to.
-	 */
-	JobResult jobResult
-	static belongsTo = [jobResult: JobResult]
+public class CsiByEventResultsDto {
 
-    static constraints = {
-		harData(nullable: true, maxSize: 2048000)
-		jobResult()
-    }
-	
-	static mapping = {
-		harData(sqlType: 'blob')
-	}
+	/**
+	 * CSI-mean of a system, weighted by shop-page and browser. 
+	 */
+	double csiValueAsPercentage;
+
+	/**
+	 * Target-CSI-value for the specified time period.
+	 */
+	double targetCsiAsPercentage;
+
+	/**
+	 * Difference between {@link #csiValue} and {@link #targetCSI}.
+	 */
+	double delta;
+
+	/**
+	 * Count of the {@link EventResult}s, underlying the calculation.
+	 */
+	int countOfMeasurings;
 }

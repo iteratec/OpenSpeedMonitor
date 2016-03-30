@@ -17,14 +17,12 @@
 
 package de.iteratec.osm.result
 
-import java.util.zip.GZIPInputStream
-
-import org.joda.time.DateTime
-
+import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.environment.Location
+import org.joda.time.DateTime
 
+import java.util.zip.GZIPInputStream
 
 /**
  * Provides methods to get {@link EventResult}s from db.
@@ -244,31 +242,7 @@ class EventResultService {
 		
 		return result
 	}
-	
-	String findContentRequestByTestId(String targetTestId) {
 
-		// TODO Try to use query instead of HQL
-		
-//		doesn't work in Version 2.1.x, need to update to version >= 2.2
-//		def query = HttpArchive.where {
-//			eventResult.jobResult.testId == targetTestId
-//			eventResult.medianValue == true
-//			eventResult.cachedView == CachedView.UNCACHED
-//		}
-//		return query.list()
-		
-		HttpArchive harArchive = HttpArchive.executeQuery(
-			"select h.harData "
-			+ "from HttpArchive as h "
-			+ "where h.jobResult.testId = :targetTestId ", [targetTestId : targetTestId]
-		)
-		
-		String harData = harArchive && harArchive[0]?unzip(harArchive[0]):"no http-archive for EventResult with testId=${targetTestId}"
-		if (log.debugEnabled) {
-			log.debug("harData=${harData}")
-		}
-		return harData
-	}
 	private String unzip(byte[] zip){
 		def inputStream = new ByteArrayInputStream(zip)
 		def zipStream = new GZIPInputStream(inputStream)

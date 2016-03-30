@@ -21,7 +21,7 @@ import de.iteratec.osm.result.detail.HARStatus
 import org.grails.databinding.BindUsing
 
 import de.iteratec.osm.measurement.schedule.Job
-
+import org.grails.databinding.BindUsing
 
 /**
  * <p>
@@ -46,8 +46,6 @@ class JobResult {
 
 	Job job
 	static belongsTo = [job : Job]
-
-    static hasOne = HttpArchive
 
 	/** timestamp of execution */
 	Date date
@@ -160,6 +158,9 @@ class JobResult {
 		jobConfigLabel (index: 'testId_and_jobConfigLabel_idx')
 		wptStatus(type: 'text')
 	}
+
+    static transients = ['eventResults']
+
 	String toString(){
 		return (testId?:id)?:super.toString()
 	}

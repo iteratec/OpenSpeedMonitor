@@ -24,7 +24,6 @@ class BatchActivityService implements Observer {
         }, 10000, 1000 * updateInterval)
     }
 
-
     /**
      * Creates a new BatchActivity. This BatchActivity will be observed and will automatically be saved, if any property has changed
      * @param c Class of the affected Domain
@@ -36,7 +35,7 @@ class BatchActivityService implements Observer {
      */
     public BatchActivity getActiveBatchActivity(Class c, long idWithinDomain, Activity activity, String name, boolean observe = true) {
         BatchActivity batchActivity
-        BatchActivity.withTransaction {
+        BatchActivity.withNewTransaction {
             batchActivity = new BatchActivity(
                     activity: activity,
                     domain: c.toString(),
@@ -91,7 +90,7 @@ class BatchActivityService implements Observer {
             activityTemp.addAll(activities)
             activities.clear()
         }
-        if(activityTemp.size()>0){
+        if (activityTemp.size() > 0) {
             BatchActivity.withNewTransaction {
                 activityTemp*.save(flush: true)
             }
@@ -102,7 +101,7 @@ class BatchActivityService implements Observer {
      * Makes a note to save the BatchActivity after the next interval
      * @param activity BatchActivity to be saved
      */
-    void noteBatchActivityUpdate(BatchActivity activity){
+    void noteBatchActivityUpdate(BatchActivity activity) {
         activities.add(activity)
     }
 

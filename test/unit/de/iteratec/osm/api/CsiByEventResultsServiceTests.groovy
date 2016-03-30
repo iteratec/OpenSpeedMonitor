@@ -16,6 +16,7 @@
 */
 package de.iteratec.osm.api
 
+import de.iteratec.osm.api.dto.CsiByEventResultsDto
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
@@ -38,15 +39,15 @@ import static org.junit.Assert.assertNotNull
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
-@TestFor(ShopCsiService)
+@TestFor(CsiByEventResultsService)
 @Mock([JobGroup, CsiConfiguration])
-class ShopCsiServiceTests {
+class CsiByEventResultsServiceTests {
 	
 	static final double DELTA = 1e-15
 	static final double expectedTargetCsi = 34d
 	static final DateTime START = new DateTime(2014,1,14,8,0,12) 
 	static final DateTime END = new DateTime(2014,1,14,9,2,0)
-	ShopCsiService serviceUnderTest
+	CsiByEventResultsService serviceUnderTest
 	MvQueryParams queryParamsIrrelevantCauseDbQueriesAreMocked
 
     void setUp() {
@@ -72,7 +73,7 @@ class ShopCsiServiceTests {
 		
 		//test execution
 		shouldFail(IllegalArgumentException){
-			SystemCSI systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+			CsiByEventResultsDto systemCsi =  serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		}
 		
 	}
@@ -86,7 +87,7 @@ class ShopCsiServiceTests {
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		
 		//test execution
-		SystemCSI systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		CsiByEventResultsDto systemCsi =  serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		
 		//assertions
 		assertNotNull(systemCsi)
@@ -123,7 +124,7 @@ class ShopCsiServiceTests {
 
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 		//test execution
-		SystemCSI systemCsi =  serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+		CsiByEventResultsDto systemCsi =  serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked, [WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		
 		//assertions
 		assertNotNull(systemCsi)
@@ -155,10 +156,10 @@ class ShopCsiServiceTests {
 		//test-specific mocks
 		mockWeightingService(weightedCsiValuesToReturnInMock)
 
-		assertNotNull(serviceUnderTest.retrieveSystemCsiByRawData(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked,[WeightFactor.PAGE, WeightFactor.BROWSER] as Set))
+		assertNotNull(serviceUnderTest.retrieveCsi(START, END, queryParamsIrrelevantCauseDbQueriesAreMocked,[WeightFactor.PAGE, WeightFactor.BROWSER] as Set))
 
 		shouldFail(IllegalArgumentException) {
-			serviceUnderTest.retrieveSystemCsiByRawData(START, END, paramsWithoutCsiConfiguration,[WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
+			serviceUnderTest.retrieveCsi(START, END, paramsWithoutCsiConfiguration,[WeightFactor.PAGE, WeightFactor.BROWSER] as Set)
 		}
 	}
 

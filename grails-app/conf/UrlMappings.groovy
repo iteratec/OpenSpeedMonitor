@@ -132,8 +132,14 @@ class UrlMappings {
 		/* Since IT-248 */
 		"/rest/$system/csi/$timestampFrom/$timestampTo" {
 			controller = "RestApi"
-			action = [GET: "getSystemCsi"]
+			action = [GET: "getEventResultBasedCsi"]
 		}
+
+        /* Since IT-1007 */
+        "/rest/$system/$page/csi/$timestampFrom/$timestampTo" {
+            controller = "RestApi"
+            action = [GET: "getEventResultBasedCsi"]
+        }
 
 		"/rest/csi/translateToCustomerSatisfaction" {
 			controller = "RestApi"
@@ -142,11 +148,6 @@ class UrlMappings {
 		"/rest/job/$id/resultUrls/$timestampFrom/$timestampTo" {
 			controller = "RestApi"
 			action = [GET: "getResultUrls"]
-		}
-		/* Since IT-723 */
-		"/rest/$system/csi/translateToCustomerSatisfaction" {
-			controller = "RestApi"
-			action = [GET: "translateToCustomerSatisfaction"]
 		}
 		/* Since IT-977 */
 		"/rest/csi/csiConfiguration" {

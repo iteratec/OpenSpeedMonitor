@@ -38,8 +38,12 @@
             <g:hiddenField name="_method" value="POST"/>
             <button class="btn" data-dismiss="modal"><g:message code="default.button.cancel.label"
                                                                 default="Cancel"/></button>
-            <a href="#" class="btn btn-primary" onclick="saveCustomDashboard()"><g:message
+            <a id="saveDashboardButton" href="#" class="btn btn-primary"
+               onclick="checkDashboardAlreadyExists()"><g:message
                     code="de.iteratec.ism.ui.labels.save" default="Save"/></a>
+            <a id="overwriteDashboardButton" href="#" class="btn btn-primary" style="display: none"
+               onclick="saveCustomDashboard()"><g:message
+                    code="de.iteratec.ism.ui.labels.overwrite" default="Overwrite"/></a>
         </g:form>
 
     </div>
@@ -73,11 +77,57 @@
         $("#validateDashboardNameErrorDiv").hide();
     }
 
-    function saveCustomDashboard() {
+    function checkDashboardAlreadyExists() {
+        var objectData = {};
+        objectData['dashboardName'] = document.getElementById("dashboardNameFromModal").value;
+        var json_data = JSON.stringify(objectData);
 
-        hideMessages()
+        $.ajax({
+            type: 'POST',
+            url: '${createLink(action: 'checkDashboardNameUnique', absolute: true)}',
+            data: {values: json_data},
+            success: function (data) {
+                if (data['result'] == 'true') {
+                    saveCustomDashboard();
+                } else {
+                    $("#validateDashboardNameErrorDiv").show();
+                    document.all.validateDashboardNameErrorDiv.innerHTML = "${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.error.overwriting', default: 'Already Exists.')}";
+                    window.scrollTo(0, 0);
+
+                    var saveButton = $('#saveDashboardButton');
+                    saveButton.hide();
+                    var overwriteButton = $('#overwriteDashboardButton');
+                    overwriteButton.show();
+
+                    $('#dashboardNameFromModal').on('input', function () {
+                        var saveButton = $('#saveDashboardButton');
+                        saveButton.show();
+                        var overwriteButton = $('#overwriteDashboardButton');
+                        overwriteButton.hide();
+                    });
+                    return false;
+                }
+            }
+        });
+
+    }
+
+    function updateCustomDashboard(name, publiclyVisible) {
+        var message = "${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.warn.overwriting', default: 'Das aktuelle Dashboard wird überschrieben.')}" + ": \n" + name;
+        var r = confirm(message);
+        if (r == true) {
+            saveCustomDashboard(name, publiclyVisible);
+        } else {
+            return false;
+        }
+    }
+
+    function saveCustomDashboard(name, publiclyVisible) {
+
+        hideMessages();
 
         var dashboardName = document.getElementById("dashboardNameFromModal").value;
+        dashboardName = dashboardName ? dashboardName : name
         if (dashboardName.trim() !== "") {
 
             var spinner = startSpinner(document.getElementById('spinner-position'));
@@ -109,7 +159,8 @@
             });
 
             objectData["dashboardName"] = dashboardName;
-            objectData["publiclyVisible"] = document.getElementById("publiclyVisibleFromModal").checked;
+            var visible = publiclyVisible != undefined ? publiclyVisible : document.getElementById("publiclyVisibleFromModal").checked;
+            objectData["publiclyVisible"] = visible;
             objectData["wideScreenDiagramMontage"] = $("#wide-screen-diagram-montage").is(':checked');
             objectData["chartTitle"] = $("#dia-title").val();
             objectData["chartWidth"] = $("#dia-width").val();

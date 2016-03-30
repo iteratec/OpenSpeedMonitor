@@ -85,8 +85,6 @@ class PersistingLocationsTests {
 		createPages()
 		createBrowsers()
 		
-		serviceUnderTest.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
-										   getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
 	}
 	
 	@After

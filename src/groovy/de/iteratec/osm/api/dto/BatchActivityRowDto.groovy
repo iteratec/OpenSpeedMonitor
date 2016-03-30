@@ -1,9 +1,9 @@
-package de.iteratec.osm.api.json
+package de.iteratec.osm.api.dto
 
 /**
  * Created by nkuhn on 17.04.15.
  */
-class BatchActivityRow {
+class BatchActivityRowDto {
     String htmlId
     String activity
     String status

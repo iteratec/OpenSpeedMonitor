@@ -17,194 +17,221 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.*
-import groovy.util.slurpersupport.GPathResult
-
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-
-import de.iteratec.osm.measurement.schedule.JobGroup
-
+import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.IntTestWithDBCleanup
-import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import grails.test.spock.IntegrationSpec
+import groovy.util.slurpersupport.GPathResult
 /**
  *
  */
-class PersistingResultsIntSpec extends IntTestWithDBCleanup {
+class PersistingResultsIntSpec extends IntegrationSpec {
+
+    static transactional = false //necessary because we test transactional service methods
 
     LocationAndResultPersisterService locationAndResultPersisterService
 	
-	private static final String RESULT_ID_MULTISTEP = '130425_W1_f606bebc977a3b22c1a9205f70d07a00'
-	private static final String RESULT_ID_NO_MULTISTEP = '140106_4H_cebcd61785a29a60d9ecf2aa58cad2df'
 	private static final String LOCATION_IDENTIFIER  = 'Agent1-wptdriver:Firefox'
+    private static Closure originalPersistJobResultsMethod
+    private static Closure originalPersistEventResultsMethod
 	WebPageTestServer server1
-	JobGroup undefinedJobGroup
-	Browser undefinedBrowser
 
-	@Before
-    void setUp() {
-		//creating test-data common to all tests
-		createPages()
-		createBrowsers()
-		createJobGroups()
-		createServers()
-		createLocations()
-		//mocks common to all tests
-		mockTimeToCsMappingService()
-		mockMetricReportingService()
-		locationAndResultPersisterService.configService = [ getDetailDataStorageTimeInWeeks: { 12 },
-			getDefaultMaxDownloadTimeInMinutes: { 60 } ] as ConfigService
+    def setup() {
+
+        originalPersistJobResultsMethod = locationAndResultPersisterService.&persistJobResult
+        originalPersistEventResultsMethod = locationAndResultPersisterService.&persistResultsOfOneTeststep
+
+        createTestDataCommonToAllTests()
+
+        mocksCommonToAllTests()
+
     }
 
-	@After
-    void tearDown() {
+    def cleanup(){
+
+        TestDataUtil.cleanUpDatabase() //necessary because our tests have to be non-transactional here
+
+        resetLarpServiceMetaclass()
+
     }
 
-	@Test
-    void testPersistingOfResultsAfterFailedHarParsing() {
-		
+	void "Results get persisted even after failed csi aggregation."() {
+
+        setup:
 		//create test-specific data
 		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
-		String har = new File("test/resources/HARs/invalid.har").getText()
-		
-		//test specific mocks
-		mockCsiAggregationUpdateService(false)
-		
-		//test execution
-		locationAndResultPersisterService.listenToResult(xmlResult, har, server1)
-		
-		//assertions
-		int runs = 1
-		int events = 2
-		int cachedViews = 2
-		int expectedNumberOfResults = runs * events * cachedViews
-		assertThat(EventResult.list().size, is(expectedNumberOfResults))
-    }
-	
-	@Test
-	void testPersistingOfResultsAfterFailedDependentCsiAggregationCalculation() {
-		
-		//create test-specific data
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
-		String harInconsistentButNotTheConcernOfThisTest = new File("test/resources/HARs/multistep_1Run_6Events_FirstAndRepeatedView.har").getText()
-		
 		//test specific mocks
 		mockCsiAggregationUpdateService(true)
-		
-		//test execution
-		locationAndResultPersisterService.listenToResult(xmlResult, harInconsistentButNotTheConcernOfThisTest, server1)
-		
-		//assertions
-		int runs = 1
-		int events = 2
-		int cachedViews = 2
-		int expectedNumberOfResults = runs * events * cachedViews
-		assertThat(EventResult.list().size, is(expectedNumberOfResults))
+        mockMetricReportingService(false)
+        //expected values
+        int runs = 1
+        int events = 2
+        int cachedViews = 2
+        int expectedNumberOfResults = runs * events * cachedViews
+
+        when:
+		locationAndResultPersisterService.listenToResult(xmlResult, server1)
+
+		then:
+        JobResult.list().size() == 1
+		EventResult.list().size == expectedNumberOfResults
+
 	}
+    void "Results get persisted even after failed metric reporting."() {
+
+        setup:
+        //create test-specific data
+        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        //test specific mocks
+        mockCsiAggregationUpdateService(false)
+        mockMetricReportingService(true)
+        //expected values
+        int runs = 1
+        int events = 2
+        int cachedViews = 2
+        int expectedNumberOfResults = runs * events * cachedViews
+
+        when:
+        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+
+        then:
+        JobResult.list().size() == 1
+        EventResult.list().size == expectedNumberOfResults
+
+    }
+    void "No EventResults get persisted when Persistence of JobResults  throws an Exception."() {
+
+        setup:
+        //create test-specific data
+        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        //test specific mocks
+        mockCsiAggregationUpdateService(false)
+        mockMetricReportingService(false)
+        letPersistingJobResultThrowAnException(true)
+        //expected values
+        int expectedNumberOfResults = 0
+
+        when:
+        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+
+        then:
+        JobResult.list().size() == expectedNumberOfResults
+        EventResult.list().size == expectedNumberOfResults
+
+    }
+    void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
+
+        setup:
+        //create test-specific data
+        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        //test specific mocks
+        mockCsiAggregationUpdateService(false)
+        mockMetricReportingService(false)
+        letPersistingEventResultsOfSpecificStepThrowAnException(0)
+        //expected values
+        int runs = 1
+        int events = 2
+        int failedEvents = 1
+        int cachedViews = 2
+        int expectedNumberOfJobResults = 1
+        int expectedNumberOfEventResults = runs * (events-failedEvents) * cachedViews
+
+        when:
+        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+
+        then:
+        JobResult.list().size() == expectedNumberOfJobResults
+        EventResult.list().size == expectedNumberOfEventResults
+
+    }
 	
 	// create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private createServers(){
-		server1 = new WebPageTestServer(
-			label: "TestServer 1",
-			proxyIdentifier: "TestServer1",
-			baseUrl: "http://ism.intgerationtest",
-			active: true
-		).save(failOnError: true, validate: false)
-	}
-	
-	private createLocations(){
-		new Location(
-				label: '',
-				uniqueIdentifierForServer: LOCATION_IDENTIFIER,
-				active: true,
-				valid: 1,
-				wptServer: server1,
-				location: '',
-				browser: undefinedBrowser).save(failOnError: true, validate: false)
-	}
-	
-	private createJobGroups(){
-		undefinedJobGroup=new JobGroup(
-			name: JobGroup.UNDEFINED_CSI
-			);
-		undefinedJobGroup.save(failOnError: true);
-	}
-	
-	private createBrowsers(){
-		String browserName=Browser.UNDEFINED
-		undefinedBrowser=new Browser(
-				name: browserName,
-				weight: 0)
-				.addToBrowserAliases(alias: Browser.UNDEFINED)
-				.save(failOnError: true)
-				
-		browserName="IE"
-		new Browser(
-				name: browserName,
-				weight: 45)
-				.addToBrowserAliases(alias: "IE")
-				.addToBrowserAliases(alias: "IE8")
-				.addToBrowserAliases(alias: "Internet Explorer")
-				.addToBrowserAliases(alias: "Internet Explorer 8")
-				.save(failOnError: true)
-		browserName="FF"
-		new Browser(
-				name: browserName,
-				weight: 55)
-				.addToBrowserAliases(alias: "FF")
-				.addToBrowserAliases(alias: "FF7")
-				.addToBrowserAliases(alias: "Firefox")
-				.addToBrowserAliases(alias: "Firefox7")
-				.save(failOnError: true)
-				
-		browserName="Chrome"
-		new Browser(
-				name: browserName,
-				weight: 55)
-				.addToBrowserAliases(alias: "Chrome")
-				.save(failOnError: true)
-	}
-	private static createPages(){
-		['HP', 'MES', Page.UNDEFINED].each{pageName ->
-			Double weight = 0
-			switch(pageName){
-				case 'HP' : weight = 6		; break
-				case 'MES' : weight = 9		; break
-				case 'SE' : weight = 36		; break
-				case 'ADS' : weight = 43		; break
-				case 'WKBS' : weight = 3		; break
-				case 'WK' : weight = 3		; break
-			}
-			new Page(
-					name: pageName,
-					weight: weight).save(failOnError: true)
-		}
-	}
-	
+
+    /**
+     * All test data created here has to be deleted in cleanup method after every test!!!
+     * That's because these integration tests have to run without an own transaction which would be
+     * rolled back in the end of every test.
+     *
+     * Integration tests that test code with own separate transactions wouldn't see test data if creation in test would
+     * happen in an own transaction.
+     */
+    private createTestDataCommonToAllTests(){
+
+        TestDataUtil.createPages(['HP', 'MES', Page.UNDEFINED])
+        Browser undefBrowser = TestDataUtil.createBrowser(Browser.UNDEFINED, 1)
+        JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
+        server1 = TestDataUtil.createWebPageTestServer(
+                "TestServer 1",
+                "TestServer1",
+                true,
+                "http://osm.intgerationtest.org"
+        )
+        Location loc = TestDataUtil.createLocation(
+                server1,
+                LOCATION_IDENTIFIER,
+                undefBrowser,
+                true
+        )
+        Script script = TestDataUtil.createScript('script', 'description', 'navigate tralala', false)
+        TestDataUtil.createJob(
+                'FF_BV1_Multistep_2',
+                script,
+                loc,
+                jobGroup,
+                'job description',
+                1,
+                true,
+                60
+        )
+        TestDataUtil.createOsmConfig()
+
+    }
+
+    void mocksCommonToAllTests(){
+        mockTimeToCsMappingService()
+    }
+
 	// mocks common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	void mockTimeToCsMappingService(){
-		locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = {Integer docReadyTimeInMilliSecs, Page page -> 
+		locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = {
+            Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
 			return 42 //not the concern of this tests
 		}
 	}
-	void mockCsiAggregationUpdateService(Boolean shouldFail){
+	void mockCsiAggregationUpdateService(boolean shouldFail){
 		locationAndResultPersisterService.csiAggregationUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result ->
-			if(shouldFail) throw new RuntimeException()
+			if(shouldFail) throw new RuntimeException('Faked failing of csi aggregation in integration test')
 		}	
 	}
-	void mockMetricReportingService(){
+	void mockMetricReportingService(boolean shouldFail){
 		locationAndResultPersisterService.metricReportingService.metaClass.reportEventResultToGraphite = {EventResult result ->
-			//not the concern of this tests
+            if(shouldFail) throw new RuntimeException('Faked failing of metric reporting in integration test')
 		}
 	}
+    void letPersistingJobResultThrowAnException(boolean throwException){
+        locationAndResultPersisterService.metaClass.persistJobResult = {WptResultXml resultXml ->
+            if(throwException) throw new OsmResultPersistanceException('Faked failing of JobResult persistance in integration test')
+        }
+    }
+    void letPersistingEventResultsOfSpecificStepThrowAnException(int stepNumber){
+        locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = {Integer testStepZeroBasedIndex, WptResultXml resultXml ->
+            if (testStepZeroBasedIndex == stepNumber){
+                throw new OsmResultPersistanceException('Faked failing of EventResult persistance in integration test')
+            }else{
+                originalPersistEventResultsMethod(testStepZeroBasedIndex, resultXml)
+            }
+        }
+    }
+    void resetLarpServiceMetaclass(){
+        locationAndResultPersisterService.metaClass.persistJobResult = originalPersistJobResultsMethod
+        locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = originalPersistEventResultsMethod
+    }
 }

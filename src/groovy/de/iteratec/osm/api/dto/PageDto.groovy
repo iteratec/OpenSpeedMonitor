@@ -3,13 +3,13 @@ package de.iteratec.osm.api.dto
 import de.iteratec.osm.csi.Page
 
 
-class JsonPage {
+class PageDto {
 
     long id
     String name
 
-    public static JsonPage create(Page page) {
-        JsonPage result = new JsonPage()
+    public static PageDto create(Page page) {
+        PageDto result = new PageDto()
 
         result.id = page.id
         result.name = page.name
@@ -17,8 +17,8 @@ class JsonPage {
         return result
     }
 
-    public static Collection<JsonPage> create(Collection<Page> pages) {
-        Set<JsonPage> result = []
+    public static Collection<PageDto> create(Collection<Page> pages) {
+        Set<PageDto> result = []
 
         pages.each {
             result.add(create(it))

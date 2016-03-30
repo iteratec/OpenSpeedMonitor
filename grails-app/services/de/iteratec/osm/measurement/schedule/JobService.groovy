@@ -22,7 +22,6 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.HttpArchive
 import de.iteratec.osm.result.JobResult
 import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
@@ -99,7 +98,7 @@ class JobService {
     }
 
     /**
-     * Deletes a Job with all JobResults, HttpArchives and EventResults
+     * Deletes a Job with all JobResults and EventResults
      *
      * @param job Job that should be deleted
      */
@@ -123,8 +122,6 @@ class JobService {
                     dc.list(offset: 0, max: batchSize).eachWithIndex { JobResult jobResult, int index ->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
-                            List<HttpArchive> httpArchives = HttpArchive.findAllByJobResult(jobResult)
-                            batchDelete(httpArchives, batchSize)
                             List<EventResult> eventResults = jobResult.getEventResults()
                             batchDelete(eventResults, batchSize)
                             jobResult.delete()

@@ -3,7 +3,7 @@ package de.iteratec.osm.api.dto
 import de.iteratec.osm.measurement.environment.Location
 
 
-class JsonLocation {
+class LocationDto {
 
     long id
     String label
@@ -13,16 +13,16 @@ class JsonLocation {
     boolean active
     int valid
     String location
-    JsonBrowser browser
-    JsonWptServer wptServer
+    BrowserDto browser
+    WptServerDto wptServer
     int activeagents
     int queuethreshold
     int queuethresholdgreenlimit
     int queuethresholdyellowlimit
     int queuethresholdredlimit
 
-    public static JsonLocation create(Location location) {
-        JsonLocation result = new JsonLocation()
+    public static LocationDto create(Location location) {
+        LocationDto result = new LocationDto()
 
         result.id = location.id
         result.label = location.label
@@ -31,8 +31,8 @@ class JsonLocation {
         result.active = location.active
         result.valid = location.valid
         result.location = location.location
-        result.browser = JsonBrowser.create(location.browser)
-        result.wptServer = JsonWptServer.create(location.wptServer)
+        result.browser = BrowserDto.create(location.browser)
+        result.wptServer = WptServerDto.create(location.wptServer)
         result.activeagents = location.activeagents
         result.queuethreshold = location.queuethreshold
         result.queuethresholdgreenlimit = location.queuethresholdgreenlimit
@@ -42,8 +42,8 @@ class JsonLocation {
         return result
     }
 
-    public static Collection<JsonLocation> create(Collection<Location> locations) {
-        Set<JsonLocation> result = []
+    public static Collection<LocationDto> create(Collection<Location> locations) {
+        Set<LocationDto> result = []
 
         locations.each {
             result.add(create(it))

@@ -29,7 +29,8 @@
                 link_CsiConfigurationSaveCopy: '${createLink(absolute: true, controller: 'csiConfiguration', action: 'saveCopy')}',
                 link_CsiConfigurationConfigurations: '${createLink(absolute: true, controller: 'csiConfiguration', action: 'configurations')}',
                 link_CsiConfigurationDeletion: '${createLink(absolute: true, controller: 'csiConfiguration', action: 'deleteCsiConfiguration')}',
-                idOfItemToDelete: idOfItemToBeDeleted ? idOfItemToBeDeleted : 'not relevant on this page'
+                idOfItemToDelete: idOfItemToBeDeleted ? idOfItemToBeDeleted : 'not relevant on this page',
+                idOfItemToUpdate: idOfItemToBeDeleted ? idOfItemToBeDeleted : 'not relevant on this page',
             });
         });
 
