@@ -298,7 +298,7 @@ class TestDataUtil {
         return new CsiSystem(
                 label: label,
                 jobGroupWeights: jobGroupWeights
-        ).save(failOnError: true)
+        )
     }
 
     static JobGroupWeight createJobGroupWeight(
@@ -310,7 +310,7 @@ class TestDataUtil {
                 csiSystem: csiSystem,
                 jobGroup: jobGroup,
                 weight: weight
-        ).save(failOnError: true)
+        )
     }
 
     /*

@@ -305,7 +305,10 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
     }
 
     private boolean csByDocCompleteAndByVisualCompleteIs(CsiAggregation csiAggregation, double expectedValue) {
-        csiAggregation.csByWptDocCompleteInPercent == expectedValue && csiAggregation.csByWptVisuallyCompleteInPercent == expectedValue
+        csiAggregation.csByWptDocCompleteInPercent == expectedValue &&
+                csiAggregation.csByWptVisuallyCompleteInPercent == expectedValue &&
+                csiAggregation.isCalculatedWithData()
+
     }
 
     private boolean amountEntriesWithAndWithoutCS(List<CsiAggregation> list, int expectedValueWithCs, int expectedValueWithoutCs, double expectedCsValue) {
@@ -342,7 +345,11 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2)
         jobGroup2.csiConfiguration = csiConfiguration
 
-        csiSystem = TestDataUtil.createCsiSystem("label",[TestDataUtil.createJobGroupWeight(jobGroup1,1.0),TestDataUtil.createJobGroupWeight(jobGroup2,1.0)])
+        csiSystem = TestDataUtil.createCsiSystem("label",[])
+        csiSystem.addToJobGroupWeights(TestDataUtil.createJobGroupWeight(csiSystem, jobGroup1, 1.0))
+        csiSystem.addToJobGroupWeights(TestDataUtil.createJobGroupWeight(csiSystem, jobGroup2,1.0))
+        csiSystem.save(failOnError: true)
+
 
         measuredEvent1 = TestDataUtil.createMeasuredEvent(eventName1,page1)
         measuredEvent2 = TestDataUtil.createMeasuredEvent(eventName2,page2)
