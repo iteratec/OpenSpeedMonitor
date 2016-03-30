@@ -81,6 +81,8 @@ class HarPersistenceService {
                                          timeToFirstByteMs:'\$assets.timeToFirstByteMs',
                                          indexWithinHar:'\$assets.indexWithinHar',
                                          sslNegotiationTimeMs:'\$assets.sslNegotiationTimeMs',
+                                         mediaType:'\$assets.mediaType',
+                                         subtype:'\$assets.subtype',
                                          url:1,
                                          page:1,
                                          //we rename this variable, because otherwise it may look like this specific asset was cached
@@ -92,10 +94,6 @@ class HarPersistenceService {
                                          browser:1,
                                          date:1
                                  ]]
-        ],options)
-    }
-
-    public void deleteHarData(){
-
-    }
+        ],options).collect()
+    }git statu
 }
