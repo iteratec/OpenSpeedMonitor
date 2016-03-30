@@ -18,17 +18,19 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import grails.test.mixin.*
-
-import org.junit.*
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.junit.Before
+import org.junit.Test
 
 /**
  * Test-suite for {@link de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService}.
  */
 @TestFor(DefaultJobGroupDaoService)
-@Mock([JobGroup, CsiConfiguration])
+@Mock([JobGroup, CsiConfiguration, CsiDay])
 class DefaultJobGroupDaoServiceTests {
 
 	public static final String nameGroup1OfType1 = 'group1type1'
