@@ -95,5 +95,5 @@ class HarPersistenceService {
                                          date:1
                                  ]]
         ],options).collect()
-    }git statu
+    }
 }
