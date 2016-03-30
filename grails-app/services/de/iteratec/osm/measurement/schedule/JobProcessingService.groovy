@@ -28,6 +28,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
+import org.apache.commons.lang.exception.ExceptionUtils
 import org.quartz.*
 import org.hibernate.StaleObjectStateException
 
@@ -334,7 +335,7 @@ class JobProcessingService {
 
 			return true
 		} catch (Exception e) {
-            log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now.")
+            log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
 			persistUnfinishedJobResult(job, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
 			return false
 		}
