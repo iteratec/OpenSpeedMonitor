@@ -114,11 +114,4 @@ class CsiConfiguration {
     public String toString(){
         return label
     }
-
-//    def afterDelete() {
-//        withNewSession {
-//            this.csiDay.delete()
-//        }
-//    }
-
 }
