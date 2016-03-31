@@ -17,47 +17,31 @@
 
 package de.iteratec.osm.csi
 
-import static org.junit.Assert.*
-import grails.test.mixin.TestMixin
-import grails.test.mixin.integration.IntegrationTestMixin
-
-import org.joda.time.DateTime
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
-
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
-import de.iteratec.osm.csi.weighting.WeightingService
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.CsiAggregationTagService
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
+import grails.test.mixin.TestMixin
+import grails.test.mixin.integration.IntegrationTestMixin
+import grails.test.spock.IntegrationSpec
+import org.joda.time.DateTime
+import org.junit.Test
 
+import static org.junit.Assert.*
 
 @TestMixin(IntegrationTestMixin)
-class WeeklyPageIntTests extends IntTestWithDBCleanup {
+class WeeklyPageIntTests  extends IntegrationSpec {
 
 	static transactional = false
 
 	/** injected by grails */
-	EventCsiAggregationService eventCsiAggregationService
 	CsiAggregationTagService csiAggregationTagService
-	EventResultService eventResultService
-	WeightingService weightingService
-	MeanCalcService meanCalcService
-	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
 	PageCsiAggregationService pageCsiAggregationService
-	JobService jobService
 	CsiAggregationUpdateService csiAggregationUpdateService
-	Map<Long, JobResult> mapToFindJobResultByEventResult
-
-	
 
 	CsiAggregationInterval hourly
 	CsiAggregationInterval weekly
@@ -74,14 +58,12 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	static AggregatorType pageAggregatorType
 
 
-	@BeforeClass
-	public static void setUpData() {
+	def setupSpec() {
 		TestDataUtil.cleanUpDatabase()
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
-		TestDataUtil.createHoursOfDay()
 		System.out.println('Create some common test-data... DONE');
 	}
 
@@ -90,8 +72,7 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated 
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
-	@Before
-	void setUp() {
+	void setup() {
 		
 		System.out.println('Loading CSV-data...');
 		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
@@ -125,41 +106,37 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		System.out.println('Set-up... DONE');
 	}
 
-	/**
-	 * Test for Page SE
-	 */
-	@Test
-	public void testCalculatingWeeklyPageValuesForPage_SE() {
-		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
-		calculatingWeeklyPageValuesForPageTest("SE", results);
-	}
 
 	/**
-	 * The target weekly page-values were taken from the old excel-evaluation: .\test\resources\SR_2.44.0_Kundenzufriedenheit.xlsx. 
+	 * The target weekly page-values were taken from the old excel-evaluation: .\test\resources\SR_2.44.0_Kundenzufriedenheit.xlsx.
 	 * The CSV read is {@code weekly_page_KW50_2012.csv}.
 	 * Calculating weekly page-values via {@link PageCsiAggregationService} should provide (nearly) the same results!
 	 */
-	private void calculatingWeeklyPageValuesForPageTest(String pageName, List<EventResult> results) {
-		
+	@Test
+	public void "test calculating weekly page values for Page_SE"() {
 		// Skip Page if no data is generated (SpeedUp Test) see pagesToGenerateDataFor
+		String pageName = "SE"
 		if(!pagesToGenerateDataFor.contains(pageName)) {
 			fail("No data Was generated for the page "+pageName+" Test skipped.")
 		}
-
 		System.out.println('Test: testCalculatingWeeklyPageValues()');
 
-		Date startDate = startOfWeek.toDate()
 
+		given:
+		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
+		Date startDate = startOfWeek.toDate()
 		Page pageToCalculateMvFor = Page.findByName(pageName)
 		JobGroup jobGroup = JobGroup.findByName("CSI")
-		
 		results.each { EventResult result ->
 			csiAggregationUpdateService.createOrUpdateDependentMvs(result)
 		}
+		double expectedValue = targetValues[csvName][pageName]?:-1
 
+		when: "We calculate the csi value"
 		List<CsiAggregation> wpmvsOfOneGroupPageCombination = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startDate, startDate, weekly, [jobGroup], [pageToCalculateMvFor])
 		CsiAggregation mvWeeklyPage = wpmvsOfOneGroupPageCombination.get(0)
 
+		then: "There should be the correct value"
 		assertEquals(startDate, mvWeeklyPage.started)
 		assertEquals(weekly.intervalInMinutes, mvWeeklyPage.interval.intervalInMinutes)
 		assertEquals(pageAggregatorType.name, mvWeeklyPage.aggregator.name)
@@ -169,11 +146,9 @@ class WeeklyPageIntTests extends IntTestWithDBCleanup {
 		// Disabled reason: Values differ may from data
 		// int targetResultCount = targetResultCounts[csvName][pageName]?:-1
 		// assertEquals(targetResultCount, mvWeeklyPage.countUnderlyingEventResultsByWptDocComplete())
-		assertNotNull(mvWeeklyPage.value)
+		assertNotNull(mvWeeklyPage.csByWptDocCompleteInPercent)
 
-		double expectedValue = targetValues[csvName][pageName]?:-1
-
-		Double calculated = mvWeeklyPage.value * 100
+		Double calculated = mvWeeklyPage.csByWptDocCompleteInPercent * 100
 		Double difference = Math.abs(calculated - expectedValue)
 		println "page ${pageName} / ${pageAggregatorType.name}"
 		println "calculated  = ${calculated}"
