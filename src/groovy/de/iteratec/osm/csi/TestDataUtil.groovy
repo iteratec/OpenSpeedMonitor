@@ -864,11 +864,11 @@ class TestDataUtil {
 
     static List<JobGroup> createJobGroups() {
         JobGroup group1 = new JobGroup(
-                name: "CSI").save(failOnError: true)
+                name: "CSI", csiConfiguration: createCsiConfiguration("CSI_TEST_LABEL")).save(failOnError: true)
         JobGroup group2 = new JobGroup(
-                name: 'csiGroup1').save(failOnError: true)
+                name: 'csiGroup1', csiConfiguration: createCsiConfiguration("csiGroup1_TEST_LABEL")).save(failOnError: true)
         JobGroup group3 = new JobGroup(
-                name: 'csiGroup2').save(failOnError: true)
+                name: 'csiGroup2', csiConfiguration: createCsiConfiguration("csiGroup2_TEST_LABEL")).save(failOnError: true)
         return [group1, group2, group3]
     }
 
@@ -979,7 +979,9 @@ class TestDataUtil {
                     runs: 1,
                     jobGroup: jobGroup,
                     script: Script.createDefaultScript(csvJobCoulumn).save(failOnError: true),
-                    maxDownloadTimeInMinutes: 60
+                    maxDownloadTimeInMinutes: 60,
+                    noTrafficShapingAtAll: true
+//                    connectivityProfile:
             ).save(failOnError: true);
         }
 
@@ -1240,7 +1242,7 @@ class TestDataUtil {
         assertNotNull(jobResult)
 
         if (columns.length > 8 && !columns[8].isEmpty()) {
-            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, csiAggregationTagService);
+            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, csiAggregationTagService, false);
         }
     }
 
