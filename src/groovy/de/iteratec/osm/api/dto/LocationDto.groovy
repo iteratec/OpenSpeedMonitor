@@ -25,6 +25,7 @@ class LocationDto {
         LocationDto result = new LocationDto()
 
         result.id = location.id
+        result.uniqueIdentifierForServer = location.uniqueIdentifierForServer
         result.label = location.label
         result.dateCreated = location.dateCreated
         result.lastUpdated = location.lastUpdated
