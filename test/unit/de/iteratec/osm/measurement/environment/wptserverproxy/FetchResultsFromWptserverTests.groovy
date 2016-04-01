@@ -17,12 +17,11 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.*
 import co.freeside.betamax.Betamax
 import co.freeside.betamax.Recorder
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -38,18 +37,21 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.RESTClient
-
 import org.apache.http.HttpHost
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
+import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
+import static org.hamcrest.Matchers.is
+import static org.junit.Assert.assertThat
 
 /**
  * Unit tests in this class test fetching of results from wptservers. In that they use wptservers getLocations.php function to
  * get xml result and proof the data registered {@link iListener}s get in their called fetchResults() method.
  */
 @TestFor(ProxyService)
-@Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, AggregatorType, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup])
+@Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, AggregatorType, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration])
 class FetchResultsFromWptserverTests {
 
 	public static final String WPTSERVER_MULTISTEP_URL = 'dev.server02.wpt.iteratec.de'
