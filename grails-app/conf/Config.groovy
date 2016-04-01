@@ -35,7 +35,7 @@ grails.databinding.dateFormats = [
 def osmConfLocationBasedOnEnvVar = System.properties["osm_config_location"]
 if (osmConfLocationBasedOnEnvVar) {
     log.info("sytem property for external configuration found: ${osmConfLocationBasedOnEnvVar}")
-    grails.config.locations = ["file:" +  osmConfLocationBasedOnEnvVar]
+    grails.config.locations = ["file:" + osmConfLocationBasedOnEnvVar]
 } else {
     grails.config.locations = [
             "classpath:${appName}-config.properties",
@@ -138,6 +138,7 @@ grails.plugin.springsecurity.interceptUrlMap = [
 '/csiConfigIO/downloadBrowserConnectivityWeights': ["permitAll"],
 '/csiConfigIO/downloadDefaultTimeToCsMappings'   : ["permitAll"],
 '/eventResultDashboard/**'                       : ["permitAll"],
+'/detailAnalysisDashboard/**'                    : ["permitAll"],
 '/tabularResultPresentation/**'                  : ["permitAll"],
 '/highchartPointDetails/**'                      : ["permitAll"],
 '/rest/**'                                       : ["permitAll"],
@@ -480,7 +481,7 @@ environments {
             appenders {
                 console name: 'stdout', layout: pattern(conversionPattern: '%c{2} %m%n')
             }
-            
+
             info(stdout: [
                     'grails.app',
                     'org.codehaus.groovy.grails.web.servlet',        // controllers

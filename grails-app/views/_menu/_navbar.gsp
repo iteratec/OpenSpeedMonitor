@@ -66,6 +66,11 @@
                                             class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                                                   default="Einzelergebnisse"/></g:link>
                                 </li>
+                                <li class="controller">
+                                    <g:link controller="detailAnalysisDashboard" action="show"><i
+                                            class="fa fa-search"></i> <g:message code="de.iteratec.result.detailAnalysis.label"
+                                                                                  default="Detail Analyse"/></g:link>
+                                </li>
                                 <li class="divider"></li>
 
                                 %{--csi --------------------------------------------------------}%

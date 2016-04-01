@@ -3,6 +3,7 @@
 <%-- determine main-tab an set variable respectively --%>
 <g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation')}"><g:set
         var="mainTab" value="results"/></g:if>
+<g:elseif test="${controllerName.equals('detailAnalysisDashboard')}"><g:set var="mainTab" value="results"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -71,6 +72,11 @@
                 <g:link controller="tabularResultPresentation" action="listResults"><i
                         class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                               default="Einzelergebnisse"/></g:link>
+            </li>
+            <li class="controller ${controllerName.equals('detailAnalysisDashboard') ? 'active' : ''}">
+                <g:link controller="detailAnalysisDashboard" action="show"><i
+                        class="fa fa-search"></i> <g:message code="de.iteratec.result.detailAnalysis.label"
+                                                              default="Detail analysis"/></g:link>
             </li>
 
 
