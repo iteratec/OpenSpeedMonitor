@@ -834,10 +834,13 @@ class TestDataUtil {
     }
 
     static Browser createBrowser(String name, double weight) {
-        return new Browser(
-                name: name,
-                weight: weight
-        ).save(failOnError: true)
+        Browser browser = Browser.findByName(name)
+        browser = browser == null ?
+            new Browser(
+                    name: name,
+                    weight: weight
+            ).save(failOnError: true) : browser
+        return browser
     }
 
     static WebPageTestServer createServer() {
@@ -982,6 +985,7 @@ class TestDataUtil {
             result = new Job(
                     label: csvJobCoulumn,
                     location: location,
+                    connectivityProfile: createConnectivityProfile("conn"),
                     page: page,
                     active: false,
                     description: '',
@@ -990,7 +994,6 @@ class TestDataUtil {
                     script: Script.createDefaultScript(csvJobCoulumn).save(failOnError: true),
                     maxDownloadTimeInMinutes: 60,
                     noTrafficShapingAtAll: true
-//                    connectivityProfile:
             ).save(failOnError: true);
         }
 
@@ -1054,6 +1057,8 @@ class TestDataUtil {
             double customerSatisfactionInPercent,
             MeasuredEvent event,
             ConnectivityProfile connectivityProfile) {
+        CsiAggregationTagService csiAggregationTagService = new CsiAggregationTagService()
+        Browser dummyBrowser = createBrowser("bro",0)
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1068,7 +1073,8 @@ class TestDataUtil {
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
-                noTrafficShapingAtAll: false
+                noTrafficShapingAtAll: false,
+                tag: csiAggregationTagService.createEventResultTag(job.jobGroup, event,event.testedPage, dummyBrowser, job.location)
         ).save(failOnError: true)
 
         return eventResult.save(failOnError: true)
