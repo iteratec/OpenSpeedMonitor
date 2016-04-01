@@ -111,6 +111,13 @@ public final class EventResultDto {
 	 * The URL to the details of this webpagetest-result.
 	 */
 	public final String detailUrl
+
+    /**
+     * The URL to download the http-archive of the {@link JobResult}.
+     *
+     * @see http://www.softwareishard.com/blog/har-12-spec/
+     */
+    public final String httpArchiveUrl
 	
 	public EventResultDto(EventResult eventResult) {
 		this.csiValue = eventResult.csByWptDocCompleteInPercent != null ?
@@ -126,8 +133,10 @@ public final class EventResultDto {
 		String testId = eventResult.jobResult.testId
 		if (baseUrlWithTrailingSlash && testId) {
 			this.detailUrl = "${baseUrlWithTrailingSlash}result/${eventResult.jobResult.testId}"
+            this.httpArchiveUrl = "${baseUrlWithTrailingSlash}export.php?test=${eventResult.jobResult.testId}"
 		}else{
 			this.detailUrl = ''
+            this.httpArchiveUrl = ''
 		}
 		this.executionTime = eventResult.jobResult.date
 		this.docCompleteTimeInMillisecs = eventResult.docCompleteTimeInMillisecs
