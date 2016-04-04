@@ -282,48 +282,48 @@ public class EventResultDashboardShowAllCommand {
     static constraints = {
         from(nullable: true, validator: { Date currentFrom, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentFrom == null) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.from.nullWithManualSelection']
+            if (manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
         })
         to(nullable: true, validator: { Date currentTo, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentTo == null) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.to.nullWithManualSelection']
-            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.to.beforeFromDate']
+            if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
         fromHour(nullable: true, validator: { String currentFromHour, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentFromHour == null) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
+            if (manualTimeframe && currentFromHour == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.fromHour.nullWithManualSelection']
         })
         toHour(nullable: true, validator: { String currentToHour, EventResultDashboardShowAllCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentToHour == null) {
-                return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.toHour.nullWithManualSelection']
+                return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.nullWithManualSelection']
             } else if (manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
                 DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
                 DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
+                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.inCombinationWithDateBeforeFrom']
             }
         })
         selectedAggrGroupValuesCached(nullable: false, validator: { Collection<String> selectedCheckedAggregators, EventResultDashboardShowAllCommand cmd ->
-            if (cmd.selectedAggrGroupValuesCached.size() < 1 && cmd.selectedAggrGroupValuesUnCached.size() < 1) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedAggrGroupValuesCached.validator.error.selectedAggrGroupValuesCached']
+            if (cmd.selectedAggrGroupValuesCached.size() < 1 && cmd.selectedAggrGroupValuesUnCached.size() < 1) return ['de.iteratec.osm.gui.selectedAggrGroupValuesCached.error.validator.error.selectedAggrGroupValuesCached']
         })
         selectedAllMeasuredEvents(nullable: true)
         selectedAllBrowsers(nullable: true)
         selectedAllLocations(nullable: true)
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
+            if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder']
         })
         selectedPages(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
+            if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage']
         })
         selectedBrowsers(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (!cmd.selectedAllBrowsers && currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
+            if (!cmd.selectedAllBrowsers && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedBrowsers.error.validator.error.selectedBrowsers']
         })
         selectedMeasuredEventIds(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (!cmd.selectedAllMeasuredEvents && currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
+            if (!cmd.selectedAllMeasuredEvents && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectMeasurings.error.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
         })
         selectedLocations(nullable: false, validator: { Collection currentCollection, EventResultDashboardShowAllCommand cmd ->
-            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
+            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedLocations.error.validator.error.selectedLocations']
         })
         selectedAllConnectivityProfiles(nullable: true)
 

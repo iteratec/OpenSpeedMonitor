@@ -49,7 +49,7 @@
             <g:hasErrors bean="${command}">
                 <div class="alert alert-error">
                     <strong><g:message
-                            code="de.iteratec.isocsi.TabularResultPresentationController.selectionErrors.title"
+                            code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"
                             default="You missed something on selection" /></strong>
                     <ul>
                         <g:eachError var="eachError" bean="${command}">
