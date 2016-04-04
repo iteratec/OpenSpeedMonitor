@@ -21,7 +21,6 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
@@ -54,7 +53,7 @@ class TabularResultPresentationControllerTests {
 	public void setUp()
 	{
 		// Enable constraint tests:
-		mockForConstraintsTests(ListResultsCommand.class);
+		mockForConstraintsTests(TabularResultListResultsCommand.class);
 		
 		// The controller under test:
 		controllerUnderTest = controller;
@@ -74,11 +73,11 @@ class TabularResultPresentationControllerTests {
 	}
 
 	/**
-	 * Test for {@link TabularResultPresentationController.ListResultsCommand}.
+	 * Test for {@link TabularResultListResultsCommand}.
 	 */
 	@Test
 	void testListResultsCommand_emptyCommandIsInvalid() {
-		ListResultsCommand out = new ListResultsCommand();
+		TabularResultListResultsCommand out = new TabularResultListResultsCommand();
 		
 		assertFalse(out.validate());
 		assertNotNull("Collections are never null", out.selectedFolder)
@@ -90,12 +89,12 @@ class TabularResultPresentationControllerTests {
 	
 	
 	/**
-	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
+	 * Test for  {@link TabularResultListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromEmptyRequestArgsIsInvalid()
 	{
-		ListResultsCommand out = new ListResultsCommand();
+		TabularResultListResultsCommand out = new TabularResultListResultsCommand();
 
 		controllerUnderTest.bindData(out, params)
 
@@ -108,7 +107,7 @@ class TabularResultPresentationControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
+	 * Test for  {@link TabularResultListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_ValuesNearlyDefaults()
@@ -140,7 +139,7 @@ class TabularResultPresentationControllerTests {
         params.includeCustomConnectivity = true
 		
 		// Create and fill the command:
-		ListResultsCommand out = new ListResultsCommand()
+		TabularResultListResultsCommand out = new TabularResultListResultsCommand()
 		controllerUnderTest.bindData(out, params)
 		
 		// Verification:
@@ -200,7 +199,7 @@ class TabularResultPresentationControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
+	 * Test for  {@link TabularResultListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_ToDateBeforeFromDate()
@@ -224,7 +223,7 @@ class TabularResultPresentationControllerTests {
 		params.selectedTimeFrameInterval = 0
 
 		// Create and fill the command:
-		ListResultsCommand out = new ListResultsCommand()
+		TabularResultListResultsCommand out = new TabularResultListResultsCommand()
 		controllerUnderTest.bindData(out, params)
 
 		// Verification:
@@ -232,7 +231,7 @@ class TabularResultPresentationControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
+	 * Test for  {@link TabularResultListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_EqualDateToHourBeforeFromHour()
@@ -256,7 +255,7 @@ class TabularResultPresentationControllerTests {
 		params.selectedTimeFrameInterval = 0
 
 		// Create and fill the command:
-		ListResultsCommand out = new ListResultsCommand()
+		TabularResultListResultsCommand out = new TabularResultListResultsCommand()
 		controllerUnderTest.bindData(out, params)
 
 		// Verification:
@@ -264,7 +263,7 @@ class TabularResultPresentationControllerTests {
 	}
 	
 	/**
-	 * Test for  {@link TabularResultPresentationController.ListResultsCommand}.
+	 * Test for  {@link TabularResultListResultsCommand}.
 	 */
 	@Test
 	public void testListResultsCommand_BindFromValidRequestArgsIsValid_EqualDateEqualHourToMinuteBeforeFromMinute()
@@ -288,7 +287,7 @@ class TabularResultPresentationControllerTests {
 		params.selectedTimeFrameInterval = 0
 
 		// Create and fill the command:
-		ListResultsCommand out = new ListResultsCommand()
+		TabularResultListResultsCommand out = new TabularResultListResultsCommand()
 		controllerUnderTest.bindData(out, params)
 
 		// Verification:
