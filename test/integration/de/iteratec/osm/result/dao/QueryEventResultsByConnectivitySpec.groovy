@@ -311,7 +311,7 @@ class QueryEventResultsByConnectivitySpec extends IntegrationSpec {
         results.findAll {it.connectivityProfile}.size() == 1
     }
     void "select by custom conn name regex AND native conn AND predefined conn"() {
-        when:
+        given:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = true
         queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
@@ -323,6 +323,7 @@ class QueryEventResultsByConnectivitySpec extends IntegrationSpec {
         queryParams.includeNativeConnectivity = true
         queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
 
+        when:
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
                 runDate.toDate(),
                 runDate.plusHours(1).toDate(),
