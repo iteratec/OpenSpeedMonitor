@@ -51,7 +51,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author nkuhn
  *
  */
-@TestMixin(IntegrationTestMixin)
 class CreatingYesNoDataMvsIntTests extends IntegrationSpec {
 
     static transactional = false
