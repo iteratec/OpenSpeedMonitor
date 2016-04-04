@@ -226,15 +226,18 @@ class CsiAggregationUpdateEventCleanupService {
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: searching for update events which belong to closed and calculated measured values...")
         List<Long> closedAndCalculatedCsiAggregationUpdateEventIds = CsiAggregation.findAllWhere(closedAndCalculated: true)*.ident()
 
-        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting all update events for closed and calculated measured values")
+        if (closedAndCalculatedCsiAggregationUpdateEventIds.size() > 0){
+            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting all update events for closed and calculated measured values")
 
-        def criteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
-            'in' 'csiAggregationId', closedAndCalculatedCsiAggregationUpdateEventIds
+            def criteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
+                'in' 'csiAggregationId', closedAndCalculatedCsiAggregationUpdateEventIds
+            }
+
+            criteria.deleteAll()
+
+            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: done deleting mesauredValueUpdateEvents for closedAndCalculated CsiAggregations")
         }
 
-        criteria.deleteAll()
-
-        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: done deleting mesauredValueUpdateEvents for closedAndCalculated CsiAggregations")
     }
 
 }
