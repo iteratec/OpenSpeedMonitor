@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 
 /**
  * <p>
- * Command of {@link TabularResultPresentationController#listResults(ListResultsCommand)}.
+ * Command of {@link TabularResultPresentationController#listResults(de.iteratec.osm.result.TabularResultListResultsCommand)} (ListResultsCommand)}.
  * </p>
  *
  * <p>

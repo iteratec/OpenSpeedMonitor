@@ -17,14 +17,11 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.result.TabularResultPresentationController.EventResultsCommandBase
-import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand;
-import de.iteratec.osm.result.TabularResultPresentationController.ListResultsForSpecificJobCommand
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
+import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 
 import java.text.SimpleDateFormat
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 
 /**
  * Provides methods to get {@link PaginationListing} for pagination.
@@ -41,12 +38,12 @@ class PaginationService {
 	 * </p>
 	 * 
 	 * @param cmd
-	 * 			The ListResultsForSpecificJobCommand contained already data of {@link EventResultsCommandBase}.
+	 * 			The ListResultsForSpecificJobCommand contained already data of {@link TabularResultEventResultsCommandBase}.
 	 * @param eventResultsTotalRecords
 	 * 			The total records count.
 	 * @return
 	 */
-	public PaginationListing buildListResultsForJobPagination(ListResultsForSpecificJobCommand cmd, int eventResultsTotalRecords){
+	public PaginationListing buildListResultsForJobPagination(TabularResultListResultsForSpecificJobCommand cmd, int eventResultsTotalRecords){
 		PaginationListing paginationListing = new PaginationListing()
 		for(int i=0; i < eventResultsTotalRecords/cmd.max; i++){
 			String paginationLink = createListResultsForJobPaginationLink(cmd, i*cmd.max)
@@ -64,12 +61,12 @@ class PaginationService {
 	 * </p>
 	 * 
 	 * @param cmd
-	 * 			The ListResultsForSpecificJobCommand contained already data of {@link EventResultsCommandBase}.
+	 * 			The ListResultsForSpecificJobCommand contained already data of {@link TabularResultEventResultsCommandBase}.
 	 * @param offset
 	 * 			The offset of the current shown Record.
 	 * @return
 	 */
-	private String createListResultsForJobPaginationLink(ListResultsForSpecificJobCommand cmd, Integer offset){
+	private String createListResultsForJobPaginationLink(TabularResultListResultsForSpecificJobCommand cmd, Integer offset){
 		SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
 		
 		String paginationLink = grailsLinkGenerator.link([
@@ -97,12 +94,12 @@ class PaginationService {
 	 * </p>
 	 * 
 	 * @param cmd
-	 *			The listResultsCommand contained already data of {@link EventResultsCommandBase}.
+	 *			The listResultsCommand contained already data of {@link TabularResultEventResultsCommandBase}.
 	 * @param eventResultsTotalRecords
 	 * 			The total records count.
 	 * @return
 	 */
-    public PaginationListing buildListResultsPagination(ListResultsCommand cmd, int eventResultsTotalRecords){
+    public PaginationListing buildListResultsPagination(TabularResultListResultsCommand cmd, int eventResultsTotalRecords){
 		PaginationListing paginationListing = new PaginationListing()
 		
 		for(int i=0; i < eventResultsTotalRecords/cmd.max; i++){
@@ -122,12 +119,12 @@ class PaginationService {
 	 * </p>
 	 * 
 	 * @param cmd
-	 * 			The ListResultsCommand contained already data of {@link EventResultsCommandBase}.
+	 * 			The ListResultsCommand contained already data of {@link TabularResultEventResultsCommandBase}.
 	 * @param offset
 	 * 			The offset of the current shown Record.
 	 * @return
 	 */
-	private String createListResultsPaginationLink(ListResultsCommand cmd, int offset){
+	private String createListResultsPaginationLink(TabularResultListResultsCommand cmd, int offset){
 		
 		SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
 		
