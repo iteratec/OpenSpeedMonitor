@@ -435,7 +435,7 @@ class TabularResultPresentationController {
          * <code>true</code>, the selections in
          * {@link #selectedMeasuredEventIds} should be ignored.
          */
-        Boolean selectedAllMeasuredEvents
+        Boolean selectedAllMeasuredEvents = true
 
         /**
          * The database IDs of the selected {@linkplain Browser
@@ -455,7 +455,7 @@ class TabularResultPresentationController {
          * <code>true</code>, the selections in
          * {@link #selectedBrowsers} should be ignored.
          */
-        Boolean selectedAllBrowsers
+        Boolean selectedAllBrowsers = true
 
         /**
          * The database IDs of the selected {@linkplain Location
@@ -475,7 +475,7 @@ class TabularResultPresentationController {
          * <code>true</code>, the selections in
          * {@link #selectedLocations} should be ignored.
          */
-        Boolean selectedAllLocations
+        Boolean selectedAllLocations = true
 
         /**
          * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
@@ -564,13 +564,16 @@ class TabularResultPresentationController {
             viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
             viewModelToCopyTo.put('selectedPages', this.selectedPages)
 
-            viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
+            viewModelToCopyTo.put('selectedAllMeasuredEvents', this.selectedAllMeasuredEvents )
+//            viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
             viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
 
-            viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers as boolean ? 'on' : ''))
+            viewModelToCopyTo.put('selectedAllBrowsers', this.selectedAllBrowsers)
+//            viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers as boolean ? 'on' : ''))
             viewModelToCopyTo.put('selectedBrowsers', this.selectedBrowsers)
 
-            viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
+            viewModelToCopyTo.put('selectedAllLocations', this.selectedAllLocations)
+//            viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
             viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
 
             viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
