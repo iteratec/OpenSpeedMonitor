@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -24,20 +24,22 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
+import org.junit.Test
 import spock.lang.Specification
 
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
-import static org.hamcrest.Matchers.*
-import static org.hamcrest.MatcherAssert.*
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.hamcrest.Matchers.everyItem
+import static org.hamcrest.Matchers.is
 
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
@@ -53,7 +55,7 @@ class GraphiteEventServiceSpec extends Specification{
     public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
     public static final String jobGroupName = 'associated JobGroup'
 
-    void setup(){
+    def setup() {
 
         serviceUnderTest = service
 
@@ -61,18 +63,19 @@ class GraphiteEventServiceSpec extends Specification{
         serviceUnderTest.batchActivityService = new BatchActivityService()
         serviceUnderTest.eventDaoService = new EventDaoService()
         CsiAggregationUtilService mockedCsiAggregationUtilService = new CsiAggregationUtilService()
-        mockedCsiAggregationUtilService.metaClass.getNowInUtc = {-> untilDateTime }
+        mockedCsiAggregationUtilService.metaClass.getNowInUtc = { -> untilDateTime }
         serviceUnderTest.csiAggregationUtilService = mockedCsiAggregationUtilService
         mockHttpBuilderToUseBetamax()
 
     }
-
     @Betamax(tape = 'GraphiteEventServiceSpec_retrieve_events')
-    void "retrieve events from test graphite server"() {
+    def "retrieve events from test graphite server test"() {
         given:
-            createGraphiteServerWithSourcePaths()
+        createGraphiteServerWithSourcePaths()
+
         when:
-            serviceUnderTest.fetchGraphiteEvents(false, minutesInPast)
+        serviceUnderTest.fetchGraphiteEvents(false, minutesInPast)
+
         then:
         List<Event> allEvents = Event.list()
         allEvents.size() == 6
@@ -84,19 +87,19 @@ class GraphiteEventServiceSpec extends Specification{
 
     private void createGraphiteServerWithSourcePaths(){
         GraphiteServer server = new GraphiteServer(
-            serverAdress: 'url.to.carbon',
-            port: 2003,
-            webappUrl: 'monitoring.hh.iteratec.de/',
-            webappProtocol: Protocol.HTTP,
-            webappPathToRenderingEngine: 'render'
+                serverAdress: 'url.to.carbon',
+                port: 2003,
+                webappUrl: 'monitoring.hh.iteratec.de/',
+                webappProtocol: Protocol.HTTP,
+                webappPathToRenderingEngine: 'render'
         )
         JobGroup jobGroup = new JobGroup(
                 name: jobGroupName,
                 graphiteServers: [server],
         )
         GraphiteEventSourcePath eventSourcePath = new GraphiteEventSourcePath(
-            staticPrefix: 'from graphite|',
-            targetMetricName: 'alias(drawAsInfinite(server.monitor02.*.load.load_fifteen),"my-graph")'
+                staticPrefix: 'from graphite|',
+                targetMetricName: 'alias(drawAsInfinite(server.monitor02.*.load.load_fifteen),"my-graph")'
         )
         eventSourcePath.addToJobGroups(jobGroup)
         server.addToGraphiteEventSourcePaths(eventSourcePath)
