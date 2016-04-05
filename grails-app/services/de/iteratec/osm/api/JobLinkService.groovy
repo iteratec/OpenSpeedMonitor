@@ -17,8 +17,10 @@
 
 package de.iteratec.osm.api
 
+import de.iteratec.osm.csi.CsiDashboardController
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
+import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.result.PageService
 
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
@@ -38,7 +40,7 @@ class JobLinkService {
 
     String getLinkToTabularResultsFor(Job job, GString fromFormatted, GString fromHourFormatted, GString toFormatted, GString toHourFormatted) {
         return grailsLinkGenerator.link(
-            controller: 'eventResult',
+            controller: 'tabularResultPresentation',
             action: 'showListResultsForJob',
             absolute: true,
             params: [
@@ -94,7 +96,7 @@ class JobLinkService {
                     ])
             csiChartUrl = grailsLinkGenerator.link(controller: 'csiDashboard', action: 'showAll', absolute: true,
                     params: [
-                            'aggrGroupAndInterval':'measuredEvent',
+                            'aggrGroupAndInterval':CsiDashboardController.HOURLY_MEASURED_EVENT,
                             'selectedTimeFrameInterval': 0,
                             'from': fromFormatted,
                             'fromHour': fromHourFormatted,
@@ -107,6 +109,7 @@ class JobLinkService {
                             'selectedBrowsers': job.location.browser.id,
                             'selectedMeasuredEventIds': eventIds,
                             'selectedLocations': job.location.id,
+                            'csiTypeDocComplete':true,
                             '_action_showAll': 'Anzeigen'
                     ])
         }
