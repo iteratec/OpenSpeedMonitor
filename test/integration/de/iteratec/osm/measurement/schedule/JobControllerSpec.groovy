@@ -32,7 +32,7 @@ class JobControllerSpec extends IntegrationSpec {
     Job deleteJob
 
 
-    void setup() {
+    def setup() {
         controllerUnderTest = new JobController()
         controllerUnderTest.jobService.batchActivityService.timer.cancel()
         controllerUnderTest.inMemoryConfigService = new InMemoryConfigService()

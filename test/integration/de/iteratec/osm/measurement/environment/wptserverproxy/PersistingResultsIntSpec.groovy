@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
@@ -32,7 +33,7 @@ import groovy.util.slurpersupport.GPathResult
 /**
  *
  */
-class PersistingResultsIntSpec extends IntegrationSpec {
+class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     static transactional = false //necessary because we test transactional service methods
 
@@ -44,6 +45,7 @@ class PersistingResultsIntSpec extends IntegrationSpec {
 	WebPageTestServer server1
 
     def setup() {
+        super.setupSpec()
 
         originalPersistJobResultsMethod = locationAndResultPersisterService.&persistJobResult
         originalPersistEventResultsMethod = locationAndResultPersisterService.&persistResultsOfOneTeststep
@@ -55,8 +57,7 @@ class PersistingResultsIntSpec extends IntegrationSpec {
     }
 
     def cleanup(){
-
-        TestDataUtil.cleanUpDatabase() //necessary because our tests have to be non-transactional here
+        super.cleanupSpec()
 
         resetLarpServiceMetaclass()
 

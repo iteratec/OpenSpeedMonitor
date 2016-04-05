@@ -17,8 +17,12 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
+import spock.lang.Shared
 
 import static org.junit.Assert.*
 
@@ -39,8 +43,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.CsiAggregationTagService
 
-@TestMixin(IntegrationTestMixin)
-class WeeklyShopIntTests extends IntTestWithDBCleanup {
+class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
 	static transactional = false
 
@@ -50,9 +53,7 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	EventResultService eventResultService
 	JobService jobService
 	CsiAggregationTagService csiAggregationTagService
-	WeightingService weightingService
-	MeanCalcService meanCalcService
-	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
+	@Shared LocationAndResultPersisterService locationAndResultPersisterService
 
 	CsiAggregationInterval hourly
 	CsiAggregationInterval weekly
@@ -74,12 +75,53 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	/** Testdata is persisted respective this csv */
 	static final String csvFilename = 'weekly_page.csv'
 
+
+	/**
+	 * Creating testdata.
+	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
+	 * with valid TimeToCsMappings from 2012 and added to csv.
+	 */
+	def setupSpec() {
+		System.out.println('Create some common test-data...');
+		TestDataUtil.createOsmConfig()
+		TestDataUtil.createCsiAggregationIntervals()
+		TestDataUtil.createAggregatorTypes()
+
+		System.out.println('Loading CSV-data...');
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
+		System.out.println('Loading CSV-data... DONE');
+
+		EventResult.findAll().each {
+			locationAndResultPersisterService.informDependentCsiAggregations(it)
+		}
+
+		CsiConfiguration.findAll().each { csiConfiguration ->
+			ConnectivityProfile.findAll().each { connectivityProfile ->
+				Browser.findAll().each { browser ->
+					csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
+				}
+				Page.findAll().each { page ->
+					csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+				}
+			}
+		}
+
+		System.out.println('Create some common test-data... DONE');
+	}
+
+	def setup() {
+		hourly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+		weekly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+		pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+		pageAggregatorShop = AggregatorType.findByName(AggregatorType.SHOP)
+		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
+
+	}
+
 	//tests//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	@Test
 	void testCalculatingWeeklyShopValueWithoutData(){
-
-		//create test-specific data
+		setup:
 		Date startDate = new DateTime(2012,01,12,0,0, DateTimeZone.UTC).toDate()
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
 
@@ -92,19 +134,17 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 				underlyingEventResultsByWptDocComplete: ''
 				).save(failOnError:true)
 
-		//execute test
-
+		when:
 		shopCsiAggregationService.calcCa(mvWeeklyShop)
 
-		//assertions
-
-		assertEquals(startDate, mvWeeklyShop.started)
-		assertEquals(weekly.intervalInMinutes, mvWeeklyShop.interval.intervalInMinutes)
-		assertEquals(pageAggregatorShop.name, mvWeeklyShop.aggregator.name)
-		assertEquals(csiGroup.ident().toString(), mvWeeklyShop.tag)
-		assertTrue(mvWeeklyShop.isCalculated())
-		assertEquals(0, mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete())
-		assertNull(mvWeeklyShop.value)
+		then:
+		startDate == mvWeeklyShop.started
+		weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
+		pageAggregatorShop.name == mvWeeklyShop.aggregator.name
+		csiGroup.ident().toString() == mvWeeklyShop.tag
+		mvWeeklyShop.isCalculated()
+		0 == mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete()
+		mvWeeklyShop.csByWptDocCompleteInPercent == null
 	}
 
 	/**
@@ -112,22 +152,16 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 	 * on-the-fly while calculating the respective weekly-shop-{@link CsiAggregation}. The hourly-event-{@link CsiAggregation}s of the period have to exist (they
 	 * won't get calculated on-the-fly. Therefore these get precalculated in test here. 
 	 */
-	@Test
 	void testCalculatingWeeklyShopValue(){
-		
+		setup:
 		Date startDate = new DateTime(2012,11,12,0,0, DateTimeZone.UTC).toDate()
 		Integer targetResultCount = 233+231+122+176+172+176
 		
 		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
-		assertTrue(Math.abs(results.size() - targetResultCount) < 30)
 
 		//create test-specific data
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
-		List<CsiAggregation> createdHmvs = precalcHourlyJobMvs(csiGroup)
-		Map<String, List<CsiAggregation>> hmvsByPagename = getHmvsByPagenameMap(createdHmvs)
-
 		Double expectedValue = 61.30
-
 
 		CsiAggregation mvWeeklyShop = new CsiAggregation(
 				started: startDate,
@@ -138,95 +172,19 @@ class WeeklyShopIntTests extends IntTestWithDBCleanup {
 				underlyingEventResultsByWptDocComplete: ''
 				).save(failOnError:true)
 
-		//execute test
-
+		when:
 		shopCsiAggregationService.calcCa(mvWeeklyShop)
 
-		//assertions
-
-		assertEquals(startDate, mvWeeklyShop.started)
-		assertEquals(weekly.intervalInMinutes, mvWeeklyShop.interval.intervalInMinutes)
-		assertEquals(pageAggregatorShop.name, mvWeeklyShop.aggregator.name)
-		assertEquals(csiGroup.ident().toString(), mvWeeklyShop.tag)
-		assertTrue(mvWeeklyShop.isCalculated())
-		assertNotNull mvWeeklyShop.value
-		Double calculated = mvWeeklyShop.value * 100
+		then:
+		Math.abs(results.size() - targetResultCount) < 30
+		startDate == mvWeeklyShop.started
+		weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
+		pageAggregatorShop.name == mvWeeklyShop.aggregator.name
+		csiGroup.ident().toString() == mvWeeklyShop.tag
+		mvWeeklyShop.isCalculated()
+		mvWeeklyShop.csByWptDocCompleteInPercent != null
+		Double calculated = mvWeeklyShop.csByWptDocCompleteInPercent * 100
 		//TODO: diff should be smaller
-		assertEquals(expectedValue, calculated, 5.0d)
-	}
-	
-	/**
-	 * <p>
-	 * Pre-calculates some hourly measured values based on the CSV from which the weekly values should be calculated.
-	 * </p>
-	 * 
-	 * @param jobGroup The group to use.
-	 * 
-	 * @return A collection of pre-calculated hourly values.
-	 */
-	private List<CsiAggregation> precalcHourlyJobMvs(JobGroup jobGroup){
-
-		DateTime currentDateTime = startOfWeek
-		DateTime endOfWeek = startOfWeek.plusWeeks(1)
-		
-		List<CsiAggregation> createdHmvs = []
-		pagesToTest.each { String pageName ->
-			createdHmvs.addAll(TestDataUtil.precalculateHourlyCsiAggregations(
-				jobGroup, pageName, endOfWeek, currentDateTime, hourly, 
-				eventCsiAggregationService,
-				csiAggregationTagService,
-				eventResultService,
-				weightingService,
-				meanCalcService,
-				csiAggregationUpdateEventDaoService)
-			)
-		}
-		return createdHmvs
-	}
-	
-	private getHmvsByPagenameMap(List<CsiAggregation> createdHmvs){
-		Map<String, List<CsiAggregation>> hmvsByPagename = [:]
-		pagesToTest.each{
-			hmvsByPagename[it] = []
-		}
-		Page page
-		createdHmvs.each{ CsiAggregation hmv ->
-			page = csiAggregationTagService.findPageOfHourlyEventTag(hmv.tag)
-			if (page && hmvsByPagename.containsKey(page.name)) {
-				hmvsByPagename[page.name].add(hmv)
-			}
-		}
-		return hmvsByPagename
-	}
-
-	//testsdata common to all tests//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	/**
-	 * Creating testdata.
-	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated 
-	 * with valid TimeToCsMappings from 2012 and added to csv.
-	 */
-	@BeforeClass
-	static void createTestData() {
-		System.out.println('Create some common test-data...');
-		TestDataUtil.createOsmConfig()
-		TestDataUtil.createCsiAggregationIntervals()
-		TestDataUtil.createAggregatorTypes()
-		TestDataUtil.createHoursOfDay()
-		System.out.println('Create some common test-data... DONE');
-
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
-		System.out.println('Loading CSV-data... DONE');
-	}
-	
-	@Before
-	public void setUpServiceMockRlikeAndData() {
-		hourly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-		weekly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-		pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-		pageAggregatorShop = AggregatorType.findByName(AggregatorType.SHOP)
-		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)
-
+		Double.compare(expectedValue,calculated) < 5.0d
 	}
 }

@@ -145,15 +145,16 @@ class TestDataUtil {
                 it.graphitePaths = []
                 it.save(failOnError: true)
             }
-        }else if(domainClass == TimeToCsMapping.class){
+        }else if(domainClass == TimeToCsMapping.class ||
+                domainClass == BrowserConnectivityWeight.class ||
+                domainClass == PageWeight.class ||
+                domainClass == CsiConfiguration.class){
             CsiConfiguration.list().each {
                 it.timeToCsMappings = []
                 it.browserConnectivityWeights = []
                 it.pageWeights = []
                 it.save(failOnError: true)
             }
-        }else if(domainClass == CsiConfiguration.class){
-
         }
 
 
@@ -617,7 +618,7 @@ class TestDataUtil {
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
                                                              ) {
-        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false)
+        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false, ConnectivityProfile.findAll())
         return calcMv(
                 toCreateAndOrCalculate,
                 csiAggregationTagService,

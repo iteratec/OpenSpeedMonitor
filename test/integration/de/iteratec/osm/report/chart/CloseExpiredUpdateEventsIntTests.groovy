@@ -19,12 +19,14 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
+import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
 import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import spock.lang.Shared
 
 /**
  * Methods in this class test the functionality to close {@link CsiAggregation}s.
@@ -36,7 +38,7 @@ import org.joda.time.DateTimeZone
  * </ul>
  * 
  */
-class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
+class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
 	CsiAggregationUtilService csiAggregationUtilService
 	CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
@@ -62,16 +64,20 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
 	DateTime secondLastHourStart
 	
 	final static int NUMBER_OF_PAGES = 3
-	
-    void setup() {
+
+    def setup() {
+        super.setupSpec()
 
         mocksCommonToAllTests()
 
         createTestdataCommonToAllTests()
-		
     }
 
-	void "Outdated daily page CsiAggregations get closed and calculated correctly"() {
+    def cleanup() {
+        super.cleanupSpec()
+    }
+
+    void "Outdated daily page CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
 		String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
 		createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
@@ -91,7 +97,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
 
 	}
 
-    public void "Outdated weekly page CsiAggregations get closed and calculated correctly"() {
+    void "Outdated weekly page CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
 		String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
 		createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
@@ -126,7 +132,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
         }
     }
 
-	void "Outdated daily JobGroup CsiAggregations get closed and calculated correctly"() {
+    void "Outdated daily JobGroup CsiAggregations get closed and calculated correctly"() {
 		setup: "Create two outdated CsiAggregations and no EventResults"
 		String tag = "${JobGroup.list()[0].ident()}"
 		createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
@@ -269,7 +275,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
         }
     }
 
-	public void "Daily page CsiAggregation younger expire time shouldn't be closed"() {
+    void "Daily page CsiAggregation younger expire time shouldn't be closed"() {
 		setup: "Create daily page CsiAggregation younger expire time"
 		String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
 		createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
@@ -287,7 +293,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
         CsiAggregationUpdateEvent.list().size() == 1
 	}
 
-    public void "Weekly page CsiAggregation younger expire time shouldn't be closed"() {
+    void "Weekly page CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create weekly page CsiAggregation younger expire time"
         String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
         createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
@@ -305,7 +311,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
         CsiAggregationUpdateEvent.list().size() == 1
     }
 
-    public void "Daily JobGroup CsiAggregation younger expire time shouldn't be closed"() {
+    void "Daily JobGroup CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create daily JobGroup CsiAggregation younger expire time"
         String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
         createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
@@ -323,7 +329,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
         CsiAggregationUpdateEvent.list().size() == 1
     }
 
-    public void "Weekly JobGroup CsiAggregation younger expire time shouldn't be closed"() {
+    void "Weekly JobGroup CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create weekly JobGroup CsiAggregation younger expire time"
         String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
         createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
@@ -341,7 +347,7 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
         CsiAggregationUpdateEvent.list().size() == 1
     }
 
-	void createCsiAggregationsWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, String tag){
+	private void createCsiAggregationsWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, String tag){
 		String resultIdsIrrelevantInTheseTests = '1,2,3'
 		CsiAggregation mv = TestDataUtil.createCsiAggregation(
 			started,
@@ -355,12 +361,12 @@ class CloseExpiredUpdateEventsIntTests extends IntegrationSpec {
 		TestDataUtil.createUpdateEvent(mv.ident(), CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
 	}
 
-    void mocksCommonToAllTests(){
+    private void mocksCommonToAllTests(){
         mockedExecTimeOfCleanup = new DateTime(2014,7,7,5,30,0, DateTimeZone.UTC)
         CsiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
     }
 
-    void createTestdataCommonToAllTests(){
+    private void createTestdataCommonToAllTests(){
         List<AggregatorType> aggregators = TestDataUtil.createAggregatorTypes()
         pageAggregator = aggregators.find{ it.name == AggregatorType.PAGE }
         shopAggregator = aggregators.find{ it.name == AggregatorType.SHOP }

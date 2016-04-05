@@ -30,16 +30,16 @@ import grails.test.mixin.integration.IntegrationTestMixin
 import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.junit.Test
+import spock.lang.Shared
 
 import static org.junit.Assert.*
 
-@TestMixin(IntegrationTestMixin)
-class WeeklyPageIntTests  extends IntegrationSpec {
+class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 
 	static transactional = false
 
 	/** injected by grails */
-	CsiAggregationTagService csiAggregationTagService
+	@Shared CsiAggregationTagService csiAggregationTagService
 	PageCsiAggregationService pageCsiAggregationService
 	CsiAggregationUpdateService csiAggregationUpdateService
 
@@ -59,11 +59,15 @@ class WeeklyPageIntTests  extends IntegrationSpec {
 
 
 	def setupSpec() {
-		TestDataUtil.cleanUpDatabase()
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
+
+		System.out.println('Loading CSV-data...');
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
+		System.out.println('Loading CSV-data... DONE');
+
 		System.out.println('Create some common test-data... DONE');
 	}
 
@@ -72,12 +76,7 @@ class WeeklyPageIntTests  extends IntegrationSpec {
 	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated 
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
-	void setup() {
-		
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
-		System.out.println('Loading CSV-data... DONE');
-		
+	def setup() {
 //		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
 //		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
 //			return mapToFindJobResultByEventResult[eventResult.ident()]
@@ -106,14 +105,17 @@ class WeeklyPageIntTests  extends IntegrationSpec {
 		System.out.println('Set-up... DONE');
 	}
 
+	def cleanup() {
+		super.cleanupSpec()
+	}
+
 
 	/**
 	 * The target weekly page-values were taken from the old excel-evaluation: .\test\resources\SR_2.44.0_Kundenzufriedenheit.xlsx.
 	 * The CSV read is {@code weekly_page_KW50_2012.csv}.
 	 * Calculating weekly page-values via {@link PageCsiAggregationService} should provide (nearly) the same results!
 	 */
-	@Test
-	public void "test calculating weekly page values for Page_SE"() {
+	void "test calculating weekly page values for Page_SE"() {
 		// Skip Page if no data is generated (SpeedUp Test) see pagesToGenerateDataFor
 		String pageName = "SE"
 		if(!pagesToGenerateDataFor.contains(pageName)) {

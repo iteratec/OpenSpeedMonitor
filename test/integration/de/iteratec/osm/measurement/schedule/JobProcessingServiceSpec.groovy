@@ -58,7 +58,7 @@ class JobProcessingServiceSpec extends IntegrationSpec {
     Location location
     JobGroup jobGroup
 
-    void setup() {
+    def setup() {
 
         // mocks common for all tests
         jobProcessingService.proxyService = [runtest: { WebPageTestServer wptserver, Map params ->

@@ -30,7 +30,7 @@ import de.iteratec.osm.result.EventResult
 import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 
-class WeeklyShopMultipleCsiGroupsIntTests extends IntegrationSpec {
+class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
 	/** injected by grails */
 	EventCsiAggregationService eventCsiAggregationService
@@ -64,7 +64,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends IntegrationSpec {
 	static final Integer countResultsPerWeeklyPageMv = 4
 	static final Integer countWeeklyPageMvsToBeCreated = 4
 
-	void setup() {
+	def setup() {
 		targetValues = [
 			csiGroup1: 0.391,
 			csiGroup2: 0.691
@@ -111,7 +111,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends IntegrationSpec {
 	/**
 	 * Creating testdata.
 	 */
-	void setupSpec() {
+	def setupSpec() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()

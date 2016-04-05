@@ -36,7 +36,7 @@ import org.joda.time.DateTimeZone
 /**
  *
  */
-class ShopCsiServiceIntTests extends IntegrationSpec {
+class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-10
 
@@ -59,7 +59,7 @@ class ShopCsiServiceIntTests extends IntegrationSpec {
     private static final DateTime END = new DateTime(2014, 12, 31, 0, 0, DateTimeZone.UTC)
     private static int groups = 0
 
-    void setupSpec() {
+    def setupSpec() {
         //test-data common to all tests
         createOsmConfig()
         createPagesAndEvents()
@@ -69,7 +69,7 @@ class ShopCsiServiceIntTests extends IntegrationSpec {
         //mocks
     }
 
-    void setup() {
+    def setup() {
         csiByEventResultsService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
     }
 
@@ -190,7 +190,7 @@ class ShopCsiServiceIntTests extends IntegrationSpec {
         createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf3)
     }
 
-    void createEventResult(MeasuredEvent event, String tag, double value) {
+    private void createEventResult(MeasuredEvent event, String tag, double value) {
         //data is needed to create a JobResult
         JobGroup group = JobGroup.list()[0]
         Script script = TestDataUtil.createScript("label${groups}", "description", "navigationScript", true)
@@ -230,7 +230,7 @@ class ShopCsiServiceIntTests extends IntegrationSpec {
         group.save(flush: true, failOnError: true)
     }
 
-    void createPagesAndEvents() {
+    private void createPagesAndEvents() {
         ['HP', 'MES', 'SE', 'ADS', 'WKBS', 'WK', Page.UNDEFINED].each { pageName ->
             Double weight = 0
             Page page = Page.findByName(pageName) ?: new Page(
@@ -246,7 +246,7 @@ class ShopCsiServiceIntTests extends IntegrationSpec {
 
     }
 
-    void createBrowsers() {
+    private void createBrowsers() {
         String browserName = "undefined"
         Browser.findByName(browserName) ?: new Browser(
                 name: browserName,
@@ -273,7 +273,7 @@ class ShopCsiServiceIntTests extends IntegrationSpec {
                 .save(failOnError: true)
     }
 
-    void createOsmConfig() {
+    private void createOsmConfig() {
         new OsmConfiguration(
                 detailDataStorageTimeInWeeks: 2,
                 defaultMaxDownloadTimeInMinutes: 60,

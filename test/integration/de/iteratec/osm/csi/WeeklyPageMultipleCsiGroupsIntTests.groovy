@@ -29,19 +29,18 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
 import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
+import spock.lang.Shared
 
 import static org.junit.Assert.*
 
 //@TestMixin(IntegrationTestMixin)
-class WeeklyPageMultipleCsiGroupsIntTests extends IntegrationSpec{
-
-	static transactional = true
+class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec{
 
 	/** injected by grails */
 	EventCsiAggregationService eventCsiAggregationService
 	PageCsiAggregationService pageCsiAggregationService
 	JobService jobService
-	CsiAggregationTagService csiAggregationTagService
+	@Shared CsiAggregationTagService csiAggregationTagService
 	EventResultService eventResultService
 	WeightingService weightingService
 	MeanCalcService meanCalcService
@@ -78,26 +77,20 @@ class WeeklyPageMultipleCsiGroupsIntTests extends IntegrationSpec{
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
 	def setupSpec() {
-//		TestDataUtil.cleanUpDatabase()
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
         TestDataUtil.createCsiConfiguration()
 
+		System.out.println('Loading CSV-data...');
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
+		System.out.println('Loading CSV-data... DONE');
+
 		System.out.println('Create some common test-data... DONE');
 	}
 
 	def setup() {
-        // Event Results have no List of JobResults anymore -> now found via EventResultService.findByJobId
-//		JobResultDaoService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-//			List<JobResult> results = JobResult.list().findAll{eventResult in it.eventResults}
-//			return results.get(0)
-//		}
-		
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
-		System.out.println('Loading CSV-data... DONE');
 		
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)
@@ -118,7 +111,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends IntegrationSpec{
 	}
 
 
-	public void testCreationAndCalculationOfWeeklyPageValuesFor_MES() {
+	void testCreationAndCalculationOfWeeklyPageValuesFor_MES() {
 		given:
 		Integer countResultsPerWeeklyPageMv = 4
 		Integer countWeeklyPageMvsToBeCreated = 2
@@ -129,7 +122,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends IntegrationSpec{
 		creationAndCalculationOfWeeklyPageValuesTest("MES", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
 	}
 
-	public void testCreationAndCalculationOfWeeklyPageValuesFor_HP() {
+	void testCreationAndCalculationOfWeeklyPageValuesFor_HP() {
         given:
 		Integer countResultsPerWeeklyPageMv = 4
 		Integer countWeeklyPageMvsToBeCreated = 2
@@ -143,7 +136,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends IntegrationSpec{
 	/**
 	 * After pre-calculation of hourly job-{@link CsiAggregation}s the creation and calculation of weekly page-{@link CsiAggregation}s is tested.
 	 */
-	void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
+	private void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
 
 		Page testedPage=Page.findByName(pageName);
 

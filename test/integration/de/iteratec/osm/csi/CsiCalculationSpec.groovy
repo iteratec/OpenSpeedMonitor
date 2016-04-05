@@ -26,10 +26,12 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
+import org.springframework.transaction.TransactionStatus
+
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-class CsiCalculationSpec extends IntegrationSpec {
+class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
     static transactional = false //necessary because we test transactional service methods
 
@@ -48,6 +50,7 @@ class CsiCalculationSpec extends IntegrationSpec {
     Script testScript
 
     def setup() {
+        super.setupSpec()
 
         createTestDataCommonForAllTests()
         mocksCommonForAllTests()
@@ -55,8 +58,7 @@ class CsiCalculationSpec extends IntegrationSpec {
     }
 
     def cleanup(){
-
-        TestDataUtil.cleanUpDatabase() //necessary because our tests have to be non-transactional here
+        super.cleanupSpec()
 
     }
 
@@ -77,12 +79,10 @@ class CsiCalculationSpec extends IntegrationSpec {
 
     void "csi must be calculated with csi-configuration, all values are 100%"() {
         setup: "prepare Job and JobGroup"
-        JobGroup.withNewTransaction {
-            JobGroup jobGroupWithCsiConf = JobGroup.findByName(jobGroupName_csi_1)
-            jobGroupWithCsiConf.csiConfiguration = csiConfiguration_all_1
-            jobGroupWithCsiConf.save(failOnError: true)
-            TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3 , false, 60)
-        }
+        JobGroup jobGroupWithCsiConf = JobGroup.findByName(jobGroupName_csi_1)
+        jobGroupWithCsiConf.csiConfiguration = csiConfiguration_all_1
+        jobGroupWithCsiConf.save(failOnError: true)
+        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
         locationAndResultPersisterService.listenToResult(xmlResult,server1)
@@ -155,8 +155,9 @@ class CsiCalculationSpec extends IntegrationSpec {
     private void mocksCommonForAllTests(){
         locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = {
             Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
-            if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
+            if (csiConfiguration == null) return null
             else if (csiConfiguration.label == csiConfiguration_all_1.label) return 100d
+            else if(csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
     }
 }
