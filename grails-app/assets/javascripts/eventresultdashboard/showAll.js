@@ -250,8 +250,8 @@ function ensureMinLength(targetString, minLength){
     }
 }
 function setChevron(accordionElement) {
-	if(!accordionElement.hasClass("collapse")) {
-		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-dow")
+    if(!accordionElement.hasClass("in")) {
+		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-up").addClass("fa fa-chevron-down")
 	} else {
 		$(accordionElement).parent().find("a.accordion-toggle").removeClass("fa fa-chevron-down").addClass("fa fa-chevron-up")
 	}
