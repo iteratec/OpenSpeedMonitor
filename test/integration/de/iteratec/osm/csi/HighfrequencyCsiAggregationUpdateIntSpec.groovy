@@ -56,7 +56,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author nkuhn
  * @see CsiAggregationUpdateEvent
  */
-class HighfrequencyCsiAggregationUpdateIntSpec extends IntTestWithDBCleanup {
+class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrationSpec {
 
 	static transactional = false
 
@@ -68,8 +68,7 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends IntTestWithDBCleanup {
 	private static final aTuesday = new DateTime(2014, 6, 3, 0, 0, 0, DateTimeZone.UTC)
 	private static final fridayBeforeTuesday = new DateTime(2014, 5, 30, 0, 0, 0, DateTimeZone.UTC)
 
-	@Before
-	void setUp() {
+	def setup() {
 
 		/*/no clue why the criteria in the following service-method doesn't work in this integration test :-(
 		JobResultService.metaClass.findJobResultByEventResult = { EventResult eventResult ->
@@ -131,12 +130,7 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends IntTestWithDBCleanup {
 //		).save(failOnError: true, flush: true)
 	}
 
-	@After
-	void tearDown() {
-	}
-
-	@Test
-	void testPersistingNewEventResultsWhileManyCsiAggregationCalculationsOccur() {
+	def testPersistingNewEventResultsWhileManyCsiAggregationCalculationsOccur() {
 
 		/*TODO: enable this test again
 		 * If this test runs in front of ShopCsiAggregationCalculationIntSpec,
@@ -146,7 +140,8 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends IntTestWithDBCleanup {
 		 * This test fails when it is running in integration test sequence,
 		 * the dependency belongs on ?
 		 */
-
+		expect:
+		true
 //		CsiAggregationCalculator mvCalculator = new CsiAggregationCalculator()
 //		mvCalculator.start(pageCsiAggregationService, log)
 //

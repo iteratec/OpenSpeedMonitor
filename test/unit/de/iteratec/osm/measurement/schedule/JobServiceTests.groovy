@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
@@ -37,7 +38,7 @@ import static org.junit.Assert.*
  * Test-suite of {@link JobService}.
  */
 @TestFor(JobService)
-@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration])
+@Mock([Job, Location, WebPageTestServer, Browser, BrowserAlias, JobGroup, Script, CsiConfiguration, CsiDay])
 class JobServiceTests {
 
 	WebPageTestServer server1

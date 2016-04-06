@@ -17,40 +17,30 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.integration.IntegrationTestMixin
-
-import static org.junit.Assert.*
-
-import org.joda.time.DateTime
-import org.junit.After
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
-
+import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
-import de.iteratec.osm.csi.weighting.WeightingService
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.result.JobResultDaoService
+import de.iteratec.osm.result.*
+import grails.test.mixin.TestMixin
+import grails.test.mixin.integration.IntegrationTestMixin
+import grails.test.spock.IntegrationSpec
+import org.joda.time.DateTime
+import spock.lang.Shared
 
-@TestMixin(IntegrationTestMixin)
-class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWithDBCleanup {
+import static org.junit.Assert.*
 
-	static transactional = true
+//@TestMixin(IntegrationTestMixin)
+class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec{
 
 	/** injected by grails */
 	EventCsiAggregationService eventCsiAggregationService
 	PageCsiAggregationService pageCsiAggregationService
 	JobService jobService
-	CsiAggregationTagService csiAggregationTagService
+	@Shared CsiAggregationTagService csiAggregationTagService
 	EventResultService eventResultService
 	WeightingService weightingService
 	MeanCalcService meanCalcService
@@ -81,33 +71,26 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 	static final DateTime startOfWeek = new DateTime(2012,11,12,0,0,0)
 	static final String csiGroup1Name = 'csiGroup1'
 	static final String csiGroup2Name = 'csiGroup2'
-
 	/**
 	 * Creating testdata.
 	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
-	@BeforeClass
-	public static void setUpData() {
-		TestDataUtil.cleanUpDatabase()
+	def setupSpec() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
-		TestDataUtil.createHoursOfDay()
-		System.out.println('Create some common test-data... DONE');		
-	}
+        TestDataUtil.createCsiConfiguration()
 
-	@Before
-	void setUp() {
-		JobResultDaoService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-			List<JobResult> results = JobResult.list().findAll{eventResult in it.eventResults}
-			return results.get(0)
-		}
-		
 		System.out.println('Loading CSV-data...');
 		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
 		System.out.println('Loading CSV-data... DONE');
+
+		System.out.println('Create some common test-data... DONE');
+	}
+
+	def setup() {
 		
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)
@@ -127,32 +110,33 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 		]
 	}
 
-	@After
-	void tearDown() {
-	}
 
-	@Test
-	public void testCreationAndCalculationOfWeeklyPageValuesFor_MES() {
+	void testCreationAndCalculationOfWeeklyPageValuesFor_MES() {
+		given:
 		Integer countResultsPerWeeklyPageMv = 4
 		Integer countWeeklyPageMvsToBeCreated = 2
+		when:
 		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
-		assertEquals(16, results.size())
+		then:
+		results.size()==16
 		creationAndCalculationOfWeeklyPageValuesTest("MES", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
 	}
 
-	@Test
-	public void testCreationAndCalculationOfWeeklyPageValuesFor_HP() {
+	void testCreationAndCalculationOfWeeklyPageValuesFor_HP() {
+        given:
 		Integer countResultsPerWeeklyPageMv = 4
 		Integer countWeeklyPageMvsToBeCreated = 2
+        when:
 		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startOfWeek.toDate(), startOfWeek.plusWeeks(1).toDate())
-		assertEquals(16, results.size())
+		then:
+        results.size() == 16
 		creationAndCalculationOfWeeklyPageValuesTest("HP", countResultsPerWeeklyPageMv, countWeeklyPageMvsToBeCreated, results);
 	}
 
 	/**
 	 * After pre-calculation of hourly job-{@link CsiAggregation}s the creation and calculation of weekly page-{@link CsiAggregation}s is tested.
 	 */
-	void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
+	private void creationAndCalculationOfWeeklyPageValuesTest(String pageName, final Integer countResultsPerWeeklyPageMv, final Integer countWeeklyPageMvsToBeCreated, List<EventResult> results) {
 
 		Page testedPage=Page.findByName(pageName);
 
@@ -192,7 +176,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends de.iteratec.osm.csi.IntTestWit
 
 			wpmvsOfOneGroupPageCombination.each{ CsiAggregation mvWeeklyPage ->
 				assertTrue(mvWeeklyPage.tag.equals(csiGroup.ident().toString() + ';' + testedPage.ident().toString()))
-				assertEquals(targetValues["${csiGroup.name}_${testedPage.name}"], mvWeeklyPage.value, 0.01d)
+				assertEquals(targetValues["${csiGroup.name}_${testedPage.name}"], mvWeeklyPage.csByWptDocCompleteInPercent, 0.01d)
 			}
 		}
 

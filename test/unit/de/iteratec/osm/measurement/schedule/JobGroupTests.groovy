@@ -18,19 +18,19 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.TestDataUtil
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.junit.Test
 
-import static org.junit.Assert.*
-
-import grails.test.mixin.*
-
-import org.junit.*
+import static org.junit.Assert.assertEquals
 
 /**
  * Test-suite of {@link JobGroup}.
  */
 @TestFor(JobGroup)
-@Mock([JobGroup, CsiConfiguration])
+@Mock([JobGroup, CsiConfiguration, CsiDay])
 class JobGroupTests {
 
 	@Test

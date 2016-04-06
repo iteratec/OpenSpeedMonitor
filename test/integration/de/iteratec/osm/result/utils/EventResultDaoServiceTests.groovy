@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.result.utils
 
-import de.iteratec.osm.csi.IntTestWithDBCleanup
+import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
@@ -31,16 +31,12 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
-import grails.test.mixin.TestMixin
-import grails.test.mixin.integration.IntegrationTestMixin
 import org.apache.commons.lang.time.DateUtils
-import org.junit.Before
 
 import static org.junit.Assert.assertEquals
 
 
-@TestMixin(IntegrationTestMixin)
-class EventResultDaoServiceTests extends IntTestWithDBCleanup {
+class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 
     public static final String CONN_PROFILE_NAME = 'connProfile 1: name'
     EventResultDaoService eventResultDaoService
@@ -57,12 +53,18 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 	private static final String MEASURAND_AGGREGATOR_TYPE_NAME_3 = 'measurand3'
 	private static final String NON_MEASURAND_AGGREGATOR_TYPE_NAME = 'nonMeasurand'
 
-	@Before
-	void setUp() {
+
+	void setup() {
+        super.setupSpec()
 		initTestData();
 	}
 
-	void testgetByStartAndEndTimeAndMvQueryParams_JUST_ONE_DATE() {
+    void cleanup(){
+        super.cleanupSpec()
+    }
+
+	def "Test getByStartAndEndTimeAndMvQueryParams with JUST_ONE_DATE" (){
+		given:
 		MvQueryParams qp=new MvQueryParams();
 		qp.browserIds.add(job.location.browser.id);
 		qp.jobGroupIds.add(job.jobGroup.id);
@@ -70,16 +72,19 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 		qp.pageIds.add(measuredEvent.testedPage.id);
 		qp.locationIds.add(job.location.id);
 
+        when:
 		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Zero, [
 			CachedView.CACHED,
 			CachedView.UNCACHED
 		], qp)
 
-		assertEquals("should be only one result but was: ", 1, results.size())
-		assertEquals("should be equal to the first run:", resultRunDatePlus_Zero, results.getAt(0))
+        then:
+		results.size() == 1
+		results.getAt(0) == resultRunDatePlus_Zero
 	}
 
-	void testgetByStartAndEndTimeAndMvQueryParams_ZERO_TO_TEN() {
+	def "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN"() {
+        given:
 		MvQueryParams qp=new MvQueryParams();
 		qp.browserIds.add(job.location.browser.id);
 		qp.jobGroupIds.add(job.jobGroup.id);
@@ -87,18 +92,21 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 		qp.pageIds.add(measuredEvent.testedPage.id);
 		qp.locationIds.add(job.location.id);
 
+        when:
 		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
 			CachedView.CACHED,
 			CachedView.UNCACHED
 		], qp)
 
-		assertEquals("shoudl be two result but was: ", 2, results.size())
-		assertEquals("should be equal to the first run:", resultRunDatePlus_Zero, results.find{it.jobResultDate == runDatePlus_Zero})
-		assertEquals("should be equal to the first run:", resultRunDatePlus_Ten,results.find{it.jobResultDate == runDatePlus_Ten})
+        then:
+        results.size() == 2
+        results.find{it.jobResultDate == runDatePlus_Zero} == resultRunDatePlus_Zero
+        results.find{it.jobResultDate == runDatePlus_Ten} == resultRunDatePlus_Ten
 	}
 
 
-	void testgetByStartAndEndTimeAndMvQueryParams_ZERO_TO_TEN_AND_BROWSER() {
+	def "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_BROWSER"() {
+        given:
 		MvQueryParams qp=new MvQueryParams();
 		qp.browserIds.add(job.location.browser.id);
 		qp.jobGroupIds.add(job.jobGroup.id);
@@ -106,25 +114,30 @@ class EventResultDaoServiceTests extends IntTestWithDBCleanup {
 		qp.pageIds.add(measuredEvent.testedPage.id);
 		qp.locationIds.add(job.location.id);
 
+        when:
 		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
 			CachedView.CACHED,
 			CachedView.UNCACHED
 		], qp)
 
-		assertEquals("shoudl be two result but was: ", 2, results.size())
-		assertEquals("should be equal to the first run:", resultRunDatePlus_Zero, results.find{it.jobResultDate == runDatePlus_Zero})
-		assertEquals("should be equal to the first run:", resultRunDatePlus_Ten,results.find{it.jobResultDate == runDatePlus_Ten})
+        then:
+        results.size() == 2
+        results.find{it.jobResultDate == runDatePlus_Zero} == resultRunDatePlus_Zero
+        results.find{it.jobResultDate == runDatePlus_Ten} == resultRunDatePlus_Ten
 	}
 
-	void testgetByStartAndEndTimeAndMvQueryParams_ZERO_TO_TEN_AND_EMPTY_MV_PARAMS() {
+	void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_EMPTY_MV_PARAMS"() {
+        given:
 		MvQueryParams qp=new MvQueryParams();
-		
+
+        when:
 		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
 			CachedView.CACHED,
 			CachedView.UNCACHED
 		], qp)
 
-		assertEquals("shoudl be two result but was: ", 2, results.size())
+        then:
+        results.size() == 2
 	}
 
     private void initTestData() {

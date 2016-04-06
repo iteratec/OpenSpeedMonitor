@@ -18,6 +18,7 @@
 package de.iteratec.osm.persistence
 
 import de.iteratec.osm.csi.IntTestWithDBCleanup
+import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import org.junit.Test
@@ -27,7 +28,7 @@ import static org.junit.Assert.assertNull
 /**
  *
  */
-class DbCleanupIntSpec extends IntTestWithDBCleanup{
+class DbCleanupIntSpec extends NonTransactionalIntegrationSpec{
 	
 	/*
 	 * TODO: The following test-methods test whether db is cleaned between execution of single methods. They are green by itself but tests 
@@ -80,8 +81,7 @@ class DbCleanupIntSpec extends IntTestWithDBCleanup{
 //			status.flush()
 //		}
 //	}
-	
-	@Test
+
 	void testCascadingDeletionOfBrowsers(){
 		
 		//creating test-specific data
@@ -99,11 +99,11 @@ class DbCleanupIntSpec extends IntTestWithDBCleanup{
 		mybrowser.delete(failOnError: true)
 		
 		//assertions
-		assertNull(Browser.findByName(browserName))
-		assertNull(BrowserAlias.findByAlias("my-browser-a"))
-		assertNull(BrowserAlias.findByAlias("my-browser-b"))
-		assertNull(BrowserAlias.findByAlias("my-browser-c"))
-		assertNull(BrowserAlias.findByAlias("my-browser-d"))
+		Browser.findByName(browserName) == null
+		BrowserAlias.findByAlias("my-browser-a") == null
+		BrowserAlias.findByAlias("my-browser-b") == null
+		BrowserAlias.findByAlias("my-browser-c") == null
+		BrowserAlias.findByAlias("my-browser-d") == null
 	}
 
 }

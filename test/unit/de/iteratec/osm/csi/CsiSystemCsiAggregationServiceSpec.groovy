@@ -49,7 +49,7 @@ import spock.lang.Specification
 @TestFor(CsiSystemCsiAggregationService)
 @Mock([MeanCalcService, CsiAggregation, CsiAggregationInterval, AggregatorType, Browser, JobGroup,
         Page, CsiAggregationUpdateEvent, CsiSystem, Job, ConnectivityProfile, JobResult,EventResult, WebPageTestServer,
-        Location, Script, MeasuredEvent, JobGroupWeight, CsiConfiguration, PageWeight, TimeToCsMapping])
+        Location, Script, MeasuredEvent, JobGroupWeight, CsiConfiguration, PageWeight, TimeToCsMapping, CsiDay])
 class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     @Shared

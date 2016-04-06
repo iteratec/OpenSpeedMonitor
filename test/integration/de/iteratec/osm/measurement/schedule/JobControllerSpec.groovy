@@ -1,8 +1,8 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -11,11 +11,8 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import grails.test.mixin.TestMixin
-import grails.test.mixin.integration.IntegrationTestMixin
+import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
-import org.junit.Before
-import org.junit.Test
 
 import static de.iteratec.osm.csi.TestDataUtil.*
 import static org.hamcrest.MatcherAssert.assertThat
@@ -25,8 +22,7 @@ import static org.hamcrest.Matchers.*
  * We need an integration test because there is no support for unit test with cascading in Hibernate 3.X
  *
  */
-@TestMixin(IntegrationTestMixin)
-class JobControllerSpec extends IntTestWithDBCleanup {
+class JobControllerSpec extends IntegrationSpec {
 
     JobController controllerUnderTest
     //Will be used to assign different names for the test data
@@ -36,8 +32,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
     Job deleteJob
 
 
-    @Before
-    void setup() {
+    def setup() {
         controllerUnderTest = new JobController()
         controllerUnderTest.jobService.batchActivityService.timer.cancel()
         controllerUnderTest.inMemoryConfigService = new InMemoryConfigService()
@@ -46,8 +41,8 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         createData()
     }
 
-    @Test
-    void delete() {
+    void "test deleting"() {
+        given:
         List<JobResult> jobResults = JobResult.findAllByJob(deleteJob)
         List<EventResult> eventResults = []
         jobResults.each {
@@ -58,9 +53,12 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         int oldMeasuredEventCount = MeasuredEvent.count()
         assert jobResults.size() == 1
         assert eventResults.size() == 1
+
+        when:
         //The Controller will use a promise to run the deletion within another thread, so we just check if the service will delete the job
         controllerUnderTest.jobService.deleteJob(deleteJob)
 
+        then:
         List<Job> allJobs = Job.list()
         List<JobResult> allJobResults = JobResult.list()
         List<EventResult> allEventResults = EventResult.list()
@@ -68,11 +66,11 @@ class JobControllerSpec extends IntTestWithDBCleanup {
         assertThat(allJobResults as Iterable<List<JobResult>>, not(hasItems(jobResults)))
         assertThat(allEventResults as Iterable<ArrayList<EventResult>>, not(hasItems(eventResults)))
 
-        assert allJobResults.size() == 1
-        assert allEventResults.size() == 1
-        assert allJobs.size() == oldJobCount - 1
+        allJobResults.size() == 1
+        allEventResults.size() == 1
+        allJobs.size() == oldJobCount - 1
         assertThat(allJobs, not(hasItem(deleteJob)))
-        assert MeasuredEvent.count() == oldMeasuredEventCount
+        MeasuredEvent.count() == oldMeasuredEventCount
 
     }
 
@@ -121,7 +119,7 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
                 httpStatusCode: 200,
-        ).save(flush: true,failOnError: true)
+        ).save(flush: true, failOnError: true)
     }
 
     private static EventResult createEventResult(JobResult jobResult, eventResultTag) {
@@ -150,8 +148,9 @@ class JobControllerSpec extends IntTestWithDBCleanup {
                 jobResultJobConfigId: 1,
                 measuredEvent: null,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: eventResultTag
-        ).save(flush: true,failOnError: true)
+                tag: eventResultTag,
+                connectivityProfile: TestDataUtil.createConnectivityProfile("unused")
+        ).save(flush: true, failOnError: true)
     }
 
 }

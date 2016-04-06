@@ -18,25 +18,23 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.TestDataUtil
-
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertTrue
-import grails.test.mixin.*
-
-import java.util.regex.Pattern
-
-import org.junit.Before
-import org.junit.Test
-
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
+import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobService
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.junit.Before
+import org.junit.Test
+
+import java.util.regex.Pattern
+
+import static org.junit.Assert.*
 
 /**
  * Test-suite of {@link CsiAggregationTagService}.
@@ -45,7 +43,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author mze
  */
 @TestFor(CsiAggregationTagService)
-@Mock([Job, JobResult, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, WebPageTestServer, CsiConfiguration])
+@Mock([Job, JobResult, EventResult, Page, JobGroup, Browser, Location, MeasuredEvent, WebPageTestServer, CsiConfiguration, CsiDay])
 class CsiAggregationTagServiceTests {
 
 	static final Integer eventResultStatus = 200

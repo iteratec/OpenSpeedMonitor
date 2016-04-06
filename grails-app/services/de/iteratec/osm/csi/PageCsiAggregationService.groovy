@@ -336,36 +336,4 @@ class PageCsiAggregationService {
         }
         return toBeCalculated
     }
-
-    /**
-     * Provides weekly page-{@link CsiAggregation}s for all pages and all csi-groups between toDate and fromDate.
-     * Non-existent {@link CsiAggregation}s will be created.
-     * All {@link CsiAggregation}s with @{link CsiAggregation.Calculated.Not} will be calculated and persisted with @{link CsiAggregation.Calculated.Yes}* or @{link CsiAggregation.Calculated.YesNoData}.
-     * @param fromDate
-     * @param toDate
-     * @return
-     * @deprecated Use {@link #getOrCalculateWeeklyPageCsiAggregations(Date, Date, List, List)}
-     */
-    @Deprecated
-    List<CsiAggregation> getOrCalculateWeeklyPageCsiAggregations(Date fromDate, Date toDate) {
-        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
-        return getOrCalculatePageCsiAggregations(fromDate, toDate, weeklyInterval, JobGroup.findAllByCsiConfigurationIsNotNull(), Page.list())
-    }
-
-    /**
-     * Provides weekly page-{@link CsiAggregation}s for all pages and given csi-groups between toDate and fromDate.
-     * Non-existent {@link CsiAggregation}s will be created.
-     * All {@link CsiAggregation}s with @{link CsiAggregation.Calculated.Not} will be calculated and persisted with @{link CsiAggregation.Calculated.Yes}* or @{link CsiAggregation.Calculated.YesNoData}.
-     * @param fromDate
-     * @param toDate
-     * @param csiGroups
-     * @return
-     *
-     * @deprecated Use {@link #getOrCalculateWeeklyPageCsiAggregations(Date, Date, List, List)}
-     */
-    @Deprecated
-    List<CsiAggregation> getOrCalculateWeeklyPageCsiAggregations(Date fromDate, Date toDate, List<JobGroup> csiGroups) {
-        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
-        return getOrCalculatePageCsiAggregations(fromDate, toDate, weeklyInterval, csiGroups, Page.list());
-    }
 }

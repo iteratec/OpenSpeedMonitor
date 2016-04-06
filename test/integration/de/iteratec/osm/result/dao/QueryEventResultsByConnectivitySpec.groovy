@@ -19,16 +19,17 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
+import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import spock.lang.Specification
+import org.junit.Test
 
 import java.util.regex.Pattern
 
 /**
  *
  */
-class QueryEventResultsByConnectivitySpec extends Specification {
+class QueryEventResultsByConnectivitySpec extends IntegrationSpec {
 
     EventResultDaoService eventResultDaoService
 
@@ -38,7 +39,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
     public static final String CUSTOM_CONN_NAME_SHOULD_NOT_MATCH = 'Custom (50000/6000 Kbps, 100ms, 0% PLR)'
 
     DateTime runDate
-    private Job job
+    private Job jobWithPredefinedConnectivity
+    private Job jobWithNativeConnectivity
+    private Job jobWithCustomConnectivity
     private MeasuredEvent measuredEvent
 
     private EventResult withPredefinedProfile1
@@ -57,15 +60,15 @@ class QueryEventResultsByConnectivitySpec extends Specification {
     }
 
     // selection by one type of selector: predefined profile(s), custom conn or native conn ///////////////////////////////////////////
-
     void "select by single predefined profile"() {
         when:
-        MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        MvQueryParams queryParams=new ErQueryParams()
+        queryParams.includeCustomConnectivity = false
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(measuredEvent.testedPage.id)
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
         queryParams.connectivityProfileIds.add(predefinedProfile1.ident())
 
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -87,15 +90,15 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results[0].connectivityProfile.ident() == predefinedProfile1.ident()
         results[0].customConnectivityName == null
     }
-
     void "select by a list of predefined profiles"() {
         when:
-        MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        MvQueryParams queryParams=new ErQueryParams()
+        queryParams.includeCustomConnectivity = false
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(measuredEvent.testedPage.id)
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
         queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident(), predefinedProfile2.ident()])
 
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -120,15 +123,15 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results[0].customConnectivityName == null
         results[1].customConnectivityName == null
     }
-
     void "select by custom conn name regex: not matching all"() {
         when:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.includeCustomConnectivity = true
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
+        queryParams.measuredEventIds.add(measuredEvent.id)
+        queryParams.pageIds.add(measuredEvent.testedPage.id)
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
         queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
 
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -150,15 +153,15 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results[0].connectivityProfile == null
         results[0].customConnectivityName == CUSTOM_CONN_NAME_SHOULD_MATCH
     }
-
     void "select by custom conn name regex: matching all"() {
         when:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
+        queryParams.includeCustomConnectivity = true
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
         queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
 
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -183,15 +186,15 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results*.customConnectivityName.contains(withCustomConnectivityMatchingRegex.customConnectivityName)
         results*.customConnectivityName.contains(withCustomConnectivityNotMatchingRegex.customConnectivityName)
     }
-
     void "select only native conn"() {
         when:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
+        queryParams.includeCustomConnectivity = false
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
         queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.includeNativeConnectivity = true
 
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
@@ -211,19 +214,18 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         then:
         results.size() == 1
         results[0].connectivityProfile == null
-        results[0].customConnectivityName == ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
     }
 
     // selection by combinations of multiple types of selectors: predefined profile(s)/custom conn/native conn ///////////////////////////////////////////
-
     void "select by custom conn name regex AND native conn"() {
         when:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
+        queryParams.includeCustomConnectivity = true
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
         queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
         queryParams.includeNativeConnectivity = true
 
@@ -244,18 +246,17 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         then:
         results.size() == 2
         results.findAll {it.connectivityProfile}.size() == 0
-        results.findAll {it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)}.size() == 1
         results.findAll {it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH)}.size() == 1
     }
-
     void "select by custom conn name regex AND predefined conn"() {
         when:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
+        queryParams.includeCustomConnectivity = true
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
         queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
         queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident()])
 
@@ -276,19 +277,18 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         then:
         results.size() == 3
         results.findAll {it.connectivityProfile}.size() == 1
-        results.findAll {it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)}.size() == 0
         results.findAll {it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH)}.size() == 1
         results.findAll {it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_NOT_MATCH)}.size() == 1
     }
-
     void "select by native conn AND predefined conn"() {
         when:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
+        queryParams.includeCustomConnectivity = false
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
         queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
         queryParams.includeNativeConnectivity = true
 
@@ -309,21 +309,21 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         then:
         results.size() == 2
         results.findAll {it.connectivityProfile}.size() == 1
-        results.findAll {it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)}.size() == 1
     }
-
     void "select by custom conn name regex AND native conn AND predefined conn"() {
-        when:
+        given:
         MvQueryParams queryParams=new ErQueryParams();
-        queryParams.browserIds.add(job.location.browser.id);
-        queryParams.jobGroupIds.add(job.jobGroup.id);
+        queryParams.includeCustomConnectivity = true
+        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
         queryParams.measuredEventIds.add(measuredEvent.id);
         queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(job.location.id);
+        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
         queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
         queryParams.includeNativeConnectivity = true
         queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
 
+        when:
         Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
                 runDate.toDate(),
                 runDate.plusHours(1).toDate(),
@@ -343,7 +343,6 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         ArrayList<EventResult> resultsWithPredefinedProfiles = results.findAll { it.connectivityProfile }
         resultsWithPredefinedProfiles.size() == 1
         resultsWithPredefinedProfiles[0].connectivityProfile.ident() == predefinedProfile2.ident()
-        results.findAll {it.customConnectivityName.equals(ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE)}.size() == 1
         results.findAll {it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH)}.size() == 1
     }
 
@@ -366,8 +365,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         Page homepage = TestDataUtil.createPage('homepage', 0.5d)
 
         Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
-
-        job = TestDataUtil.createJob('job with predefined connectivity', script, ffAgent1, jobGroup, 'irrelevantDescription', 1, false, 60)
+        jobWithPredefinedConnectivity = TestDataUtil.createJob('job with predefined connectivity', script, ffAgent1, jobGroup, 'irrelevantDescription', 1, false, 60)
+        jobWithNativeConnectivity = new Job(label:'job with native connectivity', script:script, location:ffAgent1, jobGroup:jobGroup, description:'irrelevantDescription', runs:1, active:false, maxDownloadTimeInMinutes:60, noTrafficShapingAtAll: true,customConnectivityProfile: false,connectivityProfile: null, executionSchedule: '0 0 */2 * * ? *').save(failOnError: true)
+        jobWithCustomConnectivity = TestDataUtil.createJob('job with custom connectivity', script, ffAgent1, jobGroup, 'irrelevantDescription', 1, false, 60, predefinedProfile1)
 
         measuredEvent = TestDataUtil.createMeasuredEvent('Test event', homepage)
 
@@ -376,30 +376,32 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         /* Create TestData */
         runDate = new DateTime(2013, 5, 29, 0, 0, 0, DateTimeZone.UTC)
 
-        JobResult jobRun = TestDataUtil.createJobResult('1', runDate.toDate(), job, job.location)
+        JobResult jobRunWithPredefinedConnectivity = TestDataUtil.createJobResult('1', runDate.toDate(), jobWithPredefinedConnectivity, jobWithPredefinedConnectivity.location)
+        JobResult jobRunWithNativeConnectivity = TestDataUtil.createJobResult('2', runDate.toDate(), jobWithNativeConnectivity, jobWithNativeConnectivity.location)
+        JobResult jobRunWithCustomConnectivity = TestDataUtil.createJobResult('3', runDate.toDate(), jobWithCustomConnectivity, jobWithCustomConnectivity.location)
 
         CsiAggregationTagService tagService = new CsiAggregationTagService()
-        withPredefinedProfile1 = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
+        withPredefinedProfile1 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent, tagService)
         withPredefinedProfile1.connectivityProfile = predefinedProfile1
         withPredefinedProfile1.customConnectivityName = null
         withPredefinedProfile1.save(failOnError: true)
 
-        withPredefinedProfile2 = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
+        withPredefinedProfile2 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent, tagService)
         withPredefinedProfile2.connectivityProfile = predefinedProfile2
         withPredefinedProfile1.customConnectivityName = null
         withPredefinedProfile2.save(failOnError: true)
 
-        withNativeConnectivity = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
+        withNativeConnectivity = TestDataUtil.createEventResult(jobWithNativeConnectivity, jobRunWithNativeConnectivity, 123I, 456.5D, measuredEvent, tagService, false)
         withNativeConnectivity.connectivityProfile = null
-        withNativeConnectivity.customConnectivityName = ConnectivityProfileService.CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE
+        withNativeConnectivity.customConnectivityName = null
         withNativeConnectivity.save(failOnError: true)
 
-        withCustomConnectivityMatchingRegex = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
+        withCustomConnectivityMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, tagService)
         withCustomConnectivityMatchingRegex.connectivityProfile = null
         withCustomConnectivityMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_SHOULD_MATCH
         withCustomConnectivityMatchingRegex.save(failOnError: true)
 
-        withCustomConnectivityNotMatchingRegex = TestDataUtil.createEventResult(job, jobRun, 123I, 456.5D, measuredEvent, tagService)
+        withCustomConnectivityNotMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, tagService)
         withCustomConnectivityNotMatchingRegex.connectivityProfile = null
         withCustomConnectivityNotMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_SHOULD_NOT_MATCH
         withCustomConnectivityNotMatchingRegex.save(failOnError: true)

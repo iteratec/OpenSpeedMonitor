@@ -67,15 +67,9 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
     }
 
     def cleanup() {
-        CsiAggregation.list().each {
-            it.delete()
-        }
+        CsiAggregation.list()*.delete()
     }
 
-    void "test something"() {
-    }
-
-    @Test
     void "find no csiAggregations if no existing"() {
         when:
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.findAll(fromHourly.toDate(),toHourly.toDate(),hourly,connectivityProfile)
@@ -96,7 +90,6 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         csiSystemWeeklyMvs.isEmpty()
     }
 
-    @Test
     void "calculate empty csiAggregation if no existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
@@ -144,7 +137,6 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         }
     }
 
-    @Test
     void "calculate single csiAggregation if 1 is existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
@@ -182,7 +174,6 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
     }
 
-    @Test
     void "calculate single weekly Mv if 1 is existing and only highest weekly-aggregation is called"() {
         given:
         createSingleHourlyCsiAggregations()
@@ -216,7 +207,6 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
     }
 
-    @Test
     void "aggregate to single csiAggregation if 2 hourlys are existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
@@ -257,7 +247,6 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         csByDocCompleteAndByVisualCompleteIs(csiSystemWeeklyMvs[0],DEFAULT_MV_VALUE)
     }
 
-    @Test
     void "aggregate to 2 daily- and a single weekly-csiAggregation if 2 hourlys on different days are existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
@@ -305,7 +294,10 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
     }
 
     private boolean csByDocCompleteAndByVisualCompleteIs(CsiAggregation csiAggregation, double expectedValue) {
-        csiAggregation.csByWptDocCompleteInPercent == expectedValue && csiAggregation.csByWptVisuallyCompleteInPercent == expectedValue
+        csiAggregation.csByWptDocCompleteInPercent == expectedValue &&
+                csiAggregation.csByWptVisuallyCompleteInPercent == expectedValue &&
+                csiAggregation.isCalculatedWithData()
+
     }
 
     private boolean amountEntriesWithAndWithoutCS(List<CsiAggregation> list, int expectedValueWithCs, int expectedValueWithoutCs, double expectedCsValue) {
@@ -342,7 +334,11 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
         jobGroup2 = TestDataUtil.createJobGroup(jobGroupName2)
         jobGroup2.csiConfiguration = csiConfiguration
 
-        csiSystem = TestDataUtil.createCsiSystem("label",[TestDataUtil.createJobGroupWeight(jobGroup1,1.0),TestDataUtil.createJobGroupWeight(jobGroup2,1.0)])
+        csiSystem = TestDataUtil.createCsiSystem("label",[])
+        csiSystem.addToJobGroupWeights(TestDataUtil.createJobGroupWeight(csiSystem, jobGroup1, 1.0))
+        csiSystem.addToJobGroupWeights(TestDataUtil.createJobGroupWeight(csiSystem, jobGroup2,1.0))
+        csiSystem.save(failOnError: true)
+
 
         measuredEvent1 = TestDataUtil.createMeasuredEvent(eventName1,page1)
         measuredEvent2 = TestDataUtil.createMeasuredEvent(eventName2,page2)

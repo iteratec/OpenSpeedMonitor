@@ -70,7 +70,7 @@ class TabularResultPresentationController {
     PaginationService paginationService
     EventResultDashboardService eventResultDashboardService
 
-    private Map<String, Object> listResultsByCommand(EventResultsCommandBase cmd) {
+    private Map<String, Object> listResultsByCommand(TabularResultEventResultsCommandBase cmd) {
 
         Map<String, Object> modelToRender
         modelToRender = constructStaticViewDataOfListResults();
@@ -87,25 +87,25 @@ class TabularResultPresentationController {
             } else {
                 Interval timeFrame = cmd.getSelectedTimeFrame();
                 List<EventResult> eventResults = null
-                if (cmd instanceof ListResultsCommand) {
+                if (cmd instanceof TabularResultListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
-                            ((ListResultsCommand)cmd).createMvQueryParams(),
+                            ((TabularResultListResultsCommand)cmd).createMvQueryParams(),
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
                             cmd.getOffset(),
                             new CriteriaSorting(sortAttribute: 'jobResultDate', sortOrder: CriteriaSorting.SortOrder.DESC)
                     )
-                    paginationListing = paginationService.buildListResultsPagination((ListResultsCommand)cmd, eventResults.getTotalCount())
-                } else if (cmd instanceof ListResultsForSpecificJobCommand) {
+                    paginationListing = paginationService.buildListResultsPagination((TabularResultListResultsCommand)cmd, eventResults.getTotalCount())
+                } else if (cmd instanceof TabularResultListResultsForSpecificJobCommand) {
                     eventResults = eventResultDaoService.getEventResultsByJob(
-                            ((ListResultsForSpecificJobCommand)cmd).job,
+                            ((TabularResultListResultsForSpecificJobCommand)cmd).job,
                             timeFrame.getStart().toDate(),
                             timeFrame.getEnd().toDate(),
                             cmd.getMax(),
                             cmd.getOffset()
                     )
-                    paginationListing = paginationService.buildListResultsForJobPagination((ListResultsForSpecificJobCommand)cmd, eventResults.getTotalCount())
+                    paginationListing = paginationService.buildListResultsForJobPagination((TabularResultListResultsForSpecificJobCommand)cmd, eventResults.getTotalCount())
                 }
 
                 for(EventResult eachEventResult : eventResults)
@@ -137,7 +137,7 @@ class TabularResultPresentationController {
      * 	       not <code>null</code> and never
      *         {@linkplain Map#isEmpty() empty}.
      */
-    public Map<String, Object>listResults(ListResultsCommand cmd) {
+    public Map<String, Object>listResults(TabularResultListResultsCommand cmd) {
         return listResultsByCommand(cmd)
     }
 
@@ -150,7 +150,7 @@ class TabularResultPresentationController {
      * 	       not <code>null</code> and never
      *         {@linkplain Map#isEmpty() empty}.
      */
-    public Map<String, Object> listResultsForJob(ListResultsForSpecificJobCommand cmd) {
+    public Map<String, Object> listResultsForJob(TabularResultListResultsForSpecificJobCommand cmd) {
         // default to last twelve hours if job but no date range has been specified
         if (cmd.job!=null && cmd.from==null && cmd.to==null) {
 
@@ -194,7 +194,7 @@ class TabularResultPresentationController {
      * 	       not <code>null</code> and never
      *         {@linkplain Map#isEmpty() empty}.
      */
-    public Map<String, Object> ShowListResultsForJob(ListResultsForSpecificJobCommand cmd) {
+    public Map<String, Object> ShowListResultsForJob(TabularResultListResultsForSpecificJobCommand cmd) {
         if (cmd.job!=null && cmd.from==null && cmd.to==null){
             redirect(action: 'listResultsForJob', params:['job.id': cmd.job.getId()])
         }
@@ -203,461 +203,7 @@ class TabularResultPresentationController {
         render(view: 'listResults', model: modelToRender)
     }
 
-    @Validateable(nullable = true)
-    public static class EventResultsCommandBase {
-        /**
-         * The selected start date.
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        Date from
 
-        /**
-         * The selected end date.
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        Date to
-
-        /**
-         * The selected start hour of date.
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        String fromHour
-
-        /**
-         * The selected end hour of date.
-         *
-         * Please use {@link #getSelectedTimeFrame()}.
-         */
-        String toHour
-
-        /**
-         * A predefined time frame.
-         */
-        int selectedTimeFrameInterval = 259200
-
-        Integer max = 50
-
-        Integer offset = 0
-
-        /**
-         * Constraints needs to fit.
-         */
-        static constraints = {
-            from(nullable: true, validator: {Date currentFrom, EventResultsCommandBase cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentFrom == null) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.from.nullWithManualSelection']
-            })
-            to(nullable:true, validator: { Date currentTo, EventResultsCommandBase cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentTo == null) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.to.nullWithManualSelection']
-                else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.to.beforeFromDate']
-            })
-            fromHour(nullable: true, validator: {String currentFromHour, EventResultsCommandBase cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentFromHour == null) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.fromHour.nullWithManualSelection']
-            })
-            toHour(nullable: true, validator: {String currentToHour, EventResultsCommandBase cmd ->
-                boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-                if(manualTimeframe && currentToHour == null) {
-                    return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.toHour.nullWithManualSelection']
-                }
-                else if(manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
-                    DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
-                    DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                    if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.isr.TabularResultPresentationController$ListResultsCommand.toHour.inCombinationWithDateBeforeFrom']
-                }
-            })
-            max(nullable:true)
-            offset(nullable:true)
-        }
-
-        static transients = ['selectedTimeFrame']
-
-        /**
-         * <p>
-         * Returns the selected time frame as {@link Interval}, which is the
-         * result of the aggregation of {@link #from}, {@link #fromHour},
-         * to {@link #to}, {@link #toHour}.
-         * </p>
-         *
-         * @return not <code>null</code>; end is intended to be inclusive
-         * @throws IllegalStateException
-         *         if called on an invalid instance.
-         */
-        public Interval getSelectedTimeFrame() throws IllegalStateException
-        {
-            if( !this.validate() )
-            {
-                throw new IllegalStateException('A time frame is not available from an invalid command.')
-            }
-
-            DateTime start
-            DateTime end
-
-            Boolean manualTimeframe = this.selectedTimeFrameInterval == 0
-            if (manualTimeframe && fromHour && toHour) {
-
-                DateTime firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
-                DateTime firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
-
-                start = new DateTime(this.from.getTime())
-                        .withTime(
-                        firstDayWithFromHourAsDaytime.getHourOfDay(),
-                        firstDayWithFromHourAsDaytime.getMinuteOfHour(),
-                        0, 0
-                        )
-                end = new DateTime(this.to.getTime())
-                        .withTime(
-                        firstDayWithToHourAsDaytime.getHourOfDay(),
-                        firstDayWithToHourAsDaytime.getMinuteOfHour(),
-                        59, 999
-                        )
-
-            }else{
-
-                end = new DateTime()
-                start = end.minusSeconds(this.selectedTimeFrameInterval)
-
-            }
-
-            return new Interval(start, end);
-        }
-
-        /**
-         * Returns a {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-         * @param timeWithOrWithoutMeridian
-         * 		The format can be with or without meridian (e.g. "04:45", "16:12" without or "02:00 AM", "11:23 PM" with meridian)
-         * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
-         * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
-         */
-        public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException{
-
-            Pattern regexWithMeridian = ~/\d{1,2}:\d\d [AP]M/
-            Pattern regexWithoutMeridian = ~/\d{1,2}:\d\d/
-            String dateFormatString
-
-            if(timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
-            else if(timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
-            else throw new IllegalStateException("Wrong format of time: ${timeWithOrWithoutMeridian}")
-
-            DateTimeFormatter fmt = DateTimeFormat.forPattern(dateFormatString)
-            return fmt.parseDateTime("01.01.1970 ${timeWithOrWithoutMeridian}")
-
-        }
-
-        /**
-         * <p>
-         * Copies all request data to the specified map. This operation does
-         * not care about the validation status of this instance.
-         * For missing values the defaults are inserted.
-         * </p>
-         *
-         * @param viewModelToCopyTo
-         *         The {@link Map} the request data contained in this command
-         *         object should be copied to. The map must be modifiable.
-         *         Previously contained data will be overwritten.
-         *         The argument might not be <code>null</code>.
-         */
-        public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
-        {
-            viewModelToCopyTo.put('from', this.from)
-            if(!this.fromHour.is(null)) {
-                viewModelToCopyTo.put('fromHour',this.fromHour)
-            }
-
-            viewModelToCopyTo.put('to', this.to)
-            if (!this.toHour.is(null)){
-                viewModelToCopyTo.put('toHour', this.toHour)
-            }
-            viewModelToCopyTo.put('max', this.max)
-            viewModelToCopyTo.put('offset', this.offset)
-        }
-    }
-
-    @Validateable(nullable = true)
-    public static class ListResultsForSpecificJobCommand extends EventResultsCommandBase {
-        Job job
-
-        static constraints = { job(nullable: false) }
-
-        @Override
-        public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
-        {
-            super.copyRequestDataToViewModelMap(viewModelToCopyTo)
-            viewModelToCopyTo.put('job', this.job)
-        }
-    }
-
-    /**
-     * <p>
-     * Command of {@link TabularResultPresentationController#listResults(ListResultsCommand)}.
-     * </p>
-     *
-     * <p>
-     * None of the properties will be <code>null</code> for a valid instance.
-     * </p>
-     *
-     * @author mze
-     * @since IT-74
-     */
-    @Validateable(nullable = true)
-    public static class ListResultsCommand extends EventResultsCommandBase{
-        /**
-         * The database IDs of the selected {@linkplain JobGroup CSI groups}
-         * which are the systems measured for a CSI value
-         */
-        Collection<Long> selectedFolder = []
-
-        /**
-         * The database IDs of the selected {@linkplain Page pages}
-         * which results to be shown.
-         */
-        Collection<Long> selectedPages = []
-
-        /**
-         * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
-         * measured events} which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllMeasuredEvents} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedMeasuredEventIds = []
-
-        /**
-         * User enforced the selection of all measured events.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedMeasuredEventIds} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedMeasuredEventIds} should be ignored.
-         */
-        Boolean selectedAllMeasuredEvents
-
-        /**
-         * The database IDs of the selected {@linkplain Browser
-         * browsers} which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllBrowsers} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedBrowsers = []
-
-        /**
-         * User enforced the selection of all browsers.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedBrowsers} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedBrowsers} should be ignored.
-         */
-        Boolean selectedAllBrowsers
-
-        /**
-         * The database IDs of the selected {@linkplain Location
-         * locations} which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllLocations} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedLocations = []
-
-        /**
-         * User enforced the selection of all locations.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedLocations} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedLocations} should be ignored.
-         */
-        Boolean selectedAllLocations
-
-        /**
-         * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.ConnectivityProfile}s which results to be shown.
-         *
-         * These selections are only relevant if
-         * {@link #selectedAllConnectivityProfiles} is evaluated to
-         * <code>false</code>.
-         */
-        Collection<Long> selectedConnectivityProfiles = []
-
-        /**
-         * User enforced the selection of all ConnectivityProfiles.
-         * This selection <em>is not</em> reflected in
-         * {@link #selectedConnectivityProfiles} cause of URL length
-         * restrictions. If this flag is evaluated to
-         * <code>true</code>, the selections in
-         * {@link #selectedConnectivityProfiles} should be ignored.
-         */
-        Boolean selectedAllConnectivityProfiles = true
-
-        /**
-         * Whether or not EventResults measured with native connectivity should get included.
-         */
-        Boolean includeNativeConnectivity
-
-        /**
-         * Wheter or not EventResult measured with custom connectivity should get included.
-         */
-        Boolean includeCustomConnectivity;
-
-        /**
-         * If set, this is handled as a regular expression to select results measured with custom connectivity and whos custom
-         * connectivity name matches this regex.
-         */
-        String customConnectivityName
-
-        /**
-         * Constraints needs to fit.
-         */
-        static constraints = {
-            selectedFolder(nullable:false, minSize:1)
-
-            // selectedPages is not allowed to be empty
-            selectedPages(nullable:false, minSize:1)
-
-            // selectedMeasuredEventIds is only allowed to be empty if selectedAllMeasuredEvents is true
-            selectedMeasuredEventIds(nullable:false, validator: { Collection currentCollection, ListResultsCommand cmd ->
-                return (cmd.selectedAllMeasuredEvents || (!currentCollection.isEmpty()))
-            })
-
-            // selectedBrowsers is only allowed to be empty if selectedAllBrowsers is true
-            selectedBrowsers(nullable:false, validator: { Collection currentCollection, ListResultsCommand cmd ->
-                return (cmd.selectedAllBrowsers || (!currentCollection.isEmpty()))
-            })
-
-            // selectedLocations is only allowed to be empty if selectedAllLocations is true
-            selectedLocations(nullable:false, validator: { Collection currentCollection, ListResultsCommand cmd ->
-                return (cmd.selectedAllLocations || (!currentCollection.isEmpty()))
-            })
-
-            selectedAllConnectivityProfiles(nullable: true)
-
-            includeNativeConnectivity(nullable: false)
-
-            includeCustomConnectivity(nullable: false)
-
-            customConnectivityName(nullable: true)
-        }
-
-        /**
-         * <p>
-         * Copies all request data to the specified map. This operation does
-         * not care about the validation status of this instance.
-         * For missing values the defaults are inserted.
-         * </p>
-         *
-         * @param viewModelToCopyTo
-         *         The {@link Map} the request data contained in this command
-         *         object should be copied to. The map must be modifiable.
-         *         Previously contained data will be overwritten.
-         *         The argument might not be <code>null</code>.
-         */
-        @Override
-        public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
-        {
-            viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
-            viewModelToCopyTo.put('selectedPages', this.selectedPages)
-
-            viewModelToCopyTo.put('selectedAllMeasuredEvents', (this.selectedAllMeasuredEvents as boolean ? 'on' : ''))
-            viewModelToCopyTo.put('selectedMeasuredEventIds', this.selectedMeasuredEventIds)
-
-            viewModelToCopyTo.put('selectedAllBrowsers', (this.selectedAllBrowsers as boolean ? 'on' : ''))
-            viewModelToCopyTo.put('selectedBrowsers', this.selectedBrowsers)
-
-            viewModelToCopyTo.put('selectedAllLocations', (this.selectedAllLocations as boolean ? 'on' : ''))
-            viewModelToCopyTo.put('selectedLocations', this.selectedLocations)
-
-            viewModelToCopyTo.put('selectedAllConnectivityProfiles', this.selectedAllConnectivityProfiles)
-            viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
-            viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
-            viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
-            viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
-
-            super.copyRequestDataToViewModelMap(viewModelToCopyTo)
-        }
-
-        /**
-         * <p>
-         * Creates a query tag to find results matching the selections made
-         * with this command.
-         * </p>
-         *
-         * @param csiAggregationTagService
-         *         The {@link CsiAggregationTagService} to create the tag with.
-         * @return Never <code>null</code>.
-         */
-        public Pattern createResultsQueryPattern(CsiAggregationTagService csiAggregationTagService) {
-            return csiAggregationTagService.getTagPatternForHourlyCsiAggregations(createMvQueryParams());
-        }
-
-        /**
-         * <p>
-         * Returns a boolean to include custom connectivity in selected connetivities
-         * </p>
-         */
-        public boolean includeCustomConnectivity() {
-            return includeCustomConnectivity;
-        }
-
-        /**
-         * <p>
-         * Creates {@link MvQueryParams} based on this command. This command
-         * need to be valid for this operation to be successful.
-         * </p>
-         *
-         * @return not <code>null</code>.
-         * @throws IllegalStateException
-         *         if called on an invalid instance.
-         */
-        private ErQueryParams createMvQueryParams() throws IllegalStateException
-        {
-
-            if( !this.validate() )
-            {
-                throw new IllegalStateException('Query params are not available from an invalid command.')
-            }
-
-            ErQueryParams result = new ErQueryParams();
-
-            result.jobGroupIds.addAll(this.selectedFolder);
-
-            if( !this.selectedAllMeasuredEvents )
-            {
-                result.measuredEventIds.addAll(this.selectedMeasuredEventIds);
-            }
-
-            result.pageIds.addAll(this.selectedPages);
-
-            if( !this.selectedAllBrowsers )
-            {
-                result.browserIds.addAll(this.selectedBrowsers);
-            }
-
-            if( !this.selectedAllLocations )
-            {
-                result.locationIds.addAll(this.selectedLocations);
-            }
-
-            result.includeNativeConnectivity = this.includeNativeConnectivity
-            result.includeCustomConnectivity = this.includeCustomConnectivity
-            if (this.includeCustomConnectivity){
-                result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
-            }
-            if (this.selectedAllConnectivityProfiles){
-                result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-            }else if (this.selectedConnectivityProfiles.size() > 0){
-                result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
-            }
-
-            return result;
-        }
-    }
 
     /**
      * <p>

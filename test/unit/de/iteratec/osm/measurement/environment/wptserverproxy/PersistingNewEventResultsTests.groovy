@@ -47,7 +47,7 @@ import static org.junit.Assert.*
  * TODO: This test is to complicated - make it simpler!
  */
 @TestFor(LocationAndResultPersisterService)
-@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping])
+@Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 class PersistingNewEventResultsTests {
 	private static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
 

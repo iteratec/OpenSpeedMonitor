@@ -18,6 +18,9 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
+import grails.test.spock.IntegrationSpec
+import org.junit.Test
+import spock.lang.Shared
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
@@ -48,8 +51,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author nkuhn
  *
  */
-@TestMixin(IntegrationTestMixin)
-class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
+class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
 
     static transactional = false
 
@@ -67,50 +69,10 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     DateTime startOfCreatingWeeklyPageValues = new DateTime(2012, 2, 6, 0, 0, 0)
     DateTime startOfCreatingWeeklyShopValues = new DateTime(2012, 3, 12, 0, 0, 0)
 
-    @Before
-    void setUp() {
-    }
-
-    @After
-    void tearDown() {
-    }
-
-    /**
-     * Creating weekly-page {@link CsiAggregation}s without data.
-     */
-    void testCreatingWeeklyPageValues() {
-        DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
-        List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculateWeeklyPageCsiAggregations(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate())
-        Integer countWeeks = 2
-        Integer countPages = 7
-        assertThat(wpmvs.size(), is(countWeeks * countPages))
-        wpmvs.each {
-            assertTrue(it.isCalculated())
-        }
-    }
-
-    /**
-     * Creating weekly-shop {@link de.iteratec.osm.report.chart.CsiAggregation}s without data.
-     */
-    void testCreatingWeeklyShopValues() {
-        DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
-        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
-        Integer countWeeks = 2
-        Integer countPages = 7
-        assertThat(wsmvs.size(), is(countWeeks))
-        wsmvs.each {
-            assertTrue(it.isCalculated())
-        }
-
-        Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
-        assert pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
-    }
-
     /**
      * Creating testdata.
      */
-    @BeforeClass
-    static void createTestData() {
+    def setupSpec() {
         createCsiAggregationIntervals()
         createAggregatorTypes()
         createPagesAndEvents()
@@ -121,6 +83,47 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
         createJobGroups()
         createJobs()
     }
+
+
+    /**
+     * Creating weekly-page {@link CsiAggregation}s without data.
+     */
+    void "Creating weekly page values test"() {
+        given:
+        DateTime endDate = startOfCreatingWeeklyPageValues.plusWeeks(1)
+        CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY);
+        Integer countPages = 7
+        Integer countWeeks = 2
+        when:
+        List<CsiAggregation> wpmvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startOfCreatingWeeklyPageValues.toDate(), endDate.toDate(), weeklyInterval, JobGroup.findAllByCsiConfigurationIsNotNull(), Page.list())
+
+        then:
+        wpmvs.size() == countWeeks * countPages
+        wpmvs.each {
+            it.isCalculated()
+        }
+    }
+
+    /**
+     * Creating weekly-shop {@link de.iteratec.osm.report.chart.CsiAggregation}s without data.
+     */
+    void "Creating weekly shop values test"() {
+        given:
+        DateTime endDate = startOfCreatingWeeklyShopValues.plusWeeks(1)
+        Integer countWeeks = 2
+        Integer countPages = 7
+        when:
+        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
+        Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
+        then:
+        wsmvs.size() == countWeeks
+        wsmvs.each {
+            it.isCalculated()
+        }
+        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
+
+    }
+
 
     private static createAggregatorTypes() {
         AggregatorType.findByName(AggregatorType.MEASURED_EVENT) ?: new AggregatorType(
@@ -154,9 +157,18 @@ class CreatingYesNoDataMvsIntTests extends IntTestWithDBCleanup {
     }
 
     private static void createJobGroups() {
+        CsiDay csiDay = new CsiDay()
+        0..23.each {csiDay.setHourWeight(it, 0.5)}
         String csiGroupName = 'CSI'
+        CsiConfiguration csiConfiguration = new CsiConfiguration(
+            label: "TestLabel",
+            description:  "TestDescription",
+            csiDay: csiDay,
+            browserConnectivityWeights: [],
+            pageWeights: [],
+            timeToCsMappings: []).save()
         JobGroup.findByName(csiGroupName) ?: new JobGroup(
-                name: csiGroupName).save(failOnError: true)
+                name: csiGroupName, csiConfiguration: csiConfiguration ).save(failOnError: true)
     }
 
     private static void createJobs() {

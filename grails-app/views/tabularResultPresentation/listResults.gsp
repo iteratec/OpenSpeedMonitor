@@ -49,7 +49,7 @@
             <g:hasErrors bean="${command}">
                 <div class="alert alert-error">
                     <strong><g:message
-                            code="de.iteratec.isocsi.TabularResultPresentationController.selectionErrors.title"
+                            code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"
                             default="You missed something on selection" /></strong>
                     <ul>
                         <g:eachError var="eachError" bean="${command}">
@@ -83,25 +83,25 @@
             <g:else>
                 <g:render
                       template="../eventResultDashboard/selectMeasurings"
-                      model="${['locationsOfBrowsers':locationsOfBrowsers,
-                                'eventsOfPages':eventsOfPages,
-                                'folders':csiGroups,
-                                'selectedFolder':selectedFolder,
-                                'pages':pages,
-                                'selectedPage':selectedPage,
-                                'measuredEvents':measuredEvents,
-                                'selectedAllMeasuredEvents':selectedAllMeasuredEvents,
-                                'selectedMeasuredEvents':selectedMeasuredEvents,
-                                'browsers':browsers,
-                                'selectedBrowsers':selectedBrowsers,
-                                'selectedAllBrowsers':selectedAllBrowsers,
-                                'locations':locations,
-                                'selectedLocations':selectedLocations,
-                                'selectedAllLocations':selectedAllLocations,
-                                'connectivityProfiles':connectivityProfiles,
-                                'selectedConnectivityProfiles':selectedConnectivityProfiles,
-                                'selectedAllConnectivityProfiles':selectedAllConnectivityProfiles,
-                                'showExtendedConnectivitySettings': true]}"/>
+                      model="${['locationsOfBrowsers'               :locationsOfBrowsers,
+                                'eventsOfPages'                     :eventsOfPages,
+                                'folders'                           :csiGroups,
+                                'selectedFolder'                    :selectedFolder,
+                                'pages'                             :pages,
+                                'selectedPage'                      :selectedPage,
+                                'measuredEvents'                    :measuredEvents,
+                                'selectedAllMeasuredEvents'         :selectedAllMeasuredEvents,
+                                'selectedMeasuredEvents'            :selectedMeasuredEvents,
+                                'browsers'                          :browsers,
+                                'selectedBrowsers'                  :selectedBrowsers,
+                                'selectedAllBrowsers'               :selectedAllBrowsers,
+                                'locations'                         :locations,
+                                'selectedLocations'                 :selectedLocations,
+                                'selectedAllLocations'              :selectedAllLocations,
+                                'connectivityProfiles'              :connectivityProfiles,
+                                'selectedConnectivityProfiles'      :selectedConnectivityProfiles,
+                                'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles,
+                                'showExtendedConnectivitySettings'  : true]}"/>
             </g:else>
             <p>
                 <g:actionSubmit

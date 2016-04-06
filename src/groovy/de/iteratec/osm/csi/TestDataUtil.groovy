@@ -146,15 +146,16 @@ class TestDataUtil {
                 it.graphitePaths = []
                 it.save(failOnError: true)
             }
-        }else if(domainClass == TimeToCsMapping.class){
+        }else if(domainClass == TimeToCsMapping.class ||
+                domainClass == BrowserConnectivityWeight.class ||
+                domainClass == PageWeight.class ||
+                domainClass == CsiConfiguration.class){
             CsiConfiguration.list().each {
                 it.timeToCsMappings = []
                 it.browserConnectivityWeights = []
                 it.pageWeights = []
                 it.save(failOnError: true)
             }
-        }else if(domainClass == CsiConfiguration.class){
-
         }
 
 
@@ -299,7 +300,7 @@ class TestDataUtil {
         return new CsiSystem(
                 label: label,
                 jobGroupWeights: jobGroupWeights
-        ).save(failOnError: true)
+        )
     }
 
     static JobGroupWeight createJobGroupWeight(
@@ -311,7 +312,7 @@ class TestDataUtil {
                 csiSystem: csiSystem,
                 jobGroup: jobGroup,
                 weight: weight
-        ).save(failOnError: true)
+        )
     }
 
     /*
@@ -327,7 +328,7 @@ class TestDataUtil {
                 csiDay.setHourWeight(hour,1.0)
             }
         }
-        return csiDay
+        return csiDay.save(failOnError: true)
     }
 
     static Collection<TimeToCsMapping> createTimeToCsMappingForAllPages(List<Page> allPages) {
@@ -618,7 +619,7 @@ class TestDataUtil {
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
                                                              ) {
-        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false)
+        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false, ConnectivityProfile.findAll())
         return calcMv(
                 toCreateAndOrCalculate,
                 csiAggregationTagService,
@@ -740,16 +741,25 @@ class TestDataUtil {
      */
     public
     static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages, CsiAggregationTagService csiAggregationTagService) {
-        createJobGroups()
+        List<Browser> browserList = createBrowsersAndAliases()
+        List<Page> pages = createPages(allPages)
         createServer()
-        createPages(allPages)
-        createBrowsersAndAliases()
         createLocations()
+        ConnectivityProfile profile = createConnectivityProfile("conn-profile-for-testing-purposes")
+        createJobGroups().each {
+            CsiConfiguration csiConfiguration = it.csiConfiguration
+            browserList.each { browser ->
+                csiConfiguration.addToBrowserConnectivityWeights(new BrowserConnectivityWeight(browser: browser, connectivity: profile, weight: 50))
+            }
+            pages.each { page ->
+                csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 7))
+            }
+        }
 
         csvFile.eachLine { String csvLine ->
             if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
                 //				System.out.println('Processing line: ' + csvLine);
-                decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, csiAggregationTagService)
+                decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, csiAggregationTagService, profile)
             }
         }
     }
@@ -826,10 +836,13 @@ class TestDataUtil {
     }
 
     static Browser createBrowser(String name, double weight) {
-        return new Browser(
-                name: name,
-                weight: weight
-        ).save(failOnError: true)
+        Browser browser = Browser.findByName(name)
+        browser = browser == null ?
+            new Browser(
+                    name: name,
+                    weight: weight
+            ).save(failOnError: true) : browser
+        return browser
     }
 
     static WebPageTestServer createServer() {
@@ -865,11 +878,11 @@ class TestDataUtil {
 
     static List<JobGroup> createJobGroups() {
         JobGroup group1 = new JobGroup(
-                name: "CSI").save(failOnError: true)
+                name: "CSI", csiConfiguration: createCsiConfiguration("CSI_TEST_LABEL")).save(failOnError: true)
         JobGroup group2 = new JobGroup(
-                name: 'csiGroup1').save(failOnError: true)
+                name: 'csiGroup1', csiConfiguration: createCsiConfiguration("csiGroup1_TEST_LABEL")).save(failOnError: true)
         JobGroup group3 = new JobGroup(
-                name: 'csiGroup2').save(failOnError: true)
+                name: 'csiGroup2', csiConfiguration: createCsiConfiguration("csiGroup2_TEST_LABEL")).save(failOnError: true)
         return [group1, group2, group3]
     }
 
@@ -974,13 +987,15 @@ class TestDataUtil {
             result = new Job(
                     label: csvJobCoulumn,
                     location: location,
+                    connectivityProfile: createConnectivityProfile("conn"),
                     page: page,
                     active: false,
                     description: '',
                     runs: 1,
                     jobGroup: jobGroup,
                     script: Script.createDefaultScript(csvJobCoulumn).save(failOnError: true),
-                    maxDownloadTimeInMinutes: 60
+                    maxDownloadTimeInMinutes: 60,
+                    noTrafficShapingAtAll: true
             ).save(failOnError: true);
         }
 
@@ -1044,6 +1059,8 @@ class TestDataUtil {
             double customerSatisfactionInPercent,
             MeasuredEvent event,
             ConnectivityProfile connectivityProfile) {
+        CsiAggregationTagService csiAggregationTagService = new CsiAggregationTagService()
+        Browser dummyBrowser = createBrowser("bro",0)
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1058,7 +1075,8 @@ class TestDataUtil {
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
-                noTrafficShapingAtAll: false
+                noTrafficShapingAtAll: false,
+                tag: csiAggregationTagService.createEventResultTag(job.jobGroup, event,event.testedPage, dummyBrowser, job.location)
         ).save(failOnError: true)
 
         return eventResult.save(failOnError: true)
@@ -1091,7 +1109,8 @@ class TestDataUtil {
             int docCompleteTimeInMillisecs,
             double customerSatisfactionInPercent,
             MeasuredEvent event,
-            CsiAggregationTagService csiAggregationTagService
+            CsiAggregationTagService csiAggregationTagService,
+            boolean withConnectivityProfile = true
                                         ) {
 
         JobGroup jobGroup = job.jobGroup
@@ -1113,12 +1132,74 @@ class TestDataUtil {
                 measuredEvent: event,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 tag: resultTag,
-                connectivityProfile: createConnectivityProfile('conn-profile-for-testing-purposes')
+                noTrafficShapingAtAll: job.noTrafficShapingAtAll,
+                connectivityProfile: withConnectivityProfile?createConnectivityProfile('conn-profile-for-testing-purposes'):null
         ).save(failOnError: true)
 
         return eventResult.save(failOnError: true)
 
     }
+
+    /**
+     * <p>
+     * Creates an event result and assigns it to the specified
+     * {@link JobResult}.
+     * </p>
+     *
+     * <p>
+     * None of the arguments may be <code>null</code>.
+     * </p>
+     *
+     * @param job
+     *         The parent job.
+     * @param jobResult
+     *         The job result the event result should be assigned to.
+     * @param docCompleteTimeInMillisecs
+     *         The doc-complete-time in milliseconds.
+     * @param customerSatisfactionInPercent
+     *         The customer-satisfaction-index in percent.
+     * @param csiAggregationTagService
+     * 		   The {@link CsiAggregationTagService} for generating the tag of {@link EventResult}
+     */
+    static EventResult createEventResultWithConnectivity(
+            Job job,
+            JobResult jobResult,
+            int docCompleteTimeInMillisecs,
+            double customerSatisfactionInPercent,
+            MeasuredEvent event,
+            CsiAggregationTagService csiAggregationTagService,
+            ConnectivityProfile connectivityProfile
+    ) {
+
+        JobGroup jobGroup = job.jobGroup
+        Page page = event.testedPage
+        Location location = job.location
+        Browser browser = location.browser
+
+        String resultTag = csiAggregationTagService.createEventResultTag(jobGroup, event, page, browser, location)
+        EventResult eventResult = new EventResult(
+                numberOfWptRun: 1,
+                cachedView: CachedView.UNCACHED,
+                medianValue: true,
+                wptStatus: 200,
+                docCompleteTimeInMillisecs: docCompleteTimeInMillisecs,
+                csByWptDocCompleteInPercent: customerSatisfactionInPercent,
+                jobResult: jobResult,
+                jobResultDate: jobResult.date,
+                jobResultJobConfigId: jobResult.job.ident(),
+                measuredEvent: event,
+                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                tag: resultTag,
+                noTrafficShapingAtAll: false,
+                customConnectivityName: null,
+                connectivityProfile: connectivityProfile
+        ).save(failOnError: true)
+
+        return eventResult.save(failOnError: true)
+
+    }
+
+
 
     /**
      * Decodes one line of test data CSV.
@@ -1187,7 +1268,7 @@ class TestDataUtil {
      * @param csvLine
      */
     private
-    static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor, CsiAggregationTagService csiAggregationTagService) {
+    static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor, CsiAggregationTagService csiAggregationTagService, ConnectivityProfile profile) {
         String[] columns = csvLine.split(';');
 
         String jobName = columns[0]
@@ -1239,7 +1320,7 @@ class TestDataUtil {
         assertNotNull(jobResult)
 
         if (columns.length > 8 && !columns[8].isEmpty()) {
-            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, csiAggregationTagService);
+            createEventResultWithConnectivity(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, csiAggregationTagService, profile);
         }
     }
 

@@ -17,51 +17,35 @@
 
 package de.iteratec.osm.csi
 
-import grails.test.mixin.TestMixin
-import grails.test.mixin.integration.IntegrationTestMixin
-
-import static org.junit.Assert.*
-
-import org.joda.time.DateTime
-import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Test
-
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
-import de.iteratec.osm.csi.weighting.WeightingService
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.CsiAggregationTagService
+import de.iteratec.osm.result.EventResult
+import grails.test.spock.IntegrationSpec
+import org.joda.time.DateTime
 
-
-@TestMixin(IntegrationTestMixin)
-class WeeklyShopMultipleCsiGroupsIntTests extends IntTestWithDBCleanup {
-
-	static transactional = false
+class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
 	/** injected by grails */
 	EventCsiAggregationService eventCsiAggregationService
-	ShopCsiAggregationService shopCsiAggregationService
 	JobService jobService
 	CsiAggregationTagService csiAggregationTagService
-	EventResultService eventResultService
-	WeightingService weightingService
-	MeanCalcService meanCalcService
-	CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-
-	CsiAggregationInterval weeklyInterval
-
-	AggregatorType shopAggregatorType
+	static ShopCsiAggregationService shopCsiAggregationService
+	static LocationAndResultPersisterService locationAndResultPersisterService
 
 	Map<String, Double> targetValues
-	List<JobGroup> csiGroups
 	List<Page> pageObjectsToTest
 
+	static CsiAggregationInterval weeklyInterval
+	static AggregatorType shopAggregatorType
+	static List<JobGroup> csiGroups
+	static List<CsiAggregation> wsmvs
 	static final List<String> pagesToTest = [
 		'HP',
 		'MES',
@@ -80,17 +64,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends IntTestWithDBCleanup {
 	static final Integer countResultsPerWeeklyPageMv = 4
 	static final Integer countWeeklyPageMvsToBeCreated = 4
 
-	@Before
-	void setUp() {
-		shopCsiAggregationService.meanCalcService = new MeanCalcService();
-		
-		weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-
-		shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
-		csiGroups = [
-			JobGroup.findByName(csiGroup1Name),
-			JobGroup.findByName(csiGroup2Name)
-		]
+	def setup() {
 		targetValues = [
 			csiGroup1: 0.391,
 			csiGroup2: 0.691
@@ -104,93 +78,71 @@ class WeeklyShopMultipleCsiGroupsIntTests extends IntTestWithDBCleanup {
 	/**
 	 * After pre-calculation of hourly job-{@link CsiAggregation}s the creation and calculation of weekly shop-{@link CsiAggregation}s is tested.
 	 */
-	@Test
 	void testCreationAndCalculationOfWeeklyShopValues() {
-		
+		setup:
 		Date startDate = startOfWeek.toDate()
-		
-		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
-		assertEquals(24, results.size())
 
-		precalcHourlyJobMvs()
+		when:
+		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
 		
 		CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-		List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, csiGroups)
-		assertNotNull(wsmvs)
-		assertEquals(countWeeklyShopMvsToBeCreated, wsmvs.size()) 
-		wsmvs.each{ CsiAggregation mvWeeklyShop ->
-			assertEquals(startDate, mvWeeklyShop.started)
-			assertEquals(weeklyInterval.intervalInMinutes, mvWeeklyShop.interval.intervalInMinutes)
-			assertEquals(shopAggregatorType.name, mvWeeklyShop.aggregator.name)
-			assertTrue(mvWeeklyShop.isCalculated())
+		List<CsiAggregation> wpmvsOfOneGroupPageCombination = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup])
+
+		then:
+		24 == results.size()
+		wsmvs != null
+		countWeeklyShopMvsToBeCreated == wsmvs.size()
+		startDate == mvWeeklyShop.started
+		weeklyInterval.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
+		shopAggregatorType.name == mvWeeklyShop.aggregator.name
+		mvWeeklyShop.isCalculated()
+
+		1 == wpmvsOfOneGroupPageCombination.size()
+		wpmvsOfOneGroupPageCombination.each{mvWeeklyPage ->
+			assert csiGroup.ident().toString() == mvWeeklyPage.tag
+			assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
 		}
 
-		csiGroups.each{JobGroup csiGroup ->
-			List<CsiAggregation> wpmvsOfOneGroupPageCombination = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup])
-			assertEquals(1, wpmvsOfOneGroupPageCombination.size())
-			wpmvsOfOneGroupPageCombination.each{mvWeeklyPage ->
-				assertEquals(csiGroup.ident().toString(), mvWeeklyPage.tag)
-				assertEquals(targetValues["${csiGroup.name}"], mvWeeklyPage.value, 0.01d)
-			}
-		}
-	}
-
-	/**
-	 * Pre-calculate hourly MVs for both groups.
-	 */
-	private List<CsiAggregation> precalcHourlyJobMvs(){
-
-		CsiAggregationInterval hourlyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-
-		JobGroup csiGroup1 = JobGroup.findByName(csiGroup1Name)
-		JobGroup csiGroup2 = JobGroup.findByName(csiGroup2Name)
-
-		DateTime currentDateTime = startOfWeek
-		DateTime endOfWeek = startOfWeek.plusWeeks(1)
-
-		List<CsiAggregation> createdHmvs = []
-		pagesToTest.each { String pageName ->
-			createdHmvs.addAll(
-				TestDataUtil.precalculateHourlyCsiAggregations(
-					csiGroup1, pageName, endOfWeek, currentDateTime, hourlyInterval, 
-					eventCsiAggregationService,
-					csiAggregationTagService,
-					eventResultService,
-					weightingService,
-					meanCalcService,
-					csiAggregationUpdateEventDaoService
-				)
-			)
-			createdHmvs.addAll(
-				TestDataUtil.precalculateHourlyCsiAggregations(
-				csiGroup2, pageName, endOfWeek, currentDateTime, hourlyInterval, 
-					eventCsiAggregationService,
-					csiAggregationTagService,
-					eventResultService,
-					weightingService,
-					meanCalcService,
-					csiAggregationUpdateEventDaoService
-				)
-			)
-		}
-
-		return createdHmvs
+		where:
+		mvWeeklyShop << wsmvs
+		csiGroup << csiGroups
 	}
 
 	/**
 	 * Creating testdata.
 	 */
-	@BeforeClass
-	static void createTestData() {
+	def setupSpec() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
 		TestDataUtil.createAggregatorTypes()
-		TestDataUtil.createHoursOfDay()
 		System.out.println('Create some common test-data... DONE');
 
 		System.out.println('Loading CSV-data...');
 		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
 		System.out.println('Loading CSV-data... DONE');
+
+		csiGroups = [
+				JobGroup.findByName(csiGroup1Name),
+				JobGroup.findByName(csiGroup2Name)
+		]
+
+		EventResult.findAll().each {
+			locationAndResultPersisterService.informDependentCsiAggregations(it)
+		}
+		CsiConfiguration.findAll().each { csiConfiguration ->
+			ConnectivityProfile.findAll().each { connectivityProfile ->
+				Browser.findAll().each { browser ->
+					csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
+				}
+				Page.findAll().each { page ->
+					csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+				}
+			}
+		}
+
+		shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
+		weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+		wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
 	}
 }

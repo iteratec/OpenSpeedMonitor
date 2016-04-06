@@ -27,8 +27,6 @@ import org.mockito.Mockito
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 
-import de.iteratec.osm.result.TabularResultPresentationController.ListResultsCommand
-import de.iteratec.osm.result.TabularResultPresentationController.ListResultsForSpecificJobCommand
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
@@ -115,7 +113,7 @@ class PaginationServiceTest {
 
 	@Test
 	void testBuildListResultsPagination(){
-		ListResultsCommand cmd = new ListResultsCommand()
+		TabularResultListResultsCommand cmd = new TabularResultListResultsCommand()
 		//08.08.2014
 		cmd.setFrom(new Date(1407456000000L))
 		cmd.setFromHour("4:00")
@@ -160,7 +158,7 @@ class PaginationServiceTest {
 	
 	@Test
 	void testBuildListResultsForJobPagination(){
-		ListResultsForSpecificJobCommand cmd = new ListResultsForSpecificJobCommand()
+		TabularResultListResultsForSpecificJobCommand cmd = new TabularResultListResultsForSpecificJobCommand()
 		
 		cmd.setJob(job)
 		

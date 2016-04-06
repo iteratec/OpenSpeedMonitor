@@ -48,7 +48,7 @@ class CsiDay {
     double hour22Weight
     double hour23Weight
 
-    static belongsTo = [CsiConfiguration]
+    static belongsTo = CsiConfiguration
     static mapping = {
     }
 
