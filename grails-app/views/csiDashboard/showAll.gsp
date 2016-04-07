@@ -3,7 +3,7 @@
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <% def springSecurityService %>
-<%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
+<%@ page import="de.iteratec.osm.report.UserspecificCsiDashboard" %>
 <%
     def userspecificCSIDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificCsiDashboard').newInstance()
 %>
@@ -70,7 +70,7 @@
 
                 <g:if test="${availableDashboards.size() > 0}">
                     <g:each in="${availableDashboards}" var="availableDashboard">
-                        <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
+                        <li><g:link action="showAll" params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
                 <g:else>
@@ -258,8 +258,8 @@
                                style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
                         </sec:ifAnyGranted>
                     </sec:ifLoggedIn>
-                    <g:if test="${params.id}">
-                        <g:if test="${userspecificCSIDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                    <g:if test="${params.dashboardID}">
+                        <g:if test="${userspecificCSIDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                             <a href="#" role="button" class="btn btn-primary"
                                style="margin-top: 16px;" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                             <g:render template="/_common/modals/deleteCustomDashboard"/>

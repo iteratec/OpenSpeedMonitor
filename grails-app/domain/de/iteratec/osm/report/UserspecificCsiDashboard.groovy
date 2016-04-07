@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.report
 
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
 
@@ -337,7 +336,7 @@ class UserspecificCsiDashboard {
             return true
         } else {
             // get owner name
-            UserspecificEventResultDashboard currentBoard = UserspecificCsiDashboard.get(dashboardId)
+            UserspecificCsiDashboard currentBoard = UserspecificCsiDashboard.get(dashboardId)
             if (!currentBoard) {
                 return false
             }
@@ -365,84 +364,7 @@ class UserspecificCsiDashboard {
         }
         for (board in fullList) {
             if ((board.publiclyVisible) || (board.username == currentUser)) {
-                String link = ""
-                link += "showAll?"
-                link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
-                link += "&_setFromHour="
-                if (board.setFromHour != null) {
-                    link += "&setFromHour=on"
-                }
-                link += "&from=" + SIMPLE_DATE_FORMAT.format(board.fromDate)
-                link += "&fromHour=" + board.fromHour.replace(':', '%3A')
-                link += "&_setToHour="
-                if (board.setToHour != null) {
-                    link += "&setToHour=on"
-                }
-                link += "&to=" + SIMPLE_DATE_FORMAT.format(board.toDate)
-                link += "&toHour=" + board.toHour.replace(':', '%3A')
-                if ((board.selectedFolder != null) && (board.selectedFolder.size() > 0)) {
-                    for (item in board.selectedFolder.tokenize(',')) {
-                        link += "&selectedFolder=" + item
-                    }
-                }
-                if ((board.selectedPages != null) && (board.selectedPages.size() > 0)) {
-                    for (item in board.selectedPages.tokenize(',')) {
-                        link += "&selectedPages=" + item
-                    }
-                }
-                link += "&_selectedAllBrowsers="
-                if (board.selectedAllBrowsers != null) {
-                    link += "&selectedAllBrowsers=on"
-                }
-                link += "&_selectedAllMeasuredEvents="
-                if (board.selectedAllMeasuredEvents != null) {
-                    link += "&selectedAllMeasuredEvents=on"
-                }
-                link += "&_selectedAllLocations="
-                if (board.selectedAllLocations != null) {
-                    link += "&selectedAllLocations=on"
-                }
-                if ((board.selectedMeasuredEventIds != null) && (board.selectedMeasuredEventIds.size() > 0)) {
-                    for (item in board.selectedMeasuredEventIds.tokenize(',')) {
-                        link += "&selectedMeasuredEventIds=" + item
-                    }
-                }
-                if ((board.selectedBrowsers != null) && (board.selectedBrowsers.size() > 0)) {
-                    for (item in board.selectedBrowsers.tokenize(',')) {
-                        link += "&selectedBrowsers=" + item
-                    }
-                }
-                if ((board.selectedLocations != null) && (board.selectedLocations.size() > 0)) {
-                    for (item in board.selectedLocations.tokenize(',')) {
-                        link += "&selectedLocations=" + item
-                    }
-                }
-                if ((board.selectedCsiSystems != null) && (board.selectedCsiSystems.size() > 0)) {
-                    for (item in board.selectedCsiSystems.tokenize(',')) {
-                        link += "&selectedCsiSystems=" + item
-                    }
-                }
-                link += "&_action_showAll=Show&selectedChartType=0&_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on"
-                link += "&id=" + board.id
-                link += "&dbname=" + java.net.URLEncoder.encode(board.dashboardName, "UTF-8")
-                link += "&wideScreenDiagramMontage=$wideScreenDiagramMontage"
-                link += "&aggrGroupAndInterval=" + board.aggrGroup
-                if (board.includeInterval != null) {
-                    link += "&includeInterval=on"
-                }
-                link += "&chartTitle="
-                if(board.chartTitle){
-                    link += board.chartTitle
-                }
-                link += "&chartWidth=${board.chartWidth}"
-                link += "&chartHeight=${board.chartHeight}"
-                link += "&loadTimeMinimum=${board.loadTimeMinimum}"
-                link += "&loadTimeMaximum=${board.loadTimeMaximum}"
-                link += "&showDataMarkers=${board.showDataMarkers}"
-                link += "&showDataLabels=${board.showDataLabels}"
-                link += "&csiTypeVisuallyComplete=${board.csiTypeVisuallyComplete}"
-                link += "&csiTypeDocComplete=${board.csiTypeDocComplete}"
-                result.add([dashboardName: board.dashboardName, link: link])
+                result.add([dashboardName: board.dashboardName, dashboardID: board.id])
             }
         }
         return result

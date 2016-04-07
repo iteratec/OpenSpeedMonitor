@@ -242,25 +242,15 @@ class CsiDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
+
+        if (params.dashboardID) {
+            fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+        }
+
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
-
-        // get graph aliases
-        if (params.id) {
-            UserspecificCsiDashboard savedDashboard = UserspecificCsiDashboard.get(params.id)
-            if (savedDashboard) {
-                if (savedDashboard.graphNameAliases.size() > 0) {
-                    cmd.graphNameAliases = savedDashboard.graphNameAliases
-                }
-                if (savedDashboard.graphColors.size() > 0) {
-                    cmd.graphColors = savedDashboard.graphColors
-                }
-                modelToRender.put("dashboardName", savedDashboard.dashboardName)
-                modelToRender.put("publiclyVisible", savedDashboard.publiclyVisible)
-            }
-        }
 
         cmd.copyRequestDataToViewModelMap(modelToRender)
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
@@ -305,22 +295,100 @@ class CsiDashboardController {
     }
 
     /**
-     * <p>
-     * Fills the specified map with approximate data based on {@linkplain
-     * CsiAggregation measured values} correspond to the selection in
-     * specified {@linkplain CsiDashboardShowAllCommand command object}.
-     * </p>
-     *
-     * @param modelToRender
-     *         The map to be filled. Previously added entries are overridden.
-     *         This map should not be <code>null</code>.
-     * @param cmd
-     *         The command with users selections, not <code>null</code>.
-     * @param withTargetGraph
-     *         If <code>true</code> the CSI target graph will be added to
-     *         the graphs in {@link modelToRender} else, if set to
-     *         <code>false</code> not.
+     * Gets data for the showAllCommand from a saved userspecificCsiDashboard
+     * @param cmd the command where the attribute gets set
+     * @param dashboardID the id of the saved userspecificCsiDashboard
      */
+    private void fillWithUserspecificDashboardValues(CsiDashboardShowAllCommand cmd, String dashboardID) {
+        UserspecificCsiDashboard dashboard = UserspecificCsiDashboard.get(Long.parseLong(dashboardID))
+
+        cmd.with {
+            from = dashboard.fromDate
+            to = dashboard.toDate
+            fromHour = dashboard.fromHour
+            toHour = dashboard.toHour
+            aggrGroupAndInterval = dashboard.aggrGroup
+
+            if (dashboard.selectedFolder) {
+                for (item in dashboard.selectedFolder.tokenize(',')) {
+                    selectedFolder.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedPages) {
+                for (item in dashboard.selectedPages.tokenize(',')) {
+                    selectedPages.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedMeasuredEventIds) {
+                for (item in dashboard.selectedMeasuredEventIds.tokenize(',')) {
+                    selectedMeasuredEventIds.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedBrowsers) {
+                for (item in dashboard.selectedBrowsers.tokenize(',')) {
+                    selectedBrowsers.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedLocations) {
+                for (item in dashboard.selectedLocations.tokenize(',')) {
+                    selectedLocations.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedCsiSystems) {
+                for (item in dashboard.selectedCsiSystems.tokenize(',')) {
+                    selectedCsiSystems.add(Long.parseLong(item))
+                }
+            }
+
+            selectedAllBrowsers = dashboard.selectedAllBrowsers
+            selectedAllLocations = dashboard.selectedAllLocations
+
+            overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
+            debug = dashboard.debug
+            selectedTimeFrameInterval = dashboard.selectedTimeFrameInterval
+            setFromHour = dashboard.setFromHour
+            setToHour = dashboard.setToHour
+            includeInterval = dashboard.includeInterval
+
+            chartTitle = dashboard.chartTitle
+            chartWidth = dashboard.chartWidth
+            chartHeight = dashboard.chartHeight
+            loadTimeMinimum = dashboard.loadTimeMinimum
+            loadTimeMaximum = dashboard.loadTimeMaximum
+            showDataMarkers = dashboard.showDataMarkers
+            showDataLabels = dashboard.showDataLabels
+            csiTypeDocComplete = dashboard.csiTypeDocComplete
+            csiTypeVisuallyComplete = dashboard.csiTypeVisuallyComplete
+            wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
+
+            if (dashboard.graphNameAliases.size() > 0) {
+                graphNameAliases = dashboard.graphNameAliases
+            }
+            if (dashboard.graphColors.size() > 0) {
+                graphColors = dashboard.graphColors
+            }
+
+            dashboardName = dashboard.dashboardName
+            publiclyVisible = dashboard.publiclyVisible
+        }
+    }
+/**
+ * <p>
+ * Fills the specified map with approximate data based on {@linkplain
+ * CsiAggregation measured values} correspond to the selection in
+ * specified {@linkplain CsiDashboardShowAllCommand command object}.
+ * </p>
+ *
+ * @param modelToRender
+ *         The map to be filled. Previously added entries are overridden.
+ *         This map should not be <code>null</code>.
+ * @param cmd
+ *         The command with users selections, not <code>null</code>.
+ * @param withTargetGraph
+ *         If <code>true</code> the CSI target graph will be added to
+ *         the graphs in {@link modelToRender} else, if set to
+ *         <code>false</code> not.
+ */
     private void fillWithAproximateCsiAggregationData(Map<String, Object> modelToRender, CsiDashboardShowAllCommand cmd, boolean withTargetGraph, List<CsiType> csiType) {
         // TODO Test this: Structure and data...
 
@@ -756,7 +824,7 @@ class CsiDashboardController {
         Collection<Long> selectedCsiSystems = customDashboardService.getValuesFromJSON(dashboardValues, "selectedCsiSystems")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
-        // Create command vor validation
+        // Create command for validation
         CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
                 toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,

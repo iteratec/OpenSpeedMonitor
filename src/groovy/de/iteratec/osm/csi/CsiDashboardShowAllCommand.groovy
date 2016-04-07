@@ -215,15 +215,25 @@ public class CsiDashboardShowAllCommand {
     int chartWidth
     int chartHeight
     int loadTimeMinimum
-    // If map is not specified, it acts as a string/string mapping (gorm default)
-    Map graphNameAliases = [:]
-    Map graphColors = [:]
     /**
      * The maximum load time could be set to 'auto', so we handle it as a string
      */
     String loadTimeMaximum = "auto"
     boolean showDataMarkers
     boolean showDataLabels
+    boolean wideScreenDiagramMontage = false;
+    // If map is not specified, it acts as a string/string mapping (gorm default)
+    Map graphNameAliases = [:]
+    Map graphColors = [:]
+
+    /**
+     * The name of a saved userspecificDashboard
+     */
+    String dashboardName = ""
+    /**
+     * Whether a saved userspecificDashboard is publicly visible or not
+     */
+    boolean publiclyVisible = false
 
     boolean csiTypeVisuallyComplete
     boolean csiTypeDocComplete
@@ -367,6 +377,8 @@ public class CsiDashboardShowAllCommand {
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
+        dashboardName(nullable: true)
+
 
     }
 
@@ -524,6 +536,9 @@ public class CsiDashboardShowAllCommand {
         viewModelToCopyTo.put('csiTypeDocComplete', this.csiTypeDocComplete)
         viewModelToCopyTo.put('graphNameAliases', this.graphNameAliases as JSON)
         viewModelToCopyTo.put('graphColors', this.graphColors as JSON)
+        viewModelToCopyTo.put('publiclyVisible', this.publiclyVisible)
+        viewModelToCopyTo.put('dashboardName', this.dashboardName)
+        viewModelToCopyTo.put('wideScreenDiagramMontage', this.wideScreenDiagramMontage)
     }
 
     /**
