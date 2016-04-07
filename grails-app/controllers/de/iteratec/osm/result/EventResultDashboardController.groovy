@@ -134,26 +134,15 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+        if (params.dashboardID) {
+            fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+        }
+
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-
-        // get graph aliases
-        if (params.id) {
-            UserspecificEventResultDashboard savedDashboard = UserspecificEventResultDashboard.get(params.id)
-            if (savedDashboard) {
-                if (savedDashboard.graphNameAliases.size() > 0) {
-                    cmd.graphNameAliases = savedDashboard.graphNameAliases
-                }
-                if (savedDashboard.graphColors.size() > 0) {
-                    cmd.graphColors = savedDashboard.graphColors
-                }
-                modelToRender.put("dashboardName", savedDashboard.dashboardName)
-                modelToRender.put("publiclyVisible", savedDashboard.publiclyVisible)
-            }
-        }
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
@@ -193,11 +182,100 @@ class EventResultDashboardController {
     }
 
     /**
+     * Gets data for the showAllCommand from a saved userspecificCsiDashboard
+     * @param cmd the command where the attribute gets set
+     * @param dashboardID the id of the saved userspecificCsiDashboard
+     */
+    private void fillWithUserspecificDashboardValues(EventResultDashboardShowAllCommand cmd, String dashboardID) {
+        UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(Long.parseLong(dashboardID))
+
+        cmd.with {
+            from = dashboard.fromDate
+            to = dashboard.toDate
+            fromHour = dashboard.fromHour
+            toHour = dashboard.toHour
+
+            setFromHour = dashboard.setFromHour
+            setToHour = dashboard.setToHour
+
+            selectedTimeFrameInterval = dashboard.selectedTimeFrameInterval
+            selectedInterval = dashboard.selectedInterval
+
+            if (dashboard.selectedFolder) {
+                for (item in dashboard.selectedFolder.tokenize(',')) {
+                    selectedFolder.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedPages) {
+                for (item in dashboard.selectedPages.tokenize(',')) {
+                    selectedPages.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedMeasuredEventIds) {
+                for (item in dashboard.selectedMeasuredEventIds.tokenize(',')) {
+                    selectedMeasuredEventIds.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedBrowsers) {
+                for (item in dashboard.selectedBrowsers.tokenize(',')) {
+                    selectedBrowsers.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedLocations) {
+                for (item in dashboard.selectedLocations.tokenize(',')) {
+                    selectedLocations.add(Long.parseLong(item))
+                }
+            }
+
+            selectedAllMeasuredEvents = dashboard.selectedAllMeasuredEvents
+            selectedAllBrowsers = dashboard.selectedAllBrowsers
+            selectedAllLocations = dashboard.selectedAllLocations
+
+            overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
+            debug = dashboard.debug
+
+            selectedAggrGroupValuesCached = dashboard.selectedAggrGroupValuesCached
+            selectedAggrGroupValuesUnCached = dashboard.selectedAggrGroupValuesUnCached
+
+            trimBelowLoadTimes = dashboard.trimBelowLoadTimes
+            trimAboveLoadTimes = dashboard.trimAboveLoadTimes
+            trimBelowRequestCounts = dashboard.trimBelowRequestCounts
+            trimAboveRequestCounts = dashboard.trimAboveRequestCounts
+            trimBelowRequestSizes = dashboard.trimBelowRequestSizes
+            trimAboveRequestSizes = dashboard.trimAboveRequestSizes
+
+            includeNativeConnectivity = dashboard.includeNativeConnectivity
+            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles
+            customConnectivityName = dashboard.customConnectivityName
+            selectedConnectivityProfiles = dashboard.selectedConnectivityProfiles
+            includeCustomConnectivity = dashboard.includeCustomConnectivity
+
+            chartTitle  = dashboard.chartTitle
+            chartWidth = dashboard.chartWidth
+            chartHeight = dashboard.chartHeight
+            loadTimeMinimum = dashboard.loadTimeMinimum
+            loadTimeMaximum = dashboard.loadTimeMaximum
+            showDataMarkers = dashboard.showDataMarkers
+            showDataLabels = dashboard.showDataLabels
+            wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
+
+            if (dashboard.graphNameAliases.size() > 0) {
+                                graphNameAliases = dashboard.graphNameAliases
+                            }
+                        if (dashboard.graphColors.size() > 0) {
+                                graphColors = dashboard.graphColors
+                            }
+            dashboardName = dashboard.dashboardName
+            publivlyVisible = dashboard.publiclyVisible
+        }
+    }
+
+    /**
      * <p>
      * Ajax service to validate and store custom dashboard settings.
      * Note: It will overwrite existing dashboards with same name!
      * </p>
-     *k
+     * k
      * @param values
      *         The dashboard settings, JSON encoded;
      *         not <code>null</code>.

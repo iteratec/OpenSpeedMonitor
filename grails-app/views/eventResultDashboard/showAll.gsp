@@ -33,7 +33,7 @@
                            value="${userspecificEventResultDashboardService.getListOfAvailableDashboards()}"/>
                     <g:if test="${availableDashboards.size() > 0}">
                         <g:each in="${availableDashboards}" var="availableDashboard">
-                            <li><a href="${availableDashboard.link}">${availableDashboard.dashboardName}</a></li>
+                            <li><g:link action="showAll" params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                         </g:each>
                     </g:if>
                     <g:else>
@@ -366,8 +366,8 @@
                                             </a>
                                         </sec:ifAnyGranted>
                                     </sec:ifLoggedIn>
-                                    <g:if test="${params.id}">
-                                        <g:if test="${userspecificEventResultDashboardService.isCurrentUserDashboardOwner(params.bid)}">
+                                    <g:if test="${params.dashboardID}">
+                                        <g:if test="${userspecificEventResultDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                                             <a href="#" role="button" class="btn btn-primary"
                                                style="margin-top: 16px;" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                                             <g:render template="/_common/modals/deleteCustomDashboard"/>
