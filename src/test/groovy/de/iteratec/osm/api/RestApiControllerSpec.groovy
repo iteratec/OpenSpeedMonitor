@@ -24,7 +24,7 @@ import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.json.JSONObject
+import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
 @TestFor(RestApiController)

@@ -20,7 +20,6 @@ package de.iteratec.osm.util
 
 
 import grails.test.mixin.*
-import jline.internal.Log
 import org.apache.log4j.Appender
 import org.apache.log4j.Layout
 import org.apache.log4j.Level

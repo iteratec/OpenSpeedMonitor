@@ -17,12 +17,12 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.validation.ConstrainedProperty
+import org.grails.validation.MaxSizeConstraint
 import org.junit.Assert;
 
 import static org.junit.Assert.*;
 
-import org.codehaus.groovy.grails.validation.ConstrainedProperty;
-import org.codehaus.groovy.grails.validation.MaxSizeConstraint
 import org.junit.Test;
 
 import grails.test.mixin.Mock;

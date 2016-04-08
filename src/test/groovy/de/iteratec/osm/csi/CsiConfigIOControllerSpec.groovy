@@ -20,7 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import org.apache.commons.io.FileUtils
-import org.codehaus.groovy.grails.plugins.testing.GrailsMockMultipartFile
+import org.grails.plugins.testing.GrailsMockMultipartFile
 import spock.lang.Specification
 import grails.test.mixin.*
 import grails.test.mixin.support.*
