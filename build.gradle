@@ -17,6 +17,21 @@
 buildscript {
     ext {
         grailsVersion = project.grailsVersion
+
+        bootstrapFramework = [
+            version             : "2.3.2",
+            cssPath             : "grails-app/assets/stylesheets/lib",
+            jsPath              : "grails-app/assets/javascripts/lib",
+            useIndividualJs     : true,
+            useLess             : true,
+        //    invalidVersionFails : false,
+            fontAwesome : [
+               install             : true,
+               version             : "4.2.0",
+               useLess             : false,
+               invalidVersionFails : false
+            ]
+        ]
     }
     repositories {
         mavenLocal()
@@ -27,6 +42,7 @@ buildscript {
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.7.4"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
         classpath "org.grails.plugins:hibernate4:5.0.2"
+        classpath "com.siprell.plugins:bootstrap-framework:1.0.3"
     }
 }
 
@@ -39,6 +55,7 @@ apply plugin:"war"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
+apply plugin: "com.siprell.plugins.bootstrap-framework"
 
 ext {
     grailsVersion = project.grailsVersion
@@ -90,11 +107,8 @@ dependencies {
     runtime 'net.sf.supercsv:super-csv:2.4.0'
     runtime "org.grails.plugins:asset-pipeline"
     runtime "com.h2database:h2"
-    runtime 'org.grails.plugins:twitter-bootstrap:2.3.2.2'
     runtime 'org.grails.plugins:database-migration:1.4.0'
-    runtime 'org.grails.plugins:jquery:1.11.1'
     runtime 'org.grails.plugins:quartz:1.0.1'
-    runtime 'org.grails.plugins:font-awesome-resources:4.2.0.0'
     runtime 'mysql:mysql-connector-java:5.1.26'
     runtime 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
@@ -113,9 +127,6 @@ dependencies {
 
 //    build "org.grails:tomcat:7.0.52.1"                        // not necessary anymore?
 //    build "org.grails:release:3.0.1"                          // not available
-//    compile('org.grails.plugins:jquery-ui:1.10.4') {          // not available
-//        excludes "jquery"
-//    }
 
     console "org.grails:grails-console"
     profile "org.grails.profiles:web:3.1.4"

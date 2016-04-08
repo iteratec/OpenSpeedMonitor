@@ -56,3 +56,6 @@ OpenSpeedMonitor-config.groovy
 
 # ignore karma-install
 node_modules/
+.asscache
+grails-app/assets/javascripts/lib
+grails-app/assets/stylesheets/lib
