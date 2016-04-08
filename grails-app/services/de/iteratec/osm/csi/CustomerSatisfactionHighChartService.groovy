@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.report.chart.OsmChartProcessingService
 import de.iteratec.osm.report.chart.OsmRickshawChart
+import grails.web.mapping.LinkGenerator
 
 import static de.iteratec.osm.util.Constants.*
 import de.iteratec.osm.measurement.environment.Browser
@@ -36,7 +37,6 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval

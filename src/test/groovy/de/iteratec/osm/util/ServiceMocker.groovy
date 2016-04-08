@@ -39,7 +39,7 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
 import java.text.DecimalFormat

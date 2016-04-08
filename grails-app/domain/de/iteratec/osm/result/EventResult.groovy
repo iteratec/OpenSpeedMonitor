@@ -161,7 +161,7 @@ class EventResult implements CsiValue {
 	static belongsTo = [jobResult: JobResult]
 
 	static constraints = {
-		id()
+//		id()
 		measuredEvent(nullable: true) // FIXME mze-2013-07-30: CAHNGE IMMEDIATELLY to never be null!
 		wptStatus()
 		medianValue()

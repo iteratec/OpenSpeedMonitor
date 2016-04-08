@@ -367,7 +367,7 @@ class CsiConfigurationController {
     }
 }
 
-@Validateable
+//@Validateable
 class ApplyMappingCommand {
 
     String defaultMappingName

@@ -1,8 +1,9 @@
 package de.iteratec.osm.util
 
+import grails.databinding.converters.ValueConverter
+
 import java.text.SimpleDateFormat
 
-import org.grails.databinding.converters.ValueConverter
 
 /**
  * A String to Date converter for format {@code dd.MM.yyyy}.

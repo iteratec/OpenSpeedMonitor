@@ -20,7 +20,6 @@ package de.iteratec.osm.report
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.result.EventResultDashboardShowAllCommand
 import grails.plugin.springsecurity.SpringSecurityUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
 
 import java.text.SimpleDateFormat
 

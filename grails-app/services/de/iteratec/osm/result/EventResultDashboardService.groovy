@@ -35,7 +35,7 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
 import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER

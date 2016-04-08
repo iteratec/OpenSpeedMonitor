@@ -19,7 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
-import org.grails.taggable.Taggable
+//import org.grails.taggable.Taggable
 
 
 /**
@@ -27,7 +27,8 @@ import org.grails.taggable.Taggable
  * @author nkuhn
  *
  */
-class JobGroup implements Taggable{
+//class JobGroup implements Taggable{
+class JobGroup {
 
     /**
      * The name for an undefined JobGroup, respectively CSI. Please use {@link #isUndefinedCsiJobGroup()}

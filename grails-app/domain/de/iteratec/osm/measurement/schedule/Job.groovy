@@ -23,7 +23,7 @@ import de.iteratec.osm.measurement.script.Script
 import grails.util.Environment
 
 import org.grails.databinding.BindUsing
-import org.grails.taggable.Taggable
+//import org.grails.taggable.Taggable
 import org.quartz.CronExpression
 
 /**
@@ -33,7 +33,8 @@ import org.quartz.CronExpression
  *
  * @see Script
  */
-class Job implements Taggable {
+//class Job implements Taggable {
+class Job  {
     def jobProcessingService
 
     Long id;

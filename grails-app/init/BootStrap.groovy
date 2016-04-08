@@ -440,8 +440,9 @@ class BootStrap {
 
     void fixGrailsBugs() {
         // without this it's not safe to test on JSONObject instances in a groovy way
-        // see https://jira.grails.org/browse/GRAILS-7739
-        org.codehaus.groovy.grails.web.json.JSONObject.NULL.metaClass.asBoolean = { -> false }
+        // see https://jira.grails.org/browse/GRAILS-7739#
+
+//        org.grails.web.json.JSONObject.NULL.metaClass.asBoolean = { -> false }
     }
 
 }

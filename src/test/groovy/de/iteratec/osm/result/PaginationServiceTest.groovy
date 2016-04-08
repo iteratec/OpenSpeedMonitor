@@ -19,8 +19,7 @@
 package de.iteratec.osm.result
 
 import grails.test.mixin.*
-
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.junit.*
 import org.mockito.Mockito
 

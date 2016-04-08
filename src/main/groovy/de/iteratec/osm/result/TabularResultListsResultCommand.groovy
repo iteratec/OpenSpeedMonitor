@@ -18,7 +18,7 @@ import java.util.regex.Pattern
  * @since IT-74
  */
 
-@Validateable(nullable = true)
+//@Validateable(nullable = true)
 public class TabularResultListResultsCommand extends TabularResultEventResultsCommandBase{
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}

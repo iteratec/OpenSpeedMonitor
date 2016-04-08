@@ -19,7 +19,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 
 import java.text.SimpleDateFormat
 

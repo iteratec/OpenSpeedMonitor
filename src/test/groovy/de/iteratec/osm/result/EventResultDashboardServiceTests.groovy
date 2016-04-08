@@ -23,8 +23,7 @@ import de.iteratec.osm.report.chart.OsmChartProcessingService
 import de.iteratec.osm.report.chart.OsmRickshawChart
 import grails.test.mixin.*
 import grails.test.mixin.support.*
-
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.*

@@ -6,7 +6,7 @@ import grails.validation.Validateable
 /**
  * Created by msk on 04.04.2016.
  */
-@Validateable(nullable = true)
+//@Validateable(nullable = true)
 public class TabularResultListResultsForSpecificJobCommand extends TabularResultEventResultsCommandBase {
     Job job
 

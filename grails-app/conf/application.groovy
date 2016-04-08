@@ -112,8 +112,8 @@ grails.json.legacy.builder = false
 grails.enable.native2ascii = true
 // packages to include in Spring bean scanning
 grails.spring.bean.packages = []
-
-spring.groovy.template.check-template-location = false
+//TODO: Where does this come from !?
+//spring.groovy.template.check-template-location = false
 
 // whether to disable processing of multi part requests
 grails.web.disable.multipart = false
@@ -228,7 +228,8 @@ grails.i18n.locales = ['en', 'de']
 grails.plugin.databasemigration.updateOnStart = true
 grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
 
-endpoints.jmx.unique-names = true
+//TODO: Where did this come from?!?
+//endpoints.jmx.unique-names = true
 
 
 // environment-specific config //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

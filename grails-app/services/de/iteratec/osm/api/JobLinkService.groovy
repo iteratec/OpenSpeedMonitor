@@ -22,8 +22,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.result.PageService
-
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
 /**

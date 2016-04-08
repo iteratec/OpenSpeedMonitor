@@ -43,8 +43,8 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
+import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.joda.time.Duration

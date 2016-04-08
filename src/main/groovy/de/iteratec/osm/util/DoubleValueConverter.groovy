@@ -1,6 +1,6 @@
 package de.iteratec.osm.util
 
-import org.grails.databinding.converters.ValueConverter
+import grails.databinding.converters.ValueConverter
 import org.springframework.util.NumberUtils
 
 import java.text.DecimalFormat

@@ -29,7 +29,7 @@ import java.util.regex.Pattern
  * @author mze
  * @since IT-74
  */
-@Validateable(nullable = true)
+//@Validateable(nullable = true)
 public class CsiDashboardShowAllCommand {
 
     CsiAggregationUtilService csiAggregationUtilService
