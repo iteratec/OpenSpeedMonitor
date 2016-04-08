@@ -30,7 +30,6 @@ class JobSetSpec extends Specification{
 
 
     void "setup" (){
-        mockForConstraintsTests(JobSet)
     }
 
     void "test nullable not valid" () {

@@ -41,41 +41,38 @@ class GraphitePathTests {
 		// Test-data
 		AggregatorType validMeasurand = new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)
 		
-		// Mocking domain-class for constraints
-		mockForConstraintsTests(GraphitePath)
-		
 		// Run the tests...
 		GraphitePath out = new GraphitePath(prefix: "", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "blank", out.errors["prefix"] );
+		assertTrue(((String)out.errors["prefix"]).endsWith("cannot be blank]") );
 		
 		out = new GraphitePath(prefix: "wpt..", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] );
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
 		
 		out = new GraphitePath(prefix: "wpt.testdt", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] );
-		
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
+
 		out = new GraphitePath(prefix: "wpt", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] );
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
 		
 		out = new GraphitePath(prefix: ".wpt.", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] );
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
 		
 		out = new GraphitePath(prefix: ".wpt", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] ); 
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
 		
 		out = new GraphitePath(prefix: "wpt.server.server.wpt..", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] );
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
 		
 		out = new GraphitePath(prefix: "wpt.server.server.wpt", measurand: validMeasurand)
 		assertFalse( out.validate() );
-		assertEquals( "matches", out.errors["prefix"] );
+		assertTrue(((String)out.errors["prefix"]).contains("does not match the required pattern") );
 	}
 	
 	@Test
@@ -83,9 +80,6 @@ class GraphitePathTests {
 		
 		// Test-data
 		AggregatorType validMeasurand = new AggregatorType(name: AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES)
-		
-		// Mocking domain-class for constraints
-		mockForConstraintsTests(GraphitePath)
 		
 		// Run the tests...
 		GraphitePath out = new GraphitePath(prefix: "wpt.", measurand: validMeasurand)

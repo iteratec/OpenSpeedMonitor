@@ -29,7 +29,6 @@ import spock.lang.Specification
 class BrowserConnectivityWeightSpec extends Specification {
 
     void "setup"() {
-        mockForConstraintsTests(BrowserConnectivityWeight)
     }
 
     void "test nullable"() {
