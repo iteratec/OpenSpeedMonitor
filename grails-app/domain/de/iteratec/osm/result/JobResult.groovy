@@ -105,12 +105,12 @@ class JobResult {
 	HARStatus harStatus = HARStatus.NOT_PERSISTED
 
 	static constraints = {
-		testId()
+		testId(nullable: false)
         testAgent(nullable: true)
-		date()
+		date(nullable: false)
 		wptStatus(nullable: true)
-		httpStatusCode()
-		job()
+		httpStatusCode(nullable: false)
+		job(nullable: false)
 		description(widget: 'textarea')
 
 		//from Job

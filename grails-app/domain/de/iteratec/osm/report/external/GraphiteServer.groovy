@@ -81,10 +81,10 @@ class GraphiteServer {
     static constraints = {
         serverAdress(unique: 'port', maxSize: 255)
         port(min: 0, max: 65535)
-        graphitePaths()
-        webappUrl()
-		webappProtocol()
-        webappPathToRenderingEngine()
+        graphitePaths(nullable: false)
+        webappUrl(nullable: false)
+		webappProtocol(nullable: false)
+        webappPathToRenderingEngine(nullable: false)
     }
 
     @Override

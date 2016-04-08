@@ -163,10 +163,10 @@ class EventResult implements CsiValue {
 	static constraints = {
 //		id()
 		measuredEvent(nullable: true) // FIXME mze-2013-07-30: CAHNGE IMMEDIATELLY to never be null!
-		wptStatus()
-		medianValue()
-		numberOfWptRun()
-		cachedView()
+		wptStatus(nullable: false)
+		medianValue(nullable: false)
+		numberOfWptRun(nullable: false)
+		cachedView(nullable: false)
 		testDetailsWaterfallURL(nullable: true)
 
 		docCompleteIncomingBytes(nullable: true)
@@ -190,8 +190,8 @@ class EventResult implements CsiValue {
 		validationState(nullable: true)
 
 		// from JobResult
-		jobResultDate()
-		jobResultJobConfigId()
+		jobResultDate(nullable: false)
+		jobResultJobConfigId(nullable: false)
 
 		tag(nullable: true)
 

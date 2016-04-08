@@ -71,9 +71,9 @@ class CsiAggregationUpdateEvent {
     }
     
 	static constraints = {
-		dateOfUpdate()
-		updateCause()
-		csiAggregationId()
+		dateOfUpdate(nullable: false)
+		updateCause(nullable: false)
+		csiAggregationId(nullable: false)
     }
 	
 	/*

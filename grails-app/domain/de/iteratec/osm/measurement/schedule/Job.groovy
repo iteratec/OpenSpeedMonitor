@@ -172,10 +172,10 @@ class Job  {
 
     static constraints = {
         label(maxSize: 255, blank: false, unique: true)
-        script()
-        location()
+        script(nullable: false)
+        location(nullable: false)
         lastRun(nullable: true)
-        jobGroup()
+        jobGroup(nullable: false)
 
         description(widget: 'textarea', maxSize: 255)
         runs(range: 1..25)
@@ -241,7 +241,7 @@ class Job  {
             }
         })
 
-        provideAuthenticateInformation()
+        provideAuthenticateInformation(nullable: false)
         authUsername(nullable: true, maxSize: 255)
         authPassword(nullable: true, maxSize: 255, password: true)
     }

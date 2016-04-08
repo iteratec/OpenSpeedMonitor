@@ -34,7 +34,7 @@ class CsTargetValue {
     static final Double maxCsInPercent = 100
 
     static constraints = {
-        date()
+        date(nullable: false)
         csInPercent(min: this.minCsInPercent, max: this.maxCsInPercent)
     }
     public String toString(){

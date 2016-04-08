@@ -59,10 +59,10 @@ class Location {
     static constraints = {
         label(maxSize: 150)
         uniqueIdentifierForServer(nullable: true, maxSize: 255, unique: ['wptServer', 'browser'])
-        dateCreated()
-        active()
+        dateCreated(nullable: false)
+        active(nullable: false)
         valid(range: 0 .. 1)
-        wptServer()
+        wptServer(nullable: false)
         location(maxSize: 100)
         browser(maxSize: 20)
         activeagents(nullable: true, min: -2147483648, max: 2147483647)
@@ -70,7 +70,7 @@ class Location {
         queuethresholdgreenlimit(nullable: true, min: -2147483648, max: 2147483647)
         queuethresholdyellowlimit(nullable: true, min: -2147483648, max: 2147483647)
         queuethresholdredlimit(nullable: true, min: -2147483648, max: 2147483647)
-        wptServer()
+        wptServer(nullable: false)
     }
 
     static mapping = {

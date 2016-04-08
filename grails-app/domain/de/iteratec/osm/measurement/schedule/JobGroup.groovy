@@ -50,7 +50,7 @@ class JobGroup {
 
     static constraints = {
         name(unique: true, maxSize: 255)
-        graphiteServers()
+        graphiteServers(nullable: false)
         csiConfiguration(nullable: true)
     }
 

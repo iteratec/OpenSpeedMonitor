@@ -49,17 +49,17 @@ class BatchActivity {
     }
 
     static constraints = {
-        domain()
+        domain(nullable: false)
         idWithinDomain(nullable:true)
-        name()
-        activity()
-        startDate()
-        status()
-        progress()
-        successfulActions()
+        name(nullable: false)
+        activity(nullable: false)
+        startDate(nullable: false)
+        status(nullable: false)
+        progress(nullable: false)
+        successfulActions(nullable: false)
         stage(nullable: true)
         progressWithinStage(nullable: true)
-        failures()
+        failures(nullable: false)
         lastFailureMessage(nullable: true)
         endDate(nullable: true)
     }

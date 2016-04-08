@@ -99,14 +99,14 @@ class CsiAggregation implements CsiValue {
     static transients = ['underlyingEventResultsByWptDocCompleteAsList', 'latestUpdateEvent', 'calculated']
 
     static constraints = {
-        started()
-        interval()
-        aggregator()
+        started(nullable: false)
+        interval(nullable: false)
+        aggregator(nullable: false)
         tag(maxSize: 255)
         csByWptDocCompleteInPercent(nullable: true)
         csByWptVisuallyCompleteInPercent(nullable: true)
-        underlyingEventResultsByWptDocComplete()
-        closedAndCalculated()
+        underlyingEventResultsByWptDocComplete(nullable: false)
+        closedAndCalculated(nullable: false)
         connectivityProfile(nullable: true)
         csiSystem(nullable: true)
     }
