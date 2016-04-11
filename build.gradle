@@ -100,8 +100,9 @@ dependencies {
     compile 'org.grails.plugins:rest:0.8'                       // not needed anymore?
     compile 'org.grails.plugins:taggable:1.1.0'
     compile 'org.grails.plugins:cookie:2.0.4'
+    compile 'org.grails.plugins:codenarc:0.22'
     compile 'org.mockito:mockito-all:1.9.5'                     //maybe not neccessary (especially to compile time)
-    compile 'p6spy:p6spy:2.1.4'                                 //maybe not neccessary
+    compile 'p6spy:p6spy:2.1.4'
     compile 'xml-apis:xml-apis:1.4.01'                          //new dependency
     runtime 'net.sf.supercsv:super-csv:2.4.0'
     runtime "org.grails.plugins:asset-pipeline"

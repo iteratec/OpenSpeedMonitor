@@ -17,17 +17,14 @@
 
 package de.iteratec.osm.util
 
-
-
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.core.Appender
+import ch.qos.logback.core.Layout
+import ch.qos.logback.core.OutputStreamAppender
 import grails.test.mixin.*
-import org.apache.log4j.Appender
-import org.apache.log4j.Layout
-import org.apache.log4j.Level
-import org.apache.log4j.Logger
-import org.apache.log4j.SimpleLayout
-import org.apache.log4j.WriterAppender
-import org.junit.*
 
+import org.junit.*
+import ch.qos.logback.classic.Level
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -48,7 +45,7 @@ class PerformanceLoggingServiceTests {
 	void tearDown() {
 	}
 	/**
-	 * Tests whether {@link PerformanceLoggingService} logs to rootLogger with log-level {@link LogLevel.ERROR}.
+	 * Tests whether {@link PerformanceLoggingService} logs to rootLogger with log-level {@link Level.ERROR}.
 	 */
 	@Test
     void testLoggingOfExecutionTime() {
@@ -68,7 +65,7 @@ class PerformanceLoggingServiceTests {
 		
     }
 	/**
-	 * Tests whether {@link PerformanceLoggingService} doesn't logs to rootLogger with log-level {@link LogLevel.INFO}. 
+	 * Tests whether {@link PerformanceLoggingService} doesn't logs to rootLogger with log-level {@link Level.INFO}.
 	 */
 	@Test
 	void testNoLoggingOfExecutionTimeDueToLogLevel() {
@@ -87,8 +84,7 @@ class PerformanceLoggingServiceTests {
 		Logger performanceLoggingServiceLogger = Logger.getLogger("grails.app.services.de.iteratec.osm.util.PerformanceLoggingService")
 		performanceLoggingServiceLogger.level = level
 		ByteArrayOutputStream out = new ByteArrayOutputStream()
-		Layout layout = new SimpleLayout()
-		Appender appender = new WriterAppender(layout, out)
+		Appender appender = new OutputStreamAppender(out)
 		performanceLoggingServiceLogger.addAppender(appender)
 		return out
 	}

@@ -1,7 +1,5 @@
 import de.iteratec.osm.report.chart.ChartingLibrary
-//import org.apache.log4j.AsyncAppender
-//import org.apache.log4j.DailyRollingFileAppender
-//import org.apache.log4j.RollingFileAppender
+
 
 /*
 * OpenSpeedMonitor (OSM)
@@ -21,7 +19,7 @@ import de.iteratec.osm.report.chart.ChartingLibrary
 */
 
 
-//def appNameForLog4jConfig = appName
+
 
 grails.databinding.dateFormats = [
         'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
@@ -221,7 +219,7 @@ grails.de.iteratec.osm.report.chart.availableChartTagLibs = [ChartingLibrary.RIC
 grails.plugins.cookie.cookieage.default = 60 * 60 * 24 * 36
 
 //Exclude all less files, but not the main less files. This.will solv.dependency errors and will increase the performance.
-grails.assets.less.compile = 'less4j'
+grails.assets.less.compile = 'logback'
 grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
 grails.assets.plugin."font-awesome-resources".excludes = ["**/*.less"]
 grails.assets.excludes = ["openspeedmonitor.less"]
@@ -255,113 +253,7 @@ environments {
 
         grails.assets.bundle = true
 
-//        log4j = {
-//
-//            def catalinaBase = System.properties.getProperty('catalina.base')
-//            if (!catalinaBase) catalinaBase = '.'   // just in case
-//            def logFolder = "${catalinaBase}/logs/"
-//
-////            doesn't work cause we can't access grailsApplictaion or there are no serviceClasses/controllerClasses:
-////            List<String> identifiersToLogExplicitlyFor = []
-////            identifiersToLogExplicitlyFor << 'grails.app.conf'
-////            identifiersToLogExplicitlyFor << 'grails.app.filters'
-////            identifiersToLogExplicitlyFor << 'grails.app.taglib'
-////            identifiersToLogExplicitlyFor << 'grails.app.domain'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isj'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.osm'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isocsi'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.ispc'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isr'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.iss'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.issc'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.chart'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isj'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.osm'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isocsi'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
-////            identifiersToLogExplicitlyFor.addAll(grailsApplication.serviceClasses.collect {"grails.app.services.${it.fullName}"})
-////            identifiersToLogExplicitlyFor.addAll(grailsApplication.controllerClasses.collect {"grails.app.controllers.${it.fullName}"})
-//
-//            appenders {
-//
-//                console(
-//                        name: 'stdout',
-//                        layout: pattern(conversionPattern: '%c{2} %m%n'),
-//                        threshold: org.apache.log4j.Level.ERROR
-//                )
-//
-//                /**
-//                 * Standard-appender for openSpeedMonitor-app. One Logging-level for the whole application.
-//                 *    Nothing else is logged.
-//                 */
-//                appender new DailyRollingFileAppender(
-//                        name: 'osmAppender',
-//                        datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
-//                        fileName: "logs/${appNameForLog4jConfig}.log",
-//                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
-//                        threshold: org.apache.log4j.Level.ERROR
-//                )
-//                /**
-//                 * Detail-appender for openSpeedMonitor-app. Logging-level can be set for every package separately at runtime.
-//                 * Grails-core packages get logged, too.
-//                 */
-//                RollingFileAppender rollingFileAppender = new RollingFileAppender(
-//                        name: 'osmAppenderDetails',
-//                        fileName: "logs/${appNameForLog4jConfig}Details.log",
-//                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
-//                        maxFileSize: '20MB',
-//                        maxBackupIndex: 10,
-//                        threshold: org.apache.log4j.Level.DEBUG
-//                )
-//                appender rollingFileAppender
-//                AsyncAppender asyncAppender = new AsyncAppender(
-//                        name: 'asyncOsmAppenderDetails',
-//                )
-//                asyncAppender.addAppender(rollingFileAppender)
-//                appender asyncAppender
-//            }
-//            // Per default all is logged for application artefacts.
-//            // Appenders apply their own threshold level to limit logs.
-//            all(
-//                    osmAppender: [
-//                            'grails.app'
-//                    ],
-//                    asyncOsmAppenderDetails: [
-//                            'grails.app'
-//                    ]
-//            )
-//            error(
-//                    osmAppender: [
-//                            'org.codehaus.groovy.grails.commons',            // core / classloading
-//                            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-//                            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-//                            'org.codehaus.groovy.grails.web.pages',          // GSP
-//                            'org.codehaus.groovy.grails.web.servlet',        // controllers
-//                            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-//                            'org.codehaus.groovy.grails.plugins',            // plugins
-//                            'org.springframework',
-//                            'net.sf.ehcache.hibernate',
-//                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//                            'org.hibernate.SQL', 'org.hibernate.transaction'    //hibernate],
-//                    ],
-//                    asyncOsmAppenderDetails: [
-//                            'org.codehaus.groovy.grails.commons',            // core / classloading
-//                            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-//                            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-//                            'org.codehaus.groovy.grails.web.pages',          // GSP
-//                            'org.codehaus.groovy.grails.web.servlet',        // controllers
-//                            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-//                            'org.codehaus.groovy.grails.plugins',            // plugins
-//                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//                            'org.springframework',
-//                            'net.sf.ehcache.hibernate',
-//                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//                            'org.hibernate.SQL', 'org.hibernate.transaction' //hibernate
-//                    ]
-//            )
-//        }
+
 
     }
     production {
@@ -382,123 +274,7 @@ environments {
         // all files of unix user the servlet container is running as!!!
         grails.plugin.console.fileStore.remote.enabled = false
 
-//        log4j = {
-//
-//            def catalinaBase = System.properties.getProperty('catalina.base')
-//            if (!catalinaBase) catalinaBase = '.'   // just in case
-//            def logFolder = "${catalinaBase}/logs/"
-//
-////            doesn't work cause we can't access grailsApplictaion or there are no serviceClasses/controllerClasses:
-////            List<String> identifiersToLogExplicitlyFor = []
-////            identifiersToLogExplicitlyFor << 'grails.app.conf'
-////            identifiersToLogExplicitlyFor << 'grails.app.filters'
-////            identifiersToLogExplicitlyFor << 'grails.app.taglib'
-////            identifiersToLogExplicitlyFor << 'grails.app.domain'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isj'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.osm'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isocsi'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.ispc'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.isr'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.iss'
-////            identifiersToLogExplicitlyFor << 'grails.app.controllers.de.iteratec.issc'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.chart'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isj'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.osm'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isocsi'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.ispc'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.isr'
-////            identifiersToLogExplicitlyFor << 'grails.app.services.de.iteratec.issc'
-//            //            identifiersToLogExplicitlyFor.addAll(grailsApplication.serviceClasses.collect {"grails.app.services.${it.fullName}"})
-//            //            identifiersToLogExplicitlyFor.addAll(grailsApplication.controllerClasses.collect {"grails.app.controllers.${it.fullName}"})
-//
-//            appenders {
-//
-//                console(
-//                        name: 'stdout',
-//                        layout: pattern(conversionPattern: '%c{2} %m%n'),
-//                        threshold: org.apache.log4j.Level.ERROR
-//                )
-//
-//                /**
-//                 * Standard-appender for openSpeedMonitor-app.
-//                 * Log-level ERROR as threshold.
-//                 * Per log4j configuration all would be logged.
-//                 */
-//                appender new DailyRollingFileAppender(
-//                        name: 'osmAppender',
-//                        datePattern: "'.'yyyy-MM-dd",  // See the API for all patterns.
-//                        fileName: "${logFolder}${appNameForLog4jConfig}.log",
-//                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
-//                        threshold: org.apache.log4j.Level.ERROR
-//                )
-//                /**
-//                 * Detail-appender for OpenSpeedMonitor-app.
-//                 * Log-level DEBUG as threshold.
-//                 * Per log4j configuration all would be logged.
-//                 */
-//                RollingFileAppender rollingFileAppender = new RollingFileAppender(
-//                        name: 'osmAppenderDetails',
-//                        fileName: "${logFolder}${appNameForLog4jConfig}Details.log",
-//                        layout: pattern(conversionPattern: "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"),
-//                        maxFileSize: '20MB',
-//                        maxBackupIndex: 20,
-//                        threshold: org.apache.log4j.Level.DEBUG
-//                )
-//                appender rollingFileAppender
-//                AsyncAppender asyncAppender = new AsyncAppender(
-//                        name: 'asyncOsmAppenderDetails',
-//                )
-//                asyncAppender.addAppender(rollingFileAppender)
-//                appender asyncAppender
-//            }
-//
-//            // Per default all is logged for application artefacts.
-//            // Appenders apply their own threshold level to limit logs.
-//            all(
-//                    osmAppender: [
-//                            'grails.app'
-//                    ],
-//                    asyncOsmAppenderDetails: [
-//                            'grails.app',
-//                            'liquibase'
-//                    ]
-//            )
-//            error(
-//                    osmAppender: [
-//                            'org.codehaus.groovy.grails.commons',            // core / classloading
-//                            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-//                            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-//                            'org.codehaus.groovy.grails.web.pages',          // GSP
-//                            'org.codehaus.groovy.grails.web.servlet',        // controllers
-//                            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-//                            'org.codehaus.groovy.grails.plugins',            // plugins
-//                            // GSP
-//                            'org.codehaus.groovy.grails.web.servlet',
-//                            // controllers
-//                            'org.codehaus.groovy.grails.web.sitemesh',
-//                            // layouts
-//                            'org.codehaus.groovy.grails.plugins',
-//                            // plugins
-//                            'org.springframework',
-//                            'net.sf.ehcache.hibernate',
-//                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//                            'org.hibernate.SQL', 'org.hibernate.transaction'    //hibernate],
-//                    ],
-//                    asyncOsmAppenderDetails: [
-//                            'org.codehaus.groovy.grails.commons',            // core / classloading
-//                            'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-//                            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-//                            'org.codehaus.groovy.grails.web.pages',          // GSP
-//                            'org.codehaus.groovy.grails.web.servlet',        // controllers
-//                            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-//                            'org.codehaus.groovy.grails.plugins',            // plugins
-//                            'org.springframework',
-//                            'net.sf.ehcache.hibernate',
-//                            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//                            'org.hibernate.SQL', 'org.hibernate.transaction'    //hibernate],
-//                    ]
-//            )
-//        }
+
     }
     test {
         grails.logging.jul.usebridge = true
@@ -516,27 +292,7 @@ environments {
         grails.plugin.databasemigration.autoMigrateScripts = 'TestApp'
         grails.plugin.databasemigration.forceAutoMigrate = true
 
-//        log4j = {
-//            appenders {
-//                console name: 'stdout', layout: pattern(conversionPattern: '%c{2} %m%n')
-//            }
-//
-//            info(stdout: [
-//                    'grails.app',
-//                    'org.codehaus.groovy.grails.web.servlet',        // controllers
-//                    'org.codehaus.groovy.grails.web.pages',          // GSP
-//                    'org.codehaus.groovy.grails.web.sitemesh',       // layouts
-//                    'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-//                    'org.codehaus.groovy.grails.web.mapping',        // URL mapping
-//                    'org.codehaus.groovy.grails.commons',            // core / classloading
-//                    'org.codehaus.groovy.grails.plugins',            // plugins
-//                    'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-//                    'org.springframework',
-//                    'org.hibernate',
-//                    'net.sf.ehcache.hibernate',
-//                    'co.freeside.betamax'])
-//
-//        }
+
     }
 }
 /**
