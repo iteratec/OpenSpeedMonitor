@@ -8,8 +8,7 @@ import org.joda.time.format.DateTimeFormatter
 
 import java.util.regex.Pattern
 
-//@Validateable(nullable = true)
-class DetailAnalysisDashboardCommand {
+class DetailAnalysisDashboardCommand implements Validateable{
     /**
      * The selected start date.
      *

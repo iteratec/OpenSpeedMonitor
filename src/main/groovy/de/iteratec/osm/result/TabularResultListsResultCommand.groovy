@@ -1,7 +1,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.validation.Validateable
 
 import java.util.regex.Pattern
 
@@ -18,7 +17,6 @@ import java.util.regex.Pattern
  * @since IT-74
  */
 
-//@Validateable(nullable = true)
 public class TabularResultListResultsCommand extends TabularResultEventResultsCommandBase{
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}

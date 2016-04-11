@@ -50,7 +50,6 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
-import grails.validation.Validateable
 import grails.web.mapping.LinkGenerator
 import groovy.json.JsonSlurper
 
@@ -662,7 +661,6 @@ class RestApiController {
  * @author mze
  * @since IT-81
  */
-//@Validateable(nullable = true)
 public class ResultsRequestCommand {
 
     /**
@@ -869,7 +867,6 @@ public class ResultsRequestCommand {
  * Parameters of rest api function /rest/event/create.
  * Created by nkuhn on 08.05.15.
  */
-//@Validateable(nullable = true)
 class CreateEventCommand {
     String apiKey
     String shortName
@@ -928,7 +925,6 @@ class CreateEventCommand {
  * /rest/config/deactivateMeasurementsGenerally.
  * Created by nkuhn on 08.05.15.
  */
-//@Validateable(nullable = true)
 class MeasurementActivationCommand {
 
     String apiKey
@@ -949,7 +945,6 @@ class MeasurementActivationCommand {
  * Parameters of rest api functions /rest/config/activateNightlyDatabaseCleanup and
  * /rest/config/deactivateNightlyCleanup.
  */
-//@Validateable(nullable = true)
 class NightlyDatabaseCleanupActivationCommand {
 
     String apiKey
@@ -971,7 +966,6 @@ class NightlyDatabaseCleanupActivationCommand {
  * /rest/csi/translateToCustomerSatisfaction and
  * /rest/$system/csi/translateToCustomerSatisfaction
  */
-//@Validateable(nullable = true)
 class TranslateCustomerSatisfactionCommand {
     String csiConfiguration
     Integer loadTimeInMillisecs

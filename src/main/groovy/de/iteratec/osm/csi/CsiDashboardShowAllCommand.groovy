@@ -29,8 +29,7 @@ import java.util.regex.Pattern
  * @author mze
  * @since IT-74
  */
-//@Validateable(nullable = true)
-public class CsiDashboardShowAllCommand {
+public class CsiDashboardShowAllCommand implements Validateable{
 
     CsiAggregationUtilService csiAggregationUtilService
 

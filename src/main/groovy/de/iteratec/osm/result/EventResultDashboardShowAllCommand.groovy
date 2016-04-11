@@ -27,8 +27,7 @@ import java.util.regex.Pattern
  * @author mze , rhe
  * @since IT-6
  */
-//@Validateable(nullable = true)
-public class EventResultDashboardShowAllCommand {
+public class EventResultDashboardShowAllCommand implements Validateable{
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -340,8 +339,6 @@ public class EventResultDashboardShowAllCommand {
         //TODO: validators for trimAbove's and -Below's
 
     }
-
-    static transients = ['selectedTimeFrame']
 
     /**
      * <p>

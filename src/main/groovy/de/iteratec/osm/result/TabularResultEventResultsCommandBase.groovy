@@ -15,8 +15,7 @@ import java.util.regex.Pattern
  * </p>
  * Created by Marko Schnecke on 04.04.2016.
  */
-//@Validateable(nullable = true)
-public class TabularResultEventResultsCommandBase {
+public class TabularResultEventResultsCommandBase implements Validateable{
     /**
      * The selected start date.
      *
