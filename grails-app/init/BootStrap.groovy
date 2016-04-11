@@ -83,7 +83,6 @@ class BootStrap {
         initJobScheduling()
         cancelActiveBatchActivity()
         excludePropertiesInJsonRepresentationsofDomainObjects()
-        fixGrailsBugs()
 
         log.info "initApplicationData() OSM ends"
     }
@@ -436,13 +435,6 @@ class BootStrap {
         while (iterator.hasNext()) {
             if (iterator.next().endsWith('Service')) iterator.remove()
         }
-    }
-
-    void fixGrailsBugs() {
-        // without this it's not safe to test on JSONObject instances in a groovy way
-        // see https://jira.grails.org/browse/GRAILS-7739#
-
-//        org.grails.web.json.JSONObject.NULL.metaClass.asBoolean = { -> false }
     }
 
 }
