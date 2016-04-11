@@ -34,13 +34,17 @@ grails.databinding.dateFormats = [
 def osmConfLocationBasedOnEnvVar = System.properties["osm_config_location"]
 if (osmConfLocationBasedOnEnvVar) {
     log.info("sytem property for external configuration found: ${osmConfLocationBasedOnEnvVar}")
-    grails.config.locations = ["file:" +  osmConfLocationBasedOnEnvVar]
+    spring.config.location = "file:" +  osmConfLocationBasedOnEnvVar
 } else {
-    grails.config.locations = [
-            "classpath:${appName}-config.properties",
-            "classpath:${appName}-config.groovy",
-            "file:${userHome}/.grails/${appName}-config.properties",
-            "file:${userHome}/.grails/${appName}-config.groovy"]
+    File configFile = new File("${userHome}/.grails/${appName}-config.groovy")
+    if(configFile.exists()) {
+        spring.config.location = "${userHome}/.grails/${appName}-config.groovy"
+    } else {
+        configFile = new File("${userHome}/.grails/${appName}-config.properties")
+        if(configFile.exists()) {
+            spring.config.location = "${userHome}/.grails/${appName}-config.properties"
+        }
+    }
 }
 
 // config for all environments //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
