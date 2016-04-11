@@ -76,9 +76,9 @@ dependencyManagement {
 
 dependencies {
 //    build 'org.yaml:snakeyaml:1.14'                           //not neccessary anymore ?
+    compile "org.grails:grails-core"
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
-    compile "org.grails:grails-core"
     compile "org.springframework.boot:spring-boot-starter-actuator"
     compile "org.springframework.boot:spring-boot-starter-tomcat"
     compile "org.grails:grails-dependencies"
@@ -96,7 +96,7 @@ dependencies {
     compile 'org.grails.plugins:scaffolding:2.1.0'
 //    compile 'org.grails.plugins:spring-security-core:2.0-RC3'
     compile 'org.grails.plugins:spring-security-core:3.0.4'
-    compile 'org.grails.plugins:quartz:1.0.1'
+    compile 'org.grails.plugins:quartz:2.0.8'
     compile 'org.grails.plugins:rest:0.8'                       // not needed anymore?
     compile 'org.grails.plugins:taggable:1.1.0'
     compile 'org.grails.plugins:cookie:2.0.4'
@@ -108,7 +108,6 @@ dependencies {
     runtime "org.grails.plugins:asset-pipeline"
     runtime "com.h2database:h2"
     runtime 'org.grails.plugins:database-migration:1.4.0'
-    runtime 'org.grails.plugins:quartz:1.0.1'
     runtime 'mysql:mysql-connector-java:5.1.26'
     runtime 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'

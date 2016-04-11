@@ -20,14 +20,14 @@
 				<div class="control-group fieldcontain">
 					<label for='username' class="control-label"><g:message code="springSecurity.login.username.label" locale="${lang}"/>:</label>
 					<div class="controls">
-						<input type='text' class='span4' name='j_username' id='username'/>
+						<input type='text' class='span4' name='username' id='username'/>
 					</div>
 				</div>
 	
 				<div class="control-group fieldcontain">
 					<label for='password' class="control-label"><g:message code="springSecurity.login.password.label" locale="${lang}"/>:</label>
 					<div class="controls">
-						<input type='password' class='span4' name='j_password' id='password'/>
+						<input type='password' class='span4' name='password' id='password'/>
 					</div>
 				</div>
 				
@@ -50,7 +50,7 @@
 <script type='text/javascript'>
 	<!--
 	(function() {
-		document.forms['loginForm'].elements['j_username'].focus();
+		document.forms['loginForm'].elements['username'].focus();
 	})();
 	// -->
 </script>
