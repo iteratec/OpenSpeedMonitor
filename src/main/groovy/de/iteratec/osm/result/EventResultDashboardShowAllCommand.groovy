@@ -352,10 +352,6 @@ public class EventResultDashboardShowAllCommand implements Validateable{
      *         if called on an invalid instance.
      */
     public Interval getSelectedTimeFrame() throws IllegalStateException {
-        if (!this.validate()) {
-            throw new IllegalStateException('A time frame is not available from an invalid command.')
-        }
-
         DateTime start
         DateTime end
 
