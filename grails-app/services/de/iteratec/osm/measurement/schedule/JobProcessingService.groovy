@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer

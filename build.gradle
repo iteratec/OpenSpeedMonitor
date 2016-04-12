@@ -49,6 +49,7 @@ buildscript {
 version "3.4.8-build293"
 group "OpenSpeedMonitor"
 
+apply plugin: 'codenarc'
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
@@ -64,7 +65,9 @@ ext {
 
 repositories {
     mavenLocal()
+//    mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
+//    maven { url "http://repo.grails.org/grails/pluginss"}
 }
 
 dependencyManagement {
@@ -75,7 +78,6 @@ dependencyManagement {
 }
 
 dependencies {
-//    build 'org.yaml:snakeyaml:1.14'                           //not neccessary anymore ?
     compile "org.grails:grails-core"
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
@@ -84,33 +86,27 @@ dependencies {
     compile "org.grails:grails-dependencies"
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
-    compile "org.grails.plugins:scaffolding"
+    runtime "org.grails.plugins:scaffolding"
     compile "org.grails.plugins:hibernate4"
-//    compile "org.grails.plugins:hibernate:3.6.10.19"
-//    runtime "org.grails.plugins:hibernate:3.6.10.19"
     compile "org.hibernate:hibernate-ehcache"
-//    compile 'org.grails.plugins:mongodb:5.0.3'
+    compile 'org.grails.plugins:mongodb:5.0.3'
     compile 'net.sf.supercsv:super-csv:2.4.0'
-    compile 'org.grails:grails-datastore-rest-client:5.0.0.RC2'
-    compile 'org.grails.plugins:joda-time:1.5'
-    compile 'org.grails.plugins:scaffolding:2.1.0'
-//    compile 'org.grails.plugins:spring-security-core:2.0-RC3'
+    compile 'org.grails.plugins:joda-time:2.0.0'
     compile 'org.grails.plugins:spring-security-core:3.0.4'
     compile 'org.grails.plugins:quartz:2.0.8'
-    compile 'org.grails.plugins:rest:0.8'                       // not needed anymore?
-    compile 'org.grails.plugins:taggable:1.1.0'
+    compile 'org.grails.plugins:http-builder-helper:1.0.0'
+    compile 'org.grails.plugins:taggable:2.0.1'
     compile 'org.grails.plugins:cookie:2.0.4'
-    compile 'org.grails.plugins:codenarc:0.22'
-    compile 'org.mockito:mockito-all:1.9.5'                     //maybe not neccessary (especially to compile time)
+//    compile 'org.grails.plugins:codenarc:0.22'                  //Use gradle check instead  https://grails.org/plugin/codenarc
     compile 'p6spy:p6spy:2.1.4'
     compile 'xml-apis:xml-apis:1.4.01'                          //new dependency
     runtime 'net.sf.supercsv:super-csv:2.4.0'
     runtime "org.grails.plugins:asset-pipeline"
     runtime "com.h2database:h2"
-    runtime 'org.grails.plugins:database-migration:1.4.0'
+    runtime 'org.grails.plugins:database-migration:2.0.0.RC4'
     runtime 'mysql:mysql-connector-java:5.1.26'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
-    runtime 'org.grails.plugins:grails-console:2.0.4'
+    console 'org.grails:grails-console'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'co.freeside:betamax:1.1.2'
     testCompile 'net.sourceforge.nekohtml:nekohtml:1.9.14'
@@ -119,12 +115,10 @@ dependencies {
     testCompile "org.grails.plugins:geb"
     testCompile "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testCompile "net.sourceforge.htmlunit:htmlunit:2.18"
-    testCompile "org.grails.plugins:code-coverage:2.0.3-3"
-    testCompile 'org.grails.plugins:karma-test-runner:0.2.4'
+    testCompile "org.grails.plugins:code-coverage:1.2.4"       // pervious version was 2.0.3-3
+//    testCompile 'org.grails.plugins:karma-test-runner:0.2.4'
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
-//    compile "org.grails.plugins:less-asset-pipeline:1.10.0"   // should be available - but isnt
 
-//    build "org.grails:tomcat:7.0.52.1"                        // not necessary anymore?
 //    build "org.grails:release:3.0.1"                          // not available
 
     profile "org.grails.profiles:web:3.1.4"
@@ -138,3 +132,34 @@ assets {
     minifyJs = true
     minifyCss = true
 }
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
+}
+//codenarc {
+//    processTestUnit = false
+//    processTestIntegration = false
+//    propertiesFile = 'codenarc.properties'
+//    ruleSetFiles = "file:grails-app/conf/CodeNarcRules.groovy"
+//    reports = {
+//        RedisReport('xml') {
+//            // The report name "MyXmlReport" is user-defined; Report type is 'xml'
+//            outputFile = 'target/codenarc.xml'  // Set the 'outputFile' property of the (XML) Report
+//            title = 'Grails Redis Plugin'             // Set the 'title' property of the (XML) Report
+//        }
+//    }
+//}
+//codenarc {
+//    toolVersion = "0.25.2"
+//}
+//
+//codenarcMain {
+//    configFile = rootProject.file("file:grails-app/conf/CodeNarcRules.groovy")
+//}
+//
+//codenarcTest {
+//    configFile = rootProject.file("path/to/CodeNarcTest.groovy")
+//}
