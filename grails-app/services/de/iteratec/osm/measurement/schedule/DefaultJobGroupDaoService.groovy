@@ -55,25 +55,19 @@ class DefaultJobGroupDaoService implements JobGroupDaoService {
 
     @Override
     public List<String> getAllUniqueTags(){
-//        return JobGroup.allTags
-		//TODO:Fix taggable
-		return []
+        return JobGroup.allTags
     }
 
     @Override
     public List<String> getMaxUniqueTags(int maxNumberOfTags){
-//        return JobGroup.findAllTagsWithCriteria([max:maxNumberOfTags]) {}
-		//TODO:Fix taggable
-		return []
+        return JobGroup.findAllTagsWithCriteria([max:maxNumberOfTags]) {}
     }
 
     @Override
     public Map<String, List<String>> getTagToJobGroupNameMap(){
-		//TODO:Fix taggable
-		return [:]
-//        return getAllUniqueTags().inject([:]){map, tag->
-//            map[tag] = JobGroup.findAllByTag(tag)*.name
-//            return map
-//        }
+        return getAllUniqueTags().inject([:]){map, tag->
+            map[tag] = JobGroup.findAllByTag(tag)*.name
+            return map
+        }
     }
 }

@@ -17,13 +17,12 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.script.Script
+import grails.plugins.taggable.Taggable
 import grails.util.Environment
 
 import org.grails.databinding.BindUsing
-//import org.grails.taggable.Taggable
 import org.quartz.CronExpression
 
 /**
@@ -33,8 +32,7 @@ import org.quartz.CronExpression
  *
  * @see Script
  */
-//class Job implements Taggable {
-class Job  {
+class Job implements Taggable {
     def jobProcessingService
 
     Long id;
