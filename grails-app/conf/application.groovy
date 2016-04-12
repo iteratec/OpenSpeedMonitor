@@ -1,4 +1,15 @@
 import de.iteratec.osm.report.chart.ChartingLibrary
+import grails.boot.GrailsApp
+import grails.boot.config.GrailsAutoConfiguration
+import org.grails.config.yaml.YamlPropertySourceLoader
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean
+import org.springframework.context.EnvironmentAware
+import org.springframework.core.env.AbstractEnvironment
+import org.springframework.core.env.Environment
+import org.springframework.core.env.MapPropertySource
+import org.springframework.core.io.DefaultResourceLoader
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 
 
 /*
@@ -18,32 +29,10 @@ import de.iteratec.osm.report.chart.ChartingLibrary
 * limitations under the License.
 */
 
-
-
-
 grails.databinding.dateFormats = [
         'dd.MM.yyyy', 'yyyy-MM-dd', 'yyyy/MM/dd', 'MMddyyyy', 'yyyy-MM-dd HH:mm:ss.S', 'yyyy-MM-dd HH:mm:ss', "yyyy-MM-dd'T'hh:mm:ss'Z'"]
 
-/*
- * locations to search for config files that get merged into the main config:
- *  config files can be ConfigSlurper scripts, Java properties files, or classes
- *  in the classpath in ConfigSlurper format
- */
-def osmConfLocationBasedOnEnvVar = System.properties["osm_config_location"]
-if (osmConfLocationBasedOnEnvVar) {
-    log.info("sytem property for external configuration found: ${osmConfLocationBasedOnEnvVar}")
-    spring.config.location = "file:" +  osmConfLocationBasedOnEnvVar
-} else {
-    File configFile = new File("${userHome}/.grails/${appName}-config.groovy")
-    if(configFile.exists()) {
-        spring.config.location = "${userHome}/.grails/${appName}-config.groovy"
-    } else {
-        configFile = new File("${userHome}/.grails/${appName}-config.properties")
-        if(configFile.exists()) {
-            spring.config.location = "${userHome}/.grails/${appName}-config.properties"
-        }
-    }
-}
+
 
 // config for all environments //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
