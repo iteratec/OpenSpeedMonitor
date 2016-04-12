@@ -23,7 +23,7 @@ class Application extends GrailsAutoConfiguration implements ExternalConfig {
 trait ExternalConfig implements EnvironmentAware {
     private ResourceLoader defaultResourceLoader = new DefaultResourceLoader()
     private YamlPropertySourceLoader yamlPropertySourceLoader = new YamlPropertySourceLoader()
-    private String userHome = "~"
+    private String userHome = System.getProperty("user.home")
     private String appName = "OpenSpeedMonitor"
 
     /**
