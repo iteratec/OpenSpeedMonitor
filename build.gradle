@@ -49,7 +49,6 @@ buildscript {
 version "3.4.8-build293"
 group "OpenSpeedMonitor"
 
-apply plugin: 'codenarc'
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
@@ -65,9 +64,7 @@ ext {
 
 repositories {
     mavenLocal()
-//    mavenCentral()
     maven { url "https://repo.grails.org/grails/core" }
-//    maven { url "http://repo.grails.org/grails/pluginss"}
 }
 
 dependencyManagement {
@@ -139,27 +136,3 @@ sourceSets {
         }
     }
 }
-//codenarc {
-//    processTestUnit = false
-//    processTestIntegration = false
-//    propertiesFile = 'codenarc.properties'
-//    ruleSetFiles = "file:grails-app/conf/CodeNarcRules.groovy"
-//    reports = {
-//        RedisReport('xml') {
-//            // The report name "MyXmlReport" is user-defined; Report type is 'xml'
-//            outputFile = 'target/codenarc.xml'  // Set the 'outputFile' property of the (XML) Report
-//            title = 'Grails Redis Plugin'             // Set the 'title' property of the (XML) Report
-//        }
-//    }
-//}
-//codenarc {
-//    toolVersion = "0.25.2"
-//}
-//
-//codenarcMain {
-//    configFile = rootProject.file("file:grails-app/conf/CodeNarcRules.groovy")
-//}
-//
-//codenarcTest {
-//    configFile = rootProject.file("path/to/CodeNarcTest.groovy")
-//}

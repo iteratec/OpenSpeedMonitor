@@ -302,6 +302,7 @@ dataSource {
     driverClassName = "org.h2.Driver"
     username = "sa"
     password = ""
+    dbCreate = "managed by liquibase"
 }
 hibernate {
     cache.queries = false
@@ -324,20 +325,6 @@ environments {
     production {
             dataSource {
             url = "jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000"
-        }
-    }
-}
-
-codenarc {
-    processTestUnit = false
-    processTestIntegration = false
-    propertiesFile = 'codenarc.properties'
-    ruleSetFiles = "file:grails-app/conf/CodeNarcRules.groovy"
-    reports = {
-        RedisReport('xml') {
-            // The report name "MyXmlReport" is user-defined; Report type is 'xml'
-            outputFile = 'target/codenarc.xml'  // Set the 'outputFile' property of the (XML) Report
-            title = 'Grails Redis Plugin'             // Set the 'title' property of the (XML) Report
         }
     }
 }
