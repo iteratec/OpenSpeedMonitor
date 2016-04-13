@@ -24,6 +24,7 @@ import de.iteratec.osm.report.chart.OsmRickshawChart
 import grails.test.mixin.*
 import grails.test.mixin.support.*
 import grails.web.mapping.LinkGenerator
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.*
@@ -652,7 +653,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#eventResultDaoService}.
      */
     private void mockEventResultDaoService() {
-        def eventResultDaoService = mockFor(EventResultDaoService, true)
+        def eventResultDaoService = new MockFor(EventResultDaoService, true)
         eventResultDaoService.demand.getLimitedMedianEventResultsBy(1..10000) {
             Date fromDate,
             Date toDate,
@@ -696,75 +697,75 @@ class EventResultDashboardServiceTests {
                         eventResultCached :
                         eventResultUncached
         }
-        serviceUnderTest.eventResultDaoService = eventResultDaoService.createMock()
+        serviceUnderTest.eventResultDaoService = eventResultDaoService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#performanceLoggingService}.
      */
     private void mockPerformanceLoggingService() {
-        def performanceLoggingService = mockFor(PerformanceLoggingService, true)
+        def performanceLoggingService = new MockFor(PerformanceLoggingService, true)
         performanceLoggingService.demand.logExecutionTime(1..10000) {
             LogLevel level, String description, IndentationDepth indentation, Closure toMeasure ->
                 toMeasure.call()
         }
-        serviceUnderTest.performanceLoggingService = performanceLoggingService.createMock()
+        serviceUnderTest.performanceLoggingService = performanceLoggingService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#performanceLoggingService}.
      */
     private void mockCsiAggregationUtilService() {
-        def csiAggregationUtilService = mockFor(CsiAggregationUtilService, true)
+        def csiAggregationUtilService = new MockFor(CsiAggregationUtilService, true)
         csiAggregationUtilService.demand.resetToStartOfActualInterval(1..10000) {
             DateTime dateWithinInterval, Integer intervalInMinutes ->
                 return runDateHourlyStart
         }
-        serviceUnderTest.csiAggregationUtilService = csiAggregationUtilService.createMock()
+        serviceUnderTest.csiAggregationUtilService = csiAggregationUtilService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#jobGroupDaoService}.
      */
     private void mockJobGroupDaoService() {
-        def jobGroupDaoService = mockFor(DefaultJobGroupDaoService, true)
+        def jobGroupDaoService = new MockFor(DefaultJobGroupDaoService, true)
         jobGroupDaoService.demand.getIdToObjectMap(1..10000) { ->
             return [1: JobGroup.get(1), 2: JobGroup.get(2)]
         }
-        serviceUnderTest.jobGroupDaoService = jobGroupDaoService.createMock()
+        serviceUnderTest.jobGroupDaoService = jobGroupDaoService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#pageDaoService}.
      */
     private void mockPageDaoService() {
-        def pageDaoService = mockFor(DefaultPageDaoService, true)
+        def pageDaoService = new MockFor(DefaultPageDaoService, true)
         pageDaoService.demand.getIdToObjectMap(1..10000) { ->
             return [1: Page.get(1), 2: Page.get(2)]
         }
-        serviceUnderTest.pageDaoService = pageDaoService.createMock()
+        serviceUnderTest.pageDaoService = pageDaoService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#browserDaoService}.
      */
     private void mockBrowserDaoService() {
-        def browserDaoService = mockFor(DefaultBrowserDaoService, true)
+        def browserDaoService = new MockFor(DefaultBrowserDaoService, true)
         browserDaoService.demand.getIdToObjectMap(1..10000) { ->
             return [1: Browser.get(1), 2: Browser.get(2)]
         }
-        serviceUnderTest.browserDaoService = browserDaoService.createMock()
+        serviceUnderTest.browserDaoService = browserDaoService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
      */
     private void mockLocationDaoService() {
-        def locationDaoService = mockFor(DefaultLocationDaoService, true)
+        def locationDaoService = new MockFor(DefaultLocationDaoService, true)
         locationDaoService.demand.getIdToObjectMap(1..10000) { ->
             return [1: Location.get(1), 2: Location.get(2)]
         }
-        serviceUnderTest.locationDaoService = locationDaoService.createMock()
+        serviceUnderTest.locationDaoService = locationDaoService.proxyInstance()
     }
     /**
      * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
      */
     private void mockCsiAggregationTagService() {
-        def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+        def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
         csiAggregationTagService.demand.findJobGroupIdOfHourlyEventTag(1..10000) {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[0]) as Serializable
@@ -785,20 +786,20 @@ class EventResultDashboardServiceTests {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[4]) as Serializable
         }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
     }
 
     private void mockI18nService() {
-        def i18nService = mockFor(I18nService, true)
+        def i18nService = new MockFor(I18nService, true)
         i18nService.demand.msg(1..10000) {
             String msgKey, String defaultMessage, List objs ->
                 return defaultMessage
         }
-        serviceUnderTest.i18nService = i18nService.createMock()
+        serviceUnderTest.i18nService = i18nService.proxyInstance()
     }
 
     private mockAggregatorTypeDaoService() {
-        def aggregatorTypeDaoService = mockFor(AggregatorTypeDaoService, true)
+        def aggregatorTypeDaoService = new MockFor(AggregatorTypeDaoService, true)
         aggregatorTypeDaoService.demand.getNameToObjectMap(1..10000) { ->
             Map<String, AggregatorType> map = [
                     (AggregatorType.RESULT_CACHED_DOM_TIME)  : AggregatorType.findByName(AggregatorType.RESULT_CACHED_DOM_TIME),
@@ -806,6 +807,6 @@ class EventResultDashboardServiceTests {
             ]
             return map
         }
-        serviceUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoService.createMock()
+        serviceUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoService.proxyInstance()
     }
 }

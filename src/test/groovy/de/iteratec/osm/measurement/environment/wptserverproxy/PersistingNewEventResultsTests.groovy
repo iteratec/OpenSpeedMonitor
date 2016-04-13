@@ -30,6 +30,7 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.junit.After
@@ -808,15 +809,15 @@ class PersistingNewEventResultsTests {
 	}
 	
 	private void mockProxyService(String locationIdentifier){
-		def proxyService = mockFor(ProxyService, true)
+		def proxyService = new MockFor(ProxyService, true)
 		proxyService.demand.fetchLocations(0..100) { WebPageTestServer server ->
 			createLocationIfNotExistent(locationIdentifier, undefinedBrowser, server);
 		}
-		serviceUnderTest.proxyService = proxyService.createMock()
+		serviceUnderTest.proxyService = proxyService.proxyInstance()
 	}
 	
 	private void mockBrowserService(){
-		def browserService = mockFor(BrowserService, true)
+		def browserService = new MockFor(BrowserService, true)
 		browserService.demand.findByNameOrAlias(0..100) { String nameOrAlias ->
 			//not the concern of this test
 			if(nameOrAlias.startsWith("IE"))
@@ -829,18 +830,18 @@ class PersistingNewEventResultsTests {
 				return Browser.findByName(Browser.UNDEFINED);
 			}
 		}
-		serviceUnderTest.browserService = browserService.createMock()
+		serviceUnderTest.browserService = browserService.proxyInstance()
 	}
 	private void mockCsiAggregationUpdateService(){
-		def csiAggregationUpdateServiceMocked = mockFor(CsiAggregationUpdateService, true)
+		def csiAggregationUpdateServiceMocked = new MockFor(CsiAggregationUpdateService, true)
 		csiAggregationUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
 			//not the concern of this test
 			return 34d
 		}
-		serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.createMock()
+		serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.proxyInstance()
 	}
 	private void mockPageService(){
-		def pageServiceMocked = mockFor(PageService, true)
+		def pageServiceMocked = new MockFor(PageService, true)
 		pageServiceMocked.demand.getPageByStepName(0..1000) { String pageName ->
 			def tokenized = pageName.tokenize(PageService.STEPNAME_DELIMITTER)
 			return tokenized.size() == 2 ? Page.findByName(tokenized[0]):Page.findByName(Page.UNDEFINED)
@@ -854,10 +855,10 @@ class PersistingNewEventResultsTests {
 				stepName.substring(stepName.indexOf(PageService.STEPNAME_DELIMITTER)+PageService.STEPNAME_DELIMITTER.length(), stepName.length()):
 				stepName
 		}
-		serviceUnderTest.pageService = pageServiceMocked.createMock()
+		serviceUnderTest.pageService = pageServiceMocked.proxyInstance()
 	}
 	private void mockCsiAggregationTagService(String tagToReturn){
-		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+		def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
 		csiAggregationTagService.demand.createEventResultTag(0..100) {
 			JobGroup jobGroup,
 			MeasuredEvent measuredEvent,
@@ -870,15 +871,15 @@ class PersistingNewEventResultsTests {
 			String tag ->
 			return undefinedJobGroup
 		}
-		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
 	}
 	private void mockMetricReportingService(){
-		def metricReportingService = mockFor(MetricReportingService, true)
+		def metricReportingService = new MockFor(MetricReportingService, true)
 		metricReportingService.demand.reportEventResultToGraphite(0..100) {
 			EventResult result ->
 			// not the concern of this test
 		}
-		serviceUnderTest.metricReportingService = metricReportingService.createMock()
+		serviceUnderTest.metricReportingService = metricReportingService.proxyInstance()
 	}
 
 	// create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

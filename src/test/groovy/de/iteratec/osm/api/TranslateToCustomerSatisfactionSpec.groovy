@@ -8,6 +8,7 @@ import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import spock.lang.Specification
 
 @TestFor(RestApiController)
@@ -93,7 +94,7 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
     }
 
     void mockTimeToCsMappingsService() {
-        def timeToCsMappingService = mockFor(TimeToCsMappingService)
+        def timeToCsMappingService = new MockFor(TimeToCsMappingService)
         timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..10000) { loadTimeInMilliSecs, page, csiConfig ->
             if (loadTimeInMilliSecs && page && csiConfig) {
                 TimeToCsMapping mapping = csiConfig.timeToCsMappings.find {
@@ -102,6 +103,6 @@ class TranslateToCustomerSatisfactionSpec extends Specification {
                 return mapping.customerSatisfaction
             }
         }
-        controllerUnderTest.timeToCsMappingService = timeToCsMappingService.createMock()
+        controllerUnderTest.timeToCsMappingService = timeToCsMappingService.proxyInstance()
     }
 }

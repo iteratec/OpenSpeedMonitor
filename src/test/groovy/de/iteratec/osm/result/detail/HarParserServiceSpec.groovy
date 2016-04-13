@@ -20,6 +20,8 @@
 
 package de.iteratec.osm.result.detail
 
+import groovy.mock.interceptor.MockFor
+
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertThat
@@ -97,11 +99,11 @@ class HarParserServiceSpec {
 	// mocks
 	
 	void mockPageService(){
-		def pageService = mockFor(PageService, true)
+		def pageService = new MockFor(PageService, true)
 		pageService.demand.excludePagenamePart(1..100){String stepName ->
 			return stepName //not the concern of these tests
 		}
-		serviceUnderTest.pageService = pageService.createMock()
+		serviceUnderTest.pageService = pageService.proxyInstance()
 	}
 	
 }

@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import org.junit.Before
 import org.junit.Test
 
@@ -502,13 +503,13 @@ class CsiAggregationTagServiceTests {
 	//mock services
 
 	private void mockJobService(toReturn){
-		def jobServiceMocked = mockFor(JobService)
+		def jobServiceMocked = new MockFor(JobService)
 		jobServiceMocked.demand.getCsiJobGroupOf(Job.findByLabel(jobLabel)) { Job jobConfig -> return toReturn }
-		serviceUnderTest.jobService = jobServiceMocked.createMock()
+		serviceUnderTest.jobService = jobServiceMocked.proxyInstance()
 	}
 	private mockJobResultService(JobResult toReturn){
-		def jobResultDaoServiceMocked = mockFor(JobResultDaoService)
+		def jobResultDaoServiceMocked = new MockFor(JobResultDaoService)
 		jobResultDaoServiceMocked.demand.findJobResultByEventResult(1..10000) { EventResult eventResult -> return toReturn }
-		serviceUnderTest.jobResultDaoService = jobResultDaoServiceMocked.createMock()
+		serviceUnderTest.jobResultDaoService = jobResultDaoServiceMocked.proxyInstance()
 	}
 }

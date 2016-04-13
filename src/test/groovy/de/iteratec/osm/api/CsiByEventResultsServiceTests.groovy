@@ -31,6 +31,7 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 
 import static org.junit.Assert.assertEquals
@@ -176,35 +177,35 @@ class CsiByEventResultsServiceTests {
 	 * Mocks methods of {@link EventResultDaoService}.
 	 */
 	private void mockEventResultDaoService(){
-		def eventResultDaoService = mockFor(EventResultDaoService, true)
+		def eventResultDaoService = new MockFor(EventResultDaoService, true)
 		eventResultDaoService.demand.getByStartAndEndTimeAndMvQueryParams(0..10000) {
 			Date fromDate, Date toDate, Collection<CachedView> cachedViews, MvQueryParams mvQueryParams ->
 			List<EventResult> irrelevantCauseRetrievingWeightedCsiValuesIsMockedToo = [new EventResult()]
 			return irrelevantCauseRetrievingWeightedCsiValuesIsMockedToo
 		}
-		serviceUnderTest.eventResultDaoService = eventResultDaoService.createMock();
+		serviceUnderTest.eventResultDaoService = eventResultDaoService.proxyInstance();
 	}
 	/**
 	 * Mocks methods of {@link WeightingService}.
 	 */
 	private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues){
-		def weightingService = mockFor(WeightingService, true)
+		def weightingService = new MockFor(WeightingService, true)
 		weightingService.demand.getWeightedCsiValues(1..10000) {
 			List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration unused->
 			return toReturnFromGetWeightedCsiValues
 		}
-		serviceUnderTest.weightingService = weightingService.createMock()
+		serviceUnderTest.weightingService = weightingService.proxyInstance()
 	}
 	/**
 	 * Mocks methods of {@link CsTargetGraphDaoService}.
 	 */
 	private void mockCsTargetGraphDaoService(){
-		def csTargetGraphDaoService = mockFor(CsTargetGraphDaoService, true)
+		def csTargetGraphDaoService = new MockFor(CsTargetGraphDaoService, true)
 		csTargetGraphDaoService.demand.getActualCsTargetGraph(1..10000) { ->
 			CsTargetGraph toReturn = new CsTargetGraph()
 			toReturn.metaClass.getPercentOfDate = {DateTime dateTime -> return expectedTargetCsi}
 			return toReturn
 		}
-		serviceUnderTest.csTargetGraphDaoService = csTargetGraphDaoService.createMock()
+		serviceUnderTest.csTargetGraphDaoService = csTargetGraphDaoService.proxyInstance()
 	}
 }

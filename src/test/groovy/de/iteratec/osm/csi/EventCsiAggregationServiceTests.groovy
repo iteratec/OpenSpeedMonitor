@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import groovy.mock.interceptor.MockFor
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.*
@@ -221,7 +222,7 @@ class EventCsiAggregationServiceTests {
 	 */
 	private void mockCsiAggregationDaoService(){
 		List<CsiAggregation> mvsToReturn = CsiAggregation.list()
-		def csiAggregationDaoService = mockFor(CsiAggregationDaoService, true)
+		def csiAggregationDaoService = new MockFor(CsiAggregationDaoService, true)
 		csiAggregationDaoService.demand.getMvs(1..10000) {
 			Date fromDate,
 			Date toDate,
@@ -231,7 +232,7 @@ class EventCsiAggregationServiceTests {
 			Collection<ConnectivityProfile> connectivityProfiles ->
 			return mvsToReturn
 		}
-		serviceUnderTest.csiAggregationDaoService = csiAggregationDaoService.createMock()
+		serviceUnderTest.csiAggregationDaoService = csiAggregationDaoService.proxyInstance()
 	}
 	/**
 	 * Mocks {@linkplain EventCsiAggregationService#csiAggregationTagService}
@@ -239,7 +240,7 @@ class EventCsiAggregationServiceTests {
 	 * @param pages
 	 */
 	private void mockCsiAggregationTagService(){
-		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+		def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
 		Pattern irrelevantPatternCauseDbCallIsMockedToo = Pattern.compile('1;1;1;1;1')
 		csiAggregationTagService.demand.getTagPatternForHourlyCsiAggregations(1..10000) {
 			MvQueryParams mvQueryParams ->
@@ -260,7 +261,7 @@ class EventCsiAggregationServiceTests {
 			String hourlyEventMvTag ->
 			return locationToReturn
 		}
-		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
 	}
 	/**
 	 * Mocks {@linkplain EventCsiAggregationService#eventResultService}
@@ -268,7 +269,7 @@ class EventCsiAggregationServiceTests {
 	 * @param pages
 	 */
 	private void mockEventResultService(){
-		def eventResultService = mockFor(EventResultService, true)
+		def eventResultService = new MockFor(EventResultService, true)
 		List<EventResult> eventResultsToReturn = []
 		eventResultService.demand.findByMeasuredEventBetweenDate(1..10000) {
 			JobGroup jobGroup, 
@@ -283,7 +284,7 @@ class EventCsiAggregationServiceTests {
 			EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
 			return csiRelevanceToReturn
 		}
-		serviceUnderTest.eventResultService = eventResultService.createMock()
+		serviceUnderTest.eventResultService = eventResultService.proxyInstance()
 	}
 	/**
 	 * Mocks {@linkplain EventCsiAggregationService#csiConfigCacheService}
@@ -291,7 +292,7 @@ class EventCsiAggregationServiceTests {
 	 * @param pages
 	 */
 	private void mockCsiConfigCacheService(){
-		def osmConfigCacheService = mockFor(OsmConfigCacheService, true)
+		def osmConfigCacheService = new MockFor(OsmConfigCacheService, true)
 		Integer timeToExpect = 5
 		osmConfigCacheService.demand.getCachedMinDocCompleteTimeInMillisecs(1..10000) {
 			Double ageToleranceInHours ->
@@ -301,6 +302,6 @@ class EventCsiAggregationServiceTests {
 			Double ageToleranceInHours ->
 			return timeToExpect
 		}
-		serviceUnderTest.osmConfigCacheService = osmConfigCacheService.createMock()
+		serviceUnderTest.osmConfigCacheService = osmConfigCacheService.proxyInstance()
 	}
 }

@@ -39,6 +39,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.After
@@ -342,7 +343,7 @@ class QuartzControlledGrailsReportsTests {
 	 * Mocks {@linkplain de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService#findCSIGroups}
 	 */
 	private void mockJobGroupDaoService(){
-		def jobGroupDaoService = mockFor(JobGroupDaoService, true)
+		def jobGroupDaoService = new MockFor(JobGroupDaoService, true)
 		jobGroupDaoService.demand.findCSIGroups(1..10000) {
 			
 			JobGroup jobGroupWithGraphiteServers = new JobGroup() {
@@ -368,25 +369,25 @@ class QuartzControlledGrailsReportsTests {
 					jobGroupWithoutGraphiteServers
 				] as Set
 		}
-		serviceUnderTest.jobGroupDaoService = jobGroupDaoService.createMock()
+		serviceUnderTest.jobGroupDaoService = jobGroupDaoService.proxyInstance()
 	}
 	/**
 	 * Mocks {@linkplain GraphiteSocketProvider#getSocket}.
 	 * Field {@link #graphiteSocketUsedInTests} is returned and can be used to proof sent dates.
 	 */
 	private void mockGraphiteSocketProvider(){
-		def graphiteSocketProvider = mockFor(GraphiteSocketProvider, true)
+		def graphiteSocketProvider = new MockFor(GraphiteSocketProvider, true)
 		graphiteSocketProvider.demand.getSocket(1..10000) {GraphiteServer server ->
 			graphiteSocketUsedInTests = new MockedGraphiteSocket()
 			return graphiteSocketUsedInTests
 		}
-		serviceUnderTest.graphiteSocketProvider = graphiteSocketProvider.createMock()
+		serviceUnderTest.graphiteSocketProvider = graphiteSocketProvider.proxyInstance()
 	}
 	/**
 //	 * Mocks {@linkplain EventCsiAggregationService#getOrCalculateHourylCsiAggregations}.
 	 */
 	private void mockEventCsiAggregationService(Collection<CsiAggregation> toReturnFromGetHourlyCsiAggregations){
-		def eventCsiAggregationService = mockFor(EventCsiAggregationService, true)
+		def eventCsiAggregationService = new MockFor(EventCsiAggregationService, true)
 		
 		// FIXME mze-2013-12-10: Hier muss unterschieden werden, welche Op man mocken möchte!
 		// Das mocking von Grails ist echt nicht gut lesbar :-(
@@ -396,13 +397,13 @@ class QuartzControlledGrailsReportsTests {
 			return toReturnFromGetHourlyCsiAggregations
 			
 		}
-		serviceUnderTest.eventCsiAggregationService = eventCsiAggregationService.createMock()
+		serviceUnderTest.eventCsiAggregationService = eventCsiAggregationService.proxyInstance()
 	}
 	/**
 	 * Mocks methods of {@linkplain de.iteratec.osm.result.CsiAggregationTagService}.
 	 */
 	private void mockCsiAggregationTagService(){
-		def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+		def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
 		csiAggregationTagService.demand.findPageOfHourlyEventTag(1..10000) {String hourlyEventMvTag ->
 			Page page = new Page()
 			page.setName(pageName)
@@ -428,13 +429,13 @@ class QuartzControlledGrailsReportsTests {
 			page.setName(pageName)
 			return page
 		}
-		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
+		serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
 	}
 	/**
 	 * Mocks {@linkplain PageCsiAggregationService#getOrCalculatePageCsiAggregations}.
 	 */
 	private void mockPageCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes){
-		def pageCsiAggregationService = mockFor(PageCsiAggregationService, true)
+		def pageCsiAggregationService = new MockFor(PageCsiAggregationService, true)
 		pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations(1..10000) {
 			Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
 			if ( ! interval.intervalInMinutes.equals(expectedIntervalInMinutes)) {
@@ -443,13 +444,13 @@ class QuartzControlledGrailsReportsTests {
 			return toReturnOnDemandForGetOrCalculateCsiAggregations
 			
 		}
-		serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.createMock()
+		serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.proxyInstance()
 	}
 	/**
 	 * Mocks {@linkplain ShopCsiAggregationService#getOrCalculateShopCsiAggregations}.
 	 */
 	private void mockShopCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes){
-		def shopCsiAggregationService = mockFor(ShopCsiAggregationService, true)
+		def shopCsiAggregationService = new MockFor(ShopCsiAggregationService, true)
 		shopCsiAggregationService.demand.getOrCalculateShopCsiAggregations(1..10000) {
 			Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
 			if ( ! interval.intervalInMinutes.equals(expectedIntervalInMinutes)) {
@@ -457,7 +458,7 @@ class QuartzControlledGrailsReportsTests {
 			}
 			return toReturnOnDemandForGetOrCalculateCsiAggregations
 		}
-		serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService.createMock()
+		serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService.proxyInstance()
 	}
 	
 	//test data common to all tests///////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.util.ServiceMocker
+import groovy.mock.interceptor.MockFor
 import org.junit.Assert
 
 import static org.junit.Assert.assertEquals
@@ -504,7 +505,7 @@ class PageCsiAggregationServiceTests {
      * Mocks methods of {@link WeightingService}.
      */
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = mockFor(WeightingService, true)
+        def weightingService = new MockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
@@ -513,14 +514,14 @@ class PageCsiAggregationServiceTests {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        serviceUnderTest.weightingService = weightingService.createMock()
+        serviceUnderTest.weightingService = weightingService.proxyInstance()
     }
 
     /**
      * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
     private void mockCsiAggregationUpdateEventDaoService() {
-        def csiAggregationUpdateEventDaoService = mockFor(CsiAggregationUpdateEventDaoService, true)
+        def csiAggregationUpdateEventDaoService = new MockFor(CsiAggregationUpdateEventDaoService, true)
         csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
             Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 
@@ -531,7 +532,7 @@ class PageCsiAggregationServiceTests {
                 ).save(failOnError: true)
 
         }
-        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.createMock()
+        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
     }
 
     //testdata////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

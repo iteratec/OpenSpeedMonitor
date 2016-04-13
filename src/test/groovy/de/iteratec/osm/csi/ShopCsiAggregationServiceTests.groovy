@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import groovy.mock.interceptor.MockFor
+
 import static org.junit.Assert.assertEquals
 import grails.test.mixin.*
 
@@ -265,13 +267,13 @@ class ShopCsiAggregationServiceTests {
     // mocks
 
     private void mockPageCsiAggregationService() {
-        def pageCsiAggregationService = mockFor(PageCsiAggregationService, true)
+        def pageCsiAggregationService = new MockFor(PageCsiAggregationService, true)
         pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations(0..10000) {
             Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 List<CsiAggregation> irrelevantCauseListOfWeightedValuesIsRetrievedByMock = [new CsiAggregation()]
                 return irrelevantCauseListOfWeightedValuesIsRetrievedByMock
         }
-        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.createMock();
+        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.proxyInstance();
     }
 
     private void mockCsiAggregationDaoService() {
@@ -283,7 +285,7 @@ class ShopCsiAggregationServiceTests {
 
     private void mockCsiAggregationTagService(List<JobGroup> csiGroups) {
         Pattern patternToReturn = ~/(${csiGroups*.ident().join('||')})/
-        def csiAggregationTagServiceMocked = mockFor(CsiAggregationTagService, true)
+        def csiAggregationTagServiceMocked = new MockFor(CsiAggregationTagService, true)
         csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyShopCasWithJobGroups() {
             List<JobGroup> theCsiGroups ->
                 return patternToReturn
@@ -319,7 +321,7 @@ class ShopCsiAggregationServiceTests {
         csiAggregationTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
             return group.ident() + ";" + page.ident();
         }
-        CsiAggregationTagService mVTS = csiAggregationTagServiceMocked.createMock();
+        CsiAggregationTagService mVTS = csiAggregationTagServiceMocked.proxyInstance();
         serviceUnderTest.csiAggregationTagService = mVTS
         serviceUnderTest.pageCsiAggregationService.csiAggregationTagService = mVTS
         serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationTagService = mVTS
@@ -329,7 +331,7 @@ class ShopCsiAggregationServiceTests {
      * Mocks methods of {@link WeightingService}.
      */
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = mockFor(WeightingService, true)
+        def weightingService = new MockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
@@ -338,14 +340,14 @@ class ShopCsiAggregationServiceTests {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        serviceUnderTest.weightingService = weightingService.createMock()
+        serviceUnderTest.weightingService = weightingService.proxyInstance()
     }
 
     /**
      * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
     private void mockCsiAggregationUpdateEventDaoService() {
-        def csiAggregationUpdateEventDaoService = mockFor(CsiAggregationUpdateEventDaoService, true)
+        def csiAggregationUpdateEventDaoService = new MockFor(CsiAggregationUpdateEventDaoService, true)
         csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
             Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 
@@ -356,6 +358,6 @@ class ShopCsiAggregationServiceTests {
                 ).save(failOnError: true)
 
         }
-        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.createMock()
+        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
     }
 }

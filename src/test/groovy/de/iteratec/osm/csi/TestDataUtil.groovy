@@ -796,7 +796,8 @@ class TestDataUtil {
                 location: uniqueIdentifierForServer,
                 label: uniqueIdentifierForServer,
                 browser: browser,
-                wptServer: server
+                wptServer: server,
+                dateCreated: new Date()
         ).save(failOnError: true)
     }
 

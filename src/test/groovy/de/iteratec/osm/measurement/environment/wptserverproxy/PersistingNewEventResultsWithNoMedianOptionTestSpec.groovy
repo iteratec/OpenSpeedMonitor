@@ -34,6 +34,7 @@ import de.iteratec.osm.result.detail.HarFetchService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
 import org.junit.Before
 import org.junit.Test
@@ -287,7 +288,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         ).save(failOnError: true);
     }
     private void mockTimeToCsMappingService(){
-        def timeToCsMappingService = mockFor(TimeToCsMappingService, true)
+        def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
         timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
             return 1
         }
@@ -297,18 +298,18 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
             //not the concern of this test
         }
-        serviceUnderTest.timeToCsMappingService = timeToCsMappingService.createMock()
+        serviceUnderTest.timeToCsMappingService = timeToCsMappingService.proxyInstance()
     }
     private void mockCsiAggregationUpdateService(){
-        def csiAggregationUpdateServiceMocked = mockFor(CsiAggregationUpdateService, true)
+        def csiAggregationUpdateServiceMocked = new MockFor(CsiAggregationUpdateService, true)
         csiAggregationUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
             //not the concern of this test
             return 34d
         }
-        serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.createMock()
+        serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.proxyInstance()
     }
     private void mockPageService(){
-        def pageServiceMocked = mockFor(PageService, true)
+        def pageServiceMocked = new MockFor(PageService, true)
         pageServiceMocked.demand.getPageByStepName(0..1000) { String pageName ->
             def tokenized = pageName.tokenize(PageService.STEPNAME_DELIMITTER)
             return tokenized.size() == 2 ? Page.findByName(tokenized[0]):Page.findByName(Page.UNDEFINED)
@@ -322,10 +323,10 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                     stepName.substring(stepName.indexOf(PageService.STEPNAME_DELIMITTER)+PageService.STEPNAME_DELIMITTER.length(), stepName.length()):
                     stepName
         }
-        serviceUnderTest.pageService = pageServiceMocked.createMock()
+        serviceUnderTest.pageService = pageServiceMocked.proxyInstance()
     }
     private void mockCsiAggregationTagService(String tagToReturn){
-        def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+        def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
         csiAggregationTagService.demand.createEventResultTag(0..100) {
             JobGroup jobGroup,
             MeasuredEvent measuredEvent,
@@ -338,15 +339,15 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
             String tag ->
                 return undefinedJobGroup
         }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock()
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
     }
     private void mockMetricReportingService(){
-        def metricReportingService = mockFor(MetricReportingService, true)
+        def metricReportingService = new MockFor(MetricReportingService, true)
         metricReportingService.demand.reportEventResultToGraphite(0..100) {
             EventResult result ->
                 // not the concern of this test
         }
-        serviceUnderTest.metricReportingService = metricReportingService.createMock()
+        serviceUnderTest.metricReportingService = metricReportingService.proxyInstance()
     }
 
     // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

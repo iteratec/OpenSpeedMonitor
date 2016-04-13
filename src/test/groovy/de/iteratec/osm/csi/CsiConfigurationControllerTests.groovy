@@ -29,18 +29,18 @@ import spock.lang.Specification
  */
 @TestFor(CsiConfigurationController)
 @Mock([CsiConfiguration, CsiDay, JobGroup])
-class CsiConfigurationControllerTests extends Specification{
+class CsiConfigurationControllerTests extends Specification {
 
     CsiConfiguration config1
     CsiConfiguration config2
 
     void setup() {
-        CsiDay testDay = new CsiDay(name:"testDay")
-        (0..23).each{
+        CsiDay testDay = new CsiDay(name: "testDay")
+        (0..23).each {
             testDay.setHourWeight(it, it)
         }
-        CsiDay testDay2 = new CsiDay(name:"testDay2")
-        (0..23).each{
+        CsiDay testDay2 = new CsiDay(name: "testDay2")
+        (0..23).each {
             testDay2.setHourWeight(it, (24 - it))
         }
         config1 = new CsiConfiguration(label: "config1", csiDay: testDay)
@@ -53,7 +53,7 @@ class CsiConfigurationControllerTests extends Specification{
         controller.i18nService = i18nService
     }
 
-    void "test saveCopy" () {
+    void "test saveCopy"() {
         given:
         String labelOfCopy = "ConfigCopy"
         int configCountBeforeCopy = CsiConfiguration.count
@@ -72,7 +72,7 @@ class CsiConfigurationControllerTests extends Specification{
         copy.label != config1.label
     }
 
-    void "test deleteCsiConfiguration" () {
+    void "test deleteCsiConfiguration"() {
         given:
         int csiConfigurationCountBeforeDeleting = CsiConfiguration.count
 
@@ -84,7 +84,7 @@ class CsiConfigurationControllerTests extends Specification{
         CsiConfiguration.count == csiConfigurationCountBeforeDeleting - 1
     }
 
-    void "test deleteCsiConfiguration when jobGroup using this configuration" () {
+    void "test deleteCsiConfiguration when jobGroup using this configuration"() {
         given:
         int csiConfigurationCountBeforeDeleting = CsiConfiguration.count
         JobGroup jobGroup = new JobGroup(name: "jobGroup", csiConfiguration: config1)
@@ -99,7 +99,7 @@ class CsiConfigurationControllerTests extends Specification{
         jobGroup.csiConfiguration == null
     }
 
-    void "test exception is thrown when configuration not exists" () {
+    void "test exception is thrown when configuration not exists"() {
         when:
         params.label = "doesNotExist"
         controller.deleteCsiConfiguration()
@@ -108,9 +108,9 @@ class CsiConfigurationControllerTests extends Specification{
         thrown(IllegalArgumentException)
     }
 
-    void "test exception is thrown if an attempt is made to delete the last csiConfiguration" () {
+    void "test exception is thrown if an attempt is made to delete the last csiConfiguration"() {
         given:
-        config2.delete()
+        CsiConfiguration.findByLabel(config2.label).delete()
 
         when:
         params.label = config1.label
@@ -120,7 +120,7 @@ class CsiConfigurationControllerTests extends Specification{
         thrown(IllegalStateException)
     }
 
-    void "test validateDelition if all correct" () {
+    void "test validateDelition if all correct"() {
         when:
         controller.validateDeletion()
         def jsonResponse = response.json
@@ -129,9 +129,9 @@ class CsiConfigurationControllerTests extends Specification{
         jsonResponse.errorMessages.isEmpty()
     }
 
-    void "test validateDelition if only one csiConfiguration is left" () {
+    void "test validateDeletion if only one csiConfiguration is left"() {
         given:
-        config2.delete()
+        CsiConfiguration.findByLabel(config2.label).delete()
 
         when:
         controller.validateDeletion()

@@ -36,6 +36,7 @@ import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.junit.Before
@@ -80,7 +81,7 @@ class CsiDashboardControllerTests {
         }
 
         // Enable constraint tests:
-        mockForConstraintsTests(CsiDashboardShowAllCommand.class);
+//        mockForConstraintsTests(CsiDashboardShowAllCommand.class);
 
         // The controller under test:
         controllerUnderTest = controller
@@ -107,10 +108,10 @@ class CsiDashboardControllerTests {
         this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
         controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
 
-        def configMock = mockFor(ConfigService, true)
+        def configMock = new MockFor(ConfigService, true)
         configMock.demand.getInitialChartHeightInPixels(0..100000) { -> return 400 }
         configMock.demand.getInitialChartWidthInPixels(0..100000) { -> return 1000 }
-        configServiceMock = configMock.createMock()
+        configServiceMock = configMock.proxyInstance()
         controllerUnderTest.configService = this.configServiceMock
 
 

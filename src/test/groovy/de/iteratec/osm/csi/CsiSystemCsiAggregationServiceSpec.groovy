@@ -37,6 +37,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Shared
@@ -272,7 +273,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
      * Mocks methods of {@link WeightingService}.
      */
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = mockFor(WeightingService, true)
+        def weightingService = new MockFor(WeightingService, true)
         weightingService.demand.getWeightedCsiValues(1..10000) {
             List<CsiValue> csiValues, CsiSystem csiSystem ->
                 return toReturnFromGetWeightedCsiValues
@@ -281,14 +282,14 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
             List<CsiValue> csiValues, CsiSystem csiSystem ->
                 return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        serviceUnderTest.weightingService = weightingService.createMock()
+        serviceUnderTest.weightingService = weightingService.proxyInstance()
     }
 
     /**
      * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
     private void mockCsiAggregationUpdateEventDaoService() {
-        def csiAggregationUpdateEventDaoService = mockFor(CsiAggregationUpdateEventDaoService, true)
+        def csiAggregationUpdateEventDaoService = new MockFor(CsiAggregationUpdateEventDaoService, true)
         csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
             Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 
@@ -299,7 +300,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 ).save(failOnError: true)
 
         }
-        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.createMock()
+        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
     }
 
     private mocksCommonForAllTests(CsiSystemCsiAggregationService serviceUnderTest) {

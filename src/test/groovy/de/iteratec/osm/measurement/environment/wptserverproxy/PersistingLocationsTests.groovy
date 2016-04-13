@@ -31,6 +31,7 @@ import de.iteratec.osm.measurement.schedule.*
 import de.iteratec.osm.result.*
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
 import org.junit.After
 import org.junit.Before
@@ -207,7 +208,7 @@ class PersistingLocationsTests {
 	// mocks ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private void mockBrowserService(){
-		def browserService = mockFor(BrowserService, true)
+		def browserService = new MockFor(BrowserService, true)
 		browserService.demand.findByNameOrAlias(0..100) { String nameOrAlias ->
 			//not the concern of this test
 			if(nameOrAlias.startsWith("IE"))
@@ -220,7 +221,7 @@ class PersistingLocationsTests {
 				return Browser.findByName(Browser.UNDEFINED);
 			}
 		}
-		serviceUnderTest.browserService = browserService.createMock()
+		serviceUnderTest.browserService = browserService.proxyInstance()
 	}
 
 	// create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

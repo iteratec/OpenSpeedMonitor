@@ -20,7 +20,7 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.*
-
+import groovy.mock.interceptor.MockFor
 import org.apache.commons.lang.time.DateUtils
 import org.junit.Before
 import org.junit.Test
@@ -505,7 +505,7 @@ class ResultCsiAggregationServiceTests {
 	 * 				{@link CsiAggregation}s to return from mocked method getMvs().
 	 */
 	private void mockCsiAggregationDaoService(List<CsiAggregation> toReturn){
-		def csiAggregationDaoServiceMock = mockFor(CsiAggregationDaoService, true)
+		def csiAggregationDaoServiceMock = new MockFor(CsiAggregationDaoService, true)
 		csiAggregationDaoServiceMock.demand.getMvs(1..10000) {
 			Date fromDate,
 			Date toDate,
@@ -514,7 +514,7 @@ class ResultCsiAggregationServiceTests {
 			AggregatorType aggregator ->
 			return toReturn
 		}
-		serviceUnderTest.csiAggregationDaoService = csiAggregationDaoServiceMock.createMock()
+		serviceUnderTest.csiAggregationDaoService = csiAggregationDaoServiceMock.proxyInstance()
 	}
 	
 }

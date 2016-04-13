@@ -35,6 +35,7 @@ import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.junit.Before
 
@@ -795,7 +796,7 @@ class WeightingServiceTests {
      * Mocks used methods of {@link CustomerSatisfactionWeightService}.
      */
     private void mockCustomerSatisfactionWeightService() {
-        def customerSatisfactionWeightService = mockFor(CustomerSatisfactionWeightService, true)
+        def customerSatisfactionWeightService = new MockFor(CustomerSatisfactionWeightService, true)
         customerSatisfactionWeightService.demand.getHoursOfDay(0..10000) { ->
             Map<Integer, Double> hoursofday = [
                     0 : 2.9d,
@@ -825,14 +826,14 @@ class WeightingServiceTests {
             ]
             return hoursofday
         }
-        serviceUnderTest.customerSatisfactionWeightService = customerSatisfactionWeightService.createMock();
+        serviceUnderTest.customerSatisfactionWeightService = customerSatisfactionWeightService.proxyInstance();
     }
 
     /**
      * Mocks used methods of {@link de.iteratec.osm.result.CsiAggregationTagService}.
      */
     private void mockCsiAggregationTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
-        def csiAggregationTagService = mockFor(CsiAggregationTagService, true)
+        def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
         csiAggregationTagService.demand.findBrowserOfHourlyEventTag(0..10000) { String hourlyEventMvTag ->
             Browser browser
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
@@ -874,6 +875,6 @@ class WeightingServiceTests {
                 return 1
             }
         }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.createMock();
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance();
     }
 }
