@@ -267,3 +267,7 @@ function initIntervalSelect() {
 		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
 	});
 }
+function updateSelectedInterval(selectedInterval) {
+    $('#selectedIntervalHtmlId').val(selectedInterval);
+    setCollapseDateInfos();
+}

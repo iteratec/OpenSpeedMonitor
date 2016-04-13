@@ -239,3 +239,14 @@ var setManualToHourCheckbox = function(lastManualToHourSelection){
 	$('#setToHour').attr('checked', stringUtils.stringToBoolean(lastManualToHourSelection));
 	$('#fldset-enddate-hour :input').attr("disabled", !stringUtils.stringToBoolean(lastManualToHourSelection));
 };
+
+function updateDateTimePicker(from, to, fromHour, toHour, timeFrameInterval) {
+	var fromToSet = new Date(from);
+	var toToSet = new Date(to);
+	setFrom(getDateAs_ddMMyyyy(fromToSet));
+	setTo(getDateAs_ddMMyyyy(toToSet));
+	setFromHour(fromHour);
+	setToHour(toHour);
+	$('#timeframeSelect').val(timeFrameInterval);
+}
+

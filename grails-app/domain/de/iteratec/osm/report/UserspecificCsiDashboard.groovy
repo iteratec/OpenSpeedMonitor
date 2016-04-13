@@ -18,60 +18,12 @@
 package de.iteratec.osm.report
 
 import de.iteratec.osm.csi.CsiDashboardShowAllCommand
-import grails.plugin.springsecurity.SpringSecurityUtils
-
-import java.text.SimpleDateFormat
 
 /**
  * UserspecificCsiDashboard
  * A domain class describes the data object and it's mapping to the database
  */
-class UserspecificCsiDashboard {
-
-    def springSecurityService
-    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
-    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
-
-    /**
-     * if dashboard is visible to all or just to admins and to user that created it
-     */
-    Boolean publiclyVisible
-
-    /**
-     * name of dashboard
-     */
-    String dashboardName
-
-    /**
-     * name of user that created it
-     */
-    String username
-
-    //from csi start
-
-    /**
-     * The selected start date (inclusive).
-     *
-     */
-    Date fromDate
-
-    /**
-     * The selected end date (inclusive).
-     *
-     */
-    Date toDate
-
-    /**
-     * The selected start hour of date.
-     *
-     */
-    String fromHour
-
-    /**
-     * The selected end hour of date.
-     *
-     */
-    String toHour
+class UserspecificCsiDashboard extends UserspecificDashboardBase{
 
     /**
      * The name of the {@link de.iteratec.osm.report.chart.AggregatorType}.
@@ -84,184 +36,28 @@ class UserspecificCsiDashboard {
     String aggrGroup
 
     /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
-     * which are the systems measured for a CSI value
-     *
-     */
-    String selectedFolder = ""
-
-    /**
-     * which results to be shown.
-     */
-    String selectedPages = ""
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
-     * measured events} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllMeasuredEvents} is evaluated to
-     * <code>false</code>.
-     */
-    String selectedMeasuredEventIds = ""
-
-    /**
-     * User enforced the selection of all measured events.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedMeasuredEventIds} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedMeasuredEventIds} should be ignored.
-     */
-    Boolean selectedAllMeasuredEvents
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Browser
-     * browsers} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllBrowsers} is evaluated to
-     * <code>false</code>.
-     */
-    String selectedBrowsers = ""
-
-    /**
-     * User enforced the selection of all browsers.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedBrowsers} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedBrowsers} should be ignored.
-     */
-    Boolean selectedAllBrowsers
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Location
-     * locations} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllLocations} is evaluated to
-     * <code>false</code>.
-     */
-    String selectedLocations = ""
-
-    /**
-     * User enforced the selection of all locations.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedLocations} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedLocations} should be ignored.
-     */
-    Boolean selectedAllLocations
-
-    /**
-     * If the user has been warned about a potentially long processing
-     * time, did he overwrite the waring and really want to perform
-     * the request?
-     *
-     * A value of <code>true</code> indicates that overwrite, everything
-     * should be done as requested, <code>false</code> indicates that
-     * the user hasn't been warned before, so there is no overwrite.
-     */
-    Boolean overwriteWarningAboutLongProcessingTime = true
-
-    /**
-     * Flag for manual debugging.
-     * Used for debugging highcharts-export-server, e.g.
-     */
-    Boolean debug
-
-    /**
-     * A predefined time frame.
-     */
-    int selectedTimeFrameInterval = 259200
-
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setFromHour
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setToHour
-
-    /**
      * Whether or not current and not yet finished intervals should be loaded and displayed
      */
     Boolean includeInterval
-
-    /**
-     */
-    String selectedAggrGroupValuesCached = ""
-
-    /**
-     */
-    String selectedAggrGroupValuesUnCached = ""
 
     /**
      * The selected csiSystem Ids
      */
     String selectedCsiSystems = ""
 
-    //#####Chart Adjustments#####
-    String chartTitle
-    int chartWidth
-    int chartHeight
-    int loadTimeMinimum
-
-    // If map is not specified, it acts as a string/string mapping (gorm default)
-    Map graphNameAliases = [:]
-    Map graphColors = [:]
-
-    /**
-     * The maximum load time could be set to 'auto', so we handle it as a string
-     */
-    String loadTimeMaximum
-    boolean showDataMarkers
-    boolean showDataLabels
-
     boolean csiTypeDocComplete
     boolean csiTypeVisuallyComplete
-
-    /**
-     * toggle formatting rickshaw export to wide screen format
-     */
-    Boolean wideScreenDiagramMontage = false
 
     static mapping = {
     }
 
     static constraints = {
-        dashboardName(nullable: false, unique: true)
-        username(nullable: false)
-        publiclyVisible(nullable: true)
-        fromDate(nullable: true)
-        toDate(nullable: true)
-        fromHour(nullable: true)
-        toHour(nullable: true)
         aggrGroup(nullable: true)
-        selectedFolder(nullable: true)
-        selectedPages(nullable: true)
-        selectedMeasuredEventIds(nullable: true)
-        selectedBrowsers(nullable: true)
-        selectedLocations(nullable: true)
-        overwriteWarningAboutLongProcessingTime(nullable: true)
-        selectedAggrGroupValuesCached(nullable: true)
-        selectedAllMeasuredEvents(nullable: true)
-        selectedAllBrowsers(nullable: true)
-        selectedAllLocations(nullable: true)
-        debug(nullable: true)
-        selectedTimeFrameInterval(nullable: true)
-        setFromHour(nullable: true)
-        setToHour(nullable: true)
         includeInterval(nullable: true)
-        selectedAggrGroupValuesUnCached(nullable: true)
-        wideScreenDiagramMontage(nullable: true)
         selectedCsiSystems(nullable: true)
     }
 
-    UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, String publiclyVisible,
+    UserspecificCsiDashboard(CsiDashboardShowAllCommand cmd, Boolean publiclyVisible,
                              String wideScreenDiagramMontage, String dashboardName, String username) {
         this.publiclyVisible = publiclyVisible
         this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
@@ -324,49 +120,5 @@ class UserspecificCsiDashboard {
         showDataLabels = cmd.showDataLabels
         csiTypeDocComplete = cmd.csiTypeDocComplete
         csiTypeVisuallyComplete = cmd.csiTypeVisuallyComplete
-    }
-
-    /**
-     * Checks if the currentUser is admin or creator of the given dashboard
-     * @param dashboardId the dashboard to check
-     * @return true if currentUser is admin or creator, false otherwise
-     */
-    boolean isCurrentUserDashboardOwner(String dashboardId) {
-        if (SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN")) {
-            return true
-        } else {
-            // get owner name
-            UserspecificCsiDashboard currentBoard = UserspecificCsiDashboard.get(dashboardId)
-            if (!currentBoard) {
-                return false
-            }
-            String boardCreator = currentBoard.username
-            String currentUser = ""
-            if (springSecurityService.isLoggedIn()) {
-                currentUser = springSecurityService.authentication.principal.getUsername()
-            }
-            if (currentUser == boardCreator) {
-                return true
-            } else {
-                return false
-            }
-        }
-    }
-
-    def getListOfAvailableDashboards() {
-        List result = []
-        List<UserspecificCsiDashboard> fullList = []
-        fullList = UserspecificCsiDashboard.findAll().sort {it.dashboardName}
-
-        String currentUser = ""
-        if (springSecurityService.isLoggedIn()) {
-            currentUser = springSecurityService.authentication.principal.getUsername()
-        }
-        for (board in fullList) {
-            if ((board.publiclyVisible) || (board.username == currentUser)) {
-                result.add([dashboardName: board.dashboardName, dashboardID: board.id])
-            }
-        }
-        return result
     }
 }

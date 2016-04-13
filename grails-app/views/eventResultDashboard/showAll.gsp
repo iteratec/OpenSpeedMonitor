@@ -1,9 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
-<%
-    def userspecificEventResultDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificEventResultDashboard').newInstance()
-%>
+<g:set var="userspecificDashboardService" bean="userspecificDashboardService"/>
 <html>
 <head>
     <meta name="layout" content="kickstart_osm"/>
@@ -30,10 +28,11 @@
                 </a>
                 <ul class="dropdown-menu" id="customDashBoardSelection">
                     <g:set var="availableDashboards"
-                           value="${userspecificEventResultDashboardService.getListOfAvailableDashboards()}"/>
+                           value="${userspecificDashboardService.getListOfAvailableEventResultDashboards()}"/>
                     <g:if test="${availableDashboards.size() > 0}">
                         <g:each in="${availableDashboards}" var="availableDashboard">
-                            <li><g:link action="showAll" params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
+                            <li><g:link action="showAll"
+                                        params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                         </g:each>
                     </g:if>
                     <g:else>
@@ -50,7 +49,8 @@
         </div>
     </div>
 </div>
-<br />
+<br/>
+
 <div class="row">
     <div class="span12">
         <g:if test="${command}">
@@ -367,9 +367,10 @@
                                         </sec:ifAnyGranted>
                                     </sec:ifLoggedIn>
                                     <g:if test="${params.dashboardID}">
-                                        <g:if test="${userspecificEventResultDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                                             <a href="#" role="button" class="btn btn-primary"
-                                               style="margin-top: 16px;" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
+                                               style="margin-top: 16px;"
+                                               onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                                             <g:render template="/_common/modals/deleteCustomDashboard"/>
 
                                         </g:if>
@@ -462,20 +463,20 @@
 
         var pagesToEvents = [];
         <g:each var="page" in="${pages}">
-            <g:if test="${eventsOfPages[page.id] != null}">
-                pagesToEvents[${page.id}]= [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
-            </g:if>
+        <g:if test="${eventsOfPages[page.id] != null}">
+        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
+        </g:if>
         </g:each>
 
         var browserToLocation = [];
         <g:each var="browser" in="${browsers}">
-            <g:if test="${locationsOfBrowsers[browser.id] != null}">
-                browserToLocation[${browser.id}]=[ <g:each var="location"
-                                                           in="${locationsOfBrowsers[browser.id]}">${location},</g:each> ];
-            </g:if>
+        <g:if test="${locationsOfBrowsers[browser.id] != null}">
+        browserToLocation[${browser.id}] = [<g:each var="location"
+                                                           in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
+        </g:if>
         </g:each>
 
-        function setAdjustments(){
+        function setAdjustments() {
             var chartTitle = "${chartTitle}";
             var chartWidth = "${chartWidth}";
             var chartHeight = "${chartHeight}";
@@ -484,9 +485,10 @@
             var showDataMarkers = "${showDataMarkers}";
             var showDataLabels = "${showDataLabels}";
             var optimizeForWideScreen = "${showDataLabels}"
-            var graphNameAliases = ${graphNameAliases}
+            var graphNameAliases =
+            ${graphNameAliases}
             var graphColors = ${graphColors}
-            $("#dia-title").val(chartTitle);
+                    $("#dia-title").val(chartTitle);
             $("#dia-width").val(chartWidth);
             $("#dia-height").val(chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
@@ -494,33 +496,38 @@
             initGraphNameAliases(graphNameAliases);
             initGraphColors(graphColors);
 
-            if(eval(showDataMarkers)){
+            if (eval(showDataMarkers)) {
                 $("#to-enable-marker").click();
             }
-            if(eval(showDataLabels)){
+            if (eval(showDataLabels)) {
                 $("#to-enable-label").click();
             }
         }
 
-        $(document).ready(function(){
+        $(document).ready(function () {
 
             initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
 
             doOnDomReady(
-                '${dateFormat}',
-        ${weekStart},
+                    '${dateFormat}',
+                    ${weekStart},
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
-                );
+            );
 
-                if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
-                    $("#dia-save-chart-as-png").removeClass("btn-primary");
-                    $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
-                    $("#dia-save-chart-as-png").attr( "disabled", "disabled" );
-                    $("#dia-save-chart-as-png").attr( "title", "<g:message
-            code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>" );
-                }
+            <g:if test="${dashboardName}">
+                updateDateTimePicker(${from.getTime()}, ${to.getTime()}, '${fromHour}', '${toHour}', ${selectedTimeFrameInterval});
+                updateSelectedInterval(${selectedInterval});
+            </g:if>
+
+            if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
+                $("#dia-save-chart-as-png").removeClass("btn-primary");
+                $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
+                $("#dia-save-chart-as-png").attr("disabled", "disabled");
+                $("#dia-save-chart-as-png").attr("title", "<g:message
+            code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>");
+            }
             setAdjustments();
-            });
+        });
 
     </asset:script>
 </content>

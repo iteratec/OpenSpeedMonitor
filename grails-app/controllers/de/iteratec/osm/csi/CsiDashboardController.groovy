@@ -31,6 +31,7 @@ import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
+import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
@@ -242,9 +243,15 @@ class CsiDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(CsiDashboardShowAllCommand cmd) {
+        boolean requestedAllowedDashboard = true;
 
         if (params.dashboardID) {
-            fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+            if (!isUserAllowedToViewDashboard(params.dashboardID)) {
+                flash.message = i18nService.msg("de.iteratec.osm.userspecificDashboard.notAllowed", "not allowed", [params.dashboardID])
+                requestedAllowedDashboard = false
+            } else {
+                fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+            }
         }
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
@@ -254,7 +261,7 @@ class CsiDashboardController {
 
         cmd.copyRequestDataToViewModelMap(modelToRender)
         // Validate command for errors if there was a non-empty, non-"only-language-change" request:
-        if (!ControllerUtils.isEmptyRequest(params)) {
+        if (!ControllerUtils.isEmptyRequest(params) && requestedAllowedDashboard) {
             if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
@@ -294,7 +301,11 @@ class CsiDashboardController {
         return modelToRender
     }
 
-    /**
+    private boolean isUserAllowedToViewDashboard(String dashboardID) {
+        UserspecificDashboardBase requestedDashboard = UserspecificDashboardBase.get(dashboardID)
+        return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
+    }
+/**
      * Gets data for the showAllCommand from a saved userspecificCsiDashboard
      * @param cmd the command where the attribute gets set
      * @param dashboardID the id of the saved userspecificCsiDashboard
@@ -810,7 +821,7 @@ class CsiDashboardController {
 
         String dashboardName = dashboardValues.dashboardName
         String username = springSecurityService.authentication.principal.getUsername()
-        String publiclyVisible = dashboardValues.publiclyVisible
+        Boolean publiclyVisible = dashboardValues.publiclyVisible as Boolean
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse data for command

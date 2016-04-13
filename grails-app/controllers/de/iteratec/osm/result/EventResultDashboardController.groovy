@@ -28,6 +28,8 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.p13n.CustomDashboardService
+import de.iteratec.osm.report.UserspecificDashboardBase
+import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.UserspecificEventResultDashboard
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
@@ -36,6 +38,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
+import org.apache.xpath.operations.Bool
 import org.codehaus.groovy.grails.web.json.JSONObject
 import org.codehaus.groovy.grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -65,11 +68,12 @@ class EventResultDashboardController {
     EventResultDashboardService eventResultDashboardService
     PageService pageService
     I18nService i18nService
-    CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
     def springSecurityService
     ConfigService configService
     CustomDashboardService customDashboardService
+    UserspecificDashboardService userspecificDashboardService
+
     /**
      * The Grails engine to generate links.
      *
@@ -134,19 +138,26 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
+
+        boolean requestedAllowedDashboard = true;
+
         if (params.dashboardID) {
-            fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+            if (!isUserAllowedToViewDashboard(params.dashboardID)) {
+                flash.message = i18nService.msg("de.iteratec.osm.userspecificDashboard.notAllowed", "not allowed", [params.dashboardID])
+                requestedAllowedDashboard = false
+            } else {
+                fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+            }
         }
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
 
-        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
-        if (!ControllerUtils.isEmptyRequest(params)) {
+        if (!ControllerUtils.isEmptyRequest(params) && requestedAllowedDashboard) {
             if (!cmd.validate()) {
                 modelToRender.put('command', cmd)
             } else {
@@ -181,7 +192,11 @@ class EventResultDashboardController {
         return modelToRender
     }
 
-    /**
+    private boolean isUserAllowedToViewDashboard(String dashboardID) {
+        UserspecificDashboardBase requestedDashboard = UserspecificDashboardBase.get(dashboardID)
+        return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
+    }
+/**
      * Gets data for the showAllCommand from a saved userspecificCsiDashboard
      * @param cmd the command where the attribute gets set
      * @param dashboardID the id of the saved userspecificCsiDashboard
@@ -226,31 +241,43 @@ class EventResultDashboardController {
                     selectedLocations.add(Long.parseLong(item))
                 }
             }
+            if (dashboard.selectedConnectivityProfiles) {
+                for (item in dashboard.selectedConnectivityProfiles.tokenize(',')) {
+                    selectedConnectivityProfiles.add(Long.parseLong(item))
+                }
+            }
+            if (dashboard.selectedAggrGroupValuesCached) {
+                for (item in dashboard.selectedAggrGroupValuesCached.tokenize(',')) {
+                    selectedAggrGroupValuesCached.add(item)
+                }
+            }
+            if (dashboard.selectedAggrGroupValuesUnCached) {
+                for (item in dashboard.selectedAggrGroupValuesUnCached.tokenize(',')) {
+                    selectedAggrGroupValuesUnCached.add(item)
+                }
+            }
+
 
             selectedAllMeasuredEvents = dashboard.selectedAllMeasuredEvents
             selectedAllBrowsers = dashboard.selectedAllBrowsers
             selectedAllLocations = dashboard.selectedAllLocations
+            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles
 
             overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
             debug = dashboard.debug
 
-            selectedAggrGroupValuesCached = dashboard.selectedAggrGroupValuesCached
-            selectedAggrGroupValuesUnCached = dashboard.selectedAggrGroupValuesUnCached
-
-            trimBelowLoadTimes = dashboard.trimBelowLoadTimes
-            trimAboveLoadTimes = dashboard.trimAboveLoadTimes
-            trimBelowRequestCounts = dashboard.trimBelowRequestCounts
-            trimAboveRequestCounts = dashboard.trimAboveRequestCounts
-            trimBelowRequestSizes = dashboard.trimBelowRequestSizes
-            trimAboveRequestSizes = dashboard.trimAboveRequestSizes
+            trimBelowLoadTimes = dashboard.trimBelowLoadTimes ? Integer.parseInt(dashboard.trimBelowLoadTimes) : null
+            trimAboveLoadTimes = dashboard.trimAboveLoadTimes ? Integer.parseInt(dashboard.trimAboveLoadTimes) : null
+            trimBelowRequestCounts = dashboard.trimBelowRequestCounts ? Integer.parseInt(dashboard.trimBelowRequestCounts) : null
+            trimAboveRequestCounts = dashboard.trimAboveRequestCounts ? Integer.parseInt(dashboard.trimAboveRequestCounts) : null
+            trimBelowRequestSizes = dashboard.trimBelowRequestSizes ? Integer.parseInt(dashboard.trimBelowRequestSizes) : null
+            trimAboveRequestSizes = dashboard.trimAboveRequestSizes ? Integer.parseInt(dashboard.trimAboveRequestSizes) : null
 
             includeNativeConnectivity = dashboard.includeNativeConnectivity
-            selectedAllConnectivityProfiles = dashboard.selectedAllConnectivityProfiles
             customConnectivityName = dashboard.customConnectivityName
-            selectedConnectivityProfiles = dashboard.selectedConnectivityProfiles
             includeCustomConnectivity = dashboard.includeCustomConnectivity
 
-            chartTitle  = dashboard.chartTitle
+            chartTitle = dashboard.chartTitle
             chartWidth = dashboard.chartWidth
             chartHeight = dashboard.chartHeight
             loadTimeMinimum = dashboard.loadTimeMinimum
@@ -260,13 +287,13 @@ class EventResultDashboardController {
             wideScreenDiagramMontage = dashboard.wideScreenDiagramMontage
 
             if (dashboard.graphNameAliases.size() > 0) {
-                                graphNameAliases = dashboard.graphNameAliases
-                            }
-                        if (dashboard.graphColors.size() > 0) {
-                                graphColors = dashboard.graphColors
-                            }
+                graphNameAliases = dashboard.graphNameAliases
+            }
+            if (dashboard.graphColors.size() > 0) {
+                graphColors = dashboard.graphColors
+            }
             dashboardName = dashboard.dashboardName
-            publivlyVisible = dashboard.publiclyVisible
+            publiclyVisible = dashboard.publiclyVisible
         }
     }
 
@@ -275,7 +302,7 @@ class EventResultDashboardController {
      * Ajax service to validate and store custom dashboard settings.
      * Note: It will overwrite existing dashboards with same name!
      * </p>
-     * k
+     *
      * @param values
      *         The dashboard settings, JSON encoded;
      *         not <code>null</code>.
@@ -286,7 +313,7 @@ class EventResultDashboardController {
 
         String dashboardName = dashboardValues.dashboardName
         String username = springSecurityService.authentication.principal.getUsername()
-        String publiclyVisible = dashboardValues.publiclyVisible
+        Boolean publiclyVisible = dashboardValues.publiclyVisible as Boolean
         String wideScreenDiagramMontage = dashboardValues.wideScreenDiagramMontage
 
         // Parse JSON Data for Command

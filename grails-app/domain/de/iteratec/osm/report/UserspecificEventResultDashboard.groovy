@@ -17,171 +17,13 @@
 
 package de.iteratec.osm.report
 
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.result.EventResultDashboardShowAllCommand
-import grails.plugin.springsecurity.SpringSecurityUtils
-import org.codehaus.groovy.grails.web.json.JSONObject
-
-import java.text.SimpleDateFormat
 
 /**
  * UserspecificEventResultDashboard
  * A domain class describes the data object and it's mapping to the database
  */
-class UserspecificEventResultDashboard {
-
-    def springSecurityService
-    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
-    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
-
-    /**
-     * if dashboard is visible to all or just to admins and to user that created it
-     */
-    Boolean publiclyVisible
-
-    /**
-     * name of dashboard
-     */
-    String dashboardName
-
-    /**
-     * name of user that created it
-     */
-    String username
-
-    //from csi start
-
-    /**
-     * The selected start date (inclusive).
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    Date fromDate
-
-    /**
-     * The selected end date (inclusive).
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    Date toDate
-
-    /**
-     * The selected start hour of date.
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    String fromHour
-
-    /**
-     * The selected end hour of date.
-     *
-     * Please use {@link #getSelectedTimeFrame()}.
-     */
-    String toHour
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
-     * which are the systems measured for a CSI value
-     *
-     */
-    String selectedFolder = ""
-
-    /**
-     * The database IDs of the selected {@linkplain Page pages}
-     * which results to be shown.
-     */
-    String selectedPages = ""
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.result.MeasuredEvent
-     * measured events} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllMeasuredEvents} is evaluated to
-     * <code>false</code>.
-     */
-    String selectedMeasuredEventIds = ""
-
-    /**
-     * User enforced the selection of all measured events.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedMeasuredEventIds} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedMeasuredEventIds} should be ignored.
-     */
-    Boolean selectedAllMeasuredEvents
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Browser
-     * browsers} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllBrowsers} is evaluated to
-     * <code>false</code>.
-     */
-    String selectedBrowsers = ""
-
-    /**
-     * User enforced the selection of all browsers.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedBrowsers} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedBrowsers} should be ignored.
-     */
-    Boolean selectedAllBrowsers
-
-    /**
-     * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.environment.Location
-     * locations} which results to be shown.
-     *
-     * These selections are only relevant if
-     * {@link #selectedAllLocations} is evaluated to
-     * <code>false</code>.
-     */
-    String selectedLocations = ""
-
-    /**
-     * User enforced the selection of all locations.
-     * This selection <em>is not</em> reflected in
-     * {@link #selectedLocations} cause of URL length
-     * restrictions. If this flag is evaluated to
-     * <code>true</code>, the selections in
-     * {@link #selectedLocations} should be ignored.
-     */
-    Boolean selectedAllLocations
-
-    /**
-     * If the user has been warned about a potentially long processing
-     * time, did he overwrite the waring and really want to perform
-     * the request?
-     *
-     * A value of <code>true</code> indicates that overwrite, everything
-     * should be done as requested, <code>false</code> indicates that
-     * the user hasn't been warned before, so there is no overwrite.
-     */
-    Boolean overwriteWarningAboutLongProcessingTime = true
-
-    /**
-     * Flag for manual debugging.
-     * Used for debugging highcharts-export-server, e.g.
-     */
-    Boolean debug
-
-    /**
-     * A predefined time frame.
-     */
-    int selectedTimeFrameInterval = 259200
-
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setFromHour
-    /**
-     * Whether or not the time of the start-date should be selected manually.
-     */
-    Boolean setToHour
+class UserspecificEventResultDashboard extends UserspecificDashboardBase{
 
     /**
      * The time of the {@link CsiAggregationInterval}.
@@ -230,28 +72,6 @@ class UserspecificEventResultDashboard {
      */
     Integer trimAboveRequestSizes
 
-    //#####Chart Adjustments#####
-    String chartTitle
-    int chartWidth
-    int chartHeight
-    int loadTimeMinimum
-
-    // If map is not specified, it acts as a string/string mapping (gorm default)
-    Map graphNameAliases = [:]
-    Map graphColors = [:]
-
-    /**
-     * The maximum load time could be set to 'auto', so we handle it as a string
-     */
-    String loadTimeMaximum
-    boolean showDataMarkers
-    boolean showDataLabels
-
-    /**
-     * toggle formatting rickshaw export to wide screen format
-     */
-    Boolean wideScreenDiagramMontage = false
-    //###########################
 
     Boolean includeNativeConnectivity
     Boolean selectedAllConnectivityProfiles
@@ -262,29 +82,8 @@ class UserspecificEventResultDashboard {
     static mapping = {
     }
 
-    //csi
     static constraints = {
-        dashboardName(nullable: true, unique: true)
-        username(nullable: true)
-        publiclyVisible(nullable: true)
-        fromDate(nullable: true)
-        toDate(nullable: true)
-        fromHour(nullable: true)
-        toHour(nullable: true)
-        selectedFolder(nullable: true)
-        selectedPages(nullable: true)
-        selectedMeasuredEventIds(nullable: true)
-        selectedBrowsers(nullable: true)
-        selectedLocations(nullable: true)
-        overwriteWarningAboutLongProcessingTime(nullable: true)
         selectedAggrGroupValuesCached(nullable: true)
-        selectedAllMeasuredEvents(nullable: true)
-        selectedAllBrowsers(nullable: true)
-        selectedAllLocations(nullable: true)
-        debug(nullable: true)
-        selectedTimeFrameInterval(nullable: true)
-        setFromHour(nullable: true)
-        setToHour(nullable: true)
         selectedInterval(nullable: true)
         selectedAggrGroupValuesUnCached(nullable: true)
         trimBelowLoadTimes(nullable: true)
@@ -293,14 +92,11 @@ class UserspecificEventResultDashboard {
         trimAboveRequestCounts(nullable: true)
         trimBelowRequestSizes(nullable: true)
         trimAboveRequestSizes(nullable: true)
-        wideScreenDiagramMontage(nullable: true)
         includeNativeConnectivity(nullable: true)
         selectedAllConnectivityProfiles(nullable: true)
         customConnectivityName(nullable: true)
         selectedConnectivityProfiles(nullable: true)
         includeCustomConnectivity(nullable: true)
-        chartTitle(nullable: true)
-        loadTimeMaximum(nullable: true)
     }
 
     /**
@@ -311,7 +107,7 @@ class UserspecificEventResultDashboard {
      * @param wideScreenDiagramMontage true if there should be optimisation for wideScreen
      * @param username the creator of the dashboard
      */
-    UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage, String username) {
+    UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, Boolean publiclyVisible, String wideScreenDiagramMontage, String username) {
 
         this.dashboardName = dashboardName
         this.publiclyVisible = publiclyVisible
@@ -389,50 +185,5 @@ class UserspecificEventResultDashboard {
         selectedAggrGroupValuesCached = selectedAggrGroupValuesCachedString
         selectedAggrGroupValuesUnCached = selectedAggrGroupValuesUnCachedString
         selectedConnectivityProfiles = selectedConnectivityProfilesString
-    }
-
-    /**
-     * Checks if the currentUser is admin or creator of the given dashboard
-     * @param dashboardId the dashboard to check
-     * @return true if currentUser is admin or creator, false otherwise
-     */
-    boolean isCurrentUserDashboardOwner(String dashboardId) {
-        if (SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN")) {
-            return true
-        } else {
-            // get owner name
-            UserspecificEventResultDashboard currentBoard = UserspecificEventResultDashboard.get(dashboardId)
-            if (!currentBoard) {
-                return false
-            }
-            String boardCreator = currentBoard.username
-            String currentUser = ""
-            if (springSecurityService.isLoggedIn()) {
-                currentUser = springSecurityService.authentication.principal.getUsername()
-            }
-            if (currentUser == boardCreator) {
-                return true
-            } else {
-                return false
-            }
-        }
-    }
-
-
-    def getListOfAvailableDashboards() {
-        List result = []
-        List<UserspecificEventResultDashboard> fullList = []
-        fullList = UserspecificEventResultDashboard.findAll().sort{it.dashboardName}
-
-        String currentUser = ""
-        if (springSecurityService.isLoggedIn()) {
-            currentUser = springSecurityService.authentication.principal.getUsername()
-        }
-        for (board in fullList) {
-            if ((board.publiclyVisible) || (board.username == currentUser)) {
-                result.add([dashboardName: board.dashboardName, dashboardID: board.id])
-            }
-        }
-        return result
     }
 }

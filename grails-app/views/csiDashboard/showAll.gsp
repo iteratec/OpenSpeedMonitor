@@ -4,9 +4,7 @@
 <%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificCsiDashboard" %>
-<%
-    def userspecificCSIDashboardService = grailsApplication.classLoader.loadClass('de.iteratec.osm.report.UserspecificCsiDashboard').newInstance()
-%>
+<g:set var="userspecificDashboardService" bean="userspecificDashboardService"/>
 <html>
 <head>
     <meta name="layout" content="kickstart_osm"/>
@@ -66,11 +64,12 @@
             <ul class="dropdown-menu">
 
                 <g:set var="availableDashboards"
-                       value="${userspecificCSIDashboardService.getListOfAvailableDashboards()}"/>
+                       value="${userspecificDashboardService.getListOfAvailableCsiDashboards()}"/>
 
                 <g:if test="${availableDashboards.size() > 0}">
                     <g:each in="${availableDashboards}" var="availableDashboard">
-                        <li><g:link action="showAll" params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
+                        <li><g:link action="showAll"
+                                    params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
                     </g:each>
                 </g:if>
                 <g:else>
@@ -259,9 +258,10 @@
                         </sec:ifAnyGranted>
                     </sec:ifLoggedIn>
                     <g:if test="${params.dashboardID}">
-                        <g:if test="${userspecificCSIDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
                             <a href="#" role="button" class="btn btn-primary"
-                               style="margin-top: 16px;" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
+                               style="margin-top: 16px;"
+                               onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                             <g:render template="/_common/modals/deleteCustomDashboard"/>
                         </g:if>
                     </g:if>
@@ -405,22 +405,22 @@
 
         var pagesToEvents = [];
         <g:each var="page" in="${pages}">
-            <g:if test="${eventsOfPages[page.id] != null}">
-                pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event},</g:each>];
-            </g:if>
+        <g:if test="${eventsOfPages[page.id] != null}">
+        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
+        </g:if>
         </g:each>
 
         var browserToLocation = [];
         <g:each var="browser" in="${browsers}">
-            <g:if test="${locationsOfBrowsers[browser.id] != null}">
-                browserToLocation[${browser.id}] = [<g:each var="location"
-                                                            in="${locationsOfBrowsers[browser.id]}">${location},</g:each>];
-            </g:if>
+        <g:if test="${locationsOfBrowsers[browser.id] != null}">
+        browserToLocation[${browser.id}] = [<g:each var="location"
+                                                            in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
+        </g:if>
         </g:each>
 
         var selectedCsiSystems = [];
         <g:each var="csiSystem" in="${selectedCsiSystems}">
-            selectedCsiSystems.push(${csiSystem});
+        selectedCsiSystems.push(${csiSystem});
         </g:each>
 
         function setAdjustments() {
@@ -455,9 +455,14 @@
 
             doOnDomReady(
                     'dd.mm.yyyy',
-        ${weekStart},
+                    ${weekStart},
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             )
+
+            <g:if test="${dashboardName}">
+                updateDateTimePicker(${from.getTime()}, ${to.getTime()}, '${fromHour}', '${toHour}', ${selectedTimeFrameInterval});
+            </g:if>
+
             if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
                 $("#dia-save-chart-as-png").removeClass("btn-primary");
                 $("#dia-save-chart-as-png").addClass("btn-primary.disabled");
