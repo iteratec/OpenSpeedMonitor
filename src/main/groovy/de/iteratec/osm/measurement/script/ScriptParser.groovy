@@ -18,9 +18,10 @@
 package de.iteratec.osm.measurement.script
 
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
+import org.slf4j.LoggerFactory
+import ch.qos.logback.classic.Logger
 
 /**
  * Represents a one-line statement in a script
@@ -109,7 +110,9 @@ class ScriptParser {
 	final static String logDataCmd = 'logData'  
 	final static String setEventNameCmd = 'setEventName'  
 	final static String navigateCmd = 'navigate'  
-	final static String execAndWaitCmd = 'execAndWait'  
+	final static String execAndWaitCmd = 'execAndWait'
+    static Logger log = LoggerFactory.getLogger(ScriptParser.class)
+
 	/**
 	 * This pattern matches one line and ignores any leading and trailing whitespace.
 	 * After any leading whitespace, a string of alphanumeric characters is expected (the keyword)
