@@ -227,16 +227,7 @@ databaseChangeLog = {
 			}
 		}
 	}
-
-
-	changeSet(author: "marcus (generated)", id: "1460099558388-6") {
-		dropIndex(indexName: "dashboard_name", tableName: "userspecific_csi_dashboard")
-	}
-
-	changeSet(author: "marcus (generated)", id: "1460099558388-7") {
-		dropIndex(indexName: "dashboard_name", tableName: "userspecific_event_result_dashboard")
-	}
-
+	
 	changeSet(author: "marcus (generated)", id: "1460099558388-9") {
 		dropTable(tableName: "userspecific_csi_dashboard")
 	}
