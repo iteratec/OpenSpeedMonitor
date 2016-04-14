@@ -34,5 +34,10 @@ class HourlyReportsJobSpec extends Specification {
     }
 
     void "test something"() {
+        //TODO implement me, IT-1039
+        when:
+        true
+        then:
+        true
     }
 }
