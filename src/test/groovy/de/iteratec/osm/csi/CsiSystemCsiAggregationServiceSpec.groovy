@@ -49,7 +49,7 @@ import spock.lang.Specification
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiSystemCsiAggregationService)
 @Mock([MeanCalcService, CsiAggregation, CsiAggregationInterval, AggregatorType, Browser, JobGroup,
-        Page, CsiAggregationUpdateEvent, CsiSystem, Job, ConnectivityProfile, JobResult,EventResult, WebPageTestServer,
+        Page, CsiAggregationUpdateEvent, CsiSystem, Job, ConnectivityProfile, JobResult, EventResult, WebPageTestServer,
         Location, Script, MeasuredEvent, JobGroupWeight, CsiConfiguration, PageWeight, TimeToCsMapping, CsiDay])
 class CsiSystemCsiAggregationServiceSpec extends Specification {
 
@@ -226,7 +226,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //mocking inner services
-        mockWeightingService([],[])
+        mockWeightingService([], [])
 
         when:
         List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculateCsiSystemCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [csiSystem2])
@@ -252,7 +252,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         when:
         List<CsiAggregationUpdateEvent> beforeEventList = CsiAggregationUpdateEvent.findAll()
         List<CsiAggregation> beforeList = CsiAggregation.findAll()
-        serviceUnderTest.markCaAsOutdated(startDate,eventResult,weeklyInterval)
+        serviceUnderTest.markCaAsOutdated(startDate, eventResult, weeklyInterval)
         List<CsiAggregation> afterList = CsiAggregation.findAll()
 
         List<CsiAggregationUpdateEvent> afterEventList = CsiAggregationUpdateEvent.findAll()
@@ -362,11 +362,13 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     }
 
     private void createEventResult() {
-        WebPageTestServer server= new WebPageTestServer(
-                baseUrl : 'http://server1.wpt.server.de',
-                active : true,
-                label : 'server 1 - wpt server',
-                proxyIdentifier : 'server 1 - wpt server'
+        WebPageTestServer server = new WebPageTestServer(
+                baseUrl: 'http://server1.wpt.server.de',
+                active: true,
+                label: 'server 1 - wpt server',
+                proxyIdentifier: 'server 1 - wpt server',
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
         Location ffAgent1 = new Location(
                 active: true,
@@ -374,10 +376,12 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 location: 'physNetLabAgent01-FF',
                 label: 'physNetLabAgent01 - FF up to date',
                 browser: browser,
+                dateCreated: new Date(),
+                lastUpdated: new Date(),
                 wptServer: server
         ).save(failOnError: true)
 
-        job1 = TestDataUtil.createJob("job1",TestDataUtil.createScript("script1","","auf gehts",false),ffAgent1,jobGroup1,"",1,false,20)
+        job1 = TestDataUtil.createJob("job1", TestDataUtil.createScript("script1", "", "auf gehts", false), ffAgent1, jobGroup1, "", 1, false, 20)
         conn1 = TestDataUtil.createConnectivityProfile("conn1")
 
         JobResult jobResult1 = new JobResult(
@@ -391,12 +395,12 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 frequencyInMin: 5,
                 locationLocation: job1.location.location,
                 locationBrowser: job1.location.browser.name,
-                httpStatusCode : 200,
+                httpStatusCode: 200,
         ).save(failOnError: true)
 
-        page1 = TestDataUtil.createPage("page1",0.0)
+        page1 = TestDataUtil.createPage("page1", 0.0)
 
-        MeasuredEvent measuredEvent = TestDataUtil.createMeasuredEvent("meEvent1",page1)
+        MeasuredEvent measuredEvent = TestDataUtil.createMeasuredEvent("meEvent1", page1)
 
         eventResult = new EventResult(
                 numberOfWptRun: 1,
@@ -416,9 +420,9 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 firstStatusUpdate: startDate.toDate(),
                 lastStatusUpdate: startDate.toDate(),
                 wptStatus: 0,
-                validationState : 'validationState',
+                validationState: 'validationState',
                 harData: 'harData',
-                csByWptDocCompleteInPercent:  1,
+                csByWptDocCompleteInPercent: 1,
                 jobResult: jobResult1,
                 jobResultDate: startDate.toDate(),
                 jobResultJobConfigId: jobResult1.job.ident(),

@@ -358,6 +358,10 @@ class TestDataUtil {
     }
 
     static Job createJob(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active, Integer maxDownloadTimeInMinutes, ConnectivityProfile profile = null) {
+        return createJobWithoutSaving(label, script, location, group, description, runs, active, maxDownloadTimeInMinutes, profile).save(failOnError: true)
+    }
+
+    static Job createJobWithoutSaving(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active, Integer maxDownloadTimeInMinutes, ConnectivityProfile profile = null) {
         return new Job(
                 label: label,
                 script: script,
@@ -375,8 +379,9 @@ class TestDataUtil {
                 packetLoss: 0,
                 connectivityProfile: profile,
                 executionSchedule: '0 0 */2 * * ? *'
-        ).save(failOnError: true)
+        )
     }
+
 
     /**
      * Creates script with default values for label, description, navigationScript and provideAuthenticateInformation.

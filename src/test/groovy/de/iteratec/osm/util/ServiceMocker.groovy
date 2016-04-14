@@ -119,7 +119,7 @@ class ServiceMocker {
 	 */
 	void mockCsiAggregationUpdateEventDaoService(serviceToMockIn){
 		def csiAggregationUpdateEventDaoService = new CsiAggregationUpdateEventDaoService()
-		csiAggregationUpdateEventDaoService.metaClass.createUpdateEvent << { Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
+		csiAggregationUpdateEventDaoService.metaClass.createUpdateEvent = { Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 				new CsiAggregationUpdateEvent(
 					dateOfUpdate: new Date(),
 					csiAggregationId: csiAggregationId,
@@ -135,13 +135,13 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockOsmConfigCacheService(serviceToMockIn){
-		def osmConfigCacheService = OsmConfigCacheService()
+		def osmConfigCacheService = new OsmConfigCacheService()
 		Integer minTimeToExpect = 250
-		osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs << {Double ageToleranceInHours ->
+		osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
 			return minTimeToExpect
 		}
 		Integer maxTimeToExpect = 180000
-		osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs << {Double ageToleranceInHours ->
+		osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {Double ageToleranceInHours ->
 			return maxTimeToExpect
 		}
 		serviceToMockIn.osmConfigCacheService = osmConfigCacheService
@@ -153,7 +153,7 @@ class ServiceMocker {
 	 */
 	void mockEventResultService(serviceToMockIn){
 		def eventResultService = new EventResultService()
-		eventResultService.metaClass.isCsiRelevant << {EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
+		eventResultService.metaClass.isCsiRelevant = {EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
 			return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
 			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
@@ -168,7 +168,7 @@ class ServiceMocker {
 	 */
 	void mockJobResultDaoService(serviceToMockIn){
 		def jobResultDaoService = new JobResultDaoService()
-		jobResultDaoService.metaClass.findJobResultByEventResult << { EventResult eventResult ->
+		jobResultDaoService.metaClass.findJobResultByEventResult = { EventResult eventResult ->
 			JobResult jobResult1 = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
 			JobResult jobResult2 = JobResult.findByTestId(testIdOfJobRunCsiGroup2)
 
@@ -186,7 +186,7 @@ class ServiceMocker {
 	 */
 	void mockBrowserService(serviceToMockIn){
 		def browserService = new BrowserService()
-		browserService.metaClass.findByNameOrAlias << {String browserNameOrAlias ->
+		browserService.metaClass.findByNameOrAlias = {String browserNameOrAlias ->
 			return Browser.findByName(browserName)
 			
 		}
@@ -200,7 +200,7 @@ class ServiceMocker {
 	 */
 	void mockCsiAggregationUtilService(serviceToMockIn, DateTime toReturnFromGetNowInUtc){
 		def csiAggregationUtilService = new CsiAggregationUtilService()
-		csiAggregationUtilService.metaClass.getNowInUtc << {	->
+		csiAggregationUtilService.metaClass.getNowInUtc = {	->
 			return toReturnFromGetNowInUtc
 		}
 		serviceToMockIn.csiAggregationUtilService = csiAggregationUtilService
@@ -215,7 +215,7 @@ class ServiceMocker {
 	 */
 	void mockEventCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateHourlyCsiAggregations){
 		def eventCsiAggregationServiceMocked = new EventCsiAggregationService()
-		eventCsiAggregationServiceMocked.metaClass.getHourlyCsiAggregations << { Date from, Date to, MvQueryParams mvQueryParams ->
+		eventCsiAggregationServiceMocked.metaClass.getHourlyCsiAggregations = { Date from, Date to, MvQueryParams mvQueryParams ->
 			return 	toReturnFromGetOrCalculateHourlyCsiAggregations
 		}
 		serviceToMockIn.eventCsiAggregationService = eventCsiAggregationServiceMocked
@@ -230,7 +230,7 @@ class ServiceMocker {
 	void mockPageCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyPageCsiAggregations){
 		def pageCsiAggregationServiceMocked = new PageCsiAggregationService()
 		// new Version:
-		pageCsiAggregationServiceMocked.metaClass.getOrCalculatePageCsiAggregations << {
+		pageCsiAggregationServiceMocked.metaClass.getOrCalculatePageCsiAggregations = {
 			Date from, Date to, CsiAggregationInterval mvInterval, List<JobGroup> csiGroups, List<Page> pages ->
 			return toReturnFromGetOrCalculateWeeklyPageCsiAggregations
 		}
@@ -245,10 +245,10 @@ class ServiceMocker {
 	 */
 	void mockShopCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopCsiAggregations){
 		def shopCsiAggregationServiceMocked = new ShopCsiAggregationService()
-		shopCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations <<  { Date from, Date to ->
+		shopCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations =  { Date from, Date to ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		shopCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations << { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
+		shopCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations = { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
 		serviceToMockIn.shopCsiAggregationService = shopCsiAggregationServiceMocked
@@ -279,7 +279,7 @@ class ServiceMocker {
 
 		def csiAggregationTagServiceMocked = new CsiAggregationTagService()
 		Pattern patternToReturn = ~/(${idAsStringToJobGroupMap.values()*.ident().join('|')});(${idAsStringToPageMap.values()*.ident().join('|')})/
-		csiAggregationTagServiceMocked.metaClass.createHourlyEventTag << {
+		csiAggregationTagServiceMocked.metaClass.createHourlyEventTag = {
 			JobGroup jobGroupParam,
 			MeasuredEvent measuredEventParam,
 			Page pageParam,
@@ -292,7 +292,7 @@ class ServiceMocker {
 				browserParam,
 				locationParam)
 		}
-		csiAggregationTagServiceMocked.metaClass.createEventResultTag << {
+		csiAggregationTagServiceMocked.metaClass.createEventResultTag = {
 			JobGroup jobGroupParam,
 			MeasuredEvent measuredEventParam,
 			Page pageParam,
@@ -306,63 +306,63 @@ class ServiceMocker {
 						locationParam)
 		}
 		Pattern hourlyPattern = ~/(${idAsStringToJobGroupMap.values()*.ident().join('|')});(${idAsStringToPageMap.values()*.ident().join('|')});[^;];[^;];[^;]/
-		csiAggregationTagServiceMocked.metaClass.getTagPatternForHourlyCsiAggregations << { MvQueryParams thePages ->
+		csiAggregationTagServiceMocked.metaClass.getTagPatternForHourlyCsiAggregations = { MvQueryParams thePages ->
 			return hourlyPattern;
 		}
-		csiAggregationTagServiceMocked.metaClass.findJobGroupOfHourlyEventTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findJobGroupOfHourlyEventTag = {String mvTag ->
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
 		}
-        csiAggregationTagServiceMocked.metaClass.findJobGroupOfEventResultTag << {String mvTag ->
+        csiAggregationTagServiceMocked.metaClass.findJobGroupOfEventResultTag = {String mvTag ->
             String idJobGroup = mvTag.split(";")[0]
             return idAsStringToJobGroupMap[idJobGroup]
         }
-		csiAggregationTagServiceMocked.metaClass.findMeasuredEventOfHourlyEventTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findMeasuredEventOfHourlyEventTag = {String mvTag ->
 			String measuredEventId = mvTag.split(";")[1]
 			return idAsStringToMeasuredEventMap[measuredEventId]
 		}
-		csiAggregationTagServiceMocked.metaClass.findPageOfHourlyEventTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findPageOfHourlyEventTag = {String mvTag ->
 			String pageId = mvTag.split(";")[2]
 			return idAsStringToPageMap[pageId]
 		}
-		csiAggregationTagServiceMocked.metaClass.findBrowserOfHourlyEventTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findBrowserOfHourlyEventTag = {String mvTag ->
 			String browserId = mvTag.split(";")[3]
 			return idAsStringToBrowserMap[browserId]
 		}
-		csiAggregationTagServiceMocked.metaClass.findLocationOfHourlyEventTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findLocationOfHourlyEventTag = {String mvTag ->
 			String locationId = mvTag.split(";")[4]
 			return idAsStringToLocationMap[locationId]
 		}
-		csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyPageTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyPageTag = {String mvTag ->
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
 		}
-		csiAggregationTagServiceMocked.metaClass.findPageByPageTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findPageByPageTag = {String mvTag ->
 			String pageId = mvTag.split(";")[1]
 			return idAsStringToPageMap[pageId]
 		}
-		csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyShopTag << {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyShopTag = {String mvTag ->
 			return idAsStringToJobGroupMap[mvTag]
 		}
-		csiAggregationTagServiceMocked.metaClass.isValidHourlyEventTag << {String tagToProof ->
+		csiAggregationTagServiceMocked.metaClass.isValidHourlyEventTag = {String tagToProof ->
 			return true // not the concern of the tests
 		}
-		csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyPageCasWithJobGroupsAndPages << {
+		csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyPageCasWithJobGroupsAndPages = {
 			List<JobGroup> theCsiGroups, List<Page> thePages ->
 				return patternToReturn
 		}
-		csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyShopCasWithJobGroups << {
+		csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyShopCasWithJobGroups = {
 			List<JobGroup> theCsiGroups ->
 				return ~/(${theCsiGroups*.ident().join('|')})/
 		}
-		csiAggregationTagServiceMocked.metaClass.createPageAggregatorTag << { JobGroup group, Page page ->
+		csiAggregationTagServiceMocked.metaClass.createPageAggregatorTag = { JobGroup group, Page page ->
 			return group.ident()+";"+page.ident();
 		}
-		csiAggregationTagServiceMocked.metaClass.createShopAggregatorTag << { JobGroup group ->
+		csiAggregationTagServiceMocked.metaClass.createShopAggregatorTag = { JobGroup group ->
 			return group.ident();
 		}
 
-		csiAggregationTagServiceMocked.metaClass.createPageAggregatorTagByEventResult << {
+		csiAggregationTagServiceMocked.metaClass.createPageAggregatorTagByEventResult = {
 			EventResult newResult ->
 				JobGroup jobGroup1 = idAsStringToJobGroupMap.values().toList().first() //get first value
 				Page page1 = idAsStringToPageMap.values().toList().first() //get first value
@@ -381,7 +381,7 @@ class ServiceMocker {
 	 */
 	void mockCsTargetGraphDaoService(serviceToMockIn, String labelOfActualCsTargetGraph){
 		def csTargetGraphDaoService = new CsTargetGraphDaoService()
-		csTargetGraphDaoService.metaClass.getActualCsTargetGraph << { ->
+		csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { ->
 			return CsTargetGraph.findByLabel(labelOfActualCsTargetGraph)
 		}
 		serviceToMockIn.csTargetGraphDaoService = csTargetGraphDaoService
@@ -434,12 +434,12 @@ class ServiceMocker {
 	 * 		To be returned from method {@link de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
 	 */
 	void mockTimeToCsMappingCacheService(serviceToMockIn, timeToCsMappings, frustrations){
-		TimeToCsMappingCacheService timeToCsMappingCacheService = new MockFor(TimeToCsMappingCacheService)
+		TimeToCsMappingCacheService timeToCsMappingCacheService = new TimeToCsMappingCacheService()
 
-		timeToCsMappingCacheService.metaClass.getMappingsFor << {Page page ->
+		timeToCsMappingCacheService.metaClass.getMappingsFor = {Page page ->
 			return timeToCsMappings
 		}
-		timeToCsMappingCacheService.metaClass.getCustomerFrustrations << {Page page ->
+		timeToCsMappingCacheService.metaClass.getCustomerFrustrations = {Page page ->
 			return frustrations
 		}
 
@@ -453,13 +453,13 @@ class ServiceMocker {
 	 */
 	void mockTTCsMappingService(serviceToMockIn){
 		TimeToCsMappingService timeToCsMappingService = new TimeToCsMappingService()
-		timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent << { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+		timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docCompleteTime, Page testedPage, csiConfiguration ->
 			return 1
 		}
-		timeToCsMappingService.metaClass.validFrustrationsExistFor << { Page testedPage ->
+		timeToCsMappingService.metaClass.validFrustrationsExistFor = { Page testedPage ->
 			//not the concern of this test
 		}
-        timeToCsMappingService.metaClass.validMappingsExistFor << { Page testedPage ->
+        timeToCsMappingService.metaClass.validMappingsExistFor = { Page testedPage ->
             //not the concern of this test
         }
 		serviceToMockIn.timeToCsMappingService = timeToCsMappingService
@@ -473,13 +473,13 @@ class ServiceMocker {
 	 */
 	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes, CsiTransformation toReturnFromGetCsiTransformation){
 		ConfigService configServiceMock = new ConfigService()
-		configServiceMock.metaClass.getDatabaseDriverClassName << { ->
+		configServiceMock.metaClass.getDatabaseDriverClassName = { ->
 			return toReturnFromGetDatabaseDriverClassName
 		}
-		configServiceMock.metaClass.getDefaultMaxDownloadTimeInMinutes << { ->
+		configServiceMock.metaClass.getDefaultMaxDownloadTimeInMinutes = { ->
 			return toReturnFromGetDefaultMaxDownloadTimeInMinutes
 		}
-		configServiceMock.metaClass.getCsiTransformation << { ->
+		configServiceMock.metaClass.getCsiTransformation = { ->
 			return toReturnFromGetCsiTransformation
 		}
 		serviceToMockIn.configService = configServiceMock
@@ -541,7 +541,7 @@ class ServiceMocker {
 	 */
 	void mockProxyService(serviceToMockIn){
 		ProxyService proxyServiceMock = new ProxyService()
-		proxyServiceMock.metaClass.fetchLocations << {WebPageTestServer wptserver ->
+		proxyServiceMock.metaClass.fetchLocations = {WebPageTestServer wptserver ->
 			//do nothing, using tests will have to create necessary locations on their own
 		}
 		serviceToMockIn.proxyService = proxyServiceMock
@@ -553,10 +553,10 @@ class ServiceMocker {
 	 */
 	void mockPageService(serviceToMockIn, Page pageToReturnFromGetPageByStepName, String innerStepNameToReturnFromExcludePagenamePart) {
 		PageService pageServiceMock = new PageService()
-		pageServiceMock.metaClass.getPageByStepName << {String stepname ->
+		pageServiceMock.metaClass.getPageByStepName = {String stepname ->
 			return pageToReturnFromGetPageByStepName
 		}
-		pageServiceMock.metaClass.excludePagenamePart << {String stepname ->
+		pageServiceMock.metaClass.excludePagenamePart = {String stepname ->
 			return innerStepNameToReturnFromExcludePagenamePart
 		}
 		serviceToMockIn.pageService = pageServiceMock
@@ -567,7 +567,7 @@ class ServiceMocker {
      */
     void mockI18nService(serviceToMockIn) {
 		I18nService i18nService = new I18nService()
-        i18nService.metaClass.msg << {
+        i18nService.metaClass.msg = {
             String msgKey, String defaultMessage, List objs ->
                 return defaultMessage
         }
@@ -579,7 +579,7 @@ class ServiceMocker {
      */
     void mockPerformanceLoggingService(serviceToMockIn) {
 		PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
-        performanceLoggingService.metaClass.logExecutionTime << {
+        performanceLoggingService.metaClass.logExecutionTime = {
             PerformanceLoggingService.LogLevel level, String description, PerformanceLoggingService.IndentationDepth indentation, Closure toMeasure ->
                 toMeasure.call()
         }
@@ -591,7 +591,7 @@ class ServiceMocker {
      */
     void mockEventResultDaoService(serviceToMockIn, ArrayList<EventResult> eventResults) {
 		EventResultDaoService eventResultDaoService = new EventResultDaoService()
-        eventResultDaoService.metaClass.getLimitedMedianEventResultsBy << {
+        eventResultDaoService.metaClass.getLimitedMedianEventResultsBy = {
             Date fromDate,
             Date toDate,
             Set<CachedView> cachedViews,
@@ -611,27 +611,27 @@ class ServiceMocker {
 
 		CachingContainerService cachingContainerService = new CachingContainerService()
 
-		cachingContainerService.metaClass.getDailyJobGroupsByStartDate << {dailyMvsToCalculate, allJobGroups ->
+		cachingContainerService.metaClass.getDailyJobGroupsByStartDate = {dailyMvsToCalculate, allJobGroups ->
 			return returnForGetDailyJobGroupsByStartDate
 		}
-		cachingContainerService.metaClass.getDailyPagesByStartDate << {dailyMvsToCalculate, allPages ->
+		cachingContainerService.metaClass.getDailyPagesByStartDate = {dailyMvsToCalculate, allPages ->
 			return returnForGetDailyPagesByStartDate
 		}
-		cachingContainerService.metaClass.getDailyHeCsiAggregationMapByStartDate << {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
+		cachingContainerService.metaClass.getDailyHeCsiAggregationMapByStartDate = {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
 			return returnForGetDailyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.metaClass.getWeeklyJobGroupsByStartDate << {weeklyMvsToCalculate, allJobGroups ->
+		cachingContainerService.metaClass.getWeeklyJobGroupsByStartDate = {weeklyMvsToCalculate, allJobGroups ->
 			return returnForGetWeeklyJobGroupsByStartDate
 		}
-		cachingContainerService.metaClass.getWeeklyPagesByStartDate << {weeklyMvsToCalculate, allPages ->
+		cachingContainerService.metaClass.getWeeklyPagesByStartDate = {weeklyMvsToCalculate, allPages ->
 			return returnForGetWeeklyPagesByStartDate
 		}
-		cachingContainerService.metaClass.getWeeklyHeCsiAggregationMapByStartDate << {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
+		cachingContainerService.metaClass.getWeeklyHeCsiAggregationMapByStartDate = {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
 			return returnForGetWeeklyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.metaClass.createContainerFor << {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
+		cachingContainerService.metaClass.createContainerFor = {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
 			return returnForCreateContainerFor
 		}
 

@@ -54,9 +54,6 @@ class CsiDashboardControllerActualIntervalSpec {
             dateValueConverter(DateValueConverter)
         }
 
-        // Enable constraint tests:
-        mockForConstraintsTests(CsiDashboardShowAllCommand.class);
-
         // The controller under test:
         controllerUnderTest = controller;
 

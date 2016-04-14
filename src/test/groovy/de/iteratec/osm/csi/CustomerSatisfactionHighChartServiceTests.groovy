@@ -681,6 +681,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 	}
 
     void mockServicesCommonForAllTests() {
+
         // We simply a modified version of the original service here, because
         // we expect only URL generation to be called and expect that
         // the service under test don't care about the URL itself.

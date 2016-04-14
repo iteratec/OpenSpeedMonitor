@@ -48,6 +48,7 @@ import org.joda.time.DateTimeZone
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNull
 
 /**
  * Tests the updating of hourly event-{@link CsiAggregation}s when a new {@link EventResult} is coming in.

@@ -26,6 +26,10 @@ import grails.test.mixin.TestFor
 import org.junit.Before
 import org.junit.Test
 
+import static org.junit.Assert.assertTrue
+import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertEquals
+
 /**
  * Test-suite of {@link CustomerSatisfactionWeightService}.
  */
