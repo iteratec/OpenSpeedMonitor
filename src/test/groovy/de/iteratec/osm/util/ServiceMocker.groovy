@@ -118,10 +118,8 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable. 
 	 */
 	void mockCsiAggregationUpdateEventDaoService(serviceToMockIn){
-		def csiAggregationUpdateEventDaoService = new MockFor(CsiAggregationUpdateEventDaoService, true)
-		csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
-			Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
-			
+		def csiAggregationUpdateEventDaoService = new CsiAggregationUpdateEventDaoService()
+		csiAggregationUpdateEventDaoService.metaClass.createUpdateEvent << { Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 				new CsiAggregationUpdateEvent(
 					dateOfUpdate: new Date(),
 					csiAggregationId: csiAggregationId,
@@ -129,7 +127,7 @@ class ServiceMocker {
 				).save(failOnError: true)
 				
 		}
-		serviceToMockIn.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
+		serviceToMockIn.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService
 	}
 	/**
 	 * Mocks methods of {@link CsiConfigCacheService}
@@ -137,18 +135,16 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockOsmConfigCacheService(serviceToMockIn){
-		def osmConfigCacheService = new MockFor(OsmConfigCacheService, true)
+		def osmConfigCacheService = OsmConfigCacheService()
 		Integer minTimeToExpect = 250
-		osmConfigCacheService.demand.getCachedMinDocCompleteTimeInMillisecs(1..10000) {
-			Double ageToleranceInHours ->
+		osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs << {Double ageToleranceInHours ->
 			return minTimeToExpect
 		}
 		Integer maxTimeToExpect = 180000
-		osmConfigCacheService.demand.getCachedMaxDocCompleteTimeInMillisecs(1..10000) {
-			Double ageToleranceInHours ->
+		osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs << {Double ageToleranceInHours ->
 			return maxTimeToExpect
 		}
-		serviceToMockIn.osmConfigCacheService = osmConfigCacheService.proxyInstance()
+		serviceToMockIn.osmConfigCacheService = osmConfigCacheService
 	}
 	/**
 	 * Mocks {@link EventResultService}.
@@ -156,16 +152,14 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockEventResultService(serviceToMockIn){
-		def eventResultService = new MockFor(EventResultService, true)
-		eventResultService.demand.isCsiRelevant(1..10000) {
-			EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
-			
+		def eventResultService = new EventResultService()
+		eventResultService.metaClass.isCsiRelevant << {EventResult toProof, Integer minDocTimeInMillisecs, Integer maxDocTimeInMillisecs ->
 			return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
 			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
 			
 		}
-		serviceToMockIn.eventResultService = eventResultService.proxyInstance()
+		serviceToMockIn.eventResultService = eventResultService
 	}
 	/**
 	 * Mocks methods in {@link JobResultDaoService}.
@@ -173,25 +167,17 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockJobResultDaoService(serviceToMockIn){
-		def jobResultDaoService = new MockFor(JobResultDaoService, true)
-		jobResultDaoService.demand.findJobResultByEventResult(1..10000) {
-			EventResult eventResult ->
-			
+		def jobResultDaoService = new JobResultDaoService()
+		jobResultDaoService.metaClass.findJobResultByEventResult << { EventResult eventResult ->
 			JobResult jobResult1 = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
 			JobResult jobResult2 = JobResult.findByTestId(testIdOfJobRunCsiGroup2)
-			
+
 			return (eventResult.jobResult.id == jobResult1.id) ?
 				jobResult1:
 				jobResult2
-			
-			/*
-			return jobResult1.eventResults.contains(eventResult)?
-				jobResult1:
-				jobResult2
-			//*/
-			
+
 		}
-		serviceToMockIn.jobResultDaoService = jobResultDaoService.proxyInstance()
+		serviceToMockIn.jobResultDaoService = jobResultDaoService
 	}
 	/**
 	 * Mocks methods in {@link BrowserService}.
@@ -199,13 +185,12 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockBrowserService(serviceToMockIn){
-		def browserService = new MockFor(BrowserService, true)
-		browserService.demand.findByNameOrAlias(1..10000) {
-			String browserNameOrAlias ->
+		def browserService = new BrowserService()
+		browserService.metaClass.findByNameOrAlias << {String browserNameOrAlias ->
 			return Browser.findByName(browserName)
 			
 		}
-		serviceToMockIn.browserService = browserService.proxyInstance()
+		serviceToMockIn.browserService = browserService
 	}
 	
 	/**
@@ -214,12 +199,11 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockCsiAggregationUtilService(serviceToMockIn, DateTime toReturnFromGetNowInUtc){
-		def csiAggregationUtilService = new MockFor(CsiAggregationUtilService, true)
-		csiAggregationUtilService.demand.getNowInUtc(1..10000) {
-			->
+		def csiAggregationUtilService = new CsiAggregationUtilService()
+		csiAggregationUtilService.metaClass.getNowInUtc << {	->
 			return toReturnFromGetNowInUtc
 		}
-		serviceToMockIn.csiAggregationUtilService = csiAggregationUtilService.proxyInstance()
+		serviceToMockIn.csiAggregationUtilService = csiAggregationUtilService
 	}
 	
 	/**
@@ -230,11 +214,11 @@ class ServiceMocker {
 	 * 		To return from mocked method {@link EventCsiAggregationService#getOrCalculateHourylCsiAggregations}.
 	 */
 	void mockEventCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateHourlyCsiAggregations){
-		def eventCsiAggregationServiceMocked = new MockFor(EventCsiAggregationService, true)
-		eventCsiAggregationServiceMocked.demand.getHourlyCsiAggregations(0..10000) { Date from, Date to, MvQueryParams mvQueryParams ->
+		def eventCsiAggregationServiceMocked = new EventCsiAggregationService()
+		eventCsiAggregationServiceMocked.metaClass.getHourlyCsiAggregations << { Date from, Date to, MvQueryParams mvQueryParams ->
 			return 	toReturnFromGetOrCalculateHourlyCsiAggregations
 		}
-		serviceToMockIn.eventCsiAggregationService = eventCsiAggregationServiceMocked.proxyInstance()
+		serviceToMockIn.eventCsiAggregationService = eventCsiAggregationServiceMocked
 	}
 	/**
 	 * Mocks methods of {@link PageCsiAggregationService}.
@@ -244,13 +228,13 @@ class ServiceMocker {
 	 * 		List of {@link CsiAggregation}s, the method {@link PageCsiAggregationService#getOrCalculatePageCsiAggregations(java.util.Date, java.util.Date, CsiAggregationInterval,List<JobGroup>,List<Page>)} should return.
 	 */
 	void mockPageCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyPageCsiAggregations){
-		def pageCsiAggregationServiceMocked = new MockFor(PageCsiAggregationService)
+		def pageCsiAggregationServiceMocked = new PageCsiAggregationService()
 		// new Version:
-		pageCsiAggregationServiceMocked.demand.getOrCalculatePageCsiAggregations(0..10000) {
+		pageCsiAggregationServiceMocked.metaClass.getOrCalculatePageCsiAggregations << {
 			Date from, Date to, CsiAggregationInterval mvInterval, List<JobGroup> csiGroups, List<Page> pages ->
 			return toReturnFromGetOrCalculateWeeklyPageCsiAggregations
 		}
-		serviceToMockIn.pageCsiAggregationService = pageCsiAggregationServiceMocked.proxyInstance()
+		serviceToMockIn.pageCsiAggregationService = pageCsiAggregationServiceMocked
 	}
 	/**
 	 * Mocks {@link ShopCsiAggregationService}.
@@ -260,14 +244,14 @@ class ServiceMocker {
 	 * 		List of {@link CsiAggregation}s, the method {@link ShopCsiAggregationService#getOrCalculateWeeklyShopCsiAggregations(java.util.Date, java.util.Date)} should return.
 	 */
 	void mockShopCsiAggregationService(serviceToMockIn, List<CsiAggregation> toReturnFromGetOrCalculateWeeklyShopCsiAggregations){
-		def shopCsiAggregationServiceMocked = new MockFor(ShopCsiAggregationService, true)
-		shopCsiAggregationServiceMocked.demand.getOrCalculateWeeklyShopCsiAggregations(0..10000) { Date from, Date to ->
+		def shopCsiAggregationServiceMocked = new ShopCsiAggregationService()
+		shopCsiAggregationServiceMocked.metaClass.getOrCalculateWeeklyShopCsiAggregations <<  { Date from, Date to ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		shopCsiAggregationServiceMocked.demand.getOrCalculateShopCsiAggregations(0..10000) { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
+		shopCsiAggregationServiceMocked.metaClass.getOrCalculateShopCsiAggregations << { Date from, Date to, CsiAggregationInterval interval, List csiGroups ->
 			return toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 		}
-		serviceToMockIn.shopCsiAggregationService = shopCsiAggregationServiceMocked.proxyInstance()
+		serviceToMockIn.shopCsiAggregationService = shopCsiAggregationServiceMocked
 	}
 	/**
 	 * Mocks methods of {@link CsiAggregationTagService}.
@@ -293,9 +277,9 @@ class ServiceMocker {
 		Map idAsStringToBrowserMap,
 		Map idAsStringToLocationMap){
 
-		def csiAggregationTagServiceMocked = new MockFor(CsiAggregationTagService, true)
+		def csiAggregationTagServiceMocked = new CsiAggregationTagService()
 		Pattern patternToReturn = ~/(${idAsStringToJobGroupMap.values()*.ident().join('|')});(${idAsStringToPageMap.values()*.ident().join('|')})/
-		csiAggregationTagServiceMocked.demand.createHourlyEventTag(1..10000) {
+		csiAggregationTagServiceMocked.metaClass.createHourlyEventTag << {
 			JobGroup jobGroupParam,
 			MeasuredEvent measuredEventParam,
 			Page pageParam,
@@ -308,7 +292,7 @@ class ServiceMocker {
 				browserParam,
 				locationParam)
 		}
-		csiAggregationTagServiceMocked.demand.createEventResultTag(1..10000) {
+		csiAggregationTagServiceMocked.metaClass.createEventResultTag << {
 			JobGroup jobGroupParam,
 			MeasuredEvent measuredEventParam,
 			Page pageParam,
@@ -322,63 +306,63 @@ class ServiceMocker {
 						locationParam)
 		}
 		Pattern hourlyPattern = ~/(${idAsStringToJobGroupMap.values()*.ident().join('|')});(${idAsStringToPageMap.values()*.ident().join('|')});[^;];[^;];[^;]/
-		csiAggregationTagServiceMocked.demand.getTagPatternForHourlyCsiAggregations(0..10000) { MvQueryParams thePages ->
+		csiAggregationTagServiceMocked.metaClass.getTagPatternForHourlyCsiAggregations << { MvQueryParams thePages ->
 			return hourlyPattern;
 		}
-		csiAggregationTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findJobGroupOfHourlyEventTag << {String mvTag ->
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
 		}
-        csiAggregationTagServiceMocked.demand.findJobGroupOfEventResultTag(0..10000) {String mvTag ->
+        csiAggregationTagServiceMocked.metaClass.findJobGroupOfEventResultTag << {String mvTag ->
             String idJobGroup = mvTag.split(";")[0]
             return idAsStringToJobGroupMap[idJobGroup]
         }
-		csiAggregationTagServiceMocked.demand.findMeasuredEventOfHourlyEventTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findMeasuredEventOfHourlyEventTag << {String mvTag ->
 			String measuredEventId = mvTag.split(";")[1]
 			return idAsStringToMeasuredEventMap[measuredEventId]
 		}
-		csiAggregationTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findPageOfHourlyEventTag << {String mvTag ->
 			String pageId = mvTag.split(";")[2]
 			return idAsStringToPageMap[pageId]
 		}
-		csiAggregationTagServiceMocked.demand.findBrowserOfHourlyEventTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findBrowserOfHourlyEventTag << {String mvTag ->
 			String browserId = mvTag.split(";")[3]
 			return idAsStringToBrowserMap[browserId]
 		}
-		csiAggregationTagServiceMocked.demand.findLocationOfHourlyEventTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findLocationOfHourlyEventTag << {String mvTag ->
 			String locationId = mvTag.split(";")[4]
 			return idAsStringToLocationMap[locationId]
 		}
-		csiAggregationTagServiceMocked.demand.findJobGroupOfWeeklyPageTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyPageTag << {String mvTag ->
 			String idJobGroup = mvTag.split(";")[0]
 			return idAsStringToJobGroupMap[idJobGroup]
 		}
-		csiAggregationTagServiceMocked.demand.findPageByPageTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findPageByPageTag << {String mvTag ->
 			String pageId = mvTag.split(";")[1]
 			return idAsStringToPageMap[pageId]
 		}
-		csiAggregationTagServiceMocked.demand.findJobGroupOfWeeklyShopTag(0..10000) {String mvTag ->
+		csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyShopTag << {String mvTag ->
 			return idAsStringToJobGroupMap[mvTag]
 		}
-		csiAggregationTagServiceMocked.demand.isValidHourlyEventTag(1..10000) {String tagToProof ->
+		csiAggregationTagServiceMocked.metaClass.isValidHourlyEventTag << {String tagToProof ->
 			return true // not the concern of the tests
 		}
-		csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyPageCasWithJobGroupsAndPages(0..10000) {
+		csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyPageCasWithJobGroupsAndPages << {
 			List<JobGroup> theCsiGroups, List<Page> thePages ->
 				return patternToReturn
 		}
-		csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyShopCasWithJobGroups(0..10000) {
+		csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyShopCasWithJobGroups << {
 			List<JobGroup> theCsiGroups ->
 				return ~/(${theCsiGroups*.ident().join('|')})/
 		}
-		csiAggregationTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
+		csiAggregationTagServiceMocked.metaClass.createPageAggregatorTag << { JobGroup group, Page page ->
 			return group.ident()+";"+page.ident();
 		}
-		csiAggregationTagServiceMocked.demand.createShopAggregatorTag(0..10000) { JobGroup group ->
+		csiAggregationTagServiceMocked.metaClass.createShopAggregatorTag << { JobGroup group ->
 			return group.ident();
 		}
 
-		csiAggregationTagServiceMocked.demand.createPageAggregatorTagByEventResult(0..10000) {
+		csiAggregationTagServiceMocked.metaClass.createPageAggregatorTagByEventResult << {
 			EventResult newResult ->
 				JobGroup jobGroup1 = idAsStringToJobGroupMap.values().toList().first() //get first value
 				Page page1 = idAsStringToPageMap.values().toList().first() //get first value
@@ -386,7 +370,7 @@ class ServiceMocker {
 				return pageAggregatorTagToReturn
 		}
 
-		serviceToMockIn.csiAggregationTagService = csiAggregationTagServiceMocked.proxyInstance()
+		serviceToMockIn.csiAggregationTagService = csiAggregationTagServiceMocked
 	}
 	/**
 	 * Mocks methods in {@link CsTargetGraphDaoService}.
@@ -396,11 +380,11 @@ class ServiceMocker {
 	 * 		The label of the {@link CsTargetGraph} to be returned from {@link CsTargetGraphDaoService#getActualCsTargetGraph()}. 
 	 */
 	void mockCsTargetGraphDaoService(serviceToMockIn, String labelOfActualCsTargetGraph){
-		def csTargetGraphDaoService = new MockFor(CsTargetGraphDaoService, true)
-		csTargetGraphDaoService.demand.getActualCsTargetGraph(0..10000) { ->
+		def csTargetGraphDaoService = new CsTargetGraphDaoService()
+		csTargetGraphDaoService.metaClass.getActualCsTargetGraph << { ->
 			return CsTargetGraph.findByLabel(labelOfActualCsTargetGraph)
 		}
-		serviceToMockIn.csTargetGraphDaoService = csTargetGraphDaoService.proxyInstance()
+		serviceToMockIn.csTargetGraphDaoService = csTargetGraphDaoService
 	}
 	/**
 	 * Mocks methods of {@link LinkGenerator}.
@@ -410,11 +394,34 @@ class ServiceMocker {
 	 * 		To be returned from method {@link LinkGenerator#link()}. 
 	 */
 	void mockLinkGenerator(serviceToMockIn, String toReturnFromLink){
-		def grailsLinkGeneratorMocked = new MockFor(LinkGenerator, true)
-		grailsLinkGeneratorMocked.demand.link(0..10000) { Map params ->
-			return 	toReturnFromLink
+		def grailsLinkGeneratorMocked = new LinkGenerator(){
+
+			@Override
+			String resource(Map params) {
+				return null
+			}
+
+			@Override
+			String link(Map params) {
+				return toReturnFromLink
+			}
+
+			@Override
+			String link(Map params, String encoding) {
+				return null
+			}
+
+			@Override
+			String getContextPath() {
+				return null
+			}
+
+			@Override
+			String getServerBaseURL() {
+				return null
+			}
 		}
-		serviceToMockIn.grailsLinkGenerator = grailsLinkGeneratorMocked.proxyInstance()
+		serviceToMockIn.grailsLinkGenerator = grailsLinkGeneratorMocked
 	}
 
 	/**

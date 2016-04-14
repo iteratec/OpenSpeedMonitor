@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
@@ -26,12 +24,11 @@ import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -514,15 +511,15 @@ class WeightingServiceTests {
         WeightedCsiValue weightedCsiValue1 = weightedValues.find {
             it.weightedValue.weight == expectedJobGroupWeight1
         }
-        assert(weightedCsiValue1)
-        assertEquals(expectedJobGroupWeight1,weightedCsiValue1.weightedValue.weight, DELTA)
-        assertEquals(10d,weightedCsiValue1.weightedValue.value, DELTA)
+        assert (weightedCsiValue1)
+        assertEquals(expectedJobGroupWeight1, weightedCsiValue1.weightedValue.weight, DELTA)
+        assertEquals(10d, weightedCsiValue1.weightedValue.value, DELTA)
         weightedValues.removeElement(weightedCsiValue1)
 
         WeightedCsiValue weightedCsiValue2 = weightedValues[0]
-        assert(weightedCsiValue1)
-        assertEquals(expectedJobGroupWeight2,weightedCsiValue2.weightedValue.weight, DELTA)
-        assertEquals(20d,weightedCsiValue2.weightedValue.value, DELTA)
+        assert (weightedCsiValue1)
+        assertEquals(expectedJobGroupWeight2, weightedCsiValue2.weightedValue.weight, DELTA)
+        assertEquals(20d, weightedCsiValue2.weightedValue.value, DELTA)
     }
 
     void testGetWeightedCsiValuesFromCsiAggregationsByVisuallyCompleteForCsiSystem() {
@@ -584,7 +581,7 @@ class WeightingServiceTests {
         assertEquals(0, weightedCsiValuesNoHaveVisuallyComplete.size())
 
         //weights are defined in csiSystem
-        Double meanOfTwoEqualWeightedValues = (10.0 + 20.0)/2
+        Double meanOfTwoEqualWeightedValues = (10.0 + 20.0) / 2
         assertEquals(new WeightedValue(value: meanOfTwoEqualWeightedValues, weight: 0.5), weightedCsiValuesAllHaveVisuallyComplete[0].weightedValue)
         Double valueOfDifferentWeightedValue = 20.0
         assertEquals(new WeightedValue(value: valueOfDifferentWeightedValue, weight: 2.0), weightedCsiValuesAllHaveVisuallyComplete[1].weightedValue)
@@ -721,13 +718,13 @@ class WeightingServiceTests {
         mockCustomerSatisfactionWeightService()
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
         // into the domain EventResult injected service csiConfigCacheService would be null so we have to use metaclass to implement isCsiRelevant()-method for tests
-        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = {CsiValue csiValue ->
+        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = { CsiValue csiValue ->
             return true
         }
-        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = {CsiAggregation csiValue ->
+        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = { CsiAggregation csiValue ->
             return true
         }
-        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = {EventResult csiValue ->
+        serviceUnderTest.csiValueService.metaClass.isCsiRelevant = { EventResult csiValue ->
             return true
         }
     }
@@ -786,10 +783,9 @@ class WeightingServiceTests {
         jobGroup1 = new JobGroup(name: "jobGroup1", csiConfiguration: csiConfiguration).save(failOnError: true)
         jobGroup2 = new JobGroup(name: "jobGroup2", csiConfiguration: csiConfiguration).save(failOnError: true)
 
-        csiSystem = new CsiSystem(jobGroupWeights: [
-                new JobGroupWeight(jobGroup: jobGroup1, weight: 0.5),
-                new JobGroupWeight(jobGroup: jobGroup2, weight: 2)
-        ])
+        csiSystem = new CsiSystem()
+        csiSystem.jobGroupWeights.add(new JobGroupWeight(jobGroup: jobGroup1, weight: 0.5, csiSystem: csiSystem))
+        csiSystem.jobGroupWeights.add(new JobGroupWeight(jobGroup: jobGroup2, weight: 2.0, csiSystem: csiSystem))
     }
 
     /**
@@ -833,8 +829,8 @@ class WeightingServiceTests {
      * Mocks used methods of {@link de.iteratec.osm.result.CsiAggregationTagService}.
      */
     private void mockCsiAggregationTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
-        def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
-        csiAggregationTagService.demand.findBrowserOfHourlyEventTag(0..10000) { String hourlyEventMvTag ->
+        def csiAggregationTagService = new CsiAggregationTagService()
+        csiAggregationTagService.metaClass.static.findBrowserOfHourlyEventTag << { String hourlyEventMvTag ->
             Browser browser
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
                 browser = browserToReturn_50
@@ -844,7 +840,8 @@ class WeightingServiceTests {
             }
             return browser
         }
-        csiAggregationTagService.demand.findPageByPageTag(0..10000) { String hourlyEventMvTag ->
+
+        csiAggregationTagService.metaClass.static.findPageByPageTag << { String hourlyEventMvTag ->
             Page page
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {
                 page = pageToReturn_50
@@ -854,27 +851,31 @@ class WeightingServiceTests {
             }
             return page
         }
-        csiAggregationTagService.demand.getJobGroupIdFromWeeklyOrDailyPageTag(0..100000) { String tag ->
+
+        csiAggregationTagService.metaClass.static.getJobGroupIdFromWeeklyOrDailyPageTag << { String tag ->
             try {
                 return Long.valueOf(tag)
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 return 1
             }
         }
-        csiAggregationTagService.demand.getJobGroupIdFromWeeklyOrDailyShopTag(0..100000) { String tag ->
+
+        csiAggregationTagService.metaClass.static.getJobGroupIdFromWeeklyOrDailyShopTag << { String tag ->
             try {
                 return Long.valueOf(tag)
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 return 1
             }
         }
-        csiAggregationTagService.demand.findJobGroupIdOfHourlyEventTag(0..100000) { String tag ->
+
+        csiAggregationTagService.metaClass.static.findJobGroupIdOfHourlyEventTag << { String tag ->
             try {
                 return Long.valueOf(tag)
-            } catch(NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 return 1
             }
         }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance();
+
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
 }
