@@ -290,46 +290,46 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         ).save(failOnError: true);
     }
     private void mockTimeToCsMappingService(){
-        def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
-        timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+        def timeToCsMappingService = new TimeToCsMappingService()
+        timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docCompleteTime, Page testedPage, csiConfiguration ->
             return 1
         }
-        timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
+        timeToCsMappingService.metaClass.validFrustrationsExistFor = { Page testedPage ->
             //not the concern of this test
         }
-        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
+        timeToCsMappingService.metaClass.validMappingsExistFor = { Page testedPage ->
             //not the concern of this test
         }
-        serviceUnderTest.timeToCsMappingService = timeToCsMappingService.proxyInstance()
+        serviceUnderTest.timeToCsMappingService = timeToCsMappingService
     }
     private void mockCsiAggregationUpdateService(){
-        def csiAggregationUpdateServiceMocked = new MockFor(CsiAggregationUpdateService, true)
-        csiAggregationUpdateServiceMocked.demand.createOrUpdateDependentMvs(0..100) { EventResult newResult ->
+        def csiAggregationUpdateServiceMocked = new CsiAggregationUpdateService()
+        csiAggregationUpdateServiceMocked.metaClass.createOrUpdateDependentMvs = { EventResult newResult ->
             //not the concern of this test
             return 34d
         }
-        serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked.proxyInstance()
+        serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked
     }
     private void mockPageService(){
-        def pageServiceMocked = new MockFor(PageService, true)
-        pageServiceMocked.demand.getPageByStepName(0..1000) { String pageName ->
+        def pageServiceMocked = new PageService()
+        pageServiceMocked.metaClass.getPageByStepName = { String pageName ->
             def tokenized = pageName.tokenize(PageService.STEPNAME_DELIMITTER)
             return tokenized.size() == 2 ? Page.findByName(tokenized[0]):Page.findByName(Page.UNDEFINED)
         }
-        pageServiceMocked.demand.getDefaultStepNameForPage(0..100) { Page page ->
+        pageServiceMocked.metaClass.getDefaultStepNameForPage = { Page page ->
             //not the concern of this test
             return Page.findByName('HP').name + PageService.STEPNAME_DELIMITTER + PageService.STEPNAME_DEFAULT_STEPNUMBER
         }
-        pageServiceMocked.demand.excludePagenamePart(0..100) { String stepName ->
+        pageServiceMocked.metaClass.excludePagenamePart = { String stepName ->
             return stepName.contains(PageService.STEPNAME_DELIMITTER)?
                     stepName.substring(stepName.indexOf(PageService.STEPNAME_DELIMITTER)+PageService.STEPNAME_DELIMITTER.length(), stepName.length()):
                     stepName
         }
-        serviceUnderTest.pageService = pageServiceMocked.proxyInstance()
+        serviceUnderTest.pageService = pageServiceMocked
     }
     private void mockCsiAggregationTagService(String tagToReturn){
-        def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
-        csiAggregationTagService.demand.createEventResultTag(0..100) {
+        def csiAggregationTagService = new CsiAggregationTagService()
+        csiAggregationTagService.metaClass.createEventResultTag = {
             JobGroup jobGroup,
             MeasuredEvent measuredEvent,
             Page page,
@@ -337,19 +337,19 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
             Location location ->
                 return tagToReturn
         }
-        csiAggregationTagService.demand.findJobGroupOfEventResultTag(0..100) {
+        csiAggregationTagService.metaClass.findJobGroupOfEventResultTag = {
             String tag ->
                 return undefinedJobGroup
         }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
     private void mockMetricReportingService(){
-        def metricReportingService = new MockFor(MetricReportingService, true)
-        metricReportingService.demand.reportEventResultToGraphite(0..100) {
+        def metricReportingService = new MetricReportingService()
+        metricReportingService.metaClass.reportEventResultToGraphite = {
             EventResult result ->
                 // not the concern of this test
         }
-        serviceUnderTest.metricReportingService = metricReportingService.proxyInstance()
+        serviceUnderTest.metricReportingService = metricReportingService
     }
 
     // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

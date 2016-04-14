@@ -452,17 +452,17 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockTTCsMappingService(serviceToMockIn){
-		TimeToCsMappingService timeToCsMappingService = new TimeToCsMappingService()
-		timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+		def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
+		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
 			return 1
 		}
-		timeToCsMappingService.metaClass.validFrustrationsExistFor = { Page testedPage ->
+		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
 			//not the concern of this test
 		}
-        timeToCsMappingService.metaClass.validMappingsExistFor = { Page testedPage ->
+        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
             //not the concern of this test
         }
-		serviceToMockIn.timeToCsMappingService = timeToCsMappingService
+		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.proxyInstance()
 	}
 	/**
 	 * Mocks methods of {@link de.iteratec.osm.ConfigService}.
