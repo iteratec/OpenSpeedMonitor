@@ -20,6 +20,7 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.util.ServiceMocker
 import groovy.mock.interceptor.MockFor
 
 import static org.junit.Assert.assertEquals
@@ -85,8 +86,7 @@ class MetricReportingServiceTests {
 		serviceUnderTest = service
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
-		serviceUnderTest.batchActivityService = new BatchActivityService()
-		serviceUnderTest.batchActivityService.timer.cancel()//we don't need any updates for this test
+		ServiceMocker.mockBatchActivityService(serviceUnderTest)
 		createTestDataCommonToAllTests()
     }
 	

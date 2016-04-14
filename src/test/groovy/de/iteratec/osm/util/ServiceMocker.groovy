@@ -109,6 +109,8 @@ class ServiceMocker {
 		batchActivityService.metaClass.noteBatchActivityUpdate{BatchActivity activity ->
 			//Do nothing
 		}
+		batchActivityService.timer.cancel()
+		batchActivityService.timer.purge()
 		serviceToMockIn.batchActivityService = batchActivityService
     }
 	

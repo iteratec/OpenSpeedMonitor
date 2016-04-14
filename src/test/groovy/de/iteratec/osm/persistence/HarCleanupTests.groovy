@@ -6,6 +6,7 @@ import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.result.detail.Asset
 import de.iteratec.osm.result.detail.AssetGroup
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.junit.Test
@@ -16,9 +17,7 @@ import spock.lang.Specification
 class HarCleanupTests extends Specification{
 
     public void setup(){
-        service.batchActivityService = new BatchActivityService()
-        service.batchActivityService.metaClass.runningBatch = {Class c, long l -> false}
-        service.batchActivityService.metaClass.getActiveBatchActivity = {Class c, long idWithinDomain, Activity activity, String name, boolean observe -> new BatchActivity()}
+        ServiceMocker.mockBatchActivityService(service)
     }
 
     @Test

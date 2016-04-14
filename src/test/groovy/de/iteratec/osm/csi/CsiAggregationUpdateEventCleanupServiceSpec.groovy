@@ -265,12 +265,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends Specification {
 
     void addMocksCommonForAllTests() {
 
-        serviceUnderTest.batchActivityService = [
-                getActiveBatchActivity: { Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
-                    return [updateStatus: { Map<String, Object> map -> /*do nothing*/ }] as BatchActivity
-                },
-                calculateProgress     : { int count, int actual -> 'not the concern of these tests' }
-        ] as BatchActivityService
+        ServiceMocker.mockBatchActivityService(serviceUnderTest)
 
         serviceUnderTest.inMemoryConfigService.metaClass {
             areMeasurementsGenerallyEnabled { -> return true }

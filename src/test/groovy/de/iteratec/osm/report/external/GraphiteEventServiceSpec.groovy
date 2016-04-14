@@ -27,6 +27,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovyx.net.http.RESTClient
@@ -60,7 +61,7 @@ class GraphiteEventServiceSpec extends Specification{
         serviceUnderTest = service
 
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
-        serviceUnderTest.batchActivityService = new BatchActivityService()
+        ServiceMocker.mockBatchActivityService(serviceUnderTest)
         serviceUnderTest.eventDaoService = new EventDaoService()
         CsiAggregationUtilService mockedCsiAggregationUtilService = new CsiAggregationUtilService()
         mockedCsiAggregationUtilService.metaClass.getNowInUtc = { -> untilDateTime }

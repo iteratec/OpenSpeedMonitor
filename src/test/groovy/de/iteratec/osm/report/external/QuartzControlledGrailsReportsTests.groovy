@@ -35,6 +35,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
@@ -79,8 +80,7 @@ class QuartzControlledGrailsReportsTests {
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
 		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
-		serviceUnderTest.batchActivityService = new BatchActivityService()
-		serviceUnderTest.batchActivityService.timer.cancel() //we don't need any updates for this test
+		ServiceMocker.mockBatchActivityService(serviceUnderTest)
 		new OsmConfiguration().save(failOnError: true)
 	}
 
