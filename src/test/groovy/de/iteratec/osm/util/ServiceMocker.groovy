@@ -568,12 +568,12 @@ class ServiceMocker {
      * Mocks methods of{@link I18nService}.
      */
     void mockI18nService(serviceToMockIn) {
-		I18nService i18nService = new I18nService()
-        i18nService.metaClass.msg = {
-            String msgKey, String defaultMessage, List objs ->
+		def i18nService = new MockFor(I18nService)
+        i18nService.demand.msg (0..10000){
+            String msgKey, String defaultMessage, List objs = null ->
                 return defaultMessage
         }
-        serviceToMockIn.i18nService = i18nService
+        serviceToMockIn.i18nService = i18nService.proxyInstance()
     }
 
     /**
@@ -611,33 +611,33 @@ class ServiceMocker {
 									 returnForGetDailyHeCsiAggregationMapByStartDate, returnForGetWeeklyJobGroupsByStartDate, returnForGetWeeklyPagesByStartDate,
 									 returnForGetWeeklyHeCsiAggregationMapByStartDate, returnForCreateContainerFor) {
 
-		CachingContainerService cachingContainerService = new CachingContainerService()
+		def cachingContainerService = new MockFor(CachingContainerService)
 
-		cachingContainerService.metaClass.getDailyJobGroupsByStartDate = {dailyMvsToCalculate, allJobGroups ->
+		cachingContainerService.demand.getDailyJobGroupsByStartDate (0..10000) {dailyMvsToCalculate, allJobGroups ->
 			return returnForGetDailyJobGroupsByStartDate
 		}
-		cachingContainerService.metaClass.getDailyPagesByStartDate = {dailyMvsToCalculate, allPages ->
+		cachingContainerService.demand.getDailyPagesByStartDate (0..10000) {dailyMvsToCalculate, allPages ->
 			return returnForGetDailyPagesByStartDate
 		}
-		cachingContainerService.metaClass.getDailyHeCsiAggregationMapByStartDate = {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
+		cachingContainerService.demand.getDailyHeCsiAggregationMapByStartDate (0..10000) {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
 			return returnForGetDailyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.metaClass.getWeeklyJobGroupsByStartDate = {weeklyMvsToCalculate, allJobGroups ->
+		cachingContainerService.demand.getWeeklyJobGroupsByStartDate (0..10000) {weeklyMvsToCalculate, allJobGroups ->
 			return returnForGetWeeklyJobGroupsByStartDate
 		}
-		cachingContainerService.metaClass.getWeeklyPagesByStartDate = {weeklyMvsToCalculate, allPages ->
+		cachingContainerService.demand.getWeeklyPagesByStartDate (0..10000) {weeklyMvsToCalculate, allPages ->
 			return returnForGetWeeklyPagesByStartDate
 		}
-		cachingContainerService.metaClass.getWeeklyHeCsiAggregationMapByStartDate = {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
+		cachingContainerService.demand.getWeeklyHeCsiAggregationMapByStartDate (0..10000) {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
 			return returnForGetWeeklyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.metaClass.createContainerFor = {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
+		cachingContainerService.demand.createContainerFor (0..10000) {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
 			return returnForCreateContainerFor
 		}
 
-		serviceToMockIn.cachingContainerService = cachingContainerService
+		serviceToMockIn.cachingContainerService = cachingContainerService.proxyInstance()
 	}
 
 	/**

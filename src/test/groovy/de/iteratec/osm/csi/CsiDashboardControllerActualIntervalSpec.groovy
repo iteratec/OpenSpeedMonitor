@@ -60,8 +60,6 @@ class CsiDashboardControllerActualIntervalSpec{
         //Mocks
         command = new CsiDashboardShowAllCommand()
         command.csiAggregationUtilService = new CsiAggregationUtilService()
-
-        mockBindData()
     }
 
 // daily page ////////////////////////////////////////////////////////////////////////////////////////////////////

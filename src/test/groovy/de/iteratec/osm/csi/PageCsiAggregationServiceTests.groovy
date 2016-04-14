@@ -26,6 +26,10 @@ import groovy.mock.interceptor.MockFor
 import org.junit.Assert
 
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertTrue
+import static org.junit.Assert.assertNull
+
 import grails.test.mixin.*
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone

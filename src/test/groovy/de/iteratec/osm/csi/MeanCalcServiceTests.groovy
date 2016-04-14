@@ -23,6 +23,8 @@ import org.junit.Test
 
 import de.iteratec.osm.csi.weighting.WeightedValue
 
+import static org.junit.Assert.assertEquals
+
 /**
  * Test-suite of {@link MeanCalcService}.
  */
@@ -90,7 +92,7 @@ class MeanCalcServiceTests {
 		weights.add(valueAndWeight)
 		
 		// Run the test:
-		assertEquals(2.7442, serviceUnderTest.calculateWeightedMean(weights), DELTA)
+		assertEquals(2.7442d, serviceUnderTest.calculateWeightedMean(weights), DELTA)
 	}
 	
 	@Test(expected=IllegalArgumentException.class)
