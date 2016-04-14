@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+import de.iteratec.osm.csi.TestDataUtil
 import grails.validation.ConstrainedProperty
 import org.grails.validation.MaxSizeConstraint
 import org.junit.Assert;
@@ -32,7 +33,7 @@ import grails.test.mixin.TestFor;
  * Test-suite for {@link Location}
  */
 @TestFor(Location)
-@Mock(Location)
+@Mock([Location, WebPageTestServer,Browser])
 class LocationTests {
 
 	@Test
@@ -50,19 +51,31 @@ class LocationTests {
 		Assert.assertEquals(2, Location.all.size())
 	}
 
-	@Test
-	void testLabelSize() {
-		// See
-		//     http://grailssoapbox.blogspot.de/2010/02/accessing-grails-domain-constraints-at.html
-		// and
-		//     http://grailssoapbox.blogspot.de/2010/02/accessing-grails-domain-constraints-at.html
-		// for documentation about constraint reflection.
+    @Test
+    void testLabelSize() {
+        // See
+        //     http://grailssoapbox.blogspot.de/2010/02/accessing-grails-domain-constraints-at.html
+        // and
+        //     http://grailssoapbox.blogspot.de/2010/02/accessing-grails-domain-constraints-at.html
+        // for documentation about constraint reflection.
 
-		ConstrainedProperty labelConstraints = Location.constraints.label
-		MaxSizeConstraint maxSizeConstraint = labelConstraints.getAppliedConstraint("maxSize")
+        //label increased from 50 to 150 on 30.7.2013
+        String testStringValide = "*".padLeft(150,"*")
+        String testStringInvalide = "*".padLeft(151,"*")
+        Location testLocation = new Location(active: true,
+                valid: 1,
+                uniqueIdentifierForServer: "Test",
+                location: "Test",
+                label: testStringValide,
+                browser: TestDataUtil.createBrowser("Test",123.123),
+                wptServer: TestDataUtil.createServer(),
+                dateCreated: new Date(),
+                lastUpdated: new Date())
+        assertTrue testLocation.validate()
+        testLocation.label = testStringInvalide
+        assertFalse testLocation.validate()
 
-		assertEquals("label increased from 50 to 150 on 30.7.2013", 150, maxSizeConstraint.getMaxSize())
-	}
+    }
 	
 	@Test
 	void testToString() {

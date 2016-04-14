@@ -152,7 +152,9 @@ class JobServiceTests {
 				baseUrl: 'http://server1.wpt.server.de',
 				active: true,
 				label: 'server 1 - wpt server',
-				proxyIdentifier: 'server 1 - wpt server'
+				proxyIdentifier: 'server 1 - wpt server',
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true)
 
 		String browserName = "undefined"
@@ -186,7 +188,9 @@ class JobServiceTests {
 				location: 'physNetLabAgent01-FF',
 				label: 'physNetLabAgent01 - FF up to date',
 				browser: browserFF,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true)
 
 		ieAgent1 = new Location(
@@ -195,7 +199,9 @@ class JobServiceTests {
 				location: 'physNetLabAgent01-IE8',
 				label: 'physNetLabAgent01 - IE 8',
 				browser: browserIE,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true)
 
 		ieHetznerAgent1 = new Location(
@@ -204,7 +210,9 @@ class JobServiceTests {
 				location: 'hetznerAgent01-IE8',
 				label: 'hetznerAgent01 - IE 8',
 				browser: browserIE,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true)
 
 		i8eHetznerAgent1 = new Location(
@@ -213,7 +221,9 @@ class JobServiceTests {
 				location: 'hetznerAgent01-IE8',
 				label: 'hetznerAgent01 - IE 8',
 				browser: browserIE,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true)
 
 		ffHetznerAgent1 = new Location(
@@ -222,7 +232,9 @@ class JobServiceTests {
 				location: 'hetznerAgent01-FF',
 				label: 'hetznerAgent01 - FF up to date',
 				browser: browserFF,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true)
 
 		jobGroupName = 'CSI'

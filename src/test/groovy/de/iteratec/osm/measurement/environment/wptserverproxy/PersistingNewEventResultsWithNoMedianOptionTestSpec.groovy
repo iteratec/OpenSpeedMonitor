@@ -284,7 +284,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                 location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
                 label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
                 browser: browser,//z.B. Firefox
-                wptServer: server
+                wptServer: server,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true);
     }
     private void mockTimeToCsMappingService(){

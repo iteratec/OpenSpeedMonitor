@@ -85,7 +85,9 @@ class LocationAndResultPersisterService implements iListener{
 					location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
 					label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
 					browser: browserOfLocation,//z.B. Firefox
-					wptServer: wptserverForLocation
+					wptServer: wptserverForLocation,
+					dateCreated: new Date(),
+					lastUpdated: new Date()
 					).save(failOnError: true);
 				
 				log.info("new location written while fetching locations: ${newLocation}")

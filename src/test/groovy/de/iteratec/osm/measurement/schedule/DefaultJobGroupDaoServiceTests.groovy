@@ -25,6 +25,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.junit.Before
 import org.junit.Test
+import static org.junit.Assert.*
 
 /**
  * Test-suite for {@link de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService}.

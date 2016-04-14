@@ -802,7 +802,8 @@ class TestDataUtil {
                 label: uniqueIdentifierForServer,
                 browser: browser,
                 wptServer: server,
-                dateCreated: new Date()
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
     }
 
@@ -857,7 +858,10 @@ class TestDataUtil {
                 baseUrl: 'http://wpt.server.de',
                 active: true,
                 label: 'server 1 - wpt example',
-                proxyIdentifier: 'server 1 - wpt example'
+                proxyIdentifier: 'server 1 - wpt example',
+                dateCreated: new Date(),
+                lastUpdated: new Date()
+
         ).save(failOnError: true)
         return server1
     }

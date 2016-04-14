@@ -803,7 +803,9 @@ class PersistingNewEventResultsTests {
                     location: "UNIT_TEST_LOCATION",//z.B. Agent1-wptdriver
                     label: "Unit Test Location: Browser?",//z.B. Agent 1: Windows 7 (S008178178)
                     browser: browser,//z.B. Firefox
-                    wptServer: server
+                    wptServer: server,
+					dateCreated: new Date(),
+					lastUpdated: new Date()
             ).save(failOnError: true);
         }
 	}
@@ -940,14 +942,18 @@ class PersistingNewEventResultsTests {
                 label: "TestServer 1",
                 proxyIdentifier: "TestServer1",
                 baseUrl: "http://wptUnitTest.dev.hh.iteratec.local",
-                active: true
+                active: true,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
         ).save(failOnError: true, validate: false)
 
         server2 = new WebPageTestServer(
                 label: "TestServer 2",
                 proxyIdentifier: "TestServer2",
                 baseUrl: "http://wptUnitTest2.dev.hh.iteratec.local",
-                active: 1
+                active: 1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
         ).save(failOnError: true, validate: false)
 
         undefinedJobGroup=new JobGroup(
