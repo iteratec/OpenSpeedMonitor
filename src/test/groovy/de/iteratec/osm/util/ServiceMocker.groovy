@@ -434,16 +434,16 @@ class ServiceMocker {
 	 * 		To be returned from method {@link de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService#getCustomerFrustrations(de.iteratec.osm.csi.Page)}
 	 */
 	void mockTimeToCsMappingCacheService(serviceToMockIn, timeToCsMappings, frustrations){
-		def timeToCsMappingCacheService = new MockFor(TimeToCsMappingCacheService)
+		TimeToCsMappingCacheService timeToCsMappingCacheService = new MockFor(TimeToCsMappingCacheService)
 
-		timeToCsMappingCacheService.demand.getMappingsFor(0..100000) {Page page ->
+		timeToCsMappingCacheService.metaClass.getMappingsFor << {Page page ->
 			return timeToCsMappings
 		}
-		timeToCsMappingCacheService.demand.getCustomerFrustrations(0..100000) {Page page ->
+		timeToCsMappingCacheService.metaClass.getCustomerFrustrations << {Page page ->
 			return frustrations
 		}
 
-		serviceToMockIn.timeToCsMappingCacheService = timeToCsMappingCacheService.proxyInstance()
+		serviceToMockIn.timeToCsMappingCacheService = timeToCsMappingCacheService
 	}
 	/**
 	 * Mocks methods of {@link de.iteratec.osm.csi.transformation.TimeToCsMappingService}. The methods do not deliver
@@ -452,17 +452,17 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockTTCsMappingService(serviceToMockIn){
-		def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+		TimeToCsMappingService timeToCsMappingService = new TimeToCsMappingService()
+		timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent << { Integer docCompleteTime, Page testedPage, csiConfiguration ->
 			return 1
 		}
-		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
+		timeToCsMappingService.metaClass.validFrustrationsExistFor << { Page testedPage ->
 			//not the concern of this test
 		}
-        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
+        timeToCsMappingService.metaClass.validMappingsExistFor << { Page testedPage ->
             //not the concern of this test
         }
-		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.proxyInstance()
+		serviceToMockIn.timeToCsMappingService = timeToCsMappingService
 	}
 	/**
 	 * Mocks methods of {@link de.iteratec.osm.ConfigService}.
@@ -472,17 +472,17 @@ class ServiceMocker {
 	 * 		To be returned from method {@link de.iteratec.osm.ConfigService#getDatabaseDriverClassName()}.
 	 */
 	void mockConfigService(serviceToMockIn, String toReturnFromGetDatabaseDriverClassName, Integer toReturnFromGetDefaultMaxDownloadTimeInMinutes, CsiTransformation toReturnFromGetCsiTransformation){
-		def configServiceMock = new MockFor(ConfigService, true)
-		configServiceMock.demand.getDatabaseDriverClassName(0..100){ ->
+		ConfigService configServiceMock = new ConfigService()
+		configServiceMock.metaClass.getDatabaseDriverClassName << { ->
 			return toReturnFromGetDatabaseDriverClassName
 		}
-		configServiceMock.demand.getDefaultMaxDownloadTimeInMinutes(0..100){ ->
+		configServiceMock.metaClass.getDefaultMaxDownloadTimeInMinutes << { ->
 			return toReturnFromGetDefaultMaxDownloadTimeInMinutes
 		}
-		configServiceMock.demand.getCsiTransformation(0..100){ ->
+		configServiceMock.metaClass.getCsiTransformation << { ->
 			return toReturnFromGetCsiTransformation
 		}
-		serviceToMockIn.configService = configServiceMock.proxyInstance()
+		serviceToMockIn.configService = configServiceMock
 	}
 	/**
 	 * Mocks methods in list methodsToMock in service of class classOfServiceToMock. That service get mocked in owning service serviceToMockIn.
@@ -540,11 +540,11 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockProxyService(serviceToMockIn){
-		def proxyServiceMock = new MockFor(ProxyService, true)
-		proxyServiceMock.demand.fetchLocations(0..100){WebPageTestServer wptserver ->
+		ProxyService proxyServiceMock = new ProxyService()
+		proxyServiceMock.metaClass.fetchLocations << {WebPageTestServer wptserver ->
 			//do nothing, using tests will have to create necessary locations on their own
 		}
-		serviceToMockIn.proxyService = proxyServiceMock.proxyInstance()
+		serviceToMockIn.proxyService = proxyServiceMock
 	}
 	/**
 	 * Mocks methods of{@link PageService}.
@@ -552,46 +552,46 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockPageService(serviceToMockIn, Page pageToReturnFromGetPageByStepName, String innerStepNameToReturnFromExcludePagenamePart) {
-		def pageServiceMock = new MockFor(PageService, true)
-		pageServiceMock.demand.getPageByStepName(0..100){String stepname ->
+		PageService pageServiceMock = new PageService()
+		pageServiceMock.metaClass.getPageByStepName << {String stepname ->
 			return pageToReturnFromGetPageByStepName
 		}
-		pageServiceMock.demand.excludePagenamePart(0..100){String stepname ->
+		pageServiceMock.metaClass.excludePagenamePart << {String stepname ->
 			return innerStepNameToReturnFromExcludePagenamePart
 		}
-		serviceToMockIn.pageService = pageServiceMock.proxyInstance()
+		serviceToMockIn.pageService = pageServiceMock
 	}
 
     /**
      * Mocks methods of{@link I18nService}.
      */
     void mockI18nService(serviceToMockIn) {
-        def i18nService = new MockFor(I18nService, true)
-        i18nService.demand.msg(1..10000) {
+		I18nService i18nService = new I18nService()
+        i18nService.metaClass.msg << {
             String msgKey, String defaultMessage, List objs ->
                 return defaultMessage
         }
-        serviceToMockIn.i18nService = i18nService.proxyInstance()
+        serviceToMockIn.i18nService = i18nService
     }
 
     /**
      * Mocks methods of{@link PerformanceLoggingService}.
      */
     void mockPerformanceLoggingService(serviceToMockIn) {
-        def performanceLoggingService = new MockFor(PerformanceLoggingService, true)
-        performanceLoggingService.demand.logExecutionTime(1..10000) {
+		PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
+        performanceLoggingService.metaClass.logExecutionTime << {
             PerformanceLoggingService.LogLevel level, String description, PerformanceLoggingService.IndentationDepth indentation, Closure toMeasure ->
                 toMeasure.call()
         }
-        serviceToMockIn.performanceLoggingService = performanceLoggingService.proxyInstance()
+        serviceToMockIn.performanceLoggingService = performanceLoggingService
     }
 
     /**
      * Mocks methods of{@link EventResultDaoService}.
      */
     void mockEventResultDaoService(serviceToMockIn, ArrayList<EventResult> eventResults) {
-        def eventResultDaoService = new MockFor(EventResultDaoService, true)
-        eventResultDaoService.demand.getLimitedMedianEventResultsBy(1..10000) {
+		EventResultDaoService eventResultDaoService = new EventResultDaoService()
+        eventResultDaoService.metaClass.getLimitedMedianEventResultsBy << {
             Date fromDate,
             Date toDate,
             Set<CachedView> cachedViews,
@@ -602,64 +602,64 @@ class ServiceMocker {
             CriteriaSorting sorting ->
                 return eventResults
         }
-        serviceToMockIn.eventResultDaoService = eventResultDaoService.proxyInstance()
+        serviceToMockIn.eventResultDaoService = eventResultDaoService
     }
 
 	void mockCachingContainerService(serviceToMockIn, returnForGetDailyJobGroupsByStartDate, returnForGetDailyPagesByStartDate,
 									 returnForGetDailyHeCsiAggregationMapByStartDate, returnForGetWeeklyJobGroupsByStartDate, returnForGetWeeklyPagesByStartDate,
 									 returnForGetWeeklyHeCsiAggregationMapByStartDate, returnForCreateContainerFor) {
-		def cachingContainerService = new MockFor(CachingContainerService, true)
 
-		cachingContainerService.demand.getDailyJobGroupsByStartDate(0..100000){dailyMvsToCalculate, allJobGroups ->
+		CachingContainerService cachingContainerService = new CachingContainerService()
+
+		cachingContainerService.metaClass.getDailyJobGroupsByStartDate << {dailyMvsToCalculate, allJobGroups ->
 			return returnForGetDailyJobGroupsByStartDate
 		}
-		cachingContainerService.demand.getDailyPagesByStartDate(0..100000){dailyMvsToCalculate, allPages ->
+		cachingContainerService.metaClass.getDailyPagesByStartDate << {dailyMvsToCalculate, allPages ->
 			return returnForGetDailyPagesByStartDate
 		}
-		cachingContainerService.demand.getDailyHeCsiAggregationMapByStartDate(0..100000){dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
+		cachingContainerService.metaClass.getDailyHeCsiAggregationMapByStartDate << {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
 			return returnForGetDailyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.demand.getWeeklyJobGroupsByStartDate(0..100000){weeklyMvsToCalculate, allJobGroups ->
+		cachingContainerService.metaClass.getWeeklyJobGroupsByStartDate << {weeklyMvsToCalculate, allJobGroups ->
 			return returnForGetWeeklyJobGroupsByStartDate
 		}
-		cachingContainerService.demand.getWeeklyPagesByStartDate(0..100000){weeklyMvsToCalculate, allPages ->
+		cachingContainerService.metaClass.getWeeklyPagesByStartDate << {weeklyMvsToCalculate, allPages ->
 			return returnForGetWeeklyPagesByStartDate
 		}
-		cachingContainerService.demand.getWeeklyHeCsiAggregationMapByStartDate(0..100000){weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
+		cachingContainerService.metaClass.getWeeklyHeCsiAggregationMapByStartDate << {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
 			return returnForGetWeeklyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.demand.createContainerFor(0..100000){dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
+		cachingContainerService.metaClass.createContainerFor << {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
 			return returnForCreateContainerFor
 		}
 
-		serviceToMockIn.cachingContainerService = cachingContainerService.proxyInstance()
+		serviceToMockIn.cachingContainerService = cachingContainerService
 	}
 
 	/**
 	 * Mocks methods of{@link MetricReportingService}.
 	 */
 	void mockMetricReportingService(serviceToMockIn) {
-		def metricReportingService = new MockFor(MetricReportingService, true)
-		metricReportingService.demand.reportEventResultToGraphite(1..10000) {
-			EventResult result ->
-				//do nothing
+		MetricReportingService metricReportingService = new MetricReportingService()
+		metricReportingService.metaClass.reportEventResultToGraphite = {EventResult ->
+			//Do Nothing
 		}
-		serviceToMockIn.metricReportingService = metricReportingService.proxyInstance()
+		serviceToMockIn.metricReportingService = metricReportingService
 	}
 
-	/**
-	 * Mocks methods in {@link CsiAggregationUtilService}.
-	 * @param serviceToMockIn
-	 * 		Grails-Service with the service to mock as instance-variable.
-	 */
-	void mockCsiAggregationUpdateService(serviceToMockIn){
-		def csiAggregationUpdateService = new MockFor(CsiAggregationUpdateService, true)
-		csiAggregationUpdateService.demand.createOrUpdateDependentMvs(1..10000) {
-			EventResult result->
-			//do nothing
-		}
-		serviceToMockIn.csiAggregationUpdateService = csiAggregationUpdateService.proxyInstance()
-	}
+//	/**
+//	 * Mocks methods in {@link CsiAggregationUtilService}.
+//	 * @param serviceToMockIn
+//	 * 		Grails-Service with the service to mock as instance-variable.
+//	 */
+//	void mockCsiAggregationUpdateService(serviceToMockIn){
+//		def csiAggregationUpdateService = new MockFor(CsiAggregationUpdateService, true)
+//		csiAggregationUpdateService.demand.createOrUpdateDependentMvs(1..10000) {
+//			EventResult result->
+//			//do nothing
+//		}
+//		serviceToMockIn.csiAggregationUpdateService = csiAggregationUpdateService.proxyInstance()
+//	}
 }
