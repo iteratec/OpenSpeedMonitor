@@ -17,37 +17,28 @@
 
 package de.iteratec.osm.csi
 
-import groovy.mock.interceptor.MockFor
-
-import static org.junit.Assert.assertEquals
-import grails.test.mixin.*
-
-import java.util.regex.Pattern
-
-import org.joda.time.DateTime
-import org.junit.*
-
-import de.iteratec.osm.report.chart.CsiAggregationDaoService
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import de.iteratec.osm.measurement.schedule.JobGroup
-
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
-import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiAggregationTagService
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import org.joda.time.DateTime
+import org.junit.Test
+
+import java.util.regex.Pattern
+
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -267,13 +258,13 @@ class ShopCsiAggregationServiceTests {
     // mocks
 
     private void mockPageCsiAggregationService() {
-        def pageCsiAggregationService = new MockFor(PageCsiAggregationService, true)
-        pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations(0..10000) {
+        def pageCsiAggregationService = new PageCsiAggregationService()
+        pageCsiAggregationService.metaClass.getOrCalculatePageCsiAggregations = {
             Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 List<CsiAggregation> irrelevantCauseListOfWeightedValuesIsRetrievedByMock = [new CsiAggregation()]
                 return irrelevantCauseListOfWeightedValuesIsRetrievedByMock
         }
-        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.proxyInstance();
+        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService
     }
 
     private void mockCsiAggregationDaoService() {
@@ -285,43 +276,43 @@ class ShopCsiAggregationServiceTests {
 
     private void mockCsiAggregationTagService(List<JobGroup> csiGroups) {
         Pattern patternToReturn = ~/(${csiGroups*.ident().join('||')})/
-        def csiAggregationTagServiceMocked = new MockFor(CsiAggregationTagService, true)
-        csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyShopCasWithJobGroups() {
+        def csiAggregationTagServiceMocked = new CsiAggregationTagService()
+        csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyShopCasWithJobGroups = {
             List<JobGroup> theCsiGroups ->
                 return patternToReturn
         }
         String aggregatorTagToReturn = jobGroup1.ident().toString();
-        csiAggregationTagServiceMocked.demand.createShopAggregatorTag(0..10000) {
+        csiAggregationTagServiceMocked.metaClass.createShopAggregatorTag = {
             EventResult newResult ->
                 return aggregatorTagToReturn
         }
         Pattern hourlyPattern = ~/(${csiGroups*.ident().join('|')});[^;];[^;];[^;];[^;]/
-        csiAggregationTagServiceMocked.demand.getTagPatternForHourlyCsiAggregations(0..10000) { MvQueryParams thePages ->
+        csiAggregationTagServiceMocked.metaClass.getTagPatternForHourlyCsiAggregations = { MvQueryParams thePages ->
             return hourlyPattern;
         }
-        csiAggregationTagServiceMocked.demand.findJobGroupOfWeeklyShopTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyShopTag = { String tag ->
             return jobGroup1;
         }
-        csiAggregationTagServiceMocked.demand.getTagPatternForWeeklyPageCasWithJobGroupsAndPages(0..10000) { List<JobGroup> groups, List<Page> pages ->
+        csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyPageCasWithJobGroupsAndPages = { List<JobGroup> groups, List<Page> pages ->
             Pattern weeklyPattern = ~/(${groups*.ident().join('||')});(${pages*.ident().join('||')})/
             return weeklyPattern
         }
-        csiAggregationTagServiceMocked.demand.findBrowserOfHourlyEventTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.metaClass.findBrowserOfHourlyEventTag = { String tag ->
             return browser;
         }
-        csiAggregationTagServiceMocked.demand.findJobGroupOfHourlyEventTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.metaClass.findJobGroupOfHourlyEventTag = { String tag ->
             return jobGroup1;
         }
-        csiAggregationTagServiceMocked.demand.findPageByPageTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.metaClass.findPageByPageTag = { String tag ->
             return page1;
         }
-        csiAggregationTagServiceMocked.demand.findPageOfHourlyEventTag(0..10000) { String tag ->
+        csiAggregationTagServiceMocked.metaClass.findPageOfHourlyEventTag = { String tag ->
             return page1;
         }
-        csiAggregationTagServiceMocked.demand.createPageAggregatorTag(0..10000) { JobGroup group, Page page ->
+        csiAggregationTagServiceMocked.metaClass.createPageAggregatorTag = { JobGroup group, Page page ->
             return group.ident() + ";" + page.ident();
         }
-        CsiAggregationTagService mVTS = csiAggregationTagServiceMocked.proxyInstance();
+        CsiAggregationTagService mVTS = csiAggregationTagServiceMocked
         serviceUnderTest.csiAggregationTagService = mVTS
         serviceUnderTest.pageCsiAggregationService.csiAggregationTagService = mVTS
         serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationTagService = mVTS
@@ -331,24 +322,24 @@ class ShopCsiAggregationServiceTests {
      * Mocks methods of {@link WeightingService}.
      */
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = new MockFor(WeightingService, true)
-        weightingService.demand.getWeightedCsiValues(1..10000) {
+        def weightingService = new WeightingService()
+        weightingService.metaClass.getWeightedCsiValues = {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
         }
-        weightingService.demand.getWeightedCsiValuesByVisuallyComplete(1..10000) {
+        weightingService.metaClass.getWeightedCsiValuesByVisuallyComplete = {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        serviceUnderTest.weightingService = weightingService.proxyInstance()
+        serviceUnderTest.weightingService = weightingService
     }
 
     /**
      * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
     private void mockCsiAggregationUpdateEventDaoService() {
-        def csiAggregationUpdateEventDaoService = new MockFor(CsiAggregationUpdateEventDaoService, true)
-        csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
+        def csiAggregationUpdateEventDaoService = new CsiAggregationUpdateEventDaoService ()
+        csiAggregationUpdateEventDaoService.metaClass.createUpdateEvent = {
             Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 
                 new CsiAggregationUpdateEvent(
@@ -358,6 +349,6 @@ class ShopCsiAggregationServiceTests {
                 ).save(failOnError: true)
 
         }
-        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
+        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService
     }
 }

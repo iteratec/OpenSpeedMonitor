@@ -43,6 +43,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 
+import java.text.SimpleDateFormat
+
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import static org.junit.Assert.*
 import static org.mockito.Mockito.when
@@ -80,8 +82,7 @@ class CsiDashboardControllerTests {
             dateValueConverter(DateValueConverter)
         }
 
-        // Enable constraint tests:
-//        mockForConstraintsTests(CsiDashboardShowAllCommand.class);
+        mockDataBinding()
 
         // The controller under test:
         controllerUnderTest = controller
@@ -121,7 +122,8 @@ class CsiDashboardControllerTests {
 
     }
 
-    /**
+
+/**
      * Test for inner class {@link CsiDashboardShowAllCommand}.
      */
     @Test
@@ -1785,5 +1787,15 @@ class CsiDashboardControllerTests {
         assertTrue('Map must contain key \"' + key + '\"', dataUnderTest.containsKey(key))
         assertNotNull('Map must contain a not-null value for key \"' + key + '\"', dataUnderTest.get(key))
         assertEquals(expectedValue, dataUnderTest.get(key))
+    }
+
+    private void mockDataBinding() {
+        controller.metaClass.bindData = { obj, params ->
+            params.each { key, value ->
+                if(key == "from"|| key == "to")
+                    value = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING, Locale.GERMANY).parse(value)
+                obj."$key" = value
+            }
+        }
     }
 }

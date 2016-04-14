@@ -39,7 +39,7 @@ import org.junit.*
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiDashboardController)
-class CsiDashboardControllerActualIntervalSpec {
+class CsiDashboardControllerActualIntervalSpec{
 
     public static final DateTimeFormatter FORMATTER_ddMMyyyy = DateTimeFormat.forPattern("dd.MM.yyyy")
     public static final DateTimeFormatter FORMATTER_ddMMyyyyhhmm = DateTimeFormat.forPattern("dd.MM.yyyy hh:mm")
@@ -60,13 +60,14 @@ class CsiDashboardControllerActualIntervalSpec {
         //Mocks
         command = new CsiDashboardShowAllCommand()
         command.csiAggregationUtilService = new CsiAggregationUtilService()
+
+        mockBindData()
     }
 
-    // daily page ////////////////////////////////////////////////////////////////////////////////////////////////////
+// daily page ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void testIncludingActualInterval_DailyPageAggregation()
-    {
+    public void testIncludingActualInterval_DailyPageAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime()
         DateTime fromDateExpected = toDateExpected.minusDays(14)
@@ -110,8 +111,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualInterval_DailyPageAggregation()
-    {
+    public void testExcludingActualInterval_DailyPageAggregation() {
         // request args important for this test
         DateTime toDate = new DateTime()
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
@@ -156,10 +156,9 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualIntervalForSmallChosenInterval_DailyPageAggregation()
-    {
+    public void testExcludingActualIntervalForSmallChosenInterval_DailyPageAggregation() {
         // request args important for this test
-        DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
+        DateTime toDate = new DateTime(2015, 4, 20, 5, 0, 0, DateTimeZone.UTC)
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusHours(10)
@@ -207,8 +206,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_DailyPageAggregation()
-    {
+    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_DailyPageAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime().minusDays(2)
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
@@ -252,8 +250,7 @@ class CsiDashboardControllerActualIntervalSpec {
     // daily shop ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void testIncludingActualInterval_DailyShopAggregation()
-    {
+    public void testIncludingActualInterval_DailyShopAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime()
         DateTime fromDateExpected = toDateExpected.minusDays(14)
@@ -297,8 +294,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualInterval_DailyShopAggregation()
-    {
+    public void testExcludingActualInterval_DailyShopAggregation() {
         // request args important for this test
         DateTime toDate = new DateTime()
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
@@ -343,10 +339,9 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualIntervalForSmallChosenInterval_DailyShopAggregation()
-    {
+    public void testExcludingActualIntervalForSmallChosenInterval_DailyShopAggregation() {
         // request args important for this test
-        DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
+        DateTime toDate = new DateTime(2015, 4, 20, 5, 0, 0, DateTimeZone.UTC)
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.DAILY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusHours(10)
@@ -394,8 +389,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_DailyShopAggregation()
-    {
+    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_DailyShopAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime().minusDays(2)
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
@@ -439,8 +433,7 @@ class CsiDashboardControllerActualIntervalSpec {
     // weekly page ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void testIncludingActualInterval_WeeklyPageAggregation()
-    {
+    public void testIncludingActualInterval_WeeklyPageAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime()
         DateTime fromDateExpected = toDateExpected.minusWeeks(12)
@@ -484,8 +477,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualInterval_WeeklyPageAggregation()
-    {
+    public void testExcludingActualInterval_WeeklyPageAggregation() {
         // request args important for this test
         DateTime toDate = new DateTime()
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
@@ -530,10 +522,9 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualIntervalForSmallChosenInterval_WeeklyPageAggregation()
-    {
+    public void testExcludingActualIntervalForSmallChosenInterval_WeeklyPageAggregation() {
         // request args important for this test
-        DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
+        DateTime toDate = new DateTime(2015, 4, 20, 5, 0, 0, DateTimeZone.UTC)
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusDays(4)
@@ -581,8 +572,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_WeeklyPageAggregation()
-    {
+    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_WeeklyPageAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime().minusWeeks(2)
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
@@ -626,8 +616,7 @@ class CsiDashboardControllerActualIntervalSpec {
     // weekly shop ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
-    public void testIncludingActualInterval_WeeklyShopAggregation()
-    {
+    public void testIncludingActualInterval_WeeklyShopAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime()
         DateTime fromDateExpected = toDateExpected.minusWeeks(12)
@@ -671,8 +660,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualInterval_WeeklyShopAggregation()
-    {
+    public void testExcludingActualInterval_WeeklyShopAggregation() {
         // request args important for this test
         DateTime toDate = new DateTime()
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
@@ -717,10 +705,9 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testExcludingActualIntervalForSmallChosenInterval_WeeklyShopAggregation()
-    {
+    public void testExcludingActualIntervalForSmallChosenInterval_WeeklyShopAggregation() {
         // request args important for this test
-        DateTime toDate = new DateTime(2015,4,20,5,0,0, DateTimeZone.UTC)
+        DateTime toDate = new DateTime(2015, 4, 20, 5, 0, 0, DateTimeZone.UTC)
         DateTime toDateExpected = toDate.minusMinutes(CsiAggregationInterval.WEEKLY)
         params.to = FORMATTER_ddMMyyyy.print(toDate);
         DateTime fromDate = toDate.minusDays(4)
@@ -768,8 +755,7 @@ class CsiDashboardControllerActualIntervalSpec {
     }
 
     @Test
-    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_WeeklyShopAggregation()
-    {
+    public void testIncludingLastIntervalIfActualIntervalIsNotInChosenInterval_WeeklyShopAggregation() {
         // request args important for this test
         DateTime toDateExpected = new DateTime().minusWeeks(2)
         params.to = FORMATTER_ddMMyyyy.print(toDateExpected);
