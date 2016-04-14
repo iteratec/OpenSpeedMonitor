@@ -19,18 +19,18 @@ package de.iteratec.osm.measurement.environment
 
 import grails.test.mixin.*
 import org.junit.*
+import spock.lang.Specification
 
 /**
  * Test-suite for {@link LocationService}.
  */
 @TestFor(LocationService)
 @Mock([Location])
-class LocationServiceTests {
+class LocationServiceTests extends Specification{
 
 	LocationService serviceUnderTest
 
-	@Before
-	void setUp() {
+	void "setup"() {
 		serviceUnderTest = service
 
 		new Location(label: 'label1').save(validate: false)
@@ -39,8 +39,8 @@ class LocationServiceTests {
 		new Location(label: 'label4').save(validate: false)
 	}
 
-	@Test
-	void testListLocations() {
-		assertEquals(4, serviceUnderTest.listLocations().size())
+	void "testListLocations"() {
+		expect:
+		serviceUnderTest.listLocations().size() == 4
 	}
 }

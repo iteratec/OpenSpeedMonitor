@@ -23,76 +23,67 @@ import org.junit.Test;
 import grails.test.mixin.*
 
 import org.junit.*
+import spock.lang.Specification
 
 /**
  * Test-suite for {@link de.iteratec.osm.measurement.environment.dao.LocationDaoService}.
  */
 @TestFor(DefaultLocationDaoService)
 @Mock([Location])
-class DefaultLocationDaoServiceTests {
+class DefaultLocationDaoServiceTests extends Specification {
 
     public static final String nameLocation1 = 'location1'
-	public static final String nameLocation2 = 'location2'
-	public static final String nameLocation3 = 'location3'
-	public static final String nameLocation4 = 'location4'
-	
-	LocationDaoService serviceUnderTest
-	
-    @Before
-	void setUp(){
-		serviceUnderTest = service
-		createDataCommonForAllTests()
-	}
-	
-	@Test
-	void testFindAll() {
-		new Location(location: 'agent1.agentserver.example.com', label: 'Agent1').save(failOnError:true, validate: false);
-		new Location(location: 'agent2.agentserver.example.com', label: 'Agent2').save(failOnError:true, validate: false);
-		
-		Set<Location> result = serviceUnderTest.findAll()
-		
-		assertNotNull(result);
-		assertEquals(2, result.size());
-		assertEquals(1, result.count( { it.label == 'Agent1' } ));
-		assertEquals(1, result.count( { it.label == 'Agent2' } ));
-		
-		new Location(location: 'agent3.agentserver.example.com', label: 'Agent3').save(failOnError:true, validate: false);
-		
-		Set<Location> resultAfterAdding = serviceUnderTest.findAll()
-		
-		assertNotNull(resultAfterAdding);
-		assertEquals(3, resultAfterAdding.size());
-		assertEquals(1, resultAfterAdding.count( { it.label == 'Agent1' } ));
-		assertEquals(1, resultAfterAdding.count( { it.label == 'Agent2' } ));
-		assertEquals(1, resultAfterAdding.count( { it.label == 'Agent3' } ));
-	}
-	
-	@Test
-    void testGetIdToObjectMap() {
-		
-		//create test-specific data
-		
-		Location location1 = new Location(label: nameLocation1).save(failOnError: true, validate: false)
-		Location location2 = new Location(label: nameLocation2).save(failOnError: true, validate: false)
-		Location location3 = new Location(label: nameLocation3).save(failOnError: true, validate: false)
-		Location location4 = new Location(label: nameLocation4).save(failOnError: true, validate: false)
-		
-		//execute test
-		
-		Map<Long, Location> idToObjectMap = serviceUnderTest.getIdToObjectMap()
-		
-		//assertions
-		
-		assertEquals(
-			[
-				(location1.ident()) : location1,
-				(location2.ident()) : location2,
-				(location3.ident()) : location3,
-				(location4.ident()) : location4
-				], 
-			idToObjectMap)
+    public static final String nameLocation2 = 'location2'
+    public static final String nameLocation3 = 'location3'
+    public static final String nameLocation4 = 'location4'
+
+    LocationDaoService serviceUnderTest
+
+    void "setup"() {
+        serviceUnderTest = service
     }
-	private void createDataCommonForAllTests(){
-		//nothing to do yet
-	}
+
+    void "test findAll"() {
+        given:
+        new Location(location: 'agent1.agentserver.example.com', label: 'Agent1').save(failOnError: true, validate: false);
+        new Location(location: 'agent2.agentserver.example.com', label: 'Agent2').save(failOnError: true, validate: false);
+
+        when:
+        Set<Location> result = serviceUnderTest.findAll()
+
+        then:
+        result != null
+        result.size() == 2
+        result.count({ it.label == 'Agent1' }) == 1
+        result.count({ it.label == 'Agent2' }) == 1
+
+        new Location(location: 'agent3.agentserver.example.com', label: 'Agent3').save(failOnError: true, validate: false);
+
+        Set<Location> resultAfterAdding = serviceUnderTest.findAll()
+
+        resultAfterAdding != null
+        resultAfterAdding.size() == 3
+        resultAfterAdding.count({ it.label == 'Agent1' }) == 1
+        resultAfterAdding.count({ it.label == 'Agent2' }) == 1
+        resultAfterAdding.count({ it.label == 'Agent3' }) == 1
+    }
+
+    void "test getIdToObjectMap"() {
+
+        given:
+        Location location1 = new Location(label: nameLocation1).save(failOnError: true, validate: false)
+        Location location2 = new Location(label: nameLocation2).save(failOnError: true, validate: false)
+        Location location3 = new Location(label: nameLocation3).save(failOnError: true, validate: false)
+        Location location4 = new Location(label: nameLocation4).save(failOnError: true, validate: false)
+
+        when:
+        Map<Long, Location> idToObjectMap = serviceUnderTest.getIdToObjectMap()
+
+        then:
+        [(location1.ident()): location1,
+         (location2.ident()): location2,
+         (location3.ident()): location3,
+         (location4.ident()): location4
+        ] == idToObjectMap
+    }
 }

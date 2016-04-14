@@ -20,13 +20,14 @@ package de.iteratec.osm.measurement.environment
 import grails.test.mixin.*
 
 import org.junit.*
+import spock.lang.Specification
 
 /**
  * Test-suite for {@link BrowserService}.
  */
 @TestFor(BrowserService)
 @Mock([Browser, BrowserAlias])
-class BrowserServiceTests {
+class BrowserServiceTests extends Specification{
 
 	static final String nonExistentBrowserName = "myBrowsername"
 	static final String nonExistentBrowserAlias = "myBrowseralias"
@@ -36,8 +37,7 @@ class BrowserServiceTests {
 
 	BrowserService serviceUnderTest
 
-	@Before 
-	void setUp(){
+	void "setup"(){
 		serviceUnderTest = service
 
 		// Test data
@@ -72,57 +72,62 @@ class BrowserServiceTests {
 				.save(failOnError: true)
 	}
 	
-	@Test
-	void testFindByNameOrAlias() {
+	void "test Find By Name Or Alias"() {
+		when:
 		Browser existentName = serviceUnderTest.findByNameOrAlias(existentBrowserName)
 		Browser nonExistentName = serviceUnderTest.findByNameOrAlias(nonExistentBrowserName)
 		Browser existentAlias= serviceUnderTest.findByNameOrAlias(existentBrowserAlias)
 		Browser nonExistentAlias = serviceUnderTest.findByNameOrAlias(nonExistentBrowserAlias)
 
-		assertNotNull(existentName)
-		assertNotNull(nonExistentName)
-		assertNotNull(existentAlias)
-		assertNotNull(nonExistentAlias)
+		then:
+		existentName != null
+		nonExistentName != null
+		existentAlias != null
+		nonExistentAlias != null
 
-		assertEquals(existentBrowserName, existentName.name)
-		assertEquals("undefined", nonExistentName.name)
-		assertEquals(existentBrowserName, existentAlias.name)
-		assertEquals("undefined",  nonExistentAlias.name)
+		existentName.name == existentBrowserName
+		nonExistentName.name == "undefined"
+		existentAlias.name == existentBrowserName
+		nonExistentAlias.name == "undefined"
 	}
 
-	@Test
-	void testGetCachedBrowserMap() {
+	void "test get cached browser map"() {
+		when:
 		Map<Long, Browser> dataToProve = serviceUnderTest.getCachedBrowserMap()
-		assertEquals("Map contains all browsers", browserCount, dataToProve.size())
+
+		then:
+		dataToProve.size() == browserCount
 
 		// Check if for all browsers relevant data was placed instead of null
 		for(Map.Entry<Long, Browser> eachEntry : dataToProve.entrySet())
 		{
-			assertNotNull(eachEntry.key)
-			assertNotNull(eachEntry.value)
-			assertNotNull(eachEntry.value.name)
+			eachEntry.key != null
+			eachEntry.value != null
+			eachEntry.value.name != null
 		}
 
 		// subsequent call should return equal result:
 		Map<Long, Browser> subsequentRetrievedData = serviceUnderTest.getCachedBrowserMap()
-		assertEquals(dataToProve, subsequentRetrievedData);
+		subsequentRetrievedData == dataToProve
 	}
 
-	@Test
-	void testGetBrowserMap() {
+	void "test getBrowserMap"() {
+		when:
 		Map<Long, Browser> dataToProve = serviceUnderTest.getBrowserMap()
-		assertEquals("Map contains all browsers", browserCount, dataToProve.size())
+
+		then:
+		dataToProve.size() == browserCount
 
 		// Check if for all browsers relevant data was placed instead of null
 		for(Map.Entry<Long, Browser> eachEntry : dataToProve.entrySet())
 		{
-			assertNotNull(eachEntry.key)
-			assertNotNull(eachEntry.value)
-			assertNotNull(eachEntry.value.name)
+			eachEntry.key != null
+			eachEntry.value != null
+			eachEntry.value.name != null
 		}
 
 		// subsequent call should return equal result:
 		Map<Long, Browser> subsequentRetrievedData = serviceUnderTest.getBrowserMap()
-		assertEquals(dataToProve, subsequentRetrievedData);
+		subsequentRetrievedData == dataToProve
 	}
 }
