@@ -18,14 +18,13 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
 import grails.test.mixin.*
 
 import org.junit.Before
 import org.junit.Test
 
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
+import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertEquals
 
 /**
  * Test-suite of {@link AggregatorTypeDaoService}.

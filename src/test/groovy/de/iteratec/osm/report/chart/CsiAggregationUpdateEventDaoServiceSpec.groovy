@@ -19,6 +19,8 @@ package de.iteratec.osm.report.chart
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
+import static org.junit.Assert.assertNotNull
+import static org.junit.Assert.assertTrue
 
 import grails.test.mixin.*
 

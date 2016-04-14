@@ -24,7 +24,7 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.util.slurpersupport.NodeChild
 import spock.lang.Specification
-
+import static org.junit.Assert.assertTrue
 /**
  * Test-suite for {@link OsmChartTagLib}.
  */
