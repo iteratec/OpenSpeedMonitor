@@ -50,7 +50,7 @@ class DbCleanupServiceSpec extends Specification{
         serviceUnderTest = service
         mocker = ServiceMocker.create()
         mocker.mockBatchActivityService(serviceUnderTest)
-        serviceUnderTest.batchActivityService.timer.cancel()//we don't need any updates for this tests
+//        serviceUnderTest.batchActivityService.timer.cancel()//we don't need any updates for this tests
     }
 
     @Test

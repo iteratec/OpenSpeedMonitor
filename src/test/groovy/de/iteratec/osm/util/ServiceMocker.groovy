@@ -41,6 +41,7 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
 import groovy.mock.interceptor.MockFor
+import org.hibernate.engine.jdbc.batch.spi.Batch
 import org.joda.time.DateTime
 
 import java.text.DecimalFormat
@@ -79,49 +80,36 @@ class ServiceMocker {
 
     /**
      * Mocks methods of {@link BatchActivityService}.
+	 * This Service always returns a BatchActivity when requested, but doesn't care for updates or if already one exists
      * @param serviceToMockIn
      *      Grails-Service with the service to mock as instance-variable.
      */
     void mockBatchActivityService(serviceToMockIn){
-        def batchActivityService = new MockFor(BatchActivityService, true)
-        HashMap<Long, Class> containingIds = new HashMap<>()
+        BatchActivityService batchActivityService = new BatchActivityService()
+		batchActivityService.metaClass.getActiveBatchActivity = {Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
+			return new BatchActivity(
+					activity: activity,
+					domain: c.toString(),
+					idWithinDomain: idWithinDomain,
+					name: name,
+					failures: 0,
+					lastFailureMessage: "",
+					progress: 0,
+					progressWithinStage: "0",
+					stage: "0",
+					status: Status.ACTIVE,
+					startDate: new Date(),
+					successfulActions: 0)
+		}
+		batchActivityService.metaClass.updateActivites = {
+			//Do nothing
+		}
 
-        batchActivityService.demand.getActiveBatchActivity(1..10000) {
-            Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
-                containingIds.put(idWithinDomain, c)
-                return new BatchActivity(
-                        activity: activity,
-                        domain: c.toString(),
-                        idWithinDomain: idWithinDomain,
-                        name: name,
-                        failures: 0,
-                        lastFailureMessage: "",
-                        progress: 0,
-                        progressWithinStage: "",
-                        stage: "",
-                        status: Status.ACTIVE,
-                        startDate: new Date(),
-                        successfulActions: 0,
-                ).save(failOnError: true)
-        }
-
-        batchActivityService.demand.runningBatch(1..10000) {
-            Class c,long idWithinDomain ->
-                return containingIds.containsKey(idWithinDomain) ? (containingIds.get(idWithinDomain) == c ? true : false) : false
-        }
-
-        batchActivityService.demand.updateStatus(1..1000){
-            BatchActivity activity,Map<String,Object> map ->
-            log.info "BatchActivity status updated"
-        }
-
-        batchActivityService.demand.calculateProgress(1..1000){
-            int count, int actual ->
-            DecimalFormat df = new DecimalFormat("#.##");
-            return df.format(100.0/count*actual) + " %";
-        }
-
-        serviceToMockIn.batchActivityService = batchActivityService.proxyInstance()
+		batchActivityService.metaClass.runningBatch{Class c, long idWithinDomain ->false}
+		batchActivityService.metaClass.noteBatchActivityUpdate{BatchActivity activity ->
+			//Do nothing
+		}
+		serviceToMockIn.batchActivityService = batchActivityService
     }
 	
 	/**

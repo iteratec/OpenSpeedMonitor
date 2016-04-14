@@ -42,7 +42,7 @@ class DbCleanupService {
 	EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService
 
-    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+//    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     /**
      * Deletes all {@link EventResult}s {@link JobResult}s before date toDeleteBefore.
