@@ -20,7 +20,7 @@ package de.iteratec.osm.result
 import grails.test.mixin.*
 
 import org.junit.*
-
+import static org.junit.Assert.*
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */

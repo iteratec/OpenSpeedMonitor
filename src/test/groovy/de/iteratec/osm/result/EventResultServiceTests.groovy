@@ -30,7 +30,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-
+import static org.junit.Assert.*
 /**
  * Test-suite of {@link de.iteratec.osm.result.EventResultService}.
  */
@@ -75,7 +75,9 @@ class EventResultServiceTests {
 				baseUrl : 'http://server1.wpt.server.de',
 				active : true,
 				label : 'server 1 - wpt server',
-				proxyIdentifier : 'server 1 - wpt server'
+				proxyIdentifier : 'server 1 - wpt server',
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		ffBrowser = new Browser(
@@ -96,7 +98,9 @@ class EventResultServiceTests {
 				location: 'physNetLabAgent01-FF',
 				label: 'physNetLabAgent01 - FF up to date',
 				browser: ffBrowser,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		ieAgent1 = new Location(
@@ -105,7 +109,9 @@ class EventResultServiceTests {
 				location: 'physNetLabAgent01-IE8',
 				label: 'physNetLabAgent01 - IE 8',
 				browser: ieBrowser,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		ieHetznerAgent1 = new Location(
@@ -114,7 +120,9 @@ class EventResultServiceTests {
 				location: 'hetznerAgent01-IE8',
 				label: 'hetznerAgent01 - IE 8',
 				browser: ieBrowser,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		i8eHetznerAgent1 = new Location(
@@ -123,7 +131,9 @@ class EventResultServiceTests {
 				location: 'hetznerAgent01-IE8',
 				label: 'hetznerAgent01 - IE 8',
 				browser: i8eBrowser,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		ffHetznerAgent1 = new Location(
@@ -132,7 +142,9 @@ class EventResultServiceTests {
 				location: 'hetznerAgent01-FF',
 				label: 'hetznerAgent01 - FF up to date',
 				browser: ffBrowser,
-				wptServer: server1
+				wptServer: server1,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		jobGroupUndefined = new JobGroup(name: 'undefined').save(failOnError:true)
@@ -709,8 +721,8 @@ class EventResultServiceTests {
 		
 		// Define a Browser and a Location (not relevant, because query works on copied data, but required on constraints):
 		Browser browser = new Browser(name: 'FF-w0', weight:0).save(failOnError:true);
-		WebPageTestServer wptServer = new WebPageTestServer(label:'Testserver', proxyIdentifier:'testproxy', baseUrl:'http://example.com/', active:true).save(failOnError:true);
-		Location location = new Location(active: true, location: 'agent1.example.com', browser: browser, label: 'Test-location', wptServer: wptServer).save(failOnError:true);
+		WebPageTestServer wptServer = new WebPageTestServer(label:'Testserver', proxyIdentifier:'testproxy', baseUrl:'http://example.com/', active:true,dateCreated: new Date(),lastUpdated: new Date()).save(failOnError:true);
+		Location location = new Location(active: true, location: 'agent1.example.com', browser: browser, label: 'Test-location', wptServer: wptServer,dateCreated: new Date(),lastUpdated: new Date()).save(failOnError:true);
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 		
 		// Define a job:

@@ -42,6 +42,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import static org.junit.Assert.*
 /**
  * Test-suite of {@link ResultCsiAggregationService}
  */
@@ -107,7 +108,9 @@ class ResultCsiAggregationServiceTests {
 				baseUrl : 'http://server1.wpt.server.de',
 				active : true,
 				label : 'server 1 - wpt server',
-				proxyIdentifier : 'server 1 - wpt server'
+				proxyIdentifier : 'server 1 - wpt server',
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true);
 
 		JobGroup jobGroup = new JobGroup(
@@ -130,7 +133,9 @@ class ResultCsiAggregationServiceTests {
 				location: 'physNetLabAgent01-FF',
 				label: 'physNetLabAgent01 - FF up to date',
 				browser: fireFoxBrowser,
-				wptServer: server
+				wptServer: server,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 

@@ -28,7 +28,7 @@ import org.joda.time.Interval
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
-
+import static org.junit.Assert.*
 /**
  * Test-suite of {@link TabularResultPresentationController}.
  * 
@@ -53,7 +53,7 @@ class TabularResultPresentationControllerTests {
 	public void setUp()
 	{
 		// Enable constraint tests:
-		mockForConstraintsTests(TabularResultListResultsCommand.class);
+//		mockForConstraintsTests(TabularResultListResultsCommand.class);
 		
 		// The controller under test:
 		controllerUnderTest = controller;
@@ -176,7 +176,7 @@ class TabularResultPresentationControllerTests {
 		assertTrue(out.selectedLocations.contains(17L))
 		
 		// Could we assume the time frame at once?
-		Interval timeFrame = out.selectedTimeFrame;
+		Interval timeFrame = out.receiveSelectedTimeFrame();
 
 		DateTime start = timeFrame.getStart();
 		DateTime end = timeFrame.getEnd();
@@ -224,10 +224,11 @@ class TabularResultPresentationControllerTests {
 
 		// Create and fill the command:
 		TabularResultListResultsCommand out = new TabularResultListResultsCommand()
-		controllerUnderTest.bindData(out, params)
+        controllerUnderTest.bindData(out, params)
 
 		// Verification:
-		assertFalse(out.validate())
+        assertFalse(out.validate())
+
 	}
 	
 	/**

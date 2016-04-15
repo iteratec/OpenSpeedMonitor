@@ -32,7 +32,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-
+import static org.junit.Assert.*
 
 /**
  * Test-suite of {@link de.iteratec.osm.result.PaginationService}.
@@ -59,7 +59,9 @@ class PaginationServiceTest {
 				baseUrl: 'http://server1.wpt.server.de',
 				active: true,
 				label: 'server 1 - wpt server',
-				proxyIdentifier: 'server 1 - wpt server'
+				proxyIdentifier: 'server 1 - wpt server',
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		String browserName="FF"
@@ -78,7 +80,9 @@ class PaginationServiceTest {
 				location: 'physNetLabAgent01-FF',
 				label: 'physNetLabAgent01 - FF up to date',
 				browser: browserFF,
-				wptServer: server
+				wptServer: server,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 				).save(failOnError: true)
 
 		jobGroupName = 'CSI'

@@ -19,28 +19,28 @@ public class TabularResultEventResultsCommandBase implements Validateable{
     /**
      * The selected start date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     Date from
 
     /**
      * The selected end date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     Date to
 
     /**
      * The selected start hour of date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     String fromHour
 
     /**
      * The selected end hour of date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     String toHour
 
@@ -98,12 +98,8 @@ public class TabularResultEventResultsCommandBase implements Validateable{
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    public Interval getSelectedTimeFrame() throws IllegalStateException
+    public Interval receiveSelectedTimeFrame() throws IllegalStateException
     {
-        if( !this.validate() )
-        {
-            throw new IllegalStateException('A time frame is not available from an invalid command.')
-        }
 
         DateTime start
         DateTime end

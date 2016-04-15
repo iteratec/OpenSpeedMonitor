@@ -312,8 +312,8 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
-		params.showDataMarkers = false
 
+		params.showDataMarkers = false
 		params.showDataLabels = false
 		params.selectedInterval = 0
 		params.selectChartType = 0
