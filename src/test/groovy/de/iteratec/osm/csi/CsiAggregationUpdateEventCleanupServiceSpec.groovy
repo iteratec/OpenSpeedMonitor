@@ -265,7 +265,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends Specification {
 
     void addMocksCommonForAllTests() {
 
-        ServiceMocker.mockBatchActivityService(serviceUnderTest)
+        ServiceMocker.create().mockBatchActivityService(serviceUnderTest)
 
         serviceUnderTest.inMemoryConfigService.metaClass {
             areMeasurementsGenerallyEnabled { -> return true }

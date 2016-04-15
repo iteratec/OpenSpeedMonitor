@@ -29,6 +29,7 @@ import org.joda.time.format.DateTimeFormatter
 
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.Matchers.*
+import static org.junit.Assert.assertTrue
 
 import grails.test.mixin.*
 import grails.test.mixin.support.*
@@ -224,7 +225,6 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
-
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
 
