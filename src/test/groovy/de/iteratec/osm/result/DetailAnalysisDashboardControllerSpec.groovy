@@ -23,7 +23,7 @@ import grails.test.mixin.*
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import spock.lang.Specification
-
+import static org.junit.Assert.*
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
  */
@@ -83,6 +83,9 @@ class DetailAnalysisDashboardControllerSpec extends Specification{
         params.selectedTimeFrameInterval = 0
         params.includeNativeConnectivity = false
         params.includeCustomConnectivity = true
+        params.setFromHour = false
+        params.setToHour = false
+
 
         when:
         controllerUnderTest.bindData(dashboardCommand, params)
@@ -92,6 +95,8 @@ class DetailAnalysisDashboardControllerSpec extends Specification{
 
         dashboardCommand.from == expectedDateForFrom
         dashboardCommand.fromHour == "12:00"
+
+        dashboardCommand.to == expectedDateForTo
         dashboardCommand.toHour == "13:00"
 
         dashboardCommand.selectedFolder.size() == 1
@@ -150,6 +155,9 @@ class DetailAnalysisDashboardControllerSpec extends Specification{
         params.selectedMeasuredEventIds = ['7', '8', '9']
         params.selectedBrowsers = '2'
         params.selectedLocations = 'UGLY'
+        params.setFromHour = false
+        params.setToHour = false
+
 
         when:
         controllerUnderTest.bindData(dashboardCommand, params)

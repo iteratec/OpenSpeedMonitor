@@ -22,7 +22,7 @@ import grails.test.mixin.*
 import groovy.util.slurpersupport.GPathResult
 import org.junit.Before
 import org.junit.Test
-
+import static org.junit.Assert.*;
 /**
  * Test-suite of {@link de.iteratec.osm.result.EventResultXmlService}.
  */

@@ -498,7 +498,9 @@ class EventResultDashboardServiceTests {
                 baseUrl: 'http://server1.wpt.server.de',
                 active: true,
                 label: 'server 1 - wpt server',
-                proxyIdentifier: 'server 1 - wpt server'
+                proxyIdentifier: 'server 1 - wpt server',
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
 
         location = new Location(
@@ -507,7 +509,9 @@ class EventResultDashboardServiceTests {
                 location: location1Location,
                 label: location1Label,
                 browser: browser,
-                wptServer: server
+                wptServer: server,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
 
         Browser browser2 = Browser.findByName("Test2")
@@ -519,7 +523,9 @@ class EventResultDashboardServiceTests {
                 location: location2Location,
                 label: location2Label,
                 browser: browser2,
-                wptServer: server
+                wptServer: server,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
     }
 

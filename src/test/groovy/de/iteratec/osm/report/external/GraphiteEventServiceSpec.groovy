@@ -61,7 +61,7 @@ class GraphiteEventServiceSpec extends Specification{
         serviceUnderTest = service
 
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
-        ServiceMocker.mockBatchActivityService(serviceUnderTest)
+        new ServiceMocker().mockBatchActivityService(serviceUnderTest)
         serviceUnderTest.eventDaoService = new EventDaoService()
         CsiAggregationUtilService mockedCsiAggregationUtilService = new CsiAggregationUtilService()
         mockedCsiAggregationUtilService.metaClass.getNowInUtc = { -> untilDateTime }

@@ -80,7 +80,7 @@ class QuartzControlledGrailsReportsTests {
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
 		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
-		ServiceMocker.mockBatchActivityService(serviceUnderTest)
+		new ServiceMocker().mockBatchActivityService(serviceUnderTest)
 		new OsmConfiguration().save(failOnError: true)
 	}
 

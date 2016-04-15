@@ -40,6 +40,7 @@ import org.joda.time.Interval
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
+import static org.junit.Assert.*
 
 import static org.mockito.Mockito.when
 
@@ -79,7 +80,7 @@ class EventResultDashboardControllerTests {
         }
 
 		// Enable constraint tests:
-		mockForConstraintsTests(EventResultDashboardShowAllCommand.class);
+//		mockForConstraintsTests(EventResultDashboardShowAllCommand.class);
 
 		// The controller under test:
 		controllerUnderTest = controller;
@@ -171,6 +172,23 @@ class EventResultDashboardControllerTests {
 		params.selectedTimeFrameInterval = 0
         params.includeNativeConnectivity = false
         params.includeCustomConnectivity = true
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 		
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -251,7 +269,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
 
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
 
@@ -278,7 +312,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
 
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
 
@@ -305,7 +355,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
 
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
 
@@ -331,6 +397,7 @@ class EventResultDashboardControllerTests {
 		params.aggrGroup = AggregatorType.PAGE.toString()
 		params.selectedFolder = '1'
 		params.selectedPages = ['1', '5']
+		params.selectedPages = ['1', '5']
 		params.selectedMeasuredEventIds = ['7', '8', '9']
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
@@ -342,9 +409,25 @@ class EventResultDashboardControllerTests {
 		params.selectedTimeFrameInterval = 0
         params.includeNativeConnectivity = false
         params.includeCustomConnectivity = true
-
+		params.showDataMarkers = false
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
+
 
 		// Verification:
 		assertTrue(command.validate())
@@ -418,6 +501,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = 'UGLY'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -452,6 +552,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -478,6 +595,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -504,6 +638,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '2'
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -530,6 +681,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = []
 		params.selectedLocations = '17'
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -556,6 +724,23 @@ class EventResultDashboardControllerTests {
 		params.selectedBrowsers = '1'
 		params.selectedLocations = []
 		params._action_showAll = 'Anzeigen'
+		params.showDataMarkers = false
+
+		params.showDataLabels = false
+		params.selectedInterval = 0
+		params.selectChartType = 0
+		params.trimBelowLoadTimes=0
+		params.trimAboveLoadTimes= 0
+		params.trimBelowRequestCounts=0
+		params.trimAboveRequestCounts=0
+		params.trimBelowRequestSizes=0
+		params.trimAboveRequestSizes=0
+		params.debug = false
+		params.setFromHour= false
+		params.setToHour = false
+		params.chartWidth= 0
+		params.chartHeight=0
+		params.loadTimeMinimum=0
 
 		// Create and fill the command:
 		controllerUnderTest.bindData(command, params)
@@ -764,6 +949,23 @@ class EventResultDashboardControllerTests {
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = true
         command.customConnectivityName = 'Custom (6000.*'
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -826,6 +1028,22 @@ class EventResultDashboardControllerTests {
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = true
         command.customConnectivityName = 'Custom (6000.*'
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
 
 		// Run the test:
 		Map<String, Object> dataUnderTest = new HashMap<String, Object>();
@@ -884,6 +1102,22 @@ class EventResultDashboardControllerTests {
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = true
         command.customConnectivityName = 'Custom (6000.*'
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -940,7 +1174,22 @@ class EventResultDashboardControllerTests {
         command.selectedTimeFrameInterval = 0
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = false
-
+		command.showDataMarkers = false
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
+        command.debug = false
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -981,6 +1230,23 @@ class EventResultDashboardControllerTests {
 		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = true
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
+        command.debug = false
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -1022,6 +1288,23 @@ class EventResultDashboardControllerTests {
 		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = true
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
+        command.debug = false
 
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -1063,6 +1346,23 @@ class EventResultDashboardControllerTests {
 		command.selectedAggrGroupValuesCached = [ AggregatorType.RESULT_CACHED_LOAD_TIME ]
         command.includeNativeConnectivity = false
         command.includeCustomConnectivity = true
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
+        command.debug = false
 		
 		// Do we fill all fields?
 		assertTrue(command.validate())
@@ -1106,6 +1406,23 @@ class EventResultDashboardControllerTests {
         command.selectedAllConnectivityProfiles = []
         command.includeNativeConnectivity = true
         command.includeCustomConnectivity = false
+		command.showDataMarkers = false
+
+		command.showDataLabels = false
+		command.selectedInterval = 0
+		command.selectChartType = 0
+		command.trimBelowLoadTimes=0
+		command.trimAboveLoadTimes= 0
+		command.trimBelowRequestCounts=0
+		command.trimAboveRequestCounts=0
+		command.trimBelowRequestSizes=0
+		command.trimAboveRequestSizes=0
+		command.setFromHour= false
+		command.setToHour = false
+		command.chartWidth= 0
+		command.chartHeight=0
+		command.loadTimeMinimum=0
+        command.debug = false
 
         // Do we fill all fields?
         assertTrue(command.validate())
