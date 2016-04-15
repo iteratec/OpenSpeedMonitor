@@ -19,9 +19,8 @@ else
   git config user.name "bamboo iteratec"
 
   git commit -am "[${bamboo_ci_app_version}] version update"
-  git tag "${bamboo_ci_app_version}"
 
   git pull --rebase $remote $bamboo_planRepository_branch
-  git push --tags $remote HEAD:refs/heads/$bamboo_repository_git_branch
+  git push $remote HEAD:refs/heads/$bamboo_repository_git_branch
 
 fi
