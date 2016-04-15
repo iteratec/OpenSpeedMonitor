@@ -86,7 +86,7 @@ class MetricReportingServiceTests {
 		serviceUnderTest = service
 		serviceUnderTest.configService = new ConfigService()
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
-		ServiceMocker.mockBatchActivityService(serviceUnderTest)
+		ServiceMocker.create().mockBatchActivityService(serviceUnderTest)
 		createTestDataCommonToAllTests()
     }
 	
