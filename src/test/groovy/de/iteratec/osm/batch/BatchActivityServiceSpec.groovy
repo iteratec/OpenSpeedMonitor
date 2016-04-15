@@ -34,11 +34,14 @@ class BatchActivityServiceSpec extends Specification {
 
     BatchActivityService serviceUnderTest
 
-    void "testBatchActivityCreation"() {
-        given:
-            serviceUnderTest = service
-            serviceUnderTest.timer.cancel()
+    def setup(){
+        serviceUnderTest = service
+        serviceUnderTest.metaClass.createTimerIfNecessary = {
+            //Do nothing, because we doesn't want to rely on a timer for this tests
+        }
+    }
 
+    void "testBatchActivityCreation"() {
         when:
             BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 1, Activity.DELETE, "Object test deletion")
             serviceUnderTest.updateActivities()
@@ -48,10 +51,6 @@ class BatchActivityServiceSpec extends Specification {
     }
 
     void "testBatchActivityProcess"() {
-        given:
-            serviceUnderTest = service
-            serviceUnderTest.timer.cancel()
-
         when:
             BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 2, Activity.DELETE, "Object test deletion")
             batchActivity.updateStatus(['progress': serviceUnderTest.calculateProgress(100, 5), 'stage': "firstStage"])
@@ -64,10 +63,6 @@ class BatchActivityServiceSpec extends Specification {
     }
 
     void "testBatchActivityProcessAbortion"(){
-        given:
-            serviceUnderTest = service
-            serviceUnderTest.timer.cancel()
-
         when:
             BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 3, Activity.DELETE, "Object test deletion")
             batchActivity.updateStatus(['progress': serviceUnderTest.calculateProgress(100, 5), 'stage': "firstStage"])

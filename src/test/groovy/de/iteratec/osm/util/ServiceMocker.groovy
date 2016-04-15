@@ -86,7 +86,7 @@ class ServiceMocker {
      */
     void mockBatchActivityService(serviceToMockIn){
         BatchActivityService batchActivityService = new BatchActivityService()
-		batchActivityService.metaClass.getActiveBatchActivity = {Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
+		BatchActivityService.metaClass.getActiveBatchActivity = {Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
 			return new BatchActivity(
 					activity: activity,
 					domain: c.toString(),
@@ -101,16 +101,16 @@ class ServiceMocker {
 					startDate: new Date(),
 					successfulActions: 0)
 		}
-		batchActivityService.metaClass.updateActivites = {
+		BatchActivityService.metaClass.updateActivites = {
 			//Do nothing
 		}
 
-		batchActivityService.metaClass.runningBatch{Class c, long idWithinDomain ->false}
-		batchActivityService.metaClass.noteBatchActivityUpdate{BatchActivity activity ->
+		BatchActivityService.metaClass.runningBatch{Class c, long idWithinDomain ->false}
+		BatchActivityService.metaClass.noteBatchActivityUpdate{BatchActivity activity ->
 			//Do nothing
 		}
-		batchActivityService.timer.cancel()
-		batchActivityService.timer.purge()
+		batchActivityService.timer?.cancel()
+		batchActivityService.timer?.purge()
 		serviceToMockIn.batchActivityService = batchActivityService
     }
 	

@@ -10,19 +10,10 @@ class BatchActivityService implements Observer {
 
     static transactional = false
 
-    Timer timer = new Timer()
+    Timer timer
     final Set<BatchActivity> activities = Collections.synchronizedSet(new HashSet<BatchActivity>())
     //Interval to save incoming updates in seconds
     int updateInterval = 5
-
-    BatchActivityService() {
-        timer.schedule(new TimerTask() {
-            @Override
-            void run() {
-                updateActivities()
-            }
-        }, 10000, 1000 * updateInterval)
-    }
 
     /**
      * Creates a new BatchActivity. This BatchActivity will be observed and will automatically be saved, if any property has changed
@@ -50,11 +41,24 @@ class BatchActivityService implements Observer {
                     startDate: new Date(),
                     successfulActions: 0)
             if(observe){
+                createTimerIfNecessary()
                 batchActivity.save(failOnError: true, flush: true)
                 batchActivity.addObserver(this)
             }
         }
         return batchActivity
+    }
+
+    private void createTimerIfNecessary(){
+        if(timer==null){
+            timer = new Timer()
+            timer.schedule(new TimerTask() {
+                @Override
+                void run() {
+                    updateActivities()
+                }
+            }, 10000, 1000 * updateInterval)
+        }
     }
 
     /**
