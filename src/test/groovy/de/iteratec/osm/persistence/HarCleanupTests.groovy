@@ -17,7 +17,7 @@ import spock.lang.Specification
 class HarCleanupTests extends Specification{
 
     public void setup(){
-        ServiceMocker.mockBatchActivityService(service)
+        ServiceMocker.create().mockBatchActivityService(service)
     }
 
     @Test
