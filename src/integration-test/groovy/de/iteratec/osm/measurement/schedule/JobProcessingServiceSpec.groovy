@@ -26,13 +26,15 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
-import grails.test.spock.IntegrationSpec
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.http.HttpVersion
 import org.apache.http.message.BasicHttpResponse
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
+import spock.lang.Specification
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
@@ -42,7 +44,9 @@ import static org.junit.Assert.assertNotNull
  *
  * @author dri
  */
-class JobProcessingServiceSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class JobProcessingServiceSpec extends Specification {
     JobProcessingService jobProcessingService
     QueueAndJobStatusService queueAndJobStatusService
 

@@ -27,7 +27,6 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
-import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Shared

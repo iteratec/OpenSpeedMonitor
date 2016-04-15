@@ -23,7 +23,6 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
-import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Shared

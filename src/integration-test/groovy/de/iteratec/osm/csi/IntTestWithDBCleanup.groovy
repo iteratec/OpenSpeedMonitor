@@ -17,11 +17,6 @@
 
 package de.iteratec.osm.csi
 
-import org.codehaus.groovy.grails.commons.GrailsApplication
-import org.codehaus.groovy.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
-import org.hibernate.SessionFactory
-import org.hibernate.cfg.Configuration
-import org.hibernate.tool.hbm2ddl.SchemaExport
 import org.junit.AfterClass
 import org.junit.BeforeClass
 

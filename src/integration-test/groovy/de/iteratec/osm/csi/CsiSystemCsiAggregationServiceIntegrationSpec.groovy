@@ -12,11 +12,14 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
-import grails.test.spock.IntegrationSpec
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.junit.Test
-
-class CsiSystemCsiAggregationServiceIntegrationSpec extends IntegrationSpec {
+import spock.lang.Specification
+@Integration
+@Rollback
+class CsiSystemCsiAggregationServiceIntegrationSpec extends Specification {
 
     static final String jobGroupName1 = 'jobGroupName1'
     static final String jobGroupName2 = 'jobGroupName2'

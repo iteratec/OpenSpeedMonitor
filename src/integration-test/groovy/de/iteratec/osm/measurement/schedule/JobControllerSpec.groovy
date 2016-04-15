@@ -11,8 +11,10 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
-import grails.test.spock.IntegrationSpec
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
+import spock.lang.Specification
 
 import static de.iteratec.osm.csi.TestDataUtil.*
 import static org.hamcrest.MatcherAssert.assertThat
@@ -22,7 +24,9 @@ import static org.hamcrest.Matchers.*
  * We need an integration test because there is no support for unit test with cascading in Hibernate 3.X
  *
  */
-class JobControllerSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class JobControllerSpec extends Specification {
 
     JobController controllerUnderTest
     //Will be used to assign different names for the test data

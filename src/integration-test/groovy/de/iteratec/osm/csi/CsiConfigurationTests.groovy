@@ -2,9 +2,12 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.test.spock.IntegrationSpec
-
-class CsiConfigurationTests extends IntegrationSpec {
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import spock.lang.Specification
+@Integration
+@Rollback
+class CsiConfigurationTests extends Specification {
 
     CsiConfiguration csiConfiguration
 

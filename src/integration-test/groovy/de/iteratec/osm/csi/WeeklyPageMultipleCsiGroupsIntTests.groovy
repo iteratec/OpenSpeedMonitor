@@ -27,7 +27,6 @@ import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.result.*
 import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.IntegrationTestMixin
-import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import spock.lang.Shared
 

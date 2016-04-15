@@ -1,13 +1,17 @@
 package de.iteratec.osm.csi
 
-import org.codehaus.groovy.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import org.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
 import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
-import grails.test.spock.IntegrationSpec
 import org.hibernate.tool.hbm2ddl.SchemaExport
 import spock.lang.Shared
+import spock.lang.Specification
 
-class NonTransactionalIntegrationSpec extends IntegrationSpec {
+@Integration
+@Rollback
+class NonTransactionalIntegrationSpec extends Specification {
 
     @Shared
     private static Configuration _configuration

@@ -19,17 +19,21 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
-import grails.test.spock.IntegrationSpec
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Test
+import spock.lang.Specification
 
 import java.util.regex.Pattern
 
 /**
  *
  */
-class QueryEventResultsByConnectivitySpec extends IntegrationSpec {
+@Integration
+@Rollback
+class QueryEventResultsByConnectivitySpec extends Specification {
 
     EventResultDaoService eventResultDaoService
 

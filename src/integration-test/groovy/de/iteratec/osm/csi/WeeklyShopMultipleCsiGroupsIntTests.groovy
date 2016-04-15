@@ -27,7 +27,6 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
-import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {

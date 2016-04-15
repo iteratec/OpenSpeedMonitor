@@ -29,7 +29,6 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
-import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 

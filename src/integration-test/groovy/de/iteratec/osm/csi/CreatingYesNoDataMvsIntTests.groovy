@@ -18,7 +18,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import grails.test.spock.IntegrationSpec
 import org.junit.Test
 import spock.lang.Shared
 

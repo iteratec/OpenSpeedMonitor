@@ -24,7 +24,6 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultP
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
-import grails.test.spock.IntegrationSpec
 import groovy.util.slurpersupport.GPathResult
 import org.springframework.transaction.TransactionStatus
 
