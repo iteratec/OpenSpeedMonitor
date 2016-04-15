@@ -20,8 +20,11 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
+import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.util.ServiceMocker
 import groovy.mock.interceptor.MockFor
+import groovy.mock.interceptor.StubFor
 
 import static org.junit.Assert.assertEquals
 
@@ -629,8 +632,8 @@ class MetricReportingServiceTests {
 	 * @param pages
 	 */
 	private void mockCsiAggregationTagService(AggregatorType measurandForGraphitePath, String jobGroupName = SYSTEM_NAME){
-		def csiAggregationTagService = new MockFor(CsiAggregationTagService, true)
-		csiAggregationTagService.demand.findJobGroupOfHourlyEventTag(1..10000) {
+		def csiAggregationTagService = new StubFor(CsiAggregationTagService, true)
+		csiAggregationTagService.demand.findJobGroupOfHourlyEventTag {
 			String hourlyEventMvTag ->
 			
 			JobGroup group = new JobGroup(name: jobGroupName)
@@ -644,23 +647,23 @@ class MetricReportingServiceTests {
 			group.graphiteServers = [graphiteServer]
 			return group
 		}
-		csiAggregationTagService.demand.findPageOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findPageOfHourlyEventTag{
 			String hourlyEventMvTag ->
 			return new Page(name: PAGE_NAME)
 		}
-		csiAggregationTagService.demand.findMeasuredEventOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findMeasuredEventOfHourlyEventTag {
 			String hourlyEventMvTag ->
 			return new MeasuredEvent(name: EVENT_NAME)
 		}
-		csiAggregationTagService.demand.findBrowserOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findBrowserOfHourlyEventTag {
 			String hourlyEventMvTag ->
 			return new Browser(name: BROWSER_NAME)
 		}
-		csiAggregationTagService.demand.findLocationOfHourlyEventTag(1..10000) {
+		csiAggregationTagService.demand.findLocationOfHourlyEventTag{
 			String hourlyEventMvTag ->
 			return new Location(location: LOCATION_LOCATION)
 		}
-		csiAggregationTagService.demand.findPageByPageTag(1..10000) {
+		csiAggregationTagService.demand.findPageByPageTag {
 			String weeklyPageTag ->
 			return new Page(name: PAGE_NAME)
 		}
@@ -672,8 +675,8 @@ class MetricReportingServiceTests {
 	 * @param pages
 	 */
 	private void mockJobGroupDaoService(String measurandForGraphitePath, String jobGroupName = SYSTEM_NAME){
-		def jobGroupDaoService = new MockFor(JobGroupDaoService, true)
-		jobGroupDaoService.demand.findCSIGroups(1..10000) { ->
+		def jobGroupDaoService = new StubFor(DefaultJobGroupDaoService, true)
+		jobGroupDaoService.demand.findCSIGroups { ->
 			
 			JobGroup group = new JobGroup(name: jobGroupName)
 			
@@ -696,12 +699,12 @@ class MetricReportingServiceTests {
 	 * @param pages
 	 */
 	private void mockCsiAggregationUtilService(DateTime toReturnAsStartOfInterval){
-		def csiAggregationUtilService = new MockFor(CsiAggregationUtilService, true)
-		csiAggregationUtilService.demand.resetToStartOfActualInterval(1..10000) {
+		def csiAggregationUtilService = new StubFor(CsiAggregationUtilService, true)
+		csiAggregationUtilService.demand.resetToStartOfActualInterval {
 			DateTime dateWithinInterval, Integer intervalInMinutes ->
 			return toReturnAsStartOfInterval
 		}
-		csiAggregationUtilService.demand.subtractOneInterval(1..10000) {
+		csiAggregationUtilService.demand.subtractOneInterval{
 			DateTime toSubtractFrom, Integer intervalInMinutes ->
 			return toReturnAsStartOfInterval
 		}
@@ -711,8 +714,8 @@ class MetricReportingServiceTests {
 	 * Mocks methods of {@linkplain PageCsiAggregationService}.
 	 */
 	private void mockEventCsiAggregationService(List<CsiAggregation> toReturnFromGetHourlyCsiAggregations){
-		def eventCsiAggregationService = new MockFor(EventCsiAggregationService, true)
-		eventCsiAggregationService.demand.getHourlyCsiAggregations(1..10000) {
+		def eventCsiAggregationService = new StubFor(EventCsiAggregationService, true)
+		eventCsiAggregationService.demand.getHourlyCsiAggregations{
 			Date fromDate, Date toDate, MvQueryParams mvQueryParams ->
 			return toReturnFromGetHourlyCsiAggregations
 		}
@@ -722,8 +725,8 @@ class MetricReportingServiceTests {
 	 * Mocks methods of {@linkplain PageCsiAggregationService}.
 	 */
 	private void mockPageCsiAggregationService(List<CsiAggregation> toReturnFromGetOrCalculatePageCsiAggregations){
-		def pageCsiAggregationService = new MockFor(PageCsiAggregationService, true)
-		pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations(1..10000) {
+		def pageCsiAggregationService = new StubFor(PageCsiAggregationService, true)
+		pageCsiAggregationService.demand.getOrCalculatePageCsiAggregations {
 			Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
 			return toReturnFromGetOrCalculatePageCsiAggregations
 		}
@@ -733,8 +736,8 @@ class MetricReportingServiceTests {
 	 * Mocks methods of {@linkplain ShopCsiAggregationService}.
 	 */
 	private void mockShopCsiAggregationService(List<CsiAggregation> toReturnFromGetOrCalculateShopCsiAggregations){
-		def shopCsiAggregationService = new MockFor(ShopCsiAggregationService, true)
-		shopCsiAggregationService.demand.getOrCalculateShopCsiAggregations(1..10000) {
+		def shopCsiAggregationService = new StubFor(ShopCsiAggregationService, true)
+		shopCsiAggregationService.demand.getOrCalculateShopCsiAggregations {
 			Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
 			return toReturnFromGetOrCalculateShopCsiAggregations
 		}
@@ -744,8 +747,8 @@ class MetricReportingServiceTests {
 	 * Mocks methods of {@linkplain GraphiteSocketProvider}.
 	 */
 	private void mockGraphiteSocketProvider(GraphiteSocket toReturnFromGetSocket){
-		def graphiteSocketProvider = new MockFor(GraphiteSocketProvider, true)
-		graphiteSocketProvider.demand.getSocket(1..10000) {
+		def graphiteSocketProvider = new StubFor(DefaultGraphiteSocketProvider, true)
+		graphiteSocketProvider.demand.getSocket {
 			GraphiteServer server ->
 			return toReturnFromGetSocket
 		}
@@ -755,12 +758,12 @@ class MetricReportingServiceTests {
 	 * Mocks methods of {@linkplain GraphiteSocketProvider}.
 	 */
 	private void mockResultCsiAggregationService(CachedView toReturnFromGetAggregatorTypeCachedViewType, int toReturnFromGetEventResultPropertyForCalculation){
-		def resultCsiAggregationService = new MockFor(ResultCsiAggregationService, true)
-		resultCsiAggregationService.demand.getAggregatorTypeCachedViewType(1..10000) {
+		def resultCsiAggregationService = new StubFor(ResultCsiAggregationService, true)
+		resultCsiAggregationService.demand.getAggregatorTypeCachedViewType {
 			AggregatorType aggregator ->
 			return toReturnFromGetAggregatorTypeCachedViewType
 		}
-		resultCsiAggregationService.demand.getEventResultPropertyForCalculation(1..10000) {
+		resultCsiAggregationService.demand.getEventResultPropertyForCalculation {
 			AggregatorType aggType, EventResult result ->
 			return Double.valueOf(toReturnFromGetEventResultPropertyForCalculation)
 		}
@@ -770,8 +773,8 @@ class MetricReportingServiceTests {
 	 * Mocks methods of {@linkplain GraphiteSocketProvider}.
 	 */
 	private void mockI18nService(){
-		def i18nService = new MockFor(I18nService, true)
-		i18nService.demand.msg(1..10000) {
+		def i18nService = new StubFor(I18nService, true)
+		i18nService.demand.msg {
 			String msgKey, String defaultMessage ->
 			return MEASURAND_DOCREADYTIME_NAME
 		}
