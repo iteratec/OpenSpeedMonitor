@@ -1,13 +1,12 @@
 !tape
 name: CreateChartData creates entry for each location
 interactions:
-- recorded: 2015-11-16T08:05:48.535Z
+- recorded: 2016-04-15T12:10:19.517Z
   request:
     method: GET
     uri: http://dev.server01.wpt.iteratec.de/getTesters.php
     headers:
       Accept: application/xml
-      Accept-Encoding: gzip,deflate
       Host: dev.server01.wpt.iteratec.de
       Proxy-Connection: Keep-Alive
   response:
@@ -15,23 +14,125 @@ interactions:
     headers:
       Access-Control-Allow-Origin: '*'
       Cache-Control: max-age=3600, public
-      Content-Encoding: gzip
       Content-Type: text/xml
-      Date: Mon, 16 Nov 2015 08:05:48 GMT
-      Expires: Mon, 16 Nov 2015 09:05:48 GMT
+      Date: Fri, 15 Apr 2016 12:10:19 GMT
+      Expires: Fri, 15 Apr 2016 13:10:19 GMT
       Server: Apache/2.2.22 (Debian)
-      Set-Cookie: o=753496a32ba577c8bcb3cac42707ef5efcfa4bd6; expires=Tue, 15-Nov-2016 08:05:48 GMT; path=/
+      Set-Cookie: o=49df6448a2e777d35d45d6055bdb28531c66d495; expires=Sat, 15-Apr-2017 12:10:19 GMT; path=/
       Vary: Accept-Encoding
-      X-Powered-By: PHP/5.4.45-0+deb7u1
-    body: !!binary |-
-      H4sIAAAAAAAAA9WWa2+bMBSGv/MronwuxgZCHMmh2qb0Iq0XtelW9ctkwCSoFBB22mS/fsc05ELSaGvTVpOS+Bz7+DV5/YBhh9OHtPUoSpnkWb9NEG63RBbmUZKN+u2b4ZFJ24e+wXSZKdUsFXIshGqpWSH6bSWmyprKdHNOa1yKuN8eCTUUUoE8qsrWFtK6pZBFnkkBoVRcTeS3PBK+jTGzVvJ6cAjr+Rf39ViVGiziikOT5iFXIA5hEvkJLMqVCM1IPJpjoX5nojSfkqzLLBg1mEh5IUXkk57nEWbVqcHU8/UuIi2XRWLqQ9VzUOmfDIZ354MrE7sm6VLkOcj2ULc3Vy/ClQJmQQorhrYPC8EvCBR+Y1YBvXN3fBsRijCyHYKYVXcaLC6FiBJ57xPXQbTXYdaiBxQFiCfaqiiTvk0cRBwH9Sh8DhZZDz6LjGCsv8zSEwx2fHnjQ6Ibg+VxnCaZlqwjvVVBnivwiFmL0GBhMfHhSnQDf7Esc7AOZObRDp9TLpXupdBbxQYLJnKmJ1etwazFBljLTXneef/i6Oj76fmgJkHXrOz/DhSq5ORkGwoedp3uK1A4HQ6uvoDkj68XtyYmJsWIanu1/UseGlXboWhMbUDRASgIdbYz4aCOTXcgQXqg4FFkI5cc1Amh0HGwHOqQ1eStbLxo7EdsdCZUyoPVfd4XOsnlOM9EZ++qPDpLsmQDSkw7r4ASnh3EA5J60HSXFG7Hrlm8yt1W2nZwtsrMW5Ah5O+Qabhgr7nw83J4lgdJKn7V9povGLNZ+f9Y1SCkeprODfyEJ6v2z93TzXHNH+QkGx3zlE9n1/tSPc7zUSrOxXQiN94GKMWvuNs6AQ5jHMWYci/GwfIMIGtnQLNs9yFANg+BzyFsw5WKKtclhH4oYWs0DHlgvwdloPsu9Gpd8/Tqzt3bVefZ7LYQZcKv96RYvyZ7bpAoU8roX3St+Wu4tXyl/wO1LeNPXQwAAA==
-- recorded: 2015-11-16T08:05:48.636Z
+      X-Frame-Options: sameorigin
+      X-Powered-By: PHP/5.4.45-0+deb7u2
+    body: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <?xml-stylesheet type="text/xsl" encoding="UTF-8" href="getTesters.xsl" version="1.0"?>
+      <response>
+      <statusCode>200</statusCode>
+      <statusText>Ok</statusText>
+      <data>
+      <location>
+      <id>iteratec-dev-hetzner-win7</id>
+      <elapsed>64800</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>HETZNER-04-178.63.26.79</id>
+      <pc>HETZNER-04</pc>
+      <ec2></ec2>
+      <ip>178.63.26.79</ip>
+      <version>2.15.0.183</version>
+      <freedisk>141.905</freedisk>
+      <ie></ie>
+      <dns>213.133.98.98,213.133.99.99,213.133.100.100</dns>
+      <GPU>0</GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <cpu>11</cpu>
+      <errors>0</errors>
+      <elapsed>64800</elapsed>
+      <last>64801</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-win7</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-netlab-win7</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-iPhone5</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-iPadMini</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-iPad4</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyS4</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-GoogleNexus</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyTab2</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyTab4</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyTab4-IRZ42</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SonyXperiaS</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-hetzner-64bit-ssd</id>
+      <elapsed>64797</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>HETZNER-06-136.243.16.96</id>
+      <pc>HETZNER-06</pc>
+      <ec2></ec2>
+      <ip>136.243.16.96</ip>
+      <version>2.19.0.260</version>
+      <freedisk>1787.078</freedisk>
+      <ie></ie>
+      <dns>213.133.98.98,213.133.99.99,213.133.100.100</dns>
+      <GPU>0</GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <cpu>12</cpu>
+      <errors>0</errors>
+      <elapsed>64797</elapsed>
+      <last>64797</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      </data>
+      </response>
+- recorded: 2016-04-15T12:10:19.588Z
   request:
     method: GET
     uri: http://dev.server02.wpt.iteratec.de/getTesters.php
     headers:
       Accept: application/xml
-      Accept-Encoding: gzip,deflate
       Host: dev.server02.wpt.iteratec.de
       Proxy-Connection: Keep-Alive
   response:
@@ -39,13 +140,235 @@ interactions:
     headers:
       Access-Control-Allow-Origin: '*'
       Cache-Control: max-age=3600, public
-      Content-Encoding: gzip
       Content-Type: text/xml
-      Date: Mon, 16 Nov 2015 08:05:48 GMT
-      Expires: Mon, 16 Nov 2015 09:05:48 GMT
+      Date: Fri, 15 Apr 2016 12:10:19 GMT
+      Expires: Fri, 15 Apr 2016 13:10:19 GMT
       Server: Apache/2.2.22 (Debian)
-      Set-Cookie: o=ea9fff0d7fce31c18b71f768aa7ff60b3d648f83; expires=Tue, 15-Nov-2016 08:05:48 GMT; path=/
+      Set-Cookie: o=535a507910d09848490d9bd9fb5ea4d1aa1e4f6e; expires=Sat, 15-Apr-2017 12:10:19 GMT; path=/
       Vary: Accept-Encoding
-      X-Powered-By: PHP/5.4.45-0+deb7u1
-    body: !!binary |-
-      H4sIAAAAAAAAA9WYa0/qMBzG3+9TEF67br2wS1Jm9AQvOYpG5znGNyeDFVicG1mLB86nP+1gA8dFRdCYDNr/2j7tnt/atKOH46e49swyHqVJsw6BWa+xpJuGUdJv1u/8E92pH3oaVdV0LiYx4wPGRE1MhqxZF2wsjDGPl9vUBhnrNet9JnzGhZQHebUXHSndjPFhmnAms1wEYsR/pCHzkGlSYyEuCn3Zn3f1WJTloUbDQAQyidNuIKS4zEahF8lOA8G6esie9QET/xKW6X+jxKaGLNUoi4MhZ6GHG1bDxtQoYo2K6YDLnNJLQjb2oGyaZ/IOzlr+Q7t1o5uWDrEFEMEAWsC1ZvrD7kINashQ9tlFnuxJ/kuFoVdtNpS3ZwZ5kDiAGkWk0V7GWBjxRw/aLgY2liMub0kxJnUj5VOYcA9BqYkxcB15HZSRK68ygqapftRQDTR6en3nyUAlGk17vThKlGSRU5w6aSqkP9QosxrtDkeeSw2VbHI0DrjwsO2YUN7OA412RnyiusxTjRql18bc/yll7+rk5OK83SqoqzoLrDdgz4Ozs5XYCWogewvs537r5khq/jq+utdNqDsmcJSdyu45+kqt1fwrTV/gd8lK+ggBZLsb2EMXyffJAdBxADooIgQacDHYBfcGWgK/5GnOmmATOY1PBZ8wEQedVdwJQa67zXRvt/yLo2PdJIq45QLckOTgnHhZvpb1YqO3TXUk5yi2NtCeqSKAdwAULwFdNmsKVBJVT/EFMzm6HqQJa1SguiZxtpnLM7U1c7js651zdyXLDRAX0b2f3FoPPhdLEF5GSVThgkzLJWQLMKuBfBMS+VO/DUXFBPTChN/X/mXaiWL2p7B3zYu6XPE7OUWW1pfCwC9ZX4KQzJz9qOZt8MRHSf80iIPx5HZXqqdp2o9Zm41HfB/j9IMO2pPuXnxVuvr5zQPZ2ajTZHI/ZFkU3O5IsTh8WKQTCZ3zsLJKmh85fBAd2g6wMEAWUBvDpbPHmv1IpdXiWiB3iQ4wAcJwzbZEHlkwgrs/gMAtN6LltiXLUmmd8nOaW+Nxvq6Yr68vG1fn/R7/XmVgOy6w4Ka94ddCQNtAgG9b5H+umYPG7EOAMf+o8B/2U9Vt3xAAAA==
+      X-Frame-Options: sameorigin
+      X-Powered-By: PHP/5.4.45-0+deb7u2
+    body: |
+      <?xml version="1.0" encoding="UTF-8"?>
+      <?xml-stylesheet type="text/xsl" encoding="UTF-8" href="getTesters.xsl" version="1.0"?>
+      <response>
+      <statusCode>200</statusCode>
+      <statusText>Ok</statusText>
+      <data>
+      <location>
+      <id>iteratec-dev-hetzner-win7</id>
+      <elapsed>0</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>HETZNER-04-178.63.26.79</id>
+      <pc>HETZNER-04</pc>
+      <ec2></ec2>
+      <ip>178.63.26.79</ip>
+      <version>2.15.0.194.</version>
+      <freedisk>140.918</freedisk>
+      <ie></ie>
+      <dns>213.133.98.98,213.133.99.99,213.133.100.100</dns>
+      <GPU>0</GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <cpu>8</cpu>
+      <errors>0</errors>
+      <elapsed>0</elapsed>
+      <last>0</last>
+      <busy>1</busy>
+      </tester>
+      </testers>
+      <status>OK</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-win7</id>
+      <elapsed>560211</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>ITERAHH-VBOX-01-80.83.103.98</id>
+      <pc>ITERAHH-VBOX-01</pc>
+      <ec2></ec2>
+      <ip>80.83.103.98</ip>
+      <version>194</version>
+      <freedisk>22.279</freedisk>
+      <ie></ie>
+      <dns>192.168.188.2,192.168.2.51,192.168.2.50</dns>
+      <GPU>0</GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <cpu>52</cpu>
+      <elapsed>560211</elapsed>
+      <last>647969</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-netlab-win7</id>
+      <elapsed>0</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>NETLAB-04-80.69.35.101</id>
+      <pc>NETLAB-04</pc>
+      <ec2></ec2>
+      <ip>80.69.35.101</ip>
+      <version>2.18.0.231.</version>
+      <freedisk>115.574</freedisk>
+      <ie></ie>
+      <dns>80.69.32.3</dns>
+      <GPU>0</GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <cpu>31</cpu>
+      <errors>0</errors>
+      <elapsed>0</elapsed>
+      <last>0</last>
+      <busy>1</busy>
+      </tester>
+      </testers>
+      <status>OK</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-iPhone5</id>
+      <elapsed>70286</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>iPhone5-80.83.101.98</id>
+      <pc>iPhone5</pc>
+      <ec2></ec2>
+      <ip>80.83.101.98</ip>
+      <version></version>
+      <freedisk></freedisk>
+      <ie></ie>
+      <dns></dns>
+      <GPU></GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <elapsed>70286</elapsed>
+      <last>73335</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-iPadMini</id>
+      <elapsed>424629</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>80.83.103.98</id>
+      <pc></pc>
+      <ec2></ec2>
+      <ip>80.83.103.98</ip>
+      <version></version>
+      <freedisk></freedisk>
+      <ie></ie>
+      <dns></dns>
+      <GPU></GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <elapsed>424631</elapsed>
+      <busy>0</busy>
+      </tester>
+      <tester>
+      <index>2</index>
+      <id>WPTMobile_iPadMini-80.83.103.98</id>
+      <pc>WPTMobile_iPadMini</pc>
+      <ec2></ec2>
+      <ip>80.83.103.98</ip>
+      <version></version>
+      <freedisk></freedisk>
+      <ie></ie>
+      <dns></dns>
+      <GPU></GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <elapsed>424629</elapsed>
+      <last>424631</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-iteraHH-iPad4</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyS4</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-GoogleNexus</id>
+      <elapsed>24730</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>51a4acff-79.202.192.60</id>
+      <pc>51a4acff</pc>
+      <ec2></ec2>
+      <ip>79.202.192.60</ip>
+      <version></version>
+      <freedisk></freedisk>
+      <ie></ie>
+      <dns></dns>
+      <GPU></GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <elapsed>24730</elapsed>
+      <last>24743</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyTab2</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyTab4</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SamsungGalaxyTab4-IRZ42</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-SonyXperiaS</id>
+      <status>OFFLINE</status>
+      </location>
+      <location>
+      <id>iteratec-dev-hetzner-64bit-ssd</id>
+      <elapsed>73395</elapsed>
+      <testers>
+      <tester>
+      <index>1</index>
+      <id>HETZNER-06-136.243.16.96</id>
+      <pc>HETZNER-06</pc>
+      <ec2></ec2>
+      <ip>136.243.16.96</ip>
+      <version>2.18.0.228</version>
+      <freedisk>1787.421</freedisk>
+      <ie></ie>
+      <dns>213.133.98.98,213.133.99.99,213.133.100.100</dns>
+      <GPU>1</GPU>
+      <offline></offline>
+      <rebooted></rebooted>
+      <cpu>11</cpu>
+      <errors>0</errors>
+      <elapsed>73395</elapsed>
+      <last>73406</last>
+      <busy>0</busy>
+      </tester>
+      </testers>
+      <status>OFFLINE</status>
+      </location>
+      </data>
+      </response>
