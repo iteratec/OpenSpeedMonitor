@@ -143,3 +143,10 @@ sourceSets {
         }
     }
 }
+'dbmGormDiff' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}
+
+'dbmUpdate' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}
