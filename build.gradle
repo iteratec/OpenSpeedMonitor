@@ -36,6 +36,7 @@ buildscript {
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
@@ -44,6 +45,7 @@ buildscript {
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
         classpath "org.grails.plugins:hibernate4:5.0.4"
         classpath "com.siprell.plugins:bootstrap-framework:1.0.3"
+        classpath 'com.moowork.gradle:gradle-node-plugin:0.12'
     }
 }
 
@@ -57,10 +59,15 @@ apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
 apply plugin: "com.siprell.plugins.bootstrap-framework"
+apply plugin: 'com.moowork.node'
 
 ext {
     grailsVersion = project.grailsVersion
     gradleWrapperVersion = project.gradleWrapperVersion
+
+    jasmineDependencies = ['karma', 'karma-jasmine', 'karma-phantomjs-launcher']
+    karmaExec = file('node_modules/karma/bin/karma')
+    karmaConfig = 'src/test/js/karma.conf.js'
 }
 
 repositories {
@@ -125,8 +132,32 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.9.5'
 //    build "org.grails:release:3.0.1"                          // not available
 //    testCompile "org.grails.plugins:code-coverage:1.2.4"       // pervious version was 2.0.3-3
-//    testCompile 'org.grails.plugins:karma-test-runner:0.2.4'
+    testCompile('com.github.detro.ghostdriver:phantomjsdriver:1.1.0') {
+        transitive = false
+    }
 }
+
+task setupPhantomJS(type: NpmTask) {
+    outputs.dir file('node_modules')
+    args = ['install', 'phantomjs', '--loglevel', 'error']
+}
+
+task setupJasmine(type: NpmTask) {
+    outputs.dir file('node_modules')
+    args = ['install'] + jasmineDependencies + ['--loglevel', 'error']
+}
+
+task jasmineRun(type: NodeTask, dependsOn: ['setupPhantomJS', 'setupJasmine']) {
+    script = karmaExec
+    args = ['start', karmaConfig, '--single-run']
+}
+
+task jasmineWatch(type: NodeTask, dependsOn: 'setupJasmine') {
+    script = karmaExec
+    args = ['start', karmaConfig]
+}
+
+test.dependsOn jasmineRun
 
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
