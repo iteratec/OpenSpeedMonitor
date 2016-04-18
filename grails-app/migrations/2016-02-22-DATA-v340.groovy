@@ -117,65 +117,71 @@ databaseChangeLog = {
     changeSet(author: "bka", id: "1453106072000-9") {
         grailsChange {
             change {
+                CsiAggregation.withNewSession {
+                    CsiAggregationUpdateService csiAggregationUpdateService = null
+                    int maxItemsToProcess = 10000
+                    AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+                    CsiAggregationInterval csiAggregationInterval = CsiAggregationInterval.
+                            findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
 
-                CsiAggregationUpdateService csiAggregationUpdateService = null
-                int maxItemsToProcess = 10000
-                AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-                CsiAggregationInterval csiAggregationInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+                    int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
+                            "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
+                            [aggregatorType, csiAggregationInterval])[0]
+                    int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
+                    println "processing #${amountMvsHourlyAndPage} elements in ${amountLoops} loops"
 
-                int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
-                        "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                        [aggregatorType,csiAggregationInterval])[0]
-                int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
-                println "processing #${amountMvsHourlyAndPage} elements in ${amountLoops} loops"
-
-                (0..amountLoops).each { loopNumber ->
-                    Date startOfLoop = new Date()
-                    println "############################################# start loop #${loopNumber}: ${startOfLoop}"
-                    List<CsiAggregation> currentHourlyCsiAggregations = CsiAggregation.executeQuery(
-                            "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                            [aggregatorType,csiAggregationInterval],
-                            [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
-                    )
-                    CsiAggregation.withNewSession {
-                        currentHourlyCsiAggregations.each { CsiAggregation ->
-                            List<EventResult> eventResultsOfCsiAggregation = EventResult.executeQuery(
-                                "from EventResult where id in :ids",
-                                [ids: CsiAggregation.underlyingEventResultsByWptDocCompleteAsList]
-                            )
-                            int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivityProfile.unique(false).size()
-                            // simple case: if all results have same connectivity
-                            if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.first().connectivityProfile != null) {
-                                // ... then add connectivity from any of its results to CsiAggregation
-                                CsiAggregation.executeUpdate(
-                                    "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
-                                    [cp: eventResultsOfCsiAggregation.first().connectivityProfile, mvId: CsiAggregation.id]
+                    (0..amountLoops).each { loopNumber ->
+                        Date startOfLoop = new Date()
+                        println "############################################# start loop #${loopNumber}: ${startOfLoop}"
+                        List<CsiAggregation> currentHourlyCsiAggregations = CsiAggregation.executeQuery(
+                                "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
+                                [aggregatorType, csiAggregationInterval],
+                                [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
+                        )
+                        CsiAggregation.withNewTransaction {
+                            currentHourlyCsiAggregations.each { CsiAggregation ->
+                                List<EventResult> eventResultsOfCsiAggregation = EventResult.executeQuery(
+                                        "from EventResult where id in :ids",
+                                        [ids: CsiAggregation.underlyingEventResultsByWptDocCompleteAsList]
                                 )
-                            } else { // ... else remove csi aggregation and calc it again by service
-                                println "different connectivity profiles"
-                                if ( csiAggregationUpdateService == null) {
-                                    println "initializing service"
-                                    csiAggregationUpdateService = ctx.csiAggregationUpdateService
-                                    println "initialized service DONE: ${csiAggregationUpdateService}"
-                                }
-                                CsiAggregation.executeUpdate("delete CsiAggregation where id= ?", [CsiAggregation.id])
-                                println "removed old csi aggregation"
-                                eventResultsOfCsiAggregation.each { eventResult ->
-                                    if (eventResult.connectivityProfile != null){
-                                        try{
-                                            println "try to add EventResult via update service: ${eventResult}"
-                                            csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
-                                        }catch(Exception e){
-                                            println "try to add EventResult via update service: An Exception occurred: ${e}\n\nStacktrace:\n${e.printStackTrace()}"
+                                int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivityProfile.
+                                        unique(false).size()
+                                // simple case: if all results have same connectivity
+                                if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.
+                                        first().connectivityProfile != null) {
+                                    // ... then add connectivity from any of its results to CsiAggregation
+                                    CsiAggregation.executeUpdate(
+                                            "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
+                                            [cp: eventResultsOfCsiAggregation.
+                                                    first().connectivityProfile, mvId: CsiAggregation.id]
+                                    )
+                                } else { // ... else remove csi aggregation and calc it again by service
+                                    println "different connectivity profiles"
+                                    if (csiAggregationUpdateService == null) {
+                                        println "initializing service"
+                                        csiAggregationUpdateService = ctx.csiAggregationUpdateService
+                                        println "initialized service DONE: ${csiAggregationUpdateService}"
+                                    }
+                                    CsiAggregation.
+                                            executeUpdate("delete CsiAggregation where id= ?", [CsiAggregation.id])
+                                    println "removed old csi aggregation"
+                                    eventResultsOfCsiAggregation.each { eventResult ->
+                                        if (eventResult.connectivityProfile != null) {
+                                            try {
+                                                println "try to add EventResult via update service: ${eventResult}"
+                                                csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
+                                            } catch (Exception e) {
+                                                println "try to add EventResult via update service: An Exception occurred: ${e}\n\nStacktrace:\n${e.printStackTrace()}"
+                                            }
+                                            println "try to add EventResult via update service: ...DONE"
                                         }
-                                        println "try to add EventResult via update service: ...DONE"
                                     }
                                 }
                             }
                         }
+                        Date endOfLoop = new Date()
+                        println "############################################# end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime()) / (1000 * 60)} minutes"
                     }
-                    Date endOfLoop = new Date()
-                    println "############################################# end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime())/(1000*60)} minutes"
                 }
             }
         }
@@ -204,8 +210,12 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1456135825000-1") {
         grailsChange {
             change {
-                AggregatorType.findByName("customerSatisfactionInPercentCached")?.setName(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT)
-                AggregatorType.findByName("customerSatisfactionInPercentUncached")?.setName(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT)
+                AggregatorType.withNewSession {
+                    AggregatorType.findByName("customerSatisfactionInPercentCached")?.
+                            setName(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT)
+                    AggregatorType.findByName("customerSatisfactionInPercentUncached")?.
+                            setName(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT)
+                }
             }
         }
     }
