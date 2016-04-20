@@ -40,18 +40,16 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.web.mapping.LinkGenerator
-import groovy.mock.interceptor.MockFor
-import org.hibernate.engine.jdbc.batch.spi.Batch
+import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 
-import java.text.DecimalFormat
 import java.util.regex.Pattern
 
 /**
  * <p>
- * Mocks grails-Services. 
+ * Mocks grails-Services.
  * These services get injected into instance-variables of other services in production by spring .
- * In unit-tests these services has to be mocked. To avoid duplication these mocks are assembled in this class.   
+ * In unit-tests these services has to be mocked. To avoid duplication these mocks are assembled in this class.
  * </p>
  * @author nkuhn
  *
@@ -63,19 +61,19 @@ class ServiceMocker {
 	public static ServiceMocker create(){
 		return new ServiceMocker()
 	}
-	
+
 	//TODO: Write one generic method to mock arbitrary methods of arbitrary services:
 //	void mockServiceMethod(serviceToMockInjectedServiceIn, Class serviceClassToMock, String nameOfMethodToMock){
-//		def serviceMock = new MockFor(serviceClassToMock, true)
+//		def serviceMock = new StubFor(serviceClassToMock, true)
 //		serviceMock.demand.nameOfMethodToMock(
-//			1..10000, 
+//			1..10000,
 //			getClosureToExecute(serviceClassToMock, nameOfMethodToMock)
-//		) 
+//		)
 //		serviceToMockInjectedServiceIn.metaClass.setAttribute(
 //			this, serviceToMockInjectedServiceIn, withLowerFirstLetter(serviceClassToMock.getName()),  serviceMock.proxyInstance(), false, false)
 //	}
 	Closure getClosureToExecute(serviceClassToMock, nameOfMethodToMock){
-		//TODO: should deliver the closure to be executed if the method nameOfMethodToMock of service serviceClassToMock is called in unit-tests 
+		//TODO: should deliver the closure to be executed if the method nameOfMethodToMock of service serviceClassToMock is called in unit-tests
 	}
 
     /**
@@ -113,11 +111,11 @@ class ServiceMocker {
 		batchActivityService.timer?.purge()
 		serviceToMockIn.batchActivityService = batchActivityService
     }
-	
+
 	/**
 	 * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
-	 * @param serviceToMockIn 
-	 * 		Grails-Service with the service to mock as instance-variable. 
+	 * @param serviceToMockIn
+	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockCsiAggregationUpdateEventDaoService(serviceToMockIn){
 		def csiAggregationUpdateEventDaoService = new CsiAggregationUpdateEventDaoService()
@@ -127,13 +125,13 @@ class ServiceMocker {
 					csiAggregationId: csiAggregationId,
 					updateCause: cause
 				).save(failOnError: true)
-				
+
 		}
 		serviceToMockIn.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService
 	}
 	/**
 	 * Mocks methods of {@link CsiConfigCacheService}
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockOsmConfigCacheService(serviceToMockIn){
@@ -150,7 +148,7 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks {@link EventResultService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockEventResultService(serviceToMockIn){
@@ -159,13 +157,13 @@ class ServiceMocker {
 			return toProof.csByWptDocCompleteInPercent && toProof.docCompleteTimeInMillisecs &&
 			(toProof.docCompleteTimeInMillisecs > minDocTimeInMillisecs &&
 			toProof.docCompleteTimeInMillisecs < maxDocTimeInMillisecs)
-			
+
 		}
 		serviceToMockIn.eventResultService = eventResultService
 	}
 	/**
 	 * Mocks methods in {@link JobResultDaoService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockJobResultDaoService(serviceToMockIn){
@@ -183,18 +181,18 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks methods in {@link BrowserService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockBrowserService(serviceToMockIn){
 		def browserService = new BrowserService()
 		browserService.metaClass.findByNameOrAlias = {String browserNameOrAlias ->
 			return Browser.findByName(browserName)
-			
+
 		}
 		serviceToMockIn.browserService = browserService
 	}
-	
+
 	/**
 	 * Mocks methods in {@link CsiAggregationUtilService}.
 	 * @param serviceToMockIn
@@ -207,10 +205,10 @@ class ServiceMocker {
 		}
 		serviceToMockIn.csiAggregationUtilService = csiAggregationUtilService
 	}
-	
+
 	/**
 	 * Mocks methods of {@link EventCsiAggregationService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateHourlyCsiAggregations
 	 * 		To return from mocked method {@link EventCsiAggregationService#getOrCalculateHourylCsiAggregations}.
@@ -224,7 +222,7 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks methods of {@link PageCsiAggregationService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyPageCsiAggregations
 	 * 		List of {@link CsiAggregation}s, the method {@link PageCsiAggregationService#getOrCalculatePageCsiAggregations(java.util.Date, java.util.Date, CsiAggregationInterval,List<JobGroup>,List<Page>)} should return.
@@ -240,7 +238,7 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks {@link ShopCsiAggregationService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromGetOrCalculateWeeklyShopCsiAggregations
 	 * 		List of {@link CsiAggregation}s, the method {@link ShopCsiAggregationService#getOrCalculateWeeklyShopCsiAggregations(java.util.Date, java.util.Date)} should return.
@@ -257,10 +255,10 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks methods of {@link CsiAggregationTagService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param idAsStringToJobGroupMap
-	 * 		A map with id's as keys and respective JobGroups as values.  
+	 * 		A map with id's as keys and respective JobGroups as values.
 	 * @param idAsStringToMeasuredEventMap
 	 * 		A map with id's as keys and respective MeasuredEvents as values.
 	 *	@param idAsStringToPageMap
@@ -269,7 +267,7 @@ class ServiceMocker {
 	 *			A map with id's as keys and respective Browsers as values.
 	 *	@param idAsStringToLocationMap
 	 *			A map with id's as keys and respective Locations as values.
-	 * 
+	 *
 	 */
 	void mockCsiAggregationTagService(
 		serviceToMockIn,
@@ -287,7 +285,7 @@ class ServiceMocker {
 			Page pageParam,
 			Browser browserParam,
 			Location locationParam ->
-			
+
 			return new CsiAggregationTagService().createHourlyEventTag(jobGroupParam,
 				measuredEventParam,
 				pageParam,
@@ -376,10 +374,10 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks methods in {@link CsTargetGraphDaoService}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param labelOfActualCsTargetGraph
-	 * 		The label of the {@link CsTargetGraph} to be returned from {@link CsTargetGraphDaoService#getActualCsTargetGraph()}. 
+	 * 		The label of the {@link CsTargetGraph} to be returned from {@link CsTargetGraphDaoService#getActualCsTargetGraph()}.
 	 */
 	void mockCsTargetGraphDaoService(serviceToMockIn, String labelOfActualCsTargetGraph){
 		def csTargetGraphDaoService = new CsTargetGraphDaoService()
@@ -390,10 +388,10 @@ class ServiceMocker {
 	}
 	/**
 	 * Mocks methods of {@link LinkGenerator}.
-	 * @param serviceToMockIn 
+	 * @param serviceToMockIn
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 * @param toReturnFromLink
-	 * 		To be returned from method {@link LinkGenerator#link()}. 
+	 * 		To be returned from method {@link LinkGenerator#link()}.
 	 */
 	void mockLinkGenerator(serviceToMockIn, String toReturnFromLink){
 		def grailsLinkGeneratorMocked = new LinkGenerator(){
@@ -454,14 +452,14 @@ class ServiceMocker {
 	 * 		Grails-Service with the service to mock as instance-variable.
 	 */
 	void mockTTCsMappingService(serviceToMockIn){
-		def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..100) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+		def timeToCsMappingService = new StubFor(TimeToCsMappingService, true)
+		timeToCsMappingService.demand.getCustomerSatisfactionInPercent { Integer docCompleteTime, Page testedPage, csiConfiguration ->
 			return 1
 		}
-		timeToCsMappingService.demand.validFrustrationsExistFor(0..100) { Page testedPage ->
+		timeToCsMappingService.demand.validFrustrationsExistFor { Page testedPage ->
 			//not the concern of this test
 		}
-        timeToCsMappingService.demand.validMappingsExistFor(0..100) { Page testedPage ->
+        timeToCsMappingService.demand.validMappingsExistFor { Page testedPage ->
             //not the concern of this test
         }
 		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.proxyInstance()
@@ -497,35 +495,35 @@ class ServiceMocker {
 	 * @see MethodToMock
 	 */
 	void mockService(Class classOfServiceToMock, serviceToMockIn, List<MethodToMock> methodsToMock){
-		def serviceMock = new MockFor(classOfServiceToMock, true)
+		def serviceMock = new StubFor(classOfServiceToMock, true)
 		methodsToMock.each{methodToMock ->
 			String methodName = methodToMock.method.getName()
 			if (methodToMock.method.getParameterTypes().size()==0){
-				serviceMock.demand."$methodName"(0..100){ ->
+				serviceMock.demand."$methodName"{ ->
 					return methodToMock.toReturn
 				}
 			}else if (methodToMock.method.getParameterTypes().size()==1){
-				serviceMock.demand."$methodName"(0..100){paramOne ->
+				serviceMock.demand."$methodName"{paramOne ->
 					return methodToMock.toReturn
 				}
 			}else if (methodToMock.method.getParameterTypes().size()==2){
-				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo ->
+				serviceMock.demand."$methodName"{paramOne, paramTwo ->
 					return methodToMock.toReturn
 				}
 			}else if (methodToMock.method.getParameterTypes().size()==3){
-				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree ->
+				serviceMock.demand."$methodName"{paramOne, paramTwo, paramThree ->
 					return methodToMock.toReturn
 				}
 			}else if (methodToMock.method.getParameterTypes().size()==4){
-				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour ->
+				serviceMock.demand."$methodName"{paramOne, paramTwo, paramThree, paramFour ->
 					return methodToMock.toReturn
 				}
 			}else if (methodToMock.method.getParameterTypes().size()==5){
-				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour, paramFive ->
+				serviceMock.demand."$methodName"{paramOne, paramTwo, paramThree, paramFour, paramFive ->
 					return methodToMock.toReturn
 				}
 			}else if (methodToMock.method.getParameterTypes().size()==6){
-				serviceMock.demand."$methodName"(0..100){paramOne, paramTwo, paramThree, paramFour, paramFive, paramSix ->
+				serviceMock.demand."$methodName"{paramOne, paramTwo, paramThree, paramFour, paramFive, paramSix ->
 					return methodToMock.toReturn
 				}
 			}else{
@@ -568,12 +566,12 @@ class ServiceMocker {
      * Mocks methods of{@link I18nService}.
      */
     void mockI18nService(serviceToMockIn) {
-		def i18nService = new MockFor(I18nService)
-        i18nService.demand.msg (0..10000){
+		def i18nService = new I18nService()
+        i18nService.metaClass.msg {
             String msgKey, String defaultMessage, List objs = null ->
                 return defaultMessage
         }
-        serviceToMockIn.i18nService = i18nService.proxyInstance()
+        serviceToMockIn.i18nService = i18nService
     }
 
     /**
@@ -611,29 +609,29 @@ class ServiceMocker {
 									 returnForGetDailyHeCsiAggregationMapByStartDate, returnForGetWeeklyJobGroupsByStartDate, returnForGetWeeklyPagesByStartDate,
 									 returnForGetWeeklyHeCsiAggregationMapByStartDate, returnForCreateContainerFor) {
 
-		def cachingContainerService = new MockFor(CachingContainerService)
+		def cachingContainerService = new StubFor(CachingContainerService)
 
-		cachingContainerService.demand.getDailyJobGroupsByStartDate (0..10000) {dailyMvsToCalculate, allJobGroups ->
+		cachingContainerService.demand.getDailyJobGroupsByStartDate  {dailyMvsToCalculate, allJobGroups ->
 			return returnForGetDailyJobGroupsByStartDate
 		}
-		cachingContainerService.demand.getDailyPagesByStartDate (0..10000) {dailyMvsToCalculate, allPages ->
+		cachingContainerService.demand.getDailyPagesByStartDate  {dailyMvsToCalculate, allPages ->
 			return returnForGetDailyPagesByStartDate
 		}
-		cachingContainerService.demand.getDailyHeCsiAggregationMapByStartDate (0..10000) {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
+		cachingContainerService.demand.getDailyHeCsiAggregationMapByStartDate  {dailyMvsToCalculate, dailyJobGroupsByStartDate, dailyPagesByStartDate ->
 			return returnForGetDailyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.demand.getWeeklyJobGroupsByStartDate (0..10000) {weeklyMvsToCalculate, allJobGroups ->
+		cachingContainerService.demand.getWeeklyJobGroupsByStartDate  {weeklyMvsToCalculate, allJobGroups ->
 			return returnForGetWeeklyJobGroupsByStartDate
 		}
-		cachingContainerService.demand.getWeeklyPagesByStartDate (0..10000) {weeklyMvsToCalculate, allPages ->
+		cachingContainerService.demand.getWeeklyPagesByStartDate  {weeklyMvsToCalculate, allPages ->
 			return returnForGetWeeklyPagesByStartDate
 		}
-		cachingContainerService.demand.getWeeklyHeCsiAggregationMapByStartDate (0..10000) {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
+		cachingContainerService.demand.getWeeklyHeCsiAggregationMapByStartDate  {weeklyMvsToCalculate, weeklyJobGroupsByStartDate, weeklyPagesByStartDate ->
 			return returnForGetWeeklyHeCsiAggregationMapByStartDate
 		}
 
-		cachingContainerService.demand.createContainerFor (0..10000) {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
+		cachingContainerService.demand.createContainerFor  {dpmvToCalcAndClose, allJobGroups, allPages, hemvsForDailyPageMv ->
 			return returnForCreateContainerFor
 		}
 
@@ -657,8 +655,8 @@ class ServiceMocker {
 //	 * 		Grails-Service with the service to mock as instance-variable.
 //	 */
 //	void mockCsiAggregationUpdateService(serviceToMockIn){
-//		def csiAggregationUpdateService = new MockFor(CsiAggregationUpdateService, true)
-//		csiAggregationUpdateService.demand.createOrUpdateDependentMvs(1..10000) {
+//		def csiAggregationUpdateService = new StubFor(CsiAggregationUpdateService, true)
+//		csiAggregationUpdateService.demand.createOrUpdateDependentMvs {
 //			EventResult result->
 //			//do nothing
 //		}

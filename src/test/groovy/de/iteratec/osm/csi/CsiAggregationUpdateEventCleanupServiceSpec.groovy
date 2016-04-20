@@ -1,14 +1,14 @@
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivity
-import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.StubFor
 import org.joda.time.DateTime
 import spock.lang.Specification
 
@@ -198,17 +198,19 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends Specification {
      * @param mvIds List of id's of {@link CsiAggregationUpdateEvent}s to return from mocked method.
      */
     private void prepareDaoServiceMock(List<Long> mvIds) {
-        serviceUnderTest.csiAggregationDaoService = [
-                getOpenCsiAggregationsWhosIntervalExpiredForAtLeast: { int minutes ->
-                    return mvIds.collect { CsiAggregation.get(it) }
-                },
-                getUpdateEvents                                   : { List<Long> csiAggregationIds ->
-                    return mvIds.inject([]) { List<CsiAggregationUpdateEvent> updateEvents, Long mvId ->
-                        updateEvents.addAll(CsiAggregationUpdateEvent.findAllByCsiAggregationId(mvId))
-                        return updateEvents
-                    }
-                }
-        ] as CsiAggregationDaoService
+        def csiAggregationDaoService = new StubFor(CsiAggregationDaoService)
+
+        csiAggregationDaoService.demand.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast { int minutes ->
+            return mvIds.collect { CsiAggregation.get(it) }
+        }
+        csiAggregationDaoService.demand.getUpdateEvents { List<Long> csiAggregationValueIds ->
+            return mvIds.inject([]) { List<CsiAggregationUpdateEvent> updateEvents, Long mvId ->
+                updateEvents.addAll(CsiAggregationUpdateEvent.findAllByCsiAggregationId(mvId))
+                return updateEvents
+            }
+        }
+
+        serviceUnderTest.csiAggregationDaoService = csiAggregationDaoService.proxyInstance()
     }
 
     void createTestDataCommonForAllTests() {
@@ -267,43 +269,45 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends Specification {
 
         ServiceMocker.create().mockBatchActivityService(serviceUnderTest)
 
-        serviceUnderTest.inMemoryConfigService.metaClass {
-            areMeasurementsGenerallyEnabled { -> return true }
+        def inMemoryConfigService = new StubFor(InMemoryConfigService)
+        inMemoryConfigService.demand.areMeasurementsGenerallyEnabled { ->
+            return true
         }
+        serviceUnderTest.inMemoryConfigService = inMemoryConfigService.proxyInstance()
 
-        serviceUnderTest.csiAggregationTagService = new CsiAggregationTagService()
+        serviceUnderTest.csiAggregationTagService = new StubFor(CsiAggregationTagService).proxyInstance()
 
-        serviceUnderTest.shopCsiAggregationService = [
-                calcCa: { CsiAggregation toBeCalculated ->
-                    calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
-                    return null
-                }
-        ] as ShopCsiAggregationService
+        def shopCsiAggregationService = new StubFor(ShopCsiAggregationService)
+        shopCsiAggregationService.demand.calcCa { CsiAggregation toBeCalculated ->
+            calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
+            return null
+        }
+        serviceUnderTest.shopCsiAggregationService = shopCsiAggregationService.proxyInstance()
 
-        serviceUnderTest.pageCsiAggregationService = [
-                getHmvsByCsiGroupPageCombinationMap: { List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime ->
-                    Map irrelevantBecauseWholeCalculationIsMocked = [:]
-                    return irrelevantBecauseWholeCalculationIsMocked
-                },
-                calcMv                             : { CsiAggregation toBeCalculated, CsiAggregationCachingContainer cachingContainer ->
-                    calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
-                    return null
-                }
-        ] as PageCsiAggregationService
+        def pageCsiAggregationService = new StubFor(PageCsiAggregationService)
+        pageCsiAggregationService.demand.getHmvsByCsiGroupPageCombinationMap { List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime ->
+            Map irrelevantBecauseWholeCalculationIsMocked = [:]
+            return irrelevantBecauseWholeCalculationIsMocked
+        }
+        pageCsiAggregationService.demand.calcMv { CsiAggregation toBeCalculated, CsiAggregationCachingContainer cachingContainer ->
+            calculationCounts[toBeCalculated.ident()] = ++calculationCounts[toBeCalculated.ident()]
+            return null
 
+        }
+        serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService.proxyInstance()
 
-        serviceUnderTest.csiAggregationTagService = [
-                getAllPagesFromWeeklyOrDailyPageTags    : { unused ->
-                    def result = [:].withDefault { [] }
-                    result[1].add(new Page())
-                    return result
-                },
-                getAllJobGroupsFromWeeklyOrDailyPageTags: { unused ->
-                    def result = [:].withDefault { [] }
-                    result[1].add(new JobGroup())
-                    return result
-                }
-        ] as CsiAggregationTagService
+        def csiAggregationTagService = new StubFor(CsiAggregationTagService)
+        csiAggregationTagService.demand.getAllPagesFromWeeklyOrDailyPageTags { unused ->
+            def result = [:].withDefault { [] }
+            result[1].add(new Page())
+            return result
+        }
+        csiAggregationTagService.demand.getAllJobGroupsFromWeeklyOrDailyPageTags { unused ->
+            def result = [:].withDefault { [] }
+            result[1].add(new JobGroup())
+            return result
+        }
+        serviceUnderTest.csiAggregationTagService = csiAggregationTagService.proxyInstance()
 
         mockCachingContainerService()
     }
@@ -318,7 +322,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends Specification {
         def returnForGetWeeklyJobGroupsByStartDate = [:].withDefault { [] }
         def returnForGetWeeklyPagesByStartDate = [:].withDefault { [] }
         Page page = new Page(id: 1)
-        def hCsiAggregationsByCsiGroupPageCombination = [:].withDefault {[]}
+        def hCsiAggregationsByCsiGroupPageCombination = [:].withDefault { [] }
         hCsiAggregationsByCsiGroupPageCombination.put(CsiAggregation.get(idDailyShopMvInitiallyOpenAndOutdated).started.toString(), CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyShopMvInitiallyOpenAndOutdated))
         def returnForCreateContainerFor = new CsiAggregationCachingContainer(csiGroupToCalcCsiAggregationFor: null,
                 pageToCalcCsiAggregationFor: page,

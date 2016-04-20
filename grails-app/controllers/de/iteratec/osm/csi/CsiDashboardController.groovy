@@ -278,7 +278,7 @@ class CsiDashboardController {
                         countOfSelectedEvents = ((Collection) modelToRender.get('measuredEvents')).size()
                     }
 
-                    int selectedAggregationIntervallInMintues = cmd.getSelectedMeasuredIntervalInMinutes()
+                    int selectedAggregationIntervallInMintues = cmd.receiveSelectedMeasuredIntervalInMinutes()
 
                     int countOfSelectedBrowser = cmd.selectedBrowsers.size()
                     if (countOfSelectedBrowser < 1) {
@@ -286,7 +286,7 @@ class CsiDashboardController {
                     }
 
                     warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(
-                            fixTimeFrame(cmd.getSelectedTimeFrame(), selectedAggregationIntervallInMintues),
+                            fixTimeFrame(cmd.receiveSelectedTimeFrame(), selectedAggregationIntervallInMintues),
                             selectedAggregationIntervallInMintues,
                             cmd.selectedFolder.size(),
                             cmd.selectedPages.size(),
@@ -327,7 +327,7 @@ class CsiDashboardController {
         requiresArgumentNotNull('modelToRender', modelToRender)
         requiresArgumentNotNull('cmd', cmd)
 
-        Interval timeFrame = cmd.getSelectedTimeFrame()
+        Interval timeFrame = cmd.receiveSelectedTimeFrame()
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         MvQueryParams csiAggregationsQueryParams = cmd.createMvQueryParams()

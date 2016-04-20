@@ -274,7 +274,7 @@ class CustomerSatisfactionHighChartService {
                 csiValue.aggregator.name.equals(AggregatorType.CSI_SYSTEM)
         ) {
 			Map paramsToSend = getParamsForLink(csiValue)
-            paramsToSend[CsiDashboardShowAllCommand.getControlnameFor(csiType)] = 'on'
+            paramsToSend[CsiDashboardShowAllCommand.receiveControlnameFor(csiType)] = 'on'
 			String testsDetailURLAsString = grailsLinkGenerator.link([
 				'controller': 'csiDashboard',
 				'action':'showAll',

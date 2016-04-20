@@ -1,7 +1,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MvQueryParams
@@ -36,28 +35,28 @@ public class CsiDashboardShowAllCommand implements Validateable {
     /**
      * The selected start date (inclusive).
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     Date from
 
     /**
      * The selected end date (inclusive).
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     Date to
 
     /**
      * The selected start hour of date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     String fromHour
 
     /**
      * The selected end hour of date.
      *
-     * Please use {@link #getSelectedTimeFrame()}.
+     * Please use {@link #receiveSelectedTimeFrame()}.
      */
     String toHour
 
@@ -380,7 +379,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    public Interval getSelectedTimeFrame() throws IllegalStateException {
+    public Interval receiveSelectedTimeFrame() throws IllegalStateException {
 
         DateTime start
         DateTime end
@@ -423,7 +422,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
 
         }
         if (!includeInterval) {
-            Integer intervalInMinutes = this.getSelectedMeasuredIntervalInMinutes()
+            Integer intervalInMinutes = this.receiveSelectedMeasuredIntervalInMinutes()
             if (csiAggregationUtilService.isInActualInterval(end, intervalInMinutes)) {
                 end = csiAggregationUtilService.subtractOneInterval(end, intervalInMinutes)
             }
@@ -557,7 +556,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
         return result
     }
 
-    public Integer getSelectedMeasuredIntervalInMinutes() {
+    public Integer receiveSelectedMeasuredIntervalInMinutes() {
         Integer interval
         switch (this.aggrGroupAndInterval) {
             case CsiDashboardController.HOURLY_MEASURED_EVENT:
@@ -576,7 +575,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
         return interval
     }
 
-    public static String getControlnameFor(CsiType csiType) {
+    public static String receiveControlnameFor(CsiType csiType) {
         if (csiType == CsiType.DOC_COMPLETE) {
             return 'csiTypeDocComplete'
         } else if (csiType == CsiType.VISUALLY_COMPLETE) {

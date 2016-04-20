@@ -43,7 +43,7 @@ class CustomerSatisfactionWeightServiceTests {
     @Before
     void setUp() {
         serviceUnderTest = service
-        ServiceMocker mocker = new ServiceMocker()
+        ServiceMocker mocker = ServiceMocker.create()
         mocker.mockI18nService(serviceUnderTest)
         csiConfiguration = TestDataUtil.createCsiConfiguration()
         csiConfiguration.label = "conf1"

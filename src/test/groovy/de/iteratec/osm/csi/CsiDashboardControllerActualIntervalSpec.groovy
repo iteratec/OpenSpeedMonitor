@@ -87,6 +87,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -95,7 +98,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -131,6 +134,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -139,7 +145,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -177,6 +183,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
@@ -189,7 +198,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -225,13 +234,16 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
 
         // Verification
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -269,6 +281,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -277,7 +292,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -313,6 +328,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -321,7 +339,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -359,6 +377,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
@@ -371,7 +392,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -407,6 +428,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -414,7 +438,7 @@ class CsiDashboardControllerActualIntervalSpec{
         // Verification
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -452,6 +476,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -460,7 +487,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -496,6 +523,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -504,7 +534,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -542,6 +572,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
@@ -554,7 +587,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -590,6 +623,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -597,7 +633,7 @@ class CsiDashboardControllerActualIntervalSpec{
         // Verification
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -635,6 +671,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -643,7 +682,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -679,6 +718,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -687,7 +729,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -725,6 +767,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         command.csiAggregationUtilService.metaClass.isInActualInterval = { DateTime dateTime, Integer interval ->
@@ -737,7 +782,7 @@ class CsiDashboardControllerActualIntervalSpec{
 
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 
@@ -773,6 +818,9 @@ class CsiDashboardControllerActualIntervalSpec{
         params.selectedBrowsers = '2'
         params.selectedLocations = '17'
         params.csiTypeDocComplete = true
+        params.debug = false
+        params.setToHour = false
+        params.setFromHour = false
 
         // Create and fill the command
         controllerUnderTest.bindData(command, params)
@@ -780,7 +828,7 @@ class CsiDashboardControllerActualIntervalSpec{
         // Verification
         assertTrue(command.validate())
 
-        Interval interval = command.getSelectedTimeFrame()
+        Interval interval = command.receiveSelectedTimeFrame()
         DateTime start = interval.getStart()
         DateTime end = interval.getEnd()
 

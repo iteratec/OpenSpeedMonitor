@@ -43,8 +43,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito
 
-import java.text.SimpleDateFormat
-
 import static de.iteratec.osm.csi.Contract.requiresArgumentNotNull
 import static org.junit.Assert.*
 import static org.mockito.Mockito.when
@@ -120,10 +118,9 @@ class CsiDashboardControllerTests {
 
     }
 
-
 /**
-     * Test for inner class {@link CsiDashboardShowAllCommand}.
-     */
+ * Test for inner class {@link CsiDashboardShowAllCommand}.
+ */
     @Test
     public void testShowAllCommand_EmptyCreationIsInvalid() {
         assertFalse(command.validate())
@@ -176,6 +173,10 @@ class CsiDashboardControllerTests {
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
         params.csiTypeDocComplete = true
+        params.setToHour = false
+        params.setFromHour = false
+        params.debug = false
+        params.includeInterval = false
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -214,7 +215,7 @@ class CsiDashboardControllerTests {
         assertTrue(command.selectedLocations.contains(17L))
 
         // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
+        Interval timeFrame = command.receiveSelectedTimeFrame();
 
         DateTime start = timeFrame.getStart();
         DateTime end = timeFrame.getEnd();
@@ -342,6 +343,10 @@ class CsiDashboardControllerTests {
         params.selectedTimeFrameInterval = 0
         params.includeInterval = true
         params.csiTypeDocComplete = true
+        params.setToHour = false
+        params.setFromHour = false
+        params.debug = false
+        params.includeInterval = false
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -381,7 +386,7 @@ class CsiDashboardControllerTests {
         assertTrue(command.selectedLocations.contains(17L))
 
         // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
+        Interval timeFrame = command.receiveSelectedTimeFrame();
 
         DateTime start = timeFrame.getStart();
         DateTime end = timeFrame.getEnd();
@@ -426,6 +431,10 @@ class CsiDashboardControllerTests {
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
         params.csiTypeDocComplete = true
+        params.setToHour = false
+        params.setFromHour = false
+        params.debug = false
+        params.includeInterval = false
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -464,7 +473,7 @@ class CsiDashboardControllerTests {
         assertTrue(command.selectedLocations.contains(17L))
 
         // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
+        Interval timeFrame = command.receiveSelectedTimeFrame();
 
         DateTime start = timeFrame.getStart();
         DateTime end = timeFrame.getEnd();
@@ -509,6 +518,10 @@ class CsiDashboardControllerTests {
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
         params.csiTypeDocComplete = true
+        params.setToHour = false
+        params.setFromHour = false
+        params.debug = false
+        params.includeInterval = false
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -540,7 +553,7 @@ class CsiDashboardControllerTests {
         assertEquals(0, command.selectedLocations.size())
 
         // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
+        Interval timeFrame = command.receiveSelectedTimeFrame();
 
         DateTime start = timeFrame.getStart();
         DateTime end = timeFrame.getEnd();
@@ -578,6 +591,10 @@ class CsiDashboardControllerTests {
         params._action_showAll = 'Anzeigen'
         params.selectedTimeFrameInterval = 0
         params.csiTypeDocComplete = true
+        params.setToHour = false
+        params.setFromHour = false
+        params.debug = false
+        params.includeInterval = false
 
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
@@ -601,7 +618,7 @@ class CsiDashboardControllerTests {
         assertTrue(command.selectedCsiSystems.contains(2L))
 
         // Could we assume the time frame at once?
-        Interval timeFrame = command.selectedTimeFrame;
+        Interval timeFrame = command.receiveSelectedTimeFrame();
         DateTime start = timeFrame.getStart();
         DateTime end = timeFrame.getEnd();
 
@@ -642,6 +659,11 @@ class CsiDashboardControllerTests {
         params.selectedLocations = '17'
         params._action_showAll = 'Anzeigen'
         params.csiTypeDocComplete = true
+        params.setToHour = false
+        params.setFromHour = false
+        params.debug = false
+        params.includeInterval = false
+        
         // Create and fill the command:
         controllerUnderTest.bindData(command, params)
 
@@ -1247,6 +1269,10 @@ class CsiDashboardControllerTests {
         command.setFromHour = false
         command.setToHour = false
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = true
+        command.includeInterval = false
 
         // Create and fill a command:
         assertTrue(command.validate())
@@ -1362,6 +1388,7 @@ class CsiDashboardControllerTests {
         assertFalse(command.validate())
 
     }
+
     @Test
     public void testShowAllCommand_testAtleastOneCsiTypeSelected() {
         // form = '18.08.2013'
@@ -1386,6 +1413,10 @@ class CsiDashboardControllerTests {
         command.setFromHour = false
         command.setToHour = false
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = false
+        command.includeInterval = false
 
         assertTrue(command.validate())
     }
@@ -1418,6 +1449,10 @@ class CsiDashboardControllerTests {
         command.setFromHour = false
         command.setToHour = false
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = false
+        command.includeInterval = false
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1473,6 +1508,10 @@ class CsiDashboardControllerTests {
         command.selectedAllLocations = false
         command.selectedLocations = [17L]
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = false
+        command.includeInterval = false
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1511,6 +1550,10 @@ class CsiDashboardControllerTests {
         command.selectedAllLocations = false
         command.selectedLocations = [17L]
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = false
+        command.includeInterval = false
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1550,6 +1593,10 @@ class CsiDashboardControllerTests {
         command.selectedAllLocations = false
         command.selectedLocations = [17L]
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = false
+        command.includeInterval = false
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1589,6 +1636,10 @@ class CsiDashboardControllerTests {
         command.selectedAllLocations = true;
         command.selectedLocations = [17L]
         command.csiTypeDocComplete = true
+        command.setToHour = false
+        command.setFromHour = false
+        command.debug = false
+        command.includeInterval = false
 
         // Do we fill all fields?
         assertTrue(command.validate())
@@ -1751,11 +1802,11 @@ class CsiDashboardControllerTests {
     }
 
     @Test
-    public void testGetControlnameForCsiType(){
-        assertEquals(CsiDashboardShowAllCommand.getControlnameFor(CsiType.DOC_COMPLETE), 'csiTypeDocComplete')
-        assertEquals(CsiDashboardShowAllCommand.getControlnameFor(CsiType.VISUALLY_COMPLETE), 'csiTypeVisuallyComplete')
-        shouldFail(IllegalArgumentException){
-            CsiDashboardShowAllCommand.getControlnameFor(CsiType.valueOf('NOT_EXISTANT'))
+    public void testGetControlnameForCsiType() {
+        assertEquals(CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.DOC_COMPLETE), 'csiTypeDocComplete')
+        assertEquals(CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.VISUALLY_COMPLETE), 'csiTypeVisuallyComplete')
+        shouldFail(IllegalArgumentException) {
+            CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.valueOf('NOT_EXISTANT'))
         }
     }
 
@@ -1776,8 +1827,7 @@ class CsiDashboardControllerTests {
      * @throws AssertionError
      *         if at least one of the conditions are not satisfied.
      */
-    private
-    static void assertContainedAndNotNullAndEquals(Map<String, Object> dataUnderTest, String key, Object expectedValue) throws AssertionError {
+    private static void assertContainedAndNotNullAndEquals(Map<String, Object> dataUnderTest, String key, Object expectedValue) throws AssertionError {
         requiresArgumentNotNull('dataUnderTest', dataUnderTest)
         requiresArgumentNotNull('key', key)
         requiresArgumentNotNull('expectedValue', expectedValue)
