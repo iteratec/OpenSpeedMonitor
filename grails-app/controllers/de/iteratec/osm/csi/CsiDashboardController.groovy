@@ -757,8 +757,8 @@ class CsiDashboardController {
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
         // Create command vor validation
-        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
-                toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
+                toHour: dashboardValues.toHour, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,

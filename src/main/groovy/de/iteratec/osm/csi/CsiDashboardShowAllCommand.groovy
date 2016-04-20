@@ -29,7 +29,7 @@ import java.util.regex.Pattern
  * @author mze
  * @since IT-74
  */
-public class CsiDashboardShowAllCommand implements Validateable{
+public class CsiDashboardShowAllCommand implements Validateable {
 
     CsiAggregationUtilService csiAggregationUtilService
 
@@ -53,7 +53,6 @@ public class CsiDashboardShowAllCommand implements Validateable{
      * Please use {@link #getSelectedTimeFrame()}.
      */
     String fromHour
-    String fromMinute
 
     /**
      * The selected end hour of date.
@@ -61,7 +60,6 @@ public class CsiDashboardShowAllCommand implements Validateable{
      * Please use {@link #getSelectedTimeFrame()}.
      */
     String toHour
-    String toMinute
 
     /**
      * The name of the {@link de.iteratec.osm.report.chart.AggregatorType}.
@@ -393,17 +391,13 @@ public class CsiDashboardShowAllCommand implements Validateable{
             DateTime firstDayWithFromHourAsDaytime
             DateTime firstDayWithToHourAsDaytime
 
-            if (fromMinute != null) {
-                firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":" + fromMinute.padRight(2, '0'))
-            } else if (fromHour.indexOf(":") > -1) {
+            if (fromHour.indexOf(":") > -1) {
                 firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour)
             } else {
                 firstDayWithFromHourAsDaytime = getFirstDayWithTime(fromHour + ":00")
             }
 
-            if (toMinute != null) {
-                firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":" + toMinute.padRight(2, '0'))
-            } else if (toHour.indexOf(":") > -1) {
+            if (toHour.indexOf(":") > -1) {
                 firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour)
             } else {
                 firstDayWithToHourAsDaytime = getFirstDayWithTime(toHour + ":00")
@@ -582,12 +576,12 @@ public class CsiDashboardShowAllCommand implements Validateable{
         return interval
     }
 
-    public static String getControlnameFor(CsiType csiType){
-        if(csiType == CsiType.DOC_COMPLETE){
+    public static String getControlnameFor(CsiType csiType) {
+        if (csiType == CsiType.DOC_COMPLETE) {
             return 'csiTypeDocComplete'
-        }else if(csiType == CsiType.VISUALLY_COMPLETE){
+        } else if (csiType == CsiType.VISUALLY_COMPLETE) {
             return 'csiTypeVisuallyComplete'
-        }else{
+        } else {
             throw new IllegalArgumentException("The following ")
         }
     }
