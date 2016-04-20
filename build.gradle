@@ -184,4 +184,7 @@ sourceSets {
 'dbmClearChecksums' {
     jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
 }
+'dbmChangelogSync' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}
 
