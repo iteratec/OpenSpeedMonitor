@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -24,17 +25,23 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultP
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
+import grails.test.mixin.TestFor
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
-import org.springframework.transaction.TransactionStatus
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
+@Integration
+@Rollback
+@TestFor(LocationAndResultPersisterService)
 class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
     static transactional = false //necessary because we test transactional service methods
 
-    LocationAndResultPersisterService locationAndResultPersisterService
+    LocationAndResultPersisterService serviceUnderTest
 
     static final String jobGroupName_csi_1 = "jobGroup1"
     static final String jobGroupName_csi_05 = "jobGroup2"
@@ -49,17 +56,12 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     Script testScript
 
     def setup() {
-        super.setupSpec()
-
+        serviceUnderTest = service
         createTestDataCommonForAllTests()
         mocksCommonForAllTests()
 
     }
 
-    def cleanup(){
-        super.cleanupSpec()
-
-    }
 
     void "csi won't be calculated without csi-configuration"() {
         setup: "prepare Job and JobGroup"
@@ -67,7 +69,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithoutCsiConf, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup without csi configuration"
-        locationAndResultPersisterService.listenToResult(xmlResult,server1)
+        serviceUnderTest.listenToResult(xmlResult,server1)
 
         then: "persisted EventResult has no csi value"
         Collection<EventResult> resultsWithCsiCalculated = EventResult.findAll {
@@ -84,7 +86,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
-        locationAndResultPersisterService.listenToResult(xmlResult,server1)
+        serviceUnderTest.listenToResult(xmlResult,server1)
 
         then: "persisted EventResult has csi value of 100%"
         List<EventResult> results = EventResult.findAll {
@@ -102,7 +104,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
-        locationAndResultPersisterService.listenToResult(xmlResult,server1)
+        serviceUnderTest.listenToResult(xmlResult,server1)
 
         then: "persisted EventResult has csi value of 50%"
         List<EventResult> results = EventResult.findAll {
@@ -152,11 +154,13 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     }
 
     private void mocksCommonForAllTests(){
-        locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = {
+        def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
+        timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..10000) {
             Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
             if (csiConfiguration == null) return null
-            else if (csiConfiguration.label == csiConfiguration_all_1.label) return 100d
-            else if(csiConfiguration.label == csiConfiguration_all_05.label) return 50d
+            else if (csiConfiguration.label == csiConfiguration_all_1.label)  return 100d
+            else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
+        serviceUnderTest.timeToCsMappingService = timeToCsMappingService
     }
 }

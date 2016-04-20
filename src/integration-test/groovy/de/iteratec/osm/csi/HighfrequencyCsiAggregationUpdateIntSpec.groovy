@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.csi
 
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.apache.commons.logging.LogFactory
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -56,6 +58,8 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author nkuhn
  * @see CsiAggregationUpdateEvent
  */
+@Integration
+@Rollback
 class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrationSpec {
 
 	static transactional = false
@@ -103,7 +107,9 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 				label: 'server',
 				proxyIdentifier: 'proxyIdentifier',
 				active: true,
-				baseUrl: 'http://my-url.com'
+				baseUrl: 'http://my-url.com',
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true, flush: true)
 		Browser browser = new Browser(
 				name: 'browser',
@@ -115,7 +121,9 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 				valid: 1,
 				wptServer: server,
 				location: 'location',
-				browser: browser
+				browser: browser,
+				dateCreated: new Date(),
+				lastUpdated: new Date()
 		).save(failOnError: true, flush: true)
 //		look at ToDo below
 //		new Job(

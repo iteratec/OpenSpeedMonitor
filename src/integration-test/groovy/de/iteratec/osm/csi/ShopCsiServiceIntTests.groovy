@@ -29,12 +29,16 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
 /**
  *
  */
+@Integration
+@Rollback
 class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-10
@@ -58,17 +62,13 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     private static final DateTime END = new DateTime(2014, 12, 31, 0, 0, DateTimeZone.UTC)
     private static int groups = 0
 
-    def setupSpec() {
-        //test-data common to all tests
+
+    def setup() {
         createOsmConfig()
         createPagesAndEvents()
         createBrowsers()
         createJobGroup()
         createEventResults()
-        //mocks
-    }
-
-    def setup() {
         csiByEventResultsService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
     }
 

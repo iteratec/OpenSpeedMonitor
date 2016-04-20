@@ -26,13 +26,16 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.result.*
 import grails.test.mixin.TestMixin
+import grails.test.mixin.integration.Integration
 import grails.test.mixin.integration.IntegrationTestMixin
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import spock.lang.Shared
-
 import static org.junit.Assert.*
 
 //@TestMixin(IntegrationTestMixin)
+@Integration
+@Rollback
 class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec{
 
 	/** injected by grails */
@@ -75,7 +78,8 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
-	def setupSpec() {
+
+	def setup() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
@@ -87,10 +91,7 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 		System.out.println('Loading CSV-data... DONE');
 
 		System.out.println('Create some common test-data... DONE');
-	}
 
-	def setup() {
-		
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)
 		shop = AggregatorType.findByName(AggregatorType.SHOP)

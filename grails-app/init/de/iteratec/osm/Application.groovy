@@ -1,4 +1,4 @@
-package openspeedmonitor
+package de.iteratec.osm
 
 import grails.boot.GrailsApp
 import grails.boot.config.GrailsAutoConfiguration

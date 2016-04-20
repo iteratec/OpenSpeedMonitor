@@ -18,18 +18,10 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import org.junit.Test
-import spock.lang.Shared
-
-import static org.hamcrest.Matchers.*
-import static org.junit.Assert.*
-import grails.test.mixin.TestMixin
-import grails.test.mixin.integration.IntegrationTestMixin
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 
 import org.joda.time.DateTime
-import org.junit.After
-import org.junit.Before
-import org.junit.BeforeClass
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -50,6 +42,8 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
  * @author nkuhn
  *
  */
+@Integration
+@Rollback
 class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
 
     static transactional = false
@@ -59,11 +53,9 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     ShopCsiAggregationService shopCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
 
-    CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
-    CsiAggregationInterval weekly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-    AggregatorType job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-    AggregatorType page = AggregatorType.findByName(AggregatorType.PAGE)
-    AggregatorType shop = AggregatorType.findByName(AggregatorType.SHOP)
+    AggregatorType job
+    AggregatorType page
+    AggregatorType shop
     DateTime startOfCreatingHourlyEventValues = new DateTime(2012, 1, 9, 0, 0, 0)
     DateTime startOfCreatingWeeklyPageValues = new DateTime(2012, 2, 6, 0, 0, 0)
     DateTime startOfCreatingWeeklyShopValues = new DateTime(2012, 3, 12, 0, 0, 0)
@@ -71,7 +63,8 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
     /**
      * Creating testdata.
      */
-    def setupSpec() {
+
+    def setup(){
         createCsiAggregationIntervals()
         createAggregatorTypes()
         createPagesAndEvents()
@@ -81,8 +74,10 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         createLocations()
         createJobGroups()
         createJobs()
+        job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+        page = AggregatorType.findByName(AggregatorType.PAGE)
+        shop = AggregatorType.findByName(AggregatorType.SHOP)
     }
-
 
     /**
      * Creating weekly-page {@link CsiAggregation}s without data.
@@ -119,7 +114,7 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         wsmvs.each {
             it.isCalculated()
         }
-        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), weekly).size() == countWeeks * countPages
+        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)).size() == countWeeks * countPages
 
     }
 
@@ -292,7 +287,9 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
                 baseUrl: 'http://wpt.server.de',
                 active: true,
                 label: 'server 1 - wpt server',
-                proxyIdentifier: 'server 1 - wpt server'
+                proxyIdentifier: 'server 1 - wpt server',
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
     }
 
@@ -307,7 +304,9 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
                 location: 'ffLocationLocation',
                 label: 'ffLocationLabel',
                 browser: browserFF,
-                wptServer: server1
+                wptServer: server1,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
         ieAgent1 = new Location(
                 active: true,
@@ -315,7 +314,9 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
                 location: 'ieLocationLocation',
                 label: 'ieLocationLabel',
                 browser: browserIE,
-                wptServer: server1
+                wptServer: server1,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
     }
 }

@@ -28,10 +28,14 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import groovy.util.slurpersupport.GPathResult
 /**
  *
  */
+@Integration
+@Rollback
 class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     static transactional = false //necessary because we test transactional service methods
@@ -44,7 +48,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 	WebPageTestServer server1
 
     def setup() {
-        super.setupSpec()
+
 
         originalPersistJobResultsMethod = locationAndResultPersisterService.&persistJobResult
         originalPersistEventResultsMethod = locationAndResultPersisterService.&persistResultsOfOneTeststep
@@ -56,7 +60,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     }
 
     def cleanup(){
-        super.cleanupSpec()
+
 
         resetLarpServiceMetaclass()
 

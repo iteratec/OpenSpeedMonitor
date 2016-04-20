@@ -19,7 +19,7 @@ import org.junit.Test
 import spock.lang.Specification
 @Integration
 @Rollback
-class CsiSystemCsiAggregationServiceIntegrationSpec extends Specification {
+class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     static final String jobGroupName1 = 'jobGroupName1'
     static final String jobGroupName2 = 'jobGroupName2'

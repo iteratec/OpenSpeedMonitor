@@ -1,16 +1,11 @@
 package de.iteratec.osm.csi
 
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
 import org.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
-import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
 import org.hibernate.tool.hbm2ddl.SchemaExport
 import spock.lang.Shared
 import spock.lang.Specification
 
-@Integration
-@Rollback
 class NonTransactionalIntegrationSpec extends Specification {
 
     @Shared
@@ -19,9 +14,10 @@ class NonTransactionalIntegrationSpec extends Specification {
     @Shared
     def grailsApplication
 
+
     static transactional = false
 
-    def setupSpec() {
+    def setup() {
         if (!_configuration) {
             // 1-time creation of the configuration
             Properties properties = new Properties()
@@ -35,13 +31,13 @@ class NonTransactionalIntegrationSpec extends Specification {
         }
     }
 
-    def cleanupSpec() {
+    def cleanup() {
         //After spec nuke and pave the test db
         new SchemaExport(_configuration).create(false, true)
 
         //Clear the sessions
-        SessionFactory sf = grailsApplication.getMainContext().getBean('sessionFactory')
-        sf.getCurrentSession().clear()
+//        SessionFactory sf = grailsApplication.getMainContext().getBean('sessionFactory')
+//        sf.getCurrentSession().clear()
     }
 
 }

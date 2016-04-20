@@ -26,13 +26,16 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
 import grails.test.mixin.TestMixin
+import grails.test.mixin.integration.Integration
 import grails.test.mixin.integration.IntegrationTestMixin
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Shared
 
 import static org.junit.Assert.*
-
+@Integration
+@Rollback
 class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 
 	static transactional = false
@@ -57,7 +60,13 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 	static AggregatorType pageAggregatorType
 
 
-	def setupSpec() {
+
+	/**
+	 * Creating testdata.
+	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
+	 * with valid TimeToCsMappings from 2012 and added to csv.
+	 */
+	def setup() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
@@ -68,14 +77,6 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 		System.out.println('Loading CSV-data... DONE');
 
 		System.out.println('Create some common test-data... DONE');
-	}
-
-	/**
-	 * Creating testdata.
-	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated 
-	 * with valid TimeToCsMappings from 2012 and added to csv.
-	 */
-	def setup() {
 //		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
 //		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
 //			return mapToFindJobResultByEventResult[eventResult.ident()]
@@ -104,9 +105,6 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 		System.out.println('Set-up... DONE');
 	}
 
-	def cleanup() {
-		super.cleanupSpec()
-	}
 
 
 	/**

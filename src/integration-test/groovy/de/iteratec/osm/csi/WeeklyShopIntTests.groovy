@@ -21,7 +21,9 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.test.mixin.TestMixin
+import grails.test.mixin.integration.Integration
 import grails.test.mixin.integration.IntegrationTestMixin
+import grails.transaction.Rollback
 import spock.lang.Shared
 
 import static org.junit.Assert.*
@@ -42,7 +44,8 @@ import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.CsiAggregationTagService
-
+@Integration
+@Rollback
 class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
 	static transactional = false
@@ -81,7 +84,8 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 	 * JobConfigs, jobRuns and results are generated from a csv-export of WPT-Monitor from november 2012. Customer satisfaction-values were calculated
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
-	def setupSpec() {
+
+	def setup() {
 		System.out.println('Create some common test-data...');
 		TestDataUtil.createOsmConfig()
 		TestDataUtil.createCsiAggregationIntervals()
@@ -107,9 +111,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 		}
 
 		System.out.println('Create some common test-data... DONE');
-	}
-
-	def setup() {
 		hourly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
 		weekly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
 		pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)

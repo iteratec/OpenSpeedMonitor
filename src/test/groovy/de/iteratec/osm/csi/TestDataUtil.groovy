@@ -780,7 +780,9 @@ class TestDataUtil {
                 location: 'ffLocationLocation',
                 label: 'ffLocationLabel',
                 browser: browserFF,
-                wptServer: server1
+                wptServer: server1,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
         ieAgent1 = new Location(
                 active: true,
@@ -788,7 +790,9 @@ class TestDataUtil {
                 location: 'ieLocationLocation',
                 label: 'ieLocationLabel',
                 browser: browserIE,
-                wptServer: server1
+                wptServer: server1,
+                dateCreated: new Date(),
+                lastUpdated: new Date()
         ).save(failOnError: true)
         return [ffAgent1, ieAgent1]
     }

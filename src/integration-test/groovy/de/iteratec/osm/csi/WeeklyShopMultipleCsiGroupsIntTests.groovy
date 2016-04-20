@@ -27,8 +27,11 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
-
+@Integration
+@Rollback
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
 	/** injected by grails */
@@ -62,8 +65,39 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 	static final Integer countWeeklyShopMvsToBeCreated = 2
 	static final Integer countResultsPerWeeklyPageMv = 4
 	static final Integer countWeeklyPageMvsToBeCreated = 4
-
 	def setup() {
+		System.out.println('Create some common test-data...');
+		TestDataUtil.createOsmConfig()
+		TestDataUtil.createCsiAggregationIntervals()
+		TestDataUtil.createAggregatorTypes()
+		System.out.println('Create some common test-data... DONE');
+
+		System.out.println('Loading CSV-data...');
+		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
+		System.out.println('Loading CSV-data... DONE');
+
+		csiGroups = [
+				JobGroup.findByName(csiGroup1Name),
+				JobGroup.findByName(csiGroup2Name)
+		]
+
+		EventResult.findAll().each {
+			locationAndResultPersisterService.informDependentCsiAggregations(it)
+		}
+		CsiConfiguration.findAll().each { csiConfiguration ->
+			ConnectivityProfile.findAll().each { connectivityProfile ->
+				Browser.findAll().each { browser ->
+					csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
+				}
+				Page.findAll().each { page ->
+					csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+				}
+			}
+		}
+
+		shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
+		weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+		wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
 		targetValues = [
 			csiGroup1: 0.391,
 			csiGroup2: 0.691
@@ -110,38 +144,5 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 	/**
 	 * Creating testdata.
 	 */
-	def setupSpec() {
-		System.out.println('Create some common test-data...');
-		TestDataUtil.createOsmConfig()
-		TestDataUtil.createCsiAggregationIntervals()
-		TestDataUtil.createAggregatorTypes()
-		System.out.println('Create some common test-data... DONE');
 
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
-		System.out.println('Loading CSV-data... DONE');
-
-		csiGroups = [
-				JobGroup.findByName(csiGroup1Name),
-				JobGroup.findByName(csiGroup2Name)
-		]
-
-		EventResult.findAll().each {
-			locationAndResultPersisterService.informDependentCsiAggregations(it)
-		}
-		CsiConfiguration.findAll().each { csiConfiguration ->
-			ConnectivityProfile.findAll().each { connectivityProfile ->
-				Browser.findAll().each { browser ->
-					csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
-				}
-				Page.findAll().each { page ->
-					csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
-				}
-			}
-		}
-
-		shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
-		weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-		wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
-	}
 }
