@@ -1,0 +1,70 @@
+# Move this file to one of the locations configured in config-setting grails.config.locations (see Config.groovy).
+# One of that locations is ~/.grails/OpenSpeedMonitor-config.groovy
+#
+# Settings in this file will override defaults in grails-app/config!
+# 
+# @author nkuhn
+# @see Config.groovy
+# @see http://grails.org/doc/latest/guide/conf.html#configExternalized
+# Configure default app users (bootstrapped on first start if not already in db -> see Bootstrap.groovy)
+grails:
+  de:
+    iteratec:
+      osm:
+        security:
+          initialOsmAdminUser:
+            username: [username-of-admin-user-to-be-bootsrapped]
+            password: [password-of-admin-user-to-be-bootsrapped]
+          initialOsmRootUser:
+            username: [username-of-superadmin-user-to-be-bootsrapped]
+            password: [password-of-superadmin-user-to-be-bootsrapped]
+      report:
+        chart:
+          chartTagLib: RICKSHAW
+          availableChartTagLibs:
+            - RICKSHAW
+        highchartsExportServerUrl: 'http://export.highcharts.com'
+
+environments:
+  development:
+    dataSource:
+      # You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
+      # So you can see all prepared sql statements hibernate creates and fires against your data
+      # with all the parameters replaced with the real query values.
+      # @see https://github.com/p6spy/p6spy
+      # url: jdbc:p6spy:mysql://localhost/[your-dev-mysql-scheme]
+      # riverClassName: "com.p6spy.engine.spy.P6SpyDriver"
+      #logSql: true
+      url: "jdbc:mysql://localhost/osm"
+      username: "[your-prod-mysql-user]"
+      password: "[password-of-your-prod-mysql-user]"
+      dbCreate: "managed by liquibase"
+      driverClassName: "com.mysql.jdbc.Driver"
+      logSql: false
+      pooled: true
+      properties:
+        minEvictableIdleTimeMillis: 60000
+        timeBetweenEvictionRunsMillis: 5000
+        numTestsPerEvictionRun: 3
+        testOnBorrow: true
+        testWhileIdle: true
+        testOnReturn: false
+        validationQuery: "SELECT 1"
+  production:
+    grails:
+      serverURL: 'https://[base-url-of-your-prod-osm-instance]'
+    dataSource:
+      url: "jdbc:mysql://localhost/[your-prod-mysql-scheme]"
+      username: "[your-prod-mysql-user]"
+      password: "[password-of-your-prod-mysql-user]"
+      dbCreate: "managed by liquibase"
+      driverClassName: "com.mysql.jdbc.Driver"
+      pooled: true
+      properties:
+        minEvictableIdleTimeMillis: 60000
+        timeBetweenEvictionRunsMillis: 5000
+        numTestsPerEvictionRun: 3
+        testOnBorrow: true
+        testWhileIdle: true
+        testOnReturn: false
+        validationQuery: "SELECT 1"

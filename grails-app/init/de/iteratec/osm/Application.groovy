@@ -48,7 +48,8 @@ trait ExternalConfig implements EnvironmentAware {
                     "classpath:${appName}-config.properties",
                     "classpath:${appName}-config.groovy",
                     "file:${userHome}/.grails/${appName}-config.properties",
-                    "file:${userHome}/.grails/${appName}-config.groovy"]
+                    "file:${userHome}/.grails/${appName}-config.groovy",
+                    "file:${userHome}/.grails/${appName}-config.yml"]
         }
 
         List locations = environment.getProperty('grails.config.locations', ArrayList, defaultLocations)
