@@ -80,8 +80,8 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
         Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
         Browser ie = TestDataUtil.createBrowser('IE', 1d)
-        Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-64bit-ssd:Firefox', ff, true)
-        Location locationIe = TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
+        Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-win7:Firefox', ff, true)
+        Location locationIe = TestDataUtil.createLocation(wptServer, 'NewYork:IE 11', ie, true)
         UNDEFINED_PAGE = TestDataUtil.createUndefinedPage()
 
         Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
@@ -182,7 +182,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     }
 
     // singlestep ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
     void "SINGLESTEP: persisting predefined connectivity profile in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
@@ -204,6 +204,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         allResults[1].customConnectivityName == null
 
     }
+    // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
     void "SINGLESTEP: persisting custom connectivity in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
@@ -224,6 +225,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         allResults[1].customConnectivityName == multistepJob.customConnectivityName
 
     }
+    // Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
     void "SINGLESTEP: persisting native connectivity in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")

@@ -19,6 +19,8 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import co.freeside.betamax.Betamax
 import co.freeside.betamax.Recorder
+import co.freeside.betamax.tape.yaml.OrderedPropertyComparator
+import co.freeside.betamax.tape.yaml.TapePropertyUtils
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.CsiDay
@@ -35,12 +37,16 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.yaml.snakeyaml.introspector.Property
+import spock.lang.Specification
 
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 import static org.hamcrest.Matchers.is
@@ -52,21 +58,23 @@ import static org.junit.Assert.assertThat
  */
 @TestFor(ProxyService)
 @Mock([WebPageTestServer, EventResult, JobResult, OsmConfiguration, AggregatorType, CsiAggregationInterval, Browser, BrowserAlias, Location, JobGroup, CsiDay, CsiConfiguration])
-class FetchResultsFromWptserverTests {
+class FetchResultsFromWptserverTests extends Specification{
 
 	public static final String WPTSERVER_MULTISTEP_URL = 'dev.server02.wpt.iteratec.de'
-	public static final String WPTSERVER_SINGLESTEP_URL = 'dev.server01.wpt.iteratec.de'
+	public static final String WPTSERVER_SINGLESTEP_URL = 'www.webpagetest.org'
 	private static final String LOCATION_IDENTIFIER_MULTISTEP = 'iteratec-dev-iteraHH-win7:IE'
 	private static final String LOCATION_IDENTIFIER_SINGLESTEP = 'iteratec-dev-netlab-win7:IE'
 	ProxyService serviceUnderTest
 
 	@Rule public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
 
-	@Before
-	void setUp() {
+	void setup() {
 
 		serviceUnderTest=service
-
+		//Workaround needed because of not matching versions of groovy and betamax
+		TapePropertyUtils.metaClass.sort = { Set<Property> properties, List<String> names ->
+			new LinkedHashSet(properties.sort(false, new OrderedPropertyComparator(names)))
+		}
 		//mock HttpBuilder in HttpRequestService to use betamax-proxy
 		Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
 		HttpRequestService httpRequestService = new HttpRequestService()
@@ -92,42 +100,100 @@ class FetchResultsFromWptserverTests {
 		TestDataUtil.createLocation(wptserverMultistep, LOCATION_IDENTIFIER_MULTISTEP, browsers.find {it.name.equals(Browser.UNDEFINED)}, true)
 		TestDataUtil.createLocation(wptserverSinglestep, LOCATION_IDENTIFIER_SINGLESTEP, browsers.find {it.name.equals(Browser.UNDEFINED)}, true)
 	}
-
-	@Test
+	// TestSkript:
+	//	logData	0
+	////um die hostnames vieler gemeinsamer adserver schon aufzulösen (sonst haben wir im IE10 zu viele pre-resolves)
+	////da esprit nicht per https aufgerufen wird bekommen wir nie gemeinsame third-party ressourcen in den cache
+	////setEventName	esprit_infrontofotto
+	//	navigate	http://www.esprit.de
+	////für ein tls warmup im browser
+	////setEventName	google_infrontofotto
+	//	navigate	https://google.de
+	//	logData	1
+	//	setEventName	HP_entry:::OTTO_Homepage_entry
+	//	navigate	https://www.otto.de/
+	//	setEventName	MES:::OTTO_Moduleinstieg_navigate
+	//	navigate    https://www.otto.de/damenmode/
+	//	setEventName	PL:::OTTO_Produktliste
+	//	navigate    https://www.otto.de/damenmode/kategorien/schuhe/
+	//	setEventName	SE:::OTTO_Suchergebnis_1_hosen_navigate
+	//	navigate    https://www.otto.de/suche/hosen/
+	//	setEventName	ADS:::OTTO_ADS_1_flashlisghts-hose_navigate
+	//	navigate	https://www.otto.de/p/flashlights-cargohose-set-2-tlg-mit-guertel-100773864/#variationId=440054322
+	////Artikel	1 in WK
+	//	logData	0
+	//	exec	document.querySelector('#addToBasket').click();
+	////Artikel	2 in WK
+	//	logData	1
+	//	setEventName	SE:::OTTO_Suchergebnis_schuhe_navigate
+	//	navigate https://www.otto.de/suche/schuhe/
+	//	logData	0
+	//	execAndWait	document.querySelector('#san_searchResult section .product a').click();
+	//	exec	document.querySelector('#addToBasket').click();
+	////Artikel	3 in WK
+	//	logData	1
+	//	setEventName	SE:::OTTO_Suchergebnis_3_fernseher_navigate
+	//	navigate https://www.otto.de/suche/fernseher/
+	//	logData	0
+	//	execAndWait	document.querySelector('#san_searchResult section .product a').click();
+	//	exec	document.querySelector('#addToBasket').click();
+	////Artikel	4 in WK
+	//	logData	1
+	//	setEventName	SE:::OTTO_Suchergebnis_4_fahrrad_navigate
+	//	navigate https://www.otto.de/suche/fahrrad/
+	//	logData	0
+	//	execAndWait	document.querySelector('#san_searchResult section .product a').click();
+	//	exec	document.querySelector('#addToBasket').click();
+	////Artikel	5 in WK
+	//	logData	1
+	////WK-Aufruf
+	//	setEventName	WK:::OTTO_Warenkorb
+	//	navigate	https://www.otto.de/order-system/basket
+	// Expecting Only First View && Lable = FF_Otto_multistep && EventNames = otto_homepage & otto_search_shoes & otto_product_boot
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Multistep_1Run_11Events_JustFirstView')
-	void testFetchResult_Multistep_1Run_11Events_JustFirstView() {
-
+	def testFetchResult_Multistep_1Run_11Events_JustFirstView() {
+		given:
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
 		File resultXmlFile = new File('test/resources/WptResultXmls/Multistep_1Run_11Events_JustFirstView.xml')
 		GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
 
+		when:
 		// Run the test:
 		WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'141013_EC_2026c719a0818c3f9b8d39c72ac3cd06'])
+		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'160421_Q1_AR'])
 
+		then:
 		// Verify results
 		assertThat(statusCode, is(200))
 		assertThat(listener.resultListeningCounter, is(1))
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-
-	@Test
+	//	TestSkript:
+	//	setEventName	otto_homepage
+	//	navigate	https://www.otto.de/
+	//	setEventName	otto_search_shoes
+	//	navigate    https://www.otto.de/suche/schuhe/
+	//	setEventName	otto_product_boots
+	//	navigate    https://www.otto.de/stiefel/
+	// Expecting Only First View && Lable = FF_Otto_multistep && EventNames = otto_homepage & otto_search_shoes & otto_product_boot
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo')
-	void testFetchResult_Result_wptserver2_13_multistep7_1Run_3Events_JustFirstView_WithoutVideo() {
-
+	def testFetchResult_Result_wptserver2_13_multistep7_1Run_3Events_JustFirstView_WithoutVideo() {
+		given:
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
 		File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml')
 		GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
 
+		when:
 		// Run the test:
 		WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'141124_RF_NY'])
+		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'160421_TN_D8'])
 
+		then:
 		// Verify results
 		assertThat(statusCode, is(200))
 		assertThat(listener.resultListeningCounter, is(1))
@@ -135,62 +201,79 @@ class FetchResultsFromWptserverTests {
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
 
-	@Test
+	//	TestSkript:
+	//	setEventName	esprit_infrontofotto
+	//	navigate	http://www.esprit.de
+	//	setEventName	HP_entry:::OTTO_Homepage_entry
+	//	navigate	https://www.otto.de/
+	//	setEventName	MES:::OTTO_Moduleinstieg_navigate
+	//	navigate    https://www.otto.de/damenmode/
+	// Expecting Only First View && Lable = FF_Otto_multistep && EventNames = otto_homepage & otto_search_shoes & otto_product_boot
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo')
-	void testFetchResult_Result_wptserver2_13_multistep7_1Run_3Events_JustFirstView_WithVideo() {
-
+	def testFetchResult_Result_wptserver2_13_multistep7_1Run_3Events_JustFirstView_WithVideo() {
+		given:
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
 		File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo.xml')
 		GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
 
+		when:
 		// Run the test:
 		WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_MULTISTEP_URL}/")
-		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'141125_XC_13E'])
+		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'160421_A9_EF'])
 
+		then:
 		// Verify results
 		assertThat(statusCode, is(200))
 		assertThat(listener.resultListeningCounter, is(1))
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-
-	@Test
+	//	TestSkript:
+	//	setEventName	IE_otto_hp_singlestep
+	//	navigate	https://www.otto.de/
+	// Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.15-singlestep_1Run_WithoutVideo')
 	void testFetchResult_Result_wptserver2_15_singlestep_1Run_WithoutVideo() {
-
+		given:
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
 		File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml')
 		GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
 
+		when:
 		// Run the test:
 		WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_SINGLESTEP_URL}/")
-		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'141125_3Q_23'])
+		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'160421_VP_ZMG'])
 
+		then:
 		// Verify results
 		assertThat(statusCode, is(200))
 		assertThat(listener.resultListeningCounter, is(1))
 		assertThat(listener.wptserverOfLastListening, is(wptserver))
 		assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
 	}
-
-	@Test
+	//	TestSkript:
+	//	setEventName	IE_otto_hp_singlestep
+	//	navigate	https://www.otto.de/
+	// Expecting Repeated View && Lable = IE_otto_hp_singlestep && EventName = IE_otto_hp_singlestep
 	@Betamax(tape = 'FetchResultsFromWptserverTests_Result_wptserver2.15_singlestep_1Run_WithVideo')
 	void testFetchResult_Result_wptserver2_15_singlestep_1Run_WithVideo() {
-
+		given:
 		//create test specific data
 		def listener = new TestResultListener()
 		serviceUnderTest.listener[0] = listener
 		File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.15_singlestep_1Run_WithVideo.xml')
 		GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
 
+		when:
 		// Run the test:
 		WebPageTestServer wptserver = WebPageTestServer.findByBaseUrl("http://${WPTSERVER_SINGLESTEP_URL}/")
-		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'141125_B2_25'])
+		Integer statusCode = serviceUnderTest.fetchResult(wptserver, ['resultId':'160421_5E_ZFW'])
 
+		then:
 		// Verify results
 		assertThat(statusCode, is(200))
 		assertThat(listener.resultListeningCounter, is(1))

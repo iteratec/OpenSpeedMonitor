@@ -52,12 +52,12 @@ class PersistScreenshotDependentWptMetricsSpec {
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo.xml'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2 = 'otto_search_shoes'
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3 = 'otto_product_boot'
+    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3 = 'otto_product_boots'
 
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2 = 'otto_search_shoes'
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3 = 'otto_product_boot'
+    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3 = 'otto_product_boots'
 
     public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
     public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1 = 'otto_homepage'
@@ -90,8 +90,10 @@ class PersistScreenshotDependentWptMetricsSpec {
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
         Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
         Browser ie = TestDataUtil.createBrowser('IE', 1d)
-        Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-64bit-ssd:Firefox', ff, true)
-        Location locationIe = TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
+        Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-win7:Firefox', ff, true)
+        Location locationFirefox_old = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-64bit-ssd:Firefox', ff, true)
+        Location locationIe = TestDataUtil.createLocation(wptServer, 'NewYork:IE 11', ie, true)
+        Location locationIe_old = TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
         List<Page> pages = TestDataUtil.createPages(['HP', 'SE'])
 
         Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
@@ -139,14 +141,14 @@ class PersistScreenshotDependentWptMetricsSpec {
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(3))
         EventResult resultStep_1 = allResults.find {it.measuredEvent.name.equals(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1)}
-        assertThat(resultStep_1.visuallyCompleteInMillisecs, is(2900))
-        assertThat(resultStep_1.speedIndex, is(2182))
+        assertThat(resultStep_1.visuallyCompleteInMillisecs, is(4500))
+        assertThat(resultStep_1.speedIndex, is(1647))
         EventResult resultStep_2 = allResults.find {it.measuredEvent.name.equals(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2)}
-        assertThat(resultStep_2.visuallyCompleteInMillisecs, is(2500))
-        assertThat(resultStep_2.speedIndex, is(791))
+        assertThat(resultStep_2.visuallyCompleteInMillisecs, is(1300))
+        assertThat(resultStep_2.speedIndex, is(838))
         EventResult resultStep_3 = allResults.find {it.measuredEvent.name.equals(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3)}
-        assertThat(resultStep_3.visuallyCompleteInMillisecs, is(2100))
-        assertThat(resultStep_3.speedIndex, is(858))
+        assertThat(resultStep_3.visuallyCompleteInMillisecs, is(1100))
+        assertThat(resultStep_3.speedIndex, is(847))
 
     }
     void testPersistingScreenshotDependentMetricsForMultistep1Run3EventsFvOnlyWithoutVideo() {
@@ -248,11 +250,11 @@ class PersistScreenshotDependentWptMetricsSpec {
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(2))
         EventResult fvResult = allResults.find {it.cachedView == CachedView.UNCACHED}
-        assertThat(fvResult.visuallyCompleteInMillisecs, is(12000))
-        assertThat(fvResult.speedIndex, is(7026))
+        assertThat(fvResult.visuallyCompleteInMillisecs, is(4500))
+        assertThat(fvResult.speedIndex, is(2430))
         EventResult rvResult = allResults.find {it.cachedView == CachedView.CACHED}
-        assertThat(rvResult.visuallyCompleteInMillisecs, is(3700))
-        assertThat(rvResult.speedIndex, is(1852))
+        assertThat(rvResult.visuallyCompleteInMillisecs, is(2200))
+        assertThat(rvResult.speedIndex, is(1693))
     }
     void testPersistingScreenshotDependentMetricsForSinglestep1RunWithoutVideo() {
         //test data specific for this test
@@ -264,13 +266,12 @@ class PersistScreenshotDependentWptMetricsSpec {
         //assertions
         List<EventResult> allResults = EventResult.getAll()
         assertThat(allResults.size(), is(2))
+        assertThat(allResults.get(0).visuallyCompleteInMillisecs, is(4888))
+        assertThat(allResults.get(1).visuallyCompleteInMillisecs, is(2088))
+        assertThat(allResults.get(0).speedIndex, is(2556))
+        assertThat(allResults.get(1).speedIndex, is(1590))
 
-        assertThat(allResults*.visuallyCompleteInMillisecs, everyItem(
-                nullValue()
-        ))
-        assertThat(allResults*.speedIndex, everyItem(
-                is(EventResult.SPEED_INDEX_DEFAULT_VALUE)
-        ))
+
     }
     void testPersistingScreenshotDependentMetricsForSinglestep5RunsWithVideo() {
 
