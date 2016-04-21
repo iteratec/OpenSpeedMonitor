@@ -453,13 +453,13 @@ class ServiceMocker {
 	 */
 	void mockTTCsMappingService(serviceToMockIn){
 		def timeToCsMappingService = new StubFor(TimeToCsMappingService, true)
-		timeToCsMappingService.demand.getCustomerSatisfactionInPercent { Integer docCompleteTime, Page testedPage, csiConfiguration ->
+		timeToCsMappingService.demand.getCustomerSatisfactionInPercent (0 .. 1000) { Integer docCompleteTime, Page testedPage, csiConfiguration ->
 			return 1
 		}
-		timeToCsMappingService.demand.validFrustrationsExistFor { Page testedPage ->
+		timeToCsMappingService.demand.validFrustrationsExistFor(0 .. 1000) { Page testedPage ->
 			//not the concern of this test
 		}
-        timeToCsMappingService.demand.validMappingsExistFor { Page testedPage ->
+        timeToCsMappingService.demand.validMappingsExistFor(0 .. 1000) { Page testedPage ->
             //not the concern of this test
         }
 		serviceToMockIn.timeToCsMappingService = timeToCsMappingService.proxyInstance()
