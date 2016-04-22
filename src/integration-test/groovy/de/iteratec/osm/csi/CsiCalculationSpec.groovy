@@ -29,6 +29,7 @@ import grails.test.mixin.TestFor
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import groovy.mock.interceptor.MockFor
+import groovy.mock.interceptor.StubFor
 import groovy.util.slurpersupport.GPathResult
 
 /**
@@ -36,12 +37,11 @@ import groovy.util.slurpersupport.GPathResult
  */
 @Integration
 @Rollback
-@TestFor(LocationAndResultPersisterService)
 class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
     static transactional = false //necessary because we test transactional service methods
 
-    LocationAndResultPersisterService serviceUnderTest
+    LocationAndResultPersisterService locationAndResultPersisterService
 
     static final String jobGroupName_csi_1 = "jobGroup1"
     static final String jobGroupName_csi_05 = "jobGroup2"
@@ -56,7 +56,6 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     Script testScript
 
     def setup() {
-        serviceUnderTest = service
         createTestDataCommonForAllTests()
         mocksCommonForAllTests()
 
@@ -69,7 +68,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithoutCsiConf, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup without csi configuration"
-        serviceUnderTest.listenToResult(xmlResult,server1)
+        locationAndResultPersisterService.listenToResult(xmlResult,server1)
 
         then: "persisted EventResult has no csi value"
         Collection<EventResult> resultsWithCsiCalculated = EventResult.findAll {
@@ -86,7 +85,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
-        serviceUnderTest.listenToResult(xmlResult,server1)
+        locationAndResultPersisterService.listenToResult(xmlResult,server1)
 
         then: "persisted EventResult has csi value of 100%"
         List<EventResult> results = EventResult.findAll {
@@ -104,7 +103,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
         TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
-        serviceUnderTest.listenToResult(xmlResult,server1)
+        locationAndResultPersisterService.listenToResult(xmlResult,server1)
 
         then: "persisted EventResult has csi value of 50%"
         List<EventResult> results = EventResult.findAll {
@@ -154,13 +153,13 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     }
 
     private void mocksCommonForAllTests(){
-        def timeToCsMappingService = new MockFor(TimeToCsMappingService, true)
-        timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..10000) {
+        def timeToCsMappingService = new TimeToCsMappingService()
+        timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent {
             Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
             if (csiConfiguration == null) return null
             else if (csiConfiguration.label == csiConfiguration_all_1.label)  return 100d
             else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
-        serviceUnderTest.timeToCsMappingService = timeToCsMappingService
+        locationAndResultPersisterService.timeToCsMappingService = timeToCsMappingService
     }
 }
