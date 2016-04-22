@@ -186,20 +186,22 @@ databaseChangeLog = {
 						query.setString("name", it.dashboardName)
 						def oldId = query.list()[0]
 
-
-						query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
-								'select :newID, graph_colors_idx, graph_colors_elt from userspecific_csi_dashboard_graph_colors ' +
-								'where graph_colors = :oldID')
-						query.setString("newID", it.id.toString())
-						query.setString("oldID", oldId.toString())
-						query.executeUpdate()
-
-						query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
-								'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_csi_dashboard_graph_name_aliases ' +
-								'where graph_name_aliases = :oldID')
-						query.setString("newID", it.id.toString())
-						query.setString("oldID", oldId.toString())
-						query.executeUpdate()
+						if(!it.graphColors.isEmpty()) {
+                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
+                                    'select :newID, graph_colors_idx, graph_colors_elt from userspecific_csi_dashboard_graph_colors ' +
+                                    'where graph_colors = :oldID')
+                            query.setString("newID", it.id.toString())
+                            query.setString("oldID", oldId.toString())
+                            query.executeUpdate()
+						}
+						if(!it.graphNameAliases.isEmpty()) {
+                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
+                                    'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_csi_dashboard_graph_name_aliases ' +
+                                    'where graph_name_aliases = :oldID')
+                            query.setString("newID", it.id.toString())
+                            query.setString("oldID", oldId.toString())
+                            query.executeUpdate()
+						}
 					}
 				}
 
@@ -209,25 +211,29 @@ databaseChangeLog = {
 						query.setString("name", it.dashboardName)
 						def oldId = query.list()[0]
 
-						query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
-								'select :newID, graph_colors_idx, graph_colors_elt from userspecific_event_result_dashboard_graph_colors ' +
-								'where graph_colors = :oldID')
-						query.setString("newID", it.id.toString())
-						query.setString("oldID", oldId.toString())
-						query.executeUpdate()
+                        if(!it.graphColors.isEmpty()) {
+                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
+                                    'select :newID, graph_colors_idx, graph_colors_elt from userspecific_event_result_dashboard_graph_colors ' +
+                                    'where graph_colors = :oldID')
+                            query.setString("newID", it.id.toString())
+                            query.setString("oldID", oldId.toString())
+                            query.executeUpdate()
+                        }
 
-						query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
-								'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_event_result_dashboard_graph_name_aliases ' +
-								'where graph_name_aliases = :oldID')
-						query.setString("newID", it.id.toString())
-						query.setString("oldID", oldId.toString())
-						query.executeUpdate()
+                        if(!it.graphNameAliases.isEmpty()) {
+                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
+                                    'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_event_result_dashboard_graph_name_aliases ' +
+                                    'where graph_name_aliases = :oldID')
+                            query.setString("newID", it.id.toString())
+                            query.setString("oldID", oldId.toString())
+                            query.executeUpdate()
+                        }
 					}
 				}
 			}
 		}
 	}
-	
+
 	changeSet(author: "marcus (generated)", id: "1460099558388-9") {
 		dropTable(tableName: "userspecific_csi_dashboard")
 	}
