@@ -1,15 +1,12 @@
 import ch.qos.logback.classic.AsyncAppender
+import ch.qos.logback.classic.encoder.PatternLayoutEncoder
+import ch.qos.logback.classic.filter.ThresholdFilter
 import ch.qos.logback.core.ConsoleAppender
 import ch.qos.logback.core.rolling.RollingFileAppender
-
 import grails.util.BuildSettings
 import grails.util.Environment
-import ch.qos.logback.classic.filter.ThresholdFilter
-import static ch.qos.logback.classic.Level.ALL
-import static ch.qos.logback.classic.Level.DEBUG
-import static ch.qos.logback.classic.Level.ERROR
-import static ch.qos.logback.classic.Level.INFO
-import static ch.qos.logback.classic.Level.WARN
+
+import static ch.qos.logback.classic.Level.*
 
 def appenders = []
 // See http://logback.qos.ch/manual/groovy.html for details on configuration
