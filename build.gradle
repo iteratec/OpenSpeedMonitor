@@ -65,7 +65,6 @@ ext {
     grailsVersion = project.grailsVersion
     gradleWrapperVersion = project.gradleWrapperVersion
 
-    jasmineDependencies = ['karma', 'karma-jasmine', 'karma-phantomjs-launcher']
     karmaExec = file('node_modules/karma/bin/karma')
     karmaConfig = 'src/test/js/karma.conf.js'
 }
@@ -137,22 +136,12 @@ dependencies {
     }
 }
 
-task setupNpmDependencies(type: NpmTask) {
-    outputs.dir file('node_modules')
-    args = ['install']
-}
-
-task setupPhantomJS(type: NpmTask) {
-    outputs.dir file('node_modules')
-    args = ['install', 'phantomjs', '--loglevel', 'error']
-}
-
 task setupJasmine(type: NpmTask) {
     outputs.dir file('node_modules')
-    args = ['install'] + jasmineDependencies + ['--loglevel', 'error']
+    args = ['install','--loglevel', 'error']
 }
 
-task jasmineRun(type: NodeTask, dependsOn: ['setupNpmDependencies','setupPhantomJS', 'setupJasmine']) {
+task jasmineRun(type: NodeTask, dependsOn: ['setupJasmine']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
 }
