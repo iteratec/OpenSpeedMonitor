@@ -137,6 +137,11 @@ dependencies {
     }
 }
 
+task setupNpmDependencies(type: NpmTask) {
+    outputs.dir file('node_modules')
+    args = ['install']
+}
+
 task setupPhantomJS(type: NpmTask) {
     outputs.dir file('node_modules')
     args = ['install', 'phantomjs', '--loglevel', 'error']
@@ -147,7 +152,7 @@ task setupJasmine(type: NpmTask) {
     args = ['install'] + jasmineDependencies + ['--loglevel', 'error']
 }
 
-task jasmineRun(type: NodeTask, dependsOn: ['setupPhantomJS', 'setupJasmine']) {
+task jasmineRun(type: NodeTask, dependsOn: ['setupNpmDependencies','setupPhantomJS', 'setupJasmine']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
 }
