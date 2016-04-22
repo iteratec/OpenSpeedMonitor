@@ -18,7 +18,7 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: 'target/plugins/jquery-*/web-app/js/jquery/jquery-*.js', watched: false },
+            { pattern: ASSET_PATH + '/javascripts/jquery/jquery-*.js', watched: true },
             { pattern: ASSET_PATH + '/javascripts/application.js', watched: true },
             { pattern: ASSET_PATH + '/javascripts/csi/defaultMappingCsvValidator.js', watched: true },
             { pattern: TEST_PATH + '/specs/**/*.js', watched: true }
