@@ -54,16 +54,13 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 	private static final String NON_MEASURAND_AGGREGATOR_TYPE_NAME = 'nonMeasurand'
 
 
-	void setup() {
-        super.setupSpec()
-		initTestData();
+	def setup() {
+        EventResult.withNewTransaction {
+            initTestData();
+        }
 	}
 
-    void cleanup(){
-        super.cleanupSpec()
-    }
-
-	def "Test getByStartAndEndTimeAndMvQueryParams with JUST_ONE_DATE" (){
+	void "Test getByStartAndEndTimeAndMvQueryParams with JUST_ONE_DATE" (){
 		given:
 		MvQueryParams qp=new MvQueryParams();
 		qp.browserIds.add(job.location.browser.id);
@@ -83,7 +80,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 		results.getAt(0) == resultRunDatePlus_Zero
 	}
 
-	def "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN"() {
+	void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN"() {
         given:
 		MvQueryParams qp=new MvQueryParams();
 		qp.browserIds.add(job.location.browser.id);
@@ -105,7 +102,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 	}
 
 
-	def "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_BROWSER"() {
+    void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_BROWSER"() {
         given:
 		MvQueryParams qp=new MvQueryParams();
 		qp.browserIds.add(job.location.browser.id);

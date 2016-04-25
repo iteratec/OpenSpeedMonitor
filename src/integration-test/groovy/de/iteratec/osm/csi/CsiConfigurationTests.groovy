@@ -7,7 +7,7 @@ import grails.transaction.Rollback
 import spock.lang.Specification
 @Integration
 @Rollback
-class CsiConfigurationTests extends Specification {
+class CsiConfigurationTests extends NonTransactionalIntegrationSpec {
 
     CsiConfiguration csiConfiguration
 

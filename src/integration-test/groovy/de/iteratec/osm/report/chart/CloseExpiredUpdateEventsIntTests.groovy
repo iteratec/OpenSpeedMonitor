@@ -23,6 +23,8 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import spock.lang.Shared
@@ -37,6 +39,8 @@ import spock.lang.Shared
  * </ul>
  * 
  */
+@Integration
+@Rollback
 class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
 	CsiAggregationUtilService csiAggregationUtilService
@@ -65,15 +69,9 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 	final static int NUMBER_OF_PAGES = 3
 
     def setup() {
-        super.setupSpec()
-
         mocksCommonToAllTests()
 
         createTestdataCommonToAllTests()
-    }
-
-    def cleanup() {
-        super.cleanupSpec()
     }
 
     void "Outdated daily page CsiAggregations get closed and calculated correctly"() {

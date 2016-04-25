@@ -62,15 +62,17 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
      */
 
     def setup(){
-        createCsiAggregationIntervals()
-        createAggregatorTypes()
-        createPagesAndEvents()
-        createBrowsers()
-        createHoursOfDay()
-        createServer()
-        createLocations()
-        createJobGroups()
-        createJobs()
+        CsiAggregationInterval.withNewTransaction {
+            TestDataUtil.createCsiAggregationIntervals()
+            TestDataUtil.createAggregatorTypes()
+            createPagesAndEvents()
+            createBrowsers()
+            createHoursOfDay()
+            createServer()
+            createLocations()
+            createJobGroups()
+            createJobs()
+        }
         job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
         page = AggregatorType.findByName(AggregatorType.PAGE)
         shop = AggregatorType.findByName(AggregatorType.SHOP)
@@ -113,38 +115,6 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         }
         pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)).size() == countWeeks * countPages
 
-    }
-
-
-    private static createAggregatorTypes() {
-        AggregatorType.findByName(AggregatorType.MEASURED_EVENT) ?: new AggregatorType(
-                name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.PAGE) ?: new AggregatorType(
-                name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.PAGE_AND_BROWSER) ?: new AggregatorType(
-                name: AggregatorType.PAGE_AND_BROWSER, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-
-        AggregatorType.findByName(AggregatorType.SHOP) ?: new AggregatorType(
-                name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-    }
-
-    private static createCsiAggregationIntervals() {
-        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
-                name: "hourly",
-                intervalInMinutes: CsiAggregationInterval.HOURLY
-        ).save(failOnError: true)
-
-        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY) ?: new CsiAggregationInterval(
-                name: "daily",
-                intervalInMinutes: CsiAggregationInterval.DAILY
-        ).save(failOnError: true)
-
-        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY) ?: new CsiAggregationInterval(
-                name: "weekly",
-                intervalInMinutes: CsiAggregationInterval.WEEKLY
-        ).save(failOnError: true)
     }
 
     private static void createJobGroups() {
