@@ -1,6 +1,5 @@
 package de.iteratec.osm.api
 
-import de.iteratec.osm.filters.SecureApiFunctionsFilters
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.Event
@@ -11,12 +10,11 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Duration
 import spock.lang.Specification
-
 /**
  * Created by nkuhn on 09.05.15.
  */
 @TestFor(RestApiController)
-@Mock([SecureApiFunctionsFilters, Job, ApiKey, JobGroup, Event])
+@Mock([Job, ApiKey, JobGroup, Event])
 class EventCreationViaRestApiSpec extends Specification {
 
     private RestApiController controllerUnderTest
@@ -68,9 +66,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -100,9 +96,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -131,9 +125,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -163,9 +155,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -194,9 +184,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -226,17 +214,11 @@ class EventCreationViaRestApiSpec extends Specification {
                 description: description,
                 globallyVisible: globalVisibility
         )
-        cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
 
         then:
-        //test written event
-        Event.list().size() == 0
-        //test json representation
-        response.status == 400
-        response.text == "Error field eventTimestamp: The date has the wrong format. Has to be in format ISO 8601. The 1st January 2014, 11 PM (UTC) in that format: 20140101T230000Z.\n"
+        shouldFail(IllegalArgumentException){
+            cmd.validate()
+        }
     }
 
     // successful event creation //////////////////////////////////////////////////////////////
@@ -261,9 +243,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 globallyVisible: globalVisibility
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -279,7 +259,6 @@ class EventCreationViaRestApiSpec extends Specification {
         associatedJobGroups.contains(group1)
         associatedJobGroups.contains(group2)
         //test json representation
-        response.json.class == 'de.iteratec.osm.report.chart.Event'
         response.json.shortName == shortName
         response.json.description == description
         new DateTime(response.json.eventDate) == expectedDate
@@ -302,9 +281,7 @@ class EventCreationViaRestApiSpec extends Specification {
                 system: [group1.name, group2.name],
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeyCreateEvent") {
-            controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
-        }
+        controllerUnderTest.securedViaApiKeyCreateEvent(cmd)
 
         then:
         //test written event
@@ -320,7 +297,6 @@ class EventCreationViaRestApiSpec extends Specification {
         associatedJobGroups.contains(group1)
         associatedJobGroups.contains(group2)
         //test json representation
-        response.json.class == 'de.iteratec.osm.report.chart.Event'
         response.json.shortName == shortName
         response.json.description.equals(null)
         new Duration(new DateTime(response.json.eventDate), new DateTime()).standardMinutes < 5

@@ -14,46 +14,43 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
-package de.iteratec.osm.filters
-
-import de.iteratec.osm.api.ApiKey
+package de.iteratec.osm.api
 
 /**
- * SecureApiFunctionsFilters
  * Checks whether ...
  * <ul>
  *     <li>apiKey is sent via parameter</li>
- *     <li>An apiKey exist with given key value from parameter</li>
- *     <li>apiKey is valid</li>
+ *     <li>An apiKey exists with given key value from parameter</li>
+ *     <li>Existing apiKey is valid</li>
  * </ul>
+ *
  * If one of the checks above fail the subsequent action isn't reached and an error is sent instead.
  */
-class SecureApiFunctionsFilters {
+class RestApiInterceptor {
 
-    def filters = {
-        secureApiFunctions(controller: 'restApi', action: 'securedViaApiKey*', find: true){
-            before = {
-                if( params.apiKey == null ) {
-                    prepareErrorResponse(response, 400, "This api function requires an apiKey with respected permission. You " +
-                            "have to submit this key as param 'apiKey'.")
-                    return false
-
-                }
-                ApiKey apiKey = ApiKey.findBySecretKey(params.apiKey)
-                if( apiKey == null ) {
-                    prepareErrorResponse(response, 404, "The submitted apiKey doesn't exist.")
-                    return false
-                }
-                if( !apiKey.valid ) {
-                    prepareErrorResponse(response, 403, "The submitted apiKey is invalid.")
-                    return false
-                }
-                params['validApiKey'] = apiKey
-                return true
-            }
-        }
+    public RestApiInterceptor(){
+        match(controller: "restApi", action: ~/securedViaApiKey.*/)
     }
+
+    boolean before() {
+        if( params.apiKey == null ) {
+            prepareErrorResponse(response, 400, "This api function requires an apiKey with respected permission. You " +
+                    "have to submit this key as param 'apiKey'.")
+            return false
+        }
+        ApiKey apiKey = ApiKey.findBySecretKey(params.apiKey)
+        if( apiKey == null ) {
+            prepareErrorResponse(response, 404, "The submitted apiKey doesn't exist.")
+            return false
+        }
+        if( !apiKey.valid ) {
+            prepareErrorResponse(response, 403, "The submitted apiKey is invalid.")
+            return false
+        }
+        params['validApiKey'] = apiKey
+        return true
+    }
+
     private void prepareErrorResponse(javax.servlet.http.HttpServletResponse response, Integer httpStatus, String message) {
         response.setContentType('text/plain;charset=UTF-8')
         response.status=httpStatus

@@ -1,16 +1,14 @@
 package de.iteratec.osm.api
 
-import de.iteratec.osm.filters.SecureApiFunctionsFilters
 import de.iteratec.osm.InMemoryConfigService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
-
 /**
  * Created by nkuhn on 12.05.15.
  */
 @TestFor(RestApiController)
-@Mock([SecureApiFunctionsFilters, ApiKey])
+@Mock([ApiKey])
 class MeasurementActivationViaRestApiSpec extends Specification {
 
     private RestApiController controllerUnderTest
@@ -42,9 +40,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
                 activationToSet: true
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetMeasurementActivation") {
-            controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
 
         then:
         response.status == 200
@@ -60,9 +56,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
                 activationToSet: false
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetMeasurementActivation") {
-            controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
 
         then:
         response.status == 200
@@ -83,9 +77,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
                 activationToSet: true
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetMeasurementActivation") {
-            controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
 
         then:
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
@@ -103,9 +95,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
                 apiKey: apiKeyAllowed
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetMeasurementActivation") {
-            controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetMeasurementActivation(cmd)
 
         then:
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission

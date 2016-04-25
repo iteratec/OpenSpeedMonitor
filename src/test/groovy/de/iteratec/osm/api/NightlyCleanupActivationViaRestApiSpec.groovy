@@ -1,14 +1,12 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.filters.SecureApiFunctionsFilters
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 
-
 @TestFor(RestApiController)
-@Mock([SecureApiFunctionsFilters, ApiKey])
+@Mock([ApiKey])
 class NightlyCleanupActivationViaRestApiSpec extends Specification {
 
     private RestApiController controllerUnderTest
@@ -40,9 +38,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 activationToSet: true
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
 
         then:
         response.status == 200
@@ -58,9 +54,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 activationToSet: false
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
 
         then:
         response.status == 200
@@ -81,9 +75,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 activationToSet: true
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
 
         then:
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
@@ -101,9 +93,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
                 apiKey: apiKeyAllowed
         )
         cmd.validate()
-        withFilters(action:"securedViaApiKeySetNightlyDatabaseCleanupActivation") {
-            controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
-        }
+        controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
 
         then:
         inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
