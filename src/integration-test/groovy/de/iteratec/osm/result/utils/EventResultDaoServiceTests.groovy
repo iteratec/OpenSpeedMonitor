@@ -31,11 +31,14 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import org.apache.commons.lang.time.DateUtils
 
 import static org.junit.Assert.assertEquals
 
-
+@Integration
+@Rollback
 class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 
     public static final String CONN_PROFILE_NAME = 'connProfile 1: name'
@@ -77,7 +80,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 
         then:
 		results.size() == 1
-		results.getAt(0) == resultRunDatePlus_Zero
+		results.getAt(0).id == resultRunDatePlus_Zero.id
 	}
 
 	void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN"() {
@@ -97,8 +100,8 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 
         then:
         results.size() == 2
-        results.find{it.jobResultDate == runDatePlus_Zero} == resultRunDatePlus_Zero
-        results.find{it.jobResultDate == runDatePlus_Ten} == resultRunDatePlus_Ten
+        results.find{it.jobResultDate == runDatePlus_Zero}.id == resultRunDatePlus_Zero.id
+        results.find{it.jobResultDate == runDatePlus_Ten}.id == resultRunDatePlus_Ten.id
 	}
 
 
@@ -119,8 +122,8 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
 
         then:
         results.size() == 2
-        results.find{it.jobResultDate == runDatePlus_Zero} == resultRunDatePlus_Zero
-        results.find{it.jobResultDate == runDatePlus_Ten} == resultRunDatePlus_Ten
+        results.find{it.jobResultDate == runDatePlus_Zero}.id == resultRunDatePlus_Zero.id
+        results.find{it.jobResultDate == runDatePlus_Ten}.id == resultRunDatePlus_Ten.id
 	}
 
 	void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_EMPTY_MV_PARAMS"() {
