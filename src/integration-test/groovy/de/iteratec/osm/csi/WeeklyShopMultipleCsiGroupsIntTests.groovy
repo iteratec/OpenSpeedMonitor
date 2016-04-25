@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -66,46 +67,52 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 	static final Integer countResultsPerWeeklyPageMv = 4
 	static final Integer countWeeklyPageMvsToBeCreated = 4
 	def setup() {
-		System.out.println('Create some common test-data...');
-		TestDataUtil.createOsmConfig()
-		TestDataUtil.createCsiAggregationIntervals()
-		TestDataUtil.createAggregatorTypes()
-		System.out.println('Create some common test-data... DONE');
+        System.out.println('Create some common test-data...');
+        TestDataUtil.createOsmConfig()
+        CsiAggregationInterval.withNewTransaction {
+            TestDataUtil.createCsiAggregationIntervals()
+        }
+        AggregatorType.withNewTransaction {
+            TestDataUtil.createAggregatorTypes()
+        }
+        System.out.println('Create some common test-data... DONE');
 
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
-		System.out.println('Loading CSV-data... DONE');
+        System.out.println('Loading CSV-data...');
+        EventResult.withNewTransaction {
+            TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
+        }
+        System.out.println('Loading CSV-data... DONE');
+        csiGroups = [
+                JobGroup.findByName(csiGroup1Name),
+                JobGroup.findByName(csiGroup2Name)
+        ]
 
-		csiGroups = [
-				JobGroup.findByName(csiGroup1Name),
-				JobGroup.findByName(csiGroup2Name)
-		]
+        EventResult.findAll().each {
+            locationAndResultPersisterService.informDependentCsiAggregations(it)
+        }
+        CsiConfiguration.findAll().each { csiConfiguration ->
+            ConnectivityProfile.findAll().each { connectivityProfile ->
+                Browser.findAll().each { browser ->
+                    csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
+                }
+                Page.findAll().each { page ->
+                    csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+                }
+            }
+        }
 
-		EventResult.findAll().each {
-			locationAndResultPersisterService.informDependentCsiAggregations(it)
-		}
-		CsiConfiguration.findAll().each { csiConfiguration ->
-			ConnectivityProfile.findAll().each { connectivityProfile ->
-				Browser.findAll().each { browser ->
-					csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
-				}
-				Page.findAll().each { page ->
-					csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
-				}
-			}
-		}
+        shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
+        weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+        wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
 
-		shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
-		weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-		wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
-		targetValues = [
-			csiGroup1: 0.391,
-			csiGroup2: 0.691
-		]
-		pageObjectsToTest = []
-		pagesToTest.each{
-			pageObjectsToTest.add(Page.findByName(it))
-		}
+        targetValues = [
+                csiGroup1: 0.391,
+                csiGroup2: 0.691
+        ]
+        pageObjectsToTest = []
+        pagesToTest.each {
+            pageObjectsToTest.add(Page.findByName(it))
+        }
 	}
 
 	/**
@@ -114,31 +121,32 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 	void testCreationAndCalculationOfWeeklyShopValues() {
 		setup:
 		Date startDate = startOfWeek.toDate()
-
+        List<CsiAggregation> wpmvsOfOneGroupPageCombination
 		when:
 		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
-		
-		CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-		List<CsiAggregation> wpmvsOfOneGroupPageCombination = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup])
-
 		then:
-		24 == results.size()
-		wsmvs != null
-		countWeeklyShopMvsToBeCreated == wsmvs.size()
-		startDate == mvWeeklyShop.started
-		weeklyInterval.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
-		shopAggregatorType.name == mvWeeklyShop.aggregator.name
-		mvWeeklyShop.isCalculated()
+		wsmvs.each { mvWeeklyShop ->
+            csiGroups.each { csiGroup ->
 
-		1 == wpmvsOfOneGroupPageCombination.size()
-		wpmvsOfOneGroupPageCombination.each{mvWeeklyPage ->
-			assert csiGroup.ident().toString() == mvWeeklyPage.tag
-			assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
-		}
-
-		where:
-		mvWeeklyShop << wsmvs
-		csiGroup << csiGroups
+                CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+                wpmvsOfOneGroupPageCombination = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup])
+                24 == results.size()
+                wsmvs != null
+                countWeeklyShopMvsToBeCreated == wsmvs.size()
+                startDate == mvWeeklyShop.started
+                weeklyInterval.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
+                shopAggregatorType.name == mvWeeklyShop.aggregator.name
+                mvWeeklyShop.isCalculated()
+                1 == wpmvsOfOneGroupPageCombination.size()
+                wpmvsOfOneGroupPageCombination.each { mvWeeklyPage ->
+                    assert csiGroup.ident().toString() == mvWeeklyPage.tag
+				    assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
+                }
+            }
+        }
+//		where:
+//		mvWeeklyShop << wsmvs
+//		csiGroup << csiGroups
 	}
 
 	/**
