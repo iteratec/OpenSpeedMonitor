@@ -38,9 +38,6 @@ import groovy.util.slurpersupport.GPathResult
 @Integration
 @Rollback
 class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
-
-    static transactional = false //necessary because we test transactional service methods
-
     LocationAndResultPersisterService locationAndResultPersisterService
 
     static final String jobGroupName_csi_1 = "jobGroup1"
@@ -58,14 +55,16 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     def setup() {
         createTestDataCommonForAllTests()
         mocksCommonForAllTests()
-
     }
 
 
     void "csi won't be calculated without csi-configuration"() {
         setup: "prepare Job and JobGroup"
-        JobGroup jobGroupWithoutCsiConf = JobGroup.findByName(jobGroupName_csi_1)
-        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithoutCsiConf, '', 3 , false, 60)
+        JobGroup.withNewTransaction {
+            JobGroup jobGroupWithoutCsiConf = JobGroup.findByName(jobGroupName_csi_1)
+            TestDataUtil.
+                    createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithoutCsiConf, '', 3, false, 60)
+        }
 
         when: "larpService listens to result of JobGroup without csi configuration"
         locationAndResultPersisterService.listenToResult(xmlResult,server1)
@@ -79,10 +78,12 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
     void "csi must be calculated with csi-configuration, all values are 100%"() {
         setup: "prepare Job and JobGroup"
-        JobGroup jobGroupWithCsiConf = JobGroup.findByName(jobGroupName_csi_1)
-        jobGroupWithCsiConf.csiConfiguration = csiConfiguration_all_1
-        jobGroupWithCsiConf.save(failOnError: true)
-        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3 , false, 60)
+        JobGroup.withNewTransaction {
+            JobGroup jobGroupWithCsiConf = JobGroup.findByName(jobGroupName_csi_1)
+            jobGroupWithCsiConf.csiConfiguration = csiConfiguration_all_1
+            jobGroupWithCsiConf.save(failOnError: true)
+            TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroupWithCsiConf, '', 3, false, 60)
+        }
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
         locationAndResultPersisterService.listenToResult(xmlResult,server1)
@@ -97,10 +98,12 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
     void "csi must be calculated with csi-configuration, all values are 50%"() {
         setup: "prepare Job and JobGroup"
-        JobGroup jobGroup = JobGroup.findByName(jobGroupName_csi_05)
-        jobGroup.csiConfiguration = csiConfiguration_all_05
-        jobGroup.save(failOnError: true)
-        TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3 , false, 60)
+        JobGroup.withNewTransaction {
+            JobGroup jobGroup = JobGroup.findByName(jobGroupName_csi_05)
+            jobGroup.csiConfiguration = csiConfiguration_all_05
+            jobGroup.save(failOnError: true)
+            TestDataUtil.createJob('FF_LH_BV1_hetzner', testScript, testLocation, jobGroup, '', 3, false, 60)
+        }
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
         locationAndResultPersisterService.listenToResult(xmlResult,server1)
@@ -153,13 +156,13 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     }
 
     private void mocksCommonForAllTests(){
-        def timeToCsMappingService = new TimeToCsMappingService()
-        timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent {
+        def timeToCsMappingService = new StubFor(TimeToCsMappingService, true)
+        timeToCsMappingService.demand.getCustomerSatisfactionInPercent(0..10000) {
             Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
             if (csiConfiguration == null) return null
             else if (csiConfiguration.label == csiConfiguration_all_1.label)  return 100d
             else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
-        locationAndResultPersisterService.timeToCsMappingService = timeToCsMappingService
+        locationAndResultPersisterService.timeToCsMappingService = timeToCsMappingService.proxyInstance()
     }
 }

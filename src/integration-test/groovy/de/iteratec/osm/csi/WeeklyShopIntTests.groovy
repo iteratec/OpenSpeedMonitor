@@ -48,8 +48,6 @@ import de.iteratec.osm.result.CsiAggregationTagService
 @Rollback
 class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
-	static transactional = false
-
 	/** injected by grails */
 	EventCsiAggregationService eventCsiAggregationService
 	ShopCsiAggregationService shopCsiAggregationService
@@ -86,31 +84,35 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 	 */
 
 	def setup() {
-		System.out.println('Create some common test-data...');
-		TestDataUtil.createOsmConfig()
-		TestDataUtil.createCsiAggregationIntervals()
-		TestDataUtil.createAggregatorTypes()
+		CsiAggregation.withNewTransaction {
+			System.out.println('Create some common test-data...');
+			TestDataUtil.createOsmConfig()
+			TestDataUtil.createCsiAggregationIntervals()
+			TestDataUtil.createAggregatorTypes()
 
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
-		System.out.println('Loading CSV-data... DONE');
+			System.out.println('Loading CSV-data...');
+			TestDataUtil.
+					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
+			System.out.println('Loading CSV-data... DONE');
 
-		EventResult.findAll().each {
-			locationAndResultPersisterService.informDependentCsiAggregations(it)
-		}
+			EventResult.findAll().each {
+				locationAndResultPersisterService.informDependentCsiAggregations(it)
+			}
 
-		CsiConfiguration.findAll().each { csiConfiguration ->
-			ConnectivityProfile.findAll().each { connectivityProfile ->
-				Browser.findAll().each { browser ->
-					csiConfiguration.browserConnectivityWeights.add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
-				}
-				Page.findAll().each { page ->
-					csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+			CsiConfiguration.findAll().each { csiConfiguration ->
+				ConnectivityProfile.findAll().each { connectivityProfile ->
+					Browser.findAll().each { browser ->
+						csiConfiguration.browserConnectivityWeights.
+								add(new BrowserConnectivityWeight(browser: browser, connectivity: connectivityProfile, weight: 1))
+					}
+					Page.findAll().each { page ->
+						csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 1))
+					}
 				}
 			}
-		}
 
-		System.out.println('Create some common test-data... DONE');
+			System.out.println('Create some common test-data... DONE');
+		}
 		hourly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
 		weekly= CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
 		pageAggregatorMeasuredEvent = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
@@ -126,14 +128,17 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 		Date startDate = new DateTime(2012,01,12,0,0, DateTimeZone.UTC).toDate()
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
 
-		CsiAggregation mvWeeklyShop = new CsiAggregation(
-				started: startDate,
-				interval: weekly,
-				aggregator: pageAggregatorShop,
-				tag: csiGroup.ident().toString(),
-				csByWptDocCompleteInPercent: null,
-				underlyingEventResultsByWptDocComplete: ''
-				).save(failOnError:true)
+		CsiAggregation mvWeeklyShop
+		CsiAggregation.withNewTransaction {
+			mvWeeklyShop = new CsiAggregation(
+					started: startDate,
+					interval: weekly,
+					aggregator: pageAggregatorShop,
+					tag: csiGroup.ident().toString(),
+					csByWptDocCompleteInPercent: null,
+					underlyingEventResultsByWptDocComplete: ''
+			).save(failOnError: true)
+		}
 
 		when:
 		shopCsiAggregationService.calcCa(mvWeeklyShop)
@@ -164,14 +169,17 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 		JobGroup csiGroup = JobGroup.findByName(csiGroupName)
 		Double expectedValue = 61.30
 
-		CsiAggregation mvWeeklyShop = new CsiAggregation(
-				started: startDate,
-				interval: weekly,
-				aggregator: pageAggregatorShop,
-				tag: csiGroup.ident().toString(),
-				csByWptDocCompleteInPercent: null,
-				underlyingEventResultsByWptDocComplete: ''
-				).save(failOnError:true)
+		CsiAggregation mvWeeklyShop
+		CsiAggregation.withNewTransaction {
+			mvWeeklyShop = new CsiAggregation(
+					started: startDate,
+					interval: weekly,
+					aggregator: pageAggregatorShop,
+					tag: csiGroup.ident().toString(),
+					csByWptDocCompleteInPercent: null,
+					underlyingEventResultsByWptDocComplete: ''
+			).save(failOnError: true)
+		}
 
 		when:
 		shopCsiAggregationService.calcCa(mvWeeklyShop)

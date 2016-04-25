@@ -15,7 +15,6 @@ class NonTransactionalIntegrationSpec extends Specification {
     @Shared
     def grailsApplication
 
-
     static transactional = false
 
     def setup() {
@@ -35,10 +34,6 @@ class NonTransactionalIntegrationSpec extends Specification {
     def cleanup() {
         //After spec nuke and pave the test db
         new SchemaExport(_configuration).create(false, true)
-
-        //Clear the sessions
-//        SessionFactory sf = grailsApplication.getMainContext().getBean('sessionFactory')
-//        sf.getCurrentSession().clear()
     }
 
 }

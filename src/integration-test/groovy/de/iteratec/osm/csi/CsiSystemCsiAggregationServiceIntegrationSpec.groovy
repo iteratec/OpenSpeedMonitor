@@ -66,7 +66,9 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     CsiSystem csiSystem
 
     def setup() {
-        createCommonTestData()
+        CsiAggregation.withNewTransaction {
+            createCommonTestData()
+        }
     }
 
     def cleanup() {
@@ -179,7 +181,9 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
 
     void "calculate single weekly Mv if 1 is existing and only highest weekly-aggregation is called"() {
         given:
-        createSingleHourlyCsiAggregations()
+        CsiAggregation.withNewTransaction {
+            createSingleHourlyCsiAggregations()
+        }
 
         when:
         List<CsiAggregation> csiSystemWeeklyMvs = csiSystemCsiAggregationService.getOrCalculateCsiSystemCsiAggregations(fromHourly.toDate(),toHourly.toDate(),weekly, [csiSystem])
@@ -213,7 +217,9 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     void "aggregate to single csiAggregation if 2 hourlys are existing"() {
         given:
         MvQueryParams getAllParams = createGetAllQueryParam()
-        createTwoHourlyCsiAggregations()
+        CsiAggregation.withNewTransaction {
+            createTwoHourlyCsiAggregations()
+        }
 
         when:
         List<CsiAggregation> hourlyMvs = eventCsiAggregationService.getHourlyCsiAggregations(fromHourly.toDate(),toHourly.toDate(),getAllParams)
@@ -387,10 +393,11 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
 
     private void createCsiAggregations(DateTime started) {
         new CsiAggregation(
-                started:started.toDate(),
+                started: started.toDate(),
                 interval: hourly,
                 aggregator: measuredEvent,
-                tag: csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser1,location1),
+                tag: csiAggregationTagService.
+                        createHourlyEventTag(jobGroup1, measuredEvent1, page1, browser1, location1),
                 csiSystem: csiSystem,
                 csByWptDocCompleteInPercent: DEFAULT_MV_VALUE,
                 csByWptVisuallyCompleteInPercent: DEFAULT_MV_VALUE,

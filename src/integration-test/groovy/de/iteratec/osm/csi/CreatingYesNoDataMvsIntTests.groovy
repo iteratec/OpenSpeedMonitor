@@ -45,9 +45,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 @Integration
 @Rollback
 class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
-
-    static transactional = false
-
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService

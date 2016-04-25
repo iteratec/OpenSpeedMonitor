@@ -62,8 +62,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 @Rollback
 class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrationSpec {
 
-	static transactional = false
-
 	CsiAggregationUpdateService csiAggregationUpdateService
 	PageCsiAggregationService pageCsiAggregationService
 	CsiAggregationUtilService csiAggregationUtilService

@@ -760,11 +760,13 @@ class TestDataUtil {
                 csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 7))
             }
         }
-
+        def i = 0
         csvFile.eachLine { String csvLine ->
             if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
                 //				System.out.println('Processing line: ' + csvLine);
                 decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, csiAggregationTagService, profile)
+                println(i)
+                i +=1
             }
         }
     }
@@ -1209,7 +1211,7 @@ class TestDataUtil {
                 connectivityProfile: connectivityProfile
         ).save(failOnError: true)
 
-        return eventResult.save(failOnError: true)
+        return eventResult
 
     }
 

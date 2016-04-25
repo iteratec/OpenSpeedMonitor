@@ -11,7 +11,7 @@ dataSource:
     jmxExport: true
     driverClassName: org.h2.Driver
     username: sa
-    password:
+    password: ''
     dbCreate: 'managed by liquibase'
 
 environments:

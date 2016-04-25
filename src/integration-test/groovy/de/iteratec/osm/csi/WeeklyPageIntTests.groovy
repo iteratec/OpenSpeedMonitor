@@ -37,11 +37,8 @@ import static org.junit.Assert.*
 @Integration
 @Rollback
 class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
-
-	static transactional = false
-
 	/** injected by grails */
-	@Shared CsiAggregationTagService csiAggregationTagService
+	CsiAggregationTagService csiAggregationTagService
 	PageCsiAggregationService pageCsiAggregationService
 	CsiAggregationUpdateService csiAggregationUpdateService
 
@@ -67,16 +64,19 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 	 * with valid TimeToCsMappings from 2012 and added to csv.
 	 */
 	def setup() {
-		System.out.println('Create some common test-data...');
-		TestDataUtil.createOsmConfig()
-		TestDataUtil.createCsiAggregationIntervals()
-		TestDataUtil.createAggregatorTypes()
+		CsiAggregation.withNewTransaction {
+			System.out.println('Create some common test-data...');
+			TestDataUtil.createOsmConfig()
+			TestDataUtil.createCsiAggregationIntervals()
+			TestDataUtil.createAggregatorTypes()
 
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
-		System.out.println('Loading CSV-data... DONE');
+			System.out.println('Loading CSV-data...');
+			TestDataUtil.
+					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
+			System.out.println('Loading CSV-data... DONE');
 
-		System.out.println('Create some common test-data... DONE');
+			System.out.println('Create some common test-data... DONE');
+		}
 //		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
 //		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
 //			return mapToFindJobResultByEventResult[eventResult.ident()]
@@ -126,8 +126,10 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 		Date startDate = startOfWeek.toDate()
 		Page pageToCalculateMvFor = Page.findByName(pageName)
 		JobGroup jobGroup = JobGroup.findByName("CSI")
-		results.each { EventResult result ->
-			csiAggregationUpdateService.createOrUpdateDependentMvs(result)
+		CsiAggregation.withNewTransaction {
+			results.each { EventResult result ->
+				csiAggregationUpdateService.createOrUpdateDependentMvs(result)
+			}
 		}
 		double expectedValue = targetValues[csvName][pageName]?:-1
 

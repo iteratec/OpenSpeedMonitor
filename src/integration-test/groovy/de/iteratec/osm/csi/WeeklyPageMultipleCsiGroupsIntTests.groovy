@@ -32,6 +32,7 @@ import grails.transaction.Rollback
 import org.joda.time.DateTime
 import spock.lang.Shared
 import static org.junit.Assert.*
+import static spock.util.matcher.HamcrestMatchers.closeTo
 
 //@TestMixin(IntegrationTestMixin)
 @Integration
@@ -80,17 +81,20 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 	 */
 
 	def setup() {
-		System.out.println('Create some common test-data...');
-		TestDataUtil.createOsmConfig()
-		TestDataUtil.createCsiAggregationIntervals()
-		TestDataUtil.createAggregatorTypes()
-        TestDataUtil.createCsiConfiguration()
+		CsiAggregation.withNewTransaction {
+			System.out.println('Create some common test-data...');
+			TestDataUtil.createOsmConfig()
+			TestDataUtil.createCsiAggregationIntervals()
+			TestDataUtil.createAggregatorTypes()
+			TestDataUtil.createCsiConfiguration()
 
-		System.out.println('Loading CSV-data...');
-		TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
-		System.out.println('Loading CSV-data... DONE');
+			System.out.println('Loading CSV-data...');
+			TestDataUtil.
+					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
+			System.out.println('Loading CSV-data... DONE');
 
-		System.out.println('Create some common test-data... DONE');
+			System.out.println('Create some common test-data... DONE');
+		}
 
 		job = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 		page = AggregatorType.findByName(AggregatorType.PAGE)
@@ -103,10 +107,10 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 			JobGroup.findByName(csiGroup2Name)
 		]
 		targetValues = [
-			'csiGroup1_HP':0.15,
-			'csiGroup1_MES':0.35,
-			'csiGroup2_HP':0.55,
-			'csiGroup2_MES':0.75
+			'csiGroup1_HP':0.15d,
+			'csiGroup1_MES':0.35d,
+			'csiGroup2_HP':0.55d,
+			'csiGroup2_MES':0.75d
 		]
 	}
 
@@ -175,8 +179,8 @@ class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 			assertEquals(1, wpmvsOfOneGroupPageCombination.size())
 
 			wpmvsOfOneGroupPageCombination.each{ CsiAggregation mvWeeklyPage ->
-				assertTrue(mvWeeklyPage.tag.equals(csiGroup.ident().toString() + ';' + testedPage.ident().toString()))
-				assertEquals(targetValues["${csiGroup.name}_${testedPage.name}"], mvWeeklyPage.csByWptDocCompleteInPercent, 0.01d)
+				assert mvWeeklyPage.tag.equals(csiGroup.ident().toString() + ';' + testedPage.ident().toString())
+				assert targetValues["${csiGroup.name}_${testedPage.name}"], closeTo(mvWeeklyPage.csByWptDocCompleteInPercent, 0.01d)
 			}
 		}
 

@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.result.*
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -64,11 +65,13 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
 
     def setup() {
-        createOsmConfig()
-        createPagesAndEvents()
-        createBrowsers()
-        createJobGroup()
-        createEventResults()
+        CsiAggregation.withNewTransaction {
+            createOsmConfig()
+            createPagesAndEvents()
+            createBrowsers()
+            createJobGroup()
+            createEventResults()
+        }
         csiByEventResultsService.csTargetGraphDaoService.metaClass.getActualCsTargetGraph = { return null }
     }
 
