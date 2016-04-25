@@ -31,6 +31,7 @@ import grails.test.mixin.integration.IntegrationTestMixin
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.junit.Test
+import spock.lang.Ignore
 import spock.lang.Shared
 
 import static org.junit.Assert.*
@@ -112,6 +113,7 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 	 * The CSV read is {@code weekly_page_KW50_2012.csv}.
 	 * Calculating weekly page-values via {@link PageCsiAggregationService} should provide (nearly) the same results!
 	 */
+	@Ignore("bad performance, takes more than 30min")
 	void "test calculating weekly page values for Page_SE"() {
 		// Skip Page if no data is generated (SpeedUp Test) see pagesToGenerateDataFor
 		String pageName = "SE"
