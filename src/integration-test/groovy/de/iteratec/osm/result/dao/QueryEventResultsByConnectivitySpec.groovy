@@ -56,15 +56,15 @@ class QueryEventResultsByConnectivitySpec extends Specification {
     private ConnectivityProfile predefinedProfile1
     private ConnectivityProfile predefinedProfile2
 
-    def setup() {
+    def setupTest() {
         createTestDataCommonToAllTests();
-    }
-
-    def cleanup() {
     }
 
     // selection by one type of selector: predefined profile(s), custom conn or native conn ///////////////////////////////////////////
     void "select by single predefined profile"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams()
         queryParams.includeCustomConnectivity = false
@@ -95,6 +95,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results[0].customConnectivityName == null
     }
     void "select by a list of predefined profiles"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams()
         queryParams.includeCustomConnectivity = false
@@ -128,6 +131,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results[1].customConnectivityName == null
     }
     void "select by custom conn name regex: not matching all"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = true
@@ -158,6 +164,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results[0].customConnectivityName == CUSTOM_CONN_NAME_SHOULD_MATCH
     }
     void "select by custom conn name regex: matching all"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = true
@@ -191,6 +200,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results*.customConnectivityName.contains(withCustomConnectivityNotMatchingRegex.customConnectivityName)
     }
     void "select only native conn"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = false
@@ -222,6 +234,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
 
     // selection by combinations of multiple types of selectors: predefined profile(s)/custom conn/native conn ///////////////////////////////////////////
     void "select by custom conn name regex AND native conn"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = true
@@ -253,6 +268,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results.findAll {it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_MATCH)}.size() == 1
     }
     void "select by custom conn name regex AND predefined conn"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = true
@@ -285,6 +303,9 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results.findAll {it.customConnectivityName.equals(CUSTOM_CONN_NAME_SHOULD_NOT_MATCH)}.size() == 1
     }
     void "select by native conn AND predefined conn"() {
+        setup:
+        setupTest()
+
         when:
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = false
@@ -315,7 +336,8 @@ class QueryEventResultsByConnectivitySpec extends Specification {
         results.findAll {it.connectivityProfile}.size() == 1
     }
     void "select by custom conn name regex AND native conn AND predefined conn"() {
-        given:
+        setup:
+        setupTest()
         MvQueryParams queryParams=new ErQueryParams();
         queryParams.includeCustomConnectivity = true
         queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);

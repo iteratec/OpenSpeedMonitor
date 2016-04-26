@@ -7,15 +7,18 @@ import grails.transaction.Rollback
 import spock.lang.Specification
 @Integration
 @Rollback
-class CsiConfigurationTests extends NonTransactionalIntegrationSpec {
+class CsiConfigurationTests extends Specification {
 
     CsiConfiguration csiConfiguration
 
-    def setup() {
+    def setupTest() {
         createTestDataCommonForAllTests()
     }
 
     void 'delete csiConfig and cascading elements'() {
+        setup:
+        setupTest()
+
         when: "delete a csiConfiguration"
         csiConfiguration.delete(failOnError: true)
         then: "csiConfiguration and all weights belonging to it, shall be deleted"
