@@ -51,7 +51,7 @@ databaseChangeLog = {
 
 	changeSet(author: "marko (generated)", id: "1459346200213-10") {
 		addColumn(tableName: "job_variables") {
-			column(name: "vairables_string", type: "varchar(255)")
+			column(name: "variables_string", type: "varchar(255)")
 		}
 	}
 }
