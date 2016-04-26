@@ -45,4 +45,13 @@ databaseChangeLog = {
 	changeSet(author: "msk", id: "1459346200213-8") {
 		renameTable(oldTableName: "tag_links", newTableName: "tags_links")
 	}
+	changeSet(author: "msk", id: "1459346200213-9") {
+		renameColumn(tableName: "job_variables",oldColumnName: "variables", newColumnName: "job_id", columnDataType: "bigint")
+	}
+
+	changeSet(author: "marko (generated)", id: "1459346200213-10") {
+		addColumn(tableName: "job_variables") {
+			column(name: "vairables_string", type: "varchar(255)")
+		}
+	}
 }

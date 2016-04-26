@@ -144,9 +144,6 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
                 }
             }
         }
-//		where:
-//		mvWeeklyShop << wsmvs
-//		csiGroup << csiGroups
 	}
 
 	/**
