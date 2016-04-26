@@ -103,39 +103,34 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         jobProcessingService.inMemoryConfigService = new InMemoryConfigService()
         jobProcessingService.inMemoryConfigService.activateMeasurementsGenerally()
 
-        WebPageTestServer.withNewTransaction {
-            TestDataUtil.createOsmConfig()
+        TestDataUtil.createOsmConfig()
 
-            WebPageTestServer wptServer = new WebPageTestServer(
-                    label: 'Unnamed server',
-                    proxyIdentifier: 'proxy_identifier',
-                    dateCreated: new Date(),
-                    lastUpdated: new Date(),
-                    active: true,
-                    baseUrl: 'http://example.com').save(failOnError: true)
-            Browser browser = new Browser(
-                    name: 'browser',
-                    weight: 1.0).save(failOnError: true)
-            jobGroup = new JobGroup(
-                    name: 'Unnamed group',
-                    graphiteServers: []).save(failOnError: true)
+        WebPageTestServer wptServer = new WebPageTestServer(
+                label: 'Unnamed server',
+                proxyIdentifier: 'proxy_identifier',
+                dateCreated: new Date(),
+                lastUpdated: new Date(),
+                active: true,
+                baseUrl: 'http://example.com').save(failOnError: true)
+        Browser browser = new Browser(
+                name: 'browser',
+                weight: 1.0).save(failOnError: true)
+        jobGroup = new JobGroup(
+                name: 'Unnamed group',
+                graphiteServers: []).save(failOnError: true)
 
-            script = Script.createDefaultScript('Unnamed job').save(failOnError: true)
-            location = new Location(
-                    label: 'Unnamed location',
-                    dateCreated: new Date(),
-                    active: true,
-                    valid: 1,
-                    wptServer: wptServer,
-                    location: 'location',
-                    browser: browser
-            ).save(failOnError: true)
-        }
+        script = Script.createDefaultScript('Unnamed job').save(failOnError: true)
+        location = new Location(
+                label: 'Unnamed location',
+                dateCreated: new Date(),
+                active: true,
+                valid: 1,
+                wptServer: wptServer,
+                location: 'location',
+                browser: browser
+        ).save(failOnError: true)
     }
 
-    def cleanup() {
-        JobResult.list()*.delete(flush: true)
-    }
 
     void "scheduleJob test"() {
         when:

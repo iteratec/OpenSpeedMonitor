@@ -21,6 +21,7 @@ import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -30,6 +31,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
+import groovy.mock.interceptor.StubFor
 import groovy.util.slurpersupport.GPathResult
 /**
  *
@@ -205,10 +207,12 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 	// mocks common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	void mockTimeToCsMappingService(){
-		locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = {
+        def stub = new StubFor(TimeToCsMappingService,true)
+        stub.demand.getCustomerSatisfactionInPercent (1..100){
             Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
 			return 42 //not the concern of this tests
 		}
+        locationAndResultPersisterService.timeToCsMappingService = stub.proxyInstance()
 	}
 	void mockCsiAggregationUpdateService(boolean shouldFail){
 		locationAndResultPersisterService.csiAggregationUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result ->

@@ -360,7 +360,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     private void mocksCommonToAllTests(){
         mockedExecTimeOfCleanup = new DateTime(2014,7,7,5,30,0, DateTimeZone.UTC)
-        CsiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
+        csiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
     }
 
     private void createTestdataCommonToAllTests(){
