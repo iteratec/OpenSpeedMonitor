@@ -52,9 +52,9 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         originalPersistJobResultsMethod = locationAndResultPersisterService.&persistJobResult
         originalPersistEventResultsMethod = locationAndResultPersisterService.&persistResultsOfOneTeststep
-
-        createTestDataCommonToAllTests()
-
+        WebPageTestServer.withNewTransaction {
+            createTestDataCommonToAllTests()
+        }
         mocksCommonToAllTests()
 
     }

@@ -1,6 +1,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
@@ -38,6 +39,10 @@ class JobControllerSpec extends Specification {
 
     def setup() {
         controllerUnderTest = new JobController()
+        controllerUnderTest.jobService = new JobService()
+        controllerUnderTest.jobService.batchActivityService = new BatchActivityService()
+        controllerUnderTest.jobService.batchActivityService.timer = new Timer()
+
         controllerUnderTest.jobService.batchActivityService.timer.cancel()
         controllerUnderTest.inMemoryConfigService = new InMemoryConfigService()
         controllerUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
@@ -61,7 +66,6 @@ class JobControllerSpec extends Specification {
         when:
         //The Controller will use a promise to run the deletion within another thread, so we just check if the service will delete the job
         controllerUnderTest.jobService.deleteJob(deleteJob)
-
         then:
         List<Job> allJobs = Job.list()
         List<JobResult> allJobResults = JobResult.list()
