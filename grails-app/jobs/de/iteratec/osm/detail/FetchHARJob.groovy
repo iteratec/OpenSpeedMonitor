@@ -18,10 +18,10 @@ class FetchHARJob {
     }
 
     def execute() {
-        if(harFetchService.configService.isDetailFetchingEnabled() && !fetching){
-            fetching = true
-            harFetchService.fetch()
-            fetching = false
-        }
+//        if(harFetchService.configService.isDetailFetchingEnabled() && !fetching){
+//            fetching = true
+//            harFetchService.fetch()
+//            fetching = false
+//        }
     }
 }

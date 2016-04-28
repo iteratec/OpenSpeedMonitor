@@ -720,10 +720,13 @@ class TestDataUtil {
         createPages(allPages)
         createBrowsersAndAliases()
         createLocations()
-
-        csvFile.eachLine { String csvLine ->
+        def listOfLines = csvFile.readLines()
+        int i =listOfLines.size()
+        int j = 0
+        listOfLines.each { String csvLine ->
+            j +=1
             if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
-                //				System.out.println('Processing line: ' + csvLine);
+                // System.out.println((100*j/i)+'% ' + j + ' von ' + i +' Processing line: ' + csvLine);
                 decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor)
             }
         }
@@ -1095,7 +1098,7 @@ class TestDataUtil {
                 tag: csiAggregationTagService.createEventResultTag(job.jobGroup, event,event.testedPage, dummyBrowser, job.location)
         ).save(failOnError: true)
 
-        return eventResult.save(failOnError: true)
+        return eventResult
     }
 
     /**

@@ -1,4 +1,5 @@
 <!doctype html>
+<%@ defaultCodec="none" %>
 <html>
 
     <head>
