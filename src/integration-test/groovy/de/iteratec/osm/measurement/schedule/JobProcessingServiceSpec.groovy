@@ -169,6 +169,9 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         then:
         // check if schedule matches updated Cron expression of wptJobToSchedule
         wptJobToSchedule.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(wptJobToSchedule), wptJobToSchedule)
+
+        cleanup: "Unschedule all jobs, to prevent failures in other tests"
+        jobProcessingService.unscheduleJob(wptJobToSchedule)
     }
 
     void "scheduleAllJobs test"() {
@@ -187,6 +190,10 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
 
         activeJob1.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(activeJob1), activeJob1)
         activeJob2.executionSchedule == getCronExpressionByTriggerKey(getTriggerKeyOf(activeJob2), activeJob2)
+
+        cleanup: "Unschedule all jobs, to prevent failures in other tests"
+        jobProcessingService.unscheduleJob(activeJob1)
+        jobProcessingService.unscheduleJob(activeJob2)
     }
 
     /**
