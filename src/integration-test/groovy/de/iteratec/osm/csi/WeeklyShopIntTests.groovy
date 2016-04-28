@@ -123,7 +123,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 	}
 
 	//tests//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	@Ignore("bad performance, takes more than 30min")
 	void testCalculatingWeeklyShopValueWithoutData(){
 		setup:
 		Date startDate = new DateTime(2012,01,12,0,0, DateTimeZone.UTC).toDate()
@@ -159,7 +158,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 	 * on-the-fly while calculating the respective weekly-shop-{@link CsiAggregation}. The hourly-event-{@link CsiAggregation}s of the period have to exist (they
 	 * won't get calculated on-the-fly. Therefore these get precalculated in test here. 
 	 */
-	@Ignore("bad performance, takes more than 30min")
 	void testCalculatingWeeklyShopValue(){
 		setup:
 		Date startDate = new DateTime(2012,11,12,0,0, DateTimeZone.UTC).toDate()

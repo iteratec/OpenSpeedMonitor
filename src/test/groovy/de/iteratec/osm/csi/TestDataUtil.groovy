@@ -720,16 +720,7 @@ class TestDataUtil {
         createPages(allPages)
         createBrowsersAndAliases()
         createLocations()
-        def listOfLines = csvFile.readLines()
-        int i =listOfLines.size()
-        int j = 0
-        listOfLines.each { String csvLine ->
-            j +=1
-            if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
-                // System.out.println((100*j/i)+'% ' + j + ' von ' + i +' Processing line: ' + csvLine);
-                decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor)
-            }
-        }
+        decodeCSVTestDataLine(csvFile.readLines(),pagesToGenerateDataFor)
     }
 
     /**
@@ -1221,64 +1212,90 @@ class TestDataUtil {
 
 
     /**
-     * Decodes one line of test data CSV.
+     * Decodes all lines of test data CSV.
      *
-     * @param csvLine
+     * @param listOfLines
      */
-    private static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor) {
-        String[] columns = csvLine.split(';');
-
-        String jobName = columns[0]
-
-        Page page = getPageFromCSVJobName(jobName);
-
-        assertNotNull('Page for job-name ' + jobName + ' may not be null.', page)
-
-        if (!isResultForPageRequired(page, pagesToGenerateDataFor)) {
-            // If the result is not needed for this test, just return and
-            // do nothing more...
-            return;
-        }
-
+    private static void decodeCSVTestDataLine(List listOfLines, List<String> pagesToGenerateDataFor) {
         JobGroup defaultJobGroup = JobGroup.findByName('CSI');
         JobGroup jobGroup1 = JobGroup.findByName('csiGroup1');
         JobGroup jobGroup2 = JobGroup.findByName('csiGroup2');
+        ConnectivityProfile connectivityProfile = createConnectivityProfile('the profile')
 
-        Location location = getLocationCSVJobName(jobName);
-        Date dateOfJobRun = new Date(columns[2] + " " + columns[3]);
-
+        //There are only a few amount of different jobs, pages and locations within the csv.
+        //So we put them in a map, to reduce overhead within the transaction
+        Map<String, Job> jobMap = [:]
+        Map<String, Page> pageMap = [:]
+        Map<String, Location> locationMap = [:]
 
         assertNotNull(defaultJobGroup)
         assertNotNull(jobGroup1)
         assertNotNull(jobGroup2)
-        assertNotNull(location)
-        assertNotNull(dateOfJobRun)
 
-        // Create the job:
-        JobGroup groupOfJob
-        switch (jobName.split('_')[0]) {
-            case 'csiGroup1':
-                groupOfJob = jobGroup1
-                break;
-            case 'csiGroup2':
-                groupOfJob = jobGroup2
-                break;
-            default:
-                groupOfJob = defaultJobGroup
+        int i =listOfLines.size()
+        int j = 0
+        listOfLines.each { String csvLine ->
+            j +=1
+            if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
+                 System.out.println(j + ' von ' + i);
+
+                String[] columns = csvLine.split(';');
+                String jobName = columns[0]
+
+                // Create the job:
+                JobGroup groupOfJob
+                switch (jobName.split('_')[0]) {
+                    case 'csiGroup1':
+                        groupOfJob = jobGroup1
+                        break;
+                    case 'csiGroup2':
+                        groupOfJob = jobGroup2
+                        break;
+                    default:
+                        groupOfJob = defaultJobGroup
+                }
+
+                Page page = pageMap[jobName]
+                if(!page){
+                    page = getPageFromCSVJobName(jobName)
+                    pageMap[jobName] = page
+                }
+                assertNotNull('Page for job-name ' + jobName + ' may not be null.', page)
+
+                if (!isResultForPageRequired(page, pagesToGenerateDataFor)) {
+                    // If the result is not needed for this test, just return and
+                    // do nothing more...
+                    return;
+                }
+                Location location = locationMap[jobName]
+                if(!location){
+                    location = getLocationCSVJobName(jobName)
+                    locationMap[jobName] = location
+                }
+                assertNotNull(location)
+
+                Job job= jobMap[jobName]
+                if(!job){
+                    job = getJobOfCSVJobName(jobName, groupOfJob, location)
+                    jobMap[jobName] = job
+                }
+                assertNotNull(job)
+
+                Date dateOfJobRun = new Date(columns[2] + " " + columns[3]);
+                assertNotNull(dateOfJobRun)
+
+                MeasuredEvent eventOfPage = getMeasuredEvent(groupOfJob, page);
+                assertNotNull(eventOfPage)
+
+                JobResult jobResult = createJobResult(columns[6], dateOfJobRun, job, location)
+                assertNotNull(jobResult)
+
+                if (columns.length > 8 && !columns[8].isEmpty()) {
+                        createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, connectivityProfile);
+                }
+            }
         }
-        Job job = getJobOfCSVJobName(jobName, groupOfJob, location);
-        assertNotNull(job)
 
-        MeasuredEvent eventOfPage = getMeasuredEvent(groupOfJob, page);
-        assertNotNull(eventOfPage)
-
-        JobResult jobResult = createJobResult(columns[6], dateOfJobRun, job, location)
-
-        assertNotNull(jobResult)
-
-        if (columns.length > 8 && !columns[8].isEmpty()) {
-            createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, createConnectivityProfile('the profile'));
-        }
     }
 
     /**
