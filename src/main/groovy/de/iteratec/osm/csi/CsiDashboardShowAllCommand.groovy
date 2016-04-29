@@ -363,6 +363,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
+        debug(nullable: true)
 
     }
 
