@@ -268,7 +268,7 @@ grails:
                             {pattern: '/i18n/getAllMessages',                           access: ["permitAll"]},
                             {pattern: '/console/**',                                    access: ['ROLE_SUPER_ADMIN']},
                             {pattern: '/apiKey/**',                                     access: ['ROLE_SUPER_ADMIN']},
-                            {pattern: '/**',                                            access: ['ROLE_SUPER_ADMIN', 'ROLE_SUPER_ADMIN']}]
+                            {pattern: '/**',                                            access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']}]
     de:
         iteratec:
             osm:
