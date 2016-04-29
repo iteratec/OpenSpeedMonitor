@@ -23,6 +23,6 @@ package de.iteratec.osm.api
  */
 class ApiKeyController {
 
-    static scaffold = true
+    static scaffold = ApiKey
 
 }

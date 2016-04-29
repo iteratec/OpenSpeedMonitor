@@ -23,5 +23,5 @@ package de.iteratec.osm.report
  */
 class UserspecificCsiDashboardController {
 
-    static scaffold = true
+    static scaffold = UserspecificCsiDashboard
 }

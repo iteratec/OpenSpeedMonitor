@@ -18,5 +18,5 @@
 package de.iteratec.osm.result
 
 class MeasuredEventController {
-    static scaffold = true
+    static scaffold = MeasuredEvent
 }

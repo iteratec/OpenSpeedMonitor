@@ -22,5 +22,5 @@ package de.iteratec.osm.measurement.environment
  */
 class LocationController {
 
-	static scaffold = true 
+	static scaffold = Location
 }

@@ -18,5 +18,5 @@
 package de.iteratec.osm.csi
 
 class CsTargetGraphController {
-	static scaffold = true
+	static scaffold = CsTargetGraph
 }

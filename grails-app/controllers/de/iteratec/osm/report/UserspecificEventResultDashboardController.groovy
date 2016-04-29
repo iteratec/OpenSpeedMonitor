@@ -23,5 +23,5 @@ package de.iteratec.osm.report
  */
 class UserspecificEventResultDashboardController {
 
-    static scaffold = true
+    static scaffold = UserspecificEventResultDashboard
 }

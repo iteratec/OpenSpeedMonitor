@@ -25,6 +25,6 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class GraphiteEventSourcePathController {
 
-    static scaffold = true
+    static scaffold = GraphiteEventSourcePath
 
 }

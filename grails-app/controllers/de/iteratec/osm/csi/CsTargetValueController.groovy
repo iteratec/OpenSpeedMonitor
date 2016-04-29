@@ -18,5 +18,5 @@
 package de.iteratec.osm.csi
 
 class CsTargetValueController {
-	static scaffold = true
+	static scaffold = CsTargetValue
 }

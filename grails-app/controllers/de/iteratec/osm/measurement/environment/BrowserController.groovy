@@ -18,5 +18,5 @@
 package de.iteratec.osm.measurement.environment
 
 class BrowserController {
-	static scaffold = true
+	static scaffold = Browser
 }

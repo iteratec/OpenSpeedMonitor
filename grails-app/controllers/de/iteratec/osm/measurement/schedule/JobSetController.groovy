@@ -23,5 +23,5 @@ package de.iteratec.osm.measurement.schedule
  */
 class JobSetController {
 
-    static scaffold = true
+    static scaffold = JobSet
 }

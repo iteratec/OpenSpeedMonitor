@@ -25,7 +25,7 @@ class WebPageTestServerController {
 	ProxyService proxyService
 	I18nService i18nService
 
-    static scaffold = true
+    static scaffold = WebPageTestServer
 
 	public Map<String, Object> loadLocations() {
 		WebPageTestServer webPageTestServer = WebPageTestServer.get(params.id)

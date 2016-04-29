@@ -18,6 +18,6 @@
 package de.iteratec.osm.report.external
 
 class GraphitePathController {
-	static scaffold = true
+	static scaffold = GraphitePath
 	
 }

@@ -36,7 +36,7 @@ import grails.converters.JSON
  */
 class JobGroupController {
 
-    static scaffold = true
+    static scaffold = JobGroup
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
     I18nService i18nService

@@ -91,7 +91,7 @@ dependencies {
     compile "org.grails:grails-dependencies"
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
-    runtime "org.grails.plugins:scaffolding"
+    compile "org.grails.plugins:scaffolding"
     compile "org.grails.plugins:hibernate4"
     compile "org.hibernate:hibernate-ehcache"
     runtime "com.h2database:h2"

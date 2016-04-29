@@ -24,7 +24,7 @@ package de.iteratec.osm.report.external
  */
 class GraphiteServerController {
 
-    static scaffold = true
+    static scaffold = GraphiteServer
 
     def update() {
         def graphiteServerInstance = GraphiteServer.get(params.id)

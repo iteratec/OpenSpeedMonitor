@@ -18,5 +18,5 @@
 package de.iteratec.osm.measurement.environment
 
 class BrowserAliasController {
-    static scaffold = true
+    static scaffold = BrowserAlias
 }

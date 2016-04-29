@@ -23,6 +23,6 @@ package de.iteratec.osm.report.chart
  */
 class CsiAggregationController {
 
-	static scaffold = true
+	static scaffold = CsiAggregation
 
 }
