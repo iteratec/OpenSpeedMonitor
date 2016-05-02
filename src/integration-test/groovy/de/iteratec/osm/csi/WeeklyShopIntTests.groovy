@@ -96,10 +96,13 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvFilename}"), pagesToTest, pagesToTest);
 			System.out.println('Loading CSV-data... DONE');
 
-			EventResult.findAll().each {
-				locationAndResultPersisterService.informDependentCsiAggregations(it)
-			}
+		}
 
+		EventResult.findAll().each {
+			locationAndResultPersisterService.informDependentCsiAggregations(it)
+		}
+
+		CsiAggregation.withNewTransaction {
 			CsiConfiguration.findAll().each { csiConfiguration ->
 				ConnectivityProfile.findAll().each { connectivityProfile ->
 					Browser.findAll().each { browser ->
