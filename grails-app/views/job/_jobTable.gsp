@@ -1,3 +1,4 @@
+<%@ defaultCodec="none" %>
 <tbody>
 	<g:each var="job" in="${jobs}">
 		<g:set var="tags" value="${jobsWithTags.findAll { it.jobId == job.id }.collect { it.tag }}" />
