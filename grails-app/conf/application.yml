@@ -181,9 +181,6 @@ grails:
     use:
         accept:
               header: false
-    scaffolding:
-                templates:
-                          domainSuffix: Instance
     json:
         legacy:
               builder: true
