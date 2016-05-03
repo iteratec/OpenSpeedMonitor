@@ -228,7 +228,6 @@ public class CsiDashboardShowAllCommand implements Validateable {
      * Constraints needs to fit.
      */
     static constraints = {
-
         from(nullable: true, validator: { Date currentFrom, CsiDashboardShowAllCommand cmd ->
 
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
@@ -360,6 +359,10 @@ public class CsiDashboardShowAllCommand implements Validateable {
             }
         })
 
+        setFromHour(nullable:true)
+        setToHour(nullable:true)
+        includeInterval(nullable:true)
+        csiAggregationUtilService(nullable:true)
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)

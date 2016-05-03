@@ -87,7 +87,7 @@ class EventResultDashboardController {
     List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
 
-    public final static String DATE_FORMAT_STRING = 'dd.mm.yyyy';
+    public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy';
     public final static int MONDAY_WEEKSTART = 1
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
     //def timeFrames = [0, 900, 1800, 3600, 10800, 21600, 43200, 86400, 604800, 1209600, 2419200]
@@ -247,15 +247,35 @@ class EventResultDashboardController {
 
         // Create cmd for validation
         EventResultDashboardShowAllCommand cmd = new EventResultDashboardShowAllCommand(
-                from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, toHour: dashboardValues.toHour, aggrGroup: dashboardValues.aggrGroup,
-                selectedFolder: selectedFolder, selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
-                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedAllLocations: dashboardValues.selectedAllLocations,
-                selectedAggrGroupValuesCached: selectedAggrGroupValuesCached, selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
-                overwriteWarningAboutLongProcessingTime: true, debug: dashboardValues.debug, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
-                includeCustomConnectivity: dashboardValues.includeCustomConnectivity, includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
-                selectedConnectivityProfiles: selectedConnectivityProfiles, selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles, chartTitle: dashboardValues.chartTitle ?: "",
-                loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto", showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
-                graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
+                from: fromDate,
+                to: toDate,
+                fromHour: dashboardValues.fromHour,
+                toHour: dashboardValues.toHour,
+                aggrGroup: dashboardValues.aggrGroup,
+                selectedFolder: selectedFolder,
+                selectedPages: selectedPages,
+                selectedMeasuredEventIds: selectedMeasuredEventIds,
+                selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
+                selectedBrowsers: selectedBrowsers,
+                selectedAllBrowsers: dashboardValues.selectedAllBrowsers,
+                selectedLocations: selectedLocations,
+                selectedAllLocations: dashboardValues.selectedAllLocations,
+                selectedAggrGroupValuesCached: selectedAggrGroupValuesCached,
+                selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
+                overwriteWarningAboutLongProcessingTime: true,
+                debug: dashboardValues.debug,
+                setFromHour: dashboardValues.setFromHour,
+                setToHour: dashboardValues.setToHour,
+                includeCustomConnectivity: dashboardValues.includeCustomConnectivity,
+                includeNativeConnectivity: dashboardValues.includeNativeConnectivity,
+                selectedConnectivityProfiles: selectedConnectivityProfiles,
+                selectedAllConnectivityProfiles: dashboardValues.selectedAllConnectivityProfiles,
+                chartTitle: dashboardValues.chartTitle ?: "",
+                loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
+                showDataLabels: dashboardValues.showDataLabels,
+                showDataMarkers: dashboardValues.showDataMarkers,
+                graphNameAliases: dashboardValues.graphAliases,
+                graphColors: dashboardValues.graphColors)
 
         // Parse IntegerValues if they exist
         if (dashboardValues.selectedInterval) cmd.selectedInterval = dashboardValues.selectedInterval.toInteger()

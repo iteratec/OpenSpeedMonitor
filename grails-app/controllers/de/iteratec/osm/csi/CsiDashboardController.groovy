@@ -99,7 +99,7 @@ class CsiDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
+    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.MM.yyyy'
     public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
 
@@ -757,16 +757,34 @@ class CsiDashboardController {
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
 
         // Create command vor validation
-        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
-                toHour: dashboardValues.toHour, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
-                selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
-                selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
-                selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
-                includeInterval: dashboardValues.includeInterval, setFromHour: dashboardValues.setFromHour, setToHour: dashboardValues.setToHour,
-                chartTitle: dashboardValues.chartTitle ?: "", loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
-                showDataLabels: dashboardValues.showDataLabels, showDataMarkers: dashboardValues.showDataMarkers,
-                csiTypeDocComplete: dashboardValues.csiTypeDocComplete, csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete,
-                graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(
+                from: fromDate,
+                to: toDate,
+                fromHour: dashboardValues.fromHour,
+                toHour: dashboardValues.toHour,
+                aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval,
+                selectedFolder: selectedFolder,
+                selectedPages: selectedPages,
+                selectedMeasuredEventIds: selectedMeasuredEventIds,
+                selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
+                selectedBrowsers: selectedBrowsers,
+                selectedAllBrowsers: dashboardValues.selectedAllBrowsers,
+                selectedLocations: selectedLocations,
+                selectedCsiSystems: selectedCsiSystems,
+                selectedAllLocations: dashboardValues.selectedAllLocations,
+                debug: dashboardValues.debug,
+                selectedTimeFrameInterval: timeFrameInterval,
+                includeInterval: dashboardValues.includeInterval,
+                setFromHour: dashboardValues.setFromHour,
+                setToHour: dashboardValues.setToHour,
+                chartTitle: dashboardValues.chartTitle ?: "",
+                loadTimeMaximum: dashboardValues.loadTimeMaximum ?: "auto",
+                showDataLabels: dashboardValues.showDataLabels,
+                showDataMarkers: dashboardValues.showDataMarkers,
+                csiTypeDocComplete: dashboardValues.csiTypeDocComplete,
+                csiTypeVisuallyComplete: dashboardValues.csiTypeVisuallyComplete,
+                graphNameAliases: dashboardValues.graphAliases,
+                graphColors: dashboardValues.graphColors)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
         if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
