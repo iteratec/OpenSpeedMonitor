@@ -313,7 +313,7 @@ class UserspecificEventResultDashboard {
     UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, String publiclyVisible, String wideScreenDiagramMontage, String username) {
 
         this.dashboardName = dashboardName
-        this.publiclyVisible = publiclyVisible
+        this.publiclyVisible = Boolean.valueOf(publiclyVisible)
         this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
         this.username = username
 
@@ -395,7 +395,7 @@ class UserspecificEventResultDashboard {
      * @param dashboardId the dashboard to check
      * @return true if currentUser is admin or creator, false otherwise
      */
-    boolean isCurrentUserDashboardOwner(String dashboardId) {
+    boolean isCurrentUserDashboardOwner(String dashboardId = id) {
         if (SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN")) {
             return true
         } else {
@@ -419,16 +419,12 @@ class UserspecificEventResultDashboard {
 
 
     def getListOfAvailableDashboards() {
-        List result = []
+        List<UserspecificEventResultDashboard> result = []
         List<UserspecificEventResultDashboard> fullList = []
         fullList = UserspecificEventResultDashboard.findAll().sort{it.dashboardName}
 
-        String currentUser = ""
-        if (springSecurityService.isLoggedIn()) {
-            currentUser = springSecurityService.authentication.principal.getUsername()
-        }
         for (board in fullList) {
-            if ((board.publiclyVisible) || (board.username == currentUser)) {
+            if ((board.publiclyVisible) || isCurrentUserDashboardOwner()) {
                 String link = ""
                 link += "showAll?"
                 link += "selectedTimeFrameInterval=" + board.selectedTimeFrameInterval
