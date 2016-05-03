@@ -87,6 +87,7 @@ class EventResultDashboardController {
     List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
 
+    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy';
     public final static int MONDAY_WEEKSTART = 1
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
@@ -712,7 +713,7 @@ class EventResultDashboardController {
         result['connectivityProfiles'] = eventResultDashboardService.getAllConnectivityProfiles()
 
         // JavaScript-Utility-Stuff:
-        result.put("dateFormat", DATE_FORMAT_STRING)
+        result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         result.put("weekStart", MONDAY_WEEKSTART)
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:

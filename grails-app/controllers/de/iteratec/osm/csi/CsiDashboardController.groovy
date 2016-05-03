@@ -99,7 +99,7 @@ class CsiDashboardController {
      */
     LinkGenerator grailsLinkGenerator
 
-    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.MM.yyyy'
+    public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
     public final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
     private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT_STRING)
 
@@ -111,7 +111,7 @@ class CsiDashboardController {
     public static final String WEEKLY_AGGR_GROUP_SYSTEM = 'weekly_system'
     public static final String HOURLY_MEASURED_EVENT = "measured_event"
 
-    String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
+//    String DATE_TIME_FORMAT_STRING = 'dd.MM.yyyy HH:mm:ss'
     public final static int MONDAY_WEEKSTART = 1
     public final static List<String> AGGREGATOR_GROUP_VALUES = [HOURLY_MEASURED_EVENT,
                                                                 DAILY_AGGR_GROUP_PAGE, WEEKLY_AGGR_GROUP_PAGE,
