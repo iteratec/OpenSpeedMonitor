@@ -30,11 +30,22 @@ class WebPageTestServerController {
 	public Map<String, Object> loadLocations() {
 		WebPageTestServer webPageTestServer = WebPageTestServer.get(params.id)
 		if (webPageTestServer == null){
-			flash.message i18nService.msg('', "No WebPageTestServer found with id ${params.id}")
+			flash.message = i18nService.msg('', "No WebPageTestServer found with id ${params.id}")
 		}else{
-			proxyService.fetchLocations(webPageTestServer)
+			List<Location> addedLocations = proxyService.fetchLocations(webPageTestServer)
+			String message = "Location-Request was successful."
+			if(addedLocations.empty) {
+				message += " But no locations were added"
+			} else {
+				message += " And some locations were added: <br>"
+				addedLocations.each {
+					message += it.toString() + " <br>"
+				}
+			}
+			flash.message = message
+
 		}
-		redirect(action: show, id: params.id)
+		redirect(action: "show", id: params.id)
  	}
 
 }

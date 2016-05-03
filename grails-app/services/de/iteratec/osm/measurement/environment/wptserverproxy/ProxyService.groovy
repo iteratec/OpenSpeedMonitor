@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.util.slurpersupport.GPathResult
@@ -27,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock
 
 interface iListener {
 	public String getListenerName()
-	public void listenToLocations(GPathResult result, WebPageTestServer wptserver)
+	public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserver)
 	public void listenToResult(
 		GPathResult result,
 		WebPageTestServer wptserver
@@ -104,15 +105,18 @@ class ProxyService {
 	 * @param wptserver
 	 * 			Instance of PHP-application webpagetest (see http://webpagetest.org).
 	 */
-	void fetchLocations(WebPageTestServer wptserver) {
+	List<Location> fetchLocations(WebPageTestServer wptserver) {
+		List<Location> addedLocations = []
 		
 		def locationsResponse = httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserver, 'getLocations.php', [:], ContentType.TEXT, [Accept: 'application/xml'])
 		
 		log.info("${this.listener.size} iListener(s) listen to the fetching of locations")
 		this.listener.each {
 			log.info("calling listenToLocations for iListener ${it.getListenerName()}")
-			it.listenToLocations(locationsResponse, wptserver)
+			addedLocations.addAll(it.listenToLocations(locationsResponse, wptserver))
 		}
+
+		return addedLocations
 	}
 	
 	/**

@@ -1,3 +1,4 @@
+<%@ defaultCodec="none" %>
 <div id="Content" class="container">
 
 	<!-- Main menu in one row (e.g., controller entry points -->

@@ -66,7 +66,9 @@ class LocationAndResultPersisterService implements iListener{
 	 */
 	@Override
     @Transactional
-	public void listenToLocations(GPathResult result, WebPageTestServer wptserverForLocation) {
+	public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserverForLocation) {
+		List<Location> addedLocations = []
+
 		log.info("Location.count before creating non-existent= ${Location.count()}")
 		def query
 		result.data.location.each { locationTagInXml ->
@@ -89,7 +91,7 @@ class LocationAndResultPersisterService implements iListener{
 					dateCreated: new Date(),
 					lastUpdated: new Date()
 					).save(failOnError: true);
-				
+				addedLocations << newLocation
 				log.info("new location written while fetching locations: ${newLocation}")
 			} else if(locations.size() > 1) {
 				log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserOfLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
@@ -97,6 +99,8 @@ class LocationAndResultPersisterService implements iListener{
 			
 		}
 		log.info("Location.count after creating non-existent= ${Location.count()}")
+
+		return addedLocations
 	}
 
 	/**

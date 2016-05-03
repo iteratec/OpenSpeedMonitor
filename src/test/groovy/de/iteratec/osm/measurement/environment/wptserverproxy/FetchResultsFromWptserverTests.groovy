@@ -288,7 +288,7 @@ class FetchResultsFromWptserverTests extends Specification{
 		WebPageTestServer wptserverOfLastListening
 
 		public String getListenerName(){return 'test-listener'}
-		public void listenToLocations(GPathResult result, WebPageTestServer wptserver){}
+		public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserver){return []}
 		public void listenToResult(
 				GPathResult result,
 				WebPageTestServer wptserver
