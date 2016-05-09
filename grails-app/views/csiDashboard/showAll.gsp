@@ -2,6 +2,7 @@
 <%@ page import="de.iteratec.osm.report.chart.AggregatorType" %>
 <%@ page import="de.iteratec.osm.csi.CsiDashboardController" %>
 <%@ page import="grails.plugin.springsecurity.SpringSecurityService" %>
+<%@ page defaultCodec="none" %></page>
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <%
