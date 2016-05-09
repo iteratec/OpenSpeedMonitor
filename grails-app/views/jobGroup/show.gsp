@@ -1,4 +1,5 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
+<%@ defaultCodec="none" %>
 <!doctype html>
 <html>
 
@@ -191,8 +192,6 @@
     </table>
 
 </section>
-
-
 <content tag="include.bottom">
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
@@ -229,6 +228,8 @@
 
     </asset:script>
 </content>
+
+
 </body>
 
 </html>
