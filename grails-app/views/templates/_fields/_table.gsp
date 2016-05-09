@@ -1,4 +1,4 @@
-<table>
+<table class="table table-bordered">
     <thead>
     <tr>
         <g:each in="${domainProperties}" var="p" status="i">
