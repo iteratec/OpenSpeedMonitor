@@ -32,7 +32,7 @@
         </tr>
         </thead>
         <tbody>
-        <g:each in="${webPageTestServerInstanceList}" status="i" var="webPageTestServerInstance">
+        <g:each in="${webPageTestServerList}" status="i" var="webPageTestServerInstance">
             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
                 <td><g:link action="show" id="${webPageTestServerInstance.id}">${fieldValue(bean: webPageTestServerInstance, field: "label")}</g:link></td>
@@ -52,7 +52,7 @@
         </tbody>
     </table>
     <div class="pagination">
-        <g:paginate total="${webPageTestServerTotal}" />
+        <g:paginate total="${webPageTestServerCount}" />
     </div>
 </section>
 

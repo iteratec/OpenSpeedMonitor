@@ -36,6 +36,9 @@
 
 		</tbody>
 	</table>
+	<div class="pagination">
+		<g:paginate total="${jobGroupCount}" />
+	</div>
 </section>
 
 </body>

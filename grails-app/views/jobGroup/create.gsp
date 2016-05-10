@@ -14,9 +14,9 @@
 
 <section id="create-jobGroup" class="first">
 
-	<g:hasErrors bean="${jobGroupInstance}">
+	<g:hasErrors bean="${jobGroup}">
 	<div class="alert alert-error">
-		<g:renderErrors bean="${jobGroupInstance}" as="list" />
+		<g:renderErrors bean="${jobGroup}" as="list" />
 	</div>
 	</g:hasErrors>
 	
