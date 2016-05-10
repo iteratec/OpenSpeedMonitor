@@ -13,15 +13,15 @@
 
 <section id="edit-webPageTestServer" class="first">
 
-	<g:hasErrors bean="${webPageTestServerInstance}">
+	<g:hasErrors bean="${webPageTestServer}">
 	<div class="alert alert-error">
-		<g:renderErrors bean="${webPageTestServerInstance}" as="list" />
+		<g:renderErrors bean="${webPageTestServer}" as="list" />
 	</div>
 	</g:hasErrors>
 
 	<g:form method="post" class="form-horizontal" >
-		<g:hiddenField name="id" value="${webPageTestServerInstance?.id}" />
-		<g:hiddenField name="version" value="${webPageTestServerInstance?.version}" />
+		<g:hiddenField name="id" value="${webPageTestServer?.id}" />
+		<g:hiddenField name="version" value="${webPageTestServer?.version}" />
 		<fieldset class="form">
 			<g:render template="form"/>
 		</fieldset>

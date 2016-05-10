@@ -18,16 +18,16 @@
         <div class="alert alert-error" style="display: block">${flash.error}</div>
     </g:if>
     <g:else>
-        <g:hasErrors bean="${csiSystemInstance}">
+        <g:hasErrors bean="${csiSystem}">
             <div class="alert alert-error">
-                <g:renderErrors bean="${csiSystemInstance}" as="list"/>
+                <g:renderErrors bean="${csiSystem}" as="list"/>
             </div>
         </g:hasErrors>
     </g:else>
 
     <g:form method="post" class="form-horizontal">
-        <g:hiddenField name="id" value="${csiSystemInstance?.id}"/>
-        <g:hiddenField name="version" value="${csiSystemInstance?.version}"/>
+        <g:hiddenField name="id" value="${csiSystem?.id}"/>
+        <g:hiddenField name="version" value="${csiSystem?.version}"/>
         <fieldset class="form">
             <g:render template="form"/>
         </fieldset>

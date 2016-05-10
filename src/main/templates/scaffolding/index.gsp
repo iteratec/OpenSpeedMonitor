@@ -13,7 +13,7 @@
             <f:table collection="\${${propertyName}List}" />
 
             <div class="pagination">
-                <g:paginate total="\${${propertyName}Count ?: 0}" />
+                <bs:paginate total="\${${propertyName}Count ?: 0}" />
             </div>
         </div>
     </body>

@@ -32,27 +32,27 @@
         </tr>
         </thead>
         <tbody>
-        <g:each in="${webPageTestServerList}" status="i" var="webPageTestServerInstance">
+        <g:each in="${webPageTestServerList}" status="i" var="webPageTestServer">
             <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 
-                <td><g:link action="show" id="${webPageTestServerInstance.id}">${fieldValue(bean: webPageTestServerInstance, field: "label")}</g:link></td>
+                <td><g:link action="show" id="${webPageTestServer.id}">${fieldValue(bean: webPageTestServer, field: "label")}</g:link></td>
 
-                <td>${fieldValue(bean: webPageTestServerInstance, field: "proxyIdentifier")}</td>
+                <td>${fieldValue(bean: webPageTestServer, field: "proxyIdentifier")}</td>
 
-                <td><g:formatDate date="${webPageTestServerInstance.dateCreated}" /></td>
+                <td><g:formatDate date="${webPageTestServer.dateCreated}" /></td>
 
-                <td><g:formatDate date="${webPageTestServerInstance.lastUpdated}" /></td>
+                <td><g:formatDate date="${webPageTestServer.lastUpdated}" /></td>
 
-                <td><g:formatBoolean boolean="${webPageTestServerInstance.active}" /></td>
+                <td><g:formatBoolean boolean="${webPageTestServer.active}" /></td>
 
-                <td>${fieldValue(bean: webPageTestServerInstance, field: "description")}</td>
+                <td>${fieldValue(bean: webPageTestServer, field: "description")}</td>
 
             </tr>
         </g:each>
         </tbody>
     </table>
     <div class="pagination">
-        <g:paginate total="${webPageTestServerCount}" />
+        <bs:paginate total="${webPageTestServerCount ?: 0}" />
     </div>
 </section>
 

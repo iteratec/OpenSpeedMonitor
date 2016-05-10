@@ -37,7 +37,7 @@ import grails.converters.JSON
 class JobGroupController {
 
     static scaffold = JobGroup
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
@@ -45,32 +45,32 @@ class JobGroupController {
 
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
-        def jobGroupInstance = new JobGroup(params)
+        def jobGroup = new JobGroup(params)
 
         CsiConfiguration configuration = CsiConfiguration.findByLabel(configurationLabel)
         if (configuration) {
-            jobGroupInstance.csiConfiguration = configuration
+            jobGroup.csiConfiguration = configuration
         }
 
-        if (!jobGroupInstance.save(flush: true)) {
-            render(view: "create", model: [jobGroupInstance: jobGroupInstance])
+        if (!jobGroup.save(flush: true)) {
+            render(view: "create", model: [jobGroup: jobGroup])
             return
         } else {
             // Tags can only be set after first successful save.
             // This is why Job needs to be saved again.
-            jobGroupInstance.tags = params.list('tags')
-            jobGroupInstance.save(flush: true)
+            jobGroup.tags = params.list('tags')
+            jobGroup.save(flush: true)
 
-            flash.message = message(code: 'default.created.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroupInstance.id])
-            redirect(action: "show", id: jobGroupInstance.id)
+            flash.message = message(code: 'default.created.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
+            redirect(action: "show", id: jobGroup.id)
         }
     }
 
     def show() {
-        def jobGroupInstance = JobGroup.get(params.id)
+        def jobGroup = JobGroup.get(params.id)
         def modelToRender = [:]
 
-        CsiConfiguration config = jobGroupInstance.csiConfiguration
+        CsiConfiguration config = jobGroup.csiConfiguration
 
         if (config) {
             //Labels for charts
@@ -125,47 +125,47 @@ class JobGroupController {
                              pageMappingsExist       : pageTimeToCsMappingsChart ? true : false]
         }
 
-        modelToRender.put("jobGroupInstance", jobGroupInstance)
+        modelToRender.put("jobGroup", jobGroup)
 
         return modelToRender
     }
 
     def update() {
-        def jobGroupInstance = JobGroup.get(params.id)
-        if (!jobGroupInstance) {
+        def jobGroup = JobGroup.get(params.id)
+        if (!jobGroup) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
             redirect(action: "list")
             return
         }
 
-        jobGroupInstance.graphiteServers.clear()
+        jobGroup.graphiteServers.clear()
         if (params.version) {
             def version = params.version.toLong()
-            if (jobGroupInstance.version > version) {
-                jobGroupInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
+            if (jobGroup.version > version) {
+                jobGroup.errors.rejectValue("version", "default.optimistic.locking.failure",
                         [message(code: 'jobGroup.label', default: 'JobGroup')] as Object[],
                         "Another user has updated this JobGroup while you were editing")
-                render(view: "edit", model: [jobGroupInstance: jobGroupInstance])
+                render(view: "edit", model: [jobGroup: jobGroup])
                 return
             }
         }
         String csiConfigLabel = params.remove("csiConfiguration")
         if (csiConfigLabel != null) {
             CsiConfiguration config = CsiConfiguration.findByLabel(csiConfigLabel)
-            jobGroupInstance.csiConfiguration = config
+            jobGroup.csiConfiguration = config
         } else {
-            jobGroupInstance.csiConfiguration = null
+            jobGroup.csiConfiguration = null
         }
 
-        jobGroupInstance.properties = params
-        jobGroupInstance.tags = params.list('tags')
-        if (!jobGroupInstance.save(flush: true)) {
-            render(view: "edit", model: [jobGroupInstance: jobGroupInstance])
+        jobGroup.properties = params
+        jobGroup.tags = params.list('tags')
+        if (!jobGroup.save(flush: true)) {
+            render(view: "edit", model: [jobGroup: jobGroup])
             return
         }
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroupInstance.id])
-        redirect(action: "show", id: jobGroupInstance.id)
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
+        redirect(action: "show", id: jobGroup.id)
     }
 
     /**

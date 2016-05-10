@@ -19,6 +19,7 @@
 		<g:renderErrors bean="${jobGroup}" as="list" />
 	</div>
 	</g:hasErrors>
+
 	
 	<g:form action="save" class="form-horizontal" >
 		<fieldset class="form">

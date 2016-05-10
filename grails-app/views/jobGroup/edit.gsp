@@ -1,11 +1,12 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
+<%@ defaultCodec="none" %>
 <!doctype html>
 <html>
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="layout" content="kickstart" />
-	<title><g:message code="default.edit.label" args="[jobGroupInstance.name]" /></title>
+	<title><g:message code="default.edit.label" args="[jobGroup.name]" /></title>
 
     <asset:stylesheet src="tagit.css"/>
     <g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" />
@@ -15,15 +16,15 @@
 
 <section id="edit-jobGroup" class="first">
 
-	<g:hasErrors bean="${jobGroupInstance}">
+	<g:hasErrors bean="${jobGroup}">
 	<div class="alert alert-error">
-		<g:renderErrors bean="${jobGroupInstance}" as="list" />
+		<g:renderErrors bean="${jobGroup}" as="list" />
 	</div>
 	</g:hasErrors>
 
-	<g:form method="post" class="form-horizontal" >
-		<g:hiddenField name="id" value="${jobGroupInstance?.id}" />
-		<g:hiddenField name="version" value="${jobGroupInstance?.version}" />
+	<g:form method="put" class="form-horizontal" >
+		<g:hiddenField name="id" value="${jobGroup?.id}" />
+		<g:hiddenField name="version" value="${jobGroup?.version}" />
 		<fieldset class="form">
 			<g:render template="form"/>
 		</fieldset>
@@ -43,7 +44,6 @@
 
             $("ul[name='tags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags', absolute: true)}'});
 
-            changeCsiConfigurationSelectionStatus();
         });
     </asset:script>
 </content>

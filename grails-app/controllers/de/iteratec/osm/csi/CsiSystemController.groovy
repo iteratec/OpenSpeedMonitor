@@ -35,15 +35,15 @@ class CsiSystemController {
 
     def list() {
         params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [csiSystemInstanceList: CsiSystem.list(params), csiSystemInstanceTotal: CsiSystem.count()]
+        [csiSystemList: CsiSystem.list(params), csiSystemCount: CsiSystem.count()]
     }
 
     def create() {
-        [csiSystemInstance: new CsiSystem(params)]
+        [csiSystem: new CsiSystem(params)]
     }
 
     def save() {
-        def csiSystemInstance = new CsiSystem(label: params.label)
+        def csiSystem = new CsiSystem(label: params.label)
 
         List<String> identifiers = params.jobGroupWeightIdentifiers.tokenize(',')
 
@@ -59,7 +59,7 @@ class CsiSystemController {
             }
             if (jobGroup && weightString && weightString.isDouble()) {
                 Double weight = Double.parseDouble(weightString)
-                csiSystemInstance.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup, weight: weight))
+                csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup, weight: weight))
             } else {
                 jobGroupsWeightsCorrect = false
             }
@@ -67,45 +67,45 @@ class CsiSystemController {
 
         if (!jobGroupsWeightsCorrect) {
             flash.error = message(code: 'de.iteratec.osm.csi.CsiSystem.weightError', default: "Gewichtungen muessen vom Typ Double sein")
-            render(view: "create", model: [csiSystemInstance: csiSystemInstance])
+            render(view: "create", model: [csiSystem: csiSystem])
             return
         }
 
 
-        if (!csiSystemInstance.save(flush: true)) {
-            render(view: "create", model: [csiSystemInstance: csiSystemInstance])
+        if (!csiSystem.save(flush: true)) {
+            render(view: "create", model: [csiSystem: csiSystem])
             return
         }
 
-        flash.message = message(code: 'default.created.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), csiSystemInstance.id])
-        redirect(action: "show", id: csiSystemInstance.id)
+        flash.message = message(code: 'default.created.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), csiSystem.id])
+        redirect(action: "show", id: csiSystem.id)
     }
 
     def show() {
-        def csiSystemInstance = CsiSystem.get(params.id)
-        if (!csiSystemInstance) {
+        def csiSystem = CsiSystem.get(params.id)
+        if (!csiSystem) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
             return
         }
 
-        [csiSystemInstance: csiSystemInstance]
+        [csiSystem: csiSystem]
     }
 
     def edit() {
-        def csiSystemInstance = CsiSystem.get(params.id)
-        if (!csiSystemInstance) {
+        def csiSystem = CsiSystem.get(params.id)
+        if (!csiSystem ) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
             return
         }
 
-        [csiSystemInstance: csiSystemInstance]
+        [csiSystem: csiSystem ]
     }
 
     def update() {
-        def csiSystemInstance = CsiSystem.get(params.id)
-        if (!csiSystemInstance) {
+        def csiSystem = CsiSystem.get(params.id)
+        if (!csiSystem) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
             return
@@ -113,20 +113,20 @@ class CsiSystemController {
 
         if (params.version) {
             def version = params.version.toLong()
-            if (csiSystemInstance.version > version) {
-                csiSystemInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
+            if (csiSystem.version > version) {
+                csiSystem.errors.rejectValue("version", "default.optimistic.locking.failure",
                         [message(code: 'csiSystem.label', default: 'CsiSystem')] as Object[],
                         "Another user has updated this CsiSystem while you were editing")
-                render(view: "edit", model: [csiSystemInstance: csiSystemInstance])
+                render(view: "edit", model: [csiSystem: csiSystem])
                 return
             }
         }
 
-        csiSystemInstance.label = params.label
+        csiSystem.label = params.label
         List<String> identifiers = params.jobGroupWeightIdentifiers.tokenize(',')
 
-        csiSystemInstance.jobGroupWeights.collect().each {
-            csiSystemInstance.removeFromJobGroupWeights(it)
+        csiSystem.jobGroupWeights.collect().each {
+            csiSystem.removeFromJobGroupWeights(it)
             it.delete()
         }
 
@@ -143,7 +143,7 @@ class CsiSystemController {
             if (jobGroup && weightString && weightString.isDouble()) {
                 Double weight = Double.parseDouble(weightString)
                 JobGroupWeight newWeight = new JobGroupWeight(jobGroup: jobGroup, weight: weight)
-                csiSystemInstance.addToJobGroupWeights(newWeight)
+                csiSystem.addToJobGroupWeights(newWeight)
             } else {
                 jobGroupsWeightsHaveErrors = true
             }
@@ -151,37 +151,37 @@ class CsiSystemController {
 
         if (jobGroupsWeightsHaveErrors) {
             flash.error = message(code: 'de.iteratec.osm.csi.CsiSystem.weightError', default: "Gewichtungen muessen vom Typ Double sein")
-            render(view: "edit", model: [csiSystemInstance: csiSystemInstance])
+            render(view: "edit", model: [csiSystem: csiSystem])
             return
         }
 
-        if (!csiSystemInstance.save(flush: true)) {
-            render(view: "edit", model: [csiSystemInstance: csiSystemInstance])
+        if (!csiSystem.save(flush: true)) {
+            render(view: "edit", model: [csiSystem: csiSystem])
             return
         }
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'csiSystem.label', default:
-                'CsiSystem'), csiSystemInstance.id])
-        redirect(action: "show", id: csiSystemInstance.id)
+                'CsiSystem'), csiSystem.id])
+        redirect(action: "show", id: csiSystem.id)
     }
 
     def delete() {
-        def csiSystemInstance = CsiSystem.get(params.id)
-        if (!csiSystemInstance) {
+        def csiSystem = CsiSystem.get(params.id)
+        if (!csiSystem) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
             return
         }
 
         try {
-            csiSystemInstance.jobGroupWeights.collect().each {
-                csiSystemInstance.removeFromJobGroupWeights(it)
+            csiSystem.jobGroupWeights.collect().each {
+                csiSystem.removeFromJobGroupWeights(it)
                 it.delete()
             }
 
-            CsiAggregation.findAllByCsiSystem(csiSystemInstance)*.delete()
+            CsiAggregation.findAllByCsiSystem(csiSystem)*.delete()
 
-            csiSystemInstance.delete(flush: true)
+            csiSystem.delete(flush: true)
             flash.message = message(code: 'default.deleted.message', args: [message(code: 'csiSystem.label', default: 'CsiSystem'), params.id])
             redirect(action: "list")
         }

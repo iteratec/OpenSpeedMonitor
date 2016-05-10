@@ -1,22 +1,25 @@
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
+<%@ defaultCodec="none" %>
 
 
-
-<div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'name', 'error')} ">
-    <label for="name" class="control-label"><g:message code="jobGroup.name.label" default="Name"/></label>
+<div class="control-group fieldcontain ${hasErrors(bean: jobGroup, field: 'name', 'error')} required">
+    <label for="name" class="control-label"><g:message code="jobGroup.name.label" default="Name"/><span class="required-indicator">*</span></label>
 
     <div class="controls">
-        <g:textArea name="name" cols="40" rows="5" maxlength="255" value="${jobGroupInstance?.name}"/>
+        <g:textArea name="name" cols="40" rows="5" maxlength="255" required="" value="${jobGroup?.name}"/>
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: jobGroupInstance, field: 'graphiteServers', 'error')} ">
+
+
+
+<div class="control-group fieldcontain ${hasErrors(bean: jobGroup, field: 'graphiteServers', 'error')} ">
     <label for="graphiteServers" class="control-label"><g:message code="jobGroup.graphiteServers.label"
                                                                   default="Graphite Servers"/></label>
 
     <div class="controls">
         <g:select name="graphiteServers" from="${de.iteratec.osm.report.external.GraphiteServer.list()}"
-                  multiple="multiple" optionKey="id" size="5" value="${jobGroupInstance?.graphiteServers*.id}"
+                  multiple="multiple" optionKey="id" size="5" value="${jobGroup?.graphiteServers*.id}"
                   class="many-to-many"/>
     </div>
 </div>
@@ -27,7 +30,7 @@
     </label>
     <div class="controls">
         <ul name="tags" id="tags" style="margin-left:0px;" class="width_31em">
-            <g:each in="${jobGroupInstance?.tags}">
+            <g:each in="${jobGroup?.tags}">
                 <li>${it}</li>
             </g:each>
         </ul>
@@ -41,7 +44,7 @@
     <div class="controls" id="csiConfigurationSelection">
         <g:select name="csiConfiguration" from="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
                   keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.label}"
-                  value="${jobGroupInstance?.csiConfiguration?.label}"
+                  value="${jobGroup?.csiConfiguration?.label}"
                   noSelection="${[null:g.message(code: 'jobGroup.csi_configuration.emptyLabel', default: 'Select one...')]}"/>
     </div>
 </div>
@@ -51,7 +54,7 @@
                                                                    default="Persist Detaildata"/></label>
 
     <div class="controls">
-        <g:checkBox name="persistHar" />
+        <bs:checkBox name="persistHar" />
     </div>
 
 </div>

@@ -48,9 +48,9 @@ class JobGroup implements Taggable{
     static hasMany = [graphiteServers: GraphiteServer]
 
     static constraints = {
-        name(unique: true, maxSize: 255)
-        graphiteServers(nullable: false)
-        csiConfiguration(nullable: true)
+        name unique: true, maxSize: 255
+        graphiteServers nullable: false
+        csiConfiguration nullable: true
     }
 
     @Override

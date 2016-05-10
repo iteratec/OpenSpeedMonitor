@@ -24,12 +24,12 @@
 			</tr>
 		</thead>
 		<tbody>
-		<g:each in="${jobGroupList}" status="i" var="jobGroupInstance">
+		<g:each in="${jobGroupList}" status="i" var="jobGroup">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			
-				<td><g:link action="show" id="${jobGroupInstance.id}">${fieldValue(bean: jobGroupInstance, field: "name")}</g:link></td>
+				<td><g:link action="show" id="${jobGroup.id}">${fieldValue(bean: jobGroup, field: "name")}</g:link></td>
 
-                <td>${fieldValue(bean: jobGroupInstance, field: "csiConfiguration")}</td>
+                <td>${fieldValue(bean: jobGroup, field: "csiConfiguration")}</td>
 			
 			</tr>
 		</g:each>
@@ -37,7 +37,7 @@
 		</tbody>
 	</table>
 	<div class="pagination">
-		<g:paginate total="${jobGroupCount}" />
+		<bs:paginate total="${jobGroupCount ?: 0}" />
 	</div>
 </section>
 
