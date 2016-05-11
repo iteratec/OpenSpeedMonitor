@@ -34,4 +34,9 @@ class BrowserAlias {
             }
         })
     }
+
+    @Override
+    String toString() {
+        return alias
+    }
 }
