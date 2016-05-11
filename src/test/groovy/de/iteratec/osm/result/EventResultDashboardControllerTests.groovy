@@ -880,7 +880,7 @@ class EventResultDashboardControllerTests {
 
 		// Data for java-script utilities:
 		assertTrue(result.containsKey('dateFormat'))
-		assertEquals(EventResultDashboardController.DATE_FORMAT_STRING, result.get('dateFormat'))
+		assertEquals(EventResultDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormat'))
 		assertTrue(result.containsKey('weekStart'))
 		assertEquals(EventResultDashboardController.MONDAY_WEEKSTART, result.get('weekStart'))
 		

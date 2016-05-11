@@ -110,7 +110,7 @@ dependencies {
     runtime 'mysql:mysql-connector-java:5.1.26'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'
     runtime 'org.grails.plugins:database-migration:2.0.0.RC4'
-    compile 'org.grails.plugins:mongodb:5.0.5'
+//    compile 'org.grails.plugins:mongodb:5.0.5'
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'org.grails.plugins:joda-time:2.0.0'
     compile 'org.grails.plugins:spring-security-core:3.0.4'

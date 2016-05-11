@@ -13,7 +13,7 @@
             <g:hasErrors bean="\${this.${propertyName}}">
             <ul class="errors" role="alert">
                 <g:eachError bean="\${this.${propertyName}}" var="error">
-                <li <g:if test="\${error in org.springframework.validation.FieldError}">data-field-id="\${error.field}"</g:if>><g:message error="\${error}"/></li>
+                <li <g:if test="\${error in org.springframework.validation.FieldError}">data-field-id="\${error.field}"</g:if>><div class="alert alert-danger"><g:message error="\${error}"/></div></li>
                 </g:eachError>
             </ul>
             </g:hasErrors>

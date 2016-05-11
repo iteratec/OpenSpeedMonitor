@@ -5,4 +5,5 @@
     <div class="controls">
         <g:field type="number"  name="${property}" id="${property}" value="${value}" />
     </div>
+
 </div>

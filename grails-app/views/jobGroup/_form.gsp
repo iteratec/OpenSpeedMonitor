@@ -6,7 +6,7 @@
     <label for="name" class="control-label"><g:message code="jobGroup.name.label" default="Name"/><span class="required-indicator">*</span></label>
 
     <div class="controls">
-        <g:textArea name="name" cols="40" rows="5" maxlength="255" required="" value="${jobGroup?.name}"/>
+        <g:textArea name="name" cols="40" rows="5" maxlength="255"  value="${jobGroup?.name}"/>
     </div>
 </div>
 

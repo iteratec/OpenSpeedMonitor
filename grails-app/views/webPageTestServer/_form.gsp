@@ -5,14 +5,14 @@
 			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'label', 'error')} required">
 				<label for="label" class="control-label"><g:message code="webPageTestServer.label.label" default="Label" /><span class="required-indicator">*</span></label>
 				<div class="controls">
-					<g:textField name="label" maxlength="150" required="" value="${webPageTestServer?.label}"/>
+					<g:textField name="label" maxlength="150"  value="${webPageTestServer?.label}"/>
 				</div>
 			</div>
 
 			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'proxyIdentifier', 'error')} required">
 				<label for="proxyIdentifier" class="control-label"><g:message code="webPageTestServer.proxyIdentifier.label" default="Proxy Identifier" /><span class="required-indicator">*</span></label>
 				<div class="controls">
-					<g:textField name="proxyIdentifier" required="" value="${webPageTestServer?.proxyIdentifier}"/>
+					<g:textField name="proxyIdentifier"  value="${webPageTestServer?.proxyIdentifier}"/>
 				</div>
 			</div>
 
@@ -33,7 +33,7 @@
 			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'baseUrl', 'error')} required">
 				<label for="baseUrl" class="control-label"><g:message code="webPageTestServer.baseUrl.label" default="Base Url" /><span class="required-indicator">*</span></label>
 				<div class="controls">
-					<g:field type="url" name="baseUrl" required="" value="${webPageTestServer?.baseUrl}"/>
+					<g:field type="url" name="baseUrl"  value="${webPageTestServer?.baseUrl}"/>
 				</div>
 			</div>
 
