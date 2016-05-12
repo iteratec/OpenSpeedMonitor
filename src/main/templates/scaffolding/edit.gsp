@@ -10,15 +10,15 @@
             <g:if test="\${flash.message}">
             <div class="message" role="status">\${flash.message}</div>
             </g:if>
-            <g:hasErrors bean="\${this.${propertyName}}">
+            <g:hasErrors bean="\${${propertyName}}">
             <ul class="errors" role="alert">
-                <g:eachError bean="\${this.${propertyName}}" var="error">
+                <g:eachError bean="\${${propertyName}}" var="error">
                 <li <g:if test="\${error in org.springframework.validation.FieldError}">data-field-id="\${error.field}"</g:if>><div class="alert alert-danger"><g:message error="\${error}"/></div></li>
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form resource="\${this.${propertyName}}" method="PUT" class="form-horizontal">
-                <g:hiddenField name="version" value="\${this.${propertyName}?.version}" />
+            <g:form resource="\${${propertyName}}" method="PUT" class="form-horizontal">
+                <g:hiddenField name="version" value="\${${propertyName}?.version}" />
                 <fieldset class="form">
                     <f:all bean="${propertyName}"/>
                 </fieldset>

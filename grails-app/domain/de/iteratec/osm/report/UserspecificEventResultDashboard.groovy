@@ -263,8 +263,8 @@ class UserspecificEventResultDashboard {
 
     //csi
     static constraints = {
-        dashboardName(nullable: true, unique: true)
-        username(nullable: true)
+        dashboardName(nullable: false, unique: true)
+        username(nullable: false)
         publiclyVisible(nullable: true)
         fromDate(nullable: true)
         toDate(nullable: true)
