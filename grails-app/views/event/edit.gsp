@@ -19,7 +19,7 @@
         </div>
         </g:hasErrors>
 
-        <g:form method="post" class="form-horizontal" >
+        <g:form method="put" class="form-horizontal" >
             <g:hiddenField name="id" value="${eventInstance?.id}" />
             <g:hiddenField name="version" value="${eventInstance?.version}" />
             <fieldset class="form">

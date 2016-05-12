@@ -69,7 +69,7 @@ class Event {
         shortName(maxSize: 255)
         description(nullable: true, widget: 'textarea')
         globallyVisible(nullable: false)
-        jobGroups(validator: {val, obj->
+        jobGroups(nullable: false, validator: {val, obj->
             return obj.globallyVisible || val.size() > 0
         })
     }

@@ -25,7 +25,7 @@ import org.springframework.web.servlet.support.RequestContextUtils
  */
 class EventController {
 
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     EventService eventService
 
