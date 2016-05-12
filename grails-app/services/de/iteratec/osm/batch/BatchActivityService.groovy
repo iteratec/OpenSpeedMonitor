@@ -1,6 +1,5 @@
 package de.iteratec.osm.batch
 
-import javax.annotation.PreDestroy
 import java.text.DecimalFormat
 
 /**
@@ -35,7 +34,7 @@ class BatchActivityService implements Observer {
      */
     public BatchActivity getActiveBatchActivity(Class c, long idWithinDomain, Activity activity, String name, boolean observe = true) {
         BatchActivity batchActivity
-        BatchActivity.withNewTransaction {
+        BatchActivity.withTransaction {
             batchActivity = new BatchActivity(
                     activity: activity,
                     domain: c.toString(),
@@ -50,7 +49,7 @@ class BatchActivityService implements Observer {
                     startDate: new Date(),
                     successfulActions: 0)
             batchActivity.save(flush: true)
-            
+
             if (observe) {
                 batchActivity.addObserver(this)
             }
@@ -92,7 +91,7 @@ class BatchActivityService implements Observer {
             activities.clear()
         }
         if (activityTemp.size() > 0) {
-            BatchActivity.withNewTransaction {
+            BatchActivity.withTransaction {
                 activityTemp*.save(flush: true)
             }
         }
