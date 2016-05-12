@@ -25,7 +25,7 @@
         </g:hasErrors>
     </g:else>
 
-    <g:form method="post" class="form-horizontal">
+    <g:form method="put" class="form-horizontal">
         <g:hiddenField name="id" value="${csiSystem?.id}"/>
         <g:hiddenField name="version" value="${csiSystem?.version}"/>
         <fieldset class="form">
