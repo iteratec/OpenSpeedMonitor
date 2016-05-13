@@ -262,10 +262,7 @@ public class EventResultDashboardShowAllCommand implements Validateable{
     int chartWidth
     int chartHeight
     int loadTimeMinimum
-
-    // If map is not specified, it acts as a string/string mapping (gorm default)
-    Map graphNameAliases = [:]
-    Map graphColors = [:]
+    boolean wideScreenDiagramMontage = false;
 
     /**
      * The maximum load time could be set to 'auto', so we handle it as a string
@@ -274,6 +271,18 @@ public class EventResultDashboardShowAllCommand implements Validateable{
     boolean showDataMarkers
     boolean showDataLabels
 
+    // If map is not specified, it acts as a string/string mapping (gorm default)
+    Map graphNameAliases = [:]
+    Map graphColors = [:]
+
+    /**
+     * The name of a saved userspecificDashboard
+     */
+    String dashboardName = ""
+    /**
+     * Whether a saved userspecificDashboard is publicly visible or not
+     */
+    boolean publiclyVisible = false
 
     /**
      * Constraints needs to fit.
@@ -336,17 +345,8 @@ public class EventResultDashboardShowAllCommand implements Validateable{
 
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
-        trimAboveLoadTimes(nullable:true)
-        trimAboveRequestCounts(nullable: true)
-        trimAboveRequestSizes(nullable: true)
-        trimBelowLoadTimes(nullable:true)
-        trimBelowRequestCounts(nullable:true)
-        trimBelowRequestSizes(nullable:true)
-        debug(nullable:true)
-        setToHour(nullable:true)
-        setFromHour(nullable:true)
-        selectChartType(nullable:true)
-        aggrGroup(nullable:true)
+        dashboardName(nullable: true)
+        //TODO: validators for trimAbove's and -Below's
 
     }
 
@@ -487,6 +487,9 @@ public class EventResultDashboardShowAllCommand implements Validateable{
         viewModelToCopyTo.put('loadTimeMinimum', this.loadTimeMinimum)
         viewModelToCopyTo.put('graphNameAliases', this.graphNameAliases as JSON)
         viewModelToCopyTo.put('graphColors', this.graphColors as JSON)
+        viewModelToCopyTo.put('publiclyVisible', this.publiclyVisible)
+        viewModelToCopyTo.put('dashboardName', this.dashboardName)
+        viewModelToCopyTo.put('wideScreenDiagramMontage', this.wideScreenDiagramMontage)
     }
 
     /**
@@ -541,12 +544,12 @@ public class EventResultDashboardShowAllCommand implements Validateable{
         }
         result.includeNativeConnectivity = this.includeNativeConnectivity
         result.includeCustomConnectivity = this.includeCustomConnectivity
-        if (this.includeCustomConnectivity){
+        if (this.includeCustomConnectivity) {
             result.customConnectivityNameRegex = this.customConnectivityName ?: '.*'
         }
-        if (this.selectedAllConnectivityProfiles){
+        if (this.selectedAllConnectivityProfiles) {
             result.connectivityProfileIds.addAll(ConnectivityProfile.list()*.ident())
-        }else if (this.selectedConnectivityProfiles.size() > 0){
+        } else if (this.selectedConnectivityProfiles.size() > 0) {
             result.connectivityProfileIds.addAll(this.selectedConnectivityProfiles)
         }
 

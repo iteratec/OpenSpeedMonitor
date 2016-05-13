@@ -1282,7 +1282,7 @@ class CsiDashboardControllerTests {
         command.copyRequestDataToViewModelMap(dataUnderTest);
 
         // Verification:
-        assertEquals(32, dataUnderTest.size());
+        assertEquals(35, dataUnderTest.size());
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -1338,7 +1338,7 @@ class CsiDashboardControllerTests {
         command.copyRequestDataToViewModelMap(dataUnderTest);
 
         // Verification:
-        assertEquals(32, dataUnderTest.size());
+        assertEquals(35, dataUnderTest.size());
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);
@@ -1462,7 +1462,7 @@ class CsiDashboardControllerTests {
         command.copyRequestDataToViewModelMap(dataUnderTest);
 
         // Verification:
-        assertEquals(32, dataUnderTest.size());
+        assertEquals(35, dataUnderTest.size());
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedFolder', [1L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedPages', [1L, 5L]);

@@ -96,7 +96,7 @@
                                 default="Exportierte Diagramme für Breitbild-Darstellung optimieren"/></div>
 
                         <div class="span9"><g:checkBox id="wide-screen-diagram-montage" name="wideScreenDiagramMontage"
-                                                       checked="${params.wideScreenDiagramMontage}"/></div>
+                                                       checked="${wideScreenDiagramMontage}"/></div>
                     </div>
                 </div>
             </div>
