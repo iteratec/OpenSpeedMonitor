@@ -11,7 +11,7 @@ databaseChangeLog = {
 		dropTable(tableName: "http_archive")
 	}
 
-//	### UserspecificDashboard refactoring
+	//      ### UserspecificDashboard refactoring
 	changeSet(author: "marcus (generated)", id: "1460099558388-1") {
 		createTable(tableName: "userspecific_dashboard_base") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
@@ -160,12 +160,12 @@ databaseChangeLog = {
 		}
 	}
 
-//	### DATA MIGRATION ###
+//      ### DATA MIGRATION ###
 	changeSet(author: "mmi", id: "1460040092000-1") {
 		sql('''
             insert into userspecific_dashboard_base (version, aggr_group, dashboard_name, debug, from_date, from_hour, include_interval, overwrite_warning_about_long_processing_time, publicly_visible, selected_all_browsers, selected_all_locations, selected_all_measured_events, selected_browsers, selected_folder, selected_locations, selected_measured_event_ids, selected_pages, selected_time_frame_interval, set_from_hour, set_to_hour, to_date, to_hour, username, wide_screen_diagram_montage, chart_height, chart_title, chart_width, load_time_maximum, load_time_minimum, show_data_labels, show_data_markers, csi_type_doc_complete, csi_type_visually_complete, selected_csi_systems, class)
-    			select version, aggr_group, dashboard_name, debug, from_date, from_hour, include_interval, overwrite_warning_about_long_processing_time, publicly_visible, selected_all_browsers, selected_all_locations, selected_all_measured_events, selected_browsers, selected_folder, selected_locations, selected_measured_event_ids, selected_pages, selected_time_frame_interval, set_from_hour, set_to_hour, to_date, to_hour, username, wide_screen_diagram_montage, chart_height, chart_title, chart_width, load_time_maximum, load_time_minimum, show_data_labels, show_data_markers, csi_type_doc_complete, csi_type_visually_complete, selected_csi_systems, 'de.iteratec.osm.report.UserspecificCsiDashboard'
-        		from userspecific_csi_dashboard;
+                        select version, aggr_group, dashboard_name, debug, from_date, from_hour, include_interval, overwrite_warning_about_long_processing_time, publicly_visible, selected_all_browsers, selected_all_locations, selected_all_measured_events, selected_browsers, selected_folder, selected_locations, selected_measured_event_ids, selected_pages, selected_time_frame_interval, set_from_hour, set_to_hour, to_date, to_hour, username, wide_screen_diagram_montage, chart_height, chart_title, chart_width, load_time_maximum, load_time_minimum, show_data_labels, show_data_markers, csi_type_doc_complete, csi_type_visually_complete, selected_csi_systems, 'de.iteratec.osm.report.UserspecificCsiDashboard'
+                        from userspecific_csi_dashboard;
         ''')
 	}
 
@@ -185,22 +185,31 @@ databaseChangeLog = {
 						def query = session.createSQLQuery("select id from userspecific_csi_dashboard where dashboard_name = :name")
 						query.setString("name", it.dashboardName)
 						def oldId = query.list()[0]
+						def newIdQuery = session.createSQLQuery("select id from userspecific_dashboard_base where dashboard_name = :name and class = 'de.iteratec.osm.report.UserspecificCsiDashboard'")
+						newIdQuery.setString("name", it.dashboardName)
+						def newID = newIdQuery.list()[0]
 
-						if(!it.graphColors.isEmpty()) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
-                                    'select :newID, graph_colors_idx, graph_colors_elt from userspecific_csi_dashboard_graph_colors ' +
-                                    'where graph_colors = :oldID')
-                            query.setString("newID", it.id.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
+						def nullCheckQuery = session.createSQLQuery("select * from userspecific_csi_dashboard_graph_colors where graph_colors = :oldID")
+						nullCheckQuery.setString("oldID", oldId.toString())
+						def entries = nullCheckQuery.list().size()
+						if(entries > 0){
+							query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
+									'select :newID, graph_colors_idx, graph_colors_elt from userspecific_csi_dashboard_graph_colors ' +
+									'where graph_colors = :oldID')
+							query.setString("newID", newID.toString())
+							query.setString("oldID", oldId.toString())
+							query.executeUpdate()
 						}
-						if(!it.graphNameAliases.isEmpty()) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
-                                    'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_csi_dashboard_graph_name_aliases ' +
-                                    'where graph_name_aliases = :oldID')
-                            query.setString("newID", it.id.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
+						nullCheckQuery = session.createSQLQuery("select * from userspecific_csi_dashboard_graph_name_aliases where graph_name_aliases = :oldID")
+						nullCheckQuery.setString("oldID", oldId.toString())
+						entries = nullCheckQuery.list().size()
+						if(entries > 0){
+							query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
+									'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_csi_dashboard_graph_name_aliases ' +
+									'where graph_name_aliases = :oldID')
+							query.setString("newID", newID.toString())
+							query.setString("oldID", oldId.toString())
+							query.executeUpdate()
 						}
 					}
 				}
@@ -210,24 +219,33 @@ databaseChangeLog = {
 						def query = session.createSQLQuery("select id from userspecific_csi_dashboard where dashboard_name = :name")
 						query.setString("name", it.dashboardName)
 						def oldId = query.list()[0]
+						def newIdQuery = session.createSQLQuery("select id from userspecific_dashboard_base where dashboard_name = :name and class = 'de.iteratec.osm.report.UserspecificEventResultDashboard'")
+						newIdQuery.setString("name", it.dashboardName)
+						def newID = newIdQuery.list()[0]
 
-                        if(!it.graphColors.isEmpty()) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
-                                    'select :newID, graph_colors_idx, graph_colors_elt from userspecific_event_result_dashboard_graph_colors ' +
-                                    'where graph_colors = :oldID')
-                            query.setString("newID", it.id.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
-                        }
+						def nullCheckQuery = session.createSQLQuery("select * from userspecific_event_result_dashboard_graph_colors where graph_colors = :oldID")
+						nullCheckQuery.setString("oldID", oldId.toString())
+						def entries = nullCheckQuery.list().size()
+						if(entries > 0){
+							query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
+									'select :newID, graph_colors_idx, graph_colors_elt from userspecific_event_result_dashboard_graph_colors ' +
+									'where graph_colors = :oldID')
+							query.setString("newID", newID.toString())
+							query.setString("oldID", oldId.toString())
+							query.executeUpdate()
+						}
 
-                        if(!it.graphNameAliases.isEmpty()) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
-                                    'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_event_result_dashboard_graph_name_aliases ' +
-                                    'where graph_name_aliases = :oldID')
-                            query.setString("newID", it.id.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
-                        }
+						nullCheckQuery = session.createSQLQuery("select * from userspecific_event_result_dashboard_graph_name_aliases where graph_name_aliases = :oldID")
+						nullCheckQuery.setString("oldID", oldId.toString())
+						entries = nullCheckQuery.list().size()
+						if(entries > 0){
+							query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
+									'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_event_result_dashboard_graph_name_aliases ' +
+									'where graph_name_aliases = :oldID')
+							query.setString("newID", newID.toString())
+							query.setString("oldID", oldId.toString())
+							query.executeUpdate()
+						}
 					}
 				}
 			}
@@ -257,5 +275,5 @@ databaseChangeLog = {
 	changeSet(author: "marcus (generated)", id: "1460099558388-14") {
 		dropTable(tableName: "userspecific_event_result_dashboard_graph_name_aliases")
 	}
-//	### END UserspecificDashboard refactoring
+//      ### END UserspecificDashboard refactoring
 }
