@@ -1,6 +1,5 @@
 package de.iteratec.osm.batch
 
-import javax.annotation.PreDestroy
 import java.text.DecimalFormat
 
 /**
@@ -10,10 +9,19 @@ class BatchActivityService implements Observer {
 
     static transactional = false
 
-    Timer timer
+    Timer timer = new Timer()
     final Set<BatchActivity> activities = Collections.synchronizedSet(new HashSet<BatchActivity>())
     //Interval to save incoming updates in seconds
     int updateInterval = 5
+
+    BatchActivityService() {
+        timer.schedule(new TimerTask() {
+            @Override
+            void run() {
+                updateActivities()
+            }
+        }, 10000, 1000 * updateInterval)
+    }
 
     /**
      * Creates a new BatchActivity. This BatchActivity will be observed and will automatically be saved, if any property has changed
@@ -26,7 +34,7 @@ class BatchActivityService implements Observer {
      */
     public BatchActivity getActiveBatchActivity(Class c, long idWithinDomain, Activity activity, String name, boolean observe = true) {
         BatchActivity batchActivity
-        BatchActivity.withNewTransaction {
+        BatchActivity.withTransaction {
             batchActivity = new BatchActivity(
                     activity: activity,
                     domain: c.toString(),
@@ -40,25 +48,13 @@ class BatchActivityService implements Observer {
                     status: Status.ACTIVE,
                     startDate: new Date(),
                     successfulActions: 0)
-            if(observe){
-                createTimerIfNecessary()
-                batchActivity.save(failOnError: true, flush: true)
+            batchActivity.save(flush: true)
+
+            if (observe) {
                 batchActivity.addObserver(this)
             }
         }
         return batchActivity
-    }
-
-    private void createTimerIfNecessary(){
-        if(timer==null){
-            timer = new Timer()
-            timer.schedule(new TimerTask() {
-                @Override
-                void run() {
-                    updateActivities()
-                }
-            }, 10000, 1000 * updateInterval)
-        }
     }
 
     /**
@@ -95,7 +91,7 @@ class BatchActivityService implements Observer {
             activities.clear()
         }
         if (activityTemp.size() > 0) {
-            BatchActivity.withNewTransaction {
+            BatchActivity.withTransaction {
                 activityTemp*.save(flush: true)
             }
         }
