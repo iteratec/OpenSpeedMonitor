@@ -25,37 +25,4 @@ package de.iteratec.osm.report.external
 class GraphiteServerController {
 
     static scaffold = GraphiteServer
-
-    def update() {
-        def graphiteServerInstance = GraphiteServer.get(params.id)
-        if (!graphiteServerInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
-            redirect(action: "list")
-            return
-        }
-        if (!(params?.graphitePaths)) {
-            graphiteServerInstance.graphitePaths.clear()
-        }
-        if (params.version) {
-            def version = params.version.toLong()
-            if (graphiteServerInstance.version > version) {
-                graphiteServerInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'graphiteServer.label', default: 'GraphiteServer')] as Object[],
-                          "Another user has updated this GraphiteServer while you were editing")
-                render(view: "edit", model: [graphiteServerInstance: graphiteServerInstance])
-                return
-            }
-        }
-
-        graphiteServerInstance.properties = params
-
-        if (!graphiteServerInstance.save(flush: true)) {
-            render(view: "edit", model: [graphiteServerInstance: graphiteServerInstance])
-            return
-        }
-
-		flash.message = message(code: 'default.updated.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), graphiteServerInstance.id])
-        redirect(action: "show", id: graphiteServerInstance.id)
-    }
-
 }
