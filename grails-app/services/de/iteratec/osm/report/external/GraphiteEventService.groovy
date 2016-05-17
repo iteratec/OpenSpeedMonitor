@@ -18,8 +18,8 @@
 package de.iteratec.osm.report.external
 
 import de.iteratec.osm.batch.Activity
-import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
@@ -60,16 +60,15 @@ class GraphiteEventService {
         log.debug("Fetching of graphite events: Start -> from $fromFormatted to $untilFormatted.")
 
         def graphiteServers = GraphiteServer.list()
-        int size = graphiteServers.size()
-        BatchActivity activity = batchActivityService.getActiveBatchActivity(this.class,new Date().getTime(),Activity.CREATE,"Fetch Graphite Events",createBatchActivity)
-
+        BatchActivityUpdater activity = batchActivityService.getActiveBatchActivity(this.class,Activity.CREATE,"Fetch Graphite Events "+new Date().getTime(),1, createBatchActivity)
+        activity.beginNewStage("Create Events", graphiteServers.size()).update()
         graphiteServers.eachWithIndex {server,index ->
-            activity.updateStatus(["progress": batchActivityService.calculateProgress(size,index+1), "stage": "Delete JobResults"])
             server.graphiteEventSourcePaths.each {eventSourcePath->
                 createEvents(eventSourcePath, server, fromFormatted, untilFormatted)
             }
+            activity.addProgressToStage().update()
         }
-
+        activity.done()
     }
     /**
      * Fetches the Events from the given GraphiteServer within the path.

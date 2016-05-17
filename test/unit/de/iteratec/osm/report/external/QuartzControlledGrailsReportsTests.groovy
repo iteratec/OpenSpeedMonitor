@@ -79,7 +79,6 @@ class QuartzControlledGrailsReportsTests {
 		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
 		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
 		serviceUnderTest.batchActivityService = new BatchActivityService()
-		serviceUnderTest.batchActivityService.timer.cancel() //we don't need any updates for this test
 		new OsmConfiguration().save(failOnError: true)
 	}
 

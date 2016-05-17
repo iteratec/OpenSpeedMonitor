@@ -76,52 +76,6 @@ class ServiceMocker {
 		//TODO: should deliver the closure to be executed if the method nameOfMethodToMock of service serviceClassToMock is called in unit-tests 
 	}
 
-    /**
-     * Mocks methods of {@link BatchActivityService}.
-     * @param serviceToMockIn
-     *      Grails-Service with the service to mock as instance-variable.
-     */
-    void mockBatchActivityService(serviceToMockIn){
-        def batchActivityService = mockFor(BatchActivityService, true)
-        HashMap<Long, Class> containingIds = new HashMap<>()
-
-        batchActivityService.demand.getActiveBatchActivity(1..10000) {
-            Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
-                containingIds.put(idWithinDomain, c)
-                return new BatchActivity(
-                        activity: activity,
-                        domain: c.toString(),
-                        idWithinDomain: idWithinDomain,
-                        name: name,
-                        failures: 0,
-                        lastFailureMessage: "",
-                        progress: 0,
-                        progressWithinStage: "",
-                        stage: "",
-                        status: Status.ACTIVE,
-                        startDate: new Date(),
-                        successfulActions: 0,
-                ).save(failOnError: true)
-        }
-
-        batchActivityService.demand.runningBatch(1..10000) {
-            Class c,long idWithinDomain ->
-                return containingIds.containsKey(idWithinDomain) ? (containingIds.get(idWithinDomain) == c ? true : false) : false
-        }
-
-        batchActivityService.demand.updateStatus(1..1000){
-            BatchActivity activity,Map<String,Object> map ->
-            log.info "BatchActivity status updated"
-        }
-
-        batchActivityService.demand.calculateProgress(1..1000){
-            int count, int actual ->
-            DecimalFormat df = new DecimalFormat("#.##");
-            return df.format(100.0/count*actual) + " %";
-        }
-
-        serviceToMockIn.batchActivityService = batchActivityService.createMock()
-    }
 	
 	/**
 	 * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.

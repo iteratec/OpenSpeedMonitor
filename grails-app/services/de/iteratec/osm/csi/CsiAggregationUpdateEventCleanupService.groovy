@@ -19,9 +19,8 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
-import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.batch.Status
+import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiAggregationTagService
@@ -74,18 +73,14 @@ class CsiAggregationUpdateEventCleanupService {
             return
         }
 
-        BatchActivity activity
+        BatchActivityUpdater activity
+        activity = batchActivityService.getActiveBatchActivity(this.class,Activity.UPDATE, "Close and Calculate CsiAggregations", 2, createBatchActivity)
         List<CsiAggregation> csiAggregationsOpenAndExpired = csiAggregationDaoService.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(minutes)
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${csiAggregationsOpenAndExpired.size()} CsiAggregations identified as open and expired.")
         if (csiAggregationsOpenAndExpired.size() > 0) {
             def lists = csiAggregationsOpenAndExpired.collate(DATACOUNT_BEFORE_WRITING_TO_DB)
-            if (createBatchActivity) {
-                activity = batchActivityService.getActiveBatchActivity(this.class, 0, Activity.UPDATE, "Close and Calculate CsiAggregations", createBatchActivity)
-            }
+            activity.beginNewStage("closing and calculating CsiAggregations", lists.size()).update()
             lists.eachWithIndex { slice, index ->
-                if (activity)
-                    activity.updateStatus(["stage": "closing and calculating CsiAggregations", "progressWithinStage": batchActivityService.calculateProgress(csiAggregationsOpenAndExpired.size(), ((index + 1) * DATACOUNT_BEFORE_WRITING_TO_DB) as Integer)])
-
                 CsiAggregation.withNewTransaction {
                     try {
                         closeAndCalculateIfNecessary(slice)
@@ -93,17 +88,15 @@ class CsiAggregationUpdateEventCleanupService {
                         log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation: \n" +
                                 e.getMessage() +
                                 "\n Processing with the next csiAggregations")
+                        activity.addFailures().setLastFailureMessage("An error occured during closeAndCalculate csiAggregation").update()
                     }
                 }
+                activity.addProgressToStage().update()
             }
         }
-        if (activity)
-            activity.updateStatus(["progress": batchActivityService.calculateProgress(100, (100 * 1 / 2) as Integer)])
 
         deleteUpdateEventsForClosedAndCalculatedMvs(activity)
-
-        if (activity)
-            activity.updateStatus(["stage": "", "endDate": new Date(), "status": Status.DONE, "progress": batchActivityService.calculateProgress(100, 100)])
+        activity.done()
     }
 
     void closeAndCalculateIfNecessary(List<CsiAggregation> csiAggregationsOpenAndExpired) {
@@ -223,10 +216,8 @@ class CsiAggregationUpdateEventCleanupService {
 
     }
 
-    void deleteUpdateEventsForClosedAndCalculatedMvs(BatchActivity activity) {
+    void deleteUpdateEventsForClosedAndCalculatedMvs(BatchActivityUpdater activity) {
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: searching for update events which belong to closed and calculated measured values...")
-        if (activity)
-            activity.updateStatus(["stage": "delting update Events", progressWithinStage: batchActivityService.calculateProgress(100, 0)])
 
         def closedAndCalculatedCsiAggregationsIdsCriteria = new DetachedCriteria(CsiAggregation).build {
             projections {
@@ -238,6 +229,7 @@ class CsiAggregationUpdateEventCleanupService {
 
         List<Long> closedAndCalculatedCsiAggregationIds = closedAndCalculatedCsiAggregationsIdsCriteria.list()
         log.info(closedAndCalculatedCsiAggregationIds.size() + " closedAndCalculated CsiAggregations found")
+        activity.beginNewStage("deleting update Events", 1).update()
         if (!closedAndCalculatedCsiAggregationIds.isEmpty()) {
             def updateEventsToBeDeletedCriteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
                 'in' 'csiAggregationId', closedAndCalculatedCsiAggregationIds
@@ -245,12 +237,11 @@ class CsiAggregationUpdateEventCleanupService {
 
             log.info("Deleting " + updateEventsToBeDeletedCriteria.count() + " updateEvents")
             int total = updateEventsToBeDeletedCriteria.deleteAll()
+
             log.info(total + " updateEvents deleted")
         }
-
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: done deleting csiAggregationUpdateEvents for closedAndCalculated CsiAggregations")
-        if (activity)
-            activity.updateStatus(["stage": "delting update Events", progressWithinStage: batchActivityService.calculateProgress(100, 100)])
+        activity.addProgressToStage().update()
     }
 
 }

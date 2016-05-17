@@ -18,6 +18,7 @@
 package de.iteratec.osm.persistence
 
 import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -51,8 +52,7 @@ class DbCleanupServiceSpec {
     void setUp() {
         serviceUnderTest = service
         mocker = ServiceMocker.create()
-        mocker.mockBatchActivityService(serviceUnderTest)
-        serviceUnderTest.batchActivityService.timer.cancel()//we don't need any updates for this tests
+        serviceUnderTest.batchActivityService = new BatchActivityService()
     }
 
     @Test
