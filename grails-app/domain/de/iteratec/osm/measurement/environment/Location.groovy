@@ -59,7 +59,6 @@ class Location {
     static constraints = {
         label(maxSize: 150)
         uniqueIdentifierForServer(nullable: true, maxSize: 255, unique: ['wptServer', 'browser'])
-        dateCreated(nullable: false)
         active(nullable: false)
         valid(range: 0 .. 1)
         wptServer(nullable: false)
@@ -87,6 +86,6 @@ class Location {
 
     @Override	// Override toString for a nicer / more descriptive UI
     public String toString() {
-        return this.location + ' @ ' + this.wptServer.label + ' (' + this.browser.name + ')'
+        return this.location + ' @ ' + this.wptServer?.label + ' (' + this.browser?.name + ')'
     }
 }
