@@ -33,8 +33,9 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
-@Transactional
 class WeightingService {
+
+    static transactional = false
 
     CsiAggregationTagService csiAggregationTagService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
