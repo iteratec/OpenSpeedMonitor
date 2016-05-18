@@ -31,12 +31,12 @@ class PageController {
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index() {
-        redirect(action: "list", params: params)
+        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+        [pageInstanceList: Page.list(params), pageInstanceTotal: Page.count()]
     }
 
     def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
-        [pageInstanceList: Page.list(params), pageInstanceTotal: Page.count()]
+        redirect(action: "index", params: params)
     }
 
     def create() {

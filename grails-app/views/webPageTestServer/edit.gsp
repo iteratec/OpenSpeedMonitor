@@ -27,10 +27,8 @@
 		</fieldset>
 		<div class="form-actions">
 			<g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-			<a href="#DeleteModal" role="button" class="btn btn-danger" data-toggle="modal">${message(code: 'default.button.delete.label', default: 'Delete')}</a>
-  
-<%--			<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" /> --%>
-            <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+			<g:render template="/_common/modals/deleteSymbolLink"/>
+			<button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
 		</div>
 	</g:form>
 
