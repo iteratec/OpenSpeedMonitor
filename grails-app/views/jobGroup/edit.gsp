@@ -22,7 +22,7 @@
 	</div>
 	</g:hasErrors>
 
-	<g:form method="put" class="form-horizontal" >
+	<g:form resource="${jobGroup}" method="put" class="form-horizontal" >
 		<g:hiddenField name="id" value="${jobGroup?.id}" />
 		<g:hiddenField name="version" value="${jobGroup?.version}" />
 		<fieldset class="form">

@@ -19,7 +19,7 @@
 	</div>
 	</g:hasErrors>
 
-	<g:form method="put" class="form-horizontal" >
+	<g:form resource="${webPageTestServer}" method="put" class="form-horizontal" >
 		<g:hiddenField name="id" value="${webPageTestServer?.id}" />
 		<g:hiddenField name="version" value="${webPageTestServer?.version}" />
 		<fieldset class="form">
@@ -33,7 +33,7 @@
 	</g:form>
 
 </section>
-			
+
 </body>
 
 </html>

@@ -18,8 +18,7 @@
                 <g:renderErrors bean="${pageInstance}" as="list" />
             </div>
             </g:hasErrors>
-
-            <g:form method="put" class="form-horizontal" >
+            <g:form resource="${pageInstance}" method="put" class="form-horizontal" >
                 <g:hiddenField name="id" value="${pageInstance?.id}" />
                 <g:hiddenField name="version" value="${pageInstance?.version}" />
                 <fieldset class="form">

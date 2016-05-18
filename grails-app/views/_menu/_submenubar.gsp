@@ -21,7 +21,7 @@ This menu is used to show function that can be triggered on the content (an obje
 			<g:link action="create"><i class="fa fa-plus"></i> <g:message code="default.new.label"  args="[entityName]"/></g:link>
 		</li>
 
-		<g:if test="${ params.action == 'show' || params.action == 'edit' }">
+		<g:if test="${ params.action == 'show' || params.action == 'edit' || params.action == 'update' }">
 			<!-- the item is an object (not a list) -->
 			<li class="${ params.action == "edit" ? 'active' : '' }">
 				<g:link action="edit" id="${params.id}"><i class="fa fa-pencil"></i> <g:message code="default.edit.label"  args="[entityName]"/></g:link>
