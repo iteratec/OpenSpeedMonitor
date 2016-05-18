@@ -10,8 +10,11 @@
 
         <g:sortableColumn property="status" title="${message(code: 'batchActivity.status.label', default: 'Status')}"/>
 
-        <g:sortableColumn property="progress"
-                          title="${message(code: 'batchActivity.progress.label', default: 'Progress')}"/>
+        <g:sortableColumn property="stage"
+                          title="${message(code: 'batchActivity.stage.label', default: 'Stage')}"/>
+
+        <g:sortableColumn property="stepInStage"
+                          title="${message(code: 'batchActivity.stepInStage.label', default: 'Progress in Stage')}"/>
 
         <g:sortableColumn property="lastFailureMessage"
                           title="${message(code: 'batchActivity.lastFailureMessage.label', default: 'Last Failure Message')}"/>
@@ -19,7 +22,7 @@
         <g:sortableColumn property="startDate"
                           title="${message(code: 'batchActivity.startDate.label', default: 'Start Date')}"/>
 
-        <g:sortableColumn property="lastUpdated"
+        <g:sortableColumn property="lastUpdate"
                           title="${message(code: 'batchActivity.lastUpdated.label', default: 'Last Update')}"/>
 
         <g:sortableColumn property="endDate"

@@ -57,7 +57,6 @@ class BatchActivity {
         maximumStepsInStage(nullable: true)
         failures(nullable: true)
         endDate(nullable: true)
-
     }
 
     @Override

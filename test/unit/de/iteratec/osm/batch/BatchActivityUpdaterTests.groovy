@@ -48,7 +48,7 @@ class BatchActivityUpdaterTests extends Specification{
         int maximumStepsInStage = 13
         BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,updateInterval)
 
-        when:"We change some values on the updater, but didn't call update"
+        when:"We change some values on the updater and call update"
         updater.beginNewStage(stageDescription, maximumStepsInStage).addProgressToStage().addFailures().update()
         sleep(updateInterval+BatchActivityUpdater.DELAY)
 
@@ -71,7 +71,7 @@ class BatchActivityUpdaterTests extends Specification{
         int maximumStepsInStage = 13
         BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,updateInterval)
 
-        when:"We change some values on the updater, but didn't call update"
+        when:"We change some values on the updater and begin a new stage"
         updater.beginNewStage(stageDescription, maximumStepsInStage).addProgressToStage(10).update()
         sleep(updateInterval+BatchActivityUpdater.DELAY)
         updater.beginNewStage(updatedStageDescription, maximumStepsInStage).update()
@@ -94,7 +94,7 @@ class BatchActivityUpdaterTests extends Specification{
         sleep(1000) //to make sure the end date can later than the start date
         updater.beginNewStage("stage", 10).addProgressToStage(10).done()
 
-        then:"TH status of the BatchActivity should be done and their should be an enddate"
+        then:"The status of the BatchActivity should be done and their should be an end date"
         BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)
         batchActivity.status == Status.DONE
         batchActivity.endDate != null
@@ -106,6 +106,7 @@ class BatchActivityUpdaterTests extends Specification{
         String name = "Name"
         String domain = "Domain"
         BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,3,100)
+
         when:"We call done"
         3.times {stageCount ->
             updater.beginNewStage("stage", 10).update()
@@ -122,6 +123,21 @@ class BatchActivityUpdaterTests extends Specification{
         batchActivity.actualStage == 3
         batchActivity.stepInStage == 10
         batchActivity.endDate != null
+    }
+
+    def "test timeout"(){
+        given: "A new Updater"
+        String name = "Name"
+        String domain = "Domain"
+        BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,1,1, 1)
+
+        when:"We make an update but then exceed the timeout"
+        sleep(2000)
+
+        then:"The Updater should be cancelled and there should be no active timer"
+        BatchActivity batchActivity = BatchActivity.findByNameAndDomainAndActivity(name, domain, Activity.CREATE)
+        batchActivity.status == Status.CANCELLED
+
     }
 
 }
