@@ -1,10 +1,13 @@
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.util.ServiceMocker
+import grails.test.mixin.Mock
 
 /**
  * Created by nkuhn on 22.05.15.
@@ -181,5 +184,6 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         csiAggregationUpdateEventCleanupService.inMemoryConfigService.metaClass {
             areMeasurementsGenerallyEnabled { -> return true }
         }
+        ServiceMocker.create().mockBatchActivityService(csiAggregationUpdateEventCleanupService)
     }
 }

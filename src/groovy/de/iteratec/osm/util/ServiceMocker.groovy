@@ -22,6 +22,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
@@ -605,6 +606,14 @@ class ServiceMocker {
 				//do nothing
 		}
 		serviceToMockIn.metricReportingService = metricReportingService.createMock()
+	}
+
+	void mockBatchActivityService(serviceToMockIn){
+		BatchActivityService service = new BatchActivityService()
+		service.metaClass.getActiveBatchActivity = {Class c, Activity activity, String name, int maxStages, boolean observe ->
+			return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages, 5000)
+		}
+		serviceToMockIn.batchActivityService = service
 	}
 
 	/**

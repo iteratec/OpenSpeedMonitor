@@ -52,7 +52,7 @@ class DbCleanupServiceSpec {
     void setUp() {
         serviceUnderTest = service
         mocker = ServiceMocker.create()
-        serviceUnderTest.batchActivityService = new BatchActivityService()
+        mocker.mockBatchActivityService(service)
     }
 
     @Test
