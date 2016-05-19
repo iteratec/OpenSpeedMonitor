@@ -523,5 +523,8 @@ databaseChangeLog = {
     changeSet(author: "marko (generated)", id: "1459346200213-67") {
         dropNotNullConstraint(columnDataType: "boolean", columnName: "apply_validate_rule", tableName: "job_result")
     }
+    changeSet(author: "marko (generated)", id: "1459346200213-68") {
+        addDefaultValue(columnDataType: "boolean", columnName: "valid", defaultValueBoolean: "true", tableName: "api_key")
+    }
 
 }
