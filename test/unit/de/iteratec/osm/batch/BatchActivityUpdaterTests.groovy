@@ -91,8 +91,9 @@ class BatchActivityUpdaterTests extends Specification{
         BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,1,10)
         Date startDate = new Date()
         when:"We call done "
-        sleep(1000) //to make sure the end date can later than the start date
+        sleep(1000) // make sure the next update happens with another timestamp than the activity was started
         updater.beginNewStage("stage", 10).addProgressToStage(10).done()
+        sleep(1000) // make sure the timer run again
 
         then:"The status of the BatchActivity should be done and their should be an end date"
         BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)
@@ -115,6 +116,7 @@ class BatchActivityUpdaterTests extends Specification{
             }
         }
         updater.done()
+        sleep(1000) // make sure the timer ran agin
 
         then:"All attributes should be at the defined maximum"
         BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)

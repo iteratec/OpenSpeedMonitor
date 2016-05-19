@@ -1,5 +1,5 @@
 /**
- * Refreshes the table data every 5 seconds
+ * Refreshes the table data every 2 seconds
  * @param updateTableUrl
  *          url to update complete table (method updateTableMethod within BatchActivityController)
  * @param checkUrl
@@ -24,7 +24,7 @@ function updateIfNecessary(updateTableUrl, checkUrl, rowUpdateUrl) {
         } else {
             updateRows(ids,rowUpdateUrl);
         }
-    }, 500);
+    }, 2000);
 }
 
 /**

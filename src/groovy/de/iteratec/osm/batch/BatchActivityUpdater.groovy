@@ -116,14 +116,15 @@ class BatchActivityUpdater {
 
     public BatchActivityUpdater cancel(){
         setStatus(Status.CANCELLED)
-        finish()
+        endDate = new Date()
+        update()
         return this
     }
 
     public BatchActivityUpdater done(){
         setStatus(Status.DONE)
         endDate = new Date()
-        finish()
+        update()
         return this
     }
 
@@ -155,10 +156,10 @@ class BatchActivityUpdater {
         synchronized (snapshot) {
             if (!snapshot.isEmpty()) {
                 notEmpty = true
-                snapshot.each { key, value ->
-                    batchActivity."$key" = value
+                if(snapshot."status" == Status.DONE || snapshot."status" == Status.CANCELLED){
+                    cleanup()
                 }
-                snapshot.clear()
+                snapshotToDomain()
             }
         }
         if(notEmpty){
@@ -169,13 +170,19 @@ class BatchActivityUpdater {
         return notEmpty
     }
 
+    private void snapshotToDomain(){
+        snapshot.each { key, value ->
+            batchActivity."$key" = value
+        }
+        snapshot.clear()
+    }
+
     private void setStatus(Status status) {
         this.status = status
     }
 
-    private void finish(){
+    private void cleanup(){
         timer.cancel()
-        update()
-        saveUpdate()
+        timer.purge()
     }
 }
