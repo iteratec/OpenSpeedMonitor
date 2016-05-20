@@ -123,21 +123,25 @@ class EventController {
      * Combines time and date within the param list, where time ist 'time' and date is 'eventDate'
      * @param params
      */
-    private void combineDateAndTime(def params) {
+    private def combineDateAndTime(def params) {
         //Convert english date format to german, for passing validation
         //The gsp passes the time and the date separately so we need to combine these two
-        params['eventDate'] = params['eventDate'] + " " + params['time']
-        def formatter
-        params.remove('time')
-        def locale = RequestContextUtils.getLocale(request)
-        switch (locale) {
-            case Locale.GERMANY:
-            case Locale.GERMAN:
-                formatter = "dd.MM.yyyy HH:mm"
-                break;
-            default:
-                formatter = "yyyy-MM-dd HH:mm"
+        if(params['eventDate'] && params['time']) {
+            params['eventDate'] = params['eventDate'] + " " + params['time']
+            def formatter
+            params.remove('time')
+            def locale = RequestContextUtils.getLocale(request)
+            switch (locale) {
+                case Locale.GERMANY:
+                case Locale.GERMAN:
+                    formatter = "dd.MM.yyyy HH:mm"
+                    break;
+                default:
+                    formatter = "yyyy-MM-dd HH:mm"
+            }
+            return params['eventDate'] = Date.parse(formatter, params['eventDate'] as String)
+        } else {
+            return false
         }
-        params['eventDate'] = Date.parse(formatter, params['eventDate'] as String)
     }
 }

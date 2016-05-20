@@ -59,7 +59,7 @@ class EventService {
             def version = params.version.toLong()
             if (eventInstance.version > version) {
                 eventInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                        [message(code: 'event.label', default: 'Event')] as Object[],
+                        [message(code: 'event.label', default: 'Event')],
                         "Another user has updated this Event while you were editing")
                 delegateMap.action.failure.call()
                 return
