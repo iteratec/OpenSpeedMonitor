@@ -21,6 +21,7 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
@@ -354,7 +355,7 @@ class BootStrap {
         Browser.findByName(browserName) ?: new Browser(
                 name: browserName,
                 weight: 0)
-                .addToBrowserAliases(alias: Browser.UNDEFINED)
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias(Browser.UNDEFINED))
                 .save(failOnError: true)
 
         //IE
@@ -362,10 +363,10 @@ class BootStrap {
         Browser.findByName(browserName) ?: new Browser(
                 name: browserName,
                 weight: 1)
-                .addToBrowserAliases(alias: "IE")
-                .addToBrowserAliases(alias: "IE8")
-                .addToBrowserAliases(alias: "Internet Explorer")
-                .addToBrowserAliases(alias: "Internet Explorer 8")
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("IE"))
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("IE8"))
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Internet Explorer"))
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Internet Explorer 8"))
                 .save(failOnError: true)
 
         //FF
@@ -373,10 +374,10 @@ class BootStrap {
         Browser.findByName(browserName) ?: new Browser(
                 name: browserName,
                 weight: 1)
-                .addToBrowserAliases(alias: "FF")
-                .addToBrowserAliases(alias: "FF7")
-                .addToBrowserAliases(alias: "Firefox")
-                .addToBrowserAliases(alias: "Firefox7")
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("FF"))
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("FF7"))
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Firefox"))
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Firefox7"))
                 .save(failOnError: true)
 
         //Chrome
@@ -384,7 +385,7 @@ class BootStrap {
         Browser.findByName(browserName) ?: new Browser(
                 name: browserName,
                 weight: 1)
-                .addToBrowserAliases(alias: "Chrome")
+                .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Chrome"))
                 .save(failOnError: true)
 
         log.info "init measurement infrastructure OSM ends"
