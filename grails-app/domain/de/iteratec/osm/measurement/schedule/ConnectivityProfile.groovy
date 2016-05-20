@@ -36,17 +36,18 @@ class ConnectivityProfile {
     public static final int PLR_MIN = 0
 
     String name
-    Boolean active;
+    Boolean active
     Integer bandwidthDown
     Integer bandwidthUp
     Integer latency
     Integer packetLoss
 
     def beforeUpdate() {
-        if(this.getDirtyPropertyNames().size() == 1 && this.getDirtyPropertyNames().contains("active")) {
-            log.debug("Tried to update ConnectivityProfile, but got interrupted!")
+        if((this.getDirtyPropertyNames().size() == 2 && this.getDirtyPropertyNames().contains("active")&& this.getDirtyPropertyNames().contains("name"))||
+                (this.getDirtyPropertyNames().size() == 1 && (this.getDirtyPropertyNames().contains("active")|| this.getDirtyPropertyNames().contains("name")))) {
             return true;
         } else
+            log.debug("Tried to update ConnectivityProfile, but got interrupted!")
             return false;
     }
 
@@ -55,7 +56,7 @@ class ConnectivityProfile {
     }
 
     static constraints = {
-        name(blank: false, maxSize: 255)
+        name(unique: true, blank: false, maxSize: 255)
         bandwidthDown(min: BANDWIDTH_DOWN_MIN)
         bandwidthUp(min: BANDWIDTH_UP_MIN)
         latency(min: LATENCY_MIN)

@@ -1,3 +1,7 @@
+import de.iteratec.osm.csi.BrowserConnectivityWeight
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.ConnectivityProfileController
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificEventResultDashboard
 
@@ -526,5 +530,37 @@ databaseChangeLog = {
     changeSet(author: "marko (generated)", id: "1459346200213-68") {
         addDefaultValue(columnDataType: "boolean", columnName: "valid", defaultValueBoolean: "true", tableName: "api_key")
     }
+    changeSet(author: "marko", id: "1459346200213-69"){
+        grailsChange{
+            change{
+                ConnectivityProfile.withNewSession { session ->
+                    ConnectivityProfile.findAll().each{ConnectivityProfile connectivityProfile ->
+                        if (connectivityProfile.active == false &&!connectivityProfile.name.endsWith("_old_"+String.valueOf(connectivityProfile.id))) {
+                            newConnectivityProfile = ConnectivityProfile.findByNameAndActive(connectivityProfile.name, true)
+                            BrowserConnectivityWeight.findAllByConnectivity(connectivityProfile).each { BrowserConnectivityWeight oldBrowserConnectivityWeight ->
+                                BrowserConnectivityWeight newBrowserConnectivityWeight = new BrowserConnectivityWeight()
+                                newBrowserConnectivityWeight.browser = oldBrowserConnectivityWeight.browser
+                                newBrowserConnectivityWeight.weight = oldBrowserConnectivityWeight.weight
+                                newBrowserConnectivityWeight.connectivity = newConnectivityProfile
+                                CsiConfiguration.findAll().each {CsiConfiguration currentCsiConfiguration ->
+                                    if (currentCsiConfiguration.browserConnectivityWeights.contains(oldBrowserConnectivityWeight) ){
+                                        currentCsiConfiguration.browserConnectivityWeights.add(newBrowserConnectivityWeight)
+                                        currentCsiConfiguration.save(failOnError: true,flush:true)
+                                    }
+                                }
+                                newBrowserConnectivityWeight.save(failOnError: true,flush: true)
+                            }
+                            connectivityProfile.name += "_old_" + String.valueOf(connectivityProfile.id)
+                            connectivityProfile.save(failOnError: true,flush: true)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    changeSet(author: "marko (generated)", id: "1459346200213-70") {
+        addUniqueConstraint(columnNames: "name", constraintName: "UC_CONNECTIVITY_PROFILENAME_COL", tableName: "connectivity_profile")
+    }
+
 
 }

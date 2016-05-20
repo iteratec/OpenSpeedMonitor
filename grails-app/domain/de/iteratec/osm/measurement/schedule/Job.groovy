@@ -248,7 +248,7 @@ class Job implements Taggable {
         sort 'label':'asc'
         noTrafficShapingAtAll defaultValue: false
         customConnectivityProfile defaultValue: false
-        persistNonMedianResults defaultValue: true
+        persistNonMedianResults defaultValue: '1'
         label(index: 'label_idx')
     }
 

@@ -250,7 +250,7 @@ grails:
                             {pattern: '/rest/**',                                       access: ["permitAll"]},
                             {pattern: '/login/**',                                      access: ["permitAll"]},
                             {pattern: '/logout/**',                                     access: ["permitAll"]},
-                            {pattern: '/job/list',                                      access: ["permitAll"]},
+                            {pattern: '/job/index',                                     access: ["permitAll"]},
                             {pattern: '/job/saveJobSet',                                access: ["permitAll"]},
                             {pattern: '/job/getRunningAndRecentlyFinishedJobs',         access: ["permitAll"]},
                             {pattern: '/job/nextExecution',                             access: ["permitAll"]},

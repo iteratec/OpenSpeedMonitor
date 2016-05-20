@@ -6,7 +6,7 @@
 		<g:message code="job.label.label" default="label" /><span class="required-indicator">*</span>
 	</label>
 	<div class="span9">
-		<g:textField class="form-control width_31em" required="" name="label" value="${job?.label}" />
+		<g:textField class="form-control width_31em" name="label" value="${job?.label}" />
 	</div>
 </div>
 

@@ -345,9 +345,17 @@ public class EventResultDashboardShowAllCommand implements Validateable{
 
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
-        dashboardName(nullable: true)
-        //TODO: validators for trimAbove's and -Below's
-
+        trimAboveLoadTimes(nullable:true)
+        trimAboveRequestCounts(nullable: true)
+        trimAboveRequestSizes(nullable: true)
+        trimBelowLoadTimes(nullable:true)
+        trimBelowRequestCounts(nullable:true)
+        trimBelowRequestSizes(nullable:true)
+        debug(nullable:true)
+        setToHour(nullable:true)
+        setFromHour(nullable:true)
+        selectChartType(nullable:true)
+        aggrGroup(nullable:true)
     }
 
     /**
