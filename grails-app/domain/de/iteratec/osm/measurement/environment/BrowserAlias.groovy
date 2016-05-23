@@ -27,7 +27,6 @@ class BrowserAlias {
     static constraints = {
         alias(unique: true, nullable: false, maxSize: 255, validator: {String currentAlias ->
             if(currentAlias.trim() == "") {
-                def rk = 1 // I guess this delays execution - at least with this command here, the validation works and any errors are output in frontend correctly
                 return [
                     'de.iteratec.osm.measurement.environment.browserAlias.alias.validator.error'
                 ]
