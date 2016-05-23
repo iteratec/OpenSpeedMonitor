@@ -1115,7 +1115,7 @@ class CsiDashboardController {
         long expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / selectedAggregationIntervallInMintues)
         long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph
 
-        return expectedTotalNumberOfPoints > 10000
+        return expectedTotalNumberOfPoints > 50000
     }
 
     /**

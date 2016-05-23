@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
@@ -755,14 +754,14 @@ class EventResultDashboardController {
             expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / interval);
         }
 
-        if (expectedPointsOfEachGraph > 1000) {
+        if (expectedPointsOfEachGraph > 5000) {
             return true;
         } else {
 
             long expectedCountOfGraphs = countOfSelectedAggregatorTypes * countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser;
             long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph;
 
-            return expectedTotalNumberOfPoints > 10000;
+            return expectedTotalNumberOfPoints > 50000;
         }
     }
 
