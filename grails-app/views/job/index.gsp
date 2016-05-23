@@ -173,11 +173,6 @@
                     <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                 </a>
             </span>
-            <span style="float:right;margin-top: 12px;">
-                <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
-                   data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"
-                   style="text-decoration:none;color: #3a87ad;"></a>
-            </span>
         </div>
 
 
@@ -192,14 +187,23 @@
                 <th><input type="checkbox" id="checkAll"/></th>
                 <g:set var="titleHeader"><g:message code="de.iteratec.isj.job" default="Job"/><br/>
                     <span style="font-weight: normal"><g:message
-                            code="de.iteratec.iss.script" default="Skript"/></span></g:set>
+                            code="de.iteratec.iss.script" default="Skript"/>
+                    </span>
+                </g:set>
+                <g:set var="executionScheduleLabel"><g:message code="job.executionSchedule.label" default="Execution Schedule"/>
+                    <span style="float:right;margin-top: 12px;">
+                        <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
+                           data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"
+                           style="text-decoration:none;color: #3a87ad;"></a>
+                    </span>
+                </g:set>
                 <g:sortableColumn property="label" title="${titleHeader}"/>
                 <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>
                 <g:sortableColumn property="location.uniqueIdentifierForServer" titleKey="job.location.label"/>
                 <g:sortableColumn property="location.browser.name" titleKey="browser.label"/>
                 <g:sortableColumn property="lastRun" titleKey="job.lastRun.label" title="Zuletzt ausgeführt"/>
                 <g:sortableColumn property="nextExecutionTime" titleKey="job.nextRun.label"/>
-                <g:sortableColumn property="executionSchedule" titleKey="job.executionSchedule.label"/>
+                <g:sortableColumn property="executionSchedule" title="${executionScheduleLabel}"/>
                 <g:sortableColumn property="runs" titleKey="job.runs.label" title="Runs"/>
                 <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
             </tr>
