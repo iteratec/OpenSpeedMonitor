@@ -57,25 +57,22 @@ class BatchActivityUpdater {
         this.status = Status.ACTIVE
         this.maximumStages = maximumStages
         this.snapshot = [:]
-        createUpdateThread(updateInterval, timeoutInSeconds, name, domain, activity, maximumStages)
+        createActivity(name,domain,activity,maximumStages)
+        createUpdateThread(updateInterval, timeoutInSeconds)
     }
 
-    protected void createUpdateThread(int updateInterval, int timeoutInSeconds, String name, String domain, Activity activity, int maximumStages){
+    protected void createUpdateThread(int updateInterval, int timeoutInSeconds){
         executor = Executors.newScheduledThreadPool(1);
         BatchActivityUpdater updater = this
         future = executor.scheduleAtFixedRate(new Runnable() {
             DateTime lastSuccessfulUpdate = DateTime.now()
             @Override
             void run() {
-                if(updater.batchActivity == null){
-                    createActivity(name,domain,activity,maximumStages)
-                }
-
                 boolean updated = updater.saveUpdate()
                 if(updated){
                     lastSuccessfulUpdate = DateTime.now()
                 } else if((Seconds.secondsBetween(lastSuccessfulUpdate, DateTime.now()).seconds >= timeoutInSeconds)){
-                    //The last update was to long ago, we will cancel this activity
+                    //The last update was too long ago, we will cancel this activity
                     updater.cancel()
                 }
             }
@@ -198,7 +195,7 @@ class BatchActivityUpdater {
      */
     private void snapshotToDomain(){
         snapshot.each { key, value ->
-            batchActivity."$key" = value
+            batchActivity?."$key" = value
         }
         snapshot.clear()
     }

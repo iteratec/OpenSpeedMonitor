@@ -12,7 +12,7 @@ class BatchActivityUpdaterDummy extends BatchActivityUpdater {
     }
 
     @Override
-    protected void createUpdateThread(int updateInterval, int timeoutInSeconds, String name, String domain, Activity activity, int maximumStages){
+    protected void createUpdateThread(int updateInterval, int timeoutInSeconds){
         //do nothing
     }
     @Override
