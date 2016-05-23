@@ -136,22 +136,22 @@ dependencies {
     }
 }
 
-//task setupJasmine(type: NpmTask) {
-//    outputs.dir file('node_modules')
-//    args = ['install','--loglevel', 'error']
-//}
-//
-//task jasmineRun(type: NodeTask, dependsOn: ['setupJasmine']) {
-//    script = karmaExec
-//    args = ['start', karmaConfig, '--single-run']
-//}
-//
-//task jasmineWatch(type: NodeTask, dependsOn: 'setupJasmine') {
-//    script = karmaExec
-//    args = ['start', karmaConfig]
-//}
-//
-//test.dependsOn jasmineRun
+task setupJasmine(type: NpmTask) {
+    outputs.dir file('node_modules')
+    args = ['install','--loglevel', 'error']
+}
+
+task jasmineRun(type: NodeTask, dependsOn: ['setupJasmine']) {
+    script = karmaExec
+    args = ['start', karmaConfig, '--single-run']
+}
+
+task jasmineWatch(type: NodeTask, dependsOn: 'setupJasmine') {
+    script = karmaExec
+    args = ['start', karmaConfig]
+}
+
+test.dependsOn jasmineRun
 
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion

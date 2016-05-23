@@ -154,17 +154,17 @@ class ProxyService {
 
             try {
 
-                performanceLoggingService.logExecutionTime(DEBUG, "Start of listening to a new successful result of job ${jobLabel}: locking interruptibly", PerformanceLoggingService.IndentationDepth.THREE){
+//                performanceLoggingService.logExecutionTime(DEBUG, "Start of listening to a new successful result of job ${jobLabel}: locking interruptibly", PerformanceLoggingService.IndentationDepth.THREE){
                     lock.lockInterruptibly();
-                }
+//                }
 
-                performanceLoggingService.logExecutionTime(DEBUG, "Listening to a new successful result of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.THREE){
+//                performanceLoggingService.logExecutionTime(DEBUG, "Listening to a new successful result of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.THREE){
                     this.listener.each {
                         it.listenToResult(
                                 xmlResultResponse,
                                 wptserverOfResult
                         )
-                    }
+//                    }
                 }
 
             } finally {
