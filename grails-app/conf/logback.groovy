@@ -114,7 +114,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
             pattern = "%c{2} %m%n"
         }
         filter(ThresholdFilter) {
-            level = ERROR
+            level = WARN
         }
     }
     appenders << "CONSOLE"
