@@ -380,6 +380,8 @@ class JobController {
     def cancelJobRun(long jobId, String testId) {
         Job job = Job.get(jobId)
         jobProcessingService.cancelJobRun(job, testId)
+
+        render(view: 'index', model: getListModel() << [filters: params.filters, saveSuccess: i18nService.msg("de.iteratec.osm.job.jobCancelSuccess", "success")])
     }
 
     /**
