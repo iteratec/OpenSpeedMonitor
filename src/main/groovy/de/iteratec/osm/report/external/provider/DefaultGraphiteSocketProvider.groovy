@@ -34,7 +34,6 @@ public class DefaultGraphiteSocketProvider implements GraphiteSocketProvider {
 
 	@Override
 	public GraphiteSocket getSocket(GraphiteServer server, GraphiteSocketProvider.Protocol protocol) {
-		println "aaaaaaaaaaaaa"
 		if(protocol.equals(GraphiteSocketProvider.Protocol.TCP)) {
 			return getSocket(server);
 		} else {

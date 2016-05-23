@@ -1,7 +1,9 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.BrowserConnectivityWeight
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -11,7 +13,7 @@ import grails.test.mixin.TestFor
 import spock.lang.Specification
 
 @TestFor(ConnectivityProfileController)
-@Mock([ConnectivityProfileService, ConnectivityProfile, CsiAggregation, Job, CsiAggregationInterval, AggregatorType, Script, Location, JobGroup])
+@Mock([ConnectivityProfileService, ConnectivityProfile, CsiAggregation, Job, CsiAggregationInterval, AggregatorType, Script, Location, JobGroup,BrowserConnectivityWeight])
 class ConnectivityProfileControllerSpec extends Specification {
 
     ConnectivityProfileController controllerUnderTest
@@ -46,6 +48,7 @@ class ConnectivityProfileControllerSpec extends Specification {
 
         when:
         params.bandwidthDown = 6000
+        request.method = 'PUT'
         controller.update()
 
         then:
@@ -64,6 +67,7 @@ class ConnectivityProfileControllerSpec extends Specification {
 
         when:
         params.bandwidthDown = 6000
+        request.method = 'PUT'
         controller.update()
 
         then:

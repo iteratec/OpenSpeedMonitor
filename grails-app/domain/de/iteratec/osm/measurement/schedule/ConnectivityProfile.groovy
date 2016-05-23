@@ -42,15 +42,6 @@ class ConnectivityProfile {
     Integer latency
     Integer packetLoss
 
-    def beforeUpdate() {
-        if((this.getDirtyPropertyNames().size() == 2 && this.getDirtyPropertyNames().contains("active")&& this.getDirtyPropertyNames().contains("name"))||
-                (this.getDirtyPropertyNames().size() == 1 && (this.getDirtyPropertyNames().contains("active")|| this.getDirtyPropertyNames().contains("name")))) {
-            return true;
-        } else
-            log.debug("Tried to update ConnectivityProfile, but got interrupted!")
-            return false;
-    }
-
     static mapping = {
         active defaultValue: true
     }

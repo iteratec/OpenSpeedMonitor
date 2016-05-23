@@ -171,9 +171,7 @@ class HarFetchService {
         URL hARURL = getHARURL(testDetailsWaterfallURL)
         String baseUrl = "${hARURL.getProtocol()}://${hARURL.getHost()}"
         String path = hARURL.getPath()
-        println baseUrl+path
         Map query = httpRequestService.splitQueryStringToMap(hARURL.getQuery())
-        println query
         return getResponse(baseUrl, path, query)
     }
 

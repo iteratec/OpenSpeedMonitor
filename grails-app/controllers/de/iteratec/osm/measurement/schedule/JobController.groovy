@@ -283,7 +283,6 @@ class JobController {
 
     def toggleActive(boolean active) {
         handleSelectedJobs { Job job, Map<Long, Object> massExecutionResults ->
-            println job.label
             job.active = active
             if (job.save(flush: true)) {
                 massExecutionResults[job.id] = [status : 'success',

@@ -368,14 +368,14 @@ class JobProcessingService {
 		int statusCode
 		try
 		{
-//            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
                 statusCode = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
-//            }
-//            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
+            }
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
                 if (statusCode < 200){
                     persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
                 }
-//            }
+            }
 		} catch (Exception e) {
 			statusCode = 400
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
