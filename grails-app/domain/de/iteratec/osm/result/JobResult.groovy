@@ -251,7 +251,7 @@ class JobResult {
 	 * Returns a status message matching the integer value stored in statusCode
 	 * such as 'Pending' for statusCode 100 and so forth
 	 */
-	public String getSatusCodeMessage() {
+	public String getStatusCodeMessage() {
 		def state = [0: 'Failure', 100: 'Pending', 101: 'Running', 200: 'Finished', 400: 'Error', 404: 'Not found', 504: 'Timeout']
 		def str = state[httpStatusCode]
 		return str ?: 'Unknown'

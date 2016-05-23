@@ -187,7 +187,7 @@ class QueueAndJobStatusService {
                     status    : result.httpStatusCode,
                     date      : result.date,
                     terminated: result.httpStatusCode >= 200,
-                    message   : result.getSatusCodeMessage() + (result.httpStatusCode >= 400 && result.wptStatus ? ': ' + result.wptStatus : ''),
+                    message   : result.getStatusCodeMessage() + (result.httpStatusCode >= 400 && result.wptStatus ? ': ' + result.wptStatus : ''),
                     wptStatus : result.wptStatus,
                     testUrl   : (result.wptServerBaseurl.endsWith('/') ? result.wptServerBaseurl : "${result.wptServerBaseurl}/") + "result/${result.testId}"]
         }

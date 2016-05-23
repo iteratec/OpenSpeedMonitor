@@ -93,7 +93,7 @@
 								<tr data-statuscode="${jobResult.httpStatusCode}">
 								<td>
                   <a href="${jobResult.wptServerBaseurl}result/${jobResult.testId}/">${jobResult.getSatusCodeMessage()}</a>
-                  <%-- <a href="../job/edit/${jobResult.job.id}">${jobResult.getSatusCodeMessage()}</a> --%>
+                  <%-- <a href="../job/edit/${jobResult.job.id}">${jobResult.getStatusCodeMessage()}</a> --%>
 								 </td>
 								 <td>
 									<g:render template="../job/timeago" model="${[date: jobResult.date]}" />
