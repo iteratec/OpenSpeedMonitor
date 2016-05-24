@@ -70,7 +70,7 @@ class PaginationService {
 		SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
 		
 		String paginationLink = grailsLinkGenerator.link([
-				'controller': 'eventResult',
+				'controller': 'tabularResultPresentation',
 				'action': 'showListResultsForJob',
 				'params': [
 						'selectedTimeFrameInterval': 0,
