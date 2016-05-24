@@ -215,6 +215,17 @@ class CsiAggregationDaoService {
 			'in'("csiAggregationId", csiAggregationIds)
 		}
 	}
+
+	/**
+	 * Returns the last {@link CsiAggregationUpdateEvent} for the given csiAggregationId
+	 * @param csiAggregationId
+	 * @return the last {@link CsiAggregationUpdateEvent}
+     */
+	public CsiAggregationUpdateEvent getLatestUpdateEvent(Long csiAggregationId) {
+		return CsiAggregationUpdateEvent.findByCsiAggregationId(csiAggregationId,
+				[sort: "dateOfUpdate", order: "desc"])
+	}
+
 	/**
 	 * Returns all {@link CsiAggregationUpdateEvent}s for given {@link CsiAggregation}-id csiAggregationId.
 	 * @param csiAggregationId

@@ -23,6 +23,7 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.spock.IntegrationSpec
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -364,6 +365,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     private void mocksCommonToAllTests(){
         mockedExecTimeOfCleanup = new DateTime(2014,7,7,5,30,0, DateTimeZone.UTC)
         CsiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
+        ServiceMocker.create().mockBatchActivityService(csiAggregationUpdateEventCleanupService)
     }
 
     private void createTestdataCommonToAllTests(){

@@ -317,6 +317,39 @@ class CsiAggregationDaoServiceSpec {
 		openAndExpired = serviceUnderTest.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(300)
 		assertThat(openAndExpired.size(), is(3))
 	}
+
+	@Test
+	public void testGetLatestUpdateEvent() {
+		//create test-specific data
+		Date date_20140905 = new DateTime(2014,9,5,0,0,0,DateTimeZone.UTC).toDate()
+		Date date_20140912 = new DateTime(2014,9,12,0,0,0,DateTimeZone.UTC).toDate()
+		Date date_20140919 = new DateTime(2014,9,19,0,0,0,DateTimeZone.UTC).toDate()
+		CsiAggregation csiAggregation = createAndSaveCsiAggregation(weeklyInterval, shopAggregator, false, date_20140905)
+		new CsiAggregationUpdateEvent(
+				dateOfUpdate: date_20140905,
+				csiAggregationId: csiAggregation.ident(),
+				updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
+		).save(failOnError: true)
+
+		new CsiAggregationUpdateEvent(
+				dateOfUpdate: date_20140912,
+				csiAggregationId: csiAggregation.ident(),
+				updateCause: CsiAggregationUpdateEvent.UpdateCause.CALCULATED
+		).save(failOnError: true)
+
+		new CsiAggregationUpdateEvent(
+				dateOfUpdate: date_20140919,
+				csiAggregationId: csiAggregation.ident(),
+				updateCause: CsiAggregationUpdateEvent.UpdateCause.OUTDATED
+		).save(failOnError: true)
+
+		// Test execution
+		CsiAggregationUpdateEvent updateEvent = serviceUnderTest.getLatestUpdateEvent(csiAggregation.ident())
+
+		// assertions
+		assertEquals(date_20140919, updateEvent.dateOfUpdate)
+		assertEquals(CsiAggregationUpdateEvent.UpdateCause.OUTDATED, updateEvent.updateCause)
+	}
 	
 	private CsiAggregation createAndSaveCsiAggregation(CsiAggregationInterval interval, AggregatorType aggregator, boolean closedAndCalculated, Date started){
 		double valueNotOfInterestInTheseTests = 42d
