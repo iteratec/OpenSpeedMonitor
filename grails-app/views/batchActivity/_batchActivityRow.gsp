@@ -9,7 +9,7 @@
 
     <td>${batchActivityInstance.actualStage}/${batchActivityInstance.maximumStages}</td>
 
-    <td>${batchActivityInstance.stepInStage}/${batchActivityInstance.maximumStepsInStage}</td>
+    <td>${batchActivityInstance.calculateProgressInStage()}</td>
 
     <td>${fieldValue(bean: batchActivityInstance, field: "lastFailureMessage")}</td>
 

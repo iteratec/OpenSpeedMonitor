@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.batch
 
+import java.text.DecimalFormat
+
 /**
  * BatchActivity
  * Representation of a batch activity like job deletion
@@ -57,6 +59,16 @@ class BatchActivity {
         maximumStepsInStage(nullable: true)
         failures(nullable: true)
         endDate(nullable: true)
+    }
+
+    /**
+     * Creates a String representation for BatchActivity progress in stage
+     * @return formatted string
+     */
+    public String calculateProgressInStage() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        if (maximumStepsInStage == 0) return df.format(0) + " %"
+        return df.format(100.0 / maximumStepsInStage * stepInStage) + " %";
     }
 
     @Override
