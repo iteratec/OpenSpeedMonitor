@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -32,6 +33,7 @@ import org.joda.time.format.DateTimeFormatter
  * GraphiteEventService
  * A service to fetch Events from GraphiteServers.
  */
+@Transactional
 class GraphiteEventService {
 
     EventDaoService eventDaoService
@@ -41,7 +43,6 @@ class GraphiteEventService {
 
     static final DateTimeFormatter GRAPHITE_RENDERING_ENGINES_DATETIME_FORMAT =  DateTimeFormat.forPattern("HH:mm_yyyyMMdd")
 
-    static transactional = true
 
     /**
      * Iterates over all existing GraphiteServers. If they got any GraphiteEventSourcePath,

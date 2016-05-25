@@ -37,7 +37,6 @@ class HarFetchService {
     int maximumTries = 5
     int waitTime = 5000
 
-    static transactional = false
     /**
      * Find the newest x JobResults without a persisted HAR and fetches the HAR Data to persist it
      * @param max maximum amount of JobResults to search

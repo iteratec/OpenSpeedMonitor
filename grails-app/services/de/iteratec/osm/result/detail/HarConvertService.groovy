@@ -20,14 +20,15 @@ package de.iteratec.osm.result.detail
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import grails.transaction.Transactional
 
 /**
  * HarConvertService
  * The whole purpose of this service is to convert HAR Archives to a readable format for our system
  */
+@Transactional
 class HarConvertService {
 
-    static transactional = true
 
 
     public List<AssetGroup> convertHarToAssetGroups(Map har, JobResult result){

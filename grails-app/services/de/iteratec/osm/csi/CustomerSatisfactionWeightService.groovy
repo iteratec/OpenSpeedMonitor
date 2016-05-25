@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.util.I18nService
+import grails.transaction.Transactional
 
 import java.util.regex.Pattern
 
@@ -32,6 +33,7 @@ import de.iteratec.osm.measurement.environment.Browser
  * @author nkuhn
  *
  */
+@Transactional
 class CustomerSatisfactionWeightService {
 
     I18nService i18nService

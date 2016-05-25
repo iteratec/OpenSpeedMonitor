@@ -16,14 +16,16 @@
 */
 
 package de.iteratec.osm.report.chart
+
+import grails.transaction.Transactional
+
 /**
  * CsiAggregationUpdateEventDaoService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class CsiAggregationUpdateEventDaoService {
 
-    static transactional = true
-	
 	/**
 	 * Writes a new {@link CsiAggregationUpdateEvent} with dateOfUpdate = NOW.
 	 * @param csiAggregationId

@@ -46,8 +46,6 @@ import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
  */
 class LocationAndResultPersisterService implements iListener{
 
-	static transactional = false
-	
 	public static final String STATIC_PART_WATERFALL_ANCHOR = '#waterfall_view'
 	
 	BrowserService browserService

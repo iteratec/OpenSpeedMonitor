@@ -19,6 +19,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.report.ui.PaginationListing
 import de.iteratec.osm.report.ui.PaginationListingRow
+import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 
 import java.text.SimpleDateFormat
@@ -28,6 +29,7 @@ import java.text.SimpleDateFormat
  * @author rhc
  *
  */
+@Transactional
 class PaginationService {
 
 	LinkGenerator grailsLinkGenerator

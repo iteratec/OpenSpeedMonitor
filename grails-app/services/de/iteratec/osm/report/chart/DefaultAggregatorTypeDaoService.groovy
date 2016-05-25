@@ -18,6 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import grails.transaction.Transactional
 
 /**
  * <p>
@@ -27,6 +28,7 @@ import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
  * @author mze
  * @since IT-74
  */
+@Transactional
 class DefaultAggregatorTypeDaoService implements AggregatorTypeDaoService {
 
 	@Override

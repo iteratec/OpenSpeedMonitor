@@ -18,19 +18,20 @@
 package de.iteratec.osm
 
 import de.iteratec.osm.csi.CsiTransformation
+import grails.transaction.Transactional
 
 /**
  * ConfigService
  * Delivers application-wide configurations from backend.
  * @see OsmConfiguration
  */
+@Transactional
 class ConfigService {
 
 	def grailsApplication
 
 	InMemoryConfigService inMemoryConfigService
 
-    static transactional = true
 
 	/**
 	 * Gets detail-data storage time in weeks from osm-configuration.

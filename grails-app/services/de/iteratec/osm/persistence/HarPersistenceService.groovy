@@ -35,7 +35,6 @@ class HarPersistenceService {
 
     JobResultDaoService jobResultDaoService
     HarConvertService harConvertService
-    static transactional = false
 
 
     /**

@@ -27,7 +27,6 @@ import sun.misc.BASE64Decoder
  */
 class OsmCookieService {
 
-    static transactional = false
 
     CookieService cookieService
 

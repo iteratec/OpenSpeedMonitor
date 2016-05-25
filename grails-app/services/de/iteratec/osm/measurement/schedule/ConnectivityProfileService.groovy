@@ -29,7 +29,6 @@ import static de.iteratec.osm.util.Constants.*
  */
 class ConnectivityProfileService {
 
-    static transactional = false
 
     @Deprecated
     static final String CUSTOM_CONNECTIVITY_NAME_FOR_NATIVE = 'Native (No Traffic Shaping)'

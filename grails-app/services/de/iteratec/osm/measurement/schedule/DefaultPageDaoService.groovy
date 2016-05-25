@@ -19,6 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import grails.transaction.Transactional
 
 /**
  * <p>
@@ -28,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.dao.PageDaoService
  * @author nkuhn
  * @author mze
  */
+@Transactional
 class DefaultPageDaoService implements PageDaoService {
 
 	@Override

@@ -27,8 +27,6 @@ import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
  */
 class OsmChartProcessingService {
 
-    static transactional = false
-
     I18nService i18nService
 
     OsmRickshawChart summarizeCsiGraphs(List<OsmChartGraph> graphs) {

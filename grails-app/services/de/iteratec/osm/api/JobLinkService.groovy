@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.result.PageService
+import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
@@ -29,9 +30,9 @@ import org.joda.time.DateTime
  * JobResultLinkService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class JobLinkService {
 
-    static transactional = true
 
     LinkGenerator grailsLinkGenerator
     PageService pageService

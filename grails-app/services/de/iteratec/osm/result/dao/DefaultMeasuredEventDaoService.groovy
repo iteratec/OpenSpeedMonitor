@@ -19,6 +19,7 @@ package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.MeasuredEvent
+import grails.transaction.Transactional
 
 /**
  * <p>
@@ -28,6 +29,7 @@ import de.iteratec.osm.result.MeasuredEvent
  * @author nkuhn
  * @author mze
  */
+@Transactional
 class DefaultMeasuredEventDaoService implements MeasuredEventDaoService {
 
 	@Override

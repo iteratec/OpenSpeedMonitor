@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.report.chart.OsmChartProcessingService
 import de.iteratec.osm.report.chart.OsmRickshawChart
+import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 
 import static de.iteratec.osm.util.Constants.*
@@ -47,6 +48,7 @@ import org.joda.time.format.DateTimeFormatter
 /**
  * Provides methods to get {@link CsiAggregation}s from db and transform them into a chart processable format.
  */
+@Transactional
 class CustomerSatisfactionHighChartService {
 
 	/**

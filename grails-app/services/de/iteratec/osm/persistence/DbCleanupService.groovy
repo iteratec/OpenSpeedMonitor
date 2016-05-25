@@ -36,7 +36,6 @@ import grails.gorm.DetachedCriteria
  */
 class DbCleanupService {
 
-    static transactional = false
 
     BatchActivityService batchActivityService
 	EventResultDaoService eventResultDaoService

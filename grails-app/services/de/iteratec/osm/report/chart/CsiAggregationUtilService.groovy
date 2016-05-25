@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.transaction.Transactional
+
 import static org.joda.time.DateTimeConstants.*
 
 import org.joda.time.DateTime
@@ -37,6 +39,7 @@ import org.joda.time.Interval
  * @TODO TODO mze-2013-07-12: Name possibly not matching. This service seems to
  *       handle intervals calculations and not measured values explicitly!?
  */
+@Transactional
 class CsiAggregationUtilService {
 
 	/**

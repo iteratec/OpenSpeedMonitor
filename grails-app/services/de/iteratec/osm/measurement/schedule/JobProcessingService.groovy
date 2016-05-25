@@ -24,12 +24,14 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.Transactional
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.quartz.*
 import org.hibernate.StaleObjectStateException
+import org.springframework.transaction.annotation.Propagation
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -66,8 +68,6 @@ enum TriggerGroup {
  * @author dri
  */
 class JobProcessingService {
-
-    static transactional = false
 
 	ProxyService proxyService
 	def quartzScheduler
@@ -162,8 +162,8 @@ class JobProcessingService {
 	 * specified Job/test is running and that this is not the result of a finished
 	 * test execution.
 	 */
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	private JobResult persistUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus = null) {
-
 		// If no testId was provided some error occurred and needs to be logged
 		JobResult result
 		if (testId) {
@@ -181,16 +181,13 @@ class JobProcessingService {
         }
 
 	}
-
     private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus){
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
-
         if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)){
 
             updateStatus(result, statusCode, wptStatus)
 
             try{
-
                 result.save(failOnError: true, flush: true)
 
             }catch(StaleObjectStateException staleObjectStateException){

@@ -26,7 +26,6 @@ import grails.transaction.Transactional
 
 class TimeToCsMappingService {
 
-    static transactional = false
 
     TimeToCsMappingCacheService timeToCsMappingCacheService
     ConfigService configService

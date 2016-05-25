@@ -20,12 +20,13 @@ package de.iteratec.osm.result
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.CsiValue
 import de.iteratec.osm.report.chart.CsiAggregation
+import grails.transaction.Transactional
 
 
+@Transactional
 class CsiValueService {
 
     OsmConfigCacheService osmConfigCacheService
-    static transactional = true
 
     /**
      * Whether or not this value should be factored in csi-calculations.

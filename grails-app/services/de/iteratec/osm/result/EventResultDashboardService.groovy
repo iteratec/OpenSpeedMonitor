@@ -35,6 +35,7 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import grails.transaction.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
@@ -46,6 +47,7 @@ import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
  * A utility service for the event result dashboard and related operations.
  * </p>
  */
+@Transactional
 public class EventResultDashboardService {
 
     BrowserDaoService browserDaoService

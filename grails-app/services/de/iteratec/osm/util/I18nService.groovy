@@ -22,7 +22,6 @@ import org.springframework.context.i18n.LocaleContextHolder
 
 class I18nService {
 
-	boolean transactional = false
 
 	MessageSource messageSource
 

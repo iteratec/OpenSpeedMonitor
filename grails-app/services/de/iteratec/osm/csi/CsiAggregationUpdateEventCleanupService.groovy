@@ -36,8 +36,6 @@ import grails.gorm.DetachedCriteria
  */
 class CsiAggregationUpdateEventCleanupService {
 
-    static transactional = false
-
     CsiAggregationDaoService csiAggregationDaoService
     PageCsiAggregationService pageCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService

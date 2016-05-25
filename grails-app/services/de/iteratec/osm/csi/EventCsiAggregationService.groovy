@@ -20,6 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.result.CsiValueService
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
@@ -40,6 +41,7 @@ import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import de.iteratec.osm.measurement.environment.BrowserService
 
+@Transactional
 class EventCsiAggregationService {
 	
 	CsiAggregationTagService csiAggregationTagService

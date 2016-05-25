@@ -20,6 +20,7 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.csi.CsiSystem
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.persistence.OsmDataSourceService
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
@@ -34,6 +35,7 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
+@Transactional
 class CsiAggregationDaoService {
 	
 	CsiAggregationUtilService csiAggregationUtilService

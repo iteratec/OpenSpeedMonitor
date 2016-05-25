@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -24,9 +25,9 @@ import org.springframework.dao.DataIntegrityViolationException
  * EventService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class EventService {
 
-    static transactional = true
 
     /**
      * Deletes an Event, if this action will be successful action.success will be called,

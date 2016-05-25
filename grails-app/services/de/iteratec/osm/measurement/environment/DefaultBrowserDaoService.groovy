@@ -18,10 +18,12 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import grails.transaction.Transactional
 
 /**
  * Default implementation for {@link de.iteratec.osm.measurement.environment.dao.BrowserDaoService}.
  */
+@Transactional
 class DefaultBrowserDaoService implements BrowserDaoService {
 
 	@Override

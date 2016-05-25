@@ -46,8 +46,6 @@ interface iListener {
  */
 class ProxyService {
 	
-	static transactional = false
-	
 	protected List<iListener> listener = new ArrayList<iListener>()
 	private final ReentrantLock lock = new ReentrantLock()
 	

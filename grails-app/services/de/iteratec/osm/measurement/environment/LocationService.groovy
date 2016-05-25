@@ -17,10 +17,13 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.transaction.Transactional
+
 /**
  * @deprecated Move database access to {@link de.iteratec.osm.measurement.environment.dao.LocationDaoService}.
  */
 @Deprecated
+@Transactional
 class LocationService {
 
 	/**

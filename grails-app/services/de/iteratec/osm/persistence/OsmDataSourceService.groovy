@@ -17,12 +17,14 @@
 
 package de.iteratec.osm.persistence
 
-import de.iteratec.osm.ConfigService;
+import de.iteratec.osm.ConfigService
+import grails.transaction.Transactional;
 
 /**
  * OsmDataSourceService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class OsmDataSourceService {
 	
 	ConfigService configService	

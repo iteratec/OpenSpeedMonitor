@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result.detail
 
+import grails.transaction.Transactional
 import groovy.json.JsonSlurper
 
 import org.joda.time.DateTime
@@ -29,11 +30,11 @@ import de.iteratec.osm.result.PageService
 /**
  * The HarParserService transforms HAR files into WebPerformanceWaterfalls.
  */
+@Transactional
 class HarParserService {
 
 	PageService pageService
 	
-    static transactional = true
 	/**
 	 * Software wpt-monitor (http://www.wptmonitor.org/) adds this suffix to the job-names before transmitting it as event name to wpt-servers. 
 	 */

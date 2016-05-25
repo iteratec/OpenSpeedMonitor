@@ -35,7 +35,6 @@ import org.joda.time.DateTime
  */
 class WeightingService {
 
-    static transactional = false
 
     CsiAggregationTagService csiAggregationTagService
     CustomerSatisfactionWeightService customerSatisfactionWeightService

@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import grails.transaction.Transactional
 
 /**
  * <p>
@@ -27,6 +28,7 @@ import de.iteratec.osm.measurement.environment.dao.LocationDaoService
  * @author nkuhn
  * @author mze
  */
+@Transactional
 class DefaultLocationDaoService implements LocationDaoService {
 
 	@Override

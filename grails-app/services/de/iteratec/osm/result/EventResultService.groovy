@@ -20,6 +20,7 @@ package de.iteratec.osm.result
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 import java.util.zip.GZIPInputStream
@@ -29,6 +30,7 @@ import java.util.zip.GZIPInputStream
  * @author fpavkovic, nkuhn
  *
  */
+@Transactional
 class EventResultService {
 	
 	JobResultDaoService jobResultDaoService

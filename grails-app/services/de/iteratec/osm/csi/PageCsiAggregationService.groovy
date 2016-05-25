@@ -18,6 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import grails.transaction.Transactional
 
 import static de.iteratec.osm.util.Constants.*
 
@@ -46,6 +47,7 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 
+@Transactional
 class PageCsiAggregationService {
 
     EventCsiAggregationService eventCsiAggregationService

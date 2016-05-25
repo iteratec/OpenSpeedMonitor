@@ -2,7 +2,6 @@ package de.iteratec.osm.batch
 
 class BatchActivityService {
 
-    static transactional = false
 
 
     /**

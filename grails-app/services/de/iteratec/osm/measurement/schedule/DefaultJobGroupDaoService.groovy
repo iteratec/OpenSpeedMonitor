@@ -18,6 +18,7 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import grails.transaction.Transactional
 
 /**
  * <p>
@@ -27,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
  * @author nkuhn
  * @author mze
  */
+@Transactional
 class DefaultJobGroupDaoService implements JobGroupDaoService {
 
 	@Override
