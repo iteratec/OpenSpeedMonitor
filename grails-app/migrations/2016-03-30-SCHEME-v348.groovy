@@ -354,5 +354,13 @@ databaseChangeLog = {
 			''')
 	}
 
+	changeSet(author: "bwo (generated)", id: "1464157353626-1") {
+		addColumn(tableName: "osm_configuration") {
+			column(name: "max_batch_activity_storage_time_in_days", type: "integer", defaultValue: 30) {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
 //	  ### END BatchActivity Refactoring
 }

@@ -18,6 +18,7 @@
 package de.iteratec.osm.persistence
 
 import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.report.chart.CsiAggregation
@@ -158,5 +159,48 @@ class DbCleanupService {
 
         log.info "end with deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore"
     }
+
+    /**
+     * Deletes all {@link BatchActivity}s before date toDeleteBefore.
+     * @param toDeleteBefore	All BatchActivities before this date get deleted.
+     */
+    void deletBatchActivityDataBefore(Date toDeleteBefore, boolean createBatchActivity = true){
+        String jobName = "Nightly cleanup of BatchActivities"
+        log.info "begin with $jobName"
+
+        // use gorm-batching
+        def dc = new DetachedCriteria(BatchActivity).build {
+            lt 'startDate', toDeleteBefore
+        }
+        int count = dc.count()
+
+
+        if(count > 0 && !batchActivityService.runningBatch(BatchActivity.class, jobName, Activity.DELETE)) {
+            BatchActivityUpdater batchActivityUpdater = batchActivityService.getActiveBatchActivity(BatchActivity.class, Activity.DELETE, jobName, 1, createBatchActivity)
+            batchActivityUpdater.beginNewStage("Delete BatchActivites", count).update()
+            //batch size -> hibernate doc recommends 10..50
+            int batchSize = 50
+            0.step(count, batchSize) { int offset ->
+                BatchActivity.withNewTransaction {
+                    def list = dc.list(max: batchSize)
+                    list.each { BatchActivity batchActivity ->
+                        try {
+                            batchActivity.delete()
+                            batchActivityUpdater.addProgressToStage().update()
+                        } catch (Exception e) {
+                            batchActivityUpdater.addFailures().setLastFailureMessage("Couldn't delete BatchActivity ${batchActivity.id}")
+                        }
+                    }
+                }
+                //clear hibernate session first-level cache
+                JobResult.withSession { session -> session.clear() }
+            }
+            batchActivityUpdater.done()
+        }
+
+        log.info "end with $jobName"
+    }
+
+
 }
 

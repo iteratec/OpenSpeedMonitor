@@ -22,7 +22,7 @@ class BatchActivityService {
      * @return
      */
     public boolean runningBatch(Class c, String name, Activity activity) {
-        return (BatchActivity.findByNameAndDomainAndActivityAndStatus(name, c.toString(), activity, Status.ACTIVE) != null)
+        return (BatchActivity.findByNameAndDomainAndActivityAndStatus(name, c.name, activity, Status.ACTIVE) != null)
     }
 
 }

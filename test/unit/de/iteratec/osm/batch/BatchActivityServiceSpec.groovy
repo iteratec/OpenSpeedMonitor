@@ -32,14 +32,39 @@ import org.junit.*
 @Mock(BatchActivity)
 class BatchActivityServiceSpec extends Specification {
 
-    BatchActivityService serviceUnderTest
+    BatchActivityService serviceUnderTest = service
 
-    void "testBatchActivityCreation"() {
-         when:
-           true
-            //TODO
-         then:
-           true
+    void "testGetBatchActivity"() {
+        given:
+        String name = "BatchActivityCreateTest"
+        Class aClass = this.class
+        Activity activity = Activity.CREATE
+
+        when: "We order a BatchActivityUpdater from this service"
+        BatchActivityUpdater updater = serviceUnderTest.getActiveBatchActivity(aClass, activity, name, 1, true)
+
+        then: "The underlying BatchActivity should be persisted"
+        BatchActivity.count() == 1
+        serviceUnderTest.runningBatch(aClass,name, activity)
+
+        cleanup:
+        updater.cancel()
+    }
+
+    void "testGetBatchActivityDummy"() {
+        given:
+        String name = "BatchActivityCreateTest"
+        Class aClass = this.class
+        Activity activity = Activity.CREATE
+
+        when: "We order a BatchActivityUpdaterDummy from this service"
+        BatchActivityUpdater updater = serviceUnderTest.getActiveBatchActivity(aClass, activity, name, 1, false)
+
+        then: "The should'nt be a real BatchActivity"
+        !serviceUnderTest.runningBatch(aClass,name, activity)
+
+        cleanup:
+        updater.cancel()
     }
 
 }

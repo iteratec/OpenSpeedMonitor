@@ -112,6 +112,16 @@ class ConfigService {
     }
 
 	/**
+	 * Gets max BatchActivity storage time in days from osm-configuration.
+	 * @return Time in days to store BatchActivites of the application.
+	 * @see OsmConfiguration
+	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
+	 */
+	Integer getMaxBatchActivityStorageTimeInDays(){
+		return (Integer)retrieveConfigValue('maxBatchActivityStorageTimeInDays')
+	}
+
+	/**
 	 * Get status of databaseCleanupEnabled
 	 * If false no nightly database cleanup get started. If true the nightly database cleanup jobs are active ({@link DailyOldJobResultsWithDependenciesCleanup} and {@link DbCleanupOldCsiAggregationsWithDependenciesJob})
 	 * @return Whether the nightly database cleanup is enabled or not
