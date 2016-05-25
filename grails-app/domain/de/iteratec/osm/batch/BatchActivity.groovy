@@ -17,96 +17,62 @@
 
 package de.iteratec.osm.batch
 
+import java.text.DecimalFormat
+
 /**
  * BatchActivity
  * Representation of a batch activity like job deletion
  */
 class BatchActivity {
 
-    String domain = ""
-    long idWithinDomain
     String name
+    String domain
     Activity activity
-    Date startDate = new Date()
-    Date endDate
-    Date lastUpdated
     Status status
-    String stage
-    String progressWithinStage
-    String progress
-    Integer failures = 0
-    Integer successfulActions = 0
-    String lastFailureMessage = ""
+    Date startDate
 
-    /**There is a bug which casues Domains which extending from other Objects to fail
-     * in tests, so that dynamic fileds will not be created. As a workaround we will delegate all Oberserver request to an observable
-     **/
-    Observable observable = new Observable()
-    static transients = ['observable']
-
+    String lastFailureMessage
+    Date lastUpdate
+    String stageDescription
+    int maximumStages
+    int actualStage
+    int stepInStage
+    int maximumStepsInStage
+    int failures
+    Date endDate
 
     static mapping = {
     }
 
     static constraints = {
-        domain(nullable: false)
-        idWithinDomain(nullable:true)
         name(nullable: false)
+        domain(nullable: false)
         activity(nullable: false)
-        startDate(nullable: false)
         status(nullable: false)
-        progress(nullable: false)
-        successfulActions(nullable: false)
-        stage(nullable: true)
-        progressWithinStage(nullable: true)
-        failures(nullable: false)
+        startDate(nullable: false)
         lastFailureMessage(nullable: true)
+        lastUpdate(nullable: true)
+        stageDescription(nullable: true)
+        maximumStages(nullable: true)
+        actualStage(nullable: true)
+        stepInStage(nullable: true)
+        maximumStepsInStage(nullable: true)
+        failures(nullable: true)
         endDate(nullable: true)
     }
 
-    public void setChanged(){
-        observable.setChanged()
-    }
-
-    public void notifyObservers(){
-        observable.notifyObservers(this)
-    }
-
-    public void addObserver(BatchActivityService o){
-        observable.addObserver(o)
+    /**
+     * Creates a String representation for BatchActivity progress in stage
+     * @return formatted string
+     */
+    public String calculateProgressInStage() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        if (maximumStepsInStage == 0) return df.format(0) + " %"
+        return df.format(100.0 / maximumStepsInStage * stepInStage) + " %";
     }
 
     @Override
-	public String toString() {
-		return "Domain: $domain Progress: $progress";
-	}
-
-    /**
-     *  Updates a BatchActivity with values from the given map and notify the Service to save it.
-     *  Multiple calls within the save interval from BatchActivityService will only save the last call.
-     *
-     * @param BatchActivity BatchActivity to update
-     * @param map with following possible entries:
-     *      <li>"errors": Integer,</li>
-     *      <li>"failures": Integer,</li>
-     *      <li>"lastFailureMessage": String,</li>
-     *      <li>"progress": String,</li>
-     *      <li>"progressWithinStage": String,</li>
-     *      <li>"stage": String,</li>
-     *      <li>"status": Status,</li>
-     *      <li>"successfulActions": Integer,</li>
-     *      <li>"endDate": Date</li>
-     */
-    public void updateStatus(Map<String, Object> map) {
-        List<String> allowed = ["errors", "failures", "lastFailureMessage", "progress", "progressWithinStage", "stage", "status", "successfulActions", "endDate"]
-        map.each { key, value ->
-            if (allowed.contains(key)) {
-                this[key] = value
-            } else {
-                log.error("$key not allowed for ${this.class}")
-            }
-        }
-        setChanged()
-        notifyObservers()
+    public String toString() {
+        return "Domain: $domain, Name: $name ,Stage: $actualStage/$maximumStages, Step: $stepInStage/$maximumStepsInStage";
     }
 }

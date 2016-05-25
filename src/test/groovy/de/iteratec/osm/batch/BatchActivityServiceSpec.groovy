@@ -32,46 +32,39 @@ import org.junit.*
 @Mock(BatchActivity)
 class BatchActivityServiceSpec extends Specification {
 
-    BatchActivityService serviceUnderTest
+    BatchActivityService serviceUnderTest = service
 
-    def setup(){
-        serviceUnderTest = service
-        serviceUnderTest.metaClass.createTimerIfNecessary = {
-            //Do nothing, because we doesn't want to rely on a timer for this tests
-        }
+    void "testGetBatchActivity"() {
+        given:
+        String name = "BatchActivityCreateTest"
+        Class aClass = this.class
+        Activity activity = Activity.CREATE
+
+        when: "We order a BatchActivityUpdater from this service"
+        BatchActivityUpdater updater = serviceUnderTest.getActiveBatchActivity(aClass, activity, name, 1, true)
+
+        then: "The underlying BatchActivity should be persisted"
+        BatchActivity.count() == 1
+        serviceUnderTest.runningBatch(aClass,name, activity)
+
+        cleanup:
+        updater.cancel()
     }
 
-    void "testBatchActivityCreation"() {
-        when:
-            BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 1, Activity.DELETE, "Object test deletion")
-            serviceUnderTest.updateActivities()
+    void "testGetBatchActivityDummy"() {
+        given:
+        String name = "BatchActivityCreateTest"
+        Class aClass = this.class
+        Activity activity = Activity.CREATE
 
-        then:
-            batchActivity != null
+        when: "We order a BatchActivityUpdaterDummy from this service"
+        BatchActivityUpdater updater = serviceUnderTest.getActiveBatchActivity(aClass, activity, name, 1, false)
+
+        then: "The should'nt be a real BatchActivity"
+        !serviceUnderTest.runningBatch(aClass,name, activity)
+
+        cleanup:
+        updater.cancel()
     }
 
-    void "testBatchActivityProcess"() {
-        when:
-            BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 2, Activity.DELETE, "Object test deletion")
-            batchActivity.updateStatus(['progress': serviceUnderTest.calculateProgress(100, 5), 'stage': "firstStage"])
-            serviceUnderTest.updateActivities()
-
-        then:
-            batchActivity.progress.contains("5 %")
-            batchActivity.stage.contains("firstStage")
-            batchActivity.status == Status.ACTIVE
-    }
-
-    void "testBatchActivityProcessAbortion"(){
-        when:
-            BatchActivity batchActivity = serviceUnderTest.getActiveBatchActivity(Object.class, 3, Activity.DELETE, "Object test deletion")
-            batchActivity.updateStatus(['progress': serviceUnderTest.calculateProgress(100, 5), 'stage': "firstStage"])
-            batchActivity.updateStatus(['status': Status.CANCELLED])
-            serviceUnderTest.updateActivities()
-        then:
-            batchActivity.progress.contains("5 %")
-            batchActivity.stage.contains("firstStage")
-            batchActivity.status == Status.CANCELLED
-            !serviceUnderTest.runningBatch(Object.class, 3)
-    }
 }

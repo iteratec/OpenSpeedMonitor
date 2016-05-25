@@ -39,11 +39,6 @@ class JobControllerSpec extends Specification {
 
     def setup() {
         controllerUnderTest = new JobController()
-        controllerUnderTest.jobService = new JobService()
-        controllerUnderTest.jobService.batchActivityService = new BatchActivityService()
-        controllerUnderTest.jobService.batchActivityService.timer = new Timer()
-
-        controllerUnderTest.jobService.batchActivityService.timer.cancel()
         controllerUnderTest.inMemoryConfigService = new InMemoryConfigService()
         controllerUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
         createOsmConfig()

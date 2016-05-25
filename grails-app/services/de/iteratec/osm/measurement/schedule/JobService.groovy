@@ -18,9 +18,8 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.batch.Activity
-import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.batch.Status
+import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.gorm.DetachedCriteria
@@ -103,10 +102,11 @@ class JobService {
      * @param job Job that should be deleted
      */
     void deleteJob(Job job) {
-        if (batchActivityService.runningBatch(Job.class, job.id)) {
+        String activityName = "Job ${job.label} delete"
+        if (batchActivityService.runningBatch(Job.class, activityName, Activity.DELETE)) {
             return
         }
-        BatchActivity activity = batchActivityService.getActiveBatchActivity(Job.class, job.id, Activity.DELETE, "Job ${job.label} delete")
+        BatchActivityUpdater activity = batchActivityService.getActiveBatchActivity(Job.class, Activity.DELETE, "Job ${job.label} delete", 2, true)
         def dc = new DetachedCriteria(JobResult).build {
             eq 'job', job
         }
@@ -114,36 +114,37 @@ class JobService {
         Job.withTransaction {
             count = dc.count()
         }
+        activity.beginNewStage("Delete JobResults", count).update()
         int batchSize = 100
         Job.withSession { session ->
             0.step(count, batchSize) { offset ->
                 Job.withTransaction {
-                    activity.updateStatus(["progress": batchActivityService.calculateProgress(count, offset), "stage": "Delete JobResults"])
                     dc.list(offset: 0, max: batchSize).eachWithIndex { JobResult jobResult, int index ->
                         try {
                             log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
                             List<EventResult> eventResults = jobResult.getEventResults()
                             batchDelete(eventResults, batchSize)
                             jobResult.delete()
-                            activity.updateStatus(["successfulActions": ++activity.getSuccessfulActions()])
+                            activity.addProgressToStage().update()
                         } catch (Exception e) {
                             log.error("Couldn't delete JobResult ${e}")
-                            activity.updateStatus(["failures": ++activity.getFailures(), "lastFailureMessage": "Couldn't delete JobResult: ${jobResult.id}"])
+                            activity.addFailures().setLastFailureMessage("Couldn't delete JobResult: ${jobResult.id}").update()
                         }
                     }
                     session.flush()
                     session.clear()
                 }
             }
-            activity.updateStatus(["stage": "Delete Job"])
+            activity.beginNewStage("Delete Job",1).update()
             Job.withTransaction {
                 try {
                     job.delete(flush: true)
                 } catch (Exception e) {
+                    activity.addFailures().setLastFailureMessage("Job could't be deleted").update()
                     e.printStackTrace()
                 }
             }
-            activity.updateStatus(["stage": "", "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
+            activity.addProgressToStage().done()
         }
     }
 

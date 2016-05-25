@@ -20,7 +20,7 @@ package de.iteratec.osm.persistence
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.batch.Status
+import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
@@ -56,16 +56,17 @@ class DbCleanupService {
             lt 'date', toDeleteBefore
         }
         int count = dc.count()
-
+        String jobName = "Nightly cleanup of JobResults with dependents objects"
         //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
-        if(count > 0 && !batchActivityService.runningBatch(this.class, 1)) {
-            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 1, Activity.DELETE, "Nightly cleanup of JobResults with dependents objects",createBatchActivity)
+        if(count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
+            BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName, 1, createBatchActivity)
+            batchActivity.beginNewStage("Delete JobResults", count).update()
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
             0.step(count, batchSize) { int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(count, offset)])
                 JobResult.withNewTransaction {
-                    dc.list(max: batchSize).each { JobResult jobResult ->
+                    def list = dc.list(max: batchSize)
+                    list.each { JobResult jobResult ->
                         try {
 
                             jobResult.getEventResults().each { EventResult eventResult ->
@@ -76,11 +77,12 @@ class DbCleanupService {
                         } catch (Exception e) {
                         }
                     }
+                    batchActivity.addProgressToStage(list.size()).update()
                 }
                 //clear hibernate session first-level cache
                 JobResult.withSession { session -> session.clear() }
             }
-            batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
+            batchActivity.done()
         }
 
         log.info "end with deleteResultsDataBefore"
@@ -107,26 +109,28 @@ class DbCleanupService {
         log.info "CsiAggregationUpdateEvent - Count : ${csiAggregationUpdateEventsCount}"
 
         int globalCount = csiAggregationCount + csiAggregationUpdateEventsCount
-
+        String jobName = "Nightly cleanup of CsiAggregations and CsiAggregationUpdateEvents"
         //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
-        if(csiAggregationCount > 0 && !batchActivityService.runningBatch(this.class, 2)) {
-            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(this.class, 2, Activity.DELETE, "Nightly cleanup of CsiAggregations and CsiAggregationUpdateEvents",createBatchActivity )
+        if(csiAggregationCount > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
+            BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName,2, createBatchActivity)
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
             log.debug('Starting deletion of CsiAggregationUpdateEvents and CsiAggregations')
 
             //First clean CsiAggregationUpdateEvents
+            batchActivity.beginNewStage('delete CsiAggregationUpdateEvents', globalCount).update()
             0.step(csiAggregationUpdateEventsCount, batchSize){ int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(globalCount, offset), 'stage': 'delete CsiAggregationUpdateEvents'])
                 CsiAggregationUpdateEvent.withNewTransaction {
                     csiAggregationUpdateEventDetachedCriteria.list(max: batchSize).each{ CsiAggregationUpdateEvent csiAggregationUpdateEvent
                         ->
                         try {
                             csiAggregationUpdateEvent.delete()
+                            batchActivity.addProgressToStage()
                         }
                         catch(Exception e){
                         }
                     }
+                    batchActivity.update()
                 }
                 //clear hibernate session first-level cache
                 CsiAggregationUpdateEvent.withSession { session -> session.clear() }
@@ -134,26 +138,71 @@ class DbCleanupService {
 
             log.debug('Deletion of CsiAggregationUpdateEvents finished')
 
+            batchActivity.beginNewStage('delete CsiAggregations', csiAggregationCount).update()
             //After then clean CsiAggregations
             0.step(csiAggregationCount, batchSize) { int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(csiAggregationCount, offset+csiAggregationUpdateEventsCount), 'stage': 'delete CsiAggregations'])
                 CsiAggregation.withNewTransaction {
                     csiAggregationDetachedCriteria.list(max: batchSize).each { CsiAggregation csiAggregation ->
                         try {
                             csiAggregation.delete()
+                            batchActivity.addProgressToStage()
                         } catch (Exception e) {
                         }
                     }
                 }
                 //clear hibernate session first-level cache
                 CsiAggregation.withSession { session -> session.clear() }
+                batchActivity.update()
             }
-            batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
             log.debug('Deletion of CsiAggregations finished')
+            batchActivity.done()
         }
 
         log.info "end with deleteCsiAggregationsAndCsiAggregationUpdateEventsBefore"
     }
+
+    /**
+     * Deletes all {@link BatchActivity}s before date toDeleteBefore.
+     * @param toDeleteBefore	All BatchActivities before this date get deleted.
+     */
+    void deletBatchActivityDataBefore(Date toDeleteBefore, boolean createBatchActivity = true){
+        String jobName = "Nightly cleanup of BatchActivities"
+        log.info "begin with $jobName"
+
+        // use gorm-batching
+        def dc = new DetachedCriteria(BatchActivity).build {
+            lt 'startDate', toDeleteBefore
+        }
+        int count = dc.count()
+
+
+        if(count > 0 && !batchActivityService.runningBatch(BatchActivity.class, jobName, Activity.DELETE)) {
+            BatchActivityUpdater batchActivityUpdater = batchActivityService.getActiveBatchActivity(BatchActivity.class, Activity.DELETE, jobName, 1, createBatchActivity)
+            batchActivityUpdater.beginNewStage("Delete BatchActivites", count).update()
+            //batch size -> hibernate doc recommends 10..50
+            int batchSize = 50
+            0.step(count, batchSize) { int offset ->
+                BatchActivity.withNewTransaction {
+                    def list = dc.list(max: batchSize)
+                    list.each { BatchActivity batchActivity ->
+                        try {
+                            batchActivity.delete()
+                            batchActivityUpdater.addProgressToStage().update()
+                        } catch (Exception e) {
+                            batchActivityUpdater.addFailures().setLastFailureMessage("Couldn't delete BatchActivity ${batchActivity.id}")
+                        }
+                    }
+                }
+                //clear hibernate session first-level cache
+                JobResult.withSession { session -> session.clear() }
+            }
+            batchActivityUpdater.done()
+        }
+
+        log.info "end with $jobName"
+    }
+
+
     public void deleteHarDataBefore(Date toDeleteBefore, boolean createBatchActivity = true){
         log.info "begin with deleteResultsDataBefore"
 

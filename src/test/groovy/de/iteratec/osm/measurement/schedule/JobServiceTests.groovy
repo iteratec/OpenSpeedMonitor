@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.validation.ValidationException
@@ -52,7 +53,7 @@ class JobServiceTests {
 	void setUp() {
 
 		serviceUnderTest=service
-
+		ServiceMocker.create().mockBatchActivityService(serviceUnderTest)
 		createTestDataCommonForAllTests()
 		
 	}

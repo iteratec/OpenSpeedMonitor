@@ -22,6 +22,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdaterDummy
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.transformation.TimeToCsMappingCacheService
@@ -76,41 +77,6 @@ class ServiceMocker {
 		//TODO: should deliver the closure to be executed if the method nameOfMethodToMock of service serviceClassToMock is called in unit-tests
 	}
 
-    /**
-     * Mocks methods of {@link BatchActivityService}.
-	 * This Service always returns a BatchActivity when requested, but doesn't care for updates or if already one exists
-     * @param serviceToMockIn
-     *      Grails-Service with the service to mock as instance-variable.
-     */
-    void mockBatchActivityService(serviceToMockIn){
-        BatchActivityService batchActivityService = new BatchActivityService()
-		BatchActivityService.metaClass.getActiveBatchActivity = {Class c, long idWithinDomain, Activity activity, String name, boolean observe = true ->
-			return new BatchActivity(
-					activity: activity,
-					domain: c.toString(),
-					idWithinDomain: idWithinDomain,
-					name: name,
-					failures: 0,
-					lastFailureMessage: "",
-					progress: 0,
-					progressWithinStage: "0",
-					stage: "0",
-					status: Status.ACTIVE,
-					startDate: new Date(),
-					successfulActions: 0)
-		}
-		BatchActivityService.metaClass.updateActivites = {
-			//Do nothing
-		}
-
-		BatchActivityService.metaClass.runningBatch{Class c, long idWithinDomain ->false}
-		BatchActivityService.metaClass.noteBatchActivityUpdate{BatchActivity activity ->
-			//Do nothing
-		}
-		batchActivityService.timer?.cancel()
-		batchActivityService.timer?.purge()
-		serviceToMockIn.batchActivityService = batchActivityService
-    }
 
 	/**
 	 * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
@@ -647,6 +613,14 @@ class ServiceMocker {
 			//Do Nothing
 		}
 		serviceToMockIn.metricReportingService = metricReportingService
+	}
+
+	void mockBatchActivityService(serviceToMockIn){
+		BatchActivityService service = new BatchActivityService()
+		service.metaClass.getActiveBatchActivity = {Class c, Activity activity, String name, int maxStages, boolean observe ->
+			return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages, 5000)
+		}
+		serviceToMockIn.batchActivityService = service
 	}
 
 //	/**

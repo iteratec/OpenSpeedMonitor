@@ -23,11 +23,11 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import spock.lang.Shared
 
 /**
  * Methods in this class test the functionality to close {@link CsiAggregation}s.
@@ -361,6 +361,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     private void mocksCommonToAllTests(){
         mockedExecTimeOfCleanup = new DateTime(2014,7,7,5,30,0, DateTimeZone.UTC)
         csiAggregationUtilService.metaClass.getNowInUtc = { -> mockedExecTimeOfCleanup}
+        ServiceMocker.create().mockBatchActivityService(csiAggregationUpdateEventCleanupService)
     }
 
     private void createTestdataCommonToAllTests(){

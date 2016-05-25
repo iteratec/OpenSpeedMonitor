@@ -20,21 +20,19 @@ package de.iteratec.osm.report.external
 import co.freeside.betamax.Betamax
 import co.freeside.betamax.Recorder
 import de.iteratec.osm.batch.BatchActivity
-import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
-import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
+import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.TestFor
 import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
-import org.junit.Test
 import spock.lang.Specification
 
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
@@ -61,7 +59,7 @@ class GraphiteEventServiceSpec extends Specification{
         serviceUnderTest = service
 
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
-        new ServiceMocker().mockBatchActivityService(serviceUnderTest)
+        ServiceMocker.create().mockBatchActivityService(serviceUnderTest)
         serviceUnderTest.eventDaoService = new EventDaoService()
         CsiAggregationUtilService mockedCsiAggregationUtilService = new CsiAggregationUtilService()
         mockedCsiAggregationUtilService.metaClass.getNowInUtc = { -> untilDateTime }

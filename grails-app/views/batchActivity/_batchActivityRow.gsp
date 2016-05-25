@@ -7,14 +7,16 @@
 
     <td>${message(code: batchActivityInstance.status.getI18nCode(), default: batchActivityInstance.status)}</td>
 
-    <td>${fieldValue(bean: batchActivityInstance, field: "progress")}</td>
+    <td>${batchActivityInstance.actualStage}/${batchActivityInstance.maximumStages}</td>
+
+    <td>${batchActivityInstance.calculateProgressInStage()}</td>
 
     <td>${fieldValue(bean: batchActivityInstance, field: "lastFailureMessage")}</td>
 
     <td><g:formatDate type="datetime" date="${batchActivityInstance.startDate}" style="LONG"
                       timeStyle="SHORT"/></td>
 
-    <td><g:formatDate type="datetime" date="${batchActivityInstance.lastUpdated}" style="LONG"
+    <td><g:formatDate type="datetime" date="${batchActivityInstance.lastUpdate}" style="LONG"
                       timeStyle="SHORT"/></td>
 
     <td><g:formatDate type="datetime" date="${batchActivityInstance.endDate}" style="LONG"

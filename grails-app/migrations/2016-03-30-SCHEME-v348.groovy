@@ -316,6 +316,93 @@ databaseChangeLog = {
     }
 //      ### END UserspecificDashboard refactoring
 
+//	    ### BEGIN BatchActivity refactoring
+	changeSet(author: "bwo (generated)", id: "1463554586230-1") {
+		addColumn(tableName: "batch_activity") {
+			column(name: "actual_stage", type: "integer")
+		}
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-2") {
+		renameColumn(tableName: "batch_activity", oldColumnName: "last_updated", newColumnName: "last_update", columnDataType: "datetime")
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-3") {
+		addColumn(tableName: "batch_activity") {
+			column(name: "maximum_stages", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-4") {
+		addColumn(tableName: "batch_activity") {
+			column(name: "maximum_steps_in_stage", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-5") {
+		addColumn(tableName: "batch_activity") {
+			column(name: "stage_description", type: "varchar(255)")
+		}
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-6") {
+		addColumn(tableName: "batch_activity") {
+			column(name: "step_in_stage", type: "integer") {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-8") {
+		dropColumn(columnName: "id_within_domain", tableName: "batch_activity")
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-9") {
+		dropColumn(columnName: "progress", tableName: "batch_activity")
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-10") {
+		dropColumn(columnName: "progress_within_stage", tableName: "batch_activity")
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-11") {
+		dropColumn(columnName: "stage", tableName: "batch_activity")
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-12") {
+		dropColumn(columnName: "successful_actions", tableName: "batch_activity")
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-13") {
+		sql('''
+				UPDATE batch_activity set actual_stage = 1, maximum_stages = 1,
+				step_in_stage= 1, maximum_steps_in_stage = 1
+				WHERE actual_stage is null AND status = 'DONE';
+			''')
+	}
+
+	changeSet(author: "bwo (generated)", id: "1463554586230-14") {
+		sql('''
+				UPDATE batch_activity set actual_stage = 0, maximum_stages = 0,
+				step_in_stage= 0, maximum_steps_in_stage = 0
+				WHERE actual_stage is null;
+			''')
+	}
+
+	changeSet(author: "bwo (generated)", id: "1464157353626-1") {
+		addColumn(tableName: "osm_configuration") {
+			column(name: "max_batch_activity_storage_time_in_days", type: "integer", defaultValue: 30) {
+				constraints(nullable: "false")
+			}
+		}
+	}
+
+//	  ### END BatchActivity Refactoring
+
     changeSet(author: "msk", id: "1459346200213-8") {
         renameTable(oldTableName: "tag_links", newTableName: "tags_links")
     }

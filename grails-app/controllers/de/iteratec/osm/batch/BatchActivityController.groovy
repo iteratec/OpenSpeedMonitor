@@ -98,10 +98,11 @@ class BatchActivityController {
                                     htmlId: "batchActivity_${activeId}",
                                     activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
                                     status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
-                                    progress: batchActivity.progress,
+                                    stage: batchActivity.actualStage + "/" + batchActivity.maximumStages ,
+                                    progress: batchActivity.calculateProgressInStage() ,
                                     lastFailureMessage: batchActivity.lastFailureMessage,
                                     startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
-                                    lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdated)),
+                                    lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdate)),
                                     endDate: (batchActivity.endDate)? DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate)):"",
                                     statusEN: batchActivity.status.toString()
                             )

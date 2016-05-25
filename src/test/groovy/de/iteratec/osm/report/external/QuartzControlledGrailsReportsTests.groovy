@@ -19,7 +19,6 @@ package de.iteratec.osm.report.external
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivity
-import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.csi.Page

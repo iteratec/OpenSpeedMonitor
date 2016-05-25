@@ -8,6 +8,7 @@ class BatchActivityRowDto {
     String activity
     String status
     String progress
+    String stage
     String lastFailureMessage
     String startDate
     String lastUpdated

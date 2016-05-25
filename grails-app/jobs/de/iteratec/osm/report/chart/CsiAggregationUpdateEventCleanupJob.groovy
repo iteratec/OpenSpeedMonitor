@@ -26,7 +26,7 @@ import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService;
 class CsiAggregationUpdateEventCleanupJob {
 	
 	CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
-    boolean createBatchActivity = false
+    boolean createBatchActivity = true
 	
     static triggers = {
 		/** Each Day at 5:30 am. */

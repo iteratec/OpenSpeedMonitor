@@ -1,5 +1,5 @@
 /**
- * Refreshes the table data every 5 seconds
+ * Refreshes the table data every 2 seconds
  * @param updateTableUrl
  *          url to update complete table (method updateTableMethod within BatchActivityController)
  * @param checkUrl
@@ -24,7 +24,7 @@ function updateIfNecessary(updateTableUrl, checkUrl, rowUpdateUrl) {
         } else {
             updateRows(ids,rowUpdateUrl);
         }
-    }, 5000);
+    }, 2000);
 }
 
 /**
@@ -81,16 +81,18 @@ function isPageOne() {
 function updateRow(rowObject) {
     var idxFieldActivity = 1;
     var idxFieldStatus = 2;
-    var idxFieldProgress = 3;
-    var idxFieldLastFailureMessage = 4;
-    var idxFieldLastUpdated = 6;
-    var idxFieldEndDate = 7;
+    var idxFieldStage = 3;
+    var idxFieldStageProgress = 4;
+    var idxFieldLastFailureMessage = 5;
+    var idxFieldLastUpdated = 7;
+    var idxFieldEndDate = 8;
 
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldActivity+")").html(rowObject.activity);
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldStatus+")").html(rowObject.status);
-    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldProgress+")").html(rowObject.progress);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldStage+")").html(rowObject.stage);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldStageProgress+")").html(rowObject.progress);
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastFailureMessage+")").html(rowObject.lastFailureMessage);
-    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastUpdated+")").html(rowObject.lastUpdated);
+    $("tr#" + rowObject.htmlId + " td:eq("+idxFieldLastUpdated+")").html(rowObject.lastUpdate);
     $("tr#" + rowObject.htmlId + " td:eq("+idxFieldEndDate+")").html(rowObject.endDate);
     $("tr#" + rowObject.htmlId).attr("status", rowObject.statusEN)
 }

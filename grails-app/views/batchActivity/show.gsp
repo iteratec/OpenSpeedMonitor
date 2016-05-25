@@ -25,13 +25,6 @@
 			</tr>
 		
 			<tr class="prop">
-				<td valign="top" class="name"><g:message code="batchActivity.idWithinDomain.label" default="Id Within Domain" /></td>
-				
-				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "idWithinDomain")}</td>
-				
-			</tr>
-		
-			<tr class="prop">
 				<td valign="top" class="name"><g:message code="batchActivity.name.label" default="Name" /></td>
 				
 				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "name")}</td>
@@ -58,32 +51,39 @@
 				<td valign="top" class="value"><g:message code="${batchActivityInstance?.status?.i18nCode}" default="Status" /></td>
 				
 			</tr>
-		
-			<tr class="prop">
-				<td valign="top" class="name"><g:message code="batchActivity.progress.label" default="Progress" /></td>
-				
-				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "progress")}</td>
-				
-			</tr>
-		
-			<tr class="prop">
-				<td valign="top" class="name"><g:message code="batchActivity.successfulActions.label" default="Successful Actions" /></td>
-				
-				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "successfulActions")}</td>
-				
-			</tr>
-		
+
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="batchActivity.stage.label" default="Stage" /></td>
+
+				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "actualStage")}</td>
+
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><g:message code="batchActivity.stages.label" default="Stages" /></td>
+
+				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "maximumStages")}</td>
+
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><g:message code="batchActivity.stageDescription.label" default="Stage Description" /></td>
+
+				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "stageDescription")}</td>
+
+			</tr>
+
+			<tr class="prop">
+				<td valign="top" class="name"><g:message code="batchActivity.stepInStage.label" default="Step in Stage" /></td>
 				
-				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "stage")}</td>
+				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "stepInStage")}</td>
 				
 			</tr>
-		
+
 			<tr class="prop">
-				<td valign="top" class="name"><g:message code="batchActivity.progressWithinStage.label" default="Progress Within Stage" /></td>
+				<td valign="top" class="name"><g:message code="batchActivity.stepsInStage.label" default="Steps in Stage" /></td>
 				
-				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "progressWithinStage")}</td>
+				<td valign="top" class="value">${fieldValue(bean: batchActivityInstance, field: "maximumStepsInStage")}</td>
 				
 			</tr>
 		
@@ -111,7 +111,7 @@
 			<tr class="prop">
 				<td valign="top" class="name"><g:message code="batchActivity.lastUpdated.label" default="Last Updated" /></td>
 				
-				<td valign="top" class="value"><g:formatDate date="${batchActivityInstance?.lastUpdated}" /></td>
+				<td valign="top" class="value"><g:formatDate date="${batchActivityInstance?.lastUpdate}" /></td>
 				
 			</tr>
 		
