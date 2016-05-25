@@ -489,10 +489,6 @@ databaseChangeLog = {
         addNotNullConstraint(columnDataType: "bigint", columnName: "graphite_server_graphite_paths_id", tableName: "graphite_server_graphite_path")
     }
 
-    changeSet(author: "marko (generated)", id: "1459346200213-35") {
-        dropNotNullConstraint(columnDataType: "bigint", columnName: "id_within_domain", tableName: "batch_activity")
-    }
-
     changeSet(author: "marko (generated)", id: "1459346200213-36") {
         dropNotNullConstraint(columnDataType: "boolean", columnName: "ignoressl", tableName: "job")
     }

@@ -90,7 +90,7 @@ class TestDataUtil {
     public static Map<String, List<CsiAggregation>> createHourlyCsiAggregationByGroupAndPageIdMap(
             List<CsiAggregation> hourlyCsiAggregations,
             CsiAggregationTagService csiAggregationTagService
-                                                              ) throws IllegalArgumentException {
+    ) throws IllegalArgumentException {
 
         Map<String, List<CsiAggregation>> result = [:];
 
@@ -141,15 +141,15 @@ class TestDataUtil {
     }
 
     public static void removeAssociatedDomainsFromCollections(domainClass) {
-        if (domainClass == GraphitePath.class){
+        if (domainClass == GraphitePath.class) {
             GraphiteServer.list().each {
                 it.graphitePaths = []
                 it.save(failOnError: true)
             }
-        }else if(domainClass == TimeToCsMapping.class ||
+        } else if (domainClass == TimeToCsMapping.class ||
                 domainClass == BrowserConnectivityWeight.class ||
                 domainClass == PageWeight.class ||
-                domainClass == CsiConfiguration.class){
+                domainClass == CsiConfiguration.class) {
             CsiConfiguration.list().each {
                 it.timeToCsMappings = []
                 it.browserConnectivityWeights = []
@@ -203,6 +203,10 @@ class TestDataUtil {
     }
 
     static ConnectivityProfile createConnectivityProfile(String profileName) {
+        ConnectivityProfile existingWithName = ConnectivityProfile.findByName(profileName)
+        if (existingWithName) {
+            return existingWithName
+        }
         ConnectivityProfile result = new ConnectivityProfile(
                 name: profileName,
                 bandwidthDown: 6000,
@@ -319,13 +323,14 @@ class TestDataUtil {
      * @param hourWeights
      *          set your specific weights for any hour. if no weight is given for an hour, '1.0' will be used.
      */
-    static CsiDay createCsiDay(Map<Integer,Double> hourWeights = new HashMap<>()) {
+
+    static CsiDay createCsiDay(Map<Integer, Double> hourWeights = new HashMap<>()) {
         CsiDay csiDay = new CsiDay()
-        (0..23).each {hour ->
-            if(hourWeights.containsKey(hour)) {
-                csiDay.setHourWeight(hour,hourWeights.get(hour))
+        (0..23).each { hour ->
+            if (hourWeights.containsKey(hour)) {
+                csiDay.setHourWeight(hour, hourWeights.get(hour))
             } else {
-                csiDay.setHourWeight(hour,1.0)
+                csiDay.setHourWeight(hour, 1.0)
             }
         }
         return csiDay.save(failOnError: true)
@@ -335,7 +340,7 @@ class TestDataUtil {
         List<TimeToCsMapping> timeToCsMappingList = new ArrayList<>()
         allPages.each { page ->
             (0..10000).each { loadTime ->
-                if(loadTime % 20 == 0) {
+                if (loadTime % 20 == 0) {
                     timeToCsMappingList.add(
                             new TimeToCsMapping(
                                     page: page,
@@ -382,19 +387,19 @@ class TestDataUtil {
         )
     }
 
-
     /**
      * Creates script with default values for label, description, navigationScript and provideAuthenticateInformation.
      * @return Default script.
      */
-    static Script createScript(){
+    static Script createScript() {
         return createScript(
-            'script label',
-            'script description',
-            'navigate http://www.osm.org',
-            false
+                'script label',
+                'script description',
+                'navigate http://www.osm.org',
+                false
         )
     }
+
     static Script createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation) {
         return new Script(
                 label: label,
@@ -487,7 +492,7 @@ class TestDataUtil {
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-                                                                        ) {
+    ) {
 
         List<CsiAggregation> createdHmvs = []
         while (!currentDate.isAfter(end)) {
@@ -531,7 +536,7 @@ class TestDataUtil {
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-                                                             ) {
+    ) {
         List<CsiAggregation> createdHmvs = []
 
         Page page = Page.findByName(pageName)
@@ -597,7 +602,7 @@ class TestDataUtil {
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-                                                             ) {
+    ) {
         return ensurePresenceAndCalculation(
                 startDate,
                 interval,
@@ -623,7 +628,7 @@ class TestDataUtil {
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-                                                             ) {
+    ) {
         CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false, ConnectivityProfile.findAll())
         return calcMv(
                 toCreateAndOrCalculate,
@@ -648,7 +653,7 @@ class TestDataUtil {
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-                                       ) {
+    ) {
         if (toBeCalculated) {
 
             Date fromDate = toBeCalculated.started
@@ -672,7 +677,7 @@ class TestDataUtil {
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-                                       ) {
+    ) {
 
         MeasuredEvent measuredEvent = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(toBeCalculated.tag)
         JobGroup jobGroup = csiAggregationTagService.findJobGroupOfHourlyEventTag(toBeCalculated.tag)
@@ -720,7 +725,7 @@ class TestDataUtil {
         createPages(allPages)
         createBrowsersAndAliases()
         createLocations()
-        decodeCSVTestDataLine(csvFile.readLines(),pagesToGenerateDataFor)
+        decodeCSVTestDataLine(csvFile.readLines(), pagesToGenerateDataFor)
     }
 
     /**
@@ -760,7 +765,7 @@ class TestDataUtil {
                 //				System.out.println('Processing line: ' + csvLine);
                 decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, csiAggregationTagService, profile)
                 println(i)
-                i +=1
+                i += 1
             }
         }
     }
@@ -845,10 +850,10 @@ class TestDataUtil {
     static Browser createBrowser(String name, double weight) {
         Browser browser = Browser.findByName(name)
         browser = browser == null ?
-            new Browser(
-                    name: name,
-                    weight: weight
-            ).save(failOnError: true) : browser
+                new Browser(
+                        name: name,
+                        weight: weight
+                ).save(failOnError: true) : browser
         return browser
     }
 
@@ -874,7 +879,7 @@ class TestDataUtil {
     }
 
     static List<Page> createPages(List<String> allPageNames) {
-        return allPageNames.collect {pageName->
+        return allPageNames.collect { pageName ->
             new Page(name: pageName).save(failOnError: true)
         }
     }
@@ -1070,7 +1075,7 @@ class TestDataUtil {
             MeasuredEvent event,
             ConnectivityProfile connectivityProfile) {
         CsiAggregationTagService csiAggregationTagService = new CsiAggregationTagService()
-        Browser dummyBrowser = createBrowser("bro",0)
+        Browser dummyBrowser = createBrowser("bro", 0)
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1086,7 +1091,7 @@ class TestDataUtil {
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
                 noTrafficShapingAtAll: false,
-                tag: csiAggregationTagService.createEventResultTag(job.jobGroup, event,event.testedPage, dummyBrowser, job.location)
+                tag: csiAggregationTagService.createEventResultTag(job.jobGroup, event, event.testedPage, dummyBrowser, job.location)
         ).save(failOnError: true)
 
         return eventResult
@@ -1121,7 +1126,7 @@ class TestDataUtil {
             MeasuredEvent event,
             CsiAggregationTagService csiAggregationTagService,
             boolean withConnectivityProfile = true
-                                        ) {
+    ) {
 
         JobGroup jobGroup = job.jobGroup
         Page page = event.testedPage
@@ -1143,7 +1148,7 @@ class TestDataUtil {
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 tag: resultTag,
                 noTrafficShapingAtAll: job.noTrafficShapingAtAll,
-                connectivityProfile: withConnectivityProfile?createConnectivityProfile('conn-profile-for-testing-purposes'):null
+                connectivityProfile: withConnectivityProfile ? createConnectivityProfile('conn-profile-for-testing-purposes') : null
         ).save(failOnError: true)
 
         return eventResult.save(failOnError: true)
@@ -1209,8 +1214,6 @@ class TestDataUtil {
 
     }
 
-
-
     /**
      * Decodes all lines of test data CSV.
      *
@@ -1232,12 +1235,12 @@ class TestDataUtil {
         assertNotNull(jobGroup1)
         assertNotNull(jobGroup2)
 
-        int i =listOfLines.size()
+        int i = listOfLines.size()
         int j = 0
         listOfLines.each { String csvLine ->
-            j +=1
+            j += 1
             if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
-                 System.out.println(j + ' von ' + i);
+                System.out.println(j + ' von ' + i);
 
                 String[] columns = csvLine.split(';');
                 String jobName = columns[0]
@@ -1256,7 +1259,7 @@ class TestDataUtil {
                 }
 
                 Page page = pageMap[jobName]
-                if(!page){
+                if (!page) {
                     page = getPageFromCSVJobName(jobName)
                     pageMap[jobName] = page
                 }
@@ -1268,14 +1271,14 @@ class TestDataUtil {
                     return;
                 }
                 Location location = locationMap[jobName]
-                if(!location){
+                if (!location) {
                     location = getLocationCSVJobName(jobName)
                     locationMap[jobName] = location
                 }
                 assertNotNull(location)
 
-                Job job= jobMap[jobName]
-                if(!job){
+                Job job = jobMap[jobName]
+                if (!job) {
                     job = getJobOfCSVJobName(jobName, groupOfJob, location)
                     jobMap[jobName] = job
                 }
@@ -1291,7 +1294,7 @@ class TestDataUtil {
                 assertNotNull(jobResult)
 
                 if (columns.length > 8 && !columns[8].isEmpty()) {
-                        createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, connectivityProfile);
+                    createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, connectivityProfile);
                 }
             }
         }
@@ -1417,7 +1420,7 @@ class TestDataUtil {
         AggregatorType pageAggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         AggregatorType shopAggregator = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         AggregatorType csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
-        return [eventAggregator, pageAggregator, shopAggregator,csiSystemAggregator]
+        return [eventAggregator, pageAggregator, shopAggregator, csiSystemAggregator]
     }
 
     /**
@@ -1481,7 +1484,8 @@ class TestDataUtil {
      * @param resultIdsAsString
      * @param closed
      */
-    public static CsiAggregation createCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed, ConnectivityProfile profile = null) {
+    public
+    static CsiAggregation createCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed, ConnectivityProfile profile = null) {
         return new CsiAggregation(
                 started: date,
                 interval: csiAggregationInterval,
@@ -1543,11 +1547,11 @@ class TestDataUtil {
         job.save()
     }
 
-    public static Job createSimpleJob(){
+    public static Job createSimpleJob() {
         JobGroup group = createJobGroup("group")
-        Location location =  createLocation(createWebPageTestServer("label2","proxyId",true, "http://server1.iteratec.de/"),"veryUnique",
-                createBrowser("FF",1),true)
-        return createJob("label",createScript("label1", "description", "navi", false),
+        Location location = createLocation(createWebPageTestServer("label2", "proxyId", true, "http://server1.iteratec.de/"), "veryUnique",
+                createBrowser("FF", 1), true)
+        return createJob("label", createScript("label1", "description", "navi", false),
                 location, group, "description", 1, false, 10)
     }
     /**
@@ -1555,8 +1559,8 @@ class TestDataUtil {
      * regardless if an object with this id exists
      * @return AssetGroup
      */
-    public static AssetGroup createAssetGroup(Date date = new Date()){
-        return new AssetGroup(connectivity: "6.000 kb", url:"http://iteratec.de/picture.gif", browser: 1, cached: false,
+    public static AssetGroup createAssetGroup(Date date = new Date()) {
+        return new AssetGroup(connectivity: "6.000 kb", url: "http://iteratec.de/picture.gif", browser: 1, cached: false,
                 assets: [], location: 1, eventName: "", jobGroup: 1, jobResult: 1, date: date.getTime())
     }
 

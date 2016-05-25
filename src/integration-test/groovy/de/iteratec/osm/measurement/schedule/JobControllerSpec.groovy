@@ -1,7 +1,6 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
