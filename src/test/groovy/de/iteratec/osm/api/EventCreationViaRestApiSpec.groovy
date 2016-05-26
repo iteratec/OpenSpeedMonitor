@@ -6,6 +6,7 @@ import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Duration
@@ -33,16 +34,20 @@ class EventCreationViaRestApiSpec extends Specification {
             group2 = new JobGroup(name: 'JobGroup2').save(failOnError: true)
         }
         //mocks common for all tests
-        EventDaoService eventDaoService = new EventDaoService()
-        eventDaoService.metaClass.createEvent = {
-            String shortName, DateTime eventTimestamp, String description, Boolean globallyVisible->
-                return new Event(
+        def eventDaoServiceMock = new MockFor(EventDaoService, true)
+        eventDaoServiceMock.demand.createEvent (0..10000) {
+            String shortName, DateTime eventTimestamp, String description, Boolean globallyVisible, List<JobGroup> jobGroupList->
+                Event event = new Event(
                         shortName: shortName,
                         eventDate: eventTimestamp.toDate(),
                         description: description,
                         globallyVisible: globallyVisible)
+                jobGroupList.each {group->
+                    event.addToJobGroups(group)
+                }
+                event.save(failOnError: true)
         }
-        controllerUnderTest.eventDaoService = eventDaoService
+        controllerUnderTest.eventDaoService = eventDaoServiceMock.proxyInstance();
     }
 
     //apiKey constraint violation ////////////////////////////////////

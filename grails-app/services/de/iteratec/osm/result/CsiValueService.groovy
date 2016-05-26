@@ -23,7 +23,6 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import grails.transaction.Transactional
 
 
-@Transactional
 class CsiValueService {
 
     OsmConfigCacheService osmConfigCacheService

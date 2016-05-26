@@ -17,7 +17,6 @@
 
 package de.iteratec.osm
 
-import grails.transaction.Transactional
 import org.joda.time.DateTime
 import org.joda.time.Duration
 
@@ -29,7 +28,6 @@ import de.iteratec.osm.OsmConfiguration
  * @author nkuhn
  *
  */
-@Transactional
 class OsmConfigCacheService {
 	
 	//TODO: bad design, remove code-dulplication 

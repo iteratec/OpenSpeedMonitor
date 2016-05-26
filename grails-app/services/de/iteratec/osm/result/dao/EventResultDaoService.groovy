@@ -23,7 +23,6 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.result.*
-import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 
 import java.util.regex.Pattern
@@ -35,7 +34,6 @@ import java.util.regex.Pattern
  * @author rhe
  * @author mze
  */
-@Transactional
 public class EventResultDaoService {
 		
 	OsmDataSourceService osmDataSourceService

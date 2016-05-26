@@ -24,7 +24,6 @@ import org.joda.time.DateTime
 /**
  * Provides methods for persistence of {@link Event}s.
  */
-@Transactional
 class EventDaoService {
 
 

@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.result
 
-import grails.transaction.Transactional
 
 import static Contract.*
 
@@ -51,7 +50,6 @@ import de.iteratec.osm.measurement.environment.Location
  * @author nkuhn
  * @author mze
  */
-@Transactional
 class CsiAggregationTagService {
 
 	/**

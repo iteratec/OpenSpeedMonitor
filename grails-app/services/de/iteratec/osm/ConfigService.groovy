@@ -18,14 +18,12 @@
 package de.iteratec.osm
 
 import de.iteratec.osm.csi.CsiTransformation
-import grails.transaction.Transactional
 
 /**
  * ConfigService
  * Delivers application-wide configurations from backend.
  * @see OsmConfiguration
  */
-@Transactional
 class ConfigService {
 
 	def grailsApplication

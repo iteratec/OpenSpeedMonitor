@@ -26,7 +26,6 @@ import grails.transaction.Transactional;
  * @author nkuhn, fpavkovic
  *
  */
-@Transactional
 class MeanCalcService {
 	
 	/**

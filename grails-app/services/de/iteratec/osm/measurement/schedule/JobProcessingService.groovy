@@ -67,6 +67,7 @@ enum TriggerGroup {
  *
  * @author dri
  */
+@Transactional
 class JobProcessingService {
 
 	ProxyService proxyService

@@ -25,14 +25,12 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.util.I18nService
-import grails.transaction.Transactional
 
 /**
  * Calculates {@link de.iteratec.osm.report.chart.CsiAggregation}s for EventResults.
  *
  * @author rhe
  */
-@Transactional
 class ResultCsiAggregationService {
 
     /** injected by grails */

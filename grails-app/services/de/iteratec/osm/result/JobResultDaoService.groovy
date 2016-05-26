@@ -19,12 +19,10 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.detail.HARStatus
-import grails.transaction.Transactional
 
 /**
  * Provides DAO functionality for {@link JobResult} domain.
  */
-@Transactional
 class JobResultDaoService {
 
 	/**

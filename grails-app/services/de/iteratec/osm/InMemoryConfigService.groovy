@@ -23,7 +23,6 @@ import grails.transaction.Transactional
  * InMemoryConfigService
  * A service class encapsulates the core business logic of a Grails application
  */
-@Transactional
 class InMemoryConfigService {
 
     def grailsApplication
