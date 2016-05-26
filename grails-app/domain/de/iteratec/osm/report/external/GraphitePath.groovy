@@ -44,6 +44,6 @@ class GraphitePath {
 
     @Override
     public String toString(){
-        return "${prefix}[STATIC_PATH].${measurand.getName()}"
+        return "${prefix}[STATIC_PATH].${measurand?.getName()}"
     }
 }

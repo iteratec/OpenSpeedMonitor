@@ -1,28 +1,103 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 package de.iteratec.osm.report.chart
 
-/**
- * CsiAggregationController
- * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
- */
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 class CsiAggregationController {
 
-	static scaffold = CsiAggregation
+    static scaffold = CsiAggregation
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond CsiAggregation.list(params), model:[csiAggregationCount: CsiAggregation.count()]
+    }
+
+    def show(CsiAggregation csiAggregation) {
+        respond csiAggregation
+    }
+
+    def create() {
+        respond new CsiAggregation(params)
+    }
+
+    def save(CsiAggregation csiAggregation) {
+        if (csiAggregation == null) {
+            
+            notFound()
+            return
+        }
+
+        if (csiAggregation.hasErrors()) {
+
+            respond csiAggregation.errors, view:'create'
+            return
+        }
+
+        csiAggregation.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'csiAggregation.label', default: 'CsiAggregation'), csiAggregation.id])
+                redirect csiAggregation
+            }
+            '*' { respond csiAggregation, [status: CREATED] }
+        }
+    }
+
+    def edit(CsiAggregation csiAggregation) {
+        respond csiAggregation
+    }
+
+    def update(CsiAggregation csiAggregation) {
+        if (csiAggregation == null) {
+
+            notFound()
+            return
+        }
+
+        if (csiAggregation.hasErrors()) {
+
+            respond csiAggregation.errors, view:'edit'
+            return
+        }
+
+        csiAggregation.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'csiAggregation.label', default: 'CsiAggregation'), csiAggregation.id])
+                redirect csiAggregation
+            }
+            '*'{ respond csiAggregation, [status: OK] }
+        }
+    }
+
+    def delete(CsiAggregation csiAggregation) {
+
+        if (csiAggregation == null) {
+            notFound()
+            return
+        }
+
+        try {
+            csiAggregation.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'csiAggregation.label', default: 'CsiAggregation'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'csiAggregation.label', default: 'CsiAggregation'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'csiAggregation.label', default: 'CsiAggregation'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
+        }
+    }
 }

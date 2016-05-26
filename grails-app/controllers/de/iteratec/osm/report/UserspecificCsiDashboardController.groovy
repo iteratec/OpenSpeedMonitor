@@ -1,27 +1,103 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 package de.iteratec.osm.report
 
-/**
- * UserspecificCsiDashboardController
- * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
- */
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 class UserspecificCsiDashboardController {
 
     static scaffold = UserspecificCsiDashboard
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond UserspecificCsiDashboard.list(params), model:[userspecificCsiDashboardCount: UserspecificCsiDashboard.count()]
+    }
+
+    def show(UserspecificCsiDashboard userspecificCsiDashboard) {
+        respond userspecificCsiDashboard
+    }
+
+    def create() {
+        respond new UserspecificCsiDashboard(params)
+    }
+
+    def save(UserspecificCsiDashboard userspecificCsiDashboard) {
+        if (userspecificCsiDashboard == null) {
+            
+            notFound()
+            return
+        }
+
+        if (userspecificCsiDashboard.hasErrors()) {
+
+            respond userspecificCsiDashboard.errors, view:'create'
+            return
+        }
+
+        userspecificCsiDashboard.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'userspecificCsiDashboard.label', default: 'UserspecificCsiDashboard'), userspecificCsiDashboard.id])
+                redirect userspecificCsiDashboard
+            }
+            '*' { respond userspecificCsiDashboard, [status: CREATED] }
+        }
+    }
+
+    def edit(UserspecificCsiDashboard userspecificCsiDashboard) {
+        respond userspecificCsiDashboard
+    }
+
+    def update(UserspecificCsiDashboard userspecificCsiDashboard) {
+        if (userspecificCsiDashboard == null) {
+
+            notFound()
+            return
+        }
+
+        if (userspecificCsiDashboard.hasErrors()) {
+
+            respond userspecificCsiDashboard.errors, view:'edit'
+            return
+        }
+
+        userspecificCsiDashboard.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'userspecificCsiDashboard.label', default: 'UserspecificCsiDashboard'), userspecificCsiDashboard.id])
+                redirect userspecificCsiDashboard
+            }
+            '*'{ respond userspecificCsiDashboard, [status: OK] }
+        }
+    }
+
+    def delete(UserspecificCsiDashboard userspecificCsiDashboard) {
+
+        if (userspecificCsiDashboard == null) {
+            notFound()
+            return
+        }
+
+        try {
+            userspecificCsiDashboard.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'userspecificCsiDashboard.label', default: 'UserspecificCsiDashboard'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'userspecificCsiDashboard.label', default: 'UserspecificCsiDashboard'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'userspecificCsiDashboard.label', default: 'UserspecificCsiDashboard'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
+        }
+    }
 }

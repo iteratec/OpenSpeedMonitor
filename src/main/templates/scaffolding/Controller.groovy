@@ -1,11 +1,12 @@
 <%=packageName ? "package ${packageName}" : ''%>
 
+import org.springframework.dao.DataIntegrityViolationException
 import static org.springframework.http.HttpStatus.*
-import grails.transaction.Transactional
+//TODO: This controller-templated was edited due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 
-@Transactional(readOnly = true)
 class ${className}Controller {
 
+    static scaffold = ${className}
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def index(Integer max) {
@@ -21,16 +22,15 @@ class ${className}Controller {
         respond new ${className}(params)
     }
 
-    @Transactional
     def save(${className} ${propertyName}) {
         if (${propertyName} == null) {
-            transactionStatus.setRollbackOnly()
+            
             notFound()
             return
         }
 
         if (${propertyName}.hasErrors()) {
-            transactionStatus.setRollbackOnly()
+
             respond ${propertyName}.errors, view:'create'
             return
         }
@@ -50,16 +50,15 @@ class ${className}Controller {
         respond ${propertyName}
     }
 
-    @Transactional
     def update(${className} ${propertyName}) {
         if (${propertyName} == null) {
-            transactionStatus.setRollbackOnly()
+
             notFound()
             return
         }
 
         if (${propertyName}.hasErrors()) {
-            transactionStatus.setRollbackOnly()
+
             respond ${propertyName}.errors, view:'edit'
             return
         }
@@ -75,23 +74,21 @@ class ${className}Controller {
         }
     }
 
-    @Transactional
     def delete(${className} ${propertyName}) {
 
         if (${propertyName} == null) {
-            transactionStatus.setRollbackOnly()
             notFound()
             return
         }
 
-        ${propertyName}.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: '${propertyName}.label', default: '${className}'), ${propertyName}.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
+        try {
+            ${propertyName}.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: '${propertyName}.label', default: '${className}'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: '${propertyName}.label', default: '${className}'), params.id])
+            redirect(action: "show", id: params.id)
         }
     }
 

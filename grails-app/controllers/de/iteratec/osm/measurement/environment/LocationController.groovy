@@ -1,26 +1,104 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 package de.iteratec.osm.measurement.environment
-/**
- * LocationController
- * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
- */
+
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
+
 class LocationController {
 
-	static scaffold = Location
+    static scaffold = Location
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond Location.list(params), model:[locationCount: Location.count()]
+    }
+
+    def show(Location location) {
+        respond location
+    }
+
+    def create() {
+        respond new Location(params)
+    }
+
+    def save(Location location) {
+        if (location == null) {
+            
+            notFound()
+            return
+        }
+
+        if (location.hasErrors()) {
+
+            respond location.errors, view:'create'
+            return
+        }
+
+        location.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'location.label', default: 'Location'), location.id])
+                redirect location
+            }
+            '*' { respond location, [status: CREATED] }
+        }
+    }
+
+    def edit(Location location) {
+        respond location
+    }
+
+    def update(Location location) {
+        if (location == null) {
+
+            notFound()
+            return
+        }
+
+        if (location.hasErrors()) {
+
+            respond location.errors, view:'edit'
+            return
+        }
+
+        location.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'location.label', default: 'Location'), location.id])
+                redirect location
+            }
+            '*'{ respond location, [status: OK] }
+        }
+    }
+
+    def delete(Location location) {
+
+        if (location == null) {
+            notFound()
+            return
+        }
+
+        try {
+            location.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'location.label', default: 'Location'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
+        }
+    }
 }

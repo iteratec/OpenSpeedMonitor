@@ -1,28 +1,14 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 package de.iteratec.osm
-/**
- * WPTConfigController
- * A controller class handles incoming web requests and performs actions such as redirects, rendering views and so on.
- */
+
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
+//TODO: create and delete were NOT generated
+
 class OsmConfigurationController {
 
-    static scaffold=OsmConfiguration
+    static scaffold = OsmConfiguration
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     def create() {
         redirect(action: 'list')
@@ -36,6 +22,80 @@ class OsmConfigurationController {
         } else {
             osmConfiguration.delete(flush:true)
             redirect(action: 'list')
+        }
+    }
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond OsmConfiguration.list(params), model:[osmConfigurationCount: OsmConfiguration.count()]
+    }
+
+    def show(OsmConfiguration osmConfiguration) {
+        respond osmConfiguration
+    }
+
+
+    def save(OsmConfiguration osmConfiguration) {
+        if (osmConfiguration == null) {
+            
+            notFound()
+            return
+        }
+
+        if (osmConfiguration.hasErrors()) {
+
+            respond osmConfiguration.errors, view:'create'
+            return
+        }
+
+        osmConfiguration.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'osmConfiguration.label', default: 'OsmConfiguration'), osmConfiguration.id])
+                redirect osmConfiguration
+            }
+            '*' { respond osmConfiguration, [status: CREATED] }
+        }
+    }
+
+    def edit(OsmConfiguration osmConfiguration) {
+        respond osmConfiguration
+    }
+
+    def update(OsmConfiguration osmConfiguration) {
+        if (osmConfiguration == null) {
+
+            notFound()
+            return
+        }
+
+        if (osmConfiguration.hasErrors()) {
+
+            respond osmConfiguration.errors, view:'edit'
+            return
+        }
+
+        osmConfiguration.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'osmConfiguration.label', default: 'OsmConfiguration'), osmConfiguration.id])
+                redirect osmConfiguration
+            }
+            '*'{ respond osmConfiguration, [status: OK] }
+        }
+    }
+
+
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'osmConfiguration.label', default: 'OsmConfiguration'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
         }
     }
 }

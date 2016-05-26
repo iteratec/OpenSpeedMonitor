@@ -1,20 +1,3 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
@@ -29,11 +12,11 @@ import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
 
-
-/**
- * Some methods got generated and adapted to support tags.
- */
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
+//TODO: save, show, update and tags were NOT generated
 class JobGroupController {
 
     static scaffold = JobGroup
@@ -175,5 +158,55 @@ class JobGroupController {
      */
     def tags(String term) {
         render JobGroup.findAllTagsWithCriteria([max: 5]) { ilike('name', "${term}%") } as JSON
+    }
+
+
+
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond JobGroup.list(params), model:[jobGroupCount: JobGroup.count()]
+    }
+
+
+
+    def create() {
+        respond new JobGroup(params)
+    }
+
+
+
+    def edit(JobGroup jobGroup) {
+        respond jobGroup
+    }
+
+
+
+    def delete(JobGroup jobGroup) {
+
+        if (jobGroup == null) {
+            notFound()
+            return
+        }
+
+        try {
+            jobGroup.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
+        }
     }
 }
