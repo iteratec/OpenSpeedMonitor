@@ -45,6 +45,7 @@ class JobGroupController {
 
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
+        def tagParam = params.remove('tags')
         def jobGroup = new JobGroup(params)
 
         CsiConfiguration configuration = CsiConfiguration.findByLabel(configurationLabel)
@@ -58,7 +59,8 @@ class JobGroupController {
         } else {
             // Tags can only be set after first successful save.
             // This is why Job needs to be saved again.
-            jobGroup.tags = params.list('tags')
+            def tags = [tagParam].flatten()
+            jobGroup.tags = tags
             jobGroup.save(flush: true)
 
             flash.message = message(code: 'default.created.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
