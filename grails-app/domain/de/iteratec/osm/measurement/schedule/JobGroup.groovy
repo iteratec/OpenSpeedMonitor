@@ -39,8 +39,6 @@ class JobGroup implements Taggable{
 
     CsiConfiguration csiConfiguration
 
-    boolean persistHar
-
     /**
      * Graphite-Servers to which results of this JobGroup should be sent.
      */

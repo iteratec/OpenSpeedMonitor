@@ -26,7 +26,7 @@ import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.result.detail.AssetGroup
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 
@@ -199,42 +199,6 @@ class DbCleanupService {
         }
 
         log.info "end with $jobName"
-    }
-
-
-    public void deleteHarDataBefore(Date toDeleteBefore, boolean createBatchActivity = true){
-        log.info "begin with deleteResultsDataBefore"
-
-        // use gorm-batching
-        def dc = new DetachedCriteria(AssetGroup).build {
-            lt 'date', toDeleteBefore.getTime()
-        }
-        int count = dc.count()
-
-        if(count > 0 && !batchActivityService.runningBatch(AssetGroup.class, 1)) {
-            BatchActivity batchActivity = batchActivityService.getActiveBatchActivity(AssetGroup.class, 1, Activity.DELETE, "Nightly cleanup of Har data",createBatchActivity)
-            //batch size -> hibernate doc recommends 10..50
-            int batchSize = 50
-            //TODO all three delete methods have many things in common,
-            //we should definitely do some closure magic to avoid code clones
-            0.step(count, batchSize) { int offset ->
-                batchActivity.updateStatus(['progress': batchActivityService.calculateProgress(count, offset)])
-                AssetGroup.withNewTransaction {
-                    dc.list(max: batchSize).each { AssetGroup assetGroup ->
-                        try {
-                            assetGroup.delete()
-                        } catch (Exception e) {
-                            println e
-                        }
-                    }
-                }
-                //clear hibernate session first-level cache
-                AssetGroup.withSession { session -> session.clear() }
-            }
-            batchActivity.updateStatus([ "progress": "100 %", "endDate": new Date(), "status": Status.DONE])
-        }
-
-        log.info "end with deleteHarDataBefore"
     }
 }
 

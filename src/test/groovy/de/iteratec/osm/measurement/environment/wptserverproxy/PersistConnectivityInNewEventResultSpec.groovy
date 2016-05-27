@@ -31,7 +31,7 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.detail.HarFetchService
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -103,8 +103,6 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
             // not the concern of this test
         }
         mocker.mockTTCsMappingService(serviceUnderTest)
-        serviceUnderTest.harFetchService = new HarFetchService()
-        serviceUnderTest.harFetchService.metaClass.addJobResultToQueue = {long id -> }
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
     }
 

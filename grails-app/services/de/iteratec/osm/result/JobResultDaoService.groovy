@@ -18,7 +18,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.result.detail.HARStatus
 
 /**
  * Provides DAO functionality for {@link JobResult} domain.
@@ -45,16 +44,5 @@ class JobResultDaoService {
 	 */
 	public Collection<JobResult> findSuccessfulJobResultsByJob(Job _job, Date fromDate, Date toDate) {
 		return JobResult.where { job == _job && httpStatusCode == 200 && date >= fromDate && date <= toDate }.list(sort: 'date', order: 'desc')
-	}
-
-	/**
-	 * Changes HARStatus from a given JobResult and saves it
-	 * @param result Result to change
-	 * @param status new HARStatus
-	 */
-	public void changeHARStatus(long id, HARStatus status){
-		JobResult result = JobResult.lock(id)
-		result.harStatus = status
-		result.save(flush: true)
 	}
 }

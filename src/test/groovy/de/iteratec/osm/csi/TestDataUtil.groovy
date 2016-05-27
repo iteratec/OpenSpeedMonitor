@@ -33,7 +33,7 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.AssetGroup
+
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
@@ -1554,14 +1554,4 @@ class TestDataUtil {
         return createJob("label", createScript("label1", "description", "navi", false),
                 location, group, "description", 1, false, 10)
     }
-    /**
-     * Creates a AssetGroup without Assets. Note that every id will be set to 1,
-     * regardless if an object with this id exists
-     * @return AssetGroup
-     */
-    public static AssetGroup createAssetGroup(Date date = new Date()) {
-        return new AssetGroup(connectivity: "6.000 kb", url: "http://iteratec.de/picture.gif", browser: 1, cached: false,
-                assets: [], location: 1, eventName: "", jobGroup: 1, jobResult: 1, date: date.getTime())
-    }
-
 }

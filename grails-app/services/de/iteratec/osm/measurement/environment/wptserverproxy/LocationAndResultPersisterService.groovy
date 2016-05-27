@@ -30,7 +30,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.HarFetchService
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -57,7 +57,6 @@ class LocationAndResultPersisterService implements iListener{
 	MetricReportingService metricReportingService
     PerformanceLoggingService performanceLoggingService
 	CsiValueService csiValueService
-	HarFetchService harFetchService
 
     /**
 	 * Persisting non-existent locations.
@@ -495,7 +494,6 @@ class LocationAndResultPersisterService implements iListener{
 							"(testId='${resultXml.getTestId()}', jobConfigLabel='${resultXml.getLabel()}')!"
 			)
 		}
-		harFetchService.addJobResultToQueue(jobResult.id)
 	}
 
 	void report(EventResult result){

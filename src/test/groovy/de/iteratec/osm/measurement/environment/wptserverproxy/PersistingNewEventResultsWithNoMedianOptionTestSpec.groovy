@@ -30,11 +30,10 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.HarFetchService
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
 import org.junit.Before
 import org.junit.Test
@@ -80,8 +79,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockMetricReportingService()
 
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
-        serviceUnderTest.harFetchService = new HarFetchService()
-        serviceUnderTest.harFetchService.metaClass.addJobResultToQueue = {long id ->}
     }
 
     void createLocationsAndJobs(){

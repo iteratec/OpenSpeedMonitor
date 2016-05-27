@@ -32,8 +32,6 @@ class OsmConfiguration {
     static final Integer DEFAULT_INITIAL_CHART_WIDTH_IN_PIXELS = 1070
     static final String DEFAULT_MAIN_URL_UNDER_TEST = ''
     static final Integer DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS = 13
-    static final Integer DEFAULT_MAX_HAR_DATA_STORAGE_TIME_IN_MONTHS = 13
-    static final Integer DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS = 30
     static final CsiTransformation CSI_TRANSFORMATION_TO_USE = CsiTransformation.BY_MAPPING
 
 
@@ -61,14 +59,8 @@ class OsmConfiguration {
     String mainUrlUnderTest = DEFAULT_MAIN_URL_UNDER_TEST
     /** Maximum Number of months osm keeps results in database   */
     Integer maxDataStorageTimeInMonths = DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
-    /** Maximum Number of days osm keeps BatchActivities in database   */
-    Integer maxBatchActivityStorageTimeInDays = DEFAULT_MAX_BATCH_ACTIVITY_STORAGE_TIME_IN_DAYS
-    /** Maximum Number of months osm keeps har data in database   */
-    Integer maxHarDataStorageTimeInMonths = DEFAULT_MAX_HAR_DATA_STORAGE_TIME_IN_MONTHS
     /** Method of transformation from measured load time to percent of users which are satisfied by that load time used in the application. */
     CsiTransformation csiTransformation = CSI_TRANSFORMATION_TO_USE
-    /** Set to true, if the detail data for job results should be fetched**/
-    Boolean detailFetchingEnabled = false
 
     static mapping = {
         detailDataStorageTimeInWeeks(defaultValue: DEFAULT_DETAIL_DATA_STORAGE_TIME_IN_WEEKS)
@@ -79,9 +71,7 @@ class OsmConfiguration {
         initialChartWidthInPixels(defaultValue: DEFAULT_INITIAL_CHART_HEIGHT_IN_PIXELS)
         mainUrlUnderTest(defaultValue: DEFAULT_MAIN_URL_UNDER_TEST)
         maxDataStorageTimeInMonths defaultValue: DEFAULT_MAX_DATA_STORAGE_TIME_IN_MONTHS
-        maxHarDataStorageTimeInMonths defaultValue: DEFAULT_MAX_HAR_DATA_STORAGE_TIME_IN_MONTHS
         csiTransformation defaultValue: CSI_TRANSFORMATION_TO_USE
-        detailFetchingEnabled defaultValue: false
     }
 
 

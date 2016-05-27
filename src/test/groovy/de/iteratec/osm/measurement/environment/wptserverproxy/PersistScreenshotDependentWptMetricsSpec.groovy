@@ -27,7 +27,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.HarFetchService
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -116,8 +116,6 @@ class PersistScreenshotDependentWptMetricsSpec {
         serviceUnderTest.metaClass.informDependentCsiAggregations = { EventResult results ->
             // not the concern of this test
         }
-        serviceUnderTest.harFetchService = new HarFetchService()
-        serviceUnderTest.harFetchService.metaClass.addJobResultToQueue = {long id ->}
         mocker.mockTTCsMappingService(serviceUnderTest)
         serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
     }

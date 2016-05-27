@@ -73,13 +73,6 @@
                         class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                               default="Einzelergebnisse"/></g:link>
             </li>
-            <li class="controller ${controllerName.equals('detailAnalysisDashboard') ? 'active' : ''}">
-                <g:link controller="detailAnalysisDashboard" action="show"><i
-                        class="fa fa-search"></i> <g:message code="de.iteratec.result.detailAnalysis.label"
-                                                              default="Detail analysis"/></g:link>
-            </li>
-
-
         </g:elseif>
 
     <%-- CSI --%>

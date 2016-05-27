@@ -20,14 +20,12 @@ package de.iteratec.osm.result
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.persistence.HarPersistenceService
+
 import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
-import org.joda.time.DateTime
 
 /**
  * DetailAnalysisDashboardController
@@ -40,7 +38,6 @@ class DetailAnalysisDashboardController {
 
     EventResultDashboardService eventResultDashboardService
     JobGroupDaoService jobGroupDaoService
-    HarPersistenceService harPersistenceService
 
     Map<String, Object> show(DetailAnalysisDashboardCommand cmd) {
         Map<String, Object> modelToRender = constructStaticViewData()
@@ -146,23 +143,24 @@ class DetailAnalysisDashboardController {
     }
 
     private void fillWithDashboardData(Map<String, Object> modelToRender, DetailAnalysisDashboardCommand cmd) {
-        // TODO select data from cmd
-//        def from = cmd.from
-//        def to = cmd.to
-        def from = new Date(0)
-        def to = new Date()
-        def jobGroupIds = cmd.selectedFolder as List
-        def pageIds = cmd.selectedPages as List
-        def browserIds = (cmd.selectedAllBrowsers ? Browser.list()*.id : cmd.selectedBrowsers) as List
-        def locationIds = (cmd.selectedAllLocations ? Location.list()*.id : cmd.selectedLocations) as List
-        def connectivityList = (cmd.selectedAllConnectivityProfiles ? ConnectivityProfile.list()*.name : cmd.selectedConnectivityProfiles) as List
-
-        def graphData = harPersistenceService.getAssets(from, to, [], [], [], [], [])
-//        def graphData = harPersistenceService.getAssets(from, to, jobGroupIds, pageIds, browserIds, locationIds, connectivityList)
-        def graphDataJson = graphData
-        modelToRender.put('graphData', graphDataJson)
-
-        fillWithLabelAliases(modelToRender)
+        //TODO at this point we should get the data from the OsmDa Service
+//        // TODO select data from cmd
+////        def from = cmd.from
+////        def to = cmd.to
+//        def from = new Date(0)
+//        def to = new Date()
+//        def jobGroupIds = cmd.selectedFolder as List
+//        def pageIds = cmd.selectedPages as List
+//        def browserIds = (cmd.selectedAllBrowsers ? Browser.list()*.id : cmd.selectedBrowsers) as List
+//        def locationIds = (cmd.selectedAllLocations ? Location.list()*.id : cmd.selectedLocations) as List
+//        def connectivityList = (cmd.selectedAllConnectivityProfiles ? ConnectivityProfile.list()*.name : cmd.selectedConnectivityProfiles) as List
+//
+//        def graphData = harPersistenceService.getAssets(from, to, [], [], [], [], [])
+////        def graphData = harPersistenceService.getAssets(from, to, jobGroupIds, pageIds, browserIds, locationIds, connectivityList)
+//        def graphDataJson = graphData
+//        modelToRender.put('graphData', graphDataJson)
+//
+//        fillWithLabelAliases(modelToRender)
     }
 
     private void fillWithLabelAliases(Map<String, Object> modelToRender) {

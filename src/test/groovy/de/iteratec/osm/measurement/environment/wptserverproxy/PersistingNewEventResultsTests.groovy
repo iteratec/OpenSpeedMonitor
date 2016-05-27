@@ -24,13 +24,10 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.detail.HarFetchService
-import de.iteratec.osm.result.detail.HarParserService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.mock.interceptor.MockFor
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.junit.After
@@ -982,7 +979,5 @@ class PersistingNewEventResultsTests {
 		ServiceMocker mockGenerator = ServiceMocker.create()
 		serviceUnderTest.csiValueService = new CsiValueService()
 		mockGenerator.mockOsmConfigCacheService(serviceUnderTest.csiValueService)
-		serviceUnderTest.harFetchService = new HarFetchService()
-		serviceUnderTest.harFetchService.metaClass.addJobResultToQueue = {long id ->}
     }
 }
