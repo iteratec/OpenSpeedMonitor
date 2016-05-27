@@ -1,7 +1,5 @@
 <div class="control-group fieldcontain ${hasErrors(bean: bean, field: 'property', 'error')}<g:if test="${required}">required</g:if>">
-    <label for="${property}" class="control-label">
-        <g:message code="${bean.class.getCanonicalName()}.label" default="${label}" /><g:if test="${required}"><span class="required-indicator">*</span></g:if>
-    </label>
+    <g:render template="/_fields/labelTemplate"/>
     <div class="controls">
         <g:textField  name="${property}" value="${value}" />
     </div>
