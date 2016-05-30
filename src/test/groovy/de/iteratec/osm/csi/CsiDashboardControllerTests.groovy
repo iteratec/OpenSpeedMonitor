@@ -1785,19 +1785,19 @@ class CsiDashboardControllerTests {
     }
 
     @Test
-    public void testShouldWarnAboutLongProcessingTime_Design_Hourly_3_weeks_10080_Points_Total_LessThan10000() {
+    public void testShouldWarnAboutLongProcessingTime_Design_Hourly_1_year() {
         int countOfSelectedSystems = 2;
         int countOfSelectedPages = 5;
         int countOfSelectedBrowser = 2;
 
         DateTime start = new DateTime(2013, 9, 30, 0, 0);
-        DateTime end = new DateTime(2013, 10, 20, 23, 59);
-        Interval timeFrameTwoWeeks = new Interval(start, end);
+        DateTime end = new DateTime(2014, 9, 30, 0, 0);
+        Interval timeFrameOneYear = new Interval(start, end);
 
         int selectedAggregationIntervallInMintues = 60; // one hour
 
         assertTrue(controllerUnderTest.shouldWarnAboutLongProcessingTime(
-                timeFrameTwoWeeks,
+                timeFrameOneYear,
                 selectedAggregationIntervallInMintues,
                 countOfSelectedSystems,
                 countOfSelectedPages,
