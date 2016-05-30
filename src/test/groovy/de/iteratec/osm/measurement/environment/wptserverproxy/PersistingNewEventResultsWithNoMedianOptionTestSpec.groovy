@@ -30,7 +30,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -55,6 +54,15 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
     LocationAndResultPersisterService serviceUnderTest
 
+    def doWithSpring = {
+        metricReportingService(MetricReportingService)
+        performanceLoggingService(PerformanceLoggingService)
+        timeToCsMappingService(TimeToCsMappingService)
+        pageService(PageService)
+        csiAggregationUpdateService(CsiAggregationUpdateService)
+        csiAggregationTagService(CsiAggregationTagService)
+    }
+
     @Before
     void setUp() {
         serviceUnderTest = service
@@ -78,7 +86,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //mocks common for all tests
         mockMetricReportingService()
 
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
     void createLocationsAndJobs(){
@@ -287,7 +295,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         ).save(failOnError: true);
     }
     private void mockTimeToCsMappingService(){
-        def timeToCsMappingService = new TimeToCsMappingService()
+        def timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
         timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docCompleteTime, Page testedPage, csiConfiguration ->
             return 1
         }
@@ -300,7 +308,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.timeToCsMappingService = timeToCsMappingService
     }
     private void mockCsiAggregationUpdateService(){
-        def csiAggregationUpdateServiceMocked = new CsiAggregationUpdateService()
+        def csiAggregationUpdateServiceMocked = grailsApplication.mainContext.getBean('csiAggregationUpdateService')
         csiAggregationUpdateServiceMocked.metaClass.createOrUpdateDependentMvs = { EventResult newResult ->
             //not the concern of this test
             return 34d
@@ -308,7 +316,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked
     }
     private void mockPageService(){
-        def pageServiceMocked = new PageService()
+        def pageServiceMocked = grailsApplication.mainContext.getBean('pageService')
         pageServiceMocked.metaClass.getPageByStepName = { String pageName ->
             def tokenized = pageName.tokenize(PageService.STEPNAME_DELIMITTER)
             return tokenized.size() == 2 ? Page.findByName(tokenized[0]):Page.findByName(Page.UNDEFINED)
@@ -325,7 +333,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.pageService = pageServiceMocked
     }
     private void mockCsiAggregationTagService(String tagToReturn){
-        def csiAggregationTagService = new CsiAggregationTagService()
+        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
         csiAggregationTagService.metaClass.createEventResultTag = {
             JobGroup jobGroup,
             MeasuredEvent measuredEvent,
@@ -341,7 +349,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
     private void mockMetricReportingService(){
-        def metricReportingService = new MetricReportingService()
+        def metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
         metricReportingService.metaClass.reportEventResultToGraphite = {
             EventResult result ->
                 // not the concern of this test

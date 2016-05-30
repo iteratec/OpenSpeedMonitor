@@ -61,10 +61,15 @@ class WeightingServiceTests {
     private CsiConfiguration csiConfiguration
     private CsiSystem csiSystem
 
+    def doWithSpring = {
+        performanceLoggingService(PerformanceLoggingService)
+        csiValueService(CsiValueService)
+        csiAggregationTagService(CsiAggregationTagService)
+    }
     @Before
     void setUp() {
         serviceUnderTest = service
-        serviceUnderTest.csiValueService = new CsiValueService()
+        serviceUnderTest.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
         mocksCommonToAllTests()
         createTestDataCommonToAllTests()
     }
@@ -716,7 +721,7 @@ class WeightingServiceTests {
 
     private void mocksCommonToAllTests() {
         mockCustomerSatisfactionWeightService()
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
         // into the domain EventResult injected service csiConfigCacheService would be null so we have to use metaclass to implement isCsiRelevant()-method for tests
         serviceUnderTest.csiValueService.metaClass.isCsiRelevant = { CsiValue csiValue ->
             return true
@@ -829,7 +834,7 @@ class WeightingServiceTests {
      * Mocks used methods of {@link de.iteratec.osm.result.CsiAggregationTagService}.
      */
     private void mockCsiAggregationTagService(Browser browserToReturn_50, Browser browserToReturn_70, Page pageToReturn_50, Page pageToReturn_70) {
-        def csiAggregationTagService = new CsiAggregationTagService()
+        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
         csiAggregationTagService.metaClass.static.findBrowserOfHourlyEventTag << { String hourlyEventMvTag ->
             Browser browser
             if (hourlyEventMvTag.equals(TAG_INDICATING_WEIGHT_OF_FIFTY_PERCENT)) {

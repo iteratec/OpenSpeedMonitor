@@ -34,5 +34,6 @@ class CronDispatcherQuartzJobSpec extends Specification {
     }
 
     void "test something"() {
+        true == false
     }
 }

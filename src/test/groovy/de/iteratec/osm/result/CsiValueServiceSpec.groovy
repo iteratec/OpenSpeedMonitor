@@ -40,6 +40,9 @@ class CsiValueServiceSpec extends Specification{
     EventResult eventResult
     CsiAggregation csiAggregation
 
+    def doWithSpring = {
+        osmConfigCacheService(OsmConfigCacheService)
+    }
     void setup() {
 
         serviceUnderTest = service
@@ -137,7 +140,7 @@ class CsiValueServiceSpec extends Specification{
     }
 
     void mocksCommonForAllTests(){
-        serviceUnderTest.osmConfigCacheService = new OsmConfigCacheService()
+        serviceUnderTest.osmConfigCacheService = grailsApplication.mainContext.getBean('osmConfigCacheService')
         serviceUnderTest.osmConfigCacheService.metaClass.getCachedMaxDocCompleteTimeInMillisecs = {int i -> return MAX_DOC_COMPLETE}
         serviceUnderTest.osmConfigCacheService.metaClass.getCachedMinDocCompleteTimeInMillisecs= {int i -> return MIN_DOC_COMPLETE}
     }

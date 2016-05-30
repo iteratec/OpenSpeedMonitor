@@ -91,12 +91,17 @@ class PageCsiAggregationServiceTests {
 
     PageCsiAggregationService serviceUnderTest
 
+    def doWithSpring = {
+            defaultMeasuredEventDaoService(DefaultMeasuredEventDaoService)
+    }
+
+
     @Before
     void setUp() {
         serviceUnderTest = service
 
         //mocks common for all tests
-        serviceUnderTest.measuredEventDaoService = new DefaultMeasuredEventDaoService();
+        serviceUnderTest.measuredEventDaoService = grailsApplication.mainContext.getBean('defaultMeasuredEventDaoService')
         mockCsiAggregationUpdateEventDaoService()
 
         //test-data common for all tests

@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
@@ -163,7 +164,6 @@ class JobProcessingService {
 	 * specified Job/test is running and that this is not the result of a finished
 	 * test execution.
 	 */
-	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	private JobResult persistUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus = null) {
 		// If no testId was provided some error occurred and needs to be logged
 		JobResult result
@@ -427,6 +427,7 @@ class JobProcessingService {
 	/**
 	 * Schedules a Quartz trigger to launch the given Job at the time(s) determined by its execution schedule Cron expression.
 	 */
+	@NotTransactional
 	public void scheduleJob(Job job, boolean rescheduleIfAlreadyScheduled = true) {
 		if (!job.executionSchedule) {
 			return
@@ -457,7 +458,7 @@ class JobProcessingService {
 			}
 		}
 	}
-
+	@NotTransactional
 	public void scheduleAllActiveJobs() {
 		if (log.infoEnabled) log.info("Launching all active jobs")
 		Job.findAll { active == true }.each { scheduleJob(it, false) }
@@ -466,6 +467,7 @@ class JobProcessingService {
 	/**
 	 * Removes the Quartz trigger for the specified Job
 	 */
+	@NotTransactional
 	public void unscheduleJob(Job job) {
 		if (log.infoEnabled) log.info("Unscheduling Job ${job.label}")
 		CronDispatcherQuartzJob.unschedule(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value())

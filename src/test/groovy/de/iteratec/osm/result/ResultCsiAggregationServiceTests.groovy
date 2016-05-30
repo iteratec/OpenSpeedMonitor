@@ -71,6 +71,12 @@ class ResultCsiAggregationServiceTests {
 
 	ConnectivityProfile connectivityProfile
 
+	def doWithSpring = {
+		jobResultDaoService(JobResultDaoService)
+		csiAggregationUtilService(CsiAggregationUtilService)
+		csiAggregationTagService(CsiAggregationTagService)
+		eventResultDaoService(EventResultDaoService)
+	}
 	@Before
 	void setUp() {
 		serviceUnderTest = service;
@@ -81,13 +87,13 @@ class ResultCsiAggregationServiceTests {
 		serviceUnderTest.browserDaoService = browserDaoServiceMock;
 		
 		//DB Call Find By should explicit be tested
-		serviceUnderTest.jobResultDaoService = new JobResultDaoService();
-		serviceUnderTest.eventResultDaoService = new EventResultDaoService();
+		serviceUnderTest.jobResultDaoService = grailsApplication.mainContext.getBean('jobResultDaoService')
+		serviceUnderTest.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
 
 		/** Functional Services **/
-		csiAggregationTagServiceMock = new CsiAggregationTagService();
+		csiAggregationTagServiceMock = grailsApplication.mainContext.getBean('csiAggregationTagService')
 		serviceUnderTest.csiAggregationTagService = csiAggregationTagServiceMock
-		csiAggregationUtilServiceMock=new CsiAggregationUtilService();
+		csiAggregationUtilServiceMock=grailsApplication.mainContext.getBean('csiAggregationUtilService')
 		serviceUnderTest.csiAggregationUtilService = csiAggregationUtilServiceMock
 
 		// Init some data:

@@ -104,6 +104,11 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
     public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
+	def doWithSpring = {
+		csiAggregationUtilService(CsiAggregationUtilService)
+		osmChartProcessingService(OsmChartProcessingService)
+		eventResultDashboardService(EventResultDashboardService)
+	}
 
     void setup() {
 
@@ -680,18 +685,17 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 		return graph;
 	}
 
+
     void mockServicesCommonForAllTests() {
 
         // We simply a modified version of the original service here, because
         // we expect only URL generation to be called and expect that
         // the service under test don't care about the URL itself.
-        serviceUnderTest.eventResultDashboardService = new EventResultDashboardService() {
-            @Override
-            public URL tryToBuildTestsDetailsURL(CsiAggregation mv) {
-                return new URL('http://measuredvalue.example.com/'+mv.id);
-            }
-        }
-        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService()
+        serviceUnderTest.eventResultDashboardService = grailsApplication.mainContext.getBean('eventResultDashboardService')
+		serviceUnderTest.eventResultDashboardService.metaClass.tryToBuildTestsDetailsURL = {CsiAggregation mv ->
+			return new URL('http://measuredvalue.example.com/'+mv.id);
+		}
+        serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
         mockGenerator = ServiceMocker.create()
         mockGenerator.mockCsTargetGraphDaoService(serviceUnderTest, graphLabel)
         mockGenerator.mockLinkGenerator(serviceUnderTest, 'http://www.iteratec.de')
@@ -703,7 +707,7 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
                 ['1' : new Browser(id: 1, name: expectedBrowserNames[0]), '2' : new Browser(id: 2, name: expectedBrowserNames[1])],
                 ['1' : new Location(id: 1, location: expectedLocationNames[0]), '2' : new Location(location: expectedLocationNames[1])]
         )
-        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
         serviceUnderTest.osmChartProcessingService.i18nService = [
                 msg: {String msgKey, String defaultMessage = null, List objs = null ->
                     Map i18nKeysToValues = [

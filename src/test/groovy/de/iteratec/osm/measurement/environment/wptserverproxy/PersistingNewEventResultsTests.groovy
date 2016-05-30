@@ -156,7 +156,18 @@ class PersistingNewEventResultsTests {
 
 	LocationAndResultPersisterService serviceUnderTest
 
-	@Before 
+	def doWithSpring = {
+		metricReportingService(MetricReportingService)
+		performanceLoggingService(PerformanceLoggingService)
+		proxyService(ProxyService)
+		browserService(BrowserService)
+		csiAggregationUpdateService(CsiAggregationUpdateService)
+		pageService(PageService)
+		csiAggregationTagService(CsiAggregationTagService)
+		csiValueService(CsiValueService)
+	}
+
+	@Before
 	void setUp() {
 		serviceUnderTest = service
         createTestDataCommonForAllTests()
@@ -164,7 +175,7 @@ class PersistingNewEventResultsTests {
 		//mocks common for all tests
 		SERVICE_MOCKER.mockTTCsMappingService(serviceUnderTest)
 		mockMetricReportingService()
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
 	}
 
 	@After
@@ -808,7 +819,7 @@ class PersistingNewEventResultsTests {
 	}
 	
 	private void mockProxyService(String locationIdentifier){
-		def proxyService = new ProxyService()
+		def proxyService = grailsApplication.mainContext.getBean('proxyService')
 		proxyService.metaClass.fetchLocations= { WebPageTestServer server ->
 			createLocationIfNotExistent(locationIdentifier, undefinedBrowser, server);
 		}
@@ -816,7 +827,7 @@ class PersistingNewEventResultsTests {
 	}
 	
 	private void mockBrowserService(){
-		def browserService = new BrowserService()
+		def browserService = grailsApplication.mainContext.getBean('browserService')
 		browserService.metaClass.findByNameOrAlias = { String nameOrAlias ->
 			//not the concern of this test
 			if(nameOrAlias.startsWith("IE"))
@@ -831,8 +842,9 @@ class PersistingNewEventResultsTests {
 		}
 		serviceUnderTest.browserService = browserService
 	}
+
 	private void mockCsiAggregationUpdateService(){
-		def csiAggregationUpdateServiceMocked = new CsiAggregationUpdateService()
+		def csiAggregationUpdateServiceMocked = grailsApplication.mainContext.getBean('csiAggregationUpdateService')
 		csiAggregationUpdateServiceMocked.metaClass.createOrUpdateDependentMvs = { EventResult newResult ->
 			//not the concern of this test
 			return 34d
@@ -840,7 +852,7 @@ class PersistingNewEventResultsTests {
 		serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked
 	}
 	private void mockPageService(){
-		def pageServiceMocked = new PageService()
+		def pageServiceMocked = grailsApplication.mainContext.getBean('pageService')
 		pageServiceMocked.metaClass.getPageByStepName = { String pageName ->
 			def tokenized = pageName.tokenize(PageService.STEPNAME_DELIMITTER)
 			return tokenized.size() == 2 ? Page.findByName(tokenized[0]):Page.findByName(Page.UNDEFINED)
@@ -857,7 +869,7 @@ class PersistingNewEventResultsTests {
 		serviceUnderTest.pageService = pageServiceMocked
 	}
 	private void mockCsiAggregationTagService(String tagToReturn){
-		def csiAggregationTagService = new CsiAggregationTagService()
+		def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
 		csiAggregationTagService.metaClass.createEventResultTag = {
 			JobGroup jobGroup,
 			MeasuredEvent measuredEvent,
@@ -873,7 +885,7 @@ class PersistingNewEventResultsTests {
 		serviceUnderTest.csiAggregationTagService = csiAggregationTagService
 	}
 	private void mockMetricReportingService(){
-		def metricReportingService = new MetricReportingService()
+		def metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
 		metricReportingService.metaClass.reportEventResultToGraphite = {
 			EventResult result ->
 			// not the concern of this test
@@ -977,7 +989,7 @@ class PersistingNewEventResultsTests {
 		csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages(Page.list())
 		undefinedJobGroup.csiConfiguration = csiConfiguration
 		ServiceMocker mockGenerator = ServiceMocker.create()
-		serviceUnderTest.csiValueService = new CsiValueService()
+		serviceUnderTest.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
 		mockGenerator.mockOsmConfigCacheService(serviceUnderTest.csiValueService)
     }
 }

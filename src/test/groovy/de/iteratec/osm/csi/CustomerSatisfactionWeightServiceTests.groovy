@@ -20,6 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -40,6 +41,9 @@ class CustomerSatisfactionWeightServiceTests {
 
     CsiConfiguration csiConfiguration
 
+    def doWithSpring = {
+        i18nService(I18nService)
+    }
     @Before
     void setUp() {
         serviceUnderTest = service

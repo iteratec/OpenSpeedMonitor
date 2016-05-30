@@ -48,19 +48,22 @@ class CsiDashboardControllerActualIntervalSpec{
 
     CsiDashboardController controllerUnderTest
 
+
+
     void setUp() {
-        // Because spring resources not loaded in unit tests, declare them locally:
+
         defineBeans {
+            csiAggregationUtilService(CsiAggregationUtilService)
             doubleValueConverter(DoubleValueConverter)
             dateValueConverter(DateValueConverter)
         }
-
         // The controller under test:
         controllerUnderTest = controller;
 
         //Mocks
         command = new CsiDashboardShowAllCommand()
-        command.csiAggregationUtilService = new CsiAggregationUtilService()
+//        command.csiAggregationUtilService = new CsiAggregationUtilService()
+        command.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
     }
 
 // daily page ////////////////////////////////////////////////////////////////////////////////////////////////////

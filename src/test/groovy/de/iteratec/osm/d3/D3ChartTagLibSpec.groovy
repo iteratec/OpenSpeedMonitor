@@ -18,10 +18,8 @@
 package de.iteratec.osm.d3
 
 import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.*
 import groovy.util.slurpersupport.NodeChild
-import org.junit.*
 import spock.lang.Specification
 
 /**

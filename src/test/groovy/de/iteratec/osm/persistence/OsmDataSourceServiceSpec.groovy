@@ -38,7 +38,6 @@ class OsmDataSourceServiceSpec {
 	//Mocks:
 //	ConfigService configServiceMock
 		
-	
 	@Before
 	void setUp() {
 		serviceUnderTest = service

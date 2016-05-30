@@ -81,6 +81,14 @@ class UpdateEventResultDependentCsiAggregationsTests {
     EventCsiAggregationService serviceUnderTest
     ServiceMocker mockGenerator
 
+    def doWithSpring = {
+        performanceLoggingService(PerformanceLoggingService)
+        csiValueService(CsiValueService)
+        configService(ConfigService)
+        connectivityProfileService(ConnectivityProfileService)
+        osmConfigCacheService(OsmConfigCacheService)
+    }
+
     void setUp() {
         Job.metaClass.static.performQuartzScheduling << {Boolean active ->
 
@@ -89,7 +97,7 @@ class UpdateEventResultDependentCsiAggregationsTests {
         serviceUnderTest = service
 
         //mocks common for all tests
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
         mockGenerator = ServiceMocker.create()
         mockGenerator.mockOsmConfigCacheService(serviceUnderTest)
         mockGenerator.mockEventResultService(serviceUnderTest)
@@ -109,9 +117,9 @@ class UpdateEventResultDependentCsiAggregationsTests {
                 idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests,
                 idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests
         )
-        serviceUnderTest.csiValueService = new CsiValueService()
-        serviceUnderTest.csiValueService.osmConfigCacheService = new OsmConfigCacheService()
-        serviceUnderTest.csiValueService.osmConfigCacheService.configService = new ConfigService()
+        serviceUnderTest.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
+        serviceUnderTest.csiValueService.osmConfigCacheService = grailsApplication.mainContext.getBean('osmConfigCacheService')
+        serviceUnderTest.csiValueService.osmConfigCacheService.configService = grailsApplication.mainContext.getBean('configService')
         createTestDataForAllTests()
         initializeFields()
 
@@ -312,7 +320,7 @@ class UpdateEventResultDependentCsiAggregationsTests {
 
     private void createConnectivityProfile() {
         connectivityProfile = TestDataUtil.createConnectivityProfile("conn1")
-        connectivityProfile.connectivityProfileService = new ConnectivityProfileService()
+        connectivityProfile.connectivityProfileService = grailsApplication.mainContext.getBean('connectivityProfileService')
     }
 
     private void createOsmConfiguration() {

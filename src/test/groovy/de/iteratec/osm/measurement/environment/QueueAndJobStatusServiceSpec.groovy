@@ -46,6 +46,9 @@ class QueueAndJobStatusServiceSpec extends Specification {
     private String labelJobWithExecutionSchedule = 'BV1 - Step 01'
     String jobGroupName
 
+    def doWithSpring = {
+        httpRequestService(HttpRequestService)
+    }
     @Betamax(tape = 'CreateChartData creates a map entry per server')
     def "CreateChartData creates a map entry per server"() {
         given:
@@ -89,7 +92,7 @@ class QueueAndJobStatusServiceSpec extends Specification {
         }
 
         Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
-        HttpRequestService httpRequestService = new HttpRequestService()
+        HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
         httpRequestService.metaClass.getRestClientFrom = { WebPageTestServer wptserver ->
             RESTClient restClient = new RESTClient(wptserver.baseUrl)
             restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))

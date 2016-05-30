@@ -84,6 +84,17 @@ class SummarizedChartLegendEntriesSpec extends Specification{
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
     public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
+    def doWithSpring = {
+        resultCsiAggregationService(ResultCsiAggregationService)
+        eventResultDaoService(EventResultDaoService)
+        jobResultDaoService(JobResultDaoService)
+        csiAggregationTagService(CsiAggregationTagService)
+        csiAggregationUtilService(CsiAggregationUtilService)
+        defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
+        osmChartProcessingService(OsmChartProcessingService)
+        i18nService(I18nService)
+    }
+
     void setup() {
         serviceUnderTest = service
         prepareMocksCommonForAllTests()
@@ -638,17 +649,18 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         return result.save(failOnError: true)
     }
 
+
     void prepareMocksCommonForAllTests() {
-        serviceUnderTest.resultCsiAggregationService = new ResultCsiAggregationService()
-        serviceUnderTest.resultCsiAggregationService.eventResultDaoService = new EventResultDaoService()
+        serviceUnderTest.resultCsiAggregationService = grailsApplication.mainContext.getBean('resultCsiAggregationService')
+        serviceUnderTest.resultCsiAggregationService.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
         MOCKER.mockLinkGenerator(serviceUnderTest, 'http://not-the-concern-of-this-test.org')
-        serviceUnderTest.jobResultDaoService = new JobResultDaoService()
+        serviceUnderTest.jobResultDaoService = grailsApplication.mainContext.getBean('jobResultDaoService')
         MOCKER.mockI18nService(serviceUnderTest)
         MOCKER.mockPerformanceLoggingService(serviceUnderTest)
-        serviceUnderTest.csiAggregationTagService = new CsiAggregationTagService()
-        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService()
-        serviceUnderTest.aggregatorTypeDaoService = new DefaultAggregatorTypeDaoService()
-        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        serviceUnderTest.csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
+        serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+        serviceUnderTest.aggregatorTypeDaoService = grailsApplication.mainContext.getBean('defaultAggregatorTypeDaoService')
+        serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
         serviceUnderTest.osmChartProcessingService.i18nService = [
                 msg: {String msgKey, String defaultMessage = null, List objs = null ->
                     Map i18nKeysToValues = [

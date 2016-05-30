@@ -54,14 +54,20 @@ class GraphiteEventServiceSpec extends Specification{
     public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
     public static final String jobGroupName = 'associated JobGroup'
 
+    def doWithSpring = {
+        eventDaoService(EventDaoService)
+        csiAggregationUtilService(CsiAggregationUtilService)
+        httpRequestService(HttpRequestService)
+    }
+
     def setup() {
 
         serviceUnderTest = service
 
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
         ServiceMocker.create().mockBatchActivityService(serviceUnderTest)
-        serviceUnderTest.eventDaoService = new EventDaoService()
-        CsiAggregationUtilService mockedCsiAggregationUtilService = new CsiAggregationUtilService()
+        serviceUnderTest.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
+        CsiAggregationUtilService mockedCsiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
         mockedCsiAggregationUtilService.metaClass.getNowInUtc = { -> untilDateTime }
         serviceUnderTest.csiAggregationUtilService = mockedCsiAggregationUtilService
         mockHttpBuilderToUseBetamax()
@@ -108,7 +114,7 @@ class GraphiteEventServiceSpec extends Specification{
 
     private void mockHttpBuilderToUseBetamax(){
         Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
-        HttpRequestService httpRequestService = new HttpRequestService()
+        HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
         httpRequestService.metaClass.getRestClient = {String url ->
             RESTClient restClient = new RESTClient(url)
             restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))

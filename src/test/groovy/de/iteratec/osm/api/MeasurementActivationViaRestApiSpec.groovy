@@ -17,6 +17,10 @@ class MeasurementActivationViaRestApiSpec extends Specification {
     static String apiKeyAllowed = 'allowed'
     static String apiKeyNotAllowed = 'not-allowed'
 
+    def doWithSpring = {
+        inMemoryConfigService(InMemoryConfigService)
+    }
+
     void setup(){
         controllerUnderTest = controller
         //test data common to all tests
@@ -26,7 +30,7 @@ class MeasurementActivationViaRestApiSpec extends Specification {
         }
         //mocks common to all tests
 //        mockFilters(SecureApiFunctionsFilters)
-        inMemoryConfigService = new InMemoryConfigService()
+        inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
         controllerUnderTest.inMemoryConfigService = inMemoryConfigService
     }
 

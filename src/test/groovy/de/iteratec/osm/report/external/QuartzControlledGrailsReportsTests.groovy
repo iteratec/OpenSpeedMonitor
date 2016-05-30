@@ -71,13 +71,23 @@ class QuartzControlledGrailsReportsTests {
 	
 	MetricReportingService serviceUnderTest
 	public MockedGraphiteSocket graphiteSocketUsedInTests
-	
+
+	def doWithSpring = {
+		inMemoryConfigService(InMemoryConfigService)
+		csiAggregationUtilService(CsiAggregationUtilService)
+		configService(ConfigService)
+		eventCsiAggregationService(EventCsiAggregationService)
+		csiAggregationTagService(CsiAggregationTagService)
+		pageCsiAggregationService(PageCsiAggregationService)
+		shopCsiAggregationService(ShopCsiAggregationService)
+	}
+
 	@Before
 	void setUp() {
 		serviceUnderTest = service
-		serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService()
-		serviceUnderTest.configService = new ConfigService()
-		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
+		serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+		serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
+		serviceUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
 		serviceUnderTest.inMemoryConfigService.activateMeasurementsGenerally()
 		new ServiceMocker().mockBatchActivityService(serviceUnderTest)
 		new OsmConfiguration().save(failOnError: true)
@@ -385,15 +395,15 @@ class QuartzControlledGrailsReportsTests {
 //	 * Mocks {@linkplain EventCsiAggregationService#getOrCalculateHourylCsiAggregations}.
 	 */
 	private void mockEventCsiAggregationService(Collection<CsiAggregation> toReturnFromGetHourlyCsiAggregations){
-		def eventCsiAggregationService = new EventCsiAggregationService()
-		
+		def eventCsiAggregationService = grailsApplication.mainContext.getBean('eventCsiAggregationService')
+
 		// FIXME mze-2013-12-10: Hier muss unterschieden werden, welche Op man mocken möchte!
 		// Das mocking von Grails ist echt nicht gut lesbar :-(
 		eventCsiAggregationService.metaClass.getHourlyCsiAggregations = {
 			Date fromDate, Date toDate, MvQueryParams mvQueryParams ->
-			
+
 			return toReturnFromGetHourlyCsiAggregations
-			
+
 		}
 		serviceUnderTest.eventCsiAggregationService = eventCsiAggregationService
 	}
@@ -401,7 +411,7 @@ class QuartzControlledGrailsReportsTests {
 	 * Mocks methods of {@linkplain de.iteratec.osm.result.CsiAggregationTagService}.
 	 */
 	private void mockCsiAggregationTagService(){
-		def csiAggregationTagService = new CsiAggregationTagService()
+		def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
 		csiAggregationTagService.metaClass.findPageOfHourlyEventTag = {String hourlyEventMvTag ->
 			Page page = new Page()
 			page.setName(pageName)
@@ -433,14 +443,14 @@ class QuartzControlledGrailsReportsTests {
 	 * Mocks {@linkplain PageCsiAggregationService#getOrCalculatePageCsiAggregations}.
 	 */
 	private void mockPageCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes){
-		def pageCsiAggregationService = new PageCsiAggregationService ()
+		def pageCsiAggregationService = grailsApplication.mainContext.getBean('pageCsiAggregationService')
 		pageCsiAggregationService.metaClass.getOrCalculatePageCsiAggregations = {
 			Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
 			if ( ! interval.intervalInMinutes.equals(expectedIntervalInMinutes)) {
 				return []
 			}
 			return toReturnOnDemandForGetOrCalculateCsiAggregations
-			
+
 		}
 		serviceUnderTest.pageCsiAggregationService = pageCsiAggregationService
 	}
@@ -448,7 +458,7 @@ class QuartzControlledGrailsReportsTests {
 	 * Mocks {@linkplain ShopCsiAggregationService#getOrCalculateShopCsiAggregations}.
 	 */
 	private void mockShopCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes){
-		def shopCsiAggregationService = new ShopCsiAggregationService()
+		def shopCsiAggregationService = grailsApplication.mainContext.getBean('shopCsiAggregationService')
 		shopCsiAggregationService.metaClass.getOrCalculateShopCsiAggregations = {
 			Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
 			if ( ! interval.intervalInMinutes.equals(expectedIntervalInMinutes)) {

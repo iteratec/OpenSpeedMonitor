@@ -51,6 +51,11 @@ class CsiByEventResultsServiceTests {
 	CsiByEventResultsService serviceUnderTest
 	MvQueryParams queryParamsIrrelevantCauseDbQueriesAreMocked
 
+	def doWithSpring = {
+		meanCalcService(MeanCalcService)
+		performanceLoggingService(PerformanceLoggingService)
+	}
+
     void setUp() {
 		serviceUnderTest = service
         mocksCommonToAllTests()
@@ -167,10 +172,10 @@ class CsiByEventResultsServiceTests {
 	//mocks//////////////////////////////////////////////////////////////////////////////
 
     private mocksCommonToAllTests(){
-        serviceUnderTest.meanCalcService = new MeanCalcService()
+        serviceUnderTest.meanCalcService = grailsApplication.mainContext.getBean('meanCalcService')
         mockEventResultDaoService()
         mockCsTargetGraphDaoService()
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
 	/**

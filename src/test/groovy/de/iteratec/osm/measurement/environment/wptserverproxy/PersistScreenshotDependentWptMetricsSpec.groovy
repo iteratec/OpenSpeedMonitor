@@ -27,7 +27,6 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -76,6 +75,10 @@ class PersistScreenshotDependentWptMetricsSpec {
     LocationAndResultPersisterService serviceUnderTest
     ServiceMocker mocker
 
+    def doWithSpring = {
+        pageService(PageService)
+        performanceLoggingService(PerformanceLoggingService)
+    }
     void setUp() {
 
         serviceUnderTest = service
@@ -105,7 +108,7 @@ class PersistScreenshotDependentWptMetricsSpec {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
         mocker.mockMetricReportingService(serviceUnderTest)
-        serviceUnderTest.pageService = new PageService()
+        serviceUnderTest.pageService = grailsApplication.mainContext.getBean('pageService')
         mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
@@ -117,7 +120,7 @@ class PersistScreenshotDependentWptMetricsSpec {
             // not the concern of this test
         }
         mocker.mockTTCsMappingService(serviceUnderTest)
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
     void tearDown() {

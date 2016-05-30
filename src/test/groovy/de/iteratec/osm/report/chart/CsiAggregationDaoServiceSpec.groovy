@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat
 import static org.junit.Assert.assertEquals
 import grails.test.mixin.*
 import grails.test.mixin.support.*
-
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.*
@@ -41,7 +40,11 @@ class CsiAggregationDaoServiceSpec {
 	CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
 	AggregatorType pageAggregator, shopAggregator, eventAggregator
 	ServiceMocker mockGenerator
-	
+
+	def doWithSpring = {
+		csiAggregationUtilService(CsiAggregationUtilService)
+	}
+
 	@Before
     public void setUp() {
 		
@@ -384,7 +387,7 @@ class CsiAggregationDaoServiceSpec {
 	
 	private void mockCsiAggregationUtilService(DateTime utcNowToReturn){
 		
-		CsiAggregationUtilService mvuService = new CsiAggregationUtilService()
+		CsiAggregationUtilService mvuService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
 		mvuService.metaClass.getNowInUtc = {->return utcNowToReturn}
 		serviceUnderTest.csiAggregationUtilService = mvuService
 	}

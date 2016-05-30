@@ -34,6 +34,10 @@ class CsiConfigurationControllerTests extends Specification {
     CsiConfiguration config1
     CsiConfiguration config2
 
+    def doWithSpring = {
+        performanceLoggingService(PerformanceLoggingService)
+    }
+
     void setup() {
         CsiDay testDay = new CsiDay(name: "testDay")
         (0..23).each {
@@ -49,7 +53,7 @@ class CsiConfigurationControllerTests extends Specification {
         config2.save(failOnError: true)
 
         I18nService i18nService = Mock(I18nService)
-        controller.performanceLoggingService = new PerformanceLoggingService()
+        controller.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
         controller.i18nService = i18nService
     }
 

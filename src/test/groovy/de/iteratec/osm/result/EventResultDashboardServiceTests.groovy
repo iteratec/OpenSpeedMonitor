@@ -96,7 +96,21 @@ class EventResultDashboardServiceTests {
     public static final String I18N_LABEL_MEASURAND = 'Measurand'
     public static final String I18N_LABEL_CONNECTIVITY = 'Connectivity'
 
-
+    def doWithSpring = {
+        resultCsiAggregationService(ResultCsiAggregationService)
+        eventResultDaoService(EventResultDaoService)
+        osmChartProcessingService(OsmChartProcessingService)
+        eventResultDaoService(EventResultDaoService)
+        performanceLoggingService(PerformanceLoggingService)
+        csiAggregationUtilService(CsiAggregationUtilService)
+        defaultJobGroupDaoService(DefaultJobGroupDaoService)
+        defaultPageDaoService(DefaultPageDaoService)
+        defaultBrowserDaoService(DefaultBrowserDaoService)
+        defaultLocationDaoService(DefaultLocationDaoService)
+        csiAggregationTagService(CsiAggregationTagService)
+        i18nService(I18nService)
+        defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
+    }
     @Before
     void setUp() {
 
@@ -430,12 +444,13 @@ class EventResultDashboardServiceTests {
         assertEquals(String.valueOf(resultIDsCount), paramsMap.get('lastKnownCountOfAggregatedResultsOrNull'));
     }
 
+
     private void mocksCommonToAllTests(){
-        serviceUnderTest.resultCsiAggregationService = new ResultCsiAggregationService()
-        serviceUnderTest.resultCsiAggregationService.eventResultDaoService = new EventResultDaoService()
+        serviceUnderTest.resultCsiAggregationService = grailsApplication.mainContext.getBean('resultCsiAggregationService')
+        serviceUnderTest.resultCsiAggregationService.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
         serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
         serviceUnderTest.jobResultDaoService = Mockito.mock(JobResultDaoService.class);
-        serviceUnderTest.osmChartProcessingService = new OsmChartProcessingService()
+        serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
         mockI18nService()
         serviceUnderTest.osmChartProcessingService.i18nService = [
                 msg: {String msgKey, String defaultMessage = null, List objs = null ->
@@ -660,7 +675,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#eventResultDaoService}.
      */
     private void mockEventResultDaoService() {
-        def eventResultDaoService = new EventResultDaoService()
+        def eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
         eventResultDaoService.metaClass.getLimitedMedianEventResultsBy= {
             Date fromDate,
             Date toDate,
@@ -710,18 +725,19 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#performanceLoggingService}.
      */
     private void mockPerformanceLoggingService() {
-        def performanceLoggingService = new PerformanceLoggingService()
+        def performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
         performanceLoggingService.metaClass.logExecutionTime= {
             LogLevel level, String description, IndentationDepth indentation, Closure toMeasure ->
                 toMeasure.call()
         }
         serviceUnderTest.performanceLoggingService = performanceLoggingService
     }
+
     /**
      * Mocks {@linkplain EventCsiAggregationService#performanceLoggingService}.
      */
     private void mockCsiAggregationUtilService() {
-        def csiAggregationUtilService = new CsiAggregationUtilService()
+        def csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
         csiAggregationUtilService.metaClass.resetToStartOfActualInterval= {
             DateTime dateWithinInterval, Integer intervalInMinutes ->
                 return runDateHourlyStart
@@ -732,7 +748,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#jobGroupDaoService}.
      */
     private void mockJobGroupDaoService() {
-        def jobGroupDaoService = new DefaultJobGroupDaoService()
+        def jobGroupDaoService = grailsApplication.mainContext.getBean('defaultJobGroupDaoService')
         jobGroupDaoService.metaClass.getIdToObjectMap= { ->
             return [1: JobGroup.get(1), 2: JobGroup.get(2)]
         }
@@ -742,7 +758,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#pageDaoService}.
      */
     private void mockPageDaoService() {
-        def pageDaoService = new DefaultPageDaoService()
+        def pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
         pageDaoService.metaClass.getIdToObjectMap= { ->
             return [1: Page.get(1), 2: Page.get(2)]
         }
@@ -752,7 +768,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#browserDaoService}.
      */
     private void mockBrowserDaoService() {
-        def browserDaoService = new DefaultBrowserDaoService()
+        def browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')
         browserDaoService.metaClass.getIdToObjectMap= { ->
             return [1: Browser.get(1), 2: Browser.get(2)]
         }
@@ -762,7 +778,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
      */
     private void mockLocationDaoService() {
-        def locationDaoService = new DefaultLocationDaoService()
+        def locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
         locationDaoService.metaClass.getIdToObjectMap= { ->
             return [1: Location.get(1), 2: Location.get(2)]
         }
@@ -772,7 +788,7 @@ class EventResultDashboardServiceTests {
      * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
      */
     private void mockCsiAggregationTagService() {
-        def csiAggregationTagService = new CsiAggregationTagService()
+        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
         csiAggregationTagService.metaClass.findJobGroupIdOfHourlyEventTag= {
             String hourlyEventMvTag ->
                 return Long.valueOf(hourlyEventMvTag.tokenize(';')[0]) as Serializable
@@ -795,9 +811,8 @@ class EventResultDashboardServiceTests {
         }
         serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
-
     private void mockI18nService() {
-        def i18nService = new I18nService()
+        def i18nService = grailsApplication.mainContext.getBean('i18nService')
         i18nService.metaClass.msg= {
             String msgKey, String defaultMessage, List objs ->
                 return defaultMessage
@@ -806,7 +821,7 @@ class EventResultDashboardServiceTests {
     }
 
     private mockAggregatorTypeDaoService() {
-        def aggregatorTypeDaoService = new DefaultAggregatorTypeDaoService()
+        def aggregatorTypeDaoService = grailsApplication.mainContext.getBean('defaultAggregatorTypeDaoService')
         aggregatorTypeDaoService.metaClass.getNameToObjectMap= { ->
             Map<String, AggregatorType> map = [
                     (AggregatorType.RESULT_CACHED_DOM_TIME)  : AggregatorType.findByName(AggregatorType.RESULT_CACHED_DOM_TIME),

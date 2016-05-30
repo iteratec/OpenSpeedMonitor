@@ -65,7 +65,10 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
 
     LocationAndResultPersisterService serviceUnderTest
     ServiceMocker mocker
-
+    def doWithSpring = {
+        pageService(PageService)
+        performanceLoggingService(PerformanceLoggingService)
+    }
     void setup() {
 
         serviceUnderTest = service
@@ -97,13 +100,13 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     void createMocksCommonForAllTests() {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
-        serviceUnderTest.pageService = new PageService()
+        serviceUnderTest.pageService = grailsApplication.mainContext.getBean('pageService')
         mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }
         mocker.mockTTCsMappingService(serviceUnderTest)
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
     // multistep ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

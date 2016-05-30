@@ -34,6 +34,10 @@ class OsmChartTagLibSpec extends Specification {
 
     static def HTML_FRAGMENT_PARSER
 
+	def doWithSpring = {
+		configService(ConfigService)
+	}
+
 	void setup(){
 		//test data common for all tests
 		TestDataUtil.createOsmConfig()
@@ -48,7 +52,7 @@ class OsmChartTagLibSpec extends Specification {
         //test specific mocks
 
 		def osmChartTagLib = mockTagLib(OsmChartTagLib)
-		osmChartTagLib.configService = new ConfigService()
+		osmChartTagLib.configService = grailsApplication.mainContext.getBean('configService')
 
 		// create test-specific data
 
@@ -146,7 +150,7 @@ class OsmChartTagLibSpec extends Specification {
         //test specific mocks
 
         def osmChartTagLib = mockTagLib(OsmChartTagLib)
-		osmChartTagLib.configService = new ConfigService()
+		osmChartTagLib.configService = grailsApplication.mainContext.getBean('configService')
 
         // create test-specific data
 

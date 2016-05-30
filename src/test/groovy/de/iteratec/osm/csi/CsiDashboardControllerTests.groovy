@@ -72,6 +72,10 @@ class CsiDashboardControllerTests {
     LocationDaoService locationDaoServiceMock
     ConfigService configServiceMock
 
+    def doWithSpring ={
+        csiAggregationUtilService(CsiAggregationUtilService)
+    }
+
     @Before
     public void setUp() {
         // Because spring resources not loaded in unit tests, declare them locally:
@@ -85,7 +89,7 @@ class CsiDashboardControllerTests {
 
         // Mock relevant services:
         command = new CsiDashboardShowAllCommand()
-        command.csiAggregationUtilService = new CsiAggregationUtilService()
+        command.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
 
         this.aggregatorTypeDaoServiceMock = Mockito.mock(AggregatorTypeDaoService.class);
         controllerUnderTest.aggregatorTypeDaoService = aggregatorTypeDaoServiceMock;

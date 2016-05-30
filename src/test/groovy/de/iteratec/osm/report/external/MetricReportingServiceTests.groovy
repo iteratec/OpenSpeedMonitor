@@ -22,8 +22,6 @@ import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
-import de.iteratec.osm.util.ServiceMocker
-import groovy.mock.interceptor.MockFor
 import groovy.mock.interceptor.StubFor
 
 import static org.junit.Assert.assertEquals
@@ -85,11 +83,16 @@ class MetricReportingServiceTests {
 	static final String BROWSER_NAME = 'FF'
 	static final String MEASURAND_DOCREADYTIME_NAME = 'docReadyTime'
 
+	def doWithSpring = {
+		batchActivityService(BatchActivityService)
+		configService(ConfigService)
+		inMemoryConfigService(InMemoryConfigService)
+	}
     void setUp() {
 		serviceUnderTest = service
-		serviceUnderTest.configService = new ConfigService()
-		serviceUnderTest.inMemoryConfigService = new InMemoryConfigService()
-		serviceUnderTest.batchActivityService = new BatchActivityService()
+		serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
+		serviceUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
+		serviceUnderTest.batchActivityService = grailsApplication.mainContext.getBean('batchActivityService')
 		createTestDataCommonToAllTests()
     }
 	

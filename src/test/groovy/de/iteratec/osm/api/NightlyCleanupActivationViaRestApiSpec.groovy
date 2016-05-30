@@ -14,7 +14,9 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
 
     static String apiKeyAllowed = 'allowed'
     static String apiKeyNotAllowed = 'not-allowed'
-
+    def doWithSpring = {
+        inMemoryConfigService(InMemoryConfigService)
+    }
     void setup(){
         controllerUnderTest = controller
         //test data common to all tests
@@ -23,9 +25,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
             new ApiKey(secretKey: apiKeyNotAllowed, valid: true, allowedForNightlyDatabaseCleanupActivation: false).save(failOnError: true)
         }
         //mocks common to all tests
-//        mockFilters(SecureApiFunctionsFilters)
-        inMemoryConfigService = new InMemoryConfigService()
-        controllerUnderTest.inMemoryConfigService = inMemoryConfigService
+        controllerUnderTest.inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
     }
 
     // successful calls /////////////////////////////////////////////////////////////////////
@@ -43,7 +43,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
         then:
         response.status == 200
         response.text == "Set nightly-database-cleanup activation to: true"
-        inMemoryConfigService.isDatabaseCleanupEnabled() == true
+        controllerUnderTest.inMemoryConfigService.isDatabaseCleanupEnabled() == true
     }
 
     void "successful deactivation of nightly-database-cleanup"(){
@@ -59,7 +59,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
         then:
         response.status == 200
         response.text == "Set nightly-database-cleanup activation to: false"
-        inMemoryConfigService.isDatabaseCleanupEnabled() == false
+        controllerUnderTest.inMemoryConfigService.isDatabaseCleanupEnabled() == false
     }
 
     // failing calls /////////////////////////////////////////////////////////////////////
@@ -78,7 +78,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
         controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
 
         then:
-        inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
+        controllerUnderTest.inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
         response.status == 400
         response.text == "Error field apiKey: The submitted ApiKey doesn't have the permission to (de)activate nightly cleanups.\n"
     }
@@ -96,7 +96,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
         controllerUnderTest.securedViaApiKeySetNightlyDatabaseCleanupActivation(cmd)
 
         then:
-        inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
+        controllerUnderTest.inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
         response.status == 400
         response.text == "Error field activationToSet: nullable\n"
     }

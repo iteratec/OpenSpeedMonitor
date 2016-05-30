@@ -68,6 +68,11 @@ class FetchResultsFromWptserverTests extends Specification{
 
 	@Rule public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
 
+	def doWithSpring = {
+		performanceLoggingService(PerformanceLoggingService)
+		httpRequestService(HttpRequestService)
+	}
+
 	void setup() {
 
 		serviceUnderTest=service
@@ -77,14 +82,14 @@ class FetchResultsFromWptserverTests extends Specification{
 		}
 		//mock HttpBuilder in HttpRequestService to use betamax-proxy
 		Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
-		HttpRequestService httpRequestService = new HttpRequestService()
+		HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
 		httpRequestService.metaClass.getRestClientFrom = {WebPageTestServer wptserver ->
 			RESTClient restClient = new RESTClient(wptserver.baseUrl)
 			restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))
 			return restClient
 		}
 		serviceUnderTest.httpRequestService = httpRequestService
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
 
 		createTestDataCommonToAllTests()
 	}

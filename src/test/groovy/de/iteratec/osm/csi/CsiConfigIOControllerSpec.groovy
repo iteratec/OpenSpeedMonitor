@@ -34,9 +34,12 @@ import grails.test.mixin.support.*
 class CsiConfigIOControllerSpec extends Specification{
     CsiConfiguration csiConfigurationFilled
     CsiConfiguration csiConfigurationEmpty
+    def doWithSpring = {
+        customerSatisfactionWeightService(CustomerSatisfactionWeightService)
+    }
 
     void setup() {
-        controller.customerSatisfactionWeightService = new CustomerSatisfactionWeightService()
+        controller.customerSatisfactionWeightService = grailsApplication.mainContext.getBean('customerSatisfactionWeightService')
         Browser browser1 = TestDataUtil.createBrowser("Browser1",0)
         Browser browser2 = TestDataUtil.createBrowser("Browser2",0)
         ConnectivityProfile connectivityProfile1 = TestDataUtil.createConnectivityProfile("DSL1")

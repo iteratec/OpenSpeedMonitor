@@ -69,7 +69,10 @@ class EventResultDashboardControllerTests {
 	BrowserDaoService browserDaoServiceMock
 	LocationDaoService locationDaoServiceMock
 	EventResultDashboardService eventResultDashboardServiceMock
-	
+
+	def doWithSpring = {
+		eventResultDashboardService(EventResultDashboardService)
+	}
 	@Before
 	public void setUp()
 	{
@@ -100,7 +103,7 @@ class EventResultDashboardControllerTests {
 		//controllerUnderTest.measuredEventDaoService = this.measuredEventDaoServiceMock;
 
 		// FIXME DRI,MZE 2014-01-03: Remove use of "real" implementation. Suggest to infer Java interface and to use Mockito again. 
-		this.eventResultDashboardServiceMock = new EventResultDashboardService();
+		this.eventResultDashboardServiceMock = grailsApplication.mainContext.getBean('eventResultDashboardService')
 //		 Mockito.mock(EventResultDashboardService.class);
 		controllerUnderTest.eventResultDashboardService = this.eventResultDashboardServiceMock;
 		

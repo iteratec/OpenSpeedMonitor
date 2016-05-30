@@ -17,10 +17,6 @@
 
 package de.iteratec.osm
 
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.util.ServiceMocker
-
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
 import grails.test.mixin.*
@@ -37,10 +33,13 @@ class ConfigServiceSpec {
 	ConfigService serviceUnderTest
 	InMemoryConfigService inMemoryConfigService
 
+	def doWithSpring = {
+		inMemoryConfigService(InMemoryConfigService)
+	}
 	@Before
 	void setUp(){
 		serviceUnderTest = service
-		inMemoryConfigService = new InMemoryConfigService()
+		inMemoryConfigService = grailsApplication.mainContext.getBean('inMemoryConfigService')
 	}
 
     void testFailingGettingDetailDataStorageTime() {

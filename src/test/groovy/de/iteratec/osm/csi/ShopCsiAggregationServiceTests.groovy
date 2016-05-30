@@ -63,6 +63,17 @@ class ShopCsiAggregationServiceTests {
 
     ShopCsiAggregationService serviceUnderTest
 
+    def doWithSpring = {
+        pageCsiAggregationService(PageCsiAggregationService)
+        csiAggregationDaoService(CsiAggregationDaoService)
+        csiAggregationTagService(CsiAggregationTagService)
+        csiAggregationUtilService(CsiAggregationUtilService)
+        meanCalcService(MeanCalcService)
+        performanceLoggingService(PerformanceLoggingService)
+        csiAggregationUpdateEventDaoService(CsiAggregationUpdateEventDaoService)
+        weightingService(WeightingService)
+    }
+
     void setUp() {
         weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
         dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
@@ -89,10 +100,10 @@ class ShopCsiAggregationServiceTests {
 
         serviceUnderTest = service
         //mocks common for all tests
-        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService();
-        serviceUnderTest.pageCsiAggregationService.csiAggregationUtilService = new CsiAggregationUtilService();
-        serviceUnderTest.pageCsiAggregationService.meanCalcService = new MeanCalcService();
-        serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+        serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+        serviceUnderTest.pageCsiAggregationService.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+        serviceUnderTest.pageCsiAggregationService.meanCalcService = grailsApplication.mainContext.getBean('meanCalcService')
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
         mockCsiAggregationUpdateEventDaoService()
     }
 
@@ -258,7 +269,7 @@ class ShopCsiAggregationServiceTests {
     // mocks
 
     private void mockPageCsiAggregationService() {
-        def pageCsiAggregationService = new PageCsiAggregationService()
+        def pageCsiAggregationService = grailsApplication.mainContext.getBean('pageCsiAggregationService')
         pageCsiAggregationService.metaClass.getOrCalculatePageCsiAggregations = {
             Date fromDate, Date toDate, CsiAggregationInterval interval, List<JobGroup> csiGroups ->
                 List<CsiAggregation> irrelevantCauseListOfWeightedValuesIsRetrievedByMock = [new CsiAggregation()]
@@ -268,7 +279,7 @@ class ShopCsiAggregationServiceTests {
     }
 
     private void mockCsiAggregationDaoService() {
-        CsiAggregationDaoService original = new CsiAggregationDaoService()
+        CsiAggregationDaoService original = grailsApplication.mainContext.getBean('csiAggregationDaoService')
         serviceUnderTest.csiAggregationDaoService = original
         serviceUnderTest.pageCsiAggregationService.csiAggregationDaoService = original
         serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationDaoService = original
@@ -276,7 +287,7 @@ class ShopCsiAggregationServiceTests {
 
     private void mockCsiAggregationTagService(List<JobGroup> csiGroups) {
         Pattern patternToReturn = ~/(${csiGroups*.ident().join('||')})/
-        def csiAggregationTagServiceMocked = new CsiAggregationTagService()
+        def csiAggregationTagServiceMocked = grailsApplication.mainContext.getBean('csiAggregationTagService')
         csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyShopCasWithJobGroups = {
             List<JobGroup> theCsiGroups ->
                 return patternToReturn
@@ -321,8 +332,9 @@ class ShopCsiAggregationServiceTests {
     /**
      * Mocks methods of {@link WeightingService}.
      */
+
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = new WeightingService()
+        def weightingService = grailsApplication.mainContext.getBean('weightingService')
         weightingService.metaClass.getWeightedCsiValues = {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
@@ -338,7 +350,7 @@ class ShopCsiAggregationServiceTests {
      * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
      */
     private void mockCsiAggregationUpdateEventDaoService() {
-        def csiAggregationUpdateEventDaoService = new CsiAggregationUpdateEventDaoService ()
+        def csiAggregationUpdateEventDaoService = grailsApplication.mainContext.getBean('csiAggregationUpdateEventDaoService')
         csiAggregationUpdateEventDaoService.metaClass.createUpdateEvent = {
             Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
 

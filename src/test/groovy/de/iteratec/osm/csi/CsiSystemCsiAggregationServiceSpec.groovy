@@ -76,6 +76,11 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     CsiSystemCsiAggregationService serviceUnderTest
 
+    def doWithSpring = {
+        csiAggregationUtilService(CsiAggregationUtilService)
+        csiAggregationDaoService(CsiAggregationDaoService)
+    }
+
     void setup() {
 
         serviceUnderTest = service
@@ -304,8 +309,8 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     }
 
     private mocksCommonForAllTests(CsiSystemCsiAggregationService serviceUnderTest) {
-        serviceUnderTest.csiAggregationUtilService = new CsiAggregationUtilService();
-        serviceUnderTest.csiAggregationDaoService = new CsiAggregationDaoService()
+        serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
+        serviceUnderTest.csiAggregationDaoService = grailsApplication.mainContext.getBean('csiAggregationDaoService')
 
         Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
         SERVICE_MOCKER.mockCsiAggregationTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
