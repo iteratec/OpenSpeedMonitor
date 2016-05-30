@@ -17,15 +17,17 @@
 
 package de.iteratec.osm
 
-import static org.hamcrest.Matchers.*
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.runtime.FreshRuntime
+import org.junit.Before
+
+import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertThat
-import grails.test.mixin.*
-
-import org.junit.*
-
 /**
  * See the API for {@link grails.test.mixin.services.ServiceUnitTestMixin} for usage instructions
  */
+@FreshRuntime
 @TestFor(ConfigService)
 @Mock([OsmConfiguration])
 class ConfigServiceSpec {
