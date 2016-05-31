@@ -10,6 +10,7 @@ import de.iteratec.osm.d3Data.MatrixViewEntry
 import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
@@ -142,8 +143,16 @@ class JobGroupController {
             jobGroup.csiConfiguration = null
         }
 
+
+        jobGroup.graphiteServers.clear()
+        params.list('graphiteServers').each{
+            jobGroup.graphiteServers.add(GraphiteServer.findById(it))
+        }
+        params.remove('graphiteServers')
+        def tagParam = params.remove('tags')
+        def tags = [tagParam].flatten()
+        jobGroup.tags = tags
         jobGroup.properties = params
-        jobGroup.tags = params.list('tags')
         if (!jobGroup.save(flush: true)) {
             render(view: "edit", model: [jobGroup: jobGroup])
             return
