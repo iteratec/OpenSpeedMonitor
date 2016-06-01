@@ -17,15 +17,13 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.util.I18nService
-
-import static grails.async.Promises.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -34,9 +32,10 @@ import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
-
 import org.quartz.CronExpression
 import org.springframework.http.HttpStatus
+
+import static grails.async.Promises.task
 
 class JobController {
 
@@ -381,7 +380,7 @@ class JobController {
         Job job = Job.get(jobId)
         jobProcessingService.cancelJobRun(job, testId)
 
-        render(view: 'index', model: getListModel() << [filters: params.filters, saveSuccess: i18nService.msg("de.iteratec.osm.job.jobCancelSuccess", "success")])
+        sendSimpleResponseAsStream(response, HttpStatus.OK, '')
     }
 
     /**
