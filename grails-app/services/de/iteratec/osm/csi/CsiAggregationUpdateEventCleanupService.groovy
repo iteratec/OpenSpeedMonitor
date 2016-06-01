@@ -35,7 +35,6 @@ import grails.gorm.DetachedCriteria
  * @author nkuhn
  */
 class CsiAggregationUpdateEventCleanupService {
-
     CsiAggregationDaoService csiAggregationDaoService
     PageCsiAggregationService pageCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService
@@ -86,17 +85,15 @@ class CsiAggregationUpdateEventCleanupService {
                     log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Calculating and closing open and expired csi aggregations...")
                     activityUpdater.addProgressToStage().update()
 
-                    CsiAggregation.withNewTransaction {
-                        try {
-                            closeAndCalculateIfNecessary(csiAggregationToCalcAndClose)
-                        } catch (Exception e) {
-                            log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation: \n" +
-                                    e.getMessage() +
-                                    "\n Processing with the next csiAggregations")
-                            activityUpdater.addFailures().setLastFailureMessage(e.getMessage()).update()
-                        }
-
+                    try {
+                        closeAndCalculateIfNecessary(csiAggregationToCalcAndClose)
+                    } catch (Exception e) {
+                        log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation: \n" +
+                                e.getMessage() +
+                                "\n Processing with the next csiAggregations")
+                        activityUpdater.addFailures().setLastFailureMessage(e.getMessage()).update()
                     }
+
 
                     session.flush()
                 }
@@ -113,11 +110,12 @@ class CsiAggregationUpdateEventCleanupService {
 
     void closeAndCalculateIfNecessary(CsiAggregation csiAggregationOpenAndExpired) {
         CsiAggregationUpdateEvent latestUpdateEvent = csiAggregationDaoService.getLatestUpdateEvent(csiAggregationOpenAndExpired.ident())
+        def latestUpdateEventList = latestUpdateEvent ? [latestUpdateEvent] : []
 
-        if (csiAggregationOpenAndExpired.hasToBeCalculatedAccordingEvents([latestUpdateEvent])) {
+        if (csiAggregationOpenAndExpired.hasToBeCalculatedAccordingEvents(latestUpdateEventList)) {
             calculateAndCloseCsiAggregation(csiAggregationOpenAndExpired)
         } else {
-            closeOpenAndExpiredCsiAggregations(csiAggregationOpenAndExpired)
+            closeOpenAndExpiredCsiAggregation(csiAggregationOpenAndExpired.id)
         }
     }
 
@@ -125,17 +123,17 @@ class CsiAggregationUpdateEventCleanupService {
         switch (csiAggregation.aggregator.name) {
             case AggregatorType.PAGE:
                 calculatePageMvs(csiAggregation)
-                closeOpenAndExpiredCsiAggregations(csiAggregation)
+                closeOpenAndExpiredCsiAggregation(csiAggregation.id)
                 break
 
             case AggregatorType.SHOP:
                 calculateShopMvs(csiAggregation)
-                closeOpenAndExpiredCsiAggregations(csiAggregation)
+                closeOpenAndExpiredCsiAggregation(csiAggregation.id)
                 break
 
             case AggregatorType.CSI_SYSTEM:
                 calculateCsiSystemCsiAggregation(csiAggregation)
-                closeOpenAndExpiredCsiAggregations(csiAggregation)
+                closeOpenAndExpiredCsiAggregation(csiAggregation.id)
                 break
         }
     }
@@ -144,8 +142,9 @@ class CsiAggregationUpdateEventCleanupService {
         csiSystemCsiAggregationService.calcCa(csiAggregationToCalculate, csiAggregationToCalculate.csiSystem)
     }
 
-    void closeOpenAndExpiredCsiAggregations(CsiAggregation csiAggregationToClose) {
+    void closeOpenAndExpiredCsiAggregation(Long csiAggregationToCloseId) {
         CsiAggregation.withTransaction {
+            CsiAggregation csiAggregationToClose = CsiAggregation.findById(csiAggregationToCloseId)
             csiAggregationToClose.closedAndCalculated = true
             csiAggregationToClose.save()
         }

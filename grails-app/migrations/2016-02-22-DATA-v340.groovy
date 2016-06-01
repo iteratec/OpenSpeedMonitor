@@ -194,12 +194,6 @@ databaseChangeLog = {
         ''')
     }
 
-    changeSet(author: "bwo", id: "1455107343000-1") {
-        sql('''
-            INSERT INTO aggregator_type (version,measurand_group,name)
-            VALUES(0, 'PERCENTAGES', 'csBasedOnVisuallyCompleteInPercentUncached'), (0, 'PERCENTAGES', 'csBasedOnVisuallyCompleteInPercentCached');
-        ''')
-    }
     changeSet(author: "bwo", id: "1455705739000-1") {
         sql('''
             UPDATE osm_configuration SET initial_chart_width_in_pixels=1070;
