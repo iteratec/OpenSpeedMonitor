@@ -204,7 +204,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     // mocks common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     void mockTimeToCsMappingService() {
-        locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
+        TimeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
             return 42 //not the concern of this tests
         }
     }
