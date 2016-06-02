@@ -24,6 +24,7 @@ import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Common base class for all integration tests which empties the database after execution of a test class.
@@ -32,6 +33,7 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
  *
  *@Deprecated use SPOCK-Framework for testing instead -> NonTransactionalIntegrationSpec
  */
+@ConfineMetaClassChanges([CsiAggregationDaoService])
 class IntTestWithDBCleanup {
 	
 	@BeforeClass

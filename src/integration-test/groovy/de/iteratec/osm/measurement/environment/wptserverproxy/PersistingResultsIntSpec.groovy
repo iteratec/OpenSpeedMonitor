@@ -17,40 +17,37 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import groovy.mock.interceptor.StubFor
 import groovy.util.slurpersupport.GPathResult
+import spock.util.mop.ConfineMetaClassChanges
+
 /**
  *
  */
 @Integration
 @Rollback
+@ConfineMetaClassChanges([LocationAndResultPersisterService, TimeToCsMappingService, CsiAggregationUpdateService, MetricReportingService])
 class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
-    static transactional = false //necessary because we test transactional service methods
-
     LocationAndResultPersisterService locationAndResultPersisterService
-	
-	private static final String LOCATION_IDENTIFIER  = 'Agent1-wptdriver:Firefox'
+
+    private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     private static Closure originalPersistJobResultsMethod
     private static Closure originalPersistEventResultsMethod
-	WebPageTestServer server1
+    WebPageTestServer server1
 
     def setup() {
-
 
         originalPersistJobResultsMethod = locationAndResultPersisterService.&persistJobResult
         originalPersistEventResultsMethod = locationAndResultPersisterService.&persistResultsOfOneTeststep
@@ -61,20 +58,17 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     }
 
-    def cleanup(){
-
-
+    def cleanup() {
         resetLarpServiceMetaclass()
-
     }
 
-	void "Results get persisted even after failed csi aggregation."() {
+    void "Results get persisted even after failed csi aggregation."() {
 
         setup:
-		//create test-specific data
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
-		//test specific mocks
-		mockCsiAggregationUpdateService(true)
+        //create test-specific data
+        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        //test specific mocks
+        mockCsiAggregationUpdateService(true)
         mockMetricReportingService(false)
         //expected values
         int runs = 1
@@ -83,13 +77,14 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int expectedNumberOfResults = runs * events * cachedViews
 
         when:
-		locationAndResultPersisterService.listenToResult(xmlResult, server1)
+        locationAndResultPersisterService.listenToResult(xmlResult, server1)
 
-		then:
+        then:
         JobResult.list().size() == 1
-		EventResult.list().size == expectedNumberOfResults
+        EventResult.list().size == expectedNumberOfResults
 
-	}
+    }
+
     void "Results get persisted even after failed metric reporting."() {
 
         setup:
@@ -112,6 +107,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         EventResult.list().size == expectedNumberOfResults
 
     }
+
     void "No EventResults get persisted when Persistence of JobResults  throws an Exception."() {
 
         setup:
@@ -132,6 +128,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         EventResult.list().size == expectedNumberOfResults
 
     }
+
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
 
         setup:
@@ -147,7 +144,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int failedEvents = 1
         int cachedViews = 2
         int expectedNumberOfJobResults = 1
-        int expectedNumberOfEventResults = runs * (events-failedEvents) * cachedViews
+        int expectedNumberOfEventResults = runs * (events - failedEvents) * cachedViews
 
         when:
         locationAndResultPersisterService.listenToResult(xmlResult, server1)
@@ -157,8 +154,8 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         EventResult.list().size == expectedNumberOfEventResults
 
     }
-	
-	// create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * All test data created here has to be deleted in cleanup method after every test!!!
@@ -168,7 +165,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
      * Integration tests that test code with own separate transactions wouldn't see test data if creation in test would
      * happen in an own transaction.
      */
-    private createTestDataCommonToAllTests(){
+    private createTestDataCommonToAllTests() {
 
         TestDataUtil.createPages(['HP', 'MES', Page.UNDEFINED])
         Browser undefBrowser = TestDataUtil.createBrowser(Browser.UNDEFINED, 1)
@@ -200,45 +197,47 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     }
 
-    void mocksCommonToAllTests(){
+    void mocksCommonToAllTests() {
         mockTimeToCsMappingService()
     }
 
-	// mocks common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	void mockTimeToCsMappingService(){
-        def stub = new StubFor(TimeToCsMappingService,true)
-        stub.demand.getCustomerSatisfactionInPercent (1..100){
-            Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
-			return 42 //not the concern of this tests
-		}
-        locationAndResultPersisterService.timeToCsMappingService = stub.proxyInstance()
-	}
-	void mockCsiAggregationUpdateService(boolean shouldFail){
-		locationAndResultPersisterService.csiAggregationUpdateService.metaClass.createOrUpdateDependentMvs = {EventResult result ->
-			if(shouldFail) throw new RuntimeException('Faked failing of csi aggregation in integration test')
-		}	
-	}
-	void mockMetricReportingService(boolean shouldFail){
-		locationAndResultPersisterService.metricReportingService.metaClass.reportEventResultToGraphite = {EventResult result ->
-            if(shouldFail) throw new RuntimeException('Faked failing of metric reporting in integration test')
-		}
-	}
-    void letPersistingJobResultThrowAnException(boolean throwException){
-        locationAndResultPersisterService.metaClass.persistJobResult = {WptResultXml resultXml ->
-            if(throwException) throw new OsmResultPersistanceException('Faked failing of JobResult persistance in integration test')
+    // mocks common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    void mockTimeToCsMappingService() {
+        locationAndResultPersisterService.timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docReadyTimeInMilliSecs, Page page, CsiConfiguration csiConfiguration = null ->
+            return 42 //not the concern of this tests
         }
     }
-    void letPersistingEventResultsOfSpecificStepThrowAnException(int stepNumber){
-        locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = {Integer testStepZeroBasedIndex, WptResultXml resultXml ->
-            if (testStepZeroBasedIndex == stepNumber){
+
+    void mockCsiAggregationUpdateService(boolean shouldFail) {
+        CsiAggregationUpdateService.metaClass.createOrUpdateDependentMvs = { EventResult result ->
+            if (shouldFail) throw new RuntimeException('Faked failing of csi aggregation in integration test')
+        }
+    }
+
+    void mockMetricReportingService(boolean shouldFail) {
+        MetricReportingService.metaClass.reportEventResultToGraphite = { EventResult result ->
+            if (shouldFail) throw new RuntimeException('Faked failing of metric reporting in integration test')
+        }
+    }
+
+    void letPersistingJobResultThrowAnException(boolean throwException) {
+        locationAndResultPersisterService.metaClass.persistJobResult = { WptResultXml resultXml ->
+            if (throwException) throw new OsmResultPersistanceException('Faked failing of JobResult persistance in integration test')
+        }
+    }
+
+    void letPersistingEventResultsOfSpecificStepThrowAnException(int stepNumber) {
+        locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = { Integer testStepZeroBasedIndex, WptResultXml resultXml ->
+            if (testStepZeroBasedIndex == stepNumber) {
                 throw new OsmResultPersistanceException('Faked failing of EventResult persistance in integration test')
-            }else{
+            } else {
                 originalPersistEventResultsMethod(testStepZeroBasedIndex, resultXml)
             }
         }
     }
-    void resetLarpServiceMetaclass(){
+
+    void resetLarpServiceMetaclass() {
         locationAndResultPersisterService.metaClass.persistJobResult = originalPersistJobResultsMethod
         locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = originalPersistEventResultsMethod
     }

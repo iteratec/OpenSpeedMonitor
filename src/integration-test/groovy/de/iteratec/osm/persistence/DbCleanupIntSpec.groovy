@@ -17,13 +17,9 @@
 
 package de.iteratec.osm.persistence
 
-import de.iteratec.osm.csi.IntTestWithDBCleanup
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
-import org.junit.Test
-
-import static org.junit.Assert.assertNull
 
 /**
  *

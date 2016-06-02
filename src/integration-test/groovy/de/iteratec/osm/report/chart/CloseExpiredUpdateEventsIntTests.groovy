@@ -18,6 +18,8 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.InMemoryConfigService
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
@@ -28,6 +30,7 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  * Methods in this class test the functionality to close {@link CsiAggregation}s.
@@ -41,6 +44,7 @@ import org.joda.time.DateTimeZone
  */
 @Integration
 @Rollback
+@ConfineMetaClassChanges([CsiAggregationUtilService, BatchActivityService])
 class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     CsiAggregationUtilService csiAggregationUtilService
@@ -147,7 +151,6 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
             String tag = "${JobGroup.list()[0].ident()}"
             createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
             createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
-            println ""
         }
 
         List<CsiAggregation> csiAggregations = CsiAggregation.list()

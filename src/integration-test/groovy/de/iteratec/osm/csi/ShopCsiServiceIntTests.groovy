@@ -34,12 +34,14 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import spock.util.mop.ConfineMetaClassChanges
 
 /**
  *
  */
 @Integration
 @Rollback
+@ConfineMetaClassChanges([CsiByEventResultsService])
 class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-10

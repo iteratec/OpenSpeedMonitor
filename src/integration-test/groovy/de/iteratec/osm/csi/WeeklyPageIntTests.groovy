@@ -33,10 +33,12 @@ import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Ignore
 import spock.lang.Shared
+import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.*
 @Integration
 @Rollback
+@ConfineMetaClassChanges([JobResultDaoService])
 class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 	/** injected by grails */
 	CsiAggregationTagService csiAggregationTagService

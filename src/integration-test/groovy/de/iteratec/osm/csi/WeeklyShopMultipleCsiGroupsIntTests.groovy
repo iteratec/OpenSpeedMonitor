@@ -31,42 +31,44 @@ import de.iteratec.osm.result.EventResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
+
 @Integration
 @Rollback
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
-	/** injected by grails */
-	EventCsiAggregationService eventCsiAggregationService
-	JobService jobService
-	CsiAggregationTagService csiAggregationTagService
-	static ShopCsiAggregationService shopCsiAggregationService
-	static LocationAndResultPersisterService locationAndResultPersisterService
+    /** injected by grails */
+    EventCsiAggregationService eventCsiAggregationService
+    JobService jobService
+    CsiAggregationTagService csiAggregationTagService
+    static ShopCsiAggregationService shopCsiAggregationService
+    static LocationAndResultPersisterService locationAndResultPersisterService
 
-	Map<String, Double> targetValues
-	List<Page> pageObjectsToTest
+    Map<String, Double> targetValues
+    List<Page> pageObjectsToTest
 
-	static CsiAggregationInterval weeklyInterval
-	static AggregatorType shopAggregatorType
-	static List<JobGroup> csiGroups
-	static List<CsiAggregation> wsmvs
-	static final List<String> pagesToTest = [
-		'HP',
-		'MES',
-		'SE',
-		'ADS',
-		'WKBS',
-		'WK'
-	]
-	static final String csvName = 'weekly_shop_multiple_csi_groups.csv'
-	static final DateTime startOfWeek = new DateTime(2012,11,12,0,0,0)
-	static final String csiGroup1Name = 'csiGroup1'
-	static final String csiGroup2Name = 'csiGroup2'
+    static CsiAggregationInterval weeklyInterval
+    static AggregatorType shopAggregatorType
+    static List<JobGroup> csiGroups
+    static List<CsiAggregation> wsmvs
+    static final List<String> pagesToTest = [
+            'HP',
+            'MES',
+            'SE',
+            'ADS',
+            'WKBS',
+            'WK'
+    ]
+    static final String csvName = 'weekly_shop_multiple_csi_groups.csv'
+    static final DateTime startOfWeek = new DateTime(2012, 11, 12, 0, 0, 0)
+    static final String csiGroup1Name = 'csiGroup1'
+    static final String csiGroup2Name = 'csiGroup2'
 
-	static final Integer countResultsPerWeeklyShopMv = 12
-	static final Integer countWeeklyShopMvsToBeCreated = 2
-	static final Integer countResultsPerWeeklyPageMv = 4
-	static final Integer countWeeklyPageMvsToBeCreated = 4
-	def setup() {
+    static final Integer countResultsPerWeeklyShopMv = 12
+    static final Integer countWeeklyShopMvsToBeCreated = 2
+    static final Integer countResultsPerWeeklyPageMv = 4
+    static final Integer countWeeklyPageMvsToBeCreated = 4
+
+    def setup() {
         System.out.println('Create some common test-data...');
         TestDataUtil.createOsmConfig()
         CsiAggregationInterval.withNewTransaction {
@@ -113,19 +115,19 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         pagesToTest.each {
             pageObjectsToTest.add(Page.findByName(it))
         }
-	}
+    }
 
-	/**
-	 * After pre-calculation of hourly job-{@link CsiAggregation}s the creation and calculation of weekly shop-{@link CsiAggregation}s is tested.
-	 */
-	void testCreationAndCalculationOfWeeklyShopValues() {
-		setup:
-		Date startDate = startOfWeek.toDate()
+    /**
+     * After pre-calculation of hourly job-{@link CsiAggregation}s the creation and calculation of weekly shop-{@link CsiAggregation}s is tested.
+     */
+    void testCreationAndCalculationOfWeeklyShopValues() {
+        setup:
+        Date startDate = startOfWeek.toDate()
         List<CsiAggregation> wpmvsOfOneGroupPageCombination
-		when:
-		List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
-		then:
-		wsmvs.each { mvWeeklyShop ->
+        when:
+        List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
+        then:
+        wsmvs.each { mvWeeklyShop ->
             csiGroups.each { csiGroup ->
 
                 CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
@@ -140,14 +142,9 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
                 1 == wpmvsOfOneGroupPageCombination.size()
                 wpmvsOfOneGroupPageCombination.each { mvWeeklyPage ->
                     assert csiGroup.ident().toString() == mvWeeklyPage.tag
-				    assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
+                    assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
                 }
             }
         }
-	}
-
-	/**
-	 * Creating testdata.
-	 */
-
+    }
 }
