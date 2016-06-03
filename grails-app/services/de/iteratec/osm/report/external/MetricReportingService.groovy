@@ -21,6 +21,7 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import grails.transaction.NotTransactional
 import grails.transaction.Transactional
 
@@ -191,11 +192,11 @@ class MetricReportingService {
 		csiGroupsWithGraphiteServers.eachWithIndex {JobGroup eachJobGroup, int index ->
 			activity.addProgressToStage().update()
 			MvQueryParams queryParams = new MvQueryParams()
+			ConnectivityProfile.findAll().each {queryParams.connectivityProfileIds.add(it.id)}
 			queryParams.jobGroupIds.add(eachJobGroup.getId())
 			Date startOfLastClosedInterval = csiAggregationUtilService.resetToStartOfActualInterval(
 				csiAggregationUtilService.subtractOneInterval(reportingTimeStamp, CsiAggregationInterval.HOURLY),
-				CsiAggregationInterval.HOURLY)
-																	  .toDate();
+				CsiAggregationInterval.HOURLY).toDate();
 			List<CsiAggregation> mvs = eventCsiAggregationService.getHourlyCsiAggregations(startOfLastClosedInterval, startOfLastClosedInterval, queryParams).findAll{ CsiAggregation hmv ->
 				hmv.csByWptDocCompleteInPercent != null && hmv.countUnderlyingEventResultsByWptDocComplete() > 0
 			}
