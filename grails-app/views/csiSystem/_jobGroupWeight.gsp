@@ -8,7 +8,6 @@
               value="${jobGroupWeight?.jobGroup?.id}"/>
 
     <g:textField placeholder="weight" name='jobGroupWeights_${i}.weight' value='${jobGroupWeight?.weight}'/>
-    <span class="del-jobGroupWeight">
-        <input id="jobGroupWeights_${i}.removeButton" type="button" class="close" value="&times;" />
-    </span>
+    <input id="jobGroupWeights_${i}.removeButton" type="button" class="close" value="&times;" />
+    <p></p> //needed to create a bit space between the elements
 </div>
