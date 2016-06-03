@@ -37,6 +37,7 @@ buildscript {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url  "http://dl.bintray.com/iteratec/grails-plugins" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
