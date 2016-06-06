@@ -71,8 +71,22 @@ class GraphiteServer {
      * {@link GraphiteEventSourcePath}s, to create Events.
      */
     Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
+
     static hasMany = [graphitePaths:GraphitePath, graphiteEventSourcePaths:GraphiteEventSourcePath]
     static transients = ['serverInetAddress']
+
+    /**
+     * Configuration for {@link HealthReportService} with standard values.
+     */
+    Boolean reportHealthMetrics = true
+    String healthMetricsReportPrefix = "osm.healthmetrics"
+    String garbageCollectorPrefix = "jvm.gc"
+    String memoryReportPrefix = "jvm.mem"
+    String threadStatesReportPrefix = "jvm.thread-states"
+    String processCpuLoadPrefix = "cpu.processCpuLoad"
+    int timeBetweenReportsInSeconds = 300
+
+
 
     public InetAddress getServerInetAddress() {
         return InetAddress.getByName(serverAdress)
@@ -85,6 +99,12 @@ class GraphiteServer {
         webappUrl(nullable: false)
 		webappProtocol(nullable: false)
         webappPathToRenderingEngine(nullable: false)
+        reportHealthMetrics(nullable: false)
+        timeBetweenReportsInSeconds(min:0, max: 65535)
+        healthMetricsReportPrefix(nullable: false,maxSize: 255)
+        garbageCollectorPrefix(nullable: false, maxSize: 255)
+        memoryReportPrefix(nullable:false, maxSize: 255)
+        threadStatesReportPrefix(nullable: false, maxSize: 255)
     }
 
     @Override

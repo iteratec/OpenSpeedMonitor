@@ -123,6 +123,9 @@ dependencies {
 //    compile 'org.grails.plugins:codenarc:0.22'                  //Use gradle check instead  https://grails.org/plugin/codenarc
     compile 'p6spy:p6spy:2.1.4'
     compile 'xml-apis:xml-apis:1.4.01'                          //new dependency
+    compile 'io.dropwizard.metrics:metrics-core:3.1.0'
+    compile 'io.dropwizard.metrics:metrics-graphite:3.1.2'
+    compile 'io.dropwizard.metrics:metrics-jvm:3.1.2'
     runtime 'net.sf.supercsv:super-csv:2.4.0'
     runtime "org.grails.plugins:asset-pipeline"
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.7.4'

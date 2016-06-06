@@ -3,8 +3,9 @@ package de.iteratec.osm.report.external
 import org.springframework.dao.DataIntegrityViolationException
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
+//TODO: save, edit and delete are altered to support on-the-fly start/stop of health reporting
 class GraphiteServerController {
-
+    HealthReportService healthReportService
     static scaffold = GraphiteServer
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
@@ -35,6 +36,7 @@ class GraphiteServerController {
         }
 
         graphiteServer.save flush:true
+        healthReportService.handleGraphiteServer(graphiteServer)
 
         request.withFormat {
             form multipartForm {
@@ -63,6 +65,7 @@ class GraphiteServerController {
         }
 
         graphiteServer.save flush:true
+        healthReportService.handleGraphiteServer(graphiteServer)
 
         request.withFormat {
             form multipartForm {
@@ -81,6 +84,8 @@ class GraphiteServerController {
         }
 
         try {
+            graphiteServer.reportHealthMetrics = false
+            healthReportService.handleGraphiteServer(graphiteServer)
             graphiteServer.delete(flush: true)
             flash.message = message(code: 'default.deleted.message', args: [message(code: 'graphiteServer.label', default: 'GraphiteServer'), params.id])
             redirect(action: "index")

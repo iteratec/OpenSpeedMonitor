@@ -32,6 +32,8 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.report.external.HealthReportService
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -49,6 +51,7 @@ class BootStrap {
     I18nService i18nService
     LocationAndResultPersisterService locationAndResultPersisterService
     ProxyService proxyService
+    HealthReportService healthReportService
     def grailsApplication
 
     def init = { servletContext ->
@@ -84,8 +87,15 @@ class BootStrap {
         initJobScheduling()
         cancelActiveBatchActivity()
         excludePropertiesInJsonRepresentationsofDomainObjects()
+        initHealthReporting()
 
         log.info "initApplicationData() OSM ends"
+    }
+
+    void initHealthReporting(){
+        GraphiteServer.findAllByReportHealthMetrics(true).each{
+            healthReportService.handleGraphiteServer(it)
+        }
     }
 
     void initConfig() {

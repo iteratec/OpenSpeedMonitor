@@ -644,6 +644,67 @@ databaseChangeLog = {
     changeSet(author: "marko (generated)", id: "1459346200213-70") {
         addUniqueConstraint(columnNames: "name", constraintName: "UC_CONNECTIVITY_PROFILENAME_COL", tableName: "connectivity_profile")
     }
+    changeSet(author: "marko (generated)", id: "1459346200213-71") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "garbage_collector_prefix", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 
+    changeSet(author: "marko (generated)", id: "1459346200213-72") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "health_metrics_report_prefix", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 
+    changeSet(author: "marko (generated)", id: "1459346200213-73") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "memory_report_prefix", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "marko (generated)", id: "1459346200213-74") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "report_health_metrics", type: "bit") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "marko (generated)", id: "1459346200213-75") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "thread_states_report_prefix", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+    changeSet(author: "marko (generated)", id: "1459346200213-76") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "process_cpu_load_prefix", type: "varchar(255)") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+    changeSet(author: "marko (generated)", id: "1459346200213-77") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "time_between_reports_in_seconds", type: "integer") {
+                constraints(nullable: "false")
+            }
+        }
+    }
+
+    changeSet(author: "marko", id: "1459346200213-78"){
+        sql('''
+				UPDATE graphite_server SET garbage_collector_prefix = "jvm.gc", health_metrics_report_prefix = "osm.healthmetrics",
+				 thread_states_report_prefix = "jvm.threads", report_health_metrics = 0, memory_report_prefix= "jvm.mem",
+				 time_between_reports_in_seconds = 300, process_cpu_load_prefix= "cpu.processCpuLoadPrefix"
+			''')
+
+    }
 }
+
