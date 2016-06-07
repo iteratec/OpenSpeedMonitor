@@ -40,7 +40,7 @@ class HealthReportService {
     }
 
     private startReportingToServer(GraphiteServer graphiteServer){
-        log.debug("Try to start GraphiteReporter for ${graphiteServer.serverAdress}.")
+        log.debug("Trying to start GraphiteReporter for ${graphiteServer.serverAdress}.")
         MetricRegistry metricRegistry = new MetricRegistry()
         metricRegistry.register(graphiteServer.garbageCollectorPrefix, new GarbageCollectorMetricSet())
         metricRegistry.register(graphiteServer.memoryReportPrefix, new MemoryUsageGaugeSet())
@@ -49,12 +49,12 @@ class HealthReportService {
             @Override
             Object getValue() {
                 OperatingSystemMXBean bean = (com.sun.management.OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-                bean.getProcessCpuTime()
+                bean.getProcessCpuLoad()
             }
         })
         systemPublicMetrics.metrics().each{  m->
 
-            metricRegistry.register("systen."+m.getName(), new Gauge() {
+            metricRegistry.register("system."+m.getName(), new Gauge() {
 
                 @Override
                 Object getValue() {
@@ -82,7 +82,7 @@ class HealthReportService {
 
     private stopReportingToServer(GraphiteServer graphiteServer){
         if(reporterMap[graphiteServer.id]){
-            log.debug("Try to stop GraphiteReporter for ${graphiteServer.serverAdress}.")
+            log.debug("Trying to stop GraphiteReporter for ${graphiteServer.serverAdress}.")
             reporterMap[graphiteServer.id].stop()
             reporterMap.remove(graphiteServer.id)
             log.debug("Stoped GraphiteReporter for ${graphiteServer.serverAdress}.")
