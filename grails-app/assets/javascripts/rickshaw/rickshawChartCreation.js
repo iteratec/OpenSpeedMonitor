@@ -1673,5 +1673,5 @@ function scrollToChartbox(chartBoxTopOffset) {
 // escapes special characters
 //
 function makeValidSelector(identifier) {
-    return identifier.replace(/(:|\.|\[|\]|,|\||\ )/g, "\\$1");
+    return identifier.replace(/(:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
 }
