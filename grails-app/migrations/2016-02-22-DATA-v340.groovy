@@ -201,16 +201,21 @@ databaseChangeLog = {
     }
 
     // ### rename AggregatorType ###
-    changeSet(author: "mmi", id: "1456135825000-1") {
-        grailsChange {
-            change {
-                AggregatorType.withNewSession {
-                    AggregatorType.findByName("customerSatisfactionInPercentCached")?.
-                            setName(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT)
-                    AggregatorType.findByName("customerSatisfactionInPercentUncached")?.
-                            setName(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT)
-                }
-            }
+    changeSet(author: "bwo", id: "1456135825001-1") {
+        /**
+         * In the past we had grailschanges using GORM. There was a possible bug,
+         * which prevents us from using GORM in grailschanges with java 8.
+         * We had to delete the old entries and rewrite this changes.
+         * Because there are instances which already ran the old changelog,
+         * we first check if the changelog with the given id is already in the database. If this is not
+         * the case we can safely execute the rewritten changelog
+         **/
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1456135825000-1'")
+        }
+        change {
+            sql("UPDATE aggregator_type SET name = 'csByWptDocCompleteInPercentCached' WHERE name = 'customerSatisfactionInPercentCached'")
+            sql("UPDATE aggregator_type SET name = 'csByWptDocCompleteInPercentUncached' WHERE name = 'customerSatisfactionInPercentUncached'")
         }
     }
 

@@ -216,104 +216,120 @@ databaseChangeLog = {
         ''')
     }
 
-    changeSet(author: "mmi", id: "1460040092000-3") {
-        grailsChange {
-            change {
-                UserspecificCsiDashboard.withNewSession { session ->
-                    UserspecificCsiDashboard.list().each {
-                        def query = session.createSQLQuery("select id from userspecific_csi_dashboard where dashboard_name = :name")
-                        query.setString("name", it.dashboardName)
-                        def oldId = query.list()[0]
-                        def newIdQuery = session.createSQLQuery("select id from userspecific_dashboard_base where dashboard_name = :name and class = 'de.iteratec.osm.report.UserspecificCsiDashboard'")
-                        newIdQuery.setString("name", it.dashboardName)
-                        def newID = newIdQuery.list()[0]
-
-                        def nullCheckQuery = session.createSQLQuery("select * from userspecific_csi_dashboard_graph_colors where graph_colors = :oldID")
-                        nullCheckQuery.setString("oldID", oldId.toString())
-                        def entries = nullCheckQuery.list().size()
-                        if (entries > 0) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
-                                    'select :newID, graph_colors_idx, graph_colors_elt from userspecific_csi_dashboard_graph_colors ' +
-                                    'where graph_colors = :oldID')
-                            query.setString("newID", newID.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
-                        }
-                        nullCheckQuery = session.createSQLQuery("select * from userspecific_csi_dashboard_graph_name_aliases where graph_name_aliases = :oldID")
-                        nullCheckQuery.setString("oldID", oldId.toString())
-                        entries = nullCheckQuery.list().size()
-                        if (entries > 0) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
-                                    'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_csi_dashboard_graph_name_aliases ' +
-                                    'where graph_name_aliases = :oldID')
-                            query.setString("newID", newID.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
-                        }
+    changeSet(author: "bwo", id: "1460040092001-1"){
+        /**
+         * In the past we had grailschanges using GORM. There was a possible bug,
+         * which prevents us from using GORM in grailschanges with java 8.
+         * We had to delete the old entries and rewrite this changes.
+         * Because there are instances which already ran the old changelog,
+         * we first check if the changelog with the given id is already in the database. If this is not
+         * the case we can safely execute the rewritten changelog
+         **/
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460040092000-3'")
+        }
+        grailsChange{
+            change{
+                def rows = sql.rows("SELECT * FROM userspecific_csi_dashboard")
+                rows.each{
+                    long oldId = it.id
+                    long newId = sql.firstRow("SELECT id FROM userspecific_dashboard_base WHERE dashboard_name = :name " +
+                                              "AND class = 'de.iteratec.osm.report.UserspecificCsiDashboard'",
+                                              [name:it.dashboard_name]).id
+                    def entries = sql.rows("select * from userspecific_csi_dashboard_graph_colors " +
+                                           "where graph_colors = :oldID",[oldId:oldId])
+                    if(entries.size() > 0){
+                        sql.execute('insert into userspecific_dashboard_base_graph_colors ' +
+                                '(graph_colors, graph_colors_idx, graph_colors_elt) ' +
+                                'select :newID, graph_colors_idx, graph_colors_elt ' +
+                                'from userspecific_csi_dashboard_graph_colors ' +
+                                'where graph_colors = :oldID', [newID: newId.toString(), oldID: oldId.toString()])
+                    }
+                    entries = sql.rows("select * from userspecific_csi_dashboard_graph_name_aliases " +
+                                       "where graph_name_aliases = :oldID",[oldID:oldId.toString()])
+                    if(entries.size() > 0){
+                        sql.execute('insert into userspecific_dashboard_base_graph_name_aliases ' +
+                                '(graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
+                                'select :newID, graph_name_aliases_idx, graph_name_aliases_elt ' +
+                                'from userspecific_csi_dashboard_graph_name_aliases ' +
+                                'where graph_name_aliases = :oldID',[newID: newId.toString(), oldID:oldId.toString()])
                     }
                 }
+                rows = sql.rows("SELECT * FROM userspecific_event_result_dashboard")
+                rows.each{
+                    println it.dashboard_name
+                    long oldId = it.id
+                    long newId = sql.firstRow("SELECT id FROM userspecific_dashboard_base " +
+                                              "WHERE dashboard_name = :name " +
+                                              "AND class = 'de.iteratec.osm.report.UserspecificEventResultDashboard'",
+                                              [name:it.dashboard_name]).id
+                    def entries = sql.rows("select * from userspecific_event_result_dashboard_graph_colors " +
+                                           "where graph_colors = :oldID", [oldID: oldId.toString()])
+                    if(entries.size() > 0){
+                        sql.execute('insert into userspecific_dashboard_base_graph_colors ' +
+                                    '(graph_colors, graph_colors_idx, graph_colors_elt) ' +
+                                    'select :newID, graph_colors_idx, graph_colors_elt ' +
+                                    'from userspecific_event_result_dashboard_graph_colors ' +
+                                    'where graph_colors = :oldID', [newID: newId.toString(), oldID: oldId.toString()])
+                    }
 
-                UserspecificEventResultDashboard.withNewSession { session ->
-                    UserspecificEventResultDashboard.list().each {
-                        def query = session.createSQLQuery("select id from userspecific_csi_dashboard where dashboard_name = :name")
-                        query.setString("name", it.dashboardName)
-                        def oldId = query.list()[0]
-                        def newIdQuery = session.createSQLQuery("select id from userspecific_dashboard_base where dashboard_name = :name and class = 'de.iteratec.osm.report.UserspecificEventResultDashboard'")
-                        newIdQuery.setString("name", it.dashboardName)
-                        def newID = newIdQuery.list()[0]
-
-                        def nullCheckQuery = session.createSQLQuery("select * from userspecific_event_result_dashboard_graph_colors where graph_colors = :oldID")
-                        nullCheckQuery.setString("oldID", oldId.toString())
-                        def entries = nullCheckQuery.list().size()
-                        if (entries > 0) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
-                                    'select :newID, graph_colors_idx, graph_colors_elt from userspecific_event_result_dashboard_graph_colors ' +
-                                    'where graph_colors = :oldID')
-                            query.setString("newID", newID.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
-                        }
-
-                        nullCheckQuery = session.createSQLQuery("select * from userspecific_event_result_dashboard_graph_name_aliases where graph_name_aliases = :oldID")
-                        nullCheckQuery.setString("oldID", oldId.toString())
-                        entries = nullCheckQuery.list().size()
-                        if (entries > 0) {
-                            query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_name_aliases (graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
-                                    'select :newID, graph_name_aliases_idx, graph_name_aliases_elt from userspecific_event_result_dashboard_graph_name_aliases ' +
-                                    'where graph_name_aliases = :oldID')
-                            query.setString("newID", newID.toString())
-                            query.setString("oldID", oldId.toString())
-                            query.executeUpdate()
-                        }
+                    entries = sql.rows("select * from userspecific_event_result_dashboard_graph_name_aliases " +
+                                       "where graph_name_aliases = :oldID", [oldID: oldId.toString()])
+                    if(entries.size() > 0){
+                        sql.execute('insert into userspecific_dashboard_base_graph_name_aliases ' +
+                                '(graph_name_aliases, graph_name_aliases_idx, graph_name_aliases_elt) ' +
+                                'select :newID, graph_name_aliases_idx, graph_name_aliases_elt ' +
+                                'from userspecific_event_result_dashboard_graph_name_aliases ' +
+                                'where graph_name_aliases = :oldID', [newID: newId.toString(), oldID:oldId.toString()])
                     }
                 }
-            }
+             }
         }
     }
-
-    changeSet(author: "marcus (generated)", id: "1460099558388-9") {
+    changeSet(author: "marcus (generated)", id: "1460040092001-2") {
+        //All changes of id 1460040092001-X rely on 1460040092001-1.
+        //So we had to make sure that this changes will be executed only, if the previous changeset was executed
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-9'")
+        }
         dropTable(tableName: "userspecific_csi_dashboard")
     }
 
-    changeSet(author: "marcus (generated)", id: "1460099558388-10") {
+    changeSet(author: "marcus (generated)", id: "1460040092001-3") {
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-10'")
+        }
         dropTable(tableName: "userspecific_csi_dashboard_graph_colors")
     }
 
-    changeSet(author: "marcus (generated)", id: "1460099558388-11") {
+    changeSet(author: "marcus (generated)", id: "1460040092001-4") {
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-11'")
+        }
         dropTable(tableName: "userspecific_csi_dashboard_graph_name_aliases")
     }
 
-    changeSet(author: "marcus (generated)", id: "1460099558388-12") {
+    changeSet(author: "marcus (generated)", id: "1460040092001-5") {
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-12'")
+        }
         dropTable(tableName: "userspecific_event_result_dashboard")
     }
 
-    changeSet(author: "marcus (generated)", id: "1460099558388-13") {
+    changeSet(author: "marcus (generated)", id: "1460040092001-6") {
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-13'")
+        }
         dropTable(tableName: "userspecific_event_result_dashboard_graph_colors")
     }
 
-    changeSet(author: "marcus (generated)", id: "1460099558388-14") {
+    changeSet(author: "marcus (generated)", id: "1460040092001-7") {
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1460099558388-14'")
+        }
         dropTable(tableName: "userspecific_event_result_dashboard_graph_name_aliases")
     }
+
 //      ### END UserspecificDashboard refactoring
 
 //	    ### BEGIN BatchActivity refactoring
