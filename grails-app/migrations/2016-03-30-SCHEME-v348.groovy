@@ -629,29 +629,42 @@ databaseChangeLog = {
     changeSet(author: "marko (generated)", id: "1459346200213-68") {
         addDefaultValue(columnDataType: "boolean", columnName: "valid", defaultValueBoolean: "true", tableName: "api_key")
     }
-    changeSet(author: "marko", id: "1459346200213-69"){
+
+    /**
+     * In the past we had grailschanges using GORM. There was a possible bug,
+     * which prevents us from using GORM in grailschanges with java 8.
+     * We had to delete the old entries and rewrite this changes.
+     * Because there are instances which already ran the old changelog,
+     * we first check if the changelog with the given id is already in the database. If this is not
+     * the case we can safely execute the rewritten changelog
+     **/
+    changeSet(author: "mmi", id: "1465407008000-1") {
+        preConditions(onFail: 'MARK_RAN') {
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1459346200213-69'")
+        }
         grailsChange{
             change{
-                ConnectivityProfile.withNewSession { session ->
-                    ConnectivityProfile.findAll().each{ConnectivityProfile connectivityProfile ->
-                        if (connectivityProfile.active == false &&!connectivityProfile.name.endsWith("_old_"+String.valueOf(connectivityProfile.id))) {
-                            newConnectivityProfile = ConnectivityProfile.findByNameAndActive(connectivityProfile.name, true)
-                            BrowserConnectivityWeight.findAllByConnectivity(connectivityProfile).each { BrowserConnectivityWeight oldBrowserConnectivityWeight ->
-                                BrowserConnectivityWeight newBrowserConnectivityWeight = new BrowserConnectivityWeight()
-                                newBrowserConnectivityWeight.browser = oldBrowserConnectivityWeight.browser
-                                newBrowserConnectivityWeight.weight = oldBrowserConnectivityWeight.weight
-                                newBrowserConnectivityWeight.connectivity = newConnectivityProfile
-                                CsiConfiguration.findAll().each {CsiConfiguration currentCsiConfiguration ->
-                                    if (currentCsiConfiguration.browserConnectivityWeights.contains(oldBrowserConnectivityWeight) ){
-                                        currentCsiConfiguration.browserConnectivityWeights.add(newBrowserConnectivityWeight)
-                                        currentCsiConfiguration.save(failOnError: true,flush:true)
-                                    }
+                sql.eachRow("SELECT * FROM connectivity_profile") { connectivityProfile ->
+                    if(!connectivityProfile.active && !connectivityProfile.name.endsWith("_old_"+String.valueOf(connectivityProfile.id))) {
+                        def activeConnectivityProfileId = sql.firstRow("SELECT id FROM connectivity_profile WHERE name = :name AND active = true", [name:connectivityProfile.name]).id
+                        sql.eachRow("SELECT * FROM browser_connectivity_weight where connectivity_id = :conn_id", [conn_id:connectivityProfile.id]) { oldBrowserConnectivityWeight ->
+                            def browserId = oldBrowserConnectivityWeight.browser_id
+                            def newBrowserConnectivityWeightID = sql.executeInsert("INSERT INTO browser_connectivity_weight (version, browser_id, connectivity_id, weight) VALUES (0, :browser_id, :conn_id, :weight)",
+                                    [browser_id:browserId, conn_id: activeConnectivityProfileId, weight:oldBrowserConnectivityWeight.weight])[0][0] // gets id of inserted object
+                            sql.eachRow("SELECT * FROM csi_configuration") {currentCsiConfiguration ->
+                                // if there was the old connectivity weight connected to the current csi configuration, add the new csi configuration, too
+                                def oldBrowserWeightInCsiConfiguration = sql.firstRow(
+                                        "SELECT * FROM csi_configuration_browser_connectivity_weight where csi_configuration_browser_connectivity_weights_id = :current_csi_conf_id AND browser_connectivity_weight_id = :old_id",
+                                        [current_csi_conf_id:currentCsiConfiguration.id, old_id: oldBrowserConnectivityWeight.id])
+                                if(oldBrowserWeightInCsiConfiguration) {
+                                    sql.executeInsert("INSERT INTO csi_configuration_browser_connectivity_weight (csi_configuration_browser_connectivity_weights_id, browser_connectivity_weight_id) VALUES (:conf_id, :new_weight_id)",
+                                            [conf_id: currentCsiConfiguration.id, new_weight_id:newBrowserConnectivityWeightID])
                                 }
-                                newBrowserConnectivityWeight.save(failOnError: true,flush: true)
                             }
-                            connectivityProfile.name += "_old_" + String.valueOf(connectivityProfile.id)
-                            connectivityProfile.save(failOnError: true,flush: true)
                         }
+
+                        String newName = connectivityProfile.name + "_old_" + String.valueOf(connectivityProfile.id)
+                        sql.executeUpdate("UPDATE connectivity_profile SET name = :new_name WHERE id = :old_id", [new_name:newName, old_id: connectivityProfile.id])
                     }
                 }
             }
