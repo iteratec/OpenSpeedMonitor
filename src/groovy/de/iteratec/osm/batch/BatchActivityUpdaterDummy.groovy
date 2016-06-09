@@ -7,21 +7,15 @@ package de.iteratec.osm.batch
 class BatchActivityUpdaterDummy extends BatchActivityUpdater {
 
 
-    BatchActivityUpdaterDummy(String name, String domain, Activity activity, int maximumStages, int updateInterval) {
-        super(name, domain, activity, maximumStages, updateInterval)
-    }
-
-    @Override
-    protected void createUpdateThread(int updateInterval, int timeoutInSeconds){
-        //do nothing
+    BatchActivityUpdaterDummy(String name, String domain, Activity activity, int maximumStages, int saveThreshold) {
+        super(name, domain, activity, maximumStages, saveThreshold)
     }
     @Override
     protected void createActivity(name, domain, activity, maximumStages) {
-        //do nothing
     }
 
     @Override
-    public BatchActivityUpdater beginNewStage(String stageDescription, int maximumStepsInStage) {
+    public BatchActivityUpdater beginNewStage(String stageDescription, int maximumStepsInStage, int saveThreshold = 1) {
         return this
     }
 
@@ -30,23 +24,28 @@ class BatchActivityUpdaterDummy extends BatchActivityUpdater {
         return this
     }
     @Override
-    public BatchActivityUpdater addFailures(int failures = 1) {
-        return this
-    }
-    @Override
-    public BatchActivityUpdater setLastFailureMessage(String lastFailureMessage) {
+    public BatchActivityUpdater addFailures(String lastFailureMessage, int failureAmountToAdd = 1) {
         return this
     }
     @Override
     public BatchActivityUpdater cancel(){
         return this
     }
+
     @Override
     public BatchActivityUpdater done(){
         return this
     }
+
     @Override
-    public void update(){
-        //do nothing
+    protected void update(){
+    }
+
+    @Override
+    protected void saveUpdate(boolean flush){
+    }
+
+    @Override
+    protected void setStatus(Status status) {
     }
 }
