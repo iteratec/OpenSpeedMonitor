@@ -657,6 +657,7 @@ databaseChangeLog = {
             }
         }
     }
+
     changeSet(author: "marko (generated)", id: "1459346200213-70") {
         addUniqueConstraint(columnNames: "name", constraintName: "UC_CONNECTIVITY_PROFILENAME_COL", tableName: "connectivity_profile")
     }
@@ -716,9 +717,9 @@ databaseChangeLog = {
 
     changeSet(author: "marko", id: "1459346200213-78"){
         sql('''
-				UPDATE graphite_server SET garbage_collector_prefix = "jvm.gc", health_metrics_report_prefix = "osm.healthmetrics",
-				 thread_states_report_prefix = "jvm.threads", report_health_metrics = 0, memory_report_prefix= "jvm.mem",
-				 time_between_reports_in_seconds = 300, process_cpu_load_prefix= "cpu.processCpuLoadPrefix"
+				UPDATE graphite_server SET garbage_collector_prefix = 'jvm.gc', health_metrics_report_prefix = 'osm.healthmetrics',
+				 thread_states_report_prefix = 'jvm.threads', report_health_metrics = 0, memory_report_prefix= 'jvm.mem',
+				 time_between_reports_in_seconds = 300, process_cpu_load_prefix= 'cpu.processCpuLoadPrefix'
 			''')
 
     }
