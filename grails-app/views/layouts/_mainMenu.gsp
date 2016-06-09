@@ -19,7 +19,7 @@
 
     <ul class="nav nav-tabs" data-role="listview" data-split-icon="gear" data-filter="true">
         <li class="controller ${mainTab.equals('management') ? 'active' : ''}">
-            <g:link controller="job" action="list"><g:message code="de.iteratec.isr.managementDashboard"
+            <g:link controller="job" action="index"><g:message code="de.iteratec.isr.managementDashboard"
                                                               default="Verwaltung"/></g:link>
         </li>
         <li class="controller ${mainTab.equals('results') ? 'active' : ''}">
@@ -40,7 +40,7 @@
 
         <g:if test="${mainTab.equals('management')}">
             <li class="controller ${controllerName.equals('job') ? 'active' : ''}">
-                <g:link controller="job" action="list"><i class="fa fa-calendar"></i> <g:message
+                <g:link controller="job" action="index"><i class="fa fa-calendar"></i> <g:message
                         code="de.iteratec.isj.jobs" default="Jobs"/></g:link>
             </li>
             <li class="controller ${controllerName.equals('script') ? 'active' : ''}">
