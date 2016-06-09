@@ -182,9 +182,7 @@ databaseChangeLog = {
 			change {
 				UserspecificCsiDashboard.withNewSession { session ->
 					UserspecificCsiDashboard.list().each {
-						def query = session.createSQLQuery("select id from userspecific_csi_dashboard where dashboard_name = :name")
-						query.setString("name", it.dashboardName)
-						def oldId = query.list()[0]
+						def oldId = it.id
 						def newIdQuery = session.createSQLQuery("select id from userspecific_dashboard_base where dashboard_name = :name and class = 'de.iteratec.osm.report.UserspecificCsiDashboard'")
 						newIdQuery.setString("name", it.dashboardName)
 						def newID = newIdQuery.list()[0]
@@ -192,6 +190,7 @@ databaseChangeLog = {
 						def nullCheckQuery = session.createSQLQuery("select * from userspecific_csi_dashboard_graph_colors where graph_colors = :oldID")
 						nullCheckQuery.setString("oldID", oldId.toString())
 						def entries = nullCheckQuery.list().size()
+						def query
 						if(entries > 0){
 							query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
 									'select :newID, graph_colors_idx, graph_colors_elt from userspecific_csi_dashboard_graph_colors ' +
@@ -216,9 +215,7 @@ databaseChangeLog = {
 
 				UserspecificEventResultDashboard.withNewSession { session ->
 					UserspecificEventResultDashboard.list().each {
-						def query = session.createSQLQuery("select id from userspecific_csi_dashboard where dashboard_name = :name")
-						query.setString("name", it.dashboardName)
-						def oldId = query.list()[0]
+						def oldId = it.id
 						def newIdQuery = session.createSQLQuery("select id from userspecific_dashboard_base where dashboard_name = :name and class = 'de.iteratec.osm.report.UserspecificEventResultDashboard'")
 						newIdQuery.setString("name", it.dashboardName)
 						def newID = newIdQuery.list()[0]
@@ -226,6 +223,7 @@ databaseChangeLog = {
 						def nullCheckQuery = session.createSQLQuery("select * from userspecific_event_result_dashboard_graph_colors where graph_colors = :oldID")
 						nullCheckQuery.setString("oldID", oldId.toString())
 						def entries = nullCheckQuery.list().size()
+						def query
 						if(entries > 0){
 							query = session.createSQLQuery('insert into userspecific_dashboard_base_graph_colors (graph_colors, graph_colors_idx, graph_colors_elt) ' +
 									'select :newID, graph_colors_idx, graph_colors_elt from userspecific_event_result_dashboard_graph_colors ' +
