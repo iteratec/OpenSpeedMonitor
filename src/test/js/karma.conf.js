@@ -18,16 +18,35 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            { pattern: ASSET_PATH + '/javascripts/jquery/jquery-*.js', watched: true },
-            { pattern: ASSET_PATH + '/javascripts/application.js', watched: true },
-            { pattern: ASSET_PATH + '/javascripts/csi/defaultMappingCsvValidator.js', watched: true },
-            { pattern: TEST_PATH + '/specs/**/*.js', watched: true }
+            {pattern: ASSET_PATH + '/javascripts/jquery/jquery-*.js', watched: true},
+            {pattern: ASSET_PATH + '/javascripts/application.js', watched: true},
+            {pattern: ASSET_PATH + '/javascripts/csi/defaultMappingCsvValidator.js', watched: true},
+            {pattern: TEST_PATH + '/specs/**/*.js', watched: true}
         ],
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'remote'
         // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-        reporters: ['progress'],
+        reporters: ['progress', 'junit', 'html'],
+
+        junitReporter: {
+            outputDir: 'build/test-results-jasmine', // results will be saved as $outputDir/$browserName.xml
+            outputFile: undefined, // if included, results will be saved as $outputDir/$browserName/$outputFile
+            suite: '', // suite will become the package name attribute in xml testsuite element
+            useBrowserName: true, // add browser name to report and classes names
+            nameFormatter: undefined, // function (browser, result) to customize the name attribute in xml testcase element
+            classNameFormatter: undefined, // function (browser, result) to customize the classname attribute in xml testcase element,
+            properties: {} // key value pair of properties to add to the <properties> section of the report
+        },
+        htmlReporter: {
+            outputFile: 'build/reports/tests-jasmine/units.html',
+
+            // Optional 
+            pageTitle: 'OpenSpeedMonitor',
+            subPageTitle: 'Jasmine unit tests',
+            useLegacyStyle: true
+        },
+
         port: 9876,
 
 
@@ -60,7 +79,9 @@ module.exports = function (config) {
         plugins: [
             'karma-jasmine',
             'karma-phantomjs-launcher',
-            'karma-remote-reporter'
+            'karma-junit-reporter',
+            'karma-htmlfile-reporter'
         ]
-    })
+    });
+
 };

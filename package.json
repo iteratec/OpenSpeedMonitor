@@ -27,6 +27,7 @@
     "karma-junit-reporter": "^0.4.2",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-remote-reporter": "^0.2.0",
-    "phantomjs-prebuilt": "^2.1.4"
+    "phantomjs-prebuilt": "^2.1.4",
+    "karma-htmlfile-reporter": "~0.3"
   }
 }
