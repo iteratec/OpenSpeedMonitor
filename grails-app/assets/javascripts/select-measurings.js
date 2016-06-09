@@ -70,10 +70,15 @@ var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
 				$(selectBox).css({ opacity: 1 });
 			}
 		});
-	
+
 		$(selectBox).on('change', function(event) {
-			$(checkBox).prop('checked', false);
-			$(selectBox).css({ opacity: 1 });  			
+			if ($('#selectedMeasuredEventsHtmlId option:selected').length > 0) {
+				$(checkBox).prop('checked', false);
+				$(selectBox).css({opacity: 1});
+			} else {
+				$(checkBox).prop('checked', true);
+				$(selectBox).css({opacity: 0.5});
+			}
 			$(selectBox).trigger("chosen:updated");
 		});
 		
