@@ -20,6 +20,7 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
 import groovy.mock.interceptor.StubFor
@@ -60,7 +61,7 @@ import de.iteratec.osm.util.I18nService
  */
 @TestFor(MetricReportingService)
 @TestMixin(GrailsUnitTestMixin)
-@Mock([EventResult, AggregatorType,JobGroup, BatchActivity, GraphiteServer, GraphitePath, CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration])
+@Mock([EventResult, AggregatorType,JobGroup, BatchActivity, GraphiteServer, GraphitePath, CsiAggregationInterval, Page, MeasuredEvent, Browser, Location, OsmConfiguration,ConnectivityProfile])
 class MetricReportingServiceTests {
 	MetricReportingService serviceUnderTest
 	static final double DELTA = 1e-15

@@ -49,7 +49,7 @@ import org.junit.Test
 
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(MetricReportingService)
-@Mock([CsiAggregationInterval, OsmConfiguration, BatchActivity])
+@Mock([CsiAggregationInterval, OsmConfiguration, BatchActivity,ConnectivityProfile])
 class QuartzControlledGrailsReportsTests {
 	
 	static final String jobGroupWithServersName = 'csiGroupWithServers'
