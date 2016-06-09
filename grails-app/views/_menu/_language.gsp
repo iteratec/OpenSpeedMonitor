@@ -12,9 +12,12 @@
             <g:each status="i" var="locale" in="${allLocales}">
                 <li>
                     <a class="js-language-link"
-                       title="${message(code: 'language.' + locale, default: locale)}"
-                       data-lang-code="${locale}"
-                       href="${currentURL + '?lang=' + locale + (params.isEmpty() ? '' : '&') + params.entrySet().findAll({it.key != 'lang'}).collect({ it.key + '=' + it.value }).join('&')}">
+                        title="${message(code: 'language.' + locale, default: locale)}"
+                        data-lang-code="${locale}"
+                        href="${currentURL + '?lang=' + locale + (params.isEmpty() ? '' : '&') + params.entrySet().findAll({it.key != 'lang'})
+                                .collect({param -> param.value instanceof Object[] ?  // if parameter is a collection, we have to split it up
+                                param.value.collect{param.key + '=' + it.value}.join('&') :
+                                param.key + '=' + param.value }).join('&')}">
                         <img class="flag flag-${locale}"/>
                         <g:message code="language.${locale}" default="${locale}"/>
                     </a>
