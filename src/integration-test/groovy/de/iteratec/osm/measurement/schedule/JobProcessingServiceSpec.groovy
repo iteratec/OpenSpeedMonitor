@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
 import grails.test.mixin.integration.Integration
+import grails.transaction.NotTransactional
 import grails.transaction.Rollback
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.http.HttpVersion
@@ -201,22 +202,40 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
      * 	getCurrentlyRunningJobs
      * 	pollJobRun
      * 	launchJobRun
+     *
+     * 	The @Transactional(propagation = Propagation.REQUIRES_NEW) annotation on persistUnfinishedJobResult requires that the method calls in this test are encapsulated in individual transactions.
      */
+    @NotTransactional
     void "launchJobAndPoll test"() {
+        def jobId
+        Job job
         when:
-        Job job = createJob(true, EVERY_15_SECONDS)
+        Job.withNewTransaction {
+            jobId = createJob(true, EVERY_15_SECONDS).id
+        }
 
-        //launchJobRun returns false, because it fails and catch the exception
-        jobProcessingService.launchJobRun(job)
-        // manual first execution cause quartz scheduling doesn't seem to work trustable in tests
+        Job.withNewTransaction {
+            job = Job.findById(jobId)
+            //launchJobRun returns false, because it fails and catch the exception
+            jobProcessingService.launchJobRun(job)
+        }
+        // manual first execution
+        // cause quartz scheduling doesn't seem to work trustable in tests
+        Job.withNewTransaction {
+            job = Job.findById(jobId)
         jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
+        }
+        TriggerKey subtriggerKey
 
-        // ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
-        TriggerKey subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
-
+        Job.withNewTransaction {
+            // ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
+             subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
+        }
+        Trigger subtrigger
         // no Job in  JobStore, because no Triger was created --> returns null
-        Trigger subtrigger = jobProcessingService.quartzScheduler.getTrigger(subtriggerKey)
-
+        Job.withNewTransaction {
+            subtrigger = jobProcessingService.quartzScheduler.getTrigger(subtriggerKey)
+        }
         then:
         subtriggerKey != null
         subtrigger == null
@@ -224,11 +243,17 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         for (int i = 0; i < HttpRequestServiceMock.statusCodes.length; i++) {
             // assert that an unfinished JobResult with correct status code has been persisted
             if (HttpRequestServiceMock.statusCodes[i] < 200) {
-                JobResult unfinishedResult = JobResult.findByJobConfigLabelAndTestId(job.label, HttpRequestServiceMock.testId)
+                JobResult unfinishedResult
+                Job.withNewTransaction {
+                    unfinishedResult = JobResult.findByJobConfigLabelAndTestId(job.label, HttpRequestServiceMock.testId)
+                }
                 assertNotNull(unfinishedResult)
                 assertEquals(HttpRequestServiceMock.statusCodes[i], unfinishedResult.httpStatusCode)
             }
-            jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
+            Job.withNewTransaction {
+                job = Job.findById(jobId)
+                jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
+            }
         }
 
         // ensure that upon successful completion of the test (statusCode 200) pollJobRun() removed the subtrigger
@@ -253,13 +278,16 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
 
     void "statusOfRepeatedJobExecution test"() {
         given:
-        Job job = createJob(false)
+        Job.withNewTransaction {
+            createJob(false)
+        }
+        Job job = Job.findById(1)
         Date now = new Date()
         Date oldestDate = now - 5
 
         when:
         inputStatusCodes.reverse().eachWithIndex { int httpStatusCode, int i ->
-            JobResult result = jobProcessingService.persistUnfinishedJobResult(job, null, httpStatusCode)
+            JobResult result = jobProcessingService.persistUnfinishedJobResult(job.id, null, httpStatusCode)
             result.date = now - i
             result.save(flush: true, failOnError: true)
         }

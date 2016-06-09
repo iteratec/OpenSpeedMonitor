@@ -164,8 +164,10 @@ class JobProcessingService {
 	 * specified Job/test is running and that this is not the result of a finished
 	 * test execution.
 	 */
-	private JobResult persistUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus = null) {
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null) {
 		// If no testId was provided some error occurred and needs to be logged
+		Job job = Job.get(jobId)
 		JobResult result
 		if (testId) {
 			result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
@@ -182,6 +184,7 @@ class JobProcessingService {
         }
 
 	}
+
     private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus){
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
         if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)){
@@ -333,7 +336,7 @@ class JobProcessingService {
 			return true
 		} catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
-			persistUnfinishedJobResult(job, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
+			persistUnfinishedJobResult(job.id, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
 			return false
 		}
 	}
@@ -371,13 +374,13 @@ class JobProcessingService {
             }
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
                 if (statusCode < 200){
-                    persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
+                    persistUnfinishedJobResult(job.id, testId, statusCode, wptStatus)
                 }
             }
 		} catch (Exception e) {
 			statusCode = 400
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-			persistUnfinishedJobResult(job, testId, statusCode, e.getMessage())
+			persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
 		} finally {
 			if (statusCode >= 200) {
 				CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
@@ -398,7 +401,7 @@ class JobProcessingService {
 		if (!result)
 			return
 		if (result.httpStatusCode < 200 && pollJobRun(job, testId) < 200) {
-			persistUnfinishedJobResult(job, testId, 504, '')
+			persistUnfinishedJobResult(job.id, testId, 504, '')
 			proxyService.cancelTest(job.location.wptServer, [test: testId])
 		}
 	}
