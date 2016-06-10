@@ -1,11 +1,13 @@
 package de.iteratec.osm.result
 
 import grails.validation.Validateable
+import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
+import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
 /**
@@ -15,12 +17,19 @@ import java.util.regex.Pattern
  * </p>
  * Created by Marko Schnecke on 04.04.2016.
  */
-public class TabularResultEventResultsCommandBase implements Validateable{
+public class TabularResultEventResultsCommandBase implements Validateable {
     /**
      * The selected start date.
      *
      * Please use {@link #receiveSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+            if (source['from']) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(TabularResultPresentationController.DATE_FORMAT_STRING)
+                return dateFormat.parse(source['from'])
+            }
+    })
     Date from
 
     /**
@@ -28,6 +37,13 @@ public class TabularResultEventResultsCommandBase implements Validateable{
      *
      * Please use {@link #receiveSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+            if (source['to']) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(TabularResultPresentationController.DATE_FORMAT_STRING)
+                return dateFormat.parse(source['to'])
+            }
+    })
     Date to
 
     /**
@@ -57,32 +73,31 @@ public class TabularResultEventResultsCommandBase implements Validateable{
      * Constraints needs to fit.
      */
     static constraints = {
-        from(nullable: true, validator: {Date currentFrom, TabularResultEventResultsCommandBase cmd ->
+        from(nullable: true, validator: { Date currentFrom, TabularResultEventResultsCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
+            if (manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
         })
-        to(nullable:true, validator: { Date currentTo, TabularResultEventResultsCommandBase cmd ->
+        to(nullable: true, validator: { Date currentTo, TabularResultEventResultsCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
-            else if(manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
+            if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
-        fromHour(nullable: true, validator: {String currentFromHour, TabularResultEventResultsCommandBase cmd ->
+        fromHour(nullable: true, validator: { String currentFromHour, TabularResultEventResultsCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentFromHour == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.fromHour.nullWithManualSelection']
+            if (manualTimeframe && currentFromHour == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.fromHour.nullWithManualSelection']
         })
-        toHour(nullable: true, validator: {String currentToHour, TabularResultEventResultsCommandBase cmd ->
+        toHour(nullable: true, validator: { String currentToHour, TabularResultEventResultsCommandBase cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if(manualTimeframe && currentToHour == null) {
+            if (manualTimeframe && currentToHour == null) {
                 return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.nullWithManualSelection']
-            }
-            else if(manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
+            } else if (manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
                 DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
                 DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                if(!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.inCombinationWithDateBeforeFrom']
+                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.inCombinationWithDateBeforeFrom']
             }
         })
-        max(nullable:true)
-        offset(nullable:true)
+        max(nullable: true)
+        offset(nullable: true)
     }
 
     static transients = ['selectedTimeFrame']
@@ -98,8 +113,7 @@ public class TabularResultEventResultsCommandBase implements Validateable{
      * @throws IllegalStateException
      *         if called on an invalid instance.
      */
-    public Interval receiveSelectedTimeFrame() throws IllegalStateException
-    {
+    public Interval receiveSelectedTimeFrame() throws IllegalStateException {
 
         DateTime start
         DateTime end
@@ -123,7 +137,7 @@ public class TabularResultEventResultsCommandBase implements Validateable{
                     59, 999
             )
 
-        }else{
+        } else {
 
             end = new DateTime()
             start = end.minusSeconds(this.selectedTimeFrameInterval)
@@ -140,14 +154,14 @@ public class TabularResultEventResultsCommandBase implements Validateable{
      * @return A {@link DateTime} of the first csiDay in unix-epoch with daytime respective param timeWithOrWithoutMeridian.
      * @throws IllegalStateException If timeWithOrWithoutMeridian is in wrong format.
      */
-    public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException{
+    public static DateTime getFirstDayWithTime(String timeWithOrWithoutMeridian) throws IllegalStateException {
 
         Pattern regexWithMeridian = ~/\d{1,2}:\d\d [AP]M/
         Pattern regexWithoutMeridian = ~/\d{1,2}:\d\d/
         String dateFormatString
 
-        if(timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
-        else if(timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
+        if (timeWithOrWithoutMeridian ==~ regexWithMeridian) dateFormatString = "dd.MM.yyyy hh:mm"
+        else if (timeWithOrWithoutMeridian ==~ regexWithoutMeridian) dateFormatString = "dd.MM.yyyy HH:mm"
         else throw new IllegalStateException("Wrong format of time: ${timeWithOrWithoutMeridian}")
 
         DateTimeFormatter fmt = DateTimeFormat.forPattern(dateFormatString)
@@ -168,15 +182,14 @@ public class TabularResultEventResultsCommandBase implements Validateable{
      *         Previously contained data will be overwritten.
      *         The argument might not be <code>null</code>.
      */
-    public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo)
-    {
+    public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
         viewModelToCopyTo.put('from', this.from)
-        if(!this.fromHour.is(null)) {
-            viewModelToCopyTo.put('fromHour',this.fromHour)
+        if (!this.fromHour.is(null)) {
+            viewModelToCopyTo.put('fromHour', this.fromHour)
         }
 
         viewModelToCopyTo.put('to', this.to)
-        if (!this.toHour.is(null)){
+        if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }
         viewModelToCopyTo.put('max', this.max)

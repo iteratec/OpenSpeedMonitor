@@ -5,11 +5,14 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.util.DateValueConverter
 import grails.converters.JSON
 import grails.validation.Validateable
+import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
+import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
 /**
@@ -37,6 +40,13 @@ public class EventResultDashboardShowAllCommand implements Validateable{
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+            if(source['from']) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
+                return dateFormat.parse(source['from'])
+            }
+    })
     Date from
 
     /**
@@ -44,6 +54,13 @@ public class EventResultDashboardShowAllCommand implements Validateable{
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+            if(source['to']) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
+                return dateFormat.parse(source['to'])
+            }
+    })
     Date to
 
     /**

@@ -6,11 +6,13 @@ import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.MvQueryParams
 import grails.converters.JSON
 import grails.validation.Validateable
+import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
+import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
 /**
@@ -37,6 +39,13 @@ public class CsiDashboardShowAllCommand implements Validateable {
      *
      * Please use {@link #receiveSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+            if(source['from']) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
+                return dateFormat.parse(source['from'])
+            }
+    })
     Date from
 
     /**
@@ -44,6 +53,13 @@ public class CsiDashboardShowAllCommand implements Validateable {
      *
      * Please use {@link #receiveSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+            if(source['to']) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
+                return dateFormat.parse(source['to'])
+            }
+    })
     Date to
 
     /**
