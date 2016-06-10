@@ -32,6 +32,7 @@ import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
+import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
@@ -92,6 +93,7 @@ class CsiDashboardController {
     TimeToCsMappingService timeToCsMappingService
     ConfigService configService
     CustomDashboardService customDashboardService
+    UserspecificDashboardService userspecificDashboardService
 
     /**
      * The Grails engine to generate links.
@@ -834,10 +836,19 @@ class CsiDashboardController {
         Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
         Collection<Long> selectedCsiSystems = customDashboardService.getValuesFromJSON(dashboardValues, "selectedCsiSystems")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
-
+        if ( !dashboardValues.graphAliases.isEmpty()) {
+            dashboardValues.graphAliases.each{
+                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.GERMAN)){
+                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.ENGLISH)] = it.value
+                }
+                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.ENGLISH)){
+                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.GERMAN)] = it.value
+                }
+            }
+        }
         // Create command for validation
-        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
-                toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
+                toHour: dashboardValues.toHour,  aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
