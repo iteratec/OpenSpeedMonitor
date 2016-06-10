@@ -1,8 +1,11 @@
-import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
+import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import org.joda.time.DateTime
+import org.joda.time.DateTimeConstants
 
 databaseChangeLog = {
 
@@ -15,10 +18,10 @@ databaseChangeLog = {
 
     // creating first page_weights
     changeSet(author: "mmi", id: "1453106072000-1") {
-        preConditions(onFail: 'MARK_RAN'){
-            and{
+        preConditions(onFail: 'MARK_RAN') {
+            and {
                 sqlCheck(expectedResult: 0, 'select count(*) from page_weight')
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from page')
                 }
             }
@@ -31,11 +34,11 @@ databaseChangeLog = {
 
     // creating a first csi-configuration
     changeSet(author: "mmi", id: "1453106072000-4") {
-        preConditions(onFail: 'MARK_RAN'){
-            and{
-                sqlCheck(expectedResult:0, 'select count(*) from csi_configuration')
-                not{
-                    sqlCheck(expectedResult:0, 'select count(*) from csi_day')
+        preConditions(onFail: 'MARK_RAN') {
+            and {
+                sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
+                not {
+                    sqlCheck(expectedResult: 0, 'select count(*) from csi_day')
                 }
             }
         }
@@ -45,12 +48,12 @@ databaseChangeLog = {
     // map browser_connectivity_weights to first csi_configuration
     changeSet(author: "mmi", id: "1453106072000-5") {
         preConditions(onFail: 'MARK_RAN') {
-            and{
+            and {
                 sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration_browser_connectivity_weight')
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
                 }
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from browser_connectivity_weight')
                 }
             }
@@ -65,12 +68,12 @@ databaseChangeLog = {
     // map page_weights to first csi_configuration
     changeSet(author: "mmi", id: "1453106072000-6") {
         preConditions(onFail: 'MARK_RAN') {
-            and{
+            and {
                 sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration_page_weight')
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
                 }
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from page_weight')
                 }
             }
@@ -85,12 +88,12 @@ databaseChangeLog = {
     // map time_to_cs_mappings to first csi_configuration
     changeSet(author: "mmi", id: "1453106072000-7") {
         preConditions(onFail: 'MARK_RAN') {
-            and{
+            and {
                 sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration_time_to_cs_mapping')
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from csi_configuration')
                 }
-                not{
+                not {
                     sqlCheck(expectedResult: 0, 'select count(*) from time_to_cs_mapping')
                 }
             }
@@ -113,74 +116,160 @@ databaseChangeLog = {
 
     //     ### END INITIAL CSI-CONFIGURATION ######################################################################
 
-    // add a valid connectivity-profile to every hourly-measured-value
-    changeSet(author: "bka", id: "1453106072000-9") {
+    /**
+     * In the past we had grailschanges using GORM. There was a possible bug,
+     * which prevents us from using GORM in grailschanges with java 8.
+     * We had to delete the old entries and rewrite this changes.
+     * Because there are instances which already ran the old changelog,
+     * we first check if the changelog with the given id is already in the database. If this is not
+     * the case we can safely execute the rewritten changelog
+     **/
+    changeSet(author: "mmi", id: "1453106072001-1") {
+        preConditions(onFail: 'MARK_RAN') {
+            // The old changelog is not already ran
+            sqlCheck(expectedResult: 0, "select count(*) from DATABASECHANGELOG where id = '1453106072000-9'")
+            // The application is not started with empty database
+            not {
+                sqlCheck(expectedResult: 0, "select count(*) from csi_aggregation")
+            }
+        }
+        // add a valid connectivity-profile to every hourly-measured-value
         grailsChange {
             change {
-                CsiAggregation.withNewSession {
-                    CsiAggregationUpdateService csiAggregationUpdateService = null
-                    int maxItemsToProcess = 10000
-                    AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-                    CsiAggregationInterval csiAggregationInterval = CsiAggregationInterval.
-                            findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+                int maxItemsToProcess = 10000
 
-                    int amountMvsHourlyAndPage = CsiAggregation.executeQuery(
-                            "select count(*) from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                            [aggregatorType, csiAggregationInterval])[0]
-                    int amountLoops = amountMvsHourlyAndPage / maxItemsToProcess
-                    println "processing #${amountMvsHourlyAndPage} elements in ${amountLoops} loops"
+                int hourlyIntervalID = sql.firstRow("SELECT id FROM csi_aggregation_interval where interval_in_minutes = ?", [60]).id
+                int dailyIntervalId = sql.firstRow("SELECT id FROM csi_aggregation_interval where interval_in_minutes = ?", [24 * 60]).id
+                int weeklyIntervalId = sql.firstRow("SELECT id FROM csi_aggregation_interval where interval_in_minutes = ?", [7 * 24 * 60]).id
+                int measuredEventAggregatorID = sql.firstRow("SELECT id FROM aggregator_type where name = ?", ["measuredEvent"]).id
+                int pageAggregatorID = sql.firstRow("SELECT id FROM aggregator_type where name = ?", ["page"]).id
+                int shopAggregatorID = sql.firstRow("SELECT id FROM aggregator_type where name = ?", ["shop"]).id
+                def csiSystemAggregatorID = sql.firstRow("SELECT id FROM aggregator_type where name = ?", ["csiSystem"])?.id
 
-                    (0..amountLoops).each { loopNumber ->
-                        Date startOfLoop = new Date()
-                        println "############################################# start loop #${loopNumber}: ${startOfLoop}"
-                        List<CsiAggregation> currentHourlyCsiAggregations = CsiAggregation.executeQuery(
-                                "from CsiAggregation where aggregator= ? and interval= ? and underlyingEventResultsByWptDocComplete!=''",
-                                [aggregatorType, csiAggregationInterval],
-                                [max: maxItemsToProcess, offset: loopNumber * maxItemsToProcess]
-                        )
-                        CsiAggregation.withNewTransaction {
-                            currentHourlyCsiAggregations.each { CsiAggregation ->
-                                List<EventResult> eventResultsOfCsiAggregation = EventResult.executeQuery(
-                                        "from EventResult where id in :ids",
-                                        [ids: CsiAggregation.underlyingEventResultsByWptDocCompleteAsList]
-                                )
-                                int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivityProfile.
-                                        unique(false).size()
-                                // simple case: if all results have same connectivity
-                                if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.
-                                        first().connectivityProfile != null) {
-                                    // ... then add connectivity from any of its results to CsiAggregation
-                                    CsiAggregation.executeUpdate(
-                                            "update CsiAggregation set connectivityProfile=:cp where id=:mvId",
-                                            [cp: eventResultsOfCsiAggregation.
-                                                    first().connectivityProfile, mvId: CsiAggregation.id]
-                                    )
-                                } else { // ... else remove csi aggregation and calc it again by service
-                                    println "different connectivity profiles"
-                                    if (csiAggregationUpdateService == null) {
-                                        println "initializing service"
-                                        csiAggregationUpdateService = ctx.csiAggregationUpdateService
-                                        println "initialized service DONE: ${csiAggregationUpdateService}"
+                int amountMvsHourly = sql.firstRow(
+                        "select count(*) from csi_aggregation where aggregator_id = ? and interval_id = ? and underlying_event_results_by_wpt_doc_complete !=''",
+                        [measuredEventAggregatorID, hourlyIntervalID])[0]
+
+                int amountLoops = amountMvsHourly / maxItemsToProcess
+                amountLoops.times { loopNumber ->
+                    int offset = loopNumber * maxItemsToProcess
+                    sql.eachRow("SELECT * FROM csi_aggregation where aggregator_id = ? and interval_id = ? and underlying_event_results_by_wpt_doc_complete !=''",
+                            [measuredEventAggregatorID, hourlyIntervalID], offset, maxItemsToProcess) { csiAggregation ->
+                        String eventResultIds = csiAggregation['underlying_event_results_by_wpt_doc_complete']
+                        def eventResultsOfCsiAggregation = sql.rows("SELECT * FROM event_result where id in (:ids)", [ids: eventResultIds])
+                        int amountDifferentConnectivityProfiles = eventResultsOfCsiAggregation*.connectivity_profile_id.unique(false).size()
+
+                        // simple case: if all results have same connectivity
+                        if (amountDifferentConnectivityProfiles == 1 && eventResultsOfCsiAggregation.first().connectivity_profile_id) {
+                            // ... then add connectivity from any of its results to CsiAggregation
+                            sql.executeUpdate("UPDATE csi_aggregation SET connectivity_profile_id = :cp where id=:csiAggregationID", [cp: eventResultsOfCsiAggregation.
+                                    first().connectivity_profile_id, csiAggregationID                                                   : csiAggregation.id])
+                        } else {
+                            // write update events for csi aggregations based on eventResults
+                            eventResultsOfCsiAggregation.each { eventResult ->
+                                DateTime started = new DateTime(eventResult['date_created']).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0).withHourOfDay(0)
+                                // Daily Page
+                                sql.eachRow("SELECT * FROM csi_aggregation WHERE aggregator_id = ? AND interval_id = ? AND started = ?",
+                                        [pageAggregatorID, dailyIntervalId, started.toDate()]) {
+                                    sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'OUTDATED')",
+                                            [new Date(), it.id])
+                                    sql.executeUpdate("UPDATE csi_aggregation SET closed_and_calculated = false WHERE id = ?", [it.id])
+                                }
+                                // Daily Shop
+                                sql.eachRow("SELECT * FROM csi_aggregation WHERE aggregator_id = ? AND interval_id = ? AND started = ?",
+                                        [shopAggregatorID, dailyIntervalId, started.toDate()]) {
+                                    sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'OUTDATED')",
+                                            [new Date(), it.id])
+                                    sql.executeUpdate("UPDATE csi_aggregation SET closed_and_calculated = false WHERE id = ?", [it.id])
+                                }
+                                // Daily CsiSystem
+                                if (csiSystemAggregatorID) {
+                                    sql.eachRow("SELECT * FROM csi_aggregation WHERE aggregator_id = ? AND interval_id = ? AND started = ?",
+                                            [csiSystemAggregatorID, dailyIntervalId, started.toDate()]) {
+                                        sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'OUTDATED')",
+                                                [new Date(), it.id])
+                                        sql.executeUpdate("UPDATE csi_aggregation SET closed_and_calculated = false WHERE id = ?", [it.id])
                                     }
-                                    CsiAggregation.
-                                            executeUpdate("delete CsiAggregation where id= ?", [CsiAggregation.id])
-                                    println "removed old csi aggregation"
-                                    eventResultsOfCsiAggregation.each { eventResult ->
-                                        if (eventResult.connectivityProfile != null) {
-                                            try {
-                                                println "try to add EventResult via update service: ${eventResult}"
-                                                csiAggregationUpdateService.createOrUpdateDependentMvs(eventResult)
-                                            } catch (Exception e) {
-                                                println "try to add EventResult via update service: An Exception occurred: ${e}\n\nStacktrace:\n${e.printStackTrace()}"
-                                            }
-                                            println "try to add EventResult via update service: ...DONE"
-                                        }
+                                }
+                                // Weekly Page
+                                started = started.withDayOfWeek(5) // Friday
+                                if (started.isAfter(new DateTime(eventResult['date_created']))) {
+                                    started = started.minusWeeks(1);
+                                }
+                                sql.eachRow("SELECT * FROM csi_aggregation WHERE aggregator_id = ? AND interval_id = ? AND started = ?",
+                                        [pageAggregatorID, weeklyIntervalId, started.toDate()]) {
+                                    sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'OUTDATED')",
+                                            [new Date(), it.id])
+                                    sql.executeUpdate("UPDATE csi_aggregation SET closed_and_calculated = false WHERE id = ?", [it.id])
+                                }
+                                // Weekly Shop
+                                sql.eachRow("SELECT * FROM csi_aggregation WHERE aggregator_id = ? AND interval_id = ? AND started = ?",
+                                        [shopAggregatorID, weeklyIntervalId, started.toDate()]) {
+                                    sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'OUTDATED')",
+                                            [new Date(), it.id])
+                                    sql.executeUpdate("UPDATE csi_aggregation SET closed_and_calculated = false WHERE id = ?", [it.id])
+                                }
+                                // Weekly CsiSystem
+                                if (csiSystemAggregatorID) {
+                                    sql.eachRow("SELECT * FROM csi_aggregation WHERE aggregator_id = ? AND interval_id = ? AND started = ?",
+                                            [csiSystemAggregatorID, weeklyIntervalId, started.toDate()]) {
+                                        sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'OUTDATED')",
+                                                [new Date(), it.id])
+                                        sql.executeUpdate("UPDATE csi_aggregation SET closed_and_calculated = false WHERE id = ?", [it.id])
                                     }
                                 }
                             }
+
+                            // remove hourly csi aggregation...
+                            sql.executeUpdate("DELETE FROM csi_aggregation_event_result where csi_aggregation_underlying_event_results_by_visually_complete_id = ?", [csiAggregation.id])
+                            sql.executeUpdate("DELETE FROM csi_aggregation where id = ?", [csiAggregation.id])
+
+                            // ... and calc it again for each connectivity profile
+                            eventResultsOfCsiAggregation.groupBy({ result -> result['connectivity_profile_id'] }).each { connectivityProfileID, eventResultsForConnectivityProfile ->
+                                double csByWptDocCompleteInPercent = 0.0
+                                int csByWptDocCompleteInPercentCounter = 0
+                                double csByWptVisuallyCompleteInPercent = 0.0
+                                int csByWptVisuallyCompleteInPercentCounter = 0
+                                List<String> underlying_event_results_by_wpt_doc_complete = []
+
+                                // sum all results
+                                eventResultsForConnectivityProfile.each { eventResult ->
+                                    if (eventResult['cs_by_wpt_doc_complete_in_percent']) {
+                                        csByWptDocCompleteInPercent += eventResult['cs_by_wpt_doc_complete_in_percent']
+                                        csByWptDocCompleteInPercentCounter++
+                                        underlying_event_results_by_wpt_doc_complete << eventResult.id
+                                    }
+                                    if (eventResult['cs_by_wpt_visually_complete_in_percent']) {
+                                        csByWptVisuallyCompleteInPercent += eventResult['cs_by_wpt_visually_complete_in_percent']
+                                        csByWptVisuallyCompleteInPercentCounter++
+                                    }
+                                }
+
+                                // calculate the mean
+                                if (csByWptDocCompleteInPercentCounter > 0) {
+                                    csByWptDocCompleteInPercent /= csByWptDocCompleteInPercentCounter
+                                }
+                                if (csByWptVisuallyCompleteInPercentCounter > 0) {
+                                    csByWptVisuallyCompleteInPercent /= csByWptVisuallyCompleteInPercentCounter
+                                }
+
+                                // store new csiAggregation
+                                def newCsiAggregationID = sql.executeInsert('''INSERT INTO csi_aggregation
+                                    (version, aggregator_id, interval_id, underlying_event_results_by_wpt_doc_complete, started, tag, cs_by_wpt_doc_complete_in_percent, closed_and_calculated, connectivity_profile_id, csi_system_id, cs_by_wpt_visually_complete_in_percent) VALUES
+                                    (0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+                                        [measuredEventAggregatorID, hourlyIntervalID, underlying_event_results_by_wpt_doc_complete.join(','), csiAggregation.started, csiAggregation.tag, csByWptDocCompleteInPercent, csiAggregation['closed_and_calculated'], connectivityProfileID, csiAggregation['csi_system_id'], csByWptVisuallyCompleteInPercent])[0][0]// gets id of inserted object
+
+                                // link underlying event result
+                                eventResultsForConnectivityProfile.each { eventResult ->
+                                    if (eventResult['cs_by_wpt_visually_complete_in_percent']) {
+                                        sql.executeInsert("INSERT INTO csi_aggregation_event_result VALUES (?,?)"[newCsiAggregationID, eventResult.id])
+                                    }
+                                }
+                                // create update event
+                                sql.executeInsert("INSERT INTO csi_aggregation_update_event (version, date_of_update, csi_aggregation_id, update_cause) VALUES (0, ?, ?, 'CALCULATED')",
+                                        [new Date(), newCsiAggregationID])
+                            }
                         }
-                        Date endOfLoop = new Date()
-                        println "############################################# end loop #${loopNumber}: ${endOfLoop} -> ${(endOfLoop.getTime() - startOfLoop.getTime()) / (1000 * 60)} minutes"
                     }
                 }
             }

@@ -257,7 +257,6 @@ databaseChangeLog = {
                 }
                 rows = sql.rows("SELECT * FROM userspecific_event_result_dashboard")
                 rows.each{
-                    println it.dashboard_name
                     long oldId = it.id
                     long newId = sql.firstRow("SELECT id FROM userspecific_dashboard_base " +
                                               "WHERE dashboard_name = :name " +
@@ -737,4 +736,3 @@ databaseChangeLog = {
 
     }
 }
-
