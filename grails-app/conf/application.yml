@@ -223,6 +223,9 @@ grails:
             authority:
                 className: 'de.iteratec.osm.security.Role'
             securityConfigType: 'InterceptUrlMap'
+            successHandler:
+                alwaysUseDefault: true
+                defaultTargetUrl: '/'
             interceptUrlMap: [{pattern: '/static/**',                                     access: ["permitAll"]},
                             {pattern: '/static/*',                                      access: ["permitAll"]},
                             {pattern: '/assets/**',                                     access: ["permitAll"]},
