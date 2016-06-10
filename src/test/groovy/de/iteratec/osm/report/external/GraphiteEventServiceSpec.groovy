@@ -17,8 +17,6 @@
 
 package de.iteratec.osm.report.external
 
-import co.freeside.betamax.Betamax
-import co.freeside.betamax.Recorder
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.environment.wptserverproxy.Protocol
@@ -33,6 +31,10 @@ import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
+import software.betamax.Configuration
+import software.betamax.ProxyConfiguration
+import software.betamax.junit.Betamax
+import software.betamax.junit.RecorderRule
 import spock.lang.Specification
 
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
@@ -50,8 +52,9 @@ class GraphiteEventServiceSpec extends Specification{
     public static final DateTime untilDateTime = new DateTime(2015, 5, 29, 5, 0, 0)
     public static final int minutesInPast = 1
     GraphiteEventService serviceUnderTest
-    @Rule
-    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
+
+    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    @Rule public RecorderRule recorder = new RecorderRule(configuration)
     public static final String jobGroupName = 'associated JobGroup'
 
     def doWithSpring = {
@@ -113,11 +116,16 @@ class GraphiteEventServiceSpec extends Specification{
     }
 
     private void mockHttpBuilderToUseBetamax(){
-        Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
+        Properties properties = new Properties()
+        new File('grails-app/conf/betamax.properties').withInputStream {
+            properties.load(it)
+        }
+        String host = properties.'betamax.proxyHost'
+        int port = properties.'betamax.proxyPort' as int
         HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
         httpRequestService.metaClass.getRestClient = {String url ->
             RESTClient restClient = new RESTClient(url)
-            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))
+            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(host, port, 'http'))
             return restClient
         }
         serviceUnderTest.httpRequestService = httpRequestService

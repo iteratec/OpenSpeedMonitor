@@ -1,9 +1,5 @@
 package de.iteratec.osm.measurement.environment
 
-import co.freeside.betamax.Betamax
-import co.freeside.betamax.Recorder
-import co.freeside.betamax.tape.yaml.OrderedPropertyComparator
-import co.freeside.betamax.tape.yaml.TapePropertyUtils
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
@@ -21,6 +17,11 @@ import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
 import org.yaml.snakeyaml.introspector.Property
+import software.betamax.Configuration
+import software.betamax.ProxyConfiguration
+import software.betamax.TapeMode
+import software.betamax.junit.Betamax
+import software.betamax.junit.RecorderRule
 import spock.lang.Specification
 
 import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
@@ -29,8 +30,9 @@ import static org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY
 @Mock([WebPageTestServer, Location, Job, Browser, BrowserAlias, JobGroup, Script, OsmConfiguration, AggregatorType, CsiAggregationInterval])
 class QueueAndJobStatusServiceSpec extends Specification {
 
-    @Rule
-    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).toProperties())
+//    public Recorder recorder = new Recorder(new ConfigSlurper().parse(new File('grails-app/conf/betamaxrties').toURL()).toProperties())
+    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    @Rule public RecorderRule recorder = new RecorderRule(configuration)
 
     public static final String WPTSERVER_URL = 'dev.server01.wpt.iteratec.de'
 
@@ -49,7 +51,7 @@ class QueueAndJobStatusServiceSpec extends Specification {
     def doWithSpring = {
         httpRequestService(HttpRequestService)
     }
-    @Betamax(tape = 'CreateChartData creates a map entry per server')
+    @Betamax(tape = 'CreateChartData_creates_a_map_entry_per_server')
     def "CreateChartData creates a map entry per server"() {
         given:
         def start = new DateTime()
@@ -85,20 +87,23 @@ class QueueAndJobStatusServiceSpec extends Specification {
         mocker = ServiceMocker.create()
         mocker.mockI18nService(serviceUnderTest)
         serviceUnderTest.jobService = Mock(JobService)
+        mockHttpBuilderToUseBetamax()
+    }
 
-        // betamax fix for sorting
-        TapePropertyUtils.metaClass.sort = { Set<Property> properties, List<String> names ->
-            new LinkedHashSet(properties.sort(true, new OrderedPropertyComparator(names)))
+    private void mockHttpBuilderToUseBetamax(){
+        Properties properties = new Properties()
+        new File('grails-app/conf/betamax.properties').withInputStream {
+            properties.load(it)
         }
-
-        Map betamaxProps = new ConfigSlurper().parse(new File('grails-app/conf/BetamaxConfig.groovy').toURL()).flatten()
+        String host = properties.'betamax.proxyHost'
+        int port = properties.'betamax.proxyPort' as int
         HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
-        httpRequestService.metaClass.getRestClientFrom = { WebPageTestServer wptserver ->
+        httpRequestService.metaClass.getRestClientFrom = {WebPageTestServer wptserver ->
+            println "AAAHHH"
             RESTClient restClient = new RESTClient(wptserver.baseUrl)
-            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(betamaxProps['betamax.proxyHost'], betamaxProps['betamax.proxyPort'], 'http'))
+            restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(host, port, 'http'))
             return restClient
         }
-
         serviceUnderTest.httpRequestService = httpRequestService
     }
 
