@@ -24,10 +24,10 @@ else
 
   git pull --rebase $remote release
   if [ -z $bamboo_jira_version ]; then
+    git push $remote HEAD:refs/heads/$bamboo_repository_git_branch
+  else
     git tag "${bamboo_ci_app_version}"
     git push --tags $remote HEAD:refs/heads/release
-  else
-    git push $remote HEAD:refs/heads/$bamboo_repository_git_branch
   fi
 
 fi
