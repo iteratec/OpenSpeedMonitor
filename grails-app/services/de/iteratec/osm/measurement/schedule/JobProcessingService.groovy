@@ -91,6 +91,9 @@ class JobProcessingService {
 		this.pollDelaySeconds = pollDelaySeconds
 	}
 
+    public int getDeclareTimeoutAfterMaxDownloadTimePlusSeconds(){
+        return declareTimeoutAfterMaxDownloadTimePlusSeconds
+    }
 	/**
 	 * Maps the properties of a Job to the parameters expected by
 	 * the REST API available at https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis

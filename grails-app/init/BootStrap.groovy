@@ -28,12 +28,14 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.HealthReportService
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -88,14 +90,47 @@ class BootStrap {
         cancelActiveBatchActivity()
         excludePropertiesInJsonRepresentationsofDomainObjects()
         initHealthReporting()
+        handleOldJobResults()
 
         log.info "initApplicationData() OSM ends"
     }
+    void handleOldJobResults(){
+        log.info("handleOldJobResults() OSM starts")
+        def jobResultsToDelete = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200,new DateTime().minusHours(2*jobProcessingService.getDeclareTimeoutAfterMaxDownloadTimePlusSeconds()))
+        if (!jobResultsToDelete.isEmpty()){
+            log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with HttpStatusCode < 200 that are to old. Start deleting...")
+            JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200,new DateTime().minusHours(2*jobProcessingService.getDeclareTimeoutAfterMaxDownloadTimePlusSeconds())).each { JobResult jobResult ->
+                try {
+                    jobResult.delete()
+                } catch (Exception e){
+                    log.error ("Wasn't able to delete old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+                }
+            }
+            log.debug("Deleting done.")
+        }
+
+        def jobResultsToReschedule = JobResult.findAllByHttpStatusCodeLessThanAndDateGreaterThan(200,new DateTime().minusHours(2))
+        if (!jobResultsToReschedule.isEmpty()){
+            log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with HttpStatusCode < 200 starte deleting fresh enough for rescheduling. Start rescheduling ...")
+            jobResultsToReschedule.each { JobResult jobResult ->
+                try {
+                    Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
+                    CronDispatcherQuartzJob.schedule(jobProcessingService.buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(2).toDate()), jobDataMap)
+                } catch (Exception e){
+                    log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+                }
+            }
+            log.debug("Rescheduling done.")
+        }
+        log.info("handleOldJobResults() OSM ends")
+    }
 
     void initHealthReporting(){
+        log.info("initHealthReporting() OSM starts")
         GraphiteServer.findAllByReportHealthMetrics(true).each{
             healthReportService.handleGraphiteServer(it)
         }
+        log.info("initHealthReporting() OSM ends")
     }
 
     void initConfig() {
