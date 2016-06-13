@@ -710,7 +710,6 @@ class EventResultDashboardController {
         writeCSV(csiValues, responseWriter, RequestContextUtils.getLocale(request));
 
         response.getOutputStream().flush()
-        response.sendError(200, 'OK');
         return null;
     }
 
