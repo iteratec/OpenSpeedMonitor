@@ -18,6 +18,9 @@
 package de.iteratec.osm.csi
 
 import groovy.transform.EqualsAndHashCode
+import org.grails.databinding.BindUsing
+
+import java.text.SimpleDateFormat
 
 
 /**
@@ -28,6 +31,18 @@ import groovy.transform.EqualsAndHashCode
 @EqualsAndHashCode
 class CsTargetValue {
 
+    private final static String DATE_FORMAT_STRING = 'yyyy-MM-dd';
+
+    @BindUsing({
+        obj, source ->
+
+            String dateString = source['date']
+            if(dateString) {
+                dateString = dateString.replaceAll('-', '.')
+                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_STRING)
+                return dateFormat.parse(dateString)
+            }
+    })
     Date date
     Double csInPercent
     static final Double minCsInPercent = 0
