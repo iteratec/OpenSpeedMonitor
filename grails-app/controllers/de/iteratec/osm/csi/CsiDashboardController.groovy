@@ -803,7 +803,6 @@ class CsiDashboardController {
         writeCSV(csiValues, responseWriter, RequestContextUtils.getLocale(request), false)
 
         response.getOutputStream().flush()
-        response.sendError(200, 'OK')
         return null
     }
 
