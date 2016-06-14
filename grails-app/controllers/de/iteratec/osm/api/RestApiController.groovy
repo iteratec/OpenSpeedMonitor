@@ -20,6 +20,7 @@ package de.iteratec.osm.api
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.api.dto.BrowserDto
 import de.iteratec.osm.api.dto.CsiConfigurationDto
+import de.iteratec.osm.api.dto.JobDto
 import de.iteratec.osm.api.dto.JobGroupDto
 import de.iteratec.osm.api.dto.LocationDto
 import de.iteratec.osm.api.dto.MeasuredEventDto
@@ -280,7 +281,10 @@ class RestApiController {
 
         DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
-        if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) sendSimpleResponseAsStream(response, 400, 'End of requested time-frame may not be earlier that its requested start.')
+        if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
+            sendSimpleResponseAsStream(response, 400, 'End of requested time-frame may not be earlier that its requested start.')
+            return
+        }
 
         Duration requestedDuration = new Duration(startDateTimeInclusive, endDateTimeInclusive);
 
@@ -289,6 +293,7 @@ class RestApiController {
                     MAX_TIME_FRAME_DURATION_IN_HOURS +
                     ' hours. This is too large to process. Please choose a smaller time-frame.'
             sendSimpleResponseAsStream(response, 413, errorMessage)
+            return
         }
 
         Date startTimeInclusive = startDateTimeInclusive.toDate();
@@ -299,6 +304,7 @@ class RestApiController {
             queryParams = cmd.createMvQueryParams(jobGroupDaoService, pageDaoService, measuredEventDaoService, browserDaoService, locationDaoService);
         } catch (NoResultException nre) {
             sendSimpleResponseAsStream(response, 404, 'Some of the request arguments could not be found: ' + nre.getMessage())
+            return
         }
 
         response.setContentType("application/json;charset=UTF-8");
@@ -416,11 +422,18 @@ class RestApiController {
 
         if (cmd.loadTimeInMillisecs == null || cmd.pageName == null || (cmd.csiConfiguration == null && cmd.system == null)) {
             sendSimpleResponseAsStream(response, 400, 'Params loadTimeInMillisecs AND pageName AND csiConfiguration must be set.\n')
+            return
         } else {
             Page page = Page.findByName(cmd.pageName)
             CsiConfiguration csiConfig = cmd.findCsiConfiguration()
-            if (page == null) sendSimpleResponseAsStream(response, 400, "Page with name ${cmd.pageName} couldn't be found.\n")
-            else if (csiConfig == null) sendSimpleResponseAsStream(response, 400, "CsiConfiguration couldn't be found\n")
+            if (page == null) {
+                sendSimpleResponseAsStream(response, 400, "Page with name ${cmd.pageName} couldn't be found.\n")
+                return
+            }
+            else if (csiConfig == null) {
+                sendSimpleResponseAsStream(response, 400, "CsiConfiguration couldn't be found\n")
+                return
+            }
             else {
                 return sendObjectAsJSON(
                         ['loadTimeInMillisecs'          : cmd.loadTimeInMillisecs,
@@ -440,13 +453,22 @@ class RestApiController {
     public Map<String, Object> getResultUrls() {
 
         Job job = Job.get(params.id)
-        if (job == null) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+        if (job == null) {
+            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            return
+        }
 
-        if (params.timestampFrom == null || params.timestampTo == null) sendSimpleResponseAsStream(response, 400, 'Params timestampFrom and timestampTo must be set.')
+        if (params.timestampFrom == null || params.timestampTo == null) {
+            sendSimpleResponseAsStream(response, 400, 'Params timestampFrom and timestampTo must be set.')
+            return
+        }
 
         DateTime start = API_DATE_FORMAT.parseDateTime(params.timestampFrom)
         DateTime end = API_DATE_FORMAT.parseDateTime(params.timestampTo)
-        if (end.isBefore(start)) sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
+        if (end.isBefore(start)) {
+            sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
+            return
+        }
 
         Map<String, String> visualizingLinks = jobLinkService.getResultVisualizingLinksFor(job, start, end)
 
@@ -475,6 +497,7 @@ class RestApiController {
             jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
         } else {
             sendSimpleResponseAsStream(response, 400, "CsiConfiguration with id ${params.id} doesn't exist!")
+            return
         }
 
         return sendObjectAsJSON(
@@ -490,15 +513,21 @@ class RestApiController {
      */
     public Map<String, Object> securedViaApiKeyActivateJob() {
 
-        if (!params.validApiKey.allowedForJobActivation) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to activate jobs.")
+        if (!params.validApiKey.allowedForJobActivation) {
+            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to activate jobs.")
+            return
+        }
 
         Job job = Job.get(params.id)
-        if (job == null) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+        if (job == null) {
+            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            return
+        }
 
         jobService.updateActivity(job, true)
 
         sendObjectAsJSON(
-                job.refresh(),
+                JobDto.create(job.refresh()),
                 params.pretty && params.pretty == 'true'
         )
     }
@@ -510,15 +539,21 @@ class RestApiController {
      */
     public Map<String, Object> securedViaApiKeyDeactivateJob() {
 
-        if (!params.validApiKey.allowedForJobDeactivation) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to deactivate jobs.")
+        if (!params.validApiKey.allowedForJobDeactivation) {
+            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to deactivate jobs.")
+            return
+        }
 
         Job job = Job.get(params.id)
-        if (job == null) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+        if (job == null) {
+            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            return
+        }
 
         jobService.updateActivity(job, false)
 
         sendObjectAsJSON(
-                job.refresh(),
+                JobDto.create(job.refresh()),
                 params.pretty && params.pretty == 'true'
         )
     }
@@ -531,23 +566,34 @@ class RestApiController {
      */
     public Map<String, Object> securedViaApiKeySetExecutionSchedule() {
 
-        if (!params.validApiKey.allowedForJobSetExecutionSchedule) sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
+        if (!params.validApiKey.allowedForJobSetExecutionSchedule) {
+            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
+            return
+        }
 
         Job job = Job.get(params.id)
-        if (job == null) sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+        if (job == null) {
+            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            return
+        }
 
         JsonSlurper jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
         String schedule = jsonSlurper.executionSchedule
-        if (schedule == null) sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
+        if (schedule == null) {
+            sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
+            return
+        }
 
-        if (!CronExpression.isValidExpression(schedule))
+        if (!CronExpression.isValidExpression(schedule)){
             sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
                     "(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
+            return
+        }
 
         jobService.updateExecutionSchedule(job, schedule)
 
         sendObjectAsJSON(
-                job.refresh(),
+                JobDto.create(job.refresh()),
                 params.pretty && params.pretty == 'true'
         )
     }
@@ -565,6 +611,7 @@ class RestApiController {
                 sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
             sendSimpleResponseAsStream(response, 400, sw.toString())
+            return
         } else {
             render eventDaoService.createEvent(
                     cmd.shortName,
@@ -589,6 +636,7 @@ class RestApiController {
                 sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
             sendSimpleResponseAsStream(response, 400, sw.toString())
+            return
         } else {
             inMemoryConfigService.setActiveStatusOfMeasurementsGenerally(cmd.activationToSet)
             sendSimpleResponseAsStream(response, 200, "Set measurements activation to: ${cmd.activationToSet}")
@@ -608,6 +656,7 @@ class RestApiController {
                 sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
             sendSimpleResponseAsStream(response, 400, sw.toString())
+            return
         } else {
             inMemoryConfigService.setDatabaseCleanupEnabled(cmd.activationToSet)
             sendSimpleResponseAsStream(response, 200, "Set nightly-database-cleanup activation to: ${cmd.activationToSet}")
@@ -647,7 +696,6 @@ class RestApiController {
     private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, Integer httpStatus, String message) {
         response.setContentType('text/plain;charset=UTF-8')
         response.status = httpStatus
-
         render message
     }
 
