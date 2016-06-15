@@ -60,19 +60,18 @@ function sortAlpha(a,b){
 };  
 
 var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
-
 		$(checkBox).on('change', function(event) {
 			if(event.currentTarget.checked == true) {
-				$(selectBox).css({ opacity: 0.5 });
+				$(selectBox).css({opacity: 0.5});
 				$(selectBox + " option").prop('selected', false);
 				$(selectBox).trigger("chosen:updated");
 			} else {
-				$(selectBox).css({ opacity: 1 });
+				$(selectBox).css({opacity: 1});
 			}
 		});
 
 		$(selectBox).on('change', function(event) {
-			if ($('#selectedMeasuredEventsHtmlId option:selected').length > 0) {
+			if ($(selectBox).find('option:selected').length > 0) {
 				$(checkBox).prop('checked', false);
 				$(selectBox).css({opacity: 1});
 			} else {
@@ -81,8 +80,8 @@ var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
 			}
 			$(selectBox).trigger("chosen:updated");
 		});
-		
-}
+	$(selectBox).css({opacity: 0.5});
+};
 
 var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
 	$(checkBox).on('change', function(event) {
