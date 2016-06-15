@@ -41,9 +41,14 @@ public class CsiDashboardShowAllCommand implements Validateable {
      */
     @BindUsing({
         obj, source ->
-            if(source['from']) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
-                return dateFormat.parse(source['from'])
+            def dateObject = source['from']
+            if (dateObject) {
+                if (dateObject instanceof Date) {
+                    return dateObject
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
+                    return dateFormat.parse(dateObject)
+                }
             }
     })
     Date from
@@ -55,9 +60,15 @@ public class CsiDashboardShowAllCommand implements Validateable {
      */
     @BindUsing({
         obj, source ->
-            if(source['to']) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
-                return dateFormat.parse(source['to'])
+
+            def dateObject = source['to']
+            if (dateObject) {
+                if (dateObject instanceof Date) {
+                    return dateObject
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
+                    return dateFormat.parse(dateObject)
+                }
             }
     })
     Date to
@@ -385,10 +396,10 @@ public class CsiDashboardShowAllCommand implements Validateable {
             }
         })
 
-        setFromHour(nullable:true)
-        setToHour(nullable:true)
-        includeInterval(nullable:true)
-        csiAggregationUtilService(nullable:true)
+        setFromHour(nullable: true)
+        setToHour(nullable: true)
+        includeInterval(nullable: true)
+        csiAggregationUtilService(nullable: true)
         overwriteWarningAboutLongProcessingTime(nullable: true)
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)

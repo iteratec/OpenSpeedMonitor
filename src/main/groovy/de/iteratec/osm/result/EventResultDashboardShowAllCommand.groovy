@@ -30,7 +30,7 @@ import java.util.regex.Pattern
  * @author mze , rhe
  * @since IT-6
  */
-public class EventResultDashboardShowAllCommand implements Validateable{
+public class EventResultDashboardShowAllCommand implements Validateable {
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -42,9 +42,15 @@ public class EventResultDashboardShowAllCommand implements Validateable{
      */
     @BindUsing({
         obj, source ->
-            if(source['from']) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
-                return dateFormat.parse(source['from'])
+
+            def dateObject = source['from']
+            if (dateObject) {
+                if (dateObject instanceof Date) {
+                    return dateObject
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
+                    return dateFormat.parse(dateObject)
+                }
             }
     })
     Date from
@@ -56,9 +62,15 @@ public class EventResultDashboardShowAllCommand implements Validateable{
      */
     @BindUsing({
         obj, source ->
-            if(source['to']) {
-                SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
-                return dateFormat.parse(source['to'])
+
+            def dateObject = source['to']
+            if (dateObject) {
+                if (dateObject instanceof Date) {
+                    return dateObject
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
+                    return dateFormat.parse(dateObject)
+                }
             }
     })
     Date to
@@ -362,17 +374,17 @@ public class EventResultDashboardShowAllCommand implements Validateable{
 
         chartTitle(nullable: true)
         loadTimeMaximum(nullable: true)
-        trimAboveLoadTimes(nullable:true)
+        trimAboveLoadTimes(nullable: true)
         trimAboveRequestCounts(nullable: true)
         trimAboveRequestSizes(nullable: true)
-        trimBelowLoadTimes(nullable:true)
-        trimBelowRequestCounts(nullable:true)
-        trimBelowRequestSizes(nullable:true)
-        debug(nullable:true)
-        setToHour(nullable:true)
-        setFromHour(nullable:true)
-        selectChartType(nullable:true)
-        aggrGroup(nullable:true)
+        trimBelowLoadTimes(nullable: true)
+        trimBelowRequestCounts(nullable: true)
+        trimBelowRequestSizes(nullable: true)
+        debug(nullable: true)
+        setToHour(nullable: true)
+        setFromHour(nullable: true)
+        selectChartType(nullable: true)
+        aggrGroup(nullable: true)
     }
 
     /**
