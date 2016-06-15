@@ -99,7 +99,6 @@ class QueueAndJobStatusServiceSpec extends Specification {
         int port = properties.'betamax.proxyPort' as int
         HttpRequestService httpRequestService = grailsApplication.mainContext.getBean('httpRequestService')
         httpRequestService.metaClass.getRestClientFrom = {WebPageTestServer wptserver ->
-            println "AAAHHH"
             RESTClient restClient = new RESTClient(wptserver.baseUrl)
             restClient.client.params.setParameter(DEFAULT_PROXY, new HttpHost(host, port, 'http'))
             return restClient

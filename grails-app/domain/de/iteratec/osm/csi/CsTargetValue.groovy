@@ -35,13 +35,19 @@ class CsTargetValue {
 
     @BindUsing({
         obj, source ->
-
-            String dateString = source['date']
-            if(dateString) {
-                dateString = dateString.replaceAll('-', '.')
-                SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_STRING)
-                return dateFormat.parse(dateString)
+            def dateObject = source['date']
+            Date date = null
+            if(dateObject instanceof Date){
+                date = dateObject
+            } else{
+                String dateString = dateObject
+                if(dateString) {
+                    dateString = dateString.replaceAll('-', '.')
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_STRING)
+                    date = dateFormat.parse(dateString)
+                }
             }
+            return date
     })
     Date date
     Double csInPercent
