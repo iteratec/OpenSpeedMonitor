@@ -37,12 +37,15 @@ import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -91,6 +94,7 @@ class RestApiController {
     PerformanceLoggingService performanceLoggingService
     EventDaoService eventDaoService
     InMemoryConfigService inMemoryConfigService
+    JobProcessingService jobProcessingService
 
     /**
      * <p>
@@ -532,6 +536,16 @@ class RestApiController {
         )
     }
 
+    public Map<String, Object> securedViaApiKeyHandleOldJobResults() {
+
+        if (!params.validApiKey.allowedForMeasurementActivation) {
+            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to activate jobs.")
+            return
+        }
+        def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
+        sendSimpleResponseAsStream(response, 200, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
+    }
+
     /**
      * Deactivates the job of submitted id. It gets deactivated no matter whether it was active/inactive before.
      * This function can't be called without a valid apiKey as parameter.
@@ -640,6 +654,7 @@ class RestApiController {
         } else {
             inMemoryConfigService.setActiveStatusOfMeasurementsGenerally(cmd.activationToSet)
             sendSimpleResponseAsStream(response, 200, "Set measurements activation to: ${cmd.activationToSet}")
+            return
         }
     }
 
@@ -660,6 +675,7 @@ class RestApiController {
         } else {
             inMemoryConfigService.setDatabaseCleanupEnabled(cmd.activationToSet)
             sendSimpleResponseAsStream(response, 200, "Set nightly-database-cleanup activation to: ${cmd.activationToSet}")
+            return
         }
     }
 

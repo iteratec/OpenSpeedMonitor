@@ -62,7 +62,6 @@ class BootStrap {
             case Environment.DEVELOPMENT:
                 initApplicationData(true)
                 registerProxyListener()
-                handleOldJobResults() // has to be after registerProxyListener
 
                 break
             case Environment.TEST:
@@ -72,7 +71,6 @@ class BootStrap {
             case Environment.PRODUCTION:
                 initApplicationData(false)
                 registerProxyListener()
-                handleOldJobResults() // has to be after registerProxyListener
 
                 break
         }
@@ -97,52 +95,7 @@ class BootStrap {
 
         log.info "initApplicationData() OSM ends"
     }
-    void handleOldJobResults(){
-        log.info("handleOldJobResults() OSM starts")
-        def jobResultsToDelete = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200,new DateTime().minusHours(2*jobProcessingService.getDeclareTimeoutAfterMaxDownloadTimePlusSeconds()))
-        if (!jobResultsToDelete.isEmpty()){
-            log.error("Found ${jobResultsToDelete.size()} pending/running JobResults with HttpStatusCode < 200 that are to old. Start deleting...")
-            JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200,new DateTime().minusHours(2*jobProcessingService.getDeclareTimeoutAfterMaxDownloadTimePlusSeconds())).each { JobResult jobResult ->
-                try {
-                    jobResult.delete()
-                } catch (Exception e){
-                    log.error ("Wasn't able to delete old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
-                }
-            }
-            log.error("Deleting done.")
-        }
 
-        def jobResultsToTimout = JobResult.findAllByHttpStatusCodeLessThanAndDateBetween(200,new DateTime().minusHours(2), new DateTime().minusHours(1))
-        if (!jobResultsToTimout.isEmpty()){
-            log.error("Found ${jobResultsToTimout.size()} pending/running JobResults with HttpStatusCode < 200 fresh enough for one last poll ...")
-            jobResultsToTimout.each { JobResult jobResult ->
-                try {
-                    Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
-                    CronDispatcherQuartzJob.schedule(jobProcessingService.buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(1).toDate()), jobDataMap)
-                } catch (Exception e){
-                    log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
-                }
-            }
-            log.error("Start of last poll done.")
-        }
-        def jobResultsToReschedule = JobResult.findAllByHttpStatusCodeLessThanAndDateGreaterThan(200,new DateTime().minusHours(1))
-        if (!jobResultsToReschedule.isEmpty()){
-            log.error("Found ${jobResultsToReschedule.size()} pending/running JobResults with HttpStatusCode < 200 fresh enough for rescheduling. Start rescheduling ...")
-            jobResultsToReschedule.each { JobResult jobResult ->
-                try {
-                    Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
-                    Date endDate = new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).toDate()
-                    CronDispatcherQuartzJob.schedule(jobProcessingService.buildSubTrigger(jobResult.job, jobResult.testId, endDate), jobDataMap)
-                    Date timeoutDate = new DateTime(endDate).plusSeconds( jobProcessingService.declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate()
-                    CronDispatcherQuartzJob.schedule(jobProcessingService.buildTimeoutTrigger(jobResult.job, jobResult.testId, timeoutDate), jobDataMap)
-                } catch (Exception e){
-                    log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
-                }
-            }
-            log.error("Rescheduling done.")
-        }
-        log.info("handleOldJobResults() OSM ends")
-    }
 
     void initHealthReporting(){
         log.info("initHealthReporting() OSM starts")

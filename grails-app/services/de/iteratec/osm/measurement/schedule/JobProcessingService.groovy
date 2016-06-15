@@ -30,6 +30,7 @@ import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.joda.time.DateTime
 import org.quartz.*
 import org.hibernate.StaleObjectStateException
 import org.springframework.transaction.annotation.Propagation
@@ -91,9 +92,7 @@ class JobProcessingService {
 		this.pollDelaySeconds = pollDelaySeconds
 	}
 
-    public int getDeclareTimeoutAfterMaxDownloadTimePlusSeconds(){
-        return declareTimeoutAfterMaxDownloadTimePlusSeconds
-    }
+
 	/**
 	 * Maps the properties of a Job to the parameters expected by
 	 * the REST API available at https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis
@@ -477,5 +476,52 @@ class JobProcessingService {
 	public void unscheduleJob(Job job) {
 		if (log.infoEnabled) log.info("Unscheduling Job ${job.label}")
 		CronDispatcherQuartzJob.unschedule(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value())
+	}
+
+	public Map<String, Integer> handleOldJobResults(){
+		log.info("handleOldJobResults() OSM starts")
+
+		def jobResultsToDelete = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200,new DateTime().minusHours(2))
+		def jobResultsToDeleteCount = jobResultsToDelete.size()
+		if (!jobResultsToDelete.isEmpty()){
+			log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with HttpStatusCode < 200 that are to old. Start deleting...")
+			jobResultsToDelete.each { JobResult jobResult ->
+				try {
+					jobResult.delete()
+				} catch (Exception e){
+					log.error ("Wasn't able to delete old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+				}
+			}
+			log.debug("Deleting done.")
+		}
+
+		def jobResultsToReschedule = JobResult.findAllByHttpStatusCodeLessThanAndDateGreaterThan(200,new DateTime().minusHours(2))
+		def jobResultsToRescheduleCount = jobResultsToReschedule.size()
+		if (!jobResultsToReschedule.isEmpty()){
+			log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with HttpStatusCode < 200 fresh enough for rescheduling. Start rescheduling ...")
+			jobResultsToReschedule.each { JobResult jobResult ->
+				Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
+				Date endDate = new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).toDate()
+				Date timeoutDate = new DateTime(endDate).plusSeconds( declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate()
+				if ( new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate() > new Date()) {
+					try {
+						CronDispatcherQuartzJob.schedule(buildSubTrigger(jobResult.job, jobResult.testId, endDate), jobDataMap)
+						CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, timeoutDate), jobDataMap)
+					} catch (Exception e){
+						log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+					}
+				} else {
+
+					try {
+						CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(1).toDate()), jobDataMap)
+					} catch (Exception e){
+						log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+					}
+				}
+			}
+			log.debug("Rescheduling done.")
+		}
+		log.info("handleOldJobResults() OSM ends")
+		return ["JobResultsToDeleteCount":jobResultsToDeleteCount, "JobResultsToRescheduleCount":jobResultsToRescheduleCount]
 	}
 }

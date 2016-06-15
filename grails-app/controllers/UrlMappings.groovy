@@ -172,7 +172,7 @@ class UrlMappings {
             controller = "RestApi"
             action = [PUT: "securedViaApiKeySetExecutionSchedule"]
         }
-        "/rest/event/create" {
+		"/rest/event/create" {
             controller = "RestApi"
             action = [POST: "securedViaApiKeyCreateEvent"]
         }
@@ -195,6 +195,10 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [PUT: "securedViaApiKeySetNightlyDatabaseCleanupActivation"]
 			activationToSet = false
+		}
+		"/rest/handleOldJobResults" {
+			controller = "RestApi"
+			action = [POST: "securedViaApiKeyHandleOldJobResults"]
 		}
 
 	}
