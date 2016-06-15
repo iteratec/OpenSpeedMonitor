@@ -2,11 +2,8 @@ package de.iteratec.osm.batch
 
 import grails.test.mixin.Mock
 import spock.lang.Specification
+import spock.lang.Unroll
 
-/**
- * Since the BatchActivityUpdater uses another thread, all of this tests may have to wait until the other thread has finished something.
- * This will lead to various sleep() calls within this tests
- */
 @Mock([BatchActivity])
 class BatchActivityUpdaterTests extends Specification{
 
@@ -17,16 +14,14 @@ class BatchActivityUpdaterTests extends Specification{
         String name = "TestUpdater"
         int maxStages = 10
         BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,10)
-        sleep(500)//Make sure the other thread has enough time to save the object
 
         then:"An equivalent BatchActivity should be persisted"
         updater.batchActivity != null
+        BatchActivity.findByNameAndDomain(name,domain) != null
 
-        cleanup:
-        updater.cleanup()
     }
 
-    def "test updates shouldn't effect the actual domain without an update call"(){
+    def "test threshold counter update on addProgress"(){
         given: "A new Updater"
         String domain = "Domain"
         String name = "TestUpdater"
@@ -34,69 +29,55 @@ class BatchActivityUpdaterTests extends Specification{
         String stageDescription = "New Stage"
         int maximumStepsInStage = 13
         BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,10)
-        sleep(1000) // Make sure other thread has saved the actual domain
 
-        when:"We change some values on the updater, but didn't call update"
-        updater.beginNewStage(stageDescription, maximumStepsInStage).addProgressToStage().addFailures()
+        when:
 
-        then:"An equivalent BatchActivity should be persisted"
-        BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)
-        batchActivity.stepInStage == 0
-        batchActivity.maximumStepsInStage == 0
-        batchActivity.failures == 0
-        batchActivity.stageDescription != stageDescription
+        updater.beginNewStage(stageDescription,maximumStepsInStage)
+        updater.addProgressToStage(1)
 
-        cleanup:
-        updater.cleanup()
+        then:
+        updater.count == 1
     }
 
-    def "test updates should effect the actual domain with an update call"(){
+    def "test threshold counter update on addFailure"(){
         given: "A new Updater"
         String domain = "Domain"
         String name = "TestUpdater"
         int maxStages = 10
         String stageDescription = "New Stage"
-        int updateInterval = 10
         int maximumStepsInStage = 13
-        BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,updateInterval)
+        BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,10)
 
-        when:"We change some values on the updater and call update"
-        updater.beginNewStage(stageDescription, maximumStepsInStage).addProgressToStage().addFailures().update()
-        sleep(500) // Make sure the other thread got time to save the object
+        when:
+        updater.beginNewStage(stageDescription,maximumStepsInStage)
+        updater.addFailures("That was unexpected!")
 
-        then:"An equivalent BatchActivity should be persisted"
-        BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)
-        batchActivity.stepInStage == 1
-        batchActivity.failures == 1
-        batchActivity.maximumStepsInStage == maximumStepsInStage
-        batchActivity.stageDescription == stageDescription
+        then:
+        updater.count == 1
     }
 
-    def "test beginning a new stage should reset the step in stage counter"(){
+    def "test beginNewStage should reset threshold and save direct"(){
         given: "A new Updater"
         String domain = "Domain"
         String name = "TestUpdater"
         int maxStages = 10
-        String stageDescription = "Stage"
-        String updatedStageDescription = "Second Stage"
-        int updateInterval = 10
+        String stageDescription = "New Stage"
+        String newStageDescription = "Second Stage"
         int maximumStepsInStage = 13
-        BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,updateInterval)
+        BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,maxStages,10)
 
-        when:"We change some values on the updater and begin a new stage"
-        updater.beginNewStage(stageDescription, maximumStepsInStage).addProgressToStage(10).update()
-        sleep(updateInterval)
-        updater.beginNewStage(updatedStageDescription, maximumStepsInStage).update()
-        sleep(1000)
+        when:
+        updater.beginNewStage(stageDescription,maximumStepsInStage)
+        updater.addProgressToStage()
+        updater.addProgressToStage()
+        updater.addProgressToStage()
+        updater.beginNewStage(newStageDescription,maximumStepsInStage)
 
-        then:"An equivalent BatchActivity should be persisted"
+        then:
+        updater.count == 0
         BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)
-        batchActivity.stepInStage == 0
-        batchActivity.stageDescription != stageDescription
-        batchActivity.stageDescription == updatedStageDescription
-
-        cleanup:
-        updater.done()
+        batchActivity != null
+        batchActivity.stageDescription == newStageDescription
     }
 
     def "finishing an activity"(){
@@ -129,7 +110,6 @@ class BatchActivityUpdaterTests extends Specification{
             updater.addProgressToStage(3).update()
         }
         updater.done()
-        sleep(2000) // make sure the timer ran again
 
         then:"All attributes should be at the defined maximum"
         BatchActivity batchActivity = BatchActivity.findByNameAndDomain(name,domain)
@@ -139,20 +119,4 @@ class BatchActivityUpdaterTests extends Specification{
         batchActivity.stepInStage == 3
         batchActivity.endDate != null
     }
-
-    def "test timeout"(){
-        given: "A new Updater"
-        String name = "Name"
-        String domain = "Domain"
-        BatchActivityUpdater updater = new BatchActivityUpdater(name, domain, Activity.CREATE,1,100, 1)
-
-        when:"We make an update but then exceed the timeout"
-        sleep(4000)
-
-        then:"The Updater should be cancelled and there should be no active timer"
-        BatchActivity batchActivity = BatchActivity.findByNameAndDomainAndActivity(name, domain, Activity.CREATE)
-        batchActivity.status == Status.CANCELLED
-
-    }
-
 }

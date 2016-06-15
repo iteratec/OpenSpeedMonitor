@@ -6,11 +6,11 @@ class BatchActivityService {
 
     /**
      */
-    public BatchActivityUpdater getActiveBatchActivity(Class c, Activity activity, String name, int maxStages, boolean observe) {
+    public BatchActivityUpdater getActiveBatchActivity(Class c, Activity activity, String name, int maxStages, boolean observe, int saveThreshold = 10) {
         if(observe){
-            return new BatchActivityUpdater(name,c.name,activity, maxStages, 5000)
+            return new BatchActivityUpdater(name,c.name,activity, maxStages, saveThreshold)
         } else{
-            return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages, 5000)
+            return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages,1)
         }
     }
 

@@ -18,9 +18,16 @@ else
   git config user.email "wpt@iteratec.de"
   git config user.name "bamboo iteratec"
 
+  # the following commit message is referenced by regex in bamboo to exclude these commits
+  # while picking up changes (configured in bamboo repositories advanced settings)
   git commit -am "[${bamboo_ci_app_version}] version update"
 
-  git pull --rebase $remote $bamboo_planRepository_branch
-  git push $remote HEAD:refs/heads/$bamboo_repository_git_branch
+  git pull --rebase $remote release
+  if [ -z $bamboo_jira_version ]; then
+    git push $remote HEAD:refs/heads/$bamboo_repository_git_branch
+  else
+    git tag "${bamboo_ci_app_version}"
+    git push --tags $remote HEAD:refs/heads/release
+  fi
 
 fi

@@ -76,14 +76,14 @@ class CsiAggregationUpdateEventCleanupService {
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${csiAggregationsOpenAndExpired.size()} CsiAggregations identified as open and expired.")
 
         BatchActivityUpdater activityUpdater = batchActivityService.getActiveBatchActivity(this.class, Activity.UPDATE, "Close and Calculate CsiAggregations", 2, createBatchActivity)
-        activityUpdater.beginNewStage("closing and calculating CsiAggregations", csiAggregationsOpenAndExpired.size()).update()
+        activityUpdater.beginNewStage("closing and calculating CsiAggregations", csiAggregationsOpenAndExpired.size())
 
         if (csiAggregationsOpenAndExpired.size() > 0) {
             CsiAggregation.withSession { session ->
                 csiAggregationsOpenAndExpired.each { csiAggregationToCalcAndClose ->
 
                     log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Calculating and closing open and expired csi aggregations...")
-                    activityUpdater.addProgressToStage().update()
+                    activityUpdater.addProgressToStage()
 
                     try {
                         closeAndCalculateIfNecessary(csiAggregationToCalcAndClose)
@@ -198,7 +198,7 @@ class CsiAggregationUpdateEventCleanupService {
 
 
         int batchSize = 100
-        activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting update events for closedAndCalculated csiAggregations", closedAndCalculatedCsiAggregationIds.size()).update()
+        activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting update events for closedAndCalculated csiAggregations", closedAndCalculatedCsiAggregationIds.size())
 
         if (closedAndCalculatedCsiAggregationIds.size() > 0) {
             def lists = closedAndCalculatedCsiAggregationIds.collate(batchSize)
@@ -210,7 +210,7 @@ class CsiAggregationUpdateEventCleanupService {
 
                 total += updateEventsToBeDeletedCriteria.deleteAll()
 
-                activityUpdater.addProgressToStage(l.size()).update()
+                activityUpdater.addProgressToStage(l.size())
             }
             log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${total} updateEvents deleted")
         }

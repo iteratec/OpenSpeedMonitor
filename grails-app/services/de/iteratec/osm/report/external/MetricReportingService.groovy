@@ -184,13 +184,13 @@ class MetricReportingService {
 		Contract.requiresArgumentNotNull("reportingTimeStamp", reportingTimeStamp)
 
 		if(log.debugEnabled) log.debug('reporting csi-values of last hour')
-		activity.beginNewStage("Collecting JobGroups",1).update()
+		activity.beginNewStage("Collecting JobGroups",1)
 		Collection<JobGroup> csiGroupsWithGraphiteServers = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
-		activity.addProgressToStage().update()
+		activity.addProgressToStage()
 		if(log.debugEnabled) log.debug("csi-groups to report: ${csiGroupsWithGraphiteServers}")
-		activity.beginNewStage("Reporting",csiGroupsWithGraphiteServers.size()).update()
+		activity.beginNewStage("Reporting",csiGroupsWithGraphiteServers.size())
 		csiGroupsWithGraphiteServers.eachWithIndex {JobGroup eachJobGroup, int index ->
-			activity.addProgressToStage().update()
+			activity.addProgressToStage()
 			MvQueryParams queryParams = new MvQueryParams()
 			ConnectivityProfile.findAll().each {queryParams.connectivityProfileIds.add(it.id)}
 			queryParams.jobGroupIds.add(eachJobGroup.getId())
@@ -265,9 +265,9 @@ class MetricReportingService {
 
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
-		activity.beginNewStage("Report page CSI Values", size).update()
+		activity.beginNewStage("Report page CSI Values", size)
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
-			activity.addProgressToStage().update()
+			activity.addProgressToStage()
 			Date startOfLastClosedInterval = csiAggregationUtilService.resetToStartOfActualInterval(
 				csiAggregationUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes),
 				intervalInMinutes)
@@ -337,9 +337,9 @@ class MetricReportingService {
 		if(log.debugEnabled) log.debug("reporting shop csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
 		def groups = jobGroupDaoService.findCSIGroups().findAll {it.graphiteServers.size()>0}
 		int size = groups.size()
-		activity.beginNewStage("Report CSI-Values", size).update()
+		activity.beginNewStage("Report CSI-Values", size)
 		groups.eachWithIndex {JobGroup eachJobGroup, int index ->
-			activity.addProgressToStage().update()
+			activity.addProgressToStage()
 			Date startOfLastClosedInterval = csiAggregationUtilService.resetToStartOfActualInterval(
 				csiAggregationUtilService.subtractOneInterval(reportingTimeStamp, intervalInMinutes),
 				intervalInMinutes)

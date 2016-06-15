@@ -113,7 +113,7 @@ class JobService {
         Job.withTransaction {
             count = dc.count()
         }
-        activity.beginNewStage("Delete JobResults", count).update()
+        activity.beginNewStage("Delete JobResults", count)
         int batchSize = 100
         Job.withSession { session ->
             0.step(count, batchSize) { offset ->
@@ -124,22 +124,22 @@ class JobService {
                             List<EventResult> eventResults = jobResult.getEventResults()
                             batchDelete(eventResults, batchSize)
                             jobResult.delete()
-                            activity.addProgressToStage().update()
+                            activity.addProgressToStage()
                         } catch (Exception e) {
                             log.error("Couldn't delete JobResult ${e}")
-                            activity.addFailures().setLastFailureMessage("Couldn't delete JobResult: ${jobResult.id}").update()
+                            activity.addFailures("Couldn't delete JobResult: ${jobResult.id}")
                         }
                     }
                     session.flush()
                     session.clear()
                 }
             }
-            activity.beginNewStage("Delete Job",1).update()
+            activity.beginNewStage("Delete Job",1)
             Job.withTransaction {
                 try {
                     job.delete(flush: true)
                 } catch (Exception e) {
-                    activity.addFailures().setLastFailureMessage("Job could't be deleted").update()
+                    activity.addFailures("Job could't be deleted")
                     e.printStackTrace()
                 }
             }

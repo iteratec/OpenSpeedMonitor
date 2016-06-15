@@ -59,7 +59,7 @@ class DbCleanupService {
         //TODO: check if the QuartzJob is availible... after app restart, the QuartzJob is shutdown, but the activity is in database
         if(count > 0 && !batchActivityService.runningBatch(this.class, jobName, Activity.DELETE)) {
             BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(this.class, Activity.DELETE, jobName, 1, createBatchActivity)
-            batchActivity.beginNewStage("Delete JobResults", count).update()
+            batchActivity.beginNewStage("Delete JobResults", count)
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
             0.step(count, batchSize) { int offset ->
@@ -76,7 +76,7 @@ class DbCleanupService {
                         } catch (Exception e) {
                         }
                     }
-                    batchActivity.addProgressToStage(list.size()).update()
+                    batchActivity.addProgressToStage(list.size())
                 }
                 //clear hibernate session first-level cache
                 JobResult.withSession { session -> session.clear() }
@@ -117,7 +117,7 @@ class DbCleanupService {
             log.debug('Starting deletion of CsiAggregationUpdateEvents and CsiAggregations')
 
             //First clean CsiAggregationUpdateEvents
-            batchActivity.beginNewStage('delete CsiAggregationUpdateEvents', globalCount).update()
+            batchActivity.beginNewStage('delete CsiAggregationUpdateEvents', globalCount)
             0.step(csiAggregationUpdateEventsCount, batchSize){ int offset ->
                 CsiAggregationUpdateEvent.withNewTransaction {
                     csiAggregationUpdateEventDetachedCriteria.list(max: batchSize).each{ CsiAggregationUpdateEvent csiAggregationUpdateEvent
@@ -129,7 +129,7 @@ class DbCleanupService {
                         catch(Exception e){
                         }
                     }
-                    batchActivity.update()
+                    batchActivity
                 }
                 //clear hibernate session first-level cache
                 CsiAggregationUpdateEvent.withSession { session -> session.clear() }
@@ -137,7 +137,7 @@ class DbCleanupService {
 
             log.debug('Deletion of CsiAggregationUpdateEvents finished')
 
-            batchActivity.beginNewStage('delete CsiAggregations', csiAggregationCount).update()
+            batchActivity.beginNewStage('delete CsiAggregations', csiAggregationCount)
             //After then clean CsiAggregations
             0.step(csiAggregationCount, batchSize) { int offset ->
                 CsiAggregation.withNewTransaction {
@@ -151,7 +151,7 @@ class DbCleanupService {
                 }
                 //clear hibernate session first-level cache
                 CsiAggregation.withSession { session -> session.clear() }
-                batchActivity.update()
+                batchActivity
             }
             log.debug('Deletion of CsiAggregations finished')
             batchActivity.done()
@@ -177,7 +177,7 @@ class DbCleanupService {
 
         if(count > 0 && !batchActivityService.runningBatch(BatchActivity.class, jobName, Activity.DELETE)) {
             BatchActivityUpdater batchActivityUpdater = batchActivityService.getActiveBatchActivity(BatchActivity.class, Activity.DELETE, jobName, 1, createBatchActivity)
-            batchActivityUpdater.beginNewStage("Delete BatchActivites", count).update()
+            batchActivityUpdater.beginNewStage("Delete BatchActivites", count)
             //batch size -> hibernate doc recommends 10..50
             int batchSize = 50
             0.step(count, batchSize) { int offset ->
@@ -186,9 +186,9 @@ class DbCleanupService {
                     list.each { BatchActivity batchActivity ->
                         try {
                             batchActivity.delete()
-                            batchActivityUpdater.addProgressToStage().update()
+                            batchActivityUpdater.addProgressToStage()
                         } catch (Exception e) {
-                            batchActivityUpdater.addFailures().setLastFailureMessage("Couldn't delete BatchActivity ${batchActivity.id}")
+                            batchActivityUpdater.addFailures("Couldn't delete BatchActivity ${batchActivity.id}")
                         }
                     }
                 }

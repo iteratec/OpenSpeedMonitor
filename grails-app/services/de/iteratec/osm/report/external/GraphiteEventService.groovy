@@ -62,12 +62,12 @@ class GraphiteEventService {
 
         def graphiteServers = GraphiteServer.list()
         BatchActivityUpdater activity = batchActivityService.getActiveBatchActivity(this.class,Activity.CREATE,"Fetch Graphite Events "+new Date().getTime(),1, createBatchActivity)
-        activity.beginNewStage("Create Events", graphiteServers.size()).update()
+        activity.beginNewStage("Create Events", graphiteServers.size())
         graphiteServers.eachWithIndex {server,index ->
             server.graphiteEventSourcePaths.each {eventSourcePath->
                 createEvents(eventSourcePath, server, fromFormatted, untilFormatted)
             }
-            activity.addProgressToStage().update()
+            activity.addProgressToStage()
         }
         activity.done()
     }

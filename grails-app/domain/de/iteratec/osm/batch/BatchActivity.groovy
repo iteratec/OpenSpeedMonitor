@@ -67,8 +67,17 @@ class BatchActivity {
      */
     public String calculateProgressInStage() {
         DecimalFormat df = new DecimalFormat("#.##");
-        if (maximumStepsInStage == 0) return df.format(0) + " %"
-        return df.format(100.0 / maximumStepsInStage * stepInStage) + " %";
+        String returnValue
+        if (maximumStepsInStage == 0){
+            if(this.status == Status.DONE){
+                returnValue =  df.format(100) + " %"
+            } else{
+                returnValue =  df.format(0) + " %"
+            }
+        } else{
+            returnValue = df.format(100.0 / maximumStepsInStage * stepInStage) + " %"
+        }
+        return returnValue
     }
 
     @Override
