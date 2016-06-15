@@ -17,12 +17,6 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import org.springframework.context.i18n.LocaleContextHolder
-
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
-
-import static de.iteratec.osm.util.Constants.*
 
 /**
  * Provides functionality for internet connectivites of performance measurements.

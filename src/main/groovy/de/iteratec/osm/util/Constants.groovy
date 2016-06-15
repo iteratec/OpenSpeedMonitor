@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.util
 
-import java.text.DecimalFormat
 
 abstract class Constants {
     public static final String UNIQUE_STRING_DELIMITTER = ':::'
