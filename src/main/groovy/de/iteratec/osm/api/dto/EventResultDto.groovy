@@ -34,18 +34,7 @@ import java.text.DecimalFormatSymbols
  */
 public final class EventResultDto {
 	
-	public static final DecimalFormat API_DECIMAL_FORMAT = new DecimalFormat();
-	static {
-		DecimalFormatSymbols formatSymbols = new DecimalFormatSymbols(Locale.GERMANY);
-		formatSymbols.setDecimalSeparator((char)',');
-		formatSymbols.setNaN('0');
-		formatSymbols.setInfinity('0');
-		
-		API_DECIMAL_FORMAT.applyPattern('0.00', false);
-		API_DECIMAL_FORMAT.setDecimalFormatSymbols(formatSymbols);
-		API_DECIMAL_FORMAT.setRoundingMode(RoundingMode.HALF_UP);
-	}
-	
+
 	/**
 	 * Execution time of of the test.
 	 */
@@ -121,7 +110,7 @@ public final class EventResultDto {
 	
 	public EventResultDto(EventResult eventResult) {
 		this.csiValue = eventResult.csByWptDocCompleteInPercent != null ?
-				API_DECIMAL_FORMAT.format( (double)eventResult.csByWptDocCompleteInPercent ) :
+				String.format("%.2f",eventResult.csByWptDocCompleteInPercent.round(2)).replace('.',',') :
 				"not calculated"
 		this.browser = eventResult.jobResult.locationBrowser;
 		this.location = eventResult.jobResult.locationUniqueIdentifierForServer;

@@ -42,19 +42,19 @@ class ResultTests {
 
 	@Test
 	public void testAPI_DECIMAL_FORMAT() {
-		assertEquals('1,50', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.5d));
-		assertEquals('1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.52d));
-		assertEquals('1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.521d));
-		assertEquals('1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.524d));
-		assertEquals('1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.525d));
-		assertEquals('1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) 1.529d));
+		assertEquals('1,50', String.format("%.2f",1.5d.round(2)).replace('.',','))
+		assertEquals('1,52', String.format("%.2f",1.52d.round(2)).replace('.',','))
+		assertEquals('1,52', String.format("%.2f",1.521d.round(2)).replace('.',','))
+		assertEquals('1,52', String.format("%.2f",1.524d.round(2)).replace('.',','))
+		assertEquals('1,53', String.format("%.2f",1.525d.round(2)).replace('.',','))
+		assertEquals('1,53', String.format("%.2f",1.529d.round(2)).replace('.',','))
 
-		assertEquals('-1,50', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.5d));
-		assertEquals('-1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.52d));
-		assertEquals('-1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.521d));
-		assertEquals('-1,52', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.524d));
-		assertEquals('-1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.525d));
-		assertEquals('-1,53', EventResultDto.API_DECIMAL_FORMAT.format((double) -1.529d));
+		assertEquals('-1,50', String.format("%.2f",-1.5d.round(2)).replace('.',','))
+		assertEquals('-1,52', String.format("%.2f",-1.52d.round(2)).replace('.',','))
+		assertEquals('-1,52', String.format("%.2f",-1.521d.round(2)).replace('.',','))
+		assertEquals('-1,52', String.format("%.2f",-1.524d.round(2)).replace('.',','))
+		assertEquals('-1,53', String.format("%.2f",-1.525d.round(2)).replace('.',','))
+		assertEquals('-1,53', String.format("%.2f",-1.529d.round(2)).replace('.',','))
 	}
 
 	@Test
