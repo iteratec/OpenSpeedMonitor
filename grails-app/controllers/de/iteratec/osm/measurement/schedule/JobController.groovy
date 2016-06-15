@@ -122,6 +122,7 @@ class JobController {
     }
 
     def save() {
+        def tagParam = params.remove('tags')
         Job job = new Job(params)
         setVariablesOnJob(params.variables, job)
 
@@ -140,7 +141,8 @@ class JobController {
             } else {
                 // Tags can only be set after first successful save.
                 // This is why Job needs to be saved again.
-                job.tags = params.list('tags')
+                def tags = [tagParam].flatten()
+                job.tags = tags
                 job.save(flush: true)
 
                 def flashMessageArgs = [getJobI18n(), job.label]
