@@ -279,20 +279,6 @@ grails:
                     chart:
                         chartTagLib: RICKSHAW
                         availableChartTagLibs: RICKSHAW
-    assets:
-        less:
-            compile: logback
-        plugin:
-            'twitter-bootstrap':
-                excludes:
-                    - '**/*.less'
-            'font-awesome-resources':
-                excludes:
-                    -  '**/*.less'
-        excludes:
-            - 'openspeedmonitor.less'
-        minifyJs: true
-        minifyCss: true
     i18n:
         locales:
             - en
