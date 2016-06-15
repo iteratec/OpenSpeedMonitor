@@ -10,13 +10,9 @@ class JobDto {
 
     long id
     String label
-    Date lastRun
     boolean active
-    boolean firstViewOnly
-    boolean captureVideo
-    boolean persistNonMedianResults
 
-    ConnectivityProfile connectivityProfile
+    ConnectivityProfileDto connectivityProfile
     LocationDto location
     JobGroupDto jobGroup
 
@@ -26,12 +22,8 @@ class JobDto {
 
         result.id = job.id
         result.label = job.label
-        result.lastRun= job.lastRun
         result.active = job.active
-        result.firstViewOnly = job.firstViewOnly
-        result.captureVideo= job.captureVideo
-        result.persistNonMedianResults = job.persistNonMedianResults
-        result.connectivityProfile = job.connectivityProfile
+        result.connectivityProfile = ConnectivityProfileDto.create(job.connectivityProfile)
         result.location = LocationDto.create(job.location)
         result.jobGroup = JobGroupDto.create(job.jobGroup)
         return result
