@@ -35,20 +35,20 @@ databaseChangeLog = {
         dropPrimaryKey(tableName: 'csi_aggregation_update_event', primaryKeyName: 'measured_valuPK')
         createPrimaryKey(tableName: 'csi_aggregation_update_event', primaryKeyName: 'measured_valuPK3', columnNames: "id")
     }
-    changeSet(author: "bka", id: "1459346200213-6") {
-        preConditions(onFail: 'MARK_RAN') {
-            primaryKeyExists(tableName: 'userspecific_csi_dashboard', primaryKeyName: 'userspecific_PK')
-        }
-        dropPrimaryKey(tableName: 'userspecific_csi_dashboard', primaryKeyName: 'userspecific_PK')
-        createPrimaryKey(tableName: 'userspecific_csi_dashboard', primaryKeyName: 'userspecific_PK1', columnNames: "id")
-    }
-    changeSet(author: "bka", id: "1459346200213-7") {
-        preConditions(onFail: 'MARK_RAN') {
-            primaryKeyExists(tableName: 'userspecific_event_result_dashboard', primaryKeyName: 'userspecific_PK')
-        }
-        dropPrimaryKey(tableName: 'userspecific_event_result_dashboard', primaryKeyName: 'userspecific_PK')
-        createPrimaryKey(tableName: 'userspecific_event_result_dashboard', primaryKeyName: 'userspecific_PK2', columnNames: "id")
-    }
+//    changeSet(author: "bka", id: "1459346200213-6") {
+//        preConditions(onFail: 'MARK_RAN') {
+//            primaryKeyExists(tableName: 'userspecific_csi_dashboard', primaryKeyName: 'userspecific_PK')
+//        }
+//        dropPrimaryKey(tableName: 'userspecific_csi_dashboard', primaryKeyName: 'userspecific_PK')
+//        createPrimaryKey(tableName: 'userspecific_csi_dashboard', primaryKeyName: 'userspecific_PK1', columnNames: "id")
+//    }
+//    changeSet(author: "bka", id: "1459346200213-7") {
+//        preConditions(onFail: 'MARK_RAN') {
+//            primaryKeyExists(tableName: 'userspecific_event_result_dashboard', primaryKeyName: 'userspecific_PK')
+//        }
+//        dropPrimaryKey(tableName: 'userspecific_event_result_dashboard', primaryKeyName: 'userspecific_PK')
+//        createPrimaryKey(tableName: 'userspecific_event_result_dashboard', primaryKeyName: 'userspecific_PK2', columnNames: "id")
+//    }
 
 //      ### UserspecificDashboard refactoring
     changeSet(author: "marcus (generated)", id: "1460099558388-1") {
