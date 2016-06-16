@@ -77,13 +77,6 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int expectedNumberOfResults = runs * events * cachedViews
 
         when:
-        true
-
-        then:
-        JobResult.findAll().size() == 0
-
-
-        when:
         locationAndResultPersisterService.listenToResult(xmlResult, server1)
 
         then:
