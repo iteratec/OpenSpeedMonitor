@@ -29,7 +29,6 @@ class NonTransactionalIntegrationSpec extends Specification {
 
             _configuration = new DefaultGrailsDomainConfiguration(grailsApplication: grailsApplication, properties: properties)
         }
-        new SchemaExport(_configuration).create(false, true)
     }
 
     def cleanup() {
