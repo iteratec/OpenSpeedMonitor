@@ -34,17 +34,16 @@ class RestApiInterceptor {
 
     boolean before() {
         if( params.apiKey == null ) {
-            prepareErrorResponse(response, 400, "This api function requires an apiKey with respected permission. You " +
-                    "have to submit this key as param 'apiKey'.")
+            prepareErrorResponse(response, 403, RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
             return false
         }
         ApiKey apiKey = ApiKey.findBySecretKey(params.apiKey)
         if( apiKey == null ) {
-            prepareErrorResponse(response, 404, "The submitted apiKey doesn't exist.")
+            prepareErrorResponse(response, 403, RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
             return false
         }
         if( !apiKey.valid ) {
-            prepareErrorResponse(response, 403, "The submitted apiKey is invalid.")
+            prepareErrorResponse(response, 403, RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
             return false
         }
         params['validApiKey'] = apiKey

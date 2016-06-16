@@ -79,6 +79,7 @@ import org.quartz.CronExpression
 class RestApiController {
 
     public static final DateTimeFormatter API_DATE_FORMAT = ISODateTimeFormat.basicDateTimeNoMillis()
+    public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 
     JobGroupDaoService jobGroupDaoService;
     PageDaoService pageDaoService;
@@ -518,7 +519,7 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeyActivateJob() {
 
         if (!params.validApiKey.allowedForJobActivation) {
-            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to activate jobs.")
+            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
 
@@ -535,11 +536,15 @@ class RestApiController {
                 params.pretty && params.pretty == 'true'
         )
     }
-
+    /**
+     * Handles pending/running jobResults. Old jobResults get deleted - fresh jobResults get rescheduled
+     * This function can't be called without a valid apiKey as parameter.
+     * @see de.iteratec.osm.filters.SecuredApiFunctionsFilters
+     */
     public Map<String, Object> securedViaApiKeyHandleOldJobResults() {
 
         if (!params.validApiKey.allowedForMeasurementActivation) {
-            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to activate jobs.")
+            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
         def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
@@ -554,7 +559,7 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeyDeactivateJob() {
 
         if (!params.validApiKey.allowedForJobDeactivation) {
-            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to deactivate jobs.")
+            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
 
@@ -581,7 +586,7 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeySetExecutionSchedule() {
 
         if (!params.validApiKey.allowedForJobSetExecutionSchedule) {
-            sendSimpleResponseAsStream(response, 403, "The submitted ApiKey doesn't have the permission to set execution schedule for jobs.")
+            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
 
@@ -947,7 +952,7 @@ class CreateEventCommand {
     static constraints = {
         apiKey(validator: { String currentKey, CreateEventCommand cmd ->
             ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
-            if (!validApiKey.allowedForCreateEvent) return ["The submitted ApiKey doesn't have the permission to create events."]
+            if (!validApiKey.allowedForCreateEvent) return [RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE]
             else return true
         })
         shortName(nullable: false, blank: false)
@@ -998,7 +1003,7 @@ class MeasurementActivationCommand {
         activationToSet(nullable: false)
         apiKey(validator: { String currentKey, MeasurementActivationCommand cmd ->
             ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
-            if (!validApiKey.allowedForMeasurementActivation) return ["The submitted ApiKey doesn't have the permission to (de)activate measurements generally."]
+            if (!validApiKey.allowedForMeasurementActivation) return [RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE]
             else return true
         })
     }
@@ -1018,7 +1023,7 @@ class NightlyDatabaseCleanupActivationCommand {
         activationToSet(nullable: false)
         apiKey(validator: { String currentKey, NightlyDatabaseCleanupActivationCommand cmd ->
             ApiKey validApiKey = ApiKey.findBySecretKey(currentKey)
-            if (!validApiKey.allowedForNightlyDatabaseCleanupActivation) return ["The submitted ApiKey doesn't have the permission to (de)activate nightly cleanups."]
+            if (!validApiKey.allowedForNightlyDatabaseCleanupActivation) return [RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE]
             else return true
         })
     }
