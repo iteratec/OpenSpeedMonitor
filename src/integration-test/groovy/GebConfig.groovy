@@ -13,6 +13,8 @@ import org.openqa.selenium.remote.DesiredCapabilities
 reportsDir = "target/geb-reports"
 reportOnTestFailureOnly = true
 
+baseUrl = "http://localhost:8080"
+
 // Use phantomJS as the default
 driver = {
     new PhantomJSDriver(new DesiredCapabilities())

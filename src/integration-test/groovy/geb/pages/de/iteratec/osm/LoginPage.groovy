@@ -1,16 +1,16 @@
 package geb.pages.de.iteratec.osm
 
-import de.iteratec.osm.util.I18nService
-import geb.Page
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import grails.util.Holders
 
-class LoginPage extends Page {
-    I18nService i18nService = Holders.applicationContext.getBean("i18nService")
+class LoginPage extends I18nGebPage {
 
-    static url = "/login/auth"
 
-    static at = { title == i18nService.msg("springSecurity.login.title")}
+    static url = getUrl("/login/auth")
+
+    static at = {
+        title == getI18nMessage("springSecurity.login.title")
+    }
+
 
     static content = {
         loginForm { $("#loginForm") }
@@ -19,7 +19,7 @@ class LoginPage extends Page {
 
         password { loginForm.find("#password") }
 
-        submitButton (to: [LoginPage, EventResultDashboardPage]) { loginForm.find("input", type: "submit") }
+        submitButton(to: [LoginPage, EventResultDashboardPage]) { loginForm.find("input", type: "submit") }
 
         errorMessageBox { $("div.alert") }
     }

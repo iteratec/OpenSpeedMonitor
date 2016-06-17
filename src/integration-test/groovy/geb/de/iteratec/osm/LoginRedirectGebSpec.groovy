@@ -2,11 +2,11 @@ package geb.de.iteratec.osm
 
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
+import geb.pages.de.iteratec.osm.LoginPage
+import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import geb.spock.GebReportingSpec
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import geb.pages.de.iteratec.osm.LoginPage
 import spock.lang.Stepwise
 
 /**
