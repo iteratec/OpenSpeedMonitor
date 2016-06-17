@@ -42,10 +42,10 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath 'org.grails.plugins:database-migration:2.0.0.RC4'
+        classpath "com.siprell.plugins:bootstrap-framework:1.0.3"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.7.4"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
         classpath "org.grails.plugins:hibernate4:5.0.4"
-        classpath "com.siprell.plugins:bootstrap-framework:1.0.3"
         classpath 'com.moowork.gradle:gradle-node-plugin:0.12'
     }
 }
@@ -56,10 +56,10 @@ group "OpenSpeedMonitor"
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
+apply plugin: "com.siprell.plugins.bootstrap-framework"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
-apply plugin: "com.siprell.plugins.bootstrap-framework"
 apply plugin: 'com.moowork.node'
 
 ext {
@@ -169,6 +169,9 @@ assets {
     includes = ['bootstrap-custom.less']
     excludes = ['**/*.less']
 }
+//TODO: this is a workaround for: https://github.com/kensiprell/bootstrap-framework/issues/10
+//Hopefully this dependsOn can be removed if issue is fixed
+assetCompile.dependsOn createBootstrapLess
 sourceSets {
     main {
         resources {
