@@ -15,8 +15,8 @@ import grails.test.mixin.TestFor
 import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.joda.time.DateTime
-import org.junit.Ignore
 import org.junit.Rule
+import spock.lang.Ignore
 import org.yaml.snakeyaml.introspector.Property
 import software.betamax.Configuration
 import software.betamax.ProxyConfiguration

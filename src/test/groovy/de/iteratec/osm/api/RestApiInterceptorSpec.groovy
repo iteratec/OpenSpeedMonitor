@@ -53,17 +53,16 @@ class RestApiInterceptorSpec extends Specification {
         when:
         interceptorUnderTest.before()
         then:
-        interceptorUnderTest.response.status == 400
-        interceptorUnderTest.response.text.equals("This api function requires an apiKey with respected permission. You " +
-                "have to submit this key as param 'apiKey'.")
+        interceptorUnderTest.response.status == 403
+        interceptorUnderTest.response.text.equals(RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
     }
     void "Test restApi interceptor - ApiKey param without matching ApiKey in db leads to status of 404"(){
         when:
         params.apiKey = 'missingApiKey'
         interceptorUnderTest.before()
         then:
-        interceptorUnderTest.response.status == 404
-        interceptorUnderTest.response.text.equals("The submitted apiKey doesn't exist.")
+        interceptorUnderTest.response.status == 403
+        interceptorUnderTest.response.text.equals(RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
     }
     void "Test restApi interceptor - Invalid ApiKey leads to status of 403"(){
         setup:
@@ -74,7 +73,7 @@ class RestApiInterceptorSpec extends Specification {
         interceptorUnderTest.before()
         then:
         interceptorUnderTest.response.status == 403
-        interceptorUnderTest.response.text.equals("The submitted apiKey is invalid.")
+        interceptorUnderTest.response.text.equals(RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE)
     }
 
 }

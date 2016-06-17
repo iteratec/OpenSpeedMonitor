@@ -80,7 +80,7 @@ class NightlyCleanupActivationViaRestApiSpec extends Specification {
         then:
         controllerUnderTest.inMemoryConfigService.areMeasurementsGenerallyEnabled() == defaultPermission
         response.status == 400
-        response.text == "Error field apiKey: The submitted ApiKey doesn't have the permission to (de)activate nightly cleanups.\n"
+        response.contentAsString == "Error field apiKey: "+RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE+"\n"
     }
 
     void "should fail cause of missing boolean activationToSet"(){
