@@ -33,7 +33,9 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.*
-
+import de.iteratec.osm.security.Role
+import de.iteratec.osm.security.User
+import de.iteratec.osm.security.UserRole
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
@@ -1553,5 +1555,12 @@ class TestDataUtil {
                 createBrowser("FF", 1), true)
         return createJob("label", createScript("label1", "description", "navi", false),
                 location, group, "description", 1, false, 10)
+    }
+
+    public static User createAdminUser() {
+        Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+        User admin = new User(username: 'admin', password: 'password', enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+        new UserRole(user: admin, role: adminRole).save(failOnError: true)
+        return admin
     }
 }
