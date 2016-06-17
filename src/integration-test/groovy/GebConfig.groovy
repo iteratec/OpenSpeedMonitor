@@ -1,12 +1,12 @@
+
+
+import org.openqa.selenium.chrome.ChromeDriver
+
 /*
     This is the geb configuration file
 
     @see http://www.gebish.org/manual/current/#configuration
  */
-
-
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 

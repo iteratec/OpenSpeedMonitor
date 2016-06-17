@@ -1,7 +1,8 @@
-package pages
+package geb.pages.de.iteratec.osm
 
 import de.iteratec.osm.util.I18nService
 import geb.Page
+import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import grails.util.Holders
 
 class LoginPage extends Page {

@@ -1,13 +1,12 @@
-package de.iteratec.osm
+package geb.de.iteratec.osm
 
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import geb.spock.GebReportingSpec
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import org.springframework.web.context.request.RequestContextHolder
-import pages.EventResultDashboardPage
-import pages.LoginPage
+import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
+import geb.pages.de.iteratec.osm.LoginPage
 import spock.lang.Stepwise
 
 /**

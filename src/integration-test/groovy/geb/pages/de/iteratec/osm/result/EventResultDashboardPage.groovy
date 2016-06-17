@@ -1,4 +1,4 @@
-package pages
+package geb.pages.de.iteratec.osm.result
 
 import geb.Page
 
