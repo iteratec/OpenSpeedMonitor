@@ -5,6 +5,7 @@ import de.iteratec.osm.security.User
 import geb.spock.GebReportingSpec
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
+import org.springframework.web.context.request.RequestContextHolder
 import pages.EventResultDashboardPage
 import pages.LoginPage
 import spock.lang.Stepwise

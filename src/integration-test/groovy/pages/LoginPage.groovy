@@ -1,11 +1,15 @@
 package pages
 
+import de.iteratec.osm.util.I18nService
 import geb.Page
+import grails.util.Holders
 
 class LoginPage extends Page {
+    I18nService i18nService = Holders.applicationContext.getBean("i18nService")
+
     static url = "/login/auth"
 
-    static at = { title == "Login" }
+    static at = { title == i18nService.msg("springSecurity.login.title")}
 
     static content = {
         loginForm { $("#loginForm") }
