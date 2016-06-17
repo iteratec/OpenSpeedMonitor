@@ -1,6 +1,6 @@
-
-
+import grails.util.Holders
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.firefox.FirefoxDriver
 
 /*
     This is the geb configuration file
@@ -13,16 +13,13 @@ import org.openqa.selenium.remote.DesiredCapabilities
 reportsDir = "target/geb-reports"
 reportOnTestFailureOnly = true
 
-baseUrl = "http://localhost:8080"
-
-// Use phantomJS as the default
 driver = {
-    new PhantomJSDriver(new DesiredCapabilities())
-}
-
-environments {
-    // run as “grails -Dgeb.env=chrome test-app”
-    chrome {
-        driver = { new ChromeDriver() }
+    def configuredDriver = Holders.applicationContext.getBean("grailsApplication")?.config?.grails?.de?.iteratec?.test?.geb?.driver
+    switch (configuredDriver){
+        case "chrome":
+            return new ChromeDriver()
+        case "Firefox":
+            return new FirefoxDriver()
+        default: return new FirefoxDriver()
     }
 }

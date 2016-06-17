@@ -36,8 +36,10 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
+import de.iteratec.osm.util.OsmTestLogin
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.util.Holders
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
@@ -61,7 +63,7 @@ import static org.junit.Assert.assertNotNull
  * @since IT-8
  */
 @TestMixin(GrailsUnitTestMixin)
-class TestDataUtil {
+class TestDataUtil implements OsmTestLogin {
     /**
      * <p>
      * Creates a map of {@link CsiAggregation}s referenced by a key consists
@@ -1559,7 +1561,7 @@ class TestDataUtil {
 
     public static User createAdminUser() {
         Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-        User admin = new User(username: 'admin', password: 'password', enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+        User admin = new User(username: getConfiguredUsername(), password: getConfiguredPassword(), enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
         new UserRole(user: admin, role: adminRole).save(failOnError: true)
         return admin
     }

@@ -102,7 +102,7 @@ dependencies {
     testCompile "org.grails:grails-plugin-testing"
     testCompile "org.grails.plugins:geb"
     testCompile "org.seleniumhq.selenium:selenium-support:2.53.0"
-//    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:2.53.0"
+    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:2.53.0"
     testCompile "org.seleniumhq.selenium:selenium-chrome-driver:2.53.0"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.52.0"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"

@@ -2,6 +2,9 @@ package geb.de.iteratec.osm
 
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
+import de.iteratec.osm.util.OsmTestLogin
+import geb.CustomUrlGebReportingSpec
+import geb.spock.GebReportingSpec
 import geb.pages.de.iteratec.osm.LoginPage
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import geb.spock.GebReportingSpec
@@ -15,7 +18,7 @@ import spock.lang.Stepwise
 @Integration
 @Rollback
 @Stepwise
-class LoginRedirectGebSpec extends GebReportingSpec {
+class LoginRedirectGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin{
 
     void "Remain on login page after failed login attempt"() {
         given: "User starts at login page"
@@ -44,8 +47,8 @@ class LoginRedirectGebSpec extends GebReportingSpec {
         }
 
         when: "User inserts correct data in form"
-        username << 'admin'
-        password << 'password'
+        username << configuredUsername
+        password  << configuredPassword
         submitButton.click()
 
         then: "User gets to dashboard page"
