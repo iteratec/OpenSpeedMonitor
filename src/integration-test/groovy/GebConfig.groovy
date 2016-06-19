@@ -7,9 +7,6 @@ import org.openqa.selenium.firefox.FirefoxDriver
 
     @see http://www.gebish.org/manual/current/#configuration
  */
-import org.openqa.selenium.phantomjs.PhantomJSDriver
-import org.openqa.selenium.remote.DesiredCapabilities
-
 reportsDir = "target/geb-reports"
 reportOnTestFailureOnly = true
 
