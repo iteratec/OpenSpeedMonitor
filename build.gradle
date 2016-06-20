@@ -56,10 +56,10 @@ group "OpenSpeedMonitor"
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
-apply plugin: "com.siprell.plugins.bootstrap-framework"
 apply plugin:"org.grails.grails-web"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
+apply plugin: "com.siprell.plugins.bootstrap-framework"
 apply plugin: 'com.moowork.node'
 
 ext {
