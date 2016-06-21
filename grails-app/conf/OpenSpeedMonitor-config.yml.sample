@@ -26,13 +26,12 @@ grails:
         highchartsExportServerUrl: 'http://export.highcharts.com'
       test:
         geb:
-          baseUrl: localhost
           login: admin
           password: password
           #chrome or firefox
           driver: chrome
           #You can run the tets against a different osm instance. Only uncomment this if you want to run the tests against another instance
-          #customBaseUrl: [your-osm-instance]
+          #baseUrl: [your-osm-instance]
 environments:
   development:
     dataSource:
