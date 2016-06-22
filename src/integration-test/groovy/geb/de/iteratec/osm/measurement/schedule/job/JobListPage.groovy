@@ -17,7 +17,7 @@ class JobListPage extends I18nGebPage {
     static content = {
         //Filter
         nameFilter{$("#filterByLabel")}
-        jobGroupFilter{$("#filterByJobGroup")}
+        jobGroupFilter{$("#filterByJobGroup")[0]}
         locationFilter{$("#filterByLocation")}
         tagFilter{$("#filterTags_chosen")}
         scriptFilter{$("#filterBySkript")}
@@ -36,6 +36,8 @@ class JobListPage extends I18nGebPage {
         //"Data"
         inactiveJobs{$(".jobName.inactiveJob")}
         activeJobs{$(".jobName").not(".inactiveJob")}
+        allJobs{$(".jobName")}
+        invisibleRows{$("tr", style: 'display: none;')}
     }
 
     def enableShowInactiveJobs(boolean b){

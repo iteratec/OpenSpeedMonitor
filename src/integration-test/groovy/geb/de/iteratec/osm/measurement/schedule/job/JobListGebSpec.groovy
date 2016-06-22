@@ -12,6 +12,7 @@ import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LoginPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
+import org.openqa.selenium.Keys
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -31,6 +32,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     @Shared String jobGroup1Name = "TestJobGroup1-564892#Afef1"
     @Shared String jobGroup2Name = "TestJobGroup2-564892#Afef1"
     @Shared String job4Tag = "TestingTag-564892#Afef1"
+    @Shared String browserName = "This is the very best browser i've ever seen"
 
 
 
@@ -113,17 +115,176 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     }
 
     void "Uncheck all Boxes"(){
-        given: "User is on the job list and inactive jos are shown"
+        given: "User is on the job list and inactive jobs are shown"
         to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user unmarks the checkall checkbox"
         enableCheckAll(false)
 
-        then:"There should be no job checkbox, which is not selected"
+        then:"There should be no job checkbox, which is selected"
         $("tbody").find(".jobCheckbox").findAll{it.value() == true}.size() == 0
     }
 
+    void "Show only selected jobs"(){
+        given: "User is on the job list, inactive jobs are shown and no job checkbox is selected"
+        to JobListPage
+        enableShowInactiveJobs(true)
+        enableCheckAll(false)
+
+        when:"The user marks the first job and select the box to show only marked jobs"
+        $(".jobCheckbox")[0].value("on")
+        enableShowOnlyCheckedJobs(true)
+
+        then:"There should just be the one selected entry and the rest should be hided"
+        invisibleRows.size() == 3
+    }
+
+    void "Disable show only selected Jobs"(){
+        given: "User is on the job list, inactive jobs are shown and no job checkbox is selected"
+        to JobListPage
+        enableShowInactiveJobs(true)
+        enableCheckAll(false)
+
+        when:"The user marks the first job and select the box to show only marked jobs"
+        enableShowOnlyCheckedJobs(false)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+    void "Filter Job by name"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user types the name of a job in the job filter"
+        nameFilter << job1Name
+
+        then:"There should just be the one selected entry and the rest should be hided"
+        invisibleRows.size() == 3
+    }
+
+    void "Reset filter Job by name"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user deletes the input from the text field"
+        nameFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+    void "Filter Job by JobGroup"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user types the name of a job in the job filter"
+        jobGroupFilter << jobGroup2Name
+
+        then:"There should just be the one selected entry and the rest should be hided"
+        invisibleRows.size() == 3
+    }
+
+    void "Reset filter Job by JobGroup"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user deletes the input from the text field"
+        jobGroupFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+
+    void "Filter Job by Tag"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user types the name of a job in the job filter"
+        tagFilter.find("input").click()
+        tagFilter.find("input")  << job4Tag
+        tagFilter.find("input")  << Keys.ENTER
+
+        then:"There should just be the one selected entry and the rest should be hided"
+        invisibleRows.size() == 3
+    }
+
+    void "Reset filter Job by Tag"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user deletes the input from the text field"
+        tagFilter.find("input") .value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+    void "Filter Job by Script"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user types the name of a job in the job filter"
+        scriptFilter << script1Name
+        then:"There should just be the one selected entry and the rest should be hided"
+        invisibleRows.size() == 1
+    }
+
+    void "Reset filter Job by Script"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user deletes the input from the text field"
+        scriptFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+    void "Filter Job by Browser"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user types the name of a job in the job filter"
+        browserFilter << browserName
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+    void "Reset filter Job by Browser"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user deletes the input from the text field"
+        browserFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
+
+    void "Activate Job"(){
+        given: "User is on the job list, inactive jobs are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user deletes the input from the text field"
+        browserFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+
+        then:"There should be no hided row"
+        $("tr", style: 'display: none;').size() == 0
+    }
 
     private void createData(){
 
@@ -136,12 +297,12 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
             JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
             JobGroup jobGroup2 =TestDataUtil.createJobGroup(jobGroup2Name)
             WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1","TestIdentifier",true,"http://internet.de")
-            Browser browser = TestDataUtil.createBrowser("This is the very best browser i've ever seen",1d)
+            Browser browser = TestDataUtil.createBrowser(browserName,1d)
             Location location1 = TestDataUtil.createLocation(wpt,location1Name,browser,true)
             Location location2 = TestDataUtil.createLocation(wpt,location2Name,browser,true)
             TestDataUtil.createJob(job1Name,script1,location1,jobGroup1,"This is the first test job",1,false,12)
             TestDataUtil.createJob(job2Name,script2,location2,jobGroup1,"This is the second test job",1,false,12)
-            TestDataUtil.createJob(job3Name,script1,location2,jobGroup1,"This is the third test job",1,false,12)
+            TestDataUtil.createJob(job3Name,script1,location2,jobGroup2,"This is the third test job",1,false,12)
             //the last job creation will be a test
 //            TestDataUtil.createJob("Label2",script2,location1,jobGroup2,"This is the first test job",1,false,5)
         }
