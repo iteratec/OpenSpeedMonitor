@@ -41,7 +41,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
         when: "User wants to create a job"
         createJob.click()
-        true
 
         then: "He will be redirected to the Login Page"
         at LoginPage
@@ -75,9 +74,56 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
         then: "There should be the new created job in the list and it should be highlighted"
         at JobListPage
-        showInactiveJobsToo.click()
+        enableShowInactiveJobs(true)
         $(".highlight.success").text().startsWith(job4Name)
     }
+
+    void "Disable show inactive jobs too"(){
+        given: "User is on the job list"
+        to JobListPage
+
+        when:"The user clicks a checkbox"
+        enableShowInactiveJobs(false)
+
+        then:"There should be jobs visible which are also inactive"
+        $("tr").findAll{it.displayed}.find(".jobName").size() == 0
+    }
+
+    void "Enable show inactive jobs too"(){
+        given: "User is on the job list"
+        to JobListPage
+
+        when:"The user clicks a checkbox"
+        enableShowInactiveJobs(true)
+
+        then:"There should be no inactive jobs"
+        inactiveJobs.size()>0
+    }
+
+    void "Check all Boxes"(){
+        given: "User is on the job list and inactive jos are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user clicks the check all checkbox"
+        enableCheckAll(true)
+
+        then:"There should be no job checkbox, which is not selected"
+        $("tbody").find(".jobCheckbox").findAll{it.value() == false}.size() == 0
+    }
+
+    void "Uncheck all Boxes"(){
+        given: "User is on the job list and inactive jos are shown"
+        to JobListPage
+        enableShowInactiveJobs(true)
+
+        when:"The user unmarks the checkall checkbox"
+        enableCheckAll(false)
+
+        then:"There should be no job checkbox, which is not selected"
+        $("tbody").find(".jobCheckbox").findAll{it.value() == true}.size() == 0
+    }
+
 
     private void createData(){
 
