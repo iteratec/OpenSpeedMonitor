@@ -45,21 +45,22 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         createJob.click()
 
         then: "He will be redirected to the Login Page"
-        at LoginPage
+        waitFor {
+            at LoginPage
+        }
     }
 
     void "User is able to reach create job page"() {
         given: "User is logged in"
-        to LoginPage
-        username << getConfiguredUsername()
-        password << getConfiguredPassword()
-        submitButton.click()
+        doLogin()
         to JobListPage
 
         when: "The user is able to click the create job button and fill the data in"
         createJob.click()
         then: "The user should see the create page"
-        at JobCreatePage
+        waitFor{
+            at JobCreatePage
+        }
     }
 
     void "User is able to create a Job"(){
@@ -75,7 +76,9 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         createButton.click()
 
         then: "There should be the new created job in the list and it should be highlighted"
-        at JobListPage
+        waitFor {
+            at JobListPage
+        }
         enableShowInactiveJobs(true)
         $(".highlight.success").text().startsWith(job4Name)
     }
@@ -284,6 +287,10 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
         then:"There should be no hided row"
         $("tr", style: 'display: none;').size() == 0
+    }
+
+    void cleanupSpec() {
+        doLogout()
     }
 
     private void createData(){

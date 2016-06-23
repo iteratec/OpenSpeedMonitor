@@ -4,10 +4,8 @@ import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.security.User
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
-import geb.spock.GebReportingSpec
 import geb.pages.de.iteratec.osm.LoginPage
 import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
-import geb.spock.GebReportingSpec
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import spock.lang.Stepwise
@@ -53,5 +51,9 @@ class LoginRedirectGebSpec extends CustomUrlGebReportingSpec implements OsmTestL
 
         then: "User gets to dashboard page"
         at EventResultDashboardPage
+    }
+
+    void cleanupSpec() {
+        doLogout()
     }
 }

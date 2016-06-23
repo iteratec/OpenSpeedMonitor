@@ -20,4 +20,8 @@ class I18nGebPage extends Page {
     protected String getI18nMessage(String key) {
         i18nService.msgInLocale(key, locale)
     }
+
+    protected String getI18nMessage(String key, List args) {
+        i18nService.msgInLocale(key, locale, "", args)
+    }
 }

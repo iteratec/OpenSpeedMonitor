@@ -1403,15 +1403,17 @@ class TestDataUtil implements OsmTestLogin {
      * </p>
      */
     public static void createOsmConfig() {
-        new OsmConfiguration(
-                detailDataStorageTimeInWeeks: 2,
-                defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: 250,
-                maxDocCompleteTimeInMillisecs: 180000,
-                initialChartHeightInPixels: 400,
-                maxDataStorageTimeInMonths: 12,
-                csiTransformation: CsiTransformation.BY_MAPPING
-        ).save(failOnError: true)
+        if (OsmConfiguration.count == 0) {
+            new OsmConfiguration(
+                    detailDataStorageTimeInWeeks: 2,
+                    defaultMaxDownloadTimeInMinutes: 60,
+                    minDocCompleteTimeInMillisecs: 250,
+                    maxDocCompleteTimeInMillisecs: 180000,
+                    initialChartHeightInPixels: 400,
+                    maxDataStorageTimeInMonths: 12,
+                    csiTransformation: CsiTransformation.BY_MAPPING
+            ).save(failOnError: true)
+        }
     }
 
     /**
@@ -1560,9 +1562,12 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     public static User createAdminUser() {
-        Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
-        User admin = new User(username: getConfiguredUsername(), password: getConfiguredPassword(), enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
-        new UserRole(user: admin, role: adminRole).save(failOnError: true)
-        return admin
+        def user = User.findByUsername(getConfiguredUsername())
+        if (!user) {
+            Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+            user = new User(username: getConfiguredUsername(), password: getConfiguredPassword(), enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+            new UserRole(user: user, role: adminRole).save(failOnError: true)
+        }
+        return user
     }
 }
