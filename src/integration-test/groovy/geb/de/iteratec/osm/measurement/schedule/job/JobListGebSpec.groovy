@@ -69,6 +69,9 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
         when: "The user fills out all necessary data and submits"
         location.click() //Open the dropdown to choose location, otherwise the options won't be visible
+        waitFor{
+            location.isDisplayed()
+        }
         $("#location_chosen").find("li").find{it.text() == location2Name}.click()
         nameText << job4Name
         cronString << "10/20 * * * ? *"
