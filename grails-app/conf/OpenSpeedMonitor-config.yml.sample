@@ -28,7 +28,7 @@ grails:
         geb:
           login: admin
           password: password
-          #chrome or firefox
+          #chrome or firefox or phantomJs
           driver: chrome
           #You can run the tets against a different osm instance. Only uncomment this if you want to run the tests against another instance
           #baseUrl: [your-osm-instance]

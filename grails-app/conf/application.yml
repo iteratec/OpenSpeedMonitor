@@ -279,6 +279,11 @@ grails:
                     chart:
                         chartTagLib: RICKSHAW
                         availableChartTagLibs: RICKSHAW
+                test:
+                    geb:
+                        login: admin
+                        password: password
+                        driver: phantomJs
     assets:
         less:
             compile: logback
