@@ -1,7 +1,5 @@
 package geb
 
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.security.User
 import de.iteratec.osm.util.OsmTestLogin
 import geb.pages.de.iteratec.osm.LoginPage
 import geb.spock.GebReportingSpec
