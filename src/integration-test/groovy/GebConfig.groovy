@@ -21,6 +21,6 @@ driver = {
             return new FirefoxDriver()
         case "phantomjs":
             return new PhantomJSDriver(new DesiredCapabilities())
-        default: return new FirefoxDriver()
+        default: return new PhantomJSDriver(new DesiredCapabilities())
     }
 }
