@@ -37,7 +37,6 @@ buildscript {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url  "http://dl.bintray.com/iteratec/grails-plugins" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
@@ -118,7 +117,7 @@ dependencies {
     compile 'org.grails.plugins:spring-security-core:3.0.4'
     compile 'org.grails.plugins:quartz:2.0.8'
     compile 'org.grails.plugins:http-builder-helper:1.0.2'
-    compile 'org.grails.plugins:taggable:2.0.1'
+    compile 'org.grails.plugins:taggable:2.0.1-SNAPSHOT'
     compile 'org.grails.plugins:cookie:2.0.4'
 //    compile 'org.grails.plugins:codenarc:0.22'                  //Use gradle check instead  https://grails.org/plugin/codenarc
     compile 'p6spy:p6spy:2.1.4'
@@ -139,6 +138,7 @@ dependencies {
     testCompile('com.github.detro.ghostdriver:phantomjsdriver:1.1.0') {
         transitive = false
     }
+
 }
 
 task setupJasmine(type: NpmTask) {
