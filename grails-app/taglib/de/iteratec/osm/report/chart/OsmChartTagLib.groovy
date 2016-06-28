@@ -33,7 +33,7 @@ class OsmChartTagLib {
 		String lineType = attrs["lineType"]
 		String yType = attrs["yType"]
 		String width= attrs["width"]
-		String yAxisMax = attrs["yAxisMax"] ?: "null"
+		String yAxisMax = attrs["yAxisMax"] ?: "auto"
 		String divId = attrs["divId"] ?: UUID.randomUUID().toString();
 		String measurementUnit = attrs['measurementUnit'] ?: 'unkown'
 		Long xAxisMin = attrs['xAxisMin'] ? Long.valueOf(attrs['xAxisMin']) : null
@@ -55,7 +55,7 @@ class OsmChartTagLib {
         highChartLabels.add(new OsmChartAxis(yType, MeasurandGroup.PERCENTAGES, "",1, OsmChartAxis.LEFT_CHART_SIDE))
 
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, highChartLabels, title, labelSummary, markerEnabled, annotations)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, highChartLabels, title, labelSummary, markerEnabled, annotations,yAxisMin,yAxisMax)
 
 		return out.toString()
 	}
@@ -68,7 +68,7 @@ class OsmChartTagLib {
 		String labelSummary = attrs["labelSummary"];
 		String lineType = attrs["lineType"]
 		String width= attrs["width"]
-		String yAxisMaxs = attrs["yAxisMax"] ?: "null;null;null"
+		String yAxisMax = attrs["yAxisMax"] ?: "auto"
 		String divId = attrs["divId"] ?: UUID.randomUUID().toString();
 		String measurementUnits = attrs['measurementUnit'] ?: 'unkown'
 		Long xAxisMin = attrs['xAxisMin'] ? Long.valueOf(attrs['xAxisMin']) : null
@@ -92,7 +92,7 @@ class OsmChartTagLib {
 		String heightOfChart = attrs["heightOfChart"]
 
         def htmlCreater = new RickshawHtmlCreater()
-        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, yAxesLabels, title, labelSummary, markerEnabled, annotations)
+        out << htmlCreater.generateHtmlForMultipleYAxisGraph(divId, data, dataLabelsActivated, heightOfChart,width, yAxesLabels, title, labelSummary, markerEnabled, annotations,yAxisMin,yAxisMax)
 
 		return out.toString()
 	}

@@ -446,6 +446,8 @@ class EventResultDashboardController {
         modelToRender.put("eventResultValues", chart.osmChartGraphs);
 
         modelToRender.put("labelSummary", chart.osmChartGraphsCommonLabel);
+        modelToRender.put("yAxisMax", cmd.loadTimeMaximum)
+        modelToRender.put("yAxisMin", cmd.loadTimeMinimum)
 
         if (isHighchartGraphLimitReached(chart.osmChartGraphs)) {
             modelToRender.put("warnAboutExceededPointsPerGraphLimit", true);
