@@ -44,7 +44,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         to JobListPage
 
         when: "User wants to create a job"
-        createJob.click()
+        createJobButton.click()
 
         then: "He will be redirected to the Login Page"
         waitFor {
@@ -58,7 +58,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         to JobListPage
 
         when: "The user is able to click the create job button and fill the data in"
-        createJob.click()
+        createJobButton.click()
         then: "The user should see the create page"
         waitFor{
             at JobCreatePage
@@ -66,9 +66,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     }
 
     void "User is able to create a Job"(){
-        given: "User is on the create page"
-        to JobCreatePage
-
         when: "The user fills out all necessary data and submits"
         location.click() //Open the dropdown to choose location, otherwise the options won't be visible
         waitFor{
@@ -89,9 +86,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     }
 
     void "Disable show inactive jobs too"(){
-        given: "User is on the job list"
-        to JobListPage
-
         when:"The user clicks a checkbox"
         enableShowInactiveJobs(false)
 
@@ -100,9 +94,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     }
 
     void "Enable show inactive jobs too"(){
-        given: "User is on the job list"
-        to JobListPage
-
         when:"The user clicks a checkbox"
         enableShowInactiveJobs(true)
 
@@ -112,7 +103,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Check all Boxes"(){
         given: "User is on the job list and inactive jos are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user clicks the check all checkbox"
@@ -124,7 +114,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Uncheck all Boxes"(){
         given: "User is on the job list and inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user unmarks the checkall checkbox"
@@ -136,7 +125,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Show only selected jobs"(){
         given: "User is on the job list, inactive jobs are shown and no job checkbox is selected"
-        to JobListPage
         enableShowInactiveJobs(true)
         enableCheckAll(false)
 
@@ -150,7 +138,6 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Disable show only selected Jobs"(){
         given: "User is on the job list, inactive jobs are shown and no job checkbox is selected"
-        to JobListPage
         enableShowInactiveJobs(true)
         enableCheckAll(false)
 
@@ -158,16 +145,15 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         enableShowOnlyCheckedJobs(false)
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
     void "Filter Job by name"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        nameFilter << job1Name
+        nameFilterTextbox << job1Name
 
         then:"There should just be the one selected entry and the rest should be hided"
         invisibleRows.size() == 3
@@ -175,23 +161,21 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Reset filter Job by name"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        nameFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        nameFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
     void "Filter Job by JobGroup"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        jobGroupFilter << jobGroup2Name
+        jobGroupFilterTextbox << jobGroup2Name
 
         then:"There should just be the one selected entry and the rest should be hided"
         invisibleRows.size() == 3
@@ -199,26 +183,24 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Reset filter Job by JobGroup"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        jobGroupFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        jobGroupFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
 
     void "Filter Job by Tag"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        tagFilter.find("input").click()
-        tagFilter.find("input")  << job4Tag
-        tagFilter.find("input")  << Keys.ENTER
+        tagFilterTextbox.click()
+        tagFilterTextbox << job4Tag
+        tagFilterTextbox << Keys.ENTER
 
         then:"There should just be the one selected entry and the rest should be hided"
         invisibleRows.size() == 3
@@ -226,72 +208,89 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Reset filter Job by Tag"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        tagFilter.find("input") .value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        tagFilterTextbox .value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
     void "Filter Job by Script"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        scriptFilter << script1Name
+        scriptFilterTextbox << script1Name
         then:"There should just be the one selected entry and the rest should be hided"
         invisibleRows.size() == 1
     }
 
     void "Reset filter Job by Script"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        scriptFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        scriptFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
     void "Filter Job by Browser"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        browserFilter << browserName
+        browserFilterTextbox << browserName
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
     void "Reset filter Job by Browser"(){
         given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
         enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        browserFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        browserFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        invisibleRows.size() == 0
     }
 
     void "Activate Job"(){
-        given: "User is on the job list, inactive jobs are shown"
-        to JobListPage
+        given: "User is on the job list, inactive jobs are shown, no job is selected"
+        enableShowInactiveJobs(false)
+        def visibleActiveJobsBefore = countVisibleActiveJobs()
         enableShowInactiveJobs(true)
+        enableCheckAll(true)
+        enableCheckAll(false)
+
+
+        when:"The user activates a job"
+        changeCheckbox(getCheckboxForJobName(job4Name), true)
+        activateButton.click()
+
+        then:"There should be one more active job"
+        at JobListPage
+        sleep(2000)//Otherwise the element is not clickable with chrome
+        enableShowInactiveJobs(false)
+        countVisibleActiveJobs() == visibleActiveJobsBefore + 1
+    }
+
+    void "Deactivate Job"(){
+        given: "User is on the job list, only active jobs are shown"
+        def visibleActiveJobsBefore = countVisibleActiveJobs()
 
         when:"The user deletes the input from the text field"
-        browserFilter.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        changeCheckbox(getCheckboxForJobName(job4Name), true)
+        $("input",name:"_action_deactivate").click()
 
         then:"There should be no hided row"
-        $("tr", style: 'display: none;').size() == 0
+        at JobListPage
+        sleep(2000)//Otherwise the element is not clickable with chrome
+        countVisibleActiveJobs() == visibleActiveJobsBefore - 1
     }
 
     void cleanupSpec() {
