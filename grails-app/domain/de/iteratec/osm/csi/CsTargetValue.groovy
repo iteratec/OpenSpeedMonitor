@@ -42,7 +42,6 @@ class CsTargetValue {
             } else{
                 String dateString = dateObject
                 if(dateString) {
-                    dateString = dateString.replaceAll('-', '.')
                     SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_STRING)
                     date = dateFormat.parse(dateString)
                 }
