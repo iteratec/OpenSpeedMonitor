@@ -1,4 +1,4 @@
-package geb.de.iteratec.osm.measurement.schedule.job
+package geb.pages.de.iteratec.osm.measurement.schedule.job
 
 import geb.pages.de.iteratec.osm.I18nGebPage
 
