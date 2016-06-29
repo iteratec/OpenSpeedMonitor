@@ -35,7 +35,7 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
         }
 
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} : %m%n"
         }
         filter(ThresholdFilter) {
             level = ERROR
@@ -58,7 +58,7 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
         }
 
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} (line %L): %m%n"
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} : %m%n"
         }
         filter(ThresholdFilter) {
             level = DEBUG
