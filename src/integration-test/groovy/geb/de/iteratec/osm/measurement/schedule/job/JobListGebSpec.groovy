@@ -35,16 +35,17 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     @Shared String jobGroup2Name = "TestJobGroup2-564892#Afef1"
     @Shared String job4Tag = "TestingTag-564892#Afef1"
     @Shared String browserName = "This is the very best browser i've ever seen"
+    @Shared JobListPage page
 
 
 
     void "Anonymous can't create a job"() {
         given: "User is logged in"
         createData()
-        to JobListPage
+        page = to JobListPage
 
         when: "User wants to create a job"
-        createJobButton.click()
+        page.createJobButton.click()
 
         then: "He will be redirected to the Login Page"
         waitFor {
@@ -55,10 +56,10 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     void "User is able to reach create job page"() {
         given: "User is logged in"
         doLogin()
-        to JobListPage
+        page = to JobListPage
 
         when: "The user is able to click the create job button and fill the data in"
-        createJobButton.click()
+        page.createJobButton.click()
         then: "The user should see the create page"
         waitFor{
             at JobCreatePage
@@ -66,16 +67,19 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     }
 
     void "User is able to create a Job"(){
+        given:
+        def createPage = to JobCreatePage
+
         when: "The user fills out all necessary data and submits"
-        location.click() //Open the dropdown to choose location, otherwise the options won't be visible
+        createPage.location.click() //Open the dropdown to choose location, otherwise the options won't be visible
         waitFor{
-            location.isDisplayed()
+            createPage.location.isDisplayed()
         }
         $("#location_chosen").find("li").find{it.text() == location2Name}.click()
-        nameText << job4Name
-        cronString << "10/20 * * * ? *"
-        tags << job4Tag
-        createButton.click()
+        createPage.nameText << job4Name
+        createPage.cronString << "10/20 * * * ? *"
+        createPage.tags << job4Tag
+        createPage.createButton.click()
 
         then: "There should be the new created job in the list and it should be highlighted"
         waitFor {
@@ -87,7 +91,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Disable show inactive jobs too"(){
         when:"The user clicks a checkbox"
-        enableShowInactiveJobs(false)
+        page.enableShowInactiveJobs(false)
 
         then:"There should be jobs visible which are also inactive"
         $("tr").findAll{it.displayed}.find(".jobName").size() == 0
@@ -95,18 +99,18 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Enable show inactive jobs too"(){
         when:"The user clicks a checkbox"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         then:"There should be no inactive jobs"
-        inactiveJobs.size()>0
+        page.inactiveJobs.size()>0
     }
 
     void "Check all Boxes"(){
         given: "User is on the job list and inactive jos are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user clicks the check all checkbox"
-        enableCheckAll(true)
+        page.enableCheckAll(true)
 
         then:"There should be no job checkbox, which is not selected"
         $("tbody").find(".jobCheckbox").findAll{it.value() == false}.size() == 0
@@ -114,10 +118,10 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Uncheck all Boxes"(){
         given: "User is on the job list and inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user unmarks the checkall checkbox"
-        enableCheckAll(false)
+        page.enableCheckAll(false)
 
         then:"There should be no job checkbox, which is selected"
         $("tbody").find(".jobCheckbox").findAll{it.value() == true}.size() == 0
@@ -125,158 +129,158 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void "Show only selected jobs"(){
         given: "User is on the job list, inactive jobs are shown and no job checkbox is selected"
-        enableShowInactiveJobs(true)
-        enableCheckAll(false)
+        page.enableShowInactiveJobs(true)
+        page.enableCheckAll(false)
 
         when:"The user marks the first job and select the box to show only marked jobs"
         $(".jobCheckbox")[0].value("on")
-        enableShowOnlyCheckedJobs(true)
+        page.enableShowOnlyCheckedJobs(true)
 
         then:"There should just be the one selected entry and the rest should be hided"
-        invisibleRows.size() == 3
+        page.invisibleRows.size() == 3
     }
 
     void "Disable show only selected Jobs"(){
         given: "User is on the job list, inactive jobs are shown and no job checkbox is selected"
-        enableShowInactiveJobs(true)
-        enableCheckAll(false)
+        page.enableShowInactiveJobs(true)
+        page.enableCheckAll(false)
 
         when:"The user marks the first job and select the box to show only marked jobs"
-        enableShowOnlyCheckedJobs(false)
+        page.enableShowOnlyCheckedJobs(false)
 
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
     void "Filter Job by name"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        nameFilterTextbox << job1Name
+        page.nameFilterTextbox << job1Name
 
         then:"There should just be the one selected entry and the rest should be hided"
-        invisibleRows.size() == 3
+        page.invisibleRows.size() == 3
     }
 
     void "Reset filter Job by name"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        nameFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        page.nameFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
     void "Filter Job by JobGroup"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        jobGroupFilterTextbox << jobGroup2Name
+        page.jobGroupFilterTextbox << jobGroup2Name
 
         then:"There should just be the one selected entry and the rest should be hided"
-        invisibleRows.size() == 3
+        page.invisibleRows.size() == 3
     }
 
     void "Reset filter Job by JobGroup"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        jobGroupFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        page.jobGroupFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
 
     void "Filter Job by Tag"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        tagFilterTextbox.click()
-        tagFilterTextbox << job4Tag
-        tagFilterTextbox << Keys.ENTER
+        page.tagFilterTextbox.click()
+        page.tagFilterTextbox << job4Tag
+        page.tagFilterTextbox << Keys.ENTER
 
         then:"There should just be the one selected entry and the rest should be hided"
-        invisibleRows.size() == 3
+        page.invisibleRows.size() == 3
     }
 
     void "Reset filter Job by Tag"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        tagFilterTextbox .value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        page.tagFilterTextbox .value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
     void "Filter Job by Script"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        scriptFilterTextbox << script1Name
+        page.scriptFilterTextbox << script1Name
         then:"There should just be the one selected entry and the rest should be hided"
-        invisibleRows.size() == 1
+        page.invisibleRows.size() == 1
     }
 
     void "Reset filter Job by Script"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        scriptFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        page.scriptFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
     void "Filter Job by Browser"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user types the name of a job in the job filter"
-        browserFilterTextbox << browserName
+        page.browserFilterTextbox << browserName
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
     void "Reset filter Job by Browser"(){
         given: "User is on the job list, inactive jobs are shown"
-        enableShowInactiveJobs(true)
+        page.enableShowInactiveJobs(true)
 
         when:"The user deletes the input from the text field"
-        browserFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
+        page.browserFilterTextbox.value(Keys.chord(Keys.CONTROL, "A")+Keys.BACK_SPACE)
 
         then:"There should be no hided row"
-        invisibleRows.size() == 0
+        page.invisibleRows.size() == 0
     }
 
     void "Activate Job"(){
         given: "User is on the job list, inactive jobs are shown, no job is selected"
-        enableShowInactiveJobs(false)
+        page.enableShowInactiveJobs(false)
         def visibleActiveJobsBefore = countVisibleActiveJobs()
-        enableShowInactiveJobs(true)
-        enableCheckAll(true)
-        enableCheckAll(false)
+        page.enableShowInactiveJobs(true)
+        page.enableCheckAll(true)
+        page.enableCheckAll(false)
 
 
         when:"The user activates a job"
-        changeCheckbox(getCheckboxForJobName(job4Name), true)
-        activateButton.click()
+        page.changeCheckbox(getCheckboxForJobName(job4Name), true)
+        page.activateButton.click()
 
         then:"There should be one more active job"
         at JobListPage
         sleep(2000)//Otherwise the element is not clickable with chrome
-        enableShowInactiveJobs(false)
-        countVisibleActiveJobs() == visibleActiveJobsBefore + 1
+        page.enableShowInactiveJobs(false)
+        page.countVisibleActiveJobs() == visibleActiveJobsBefore + 1
     }
 
     void "Deactivate Job"(){
@@ -284,13 +288,13 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
         def visibleActiveJobsBefore = countVisibleActiveJobs()
 
         when:"The user deletes the input from the text field"
-        changeCheckbox(getCheckboxForJobName(job4Name), true)
+        page.changeCheckbox(getCheckboxForJobName(job4Name), true)
         $("input",name:"_action_deactivate").click()
 
         then:"There should be no hided row"
         at JobListPage
         sleep(2000)//Otherwise the element is not clickable with chrome
-        countVisibleActiveJobs() == visibleActiveJobsBefore - 1
+        page.countVisibleActiveJobs() == visibleActiveJobsBefore - 1
     }
 
     void cleanupSpec() {
