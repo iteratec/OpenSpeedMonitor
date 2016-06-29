@@ -1,3 +1,6 @@
+import org.apache.commons.io.FileUtils
+import org.apache.tools.ant.taskdefs.condition.Os
+
 /*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
@@ -19,25 +22,25 @@ buildscript {
         grailsVersion = project.grailsVersion
 
         bootstrapFramework = [
-            version             : "2.3.2",
-            cssPath             : "grails-app/assets/stylesheets/lib",
-            jsPath              : "grails-app/assets/javascripts/lib",
-            useIndividualJs     : true,
-            useLess             : true,
-        //    invalidVersionFails : false,
-            fontAwesome : [
-               install             : true,
-               version             : "4.2.0",
-               useLess             : false,
-               invalidVersionFails : false
-            ]
+                version        : "2.3.2",
+                cssPath        : "grails-app/assets/stylesheets/lib",
+                jsPath         : "grails-app/assets/javascripts/lib",
+                useIndividualJs: true,
+                useLess        : true,
+                //    invalidVersionFails : false,
+                fontAwesome    : [
+                        install            : true,
+                        version            : "4.2.0",
+                        useLess            : false,
+                        invalidVersionFails: false
+                ]
         ]
     }
     repositories {
         mavenLocal()
         maven { url "https://repo.grails.org/grails/core" }
         maven { url "https://plugins.gradle.org/m2/" }
-        maven { url  "http://dl.bintray.com/iteratec/grails-plugins" }
+        maven { url "http://dl.bintray.com/iteratec/grails-plugins" }
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
@@ -53,12 +56,12 @@ buildscript {
 version "3.4.8-build293"
 group "OpenSpeedMonitor"
 
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-apply plugin:"org.grails.grails-gsp"
-apply plugin:"asset-pipeline"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "war"
+apply plugin: "org.grails.grails-web"
+apply plugin: "org.grails.grails-gsp"
+apply plugin: "asset-pipeline"
 apply plugin: "com.siprell.plugins.bootstrap-framework"
 apply plugin: 'com.moowork.node'
 
@@ -69,13 +72,14 @@ ext {
     karmaExec = file('node_modules/karma/bin/karma')
     karmaConfig = 'src/test/js/karma.conf.js'
 
-    seleniumVersion = "2.31.0"
+    seleniumVersion = "2.46.0"
+    phantomJsVersion = '1.9.7'
 }
 
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
-    maven { url  "http://dl.bintray.com/iteratec/grails-plugins" }
+    maven { url "http://dl.bintray.com/iteratec/grails-plugins" }
 }
 
 dependencyManagement {
@@ -140,14 +144,59 @@ dependencies {
     testCompile 'org.mockito:mockito-all:1.9.5'
 //    build "org.grails:release:3.0.1"                          // not available
 //    testCompile "org.grails.plugins:code-coverage:1.2.4"       // pervious version was 2.0.3-3
-    testCompile('com.github.detro.ghostdriver:phantomjsdriver:1.1.0') {
+    testCompile('com.codeborne:phantomjsdriver:1.2.1') {
         transitive = false
     }
 }
 
+task downloadPhantomJs {
+    def osFilenamePart
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        osFilenamePart = "windows.zip"
+    } else if (Os.isFamily(Os.FAMILY_MAC)) {
+        osFilenamePart = "macosx.zip"
+    } else if (Os.isFamily(Os.FAMILY_UNIX)) {
+        osFilenamePart = Os.isArch("amd64") ? "linux-x86_64.tar.bz2" : "linux-i686.tar.bz2"
+    }
+
+    def filename = "phantomjs-$phantomJsVersion-$osFilenamePart"
+    def outputFile = file("$buildDir/webdriver/$filename")
+    inputs.property("phantomJsVersion", phantomJsVersion)
+    outputs.file(outputFile)
+
+    doLast {
+        FileUtils.copyURLToFile(new URL("https://bitbucket.org/ariya/phantomjs/downloads/$filename"), outputFile)
+    }
+}
+
+task unzipPhantomJs(type: Copy) {
+    def outputDir = file("$buildDir/webdriver/phantomjs")
+    dependsOn downloadPhantomJs
+    outputs.dir(outputDir)
+
+    def archive = downloadPhantomJs.outputs.files.singleFile
+
+    from(Os.isFamily(Os.FAMILY_MAC) || Os.isFamily(Os.FAMILY_WINDOWS) ? zipTree(archive) : tarTree(archive))
+    into(outputDir)
+    eachFile { FileCopyDetails fcp ->
+        fcp.relativePath = new RelativePath(!fcp.directory, *fcp.relativePath.segments[1..-1])
+    }
+}
+
+integrationTest {
+    outputs.upToDateWhen { false }
+
+    systemProperties["geb.env"] = System.getProperty("geb.env", "phantomJs")
+    if (systemProperties["geb.env"] == "phantomJs") {
+        dependsOn unzipPhantomJs
+    }
+    def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
+    systemProperty "phantomjs.binary.path", new File(unzipPhantomJs.outputs.files.singleFile, phantomJsFilename).absolutePath
+}
+
 task setupJasmine(type: NpmTask) {
     outputs.dir file('node_modules')
-    args = ['install','--loglevel', 'error']
+    args = ['install', '--loglevel', 'error']
 }
 
 task jasmineRun(type: NodeTask, dependsOn: ['setupJasmine']) {
@@ -178,16 +227,16 @@ sourceSets {
     }
 }
 'dbmGormDiff' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 
 'dbmUpdate' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 'dbmClearChecksums' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 'dbmChangelogSync' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 
