@@ -73,7 +73,7 @@ ext {
     karmaConfig = 'src/test/js/karma.conf.js'
 
     seleniumVersion = "2.46.0"
-    phantomJsVersion = '1.9.7'
+    phantomJsVersion = '2.1.1'
 }
 
 repositories {
@@ -186,12 +186,11 @@ task unzipPhantomJs(type: Copy) {
 integrationTest {
     outputs.upToDateWhen { false }
 
-    systemProperties["geb.env"] = System.getProperty("geb.env", "phantomJs")
-    if (systemProperties["geb.env"] == "phantomJs") {
+    if (!System.getProperty("geb.env", "phantomJs") || System.getProperty("geb.env", "phantomJs") == "phantomJs") {
         dependsOn unzipPhantomJs
+        def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
+        systemProperty "phantomjs.binary.path", new File(unzipPhantomJs.outputs.files.singleFile, phantomJsFilename).absolutePath
     }
-    def phantomJsFilename = Os.isFamily(Os.FAMILY_WINDOWS) ? "phantomjs.exe" : "bin/phantomjs"
-    systemProperty "phantomjs.binary.path", new File(unzipPhantomJs.outputs.files.singleFile, phantomJsFilename).absolutePath
 }
 
 task setupJasmine(type: NpmTask) {

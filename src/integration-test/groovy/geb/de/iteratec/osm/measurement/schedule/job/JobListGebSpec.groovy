@@ -86,7 +86,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
             at JobListPage
         }
         enableShowInactiveJobs(true)
-        $(".highlight.success").text().startsWith(job4Name)
+        page.allJobs.find{it.text().contains(job4Name)}
     }
 
     void "Disable show inactive jobs too"(){

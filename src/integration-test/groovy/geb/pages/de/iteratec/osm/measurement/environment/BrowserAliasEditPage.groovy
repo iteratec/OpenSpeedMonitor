@@ -13,7 +13,7 @@ class BrowserAliasEditPage extends I18nGebPage{
     static content = {
         aliasTextField { $("#alias") }
 
-        saveButton (to: [BrowserAliasEditPage, BrowserShowPage]) { $("input").find{it.attr("name") == "_action_update"} }
+        saveButton (to: [BrowserAliasEditPage, BrowserAliasShowPage]) { $("input").find{it.attr("name") == "_action_update"} }
         resetButton { $("button", type: "reset") }
 
         errorMessageBox { $("div", class: "alert alert-danger") }
