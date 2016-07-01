@@ -29,11 +29,22 @@ class NonTransactionalIntegrationSpec extends Specification {
 
             _configuration = new DefaultGrailsDomainConfiguration(grailsApplication: grailsApplication, properties: properties)
         }
+        new SchemaExport(_configuration).create(false, true)
     }
 
     def cleanup() {
-//        After spec nuke and pave the test db
-        new SchemaExport(_configuration).create(false, true)
+      if (!_configuration) {
+          // 1-time creation of the configuration
+          Properties properties = new Properties()
+          properties.setProperty 'hibernate.connection.driver_class', grailsApplication.config.dataSource.driverClassName
+          properties.setProperty 'hibernate.connection.username', grailsApplication.config.dataSource.username
+          properties.setProperty 'hibernate.connection.password', grailsApplication.config.dataSource.password ?:""
+          properties.setProperty 'hibernate.connection.url', grailsApplication.config.dataSource.url
+          properties.setProperty 'hibernate.dialect', 'org.hibernate.dialect.H2Dialect'
+
+          _configuration = new DefaultGrailsDomainConfiguration(grailsApplication: grailsApplication, properties: properties)
+      }
+      new SchemaExport(_configuration).create(false, true)
     }
 
 }

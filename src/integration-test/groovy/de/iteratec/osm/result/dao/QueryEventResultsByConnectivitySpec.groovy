@@ -33,7 +33,7 @@ import java.util.regex.Pattern
  */
 @Integration
 @Rollback
-class QueryEventResultsByConnectivitySpec extends Specification {
+class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpec {
 
     EventResultDaoService eventResultDaoService
 
