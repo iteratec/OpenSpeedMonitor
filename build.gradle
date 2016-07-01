@@ -112,7 +112,7 @@ dependencies {
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
     profile "org.grails.profiles:web:3.1.5"
 
-    testCompile "org.grails.plugins:hibernate4"
+    testCompile "org.grails.plugins:hibernate"
     testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"
     testCompile "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
