@@ -198,7 +198,7 @@ class UrlMappings {
 		}
 		"/rest/handleOldJobResults" {
 			controller = "RestApi"
-			action = [POST: "securedViaApiKeyHandleOldJobResults"]
+			action = [PUT: "securedViaApiKeyHandleOldJobResults"]
 		}
 
 	}

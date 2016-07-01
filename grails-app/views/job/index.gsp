@@ -173,6 +173,11 @@
                     <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
                 </a>
             </span>
+            <span style="float:right;margin-top: 12px;">
+                <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
+                   data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"
+                   style="text-decoration:none;color: #3a87ad;"></a>
+            </span>
         </div>
 
 
@@ -191,11 +196,6 @@
                     </span>
                 </g:set>
                 <g:set var="executionScheduleLabel"><g:message code="job.executionSchedule.label" default="Execution Schedule"/>
-                    <span style="float:right;margin-top: 12px;">
-                        <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
-                           data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"
-                           style="text-decoration:none;color: #3a87ad;"></a>
-                    </span>
                 </g:set>
                 <g:sortableColumn property="label" title="${titleHeader}"/>
                 <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>

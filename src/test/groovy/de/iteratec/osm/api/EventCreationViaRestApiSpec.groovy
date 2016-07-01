@@ -65,7 +65,7 @@ class EventCreationViaRestApiSpec extends Specification {
         //test written event
         Event.list().size() == 0
         response.status == 400
-        response.text == "Error field apiKey: The submitted ApiKey doesn't have the permission to create events.\n"
+        response.contentAsString == "Error field apiKey: "+RestApiController.DEFAULT_ACCESS_DENIED_MESSAGE+"\n"
     }
 
     //shortName constraint violation ////////////////////////////////////

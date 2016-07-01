@@ -16,6 +16,7 @@ import groovyx.net.http.RESTClient
 import org.apache.http.HttpHost
 import org.joda.time.DateTime
 import org.junit.Rule
+import spock.lang.Ignore
 import org.yaml.snakeyaml.introspector.Property
 import software.betamax.Configuration
 import software.betamax.ProxyConfiguration
@@ -51,6 +52,7 @@ class QueueAndJobStatusServiceSpec extends Specification {
     def doWithSpring = {
         httpRequestService(HttpRequestService)
     }
+    @Ignore
     @Betamax(tape = 'CreateChartData_creates_a_map_entry_per_server')
     def "CreateChartData creates a map entry per server"() {
         given:
@@ -66,6 +68,7 @@ class QueueAndJobStatusServiceSpec extends Specification {
         resultMap.keySet().size() == 2
     }
 
+    @Ignore
     @Betamax(tape = 'CreateChartData creates entry for each location')
     def "CreateChartData creates entry for each location"() {
         given:

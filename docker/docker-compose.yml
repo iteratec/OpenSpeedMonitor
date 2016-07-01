@@ -1,0 +1,16 @@
+osm:
+  image: iteratec/openspeedmonitor
+  ports:
+   - "8080:8080"
+  links:
+   - osm_mysql
+  environment:
+    MYSQL_HOST: osm_mysql
+
+osm_mysql:
+  image: mysql
+  environment:
+    MYSQL_ROOT_PASSWORD: anything
+    MYSQL_DATABASE: osm
+    MYSQL_USER: osm
+    MYSQL_PASSWORD: osm123
