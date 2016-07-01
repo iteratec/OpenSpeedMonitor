@@ -12,7 +12,10 @@ reportsDir = "target/geb-reports"
 reportOnTestFailureOnly = true
 
 driver = {
-    def driverInstance = new PhantomJSDriver(new DesiredCapabilities())
+    DesiredCapabilities caps = new DesiredCapabilities()
+    caps.setCapability('phantomjs.binary.path','./node_modules/phantomjs-prebuilt/bin/phantomjs')
+
+    def driverInstance = new PhantomJSDriver(caps)
     driverInstance.manage().window().maximize()
     driverInstance
 }
