@@ -169,9 +169,20 @@ assets {
     includes = ['bootstrap-custom.less']
     excludes = ['**/*.less']
 }
+
 //TODO: this is a workaround for: https://github.com/kensiprell/bootstrap-framework/issues/10
 //Hopefully this dependsOn can be removed if issue is fixed
-assetCompile.dependsOn createBootstrapLess
+assetCompile.dependsOn {[
+    createBootstrapLess,
+    createBootstrapJs,
+    createBootstrapMixins,
+    createFontAwesomeCssAll,
+    createFontAwesomeCssIndividual,
+    createFontAwesomeFonts,
+    createFontAwesomeLessLess,
+    createFontAwesomeLess
+]}
+
 sourceSets {
     main {
         resources {

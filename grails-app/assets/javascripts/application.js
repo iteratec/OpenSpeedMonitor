@@ -16,7 +16,7 @@
 */
 //= require jquery/jquery-1.12.3.js
 //= require jquery/jquery-ui-1.10.4.js
-//= require lib/bootstrap-all
+//= require_tree lib/bootstrap
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
 //= require date-time-picker/bootstrap-datepicker.min.js
