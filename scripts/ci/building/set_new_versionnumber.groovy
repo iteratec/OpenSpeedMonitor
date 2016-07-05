@@ -34,6 +34,8 @@ newVersion += "-build${bamboo_build_number}"
 
 writeVersionToFile(buildFile,newVersion)
 
+export BAMBOO_CI_APP_VERSION=newVersion
+
 println "Updated version from ${oldVersion} to ${newVersion}"
 
 
