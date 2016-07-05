@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // set new osm version in application.properties
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+import hudson.model.*
 File buildFile = new File('./build.gradle')
 
 String appVersion = getVersionFromFile(buildFile)
@@ -34,7 +34,9 @@ newVersion += "-build${bamboo_build_number}"
 
 writeVersionToFile(buildFile,newVersion)
 
-export BAMBOO_CI_APP_VERSION=newVersion
+File versionPropertiesFile = new File('./version.properties')
+String propertiesToWrite = "app.version=${newVersion}"
+versionPropertiesFile<<propertiesToWrite
 
 println "Updated version from ${oldVersion} to ${newVersion}"
 

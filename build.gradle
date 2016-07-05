@@ -49,7 +49,7 @@ buildscript {
     }
 }
 
-version "3.4.8-build293"
+version "3.4.8-buildnull"
 group "OpenSpeedMonitor"
 
 apply plugin:"eclipse"
