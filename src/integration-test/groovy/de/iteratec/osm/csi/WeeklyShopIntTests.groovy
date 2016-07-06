@@ -160,10 +160,11 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         //create test-specific data
         JobGroup csiGroup = JobGroup.findByName(csiGroupName)
         Double expectedValue = 61.30
+        long csiAggregationId
 
         CsiAggregation.withNewTransaction {
 
-            new CsiAggregation(
+            CsiAggregation aggregation = new CsiAggregation(
                     started: startDate,
                     interval: weekly,
                     aggregator: pageAggregatorShop,
@@ -171,11 +172,11 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
                     csByWptDocCompleteInPercent: null,
                     underlyingEventResultsByWptDocComplete: ''
             ).save(failOnError: true, flush: true)
+            csiAggregationId = aggregation.id
+        }
 
-        }
-        CsiAggregation mvWeeklyShop = CsiAggregation.find {
-            started == startDate && aggregator.name == AggregatorType.SHOP
-        }
+        CsiAggregationInterval.findAll()
+        CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
 
         when:
         shopCsiAggregationService.calcCa(mvWeeklyShop)
