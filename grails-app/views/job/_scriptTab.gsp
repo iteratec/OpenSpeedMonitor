@@ -21,4 +21,4 @@
         <i class="fa fa-edit" rel="tooltip" title="${ message(code: 'job.script.edit') }"></i>
     </a>:
 </p>
-<g:render template="../script/codemirror" model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}" />
+<g:render template="/script/codemirror" model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}" />
