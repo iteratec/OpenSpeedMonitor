@@ -10,10 +10,8 @@ println "AppVersion from application.properties is ${appVersion}"
 List tokenizedVersion = appVersion.tokenize('.')
 Integer major = Integer.valueOf(tokenizedVersion[0])
 Integer minor = Integer.valueOf(tokenizedVersion[1])
+Integer patch = Integer.valueOf(tokenizedVersion[2])
 
-String lastVersionPart = tokenizedVersion[2]
-List tokenizedLastVersionPart = lastVersionPart.tokenize('-')
-Integer patch = Integer.valueOf(tokenizedLastVersionPart[0])
 
 String oldVersion = "${major}.${minor}.${patch}"
 println "OldVersion is ${oldVersion}"
@@ -23,6 +21,7 @@ String newVersion
 if("${bamboo_jira_version}") {
   println 'Given release-version from jira: ' + bamboo_jira_version + '...'
   newVersion = "${bamboo_jira_version}"
+  writeVersionToFile(buildFile,newVersion)
 } else {
   println 'None release-version given from jira...'
   newVersion = "${major}.${minor}.${patch}"
@@ -32,11 +31,9 @@ println "... and adding build-number ${bamboo_build_number} to version-number"
 
 newVersion += "-build${bamboo_build_number}"
 
-writeVersionToFile(buildFile,newVersion)
-
 File versionPropertiesFile = new File('./version.properties')
 String propertiesToWrite = "app.version=${newVersion}"
-versionPropertiesFile<<propertiesToWrite
+versionPropertiesFile.write(propertiesToWrite)
 
 println "Updated version from ${oldVersion} to ${newVersion}"
 
@@ -69,7 +66,7 @@ def String getVersionFromFile(File file) {
 def String writeVersionToFile(File file, String versionNumber) {
   String writeToFile = 'version "' + versionNumber + '"\n'
   def text = file.text
-  def pattern = ~/version "\d\.\d\.\d\-build(\d+)"\n/
+  def pattern = ~/version "\d\.\d\.\d\"\n/
 
   file.withWriter { w ->
     w << text.replaceAll(pattern, writeToFile)
