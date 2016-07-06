@@ -56,3 +56,4 @@ OpenSpeedMonitor-config.groovy
 
 # ignore karma-install
 node_modules/
+version.properties
