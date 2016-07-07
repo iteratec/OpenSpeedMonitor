@@ -8,7 +8,7 @@ else
   if [ -z $bamboo_jira_version ]; then
     echo 'Nothing to commit since we are not pushing the build numbers anymore'
   else
-    if [ ${bamboo.planRepository.branchName}" == "release" ]; then
+    if [ "${bamboo.planRepository.branchName}" == "release" ]; then
       echo "Found version-number: ${bamboo_ci_app_version}"
 
       remote=origin
