@@ -23,9 +23,6 @@ String newVersion = ""
 if("${bamboo_jira_version}") {
   println 'Given release-version from jira: ' + bamboo_jira_version + '...'
   newVersion = "${bamboo_jira_version}"
-  props.setProperty('app.version', newVersion)
-  props = props.sort()
-  props.store(propsFile.newWriter(), null)
 } else {
   println 'None release-version given from jira...'
   newVersion = "${major}.${minor}.${patch}"
@@ -34,6 +31,10 @@ def bamboo_build_number = System.getenv("bamboo_buildNumber")
 println "... and adding build-number ${bamboo_build_number} to version-number"
 
 newVersion += "-build${bamboo_build_number}"
+props.setProperty('app.version', newVersion)
+props = props.sort()
+props.store(propsFile.newWriter(), null)
+
 File versionPropertiesFile = new File('./version.properties')
 String propertiesToWrite = "app.version=${newVersion}"
 versionPropertiesFile.write(propertiesToWrite)
