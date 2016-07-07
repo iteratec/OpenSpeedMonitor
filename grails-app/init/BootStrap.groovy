@@ -41,11 +41,16 @@ import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.I18nService
+import grails.util.BuildSettings
 import grails.util.Environment
 import org.joda.time.DateTime
+import org.springframework.core.io.DefaultResourceLoader
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
 
 class BootStrap {
 
+    ResourceLoader defaultResourceLoader = new DefaultResourceLoader()
     EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
     JobResultDaoService jobResultService
@@ -329,10 +334,21 @@ class BootStrap {
         if (DefaultTimeToCsMapping.list().size() == 0) {
 
             Map indexToMappingName = [1: '1 - impatient', 2: '2', 3: '3', 4: '4', 5: '5 - patient']
-            String pathToCsiMappingCsv = 'Default_CSI_Mappings.csv'
-            File csvFile = grailsApplication.mainContext.getResource("$pathToCsiMappingCsv").file
+            String pathToFile
+            String fileName = 'Default_CSI_Mappings.csv'
+            InputStream csvIs
+            if(grailsApplication.warDeployed) {
+                pathToFile = '/WEB-INF/classes/' + fileName
+                Resource csvFileAsResource = defaultResourceLoader.getResource(pathToFile)
+                csvIs = csvFileAsResource.getInputStream()
+            } else {
+                pathToFile = BuildSettings.BASE_DIR.absolutePath + "/src/main/resources/" + fileName
+                csvIs = new FileInputStream(pathToFile)
+            }
+            BufferedReader csvFileReader = new BufferedReader(new InputStreamReader(csvIs))
             int lineCounter = 0
-            new FileInputStream(csvFile).eachLine { line ->
+            String line
+            while ((line = csvFileReader.readLine()) != null) {
                 // exclude header
                 if (lineCounter >= 1) {
                     def tokenized = line.tokenize(';')
@@ -346,8 +362,8 @@ class BootStrap {
 
                 }
                 lineCounter++
-
             }
+            csvFileReader.close();
         }
 
     }
