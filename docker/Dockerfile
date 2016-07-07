@@ -1,22 +1,10 @@
 FROM java:8
 MAINTAINER nils.kuhn@iteratec.de, birger.kamp@iteratec.de
 
-ENV GRAILS_VERSION 3.1.6
 ENV OSM_VERSION 3.4.8-build293
 ENV OSM_HOME /osm
 ENV OSM_CONFIG_HOME /home/osm/.grails
 ENV JAVA_OPTS "-server -Dgrails.env=prod -Dfile.encoding=UTF-8"
-
-# Install Grails
-WORKDIR /usr/lib/jvm
-RUN wget https://github.com/grails/grails-core/releases/download/v$GRAILS_VERSION/grails-$GRAILS_VERSION.zip && \
-    unzip grails-$GRAILS_VERSION.zip && \
-    rm -rf grails-$GRAILS_VERSION.zip && \
-    ln -s grails-$GRAILS_VERSION grails
-
-# Setup Grails path.
-ENV GRAILS_HOME /usr/lib/jvm/grails
-ENV PATH $GRAILS_HOME/bin:$PATH
 
 # get OSM-sources
 RUN mkdir -p $OSM_HOME
