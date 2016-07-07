@@ -653,7 +653,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Data-markers show on the graph"
         waitFor {dataLabel}
-        waitFor{dataLabel.attr("style").contains('top: 479px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default; fill: rgb(179, 179, 179);')}
+        waitFor{dataLabel.attr("style").contains('top: 479px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default')}
     }
 
 
