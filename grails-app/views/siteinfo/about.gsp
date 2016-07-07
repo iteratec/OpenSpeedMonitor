@@ -2,21 +2,21 @@
 <html>
 
 <head>
-	<title><g:message code="de.iteratec.osm.about.label" default="about" locale="${lang}"/> ${meta(name:'app.name')}</title>
+	<title><g:message code="de.iteratec.osm.about.label" default="about" locale="${lang}"/> ${meta(name:'info.app.name')}</title>
 	<meta name="layout" content="kickstart_osm" />
 </head>
 
 <body>
-	<h1><g:message code="de.iteratec.osm.about.label" default="about" locale="${lang}"/> ${meta(name:'app.name')} <small>version ${meta(name:'app.version')}</small></h1>
+	<h1><g:message code="de.iteratec.osm.about.label" default="about" locale="${lang}"/> ${meta(name:'info.app.name')} <small>version ${meta(name:'info.app.version')}</small></h1>
 	<section id="intro">
 		<p class="lead">
 		<g:if test="${lang.toString().equals('de')}">
-      ${meta(name: 'app.name')} automatisiert Web-Performance-Messungen basierend auf <a title="webpagetest" href="http://webpagetest.org/">webpagetest</a>. Außerdem verarbeitet, aggregiert und visualisiert die Ergebnisse.
+      ${meta(name: 'info.app.name')} automatisiert Web-Performance-Messungen basierend auf <a title="webpagetest" href="http://webpagetest.org/">webpagetest</a>. Außerdem verarbeitet, aggregiert und visualisiert die Ergebnisse.
       Seine technische Basis ist <a title="grails" href="http://grails.org/">Grails</a>, ein JVM-basiertes Web-Framework welches die Programmiersprache <a title="groovy programming language" href="http://groovy.codehaus.org/">Groovy</a> nutzt. 
       Its technical base is grails, a jvm based web framework leveraged by the programming language groovy.
 		</g:if>
 		<g:else>
-      ${meta(name: 'app.name')} automates web performance measurements based on <a title="webpagetest" href="http://webpagetest.org/">webpagetest</a>. It also processes, aggregates and visualizes the results.
+      ${meta(name: 'info.app.name')} automates web performance measurements based on <a title="webpagetest" href="http://webpagetest.org/">webpagetest</a>. It also processes, aggregates and visualizes the results.
       Its technical base is <a title="grails" href="http://grails.org/">grails</a>, a jvm based web framework leveraging the programming language <a title="groovy programming language" href="http://groovy.codehaus.org/">groovy</a>.
 		</g:else>
 		</p>
