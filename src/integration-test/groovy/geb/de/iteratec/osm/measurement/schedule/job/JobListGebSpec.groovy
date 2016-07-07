@@ -1,12 +1,22 @@
 package geb.de.iteratec.osm.measurement.schedule.job
 
+import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.security.Role
+import de.iteratec.osm.security.User
+import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
 import geb.pages.de.iteratec.osm.LoginPage
@@ -299,6 +309,41 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
     void cleanupSpec() {
         doLogout()
+        Job.withNewTransaction{
+            Job.list().each{
+                it.delete()
+            }
+            Location.list().each{
+                it.delete()
+            }
+            Browser.list().each{
+                it.delete()
+            }
+            WebPageTestServer.list().each{
+                it.delete()
+            }
+            JobGroup.list().each{
+                it.delete()
+            }
+            Script.list().each{
+                it.delete()
+            }
+            AggregatorType.list().each{
+                it.delete()
+            }
+            UserRole.list().each{
+                it.delete()
+            }
+            User.list().each{
+                it.delete()
+            }
+            Role.list().each{
+                it.delete()
+            }
+            OsmConfiguration.list().each{
+                it.delete()
+            }
+        }
     }
 
     private void createData(){
