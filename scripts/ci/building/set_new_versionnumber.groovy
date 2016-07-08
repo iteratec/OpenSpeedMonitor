@@ -29,6 +29,9 @@ def bamboo_build_number = System.getenv("bamboo_buildNumber")
 println "... and adding build-number ${bamboo_build_number} to version-number"
 
 newVersion += "-build${bamboo_build_number}"
+if( !System.getenv("bamboo_planRepository_branchName").equals("release") ){
+    newVersion += "-SNAPSHOT"
+}
 writeVersionToFile(buildFile,newVersion)
 
 File versionPropertiesFile = new File('./version.properties')
