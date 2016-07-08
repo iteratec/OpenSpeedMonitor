@@ -1,5 +1,6 @@
 osm:
   image: iteratec/openspeedmonitor
+  entrypoint: dockerize -wait tcp://osm_mysql:3306 -timeout 240s /entrypoint.sh
   ports:
    - "8080:8080"
   links:

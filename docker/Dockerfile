@@ -5,6 +5,11 @@ ENV OSM_VERSION 3.4.8-build293
 ENV OSM_HOME /osm
 ENV OSM_CONFIG_HOME /home/osm/.grails
 ENV JAVA_OPTS "-server -Dgrails.env=prod -Dfile.encoding=UTF-8"
+ENV DOCKERIZE_VERSION v0.2.0
+
+# install dockerize
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 # get OSM-sources
 RUN mkdir -p $OSM_HOME
@@ -28,7 +33,7 @@ RUN rm -r $OSM_HOME/OpenSpeedMonitor-feature-detailAnalysis /root/.gradle
 RUN useradd -ms /bin/bash osm
 RUN mkdir -p $OSM_HOME/logs && \
     chmod 777 -R $OSM_HOME/logs
-ADD templates/osm-config.yml $OSM_CONFIG_HOME/OpenSpeedMonitor-config.yml
+ADD templates/osm-config.yml.j2 $OSM_CONFIG_HOME/OpenSpeedMonitor-config.yml.j2
 RUN mkdir -p $OSM_HOME/logs && \
     chown osm:osm -R $OSM_HOME $OSM_CONFIG_HOME
 VOLUME ["$OSM_CONFIG_HOME","$OSM_HOME/logs"]
