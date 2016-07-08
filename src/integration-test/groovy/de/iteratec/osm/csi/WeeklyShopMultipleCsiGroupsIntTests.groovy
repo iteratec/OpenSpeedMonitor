@@ -17,16 +17,13 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
@@ -37,11 +34,8 @@ import org.joda.time.DateTime
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    EventCsiAggregationService eventCsiAggregationService
-    JobService jobService
-    CsiAggregationTagService csiAggregationTagService
     static ShopCsiAggregationService shopCsiAggregationService
-    static LocationAndResultPersisterService locationAndResultPersisterService
+    static ResultPersisterService resultPersisterService
 
     Map<String, Double> targetValues
     List<Page> pageObjectsToTest
@@ -63,10 +57,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
     static final String csiGroup1Name = 'csiGroup1'
     static final String csiGroup2Name = 'csiGroup2'
 
-    static final Integer countResultsPerWeeklyShopMv = 12
     static final Integer countWeeklyShopMvsToBeCreated = 2
-    static final Integer countResultsPerWeeklyPageMv = 4
-    static final Integer countWeeklyPageMvsToBeCreated = 4
 
     def setup() {
         System.out.println('Create some common test-data...');
@@ -90,7 +81,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
         ]
 
         EventResult.findAll().each {
-            locationAndResultPersisterService.informDependentCsiAggregations(it)
+            resultPersisterService.informDependentCsiAggregations(it)
         }
         CsiConfiguration.findAll().each { csiConfiguration ->
             ConnectivityProfile.findAll().each { connectivityProfile ->

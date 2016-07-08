@@ -44,7 +44,7 @@ import static org.junit.Assert.*
  * 
  * TODO: This test is to complicated - make it simpler!
  */
-@TestFor(LocationAndResultPersisterService)
+@TestFor(ResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 class PersistingNewEventResultsTests {
 	private static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
@@ -154,7 +154,7 @@ class PersistingNewEventResultsTests {
 		]
 	]
 
-	LocationAndResultPersisterService serviceUnderTest
+	ResultPersisterService serviceUnderTest
 
 	def doWithSpring = {
 		metricReportingService(MetricReportingService)

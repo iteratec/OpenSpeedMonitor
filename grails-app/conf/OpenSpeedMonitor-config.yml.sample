@@ -27,6 +27,13 @@ grails:
 
 environments:
   development:
+     grails:
+        de:
+          iteratec:
+            osm:
+              assetRequests:
+                #enablePersistenceOfAssetRequests: true
+                #microserviceUrl: "http://localhost:8081"
     dataSource:
       # You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
       # So you can see all prepared sql statements hibernate creates and fires against your data

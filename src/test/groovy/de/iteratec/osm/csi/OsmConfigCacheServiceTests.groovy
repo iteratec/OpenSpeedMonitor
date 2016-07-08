@@ -33,25 +33,25 @@ import de.iteratec.osm.OsmConfiguration
 @Mock([OsmConfiguration])
 class OsmConfigCacheServiceTests {
 
-	static transactional = false
-	OsmConfigCacheService serviceUnderTest
+    static transactional = false
+    OsmConfigCacheService serviceUnderTest
 
-	def doWithSpring = {
-		configService(ConfigService)
-	}
+    def doWithSpring = {
+        configService(ConfigService)
+    }
 
-	@Before
-	void setUp() {
-		serviceUnderTest=service
-		serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
+    @Before
+    void setUp() {
+        serviceUnderTest = service
+        serviceUnderTest.configService = grailsApplication.mainContext.getBean('configService')
 
-		// creating configuration with default values
-		new OsmConfiguration().save(failOnError: true)
-	}
+        // creating configuration with default values
+        new OsmConfiguration().save(failOnError: true)
+    }
 
-	@Test
-	void testAccessingCachedConfigs() {
-		Assert.assertEquals(250, serviceUnderTest.getCachedMinDocCompleteTimeInMillisecs(24))
-		Assert.assertEquals(180000, serviceUnderTest.getCachedMaxDocCompleteTimeInMillisecs(24))
-	}
+    @Test
+    void testAccessingCachedConfigs() {
+        Assert.assertEquals(250, serviceUnderTest.getCachedMinDocCompleteTimeInMillisecs(24))
+        Assert.assertEquals(180000, serviceUnderTest.getCachedMaxDocCompleteTimeInMillisecs(24))
+    }
 }

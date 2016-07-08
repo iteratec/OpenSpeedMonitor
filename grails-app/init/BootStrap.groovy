@@ -22,20 +22,20 @@ import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.LocationPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 
 import de.iteratec.osm.measurement.schedule.JobProcessingService
-import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.HealthReportService
-import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
@@ -43,6 +43,7 @@ import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.I18nService
 import grails.util.BuildSettings
 import grails.util.Environment
+import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
 import org.springframework.core.io.DefaultResourceLoader
 import org.springframework.core.io.Resource
@@ -53,10 +54,11 @@ class BootStrap {
     ResourceLoader defaultResourceLoader = new DefaultResourceLoader()
     EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
-    JobResultDaoService jobResultService
     JobProcessingService jobProcessingService
     I18nService i18nService
-    LocationAndResultPersisterService locationAndResultPersisterService
+    ResultPersisterService resultPersisterService
+    LocationPersisterService locationPersisterService
+    AssetRequestPersisterService assetRequestPersisterService
     ProxyService proxyService
     HealthReportService healthReportService
     def grailsApplication
@@ -102,9 +104,9 @@ class BootStrap {
     }
 
 
-    void initHealthReporting(){
+    void initHealthReporting() {
         log.info("initHealthReporting() OSM starts")
-        GraphiteServer.findAllByReportHealthMetrics(true).each{
+        GraphiteServer.findAllByReportHealthMetrics(true).each {
             healthReportService.handleGraphiteServer(it)
         }
         log.info("initHealthReporting() OSM ends")
@@ -312,7 +314,7 @@ class BootStrap {
 
         createDefaultTimeToCsiMappingIfMissing()
 
-        if(CsiConfiguration.count <= 0) {
+        if (CsiConfiguration.count <= 0) {
             CsiConfiguration initCsiConfiguration = new CsiConfiguration()
             initCsiConfiguration.with {
                 label = "initial csi configuration"
@@ -337,7 +339,7 @@ class BootStrap {
             String pathToFile
             String fileName = 'Default_CSI_Mappings.csv'
             InputStream csvIs
-            if(grailsApplication.warDeployed) {
+            if (grailsApplication.warDeployed) {
                 pathToFile = '/WEB-INF/classes/' + fileName
                 Resource csvFileAsResource = defaultResourceLoader.getResource(pathToFile)
                 csvIs = csvFileAsResource.getInputStream()
@@ -427,7 +429,22 @@ class BootStrap {
 
     def registerProxyListener = {
         log.info "registerProxyListener OSM ends"
-        proxyService.addListener(locationAndResultPersisterService)
+        proxyService.addLocationListener(locationPersisterService)
+        proxyService.addResultListener(resultPersisterService)
+
+        // enable peristence of assetRequests for JobResults if configured
+        boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.assetRequests?.enablePersistenceOfAssetRequests
+        if (persistenceEnabled) {
+            String microserviceUrl = grailsApplication.config.grails?.de?.iteratec?.osm?.assetRequests?.microserviceUrl
+            UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
+            if (!microserviceUrl || !urlValidator.isValid(microserviceUrl)) {
+                throw new IllegalStateException("A valid url for the microservice is required, if persistence of assetRequests is to be enabled")
+            }
+            assetRequestPersisterService.enablePersistenceOfAssetRequestsForJobResults(microserviceUrl)
+            proxyService.addResultListener(assetRequestPersisterService)
+        }
+
+        log.info "persistence of assetRequests is enabled: " + persistenceEnabled
         log.info "registerProxyListener OSM ends"
     }
 

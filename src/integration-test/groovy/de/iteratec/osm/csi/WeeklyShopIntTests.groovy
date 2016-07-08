@@ -18,7 +18,7 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.wptserverproxy.LocationAndResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
@@ -39,13 +39,9 @@ import spock.lang.Shared
 class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    EventCsiAggregationService eventCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService
-    EventResultService eventResultService
-    JobService jobService
-    CsiAggregationTagService csiAggregationTagService
     @Shared
-    LocationAndResultPersisterService locationAndResultPersisterService
+    ResultPersisterService resultPersisterService
 
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly
@@ -62,7 +58,6 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
             'WKBS',
             'WK'
     ]
-    static final DateTime startOfWeek = new DateTime(2012, 11, 12, 0, 0, 0)
     static final String csiGroupName = "CSI"
     /** Testdata is persisted respective this csv */
     static final String csvFilename = 'weekly_page.csv'
@@ -88,7 +83,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         }
 
         EventResult.findAll().each {
-            locationAndResultPersisterService.informDependentCsiAggregations(it)
+            resultPersisterService.informDependentCsiAggregations(it)
         }
 
         CsiAggregation.withNewTransaction {

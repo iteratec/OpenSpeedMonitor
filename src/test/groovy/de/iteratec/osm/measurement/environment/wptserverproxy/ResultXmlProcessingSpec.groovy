@@ -25,15 +25,13 @@ import grails.test.mixin.*
 import grails.test.mixin.support.*
 import groovy.util.slurpersupport.GPathResult
 
-import org.junit.*
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
-@TestFor(LocationAndResultPersisterService)
+@TestFor(ResultPersisterService)
 class ResultXmlProcessingSpec {
-	LocationAndResultPersisterService serviceUnderTest
+	ResultPersisterService serviceUnderTest
     void setUp() {
 		serviceUnderTest = service
     }
