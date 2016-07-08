@@ -38,6 +38,9 @@ class AssetRequestPersisterService implements iResultListener {
     private String microserviceUrl
     private boolean callListenerAsync = true
 
+    private final int MAX_ATTEMPTS = 3
+    private final int TIMEOUT_IN_SECONDS = 5
+
     LinkGenerator grailsLinkGenerator
 
     /**
@@ -90,11 +93,19 @@ class AssetRequestPersisterService implements iResultListener {
         final String jobLabel = resultXml.getLabel()
         Long jobGroupId = Job.findByLabel(jobLabel).jobGroup.id
 
-        def resp = client.post(path: 'restApi/persistAssetsForWptResult',
-                body: [osmUrl: osmUrl, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
-                requestContentType: JSON)
+        def resp
+        int attempts = 0
 
-        assert resp.status == 200
+        while (!resp && resp.status != 200 && attempts < MAX_ATTEMPTS) {
+            attempts++
+            resp = client.post(path: 'restApi/persistAssetsForWptResult',
+                    body: [osmUrl: osmUrl, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
+                    requestContentType: JSON)
+            sleep(1000 * TIMEOUT_IN_SECONDS)
+        }
+
+        if(resp.status != 200)
+            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId())
     }
 
 
