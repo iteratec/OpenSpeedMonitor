@@ -11,9 +11,9 @@ ENV DOCKERIZE_VERSION v0.2.0
 RUN useradd -ms /bin/bash osm
 
 # install dockerize
-RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
-    && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+    tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && \
+    rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
 # get osm-sources and build war-file
 RUN mkdir -p $OSM_HOME $OSM_HOME/logs $OSM_CONFIG_HOME
