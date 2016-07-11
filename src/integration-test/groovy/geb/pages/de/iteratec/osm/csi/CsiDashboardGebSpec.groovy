@@ -1,0 +1,255 @@
+package geb.pages.de.iteratec.osm.csi
+
+import de.iteratec.osm.csi.BrowserConnectivityWeight
+import de.iteratec.osm.csi.CsTargetGraph
+import de.iteratec.osm.csi.CsTargetValue
+import de.iteratec.osm.csi.CsiConfiguration
+import de.iteratec.osm.csi.CsiDay
+import de.iteratec.osm.csi.CsiSystem
+import de.iteratec.osm.csi.JobGroupWeight
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.PageWeight
+import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.MeasurandGroup
+import de.iteratec.osm.result.CsiAggregationTagService
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.util.OsmTestLogin
+import geb.CustomUrlGebReportingSpec
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import org.joda.time.DateTime
+import org.openqa.selenium.Keys
+import spock.lang.Shared
+import spock.lang.Stepwise
+
+/**
+ * Created by marko on 07.07.16.
+ */
+
+@Integration
+@Rollback
+@Stepwise
+class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
+    CsiAggregationTagService csiAggregationTagService
+    @Shared String script1Name = "TestScript1-564892#Afef1"
+    @Shared String script2Name = "TestScript2-564892#Afef1"
+    @Shared String job1Name = "TestJob1-564892#Afef1"
+    @Shared String job2Name = "TestJob2-564892#Afef1"
+    @Shared String location1Name = "TestLocation1-564892#Afef1"
+    @Shared String Location2Name = "TestLocation2-564892#Afef1"
+    @Shared String jobGroup1Name = "TestJobGroup1-564892#Afef1"
+    @Shared String jobGroup2Name = "TestJobGroup2-564892#Afef1"
+    @Shared String page1Name = "TestPage1-564892#Afef1"
+    @Shared String connectivityProfileName = "ConnectivityProfile-564892#Afef1"
+    @Shared String measureEvent1Name = "MeasureEvent1-564892#Afef1"
+    @Shared String csiConfigurationName = "CsiConfiguration1-564892#Afef1"
+
+    void "No selection leads to error message"(){
+        given: "User is on "
+        createData()
+        to CsiDashboardPage
+        when: "The button is invisible"
+        timeFrameSelect.click()
+        selectDateInDatepicker(fromDatepicker, "01.06.2016")
+        selectDateInDatepicker(toDatepicker, "11.06.2016")
+        waitFor{showButton.displayed}
+        showButton.click()
+
+        then: "Button is visible"
+        waitFor{at CsiDashboardPage}
+        waitFor{$("div", class: "alert alert-error")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")} //check that the error box appears
+        waitFor{$("div", class: "alert alert-error")[0].find("li")[0].attr("innerHTML").contains("Please select at least one folder.")} //check that the correct error message is displayed
+        waitFor{$("div", class: "alert alert-error")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page.")} //check that the correct error message is displayed
+
+        while(true)sleep(1000)
+
+    }
+
+    private void createData(){
+        Job.withNewTransaction{
+            TestDataUtil.createOsmConfig()
+            TestDataUtil.createAdminUser()
+            initChartData()
+            initCsiData()
+            createTestSpecificData()
+        }
+
+    }
+
+    private void createTestSpecificData(){
+
+
+        Script script1 = TestDataUtil.createScript(script1Name,"This is for test purposes","stuff",false)
+        Script script2 =TestDataUtil.createScript(script2Name,"This is also for test purposes","stuff",false)
+        Browser browser = TestDataUtil.createBrowser("TestFireFox",1d)
+        ConnectivityProfile connectivityProfile =TestDataUtil.createConnectivityProfile(connectivityProfileName)
+        BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
+        Page page1 =TestDataUtil.createPage(page1Name,1.0)
+        PageWeight pageWeight = TestDataUtil.createPageWeight(page1,3)
+        TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
+        CsiDay csiDay = TestDataUtil.createCsiDay([0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:11,13:10,14:9,15:8,16:7,17:6,18:5,19:4,20:3,21:2,22:1,23:0])
+        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName,"TestDescription",csiDay,[browserConnectivityWeight],[pageWeight], [timeToCsMapping])
+        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(),TestDataUtil.createCsTargetValue())
+        JobGroup jobGroup1 = new JobGroup([csiConfiguration:csiConfiguration, name: jobGroup1Name]).save()
+        JobGroup jobGroup2 = new JobGroup([csiConfiguration:csiConfiguration, name: jobGroup2Name]).save()
+        WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1","TestIdentifier",true,"http://internet.de")
+        Location location1 = TestDataUtil.createLocation(wpt,location1Name,browser,true)
+        Location location2 = TestDataUtil.createLocation(wpt,location2Name,browser,true)
+        Job job1=TestDataUtil.createJob(job1Name,script1,location1,jobGroup1,"This is the first test job",1,false,12)
+        Job job2=TestDataUtil.createJob(job2Name,script2,location2,jobGroup1,"This is the second test job",1,false,12)
+        CsiSystem csiSystem =  new CsiSystem([label:"TestCsiSystem"])
+        csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))
+        csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 60))
+        csiSystem.save(failOnError:true)
+        JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016,06,22,5,13).toDate(),job1,location1)
+        JobResult jobResult2 = TestDataUtil.createJobResult("Test2", new DateTime(2016,06,22,5,18).toDate(),job1,location1)
+        JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016,06,22,5,15).toDate(),job2,location1)
+        MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
+        CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
+        AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+        new CsiAggregation([started:new DateTime(2016,6,5 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:14,csByWptVisuallyCompleteInPercent:55,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,6 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:22,csByWptVisuallyCompleteInPercent:58,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,7 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:33,csByWptVisuallyCompleteInPercent:68,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,8 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:44,csByWptVisuallyCompleteInPercent:81,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,9 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:55,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,10,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:66,csByWptVisuallyCompleteInPercent:48,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,11,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:73,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,12,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:24,csByWptVisuallyCompleteInPercent:98,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,13,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:39,csByWptVisuallyCompleteInPercent:65,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,14,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:77,csByWptVisuallyCompleteInPercent:61,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,15,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:88,csByWptVisuallyCompleteInPercent:72,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,16,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:99,csByWptVisuallyCompleteInPercent:78,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,17,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:1,csByWptVisuallyCompleteInPercent:84,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started:new DateTime(2016,6,18,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:31,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+
+    }
+    private void selectDateInDatepicker(def datePicker, String date) {
+        datePicker.click()
+        datePicker << Keys.chord(Keys.CONTROL, "a")
+        datePicker << Keys.chord(Keys.DELETE)
+        datePicker << Keys.chord(Keys.ESCAPE)
+        datePicker << date
+    }
+
+    private void initChartData() {
+
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_UNCACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOM_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FIRST_BYTE, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_REQUEST_COUNT, MeasurandGroup.REQUEST_COUNTS);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_LOAD_TIME, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_START_RENDER, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_DOC_COMPLETE_REQUESTS, MeasurandGroup.REQUEST_COUNTS);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_FULLY_LOADED_INCOMING_BYTES, MeasurandGroup.REQUEST_SIZES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_DOC_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
+        TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+
+    }
+
+    private void initCsiData() {
+
+        def csiGroupName = JobGroup.UNDEFINED_CSI
+        JobGroup.findByName(csiGroupName) ?: new JobGroup(
+                name: csiGroupName).save(failOnError: true)
+
+        // here you can initialize the weights of the hours of the csiDay for csi calculation  (see de.iteratec.osm.csi.PageCsiAggregationService)
+        if (CsiDay.count <= 0) {
+            CsiDay initDay = new CsiDay()
+            (0..23).each {
+                initDay.setHourWeight(it, 1)
+            }
+            initDay.save(failOnError: true)
+        }
+
+        Page.findByName(Page.UNDEFINED) ?: new Page(name: Page.UNDEFINED).save(failOnError: true)
+
+        TestDataUtil.createAggregatorType(AggregatorType.MEASURED_EVENT, MeasurandGroup.NO_MEASURAND)
+        TestDataUtil.createAggregatorType(AggregatorType.PAGE, MeasurandGroup.NO_MEASURAND)
+        TestDataUtil.createAggregatorType(AggregatorType.PAGE_AND_BROWSER, MeasurandGroup.NO_MEASURAND)
+        TestDataUtil.createAggregatorType(AggregatorType.SHOP, MeasurandGroup.NO_MEASURAND)
+        TestDataUtil.createAggregatorType(AggregatorType.CSI_SYSTEM, MeasurandGroup.NO_MEASURAND)
+
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY) ?: new CsiAggregationInterval(
+                name: "hourly",
+                intervalInMinutes: CsiAggregationInterval.HOURLY
+        ).save(failOnError: true)
+
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY) ?: new CsiAggregationInterval(
+                name: "daily",
+                intervalInMinutes: CsiAggregationInterval.DAILY
+        ).save(failOnError: true)
+
+        CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY) ?: new CsiAggregationInterval(
+                name: "weekly",
+                intervalInMinutes: CsiAggregationInterval.WEEKLY
+        ).save(failOnError: true)
+
+        Date date = new DateTime(2000, 1, 1, 0, 0).toDate()
+        Double percent = 90
+        CsTargetValue val1 = CsTargetValue.findByDateAndCsInPercent(date, percent) ?: new CsTargetValue(
+                date: date,
+                csInPercent: percent,
+        ).save(failOnError: true)
+        date = new DateTime(2100, 12, 31, 23, 59).toDate()
+        percent = 90
+        CsTargetValue val2 = CsTargetValue.findByDateAndCsInPercent(date, percent) ?: new CsTargetValue(
+                date: date,
+                csInPercent: percent,
+        ).save(failOnError: true)
+
+        String labelTargetCsi_EN = 'Target-CSI'
+        String descriptionTargetCsi_EN =  'Customer satisfaction index defined as target.'
+        CsTargetGraph.findByLabel(labelTargetCsi_EN) ?: new CsTargetGraph(
+                label: labelTargetCsi_EN,
+                description: descriptionTargetCsi_EN,
+                pointOne: val1,
+                pointTwo: val2,
+                defaultVisibility: true
+        ).save(failOnError: true)
+
+
+
+        if(CsiConfiguration.count <= 0) {
+            CsiConfiguration initCsiConfiguration = new CsiConfiguration()
+            initCsiConfiguration.with {
+                label = "initial csi configuration"
+                description = "a first csi configuration as template"
+                csiDay = CsiDay.findAll()[0]
+            }
+            initCsiConfiguration.save(failOnError: true)
+        }
+
+    }
+
+}
