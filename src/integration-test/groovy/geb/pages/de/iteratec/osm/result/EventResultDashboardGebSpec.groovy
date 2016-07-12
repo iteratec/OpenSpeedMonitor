@@ -648,19 +648,21 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         waitFor { chartTitle == "CustomTitle" }
     }
 
-    @Ignore("Cannot debug pop-up dialog")
     void "Adjust Chart Size to illigal values"() {
         given: "User edits chart size"
-        chartWidthInputField << 0
-        chartheightInputField << 9999999
+        chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
+        chartWidthInputField << Keys.chord(Keys.DELETE)
+        chartWidthInputField << "0"
+        chartheightInputField << Keys.chord(Keys.CONTROL, "a")
+        chartheightInputField << Keys.chord(Keys.DELETE)
+        chartheightInputField << "9999999"
 
         when: "User clicks \"apply\""
-        sleep(500)
-        chartTitleInputField << "CustomTitle"
-        sleep(500)
+        sleep(100)
+        def result = withAlert{diaChangeChartsizeButton.click()}
 
         then: "Error message is shown"
-        chartTitle == "CustomTitle"
+        result== "Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels."
     }
 
     void "Adjust Chart Size"() {
