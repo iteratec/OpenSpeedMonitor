@@ -89,7 +89,7 @@ class EventResultDashboardPage extends Page {
         sleep(100)
         js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
         sleep(100)
-        $('#bottomCommitButtons').$("a").click()
+        $("a",href:'#CreateUserspecifiedDashboardModal').click()
 
     }
 }
