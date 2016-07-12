@@ -39,11 +39,11 @@ class GraphitePath {
 
     static constraints = {
         prefix(matches: /([a-zA-Z0-9]+\.)+/, nullable: false, blank: false, maxSize: 255)
-        measurand()
+        measurand(nullable: false)
     }
 
     @Override
     public String toString(){
-        return "${prefix}[STATIC_PATH].${measurand.getName()}"
+        return "${prefix}[STATIC_PATH].${measurand?.getName()}"
     }
 }

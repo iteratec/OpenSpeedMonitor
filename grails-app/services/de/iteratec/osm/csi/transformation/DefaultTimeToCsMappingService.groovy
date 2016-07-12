@@ -32,7 +32,6 @@ import de.iteratec.osm.util.I18nService
  */
 class DefaultTimeToCsMappingService {
 
-    static transactional = false
 
     TimeToCsMappingCacheService timeToCsMappingCacheService
     I18nService i18nService

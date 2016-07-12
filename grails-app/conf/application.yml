@@ -1,0 +1,293 @@
+---
+hibernate:
+    cache:
+        queries: false
+        use_second_level_cache: true
+        use_query_cache: false
+        region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
+
+dataSource:
+    pooled: true
+    jmxExport: true
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ''
+    dbCreate: 'managed by liquibase'
+
+environments:
+    development:
+        grails:
+            logging:
+                jul:
+                    userbridge: true
+            dbconsole:
+                enabled: true
+                urlRoot: '/admin/dbconsole'
+            plugin:
+                console:
+                    enabled: true
+                    fileStore:
+                        remote:
+                            enabled: true
+            assets:
+                bundle: true
+        dataSource:
+            url: jdbc:h2:mem:devaDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+    test:
+        grails:
+            logging:
+                jul:
+                    userbridge: true
+            dbconsole:
+                enabled: true
+                urlRoot: '/admin/dbconsole'
+            plugin:
+                console:
+                    enabled: true
+                    fileStore:
+                        remote:
+                            enabled: true
+                databasemigration:
+                    dropOnStart: true
+                    autoMigrateScripts: 'TestApp'
+                    forceAutoMigrate: true
+        dataSource:
+            url: jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+    production:
+        grails:
+            logging:
+                jul:
+                    userbridge: false
+            dbconsole:
+                enabled: true
+                urlRoot: '/admin/dbconsole'
+            plugin:
+                console:
+                    enabled: true
+                    fileStore:
+                        remote:
+                            enabled: true
+        dataSource:
+            url: jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+            properties:
+                jmxEnabled: true
+                initialSize: 5
+                maxActive: 50
+                minIdle: 5
+                maxIdle: 25
+                maxWait: 10000
+                maxAge: 600000
+                timeBetweenEvictionRunsMillis: 5000
+                minEvictableIdleTimeMillis: 60000
+                validationQuery: SELECT 1
+                validationQueryTimeout: 3
+                validationInterval: 15000
+                testOnBorrow: true
+                testWhileIdle: true
+                testOnReturn: false
+                jdbcInterceptors: ConnectionState
+                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+
+---
+---
+grails:
+    profile: web
+    codegen:
+        defaultPackage: "de.iteratec.osm"
+    spring:
+        transactionManagement:
+            proxies: false
+        bean:
+            packages: []
+    databinding.dateFormats:
+        - 'dd.MM.yyyy'
+        - 'yyyy-MM-dd'
+        - 'yyyy/MM/dd'
+        - 'MMddyyyy'
+        - 'yyyy-MM-dd HH:mm:ss.S'
+        - 'yyyy-MM-dd HH:mm:ss'
+        - "yyyy-MM-dd'T'hh:mm:ss'Z'"
+
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+
+    groovy:
+        template:
+            check-template-location: false
+
+---
+grails:
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            all: '*/*'
+            atom: application/atom+xml
+            css: text/css
+            csv: text/csv
+            form: application/x-www-form-urlencoded
+            html:
+              - text/html
+              - application/xhtml+xml
+            js: text/javascript
+            json:
+              - application/json
+              - text/json
+            multipartForm: multipart/form-data
+            pdf: application/pdf
+            rss: application/rss+xml
+            text: text/plain
+            hal:
+              - application/hal+json
+              - application/hal+xml
+            xml:
+              - text/xml
+              - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+        upload:
+            maxFileSize: 10000000
+            maxRequestSize: 10000000
+    converters:
+        encoding: UTF-8
+        default:
+                pretty:
+                      print: true
+    views:
+        default:
+            codec: none
+        gsp:
+            encoding: UTF-8
+            htmlcodec: xml
+            sitemesh:
+                    preprocess: true
+            codecs:
+                expression: html
+                scriptlets: html
+                taglib: none
+                staticparts: none
+    file:
+        extensions: true
+    use:
+        accept:
+              header: false
+    json:
+        legacy:
+              builder: true
+    enable:
+      native2ascii: true
+    web:
+        disable:
+            multipart: false
+    exceptionresolver:
+        params:
+            exclude:
+                - 'password'
+    taggable:
+        tag:
+            autoImport: true
+        tagLink:
+            autoImport: true
+    config:
+        defaults:
+            locations: []
+    plugin:
+        databasemigration:
+            updateOnStart: true
+            updateOnStartFileNames:
+                - 'changelog.groovy'
+        cookie:
+            cookieage:
+                default: 3110400
+        springsecurity:
+            password:
+                algorithm: SHA-512
+                hash:
+                    iterations: 1
+            userLookup:
+                userDomainClassName: 'de.iteratec.osm.security.User'
+                authorityJoinClassName: 'de.iteratec.osm.security.UserRole'
+            authority:
+                className: 'de.iteratec.osm.security.Role'
+            securityConfigType: 'InterceptUrlMap'
+            successHandler:
+                alwaysUseDefault: true
+                defaultTargetUrl: '/'
+            interceptUrlMap: [{pattern: '/static/**',                                     access: ["permitAll"]},
+                            {pattern: '/static/*',                                      access: ["permitAll"]},
+                            {pattern: '/assets/**',                                     access: ["permitAll"]},
+                            {pattern: '/assets/*',                                      access: ["permitAll"]},
+                            {pattern: '/css/**',                                        access: ["permitAll"]},
+                            {pattern: '/js/**',                                         access: ["permitAll"]},
+                            {pattern: '/images/**',                                     access: ["permitAll"]},
+                            {pattern: '/less/**',                                       access: ["permitAll"]},
+                            {pattern: '/',                                              access: ["permitAll"]},
+                            {pattern: '/proxy/**',                                      access: ["permitAll"]},
+                            {pattern: '/wptProxy/**',                                   access: ["permitAll"]},
+                            {pattern: '/csiDashboard/index',                            access: ["permitAll"]},
+                            {pattern: '/csiDashboard/showAll',                          access: ["permitAll"]},
+                            {pattern: '/csiDashboard/csiValuesCsv',                     access: ["permitAll"]},
+                            {pattern: '/csiDashboard/showDefault',                      access: ["permitAll"]},
+                            {pattern: '/csiConfiguration/configurations/**',            access: ["permitAll"]},
+                            {pattern: '/csiConfigIO/downloadBrowserWeights',            access: ["permitAll"]},
+                            {pattern: '/csiConfigIO/downloadPageWeights',               access: ["permitAll"]},
+                            {pattern: '/csiConfigIO/downloadHourOfDayWeights',          access: ["permitAll"]},
+                            {pattern: '/csiConfigIO/downloadBrowserConnectivityWeights',access: ["permitAll"]},
+                            {pattern: '/csiConfigIO/downloadDefaultTimeToCsMappings',   access: ["permitAll"]},
+                            {pattern: '/eventResultDashboard/**',                       access: ["permitAll"]},
+                            {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
+                            {pattern: '/highchartPointDetails/**',                      access: ["permitAll"]},
+                            {pattern: '/rest/**',                                       access: ["permitAll"]},
+                            {pattern: '/login/**',                                      access: ["permitAll"]},
+                            {pattern: '/logout/**',                                     access: ["permitAll"]},
+                            {pattern: '/job/index',                                     access: ["permitAll"]},
+                            {pattern: '/job/saveJobSet',                                access: ["permitAll"]},
+                            {pattern: '/job/getRunningAndRecentlyFinishedJobs',         access: ["permitAll"]},
+                            {pattern: '/job/nextExecution',                             access: ["permitAll"]},
+                            {pattern: '/job/getLastRun',                                access: ["permitAll"]},
+                            {pattern: '/script/list',                                   access: ["permitAll"]},
+                            {pattern: '/queueStatus/list',                              access: ["permitAll"]},
+                            {pattern: '/queueStatus/refresh',                           access: ["permitAll"]},
+                            {pattern: '/jobSchedule/schedules',                         access: ["permitAll"]},
+                            {pattern: '/connectivityProfile/list',                      access: ["permitAll"]},
+                            {pattern: '/about',                                         access: ["permitAll"]},
+                            {pattern: '/cookie/**',                                     access: ["permitAll"]},
+                            {pattern: '/csiDashboard/storeCustomDashboard',             access: ["permitAll"]},
+                            {pattern: '/csiDashboard/validateDashboardName',            access: ["permitAll"]},
+                            {pattern: '/csiDashboard/validateAndSaveDashboardValues',   access: ["permitAll"]},
+                            {pattern: '/i18n/getAllMessages',                           access: ["permitAll"]},
+                            {pattern: '/console/**',                                    access: ['ROLE_SUPER_ADMIN']},
+                            {pattern: '/apiKey/**',                                     access: ['ROLE_SUPER_ADMIN']},
+                            {pattern: '/**',                                            access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']}]
+    de:
+        iteratec:
+            osm:
+                report:
+                    chart:
+                        chartTagLib: RICKSHAW
+                        availableChartTagLibs: RICKSHAW
+    i18n:
+        locales:
+            - en
+            - de
+
+
+endpoints:
+    jmx:
+        unique-names: true
+beans:
+    cacheManager:
+        shared: true

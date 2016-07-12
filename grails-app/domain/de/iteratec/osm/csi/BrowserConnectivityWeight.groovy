@@ -31,9 +31,9 @@ class BrowserConnectivityWeight {
     Double weight
 
     static constraints = {
-        browser()
-        connectivity()
-        weight()
+        browser(nullable: false)
+        connectivity(nullable: false)
+        weight(nullable: false)
     }
 
     static BrowserConnectivityWeight copyBrowserConnectivityWeight(BrowserConnectivityWeight source) {

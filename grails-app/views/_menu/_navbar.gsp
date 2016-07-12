@@ -34,7 +34,7 @@
                                 %{--measurement --------------------------------------------------------}%
 
                                 <li class="controller">
-                                    <g:link controller="job" action="list"><i class="fa fa-calendar"></i> <g:message
+                                    <g:link controller="job" action="index"><i class="fa fa-calendar"></i> <g:message
                                             code="de.iteratec.isj.jobs" default="Jobs"/></g:link>
                                 </li>
                                 <li class="controller">

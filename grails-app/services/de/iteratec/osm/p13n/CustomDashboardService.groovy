@@ -18,14 +18,15 @@
 package de.iteratec.osm.p13n
 
 import de.iteratec.osm.report.UserspecificEventResultDashboard
+import grails.transaction.Transactional
 
 /**
  * CustomDashboardService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class CustomDashboardService {
 
-    static transactional = true
 
     /**
      * <p>

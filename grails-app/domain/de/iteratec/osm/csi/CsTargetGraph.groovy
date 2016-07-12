@@ -52,9 +52,9 @@ class CsTargetGraph {
     static constraints = {
         label(maxSize: 255)
         description(nullable: true, widget: 'textarea')
-        pointOne()
-        pointTwo()
-        defaultVisibility()
+        pointOne(nullable: false)
+        pointTwo(nullable: false)
+        defaultVisibility(nullable: false)
     }
 
     static mapping = {

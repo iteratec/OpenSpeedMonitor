@@ -32,9 +32,9 @@ class DefaultTimeToCsMapping implements RickshawTransformableCsMapping {
 	Double customerSatisfactionInPercent
 
     static constraints = {
-        name()
-		loadTimeInMilliSecs()
-		customerSatisfactionInPercent()
+        name(nullable: false)
+		loadTimeInMilliSecs(nullable: false)
+		customerSatisfactionInPercent(nullable: false)
     }
 
     public String retrieveGroupingCriteria(){

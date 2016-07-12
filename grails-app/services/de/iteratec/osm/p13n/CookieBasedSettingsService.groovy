@@ -30,7 +30,6 @@ import de.iteratec.osm.report.chart.ChartingLibrary
  */
 class CookieBasedSettingsService {
 
-    static transactional = false
 
     OsmCookieService osmCookieService
     def grailsApplication

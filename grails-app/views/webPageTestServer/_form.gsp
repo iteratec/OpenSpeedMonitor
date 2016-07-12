@@ -2,52 +2,52 @@
 
 
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'label', 'error')} required">
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'label', 'error')} required">
 				<label for="label" class="control-label"><g:message code="webPageTestServer.label.label" default="Label" /><span class="required-indicator">*</span></label>
 				<div class="controls">
-					<g:textField name="label" maxlength="150" required="" value="${webPageTestServerInstance?.label}"/>
+					<g:textField name="label" maxlength="150"  value="${webPageTestServer?.label}"/>
 				</div>
 			</div>
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'proxyIdentifier', 'error')} ">
-				<label for="proxyIdentifier" class="control-label"><g:message code="webPageTestServer.proxyIdentifier.label" default="Proxy Identifier" /></label>
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'proxyIdentifier', 'error')} required">
+				<label for="proxyIdentifier" class="control-label"><g:message code="webPageTestServer.proxyIdentifier.label" default="Proxy Identifier" /><span class="required-indicator">*</span></label>
 				<div class="controls">
-					<g:textField name="proxyIdentifier" value="${webPageTestServerInstance?.proxyIdentifier}"/>
+					<g:textField name="proxyIdentifier"  value="${webPageTestServer?.proxyIdentifier}"/>
 				</div>
 			</div>
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'active', 'error')} ">
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'active', 'error')} ">
 				<label for="active" class="control-label"><g:message code="webPageTestServer.active.label" default="Active" /></label>
 				<div class="controls">
-					<bs:checkBox name="active" value="${webPageTestServerInstance?.active}" />
+					<bs:checkBox name="active" value="${webPageTestServer?.active}" />
 				</div>
 			</div>
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'description', 'error')} ">
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'description', 'error')} ">
 				<label for="description" class="control-label"><g:message code="webPageTestServer.description.label" default="Description" /></label>
 				<div class="controls">
-					<g:textArea name="description" cols="40" rows="5" value="${webPageTestServerInstance?.description}"/>
+					<g:textArea name="description" cols="40" rows="5" value="${webPageTestServer?.description}"/>
 				</div>
 			</div>
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'baseUrl', 'error')} required">
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'baseUrl', 'error')} required">
 				<label for="baseUrl" class="control-label"><g:message code="webPageTestServer.baseUrl.label" default="Base Url" /><span class="required-indicator">*</span></label>
 				<div class="controls">
-					<g:field type="url" name="baseUrl" required="" value="${webPageTestServerInstance?.baseUrl}"/>
+					<g:field type="url" name="baseUrl"  value="${webPageTestServer?.baseUrl}"/>
 				</div>
 			</div>
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'contactPersonName', 'error')} ">
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'contactPersonName', 'error')} ">
 				<label for="contactPersonName" class="control-label"><g:message code="webPageTestServer.contactPersonName.label" default="Contact Person Name" /></label>
 				<div class="controls">
-					<g:textField name="contactPersonName" maxlength="200" value="${webPageTestServerInstance?.contactPersonName}"/>
+					<g:textField name="contactPersonName" maxlength="200" value="${webPageTestServer?.contactPersonName}"/>
 				</div>
 			</div>
 
-			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServerInstance, field: 'contactPersonEmail', 'error')} ">
+			<div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'contactPersonEmail', 'error')} ">
 				<label for="contactPersonEmail" class="control-label"><g:message code="webPageTestServer.contactPersonEmail.label" default="Contact Person Email" /></label>
 				<div class="controls">
-					<g:field type="email" name="contactPersonEmail" value="${webPageTestServerInstance?.contactPersonEmail}"/>
+					<g:field type="email" name="contactPersonEmail" value="${webPageTestServer?.contactPersonEmail}"/>
 				</div>
 			</div>
 

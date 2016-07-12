@@ -19,7 +19,7 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
-import org.grails.taggable.Taggable
+import grails.plugins.taggable.Taggable
 
 
 /**
@@ -46,9 +46,9 @@ class JobGroup implements Taggable{
     static hasMany = [graphiteServers: GraphiteServer]
 
     static constraints = {
-        name(unique: true, maxSize: 255)
-        graphiteServers()
-        csiConfiguration(nullable: true)
+        name unique: true, maxSize: 255
+        graphiteServers nullable: false
+        csiConfiguration nullable: true
     }
 
     @Override

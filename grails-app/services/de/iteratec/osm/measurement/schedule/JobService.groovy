@@ -28,7 +28,6 @@ import org.joda.time.DateTime
 import org.quartz.CronExpression
 
 class JobService {
-    static transactional = false
     BatchActivityService batchActivityService
 
     /**

@@ -1,4 +1,5 @@
 <%@ page import="grails.plugin.springsecurity.SpringSecurityUtils; grails.converters.JSON" contentType="text/html;charset=UTF-8" %>
+<%@ defaultCodec="none" %>
 <html>
 <head>
     <meta name="layout" content="kickstart_osm"/>

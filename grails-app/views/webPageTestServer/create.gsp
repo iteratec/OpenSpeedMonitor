@@ -13,9 +13,9 @@
 
 <section id="create-webPageTestServer" class="first">
 
-	<g:hasErrors bean="${webPageTestServerInstance}">
+	<g:hasErrors bean="${webPageTestServer}">
 	<div class="alert alert-error">
-		<g:renderErrors bean="${webPageTestServerInstance}" as="list" />
+		<g:renderErrors bean="${webPageTestServer}" as="list" />
 	</div>
 	</g:hasErrors>
 	

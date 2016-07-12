@@ -44,7 +44,7 @@
     </p>
     </g:if>
     
-    <g:render template="../tabularResultPresentation/listResults" 
+    <g:render template="/tabularResultPresentation/listResults"
               model="${[model: eventResultListing]}" />
     
 	<g:if test="${remainingResultsCount}">

@@ -17,8 +17,10 @@
 
 package de.iteratec.osm.result
 
+import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 
+@Transactional
 class EventResultXmlService {
 
 	/**

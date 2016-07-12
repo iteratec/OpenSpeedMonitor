@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.result
 
+
 import static Contract.*
 
 import java.util.regex.Pattern

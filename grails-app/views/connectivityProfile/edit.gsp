@@ -19,9 +19,10 @@
                 </div>
             </g:hasErrors>
 
-            <g:form method="post" class="form-horizontal">
+            <g:form resource="${connectivityProfileInstance}" method="put" class="form-horizontal">
                 <g:hiddenField name="id" value="${connectivityProfileInstance?.id}"/>
                 <g:hiddenField name="version" value="${connectivityProfileInstance?.version}"/>
+
                 <fieldset class="form">
                     <g:render template="form"/>
                 </fieldset>

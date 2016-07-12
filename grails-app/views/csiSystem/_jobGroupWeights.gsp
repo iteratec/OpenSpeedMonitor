@@ -1,5 +1,5 @@
 <asset:script type="text/javascript">
-    var childCount = ${csiSystemInstance?.jobGroupWeights.size()} +0;
+    var childCount = ${csiSystem?.jobGroupWeights.size()} +0;
 
     function addJobGroupWeight() {
         var clone = $("#jobGroupWeights__clone").clone();
@@ -65,9 +65,9 @@
 </asset:script>
 
 <div id="childList">
-    <g:hiddenField name="jobGroupWeightCount" value="${csiSystemInstance.jobGroupWeights.size()}"/>
+    <g:hiddenField name="jobGroupWeightCount" value="${csiSystem.jobGroupWeights.size()}"/>
     <g:hiddenField name="jobGroupWeightIdentifiers" value="${[]}"/>
-    <g:each var="jobGroupWeight" in="${csiSystemInstance.jobGroupWeights}" status="i">
+    <g:each var="jobGroupWeight" in="${csiSystem.jobGroupWeights}" status="i">
 
         <g:render template='jobGroupWeight' model="['jobGroupWeight': jobGroupWeight, 'i': i, 'hidden': false]"/>
         <asset:script type="text/javascript">

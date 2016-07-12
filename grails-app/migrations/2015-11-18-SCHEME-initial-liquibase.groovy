@@ -977,7 +977,7 @@ databaseChangeLog = {
 	changeSet(author: "nkuhn (generated)", id: "1447946152150-32") {
 		createTable(tableName: "measured_value") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK1")
 			}
 
 			column(name: "version", type: "bigint") {
@@ -1015,7 +1015,7 @@ databaseChangeLog = {
 	changeSet(author: "nkuhn (generated)", id: "1447946152150-33") {
 		createTable(tableName: "measured_value_interval") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK2")
 			}
 
 			column(name: "version", type: "bigint") {
@@ -1035,7 +1035,7 @@ databaseChangeLog = {
 	changeSet(author: "nkuhn (generated)", id: "1447946152150-34") {
 		createTable(tableName: "measured_value_update_event") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "measured_valuPK3")
 			}
 
 			column(name: "version", type: "bigint") {
@@ -1309,7 +1309,7 @@ databaseChangeLog = {
 	changeSet(author: "nkuhn (generated)", id: "1447946152150-45") {
 		createTable(tableName: "userspecific_csi_dashboard") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userspecific_PK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userspecific_PK1")
 			}
 
 			column(name: "version", type: "bigint") {
@@ -1377,7 +1377,7 @@ databaseChangeLog = {
 	changeSet(author: "nkuhn (generated)", id: "1447946152150-46") {
 		createTable(tableName: "userspecific_event_result_dashboard") {
 			column(autoIncrement: "true", name: "id", type: "bigint") {
-				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userspecific_PK")
+				constraints(nullable: "false", primaryKey: "true", primaryKeyName: "userspecific_PK2")
 			}
 
 			column(name: "version", type: "bigint") {

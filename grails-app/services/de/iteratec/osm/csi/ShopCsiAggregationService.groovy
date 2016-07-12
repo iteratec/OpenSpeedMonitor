@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
@@ -45,6 +46,7 @@ import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
  * @author nkuhn
  *
  */
+@Transactional
 class ShopCsiAggregationService {
 
     PageCsiAggregationService pageCsiAggregationService

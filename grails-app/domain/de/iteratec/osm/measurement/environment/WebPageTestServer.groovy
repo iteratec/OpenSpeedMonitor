@@ -42,9 +42,7 @@ class WebPageTestServer {
     static constraints = {
         label(blank: false, maxSize: 150)
         proxyIdentifier(maxSize: 255)
-        dateCreated()
-        lastUpdated()
-        active()
+        active(nullable: false)
         description(nullable: true, widget: 'textarea', maxSize: 255)
         baseUrl(blank: false, url: ["localhost(:(\\d{1,5}))?"], maxSize: 255)
         contactPersonName(maxSize: 200, nullable: true)

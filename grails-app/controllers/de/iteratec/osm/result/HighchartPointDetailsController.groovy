@@ -17,7 +17,7 @@
 
 package de.iteratec.osm.result
 
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 
 import de.iteratec.osm.report.chart.CsiAggregationDaoService

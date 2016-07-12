@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.csi.BrowserConnectivityWeight
+import de.iteratec.osm.csi.CsiConfiguration
 import org.springframework.dao.DataIntegrityViolationException
 
 /**
@@ -25,7 +27,7 @@ import org.springframework.dao.DataIntegrityViolationException
  */
 class ConnectivityProfileController {
 
-    static allowedMethods = [save: "POST", save: "POST", deactivate: "POST"]
+    static allowedMethods = [save: "POST", update: "PUT", deactivate: "PUT"]
 
     def index() {
         redirect(action: "list", params: params)
@@ -95,10 +97,9 @@ class ConnectivityProfileController {
     }
 
     def update() {
-
         // Deactivate previous version
         ConnectivityProfile connectivityProfileInstance = ConnectivityProfile.get(params.id)
-
+        params.action
         if (!connectivityProfileInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), params.id])
             redirect(action: "list")
@@ -117,6 +118,7 @@ class ConnectivityProfileController {
         }
 
         connectivityProfileInstance.active = false;
+        connectivityProfileInstance.name += "_old_" + String.valueOf(connectivityProfileInstance.id)
 
         if (!connectivityProfileInstance.save(flush: true)) {
             render(view: "edit", model: [connectivityProfileInstance: connectivityProfileInstance])
@@ -138,8 +140,23 @@ class ConnectivityProfileController {
             it.connectivityProfile = connectivityProfileInstanceCopy
             it.save()
         }
+        BrowserConnectivityWeight.findAllByConnectivity(connectivityProfileInstance).each { BrowserConnectivityWeight oldBrowserConnectivityWeight ->
+            BrowserConnectivityWeight newBrowserConnectivityWeight = new BrowserConnectivityWeight()
+            newBrowserConnectivityWeight.browser = oldBrowserConnectivityWeight.browser
+            newBrowserConnectivityWeight.weight = oldBrowserConnectivityWeight.weight
+            newBrowserConnectivityWeight.connectivity = connectivityProfileInstanceCopy
+            CsiConfiguration.findAll().each {CsiConfiguration currentCsiConfiguration ->
+                if (currentCsiConfiguration.browserConnectivityWeights.contains(oldBrowserConnectivityWeight) ){
+                    currentCsiConfiguration.browserConnectivityWeights.add(newBrowserConnectivityWeight)
+                    currentCsiConfiguration.save(flush:true)
+                }
+            }
+            newBrowserConnectivityWeight.save(flush: true)
+        }
 
-        flash.message = message(code: 'default.savedascopy.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
+
+
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'connectivityProfile.label', default: 'ConnectivityProfile'), connectivityProfileInstance.name])
         redirect(action: "list")
     }
 }

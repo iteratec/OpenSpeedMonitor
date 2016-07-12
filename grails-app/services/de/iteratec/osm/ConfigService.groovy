@@ -30,7 +30,6 @@ class ConfigService {
 
 	InMemoryConfigService inMemoryConfigService
 
-    static transactional = true
 
 	/**
 	 * Gets detail-data storage time in weeks from osm-configuration.

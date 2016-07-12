@@ -25,10 +25,10 @@ class TimeToCsMapping implements RickshawTransformableCsMapping {
     Integer mappingVersion
 
     static constraints = {
-        page()
-        loadTimeInMilliSecs()
-        customerSatisfaction()
-        mappingVersion()
+        page(nullable: false)
+        loadTimeInMilliSecs(nullable: false)
+        customerSatisfaction(nullable: false)
+        mappingVersion(nullable: false)
     }
 
     static TimeToCsMapping copyTimeToCsMapping(TimeToCsMapping source) {

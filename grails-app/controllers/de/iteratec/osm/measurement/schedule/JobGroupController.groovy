@@ -1,20 +1,3 @@
-/* 
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-* 
-* 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
-* limitations under the License.
-*/
-
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.csi.CsiConfiguration
@@ -27,17 +10,18 @@ import de.iteratec.osm.d3Data.MatrixViewEntry
 import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
 
-
-/**
- * Some methods got generated and adapted to support tags.
- */
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
+//TODO: save, show, update and tags were NOT generated
 class JobGroupController {
 
-    static scaffold = true
-    static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+    static scaffold = JobGroup
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
     I18nService i18nService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
@@ -45,32 +29,34 @@ class JobGroupController {
 
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
-        def jobGroupInstance = new JobGroup(params)
+        def tagParam = params.remove('tags')
+        def jobGroup = new JobGroup(params)
 
         CsiConfiguration configuration = CsiConfiguration.findByLabel(configurationLabel)
         if (configuration) {
-            jobGroupInstance.csiConfiguration = configuration
+            jobGroup.csiConfiguration = configuration
         }
 
-        if (!jobGroupInstance.save(flush: true)) {
-            render(view: "create", model: [jobGroupInstance: jobGroupInstance])
+        if (!jobGroup.save(flush: true)) {
+            render(view: "create", model: [jobGroup: jobGroup])
             return
         } else {
             // Tags can only be set after first successful save.
             // This is why Job needs to be saved again.
-            jobGroupInstance.tags = params.list('tags')
-            jobGroupInstance.save(flush: true)
+            def tags = [tagParam].flatten()
+            jobGroup.tags = tags
+            jobGroup.save(flush: true)
 
-            flash.message = message(code: 'default.created.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroupInstance.id])
-            redirect(action: "show", id: jobGroupInstance.id)
+            flash.message = message(code: 'default.created.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
+            redirect(action: "show", id: jobGroup.id)
         }
     }
 
     def show() {
-        def jobGroupInstance = JobGroup.get(params.id)
+        def jobGroup = JobGroup.get(params.id)
         def modelToRender = [:]
 
-        CsiConfiguration config = jobGroupInstance.csiConfiguration
+        CsiConfiguration config = jobGroup.csiConfiguration
 
         if (config) {
             //Labels for charts
@@ -125,47 +111,55 @@ class JobGroupController {
                              pageMappingsExist       : pageTimeToCsMappingsChart ? true : false]
         }
 
-        modelToRender.put("jobGroupInstance", jobGroupInstance)
+        modelToRender.put("jobGroup", jobGroup)
 
         return modelToRender
     }
 
     def update() {
-        def jobGroupInstance = JobGroup.get(params.id)
-        if (!jobGroupInstance) {
+        def jobGroup = JobGroup.get(params.id)
+        if (!jobGroup) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
             redirect(action: "list")
             return
         }
 
-        jobGroupInstance.graphiteServers.clear()
+        jobGroup.graphiteServers.clear()
         if (params.version) {
             def version = params.version.toLong()
-            if (jobGroupInstance.version > version) {
-                jobGroupInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
+            if (jobGroup.version > version) {
+                jobGroup.errors.rejectValue("version", "default.optimistic.locking.failure",
                         [message(code: 'jobGroup.label', default: 'JobGroup')] as Object[],
                         "Another user has updated this JobGroup while you were editing")
-                render(view: "edit", model: [jobGroupInstance: jobGroupInstance])
+                render(view: "edit", model: [jobGroup: jobGroup])
                 return
             }
         }
         String csiConfigLabel = params.remove("csiConfiguration")
         if (csiConfigLabel != null) {
             CsiConfiguration config = CsiConfiguration.findByLabel(csiConfigLabel)
-            jobGroupInstance.csiConfiguration = config
+            jobGroup.csiConfiguration = config
         } else {
-            jobGroupInstance.csiConfiguration = null
+            jobGroup.csiConfiguration = null
         }
 
-        jobGroupInstance.properties = params
-        jobGroupInstance.tags = params.list('tags')
-        if (!jobGroupInstance.save(flush: true)) {
-            render(view: "edit", model: [jobGroupInstance: jobGroupInstance])
+
+        jobGroup.graphiteServers.clear()
+        params.list('graphiteServers').each{
+            jobGroup.graphiteServers.add(GraphiteServer.findById(it))
+        }
+        params.remove('graphiteServers')
+        def tagParam = params.remove('tags')
+        def tags = [tagParam].flatten()
+        jobGroup.tags = tags
+        jobGroup.properties = params
+        if (!jobGroup.save(flush: true)) {
+            render(view: "edit", model: [jobGroup: jobGroup])
             return
         }
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroupInstance.id])
-        redirect(action: "show", id: jobGroupInstance.id)
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
+        redirect(action: "show", id: jobGroup.id)
     }
 
     /**
@@ -173,5 +167,55 @@ class JobGroupController {
      */
     def tags(String term) {
         render JobGroup.findAllTagsWithCriteria([max: 5]) { ilike('name', "${term}%") } as JSON
+    }
+
+
+
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond JobGroup.list(params), model:[jobGroupCount: JobGroup.count()]
+    }
+
+
+
+    def create() {
+        respond new JobGroup(params)
+    }
+
+
+
+    def edit(JobGroup jobGroup) {
+        respond jobGroup
+    }
+
+
+
+    def delete(JobGroup jobGroup) {
+
+        if (jobGroup == null) {
+            notFound()
+            return
+        }
+
+        try {
+            jobGroup.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
+        }
     }
 }

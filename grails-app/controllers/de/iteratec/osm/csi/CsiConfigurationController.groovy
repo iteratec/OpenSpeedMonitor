@@ -26,7 +26,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
-import grails.validation.Validateable
 
 /**
  * CsiConfigurationController
@@ -367,7 +366,6 @@ class CsiConfigurationController {
     }
 }
 
-@Validateable
 class ApplyMappingCommand {
 
     String defaultMappingName

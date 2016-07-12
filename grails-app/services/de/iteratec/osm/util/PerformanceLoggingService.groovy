@@ -22,8 +22,7 @@ import org.joda.time.DateTime
 
 class PerformanceLoggingService {
 
-    static transactional = false
-	
+
 	enum LogLevel{
 		FATAL, ERROR, WARN, INFO, DEBUG, TRACE
 	}

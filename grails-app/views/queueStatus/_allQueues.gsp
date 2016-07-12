@@ -92,11 +92,11 @@
 							<g:each var="jobResult" in="${job.value}">
 								<tr data-statuscode="${jobResult.httpStatusCode}">
 								<td>
-                  <a href="${jobResult.wptServerBaseurl}result/${jobResult.testId}/">${jobResult.getSatusCodeMessage()}</a>
-                  <%-- <a href="../job/edit/${jobResult.job.id}">${jobResult.getSatusCodeMessage()}</a> --%>
+                  <a href="${jobResult.wptServerBaseurl}result/${jobResult.testId}/">${jobResult.getStatusCodeMessage()}</a>
+                  <%-- <a href="../job/edit/${jobResult.job.id}">${jobResult.getStatusCodeMessage()}</a> --%>
 								 </td>
 								 <td>
-									<g:render template="../job/timeago" model="${[date: jobResult.date]}" />
+									<g:render template="/job/timeago" model="${[date: jobResult.date]}" />
 								</td>
 								</tr>
 							</g:each>

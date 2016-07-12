@@ -381,23 +381,32 @@ function RickshawGraphBuilder(args) {
         var palette = new Rickshaw.Color.Palette({
             scheme: 'iteratec'
         });
+        //Data has to be ordered to ensure that the colors are not random
+        var dataTupleList = [];
+        for (var key in data) dataTupleList.push([key, data[key]]);
+        dataTupleList.sort(function(a, b) {
+            a = a[1].name;
+            b = b[1].name;
 
-        data.forEach(function (eachData) {
+            return a < b ? -1 : (a > b ? 1 : 0);
+        });
+
+        for (var i = 0; i < dataTupleList.length; i++) {
             var entry = {
                 color: palette.color(),
-                data: eachData.data,
-                name: eachData.name,
+                data: dataTupleList[i][1].data,
+                name: dataTupleList[i][1].name,
                 scale: scale,
-                measurandGroup: eachData.measurandGroup,
-                label: eachData.yAxisLabel
+                measurandGroup: dataTupleList[i][1].measurandGroup,
+                label: dataTupleList[i][1].yAxisLabel
             };
             series.push(entry);
 
             // count measurand groups
-            if ($.inArray(eachData.measurandGroup, measurandGroups) == -1) {
-                measurandGroups.push(eachData.measurandGroup);
+            if ($.inArray(dataTupleList[i][1].measurandGroup, measurandGroups) == -1) {
+                measurandGroups.push(dataTupleList[i][1].measurandGroup);
             }
-        });
+        };
         series.numberOfMeasurandGroups = measurandGroups.length;
         return series;
     }
@@ -1673,5 +1682,5 @@ function scrollToChartbox(chartBoxTopOffset) {
 // escapes special characters
 //
 function makeValidSelector(identifier) {
-    return identifier.replace(/(:|\.|\[|\]|,|\||\ )/g, "\\$1");
+    return identifier.replace(/(:|\.|\[|\]|,|\||\ |\%)/g, "\\$1");
 }

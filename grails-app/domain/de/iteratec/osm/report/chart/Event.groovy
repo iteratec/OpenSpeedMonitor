@@ -65,11 +65,11 @@ class Event {
     }
 
 	static constraints = {
-        eventDate()
+        eventDate(nullable: false)
         shortName(maxSize: 255)
         description(nullable: true, widget: 'textarea')
-        globallyVisible()
-        jobGroups(validator: {val, obj->
+        globallyVisible(nullable: false)
+        jobGroups(nullable: false, validator: {val, obj->
             return obj.globallyVisible || val.size() > 0
         })
     }

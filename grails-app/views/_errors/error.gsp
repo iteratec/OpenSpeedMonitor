@@ -10,7 +10,6 @@
   
 	<section id="overview" class="">
     	<div class="alert alert-error">
-			${request.'javax.servlet.error.message'.indexOf(':') != -1 ? request.'javax.servlet.error.message'?.substring(0, request.'javax.servlet.error.message'?.indexOf(':')).encodeAsHTML() : request.'javax.servlet.error.message'?.encodeAsHTML()}
 			<g:if test="${request.'javax.servlet.error.message' == null}">
 			</g:if>
 			<g:elseif test="${request.'javax.servlet.error.message'.indexOf(':') != -1}">

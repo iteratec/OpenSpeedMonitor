@@ -65,6 +65,6 @@ class MeasuredEvent {
 
 	@Override
 	String toString(){
-		return name + ' (page: ' + testedPage.name + ')'
+		return name + ' (page: ' + testedPage?.name + ')'
 	}
 }

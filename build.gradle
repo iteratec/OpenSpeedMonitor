@@ -1,0 +1,205 @@
+/*
+* OpenSpeedMonitor (OSM)
+* Copyright 2014 iteratec GmbH
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+buildscript {
+    ext {
+        grailsVersion = project.grailsVersion
+
+        bootstrapFramework = [
+            version             : "2.3.2",
+            cssPath             : "grails-app/assets/stylesheets/lib",
+            jsPath              : "grails-app/assets/javascripts/lib",
+            useIndividualJs     : true,
+            useLess             : true,
+        //    invalidVersionFails : false,
+            fontAwesome : [
+               install             : true,
+               version             : "4.2.0",
+               useLess             : false,
+               invalidVersionFails : false
+            ]
+        ]
+    }
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+        maven { url "https://plugins.gradle.org/m2/" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+        classpath 'org.grails.plugins:database-migration:2.0.0.RC4'
+        classpath "com.siprell.plugins:bootstrap-framework:1.0.3"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.7.4"
+        classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
+        classpath "org.grails.plugins:hibernate4:5.0.4"
+        classpath 'com.moowork.gradle:gradle-node-plugin:0.12'
+    }
+}
+
+version "3.4.8"
+group "OpenSpeedMonitor"
+
+apply plugin:"eclipse"
+apply plugin:"idea"
+apply plugin:"war"
+apply plugin:"org.grails.grails-web"
+apply plugin:"org.grails.grails-gsp"
+apply plugin:"asset-pipeline"
+apply plugin: "com.siprell.plugins.bootstrap-framework"
+apply plugin: 'com.moowork.node'
+
+ext {
+    grailsVersion = project.grailsVersion
+    gradleWrapperVersion = project.gradleWrapperVersion
+
+    karmaExec = file('node_modules/karma/bin/karma')
+    karmaConfig = 'src/test/js/karma.conf.js'
+}
+
+repositories {
+    mavenLocal()
+    maven { url "https://repo.grails.org/grails/core" }
+    maven { url  "http://dl.bintray.com/iteratec/grails-plugins" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.grails:grails-bom:$grailsVersion"
+    }
+    applyMavenExclusions false
+}
+
+dependencies {
+    // Default Grails-Stuff
+    compile "org.grails:grails-core"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    compile "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    compile "org.grails:grails-dependencies"
+    compile "org.grails:grails-web-boot"
+    compile "org.grails.plugins:cache"
+    compile "org.grails.plugins:scaffolding"
+    compile "org.grails.plugins:hibernate4"
+    compile "org.hibernate:hibernate-ehcache"
+    runtime "com.h2database:h2"
+    console "org.grails:grails-console"
+    runtime 'org.grails.plugins:grails-console:2.0.4'
+    testCompile "org.grails:grails-plugin-testing"
+    testCompile "org.grails.plugins:geb"
+    testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
+    testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+    profile "org.grails.profiles:web:3.1.5"
+
+
+
+
+    //Custom OSM-Stuff
+    runtime 'mysql:mysql-connector-java:5.1.26'
+    compile 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
+    runtime 'org.grails.plugins:database-migration:2.0.0.RC4'
+//    compile 'org.grails.plugins:mongodb:5.0.5'
+    compile 'net.sf.supercsv:super-csv:2.4.0'
+    compile 'org.grails.plugins:joda-time:2.0.0'
+    compile 'org.grails.plugins:spring-security-core:3.0.4'
+    compile 'org.grails.plugins:quartz:2.0.8'
+    compile 'org.grails.plugins:http-builder-helper:1.0.2'
+    compile 'org.grails.plugins:taggable:2.0.1-SNAPSHOT'
+    compile 'org.grails.plugins:cookie:2.0.4'
+//    compile 'org.grails.plugins:codenarc:0.22'                  //Use gradle check instead  https://grails.org/plugin/codenarc
+    compile 'p6spy:p6spy:2.1.4'
+    compile 'xml-apis:xml-apis:1.4.01'                          //new dependency
+    compile 'io.dropwizard.metrics:metrics-core:3.1.0'
+    compile 'io.dropwizard.metrics:metrics-graphite:3.1.2'
+    compile 'io.dropwizard.metrics:metrics-jvm:3.1.2'
+    runtime 'net.sf.supercsv:super-csv:2.4.0'
+    runtime "org.grails.plugins:asset-pipeline"
+    assets 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
+    testCompile 'org.hamcrest:hamcrest-all:1.3'
+//    testCompile 'org.eclipse.jetty.aggregate:jetty-all:7.3.1.v20110307'
+    testCompile 'software.betamax:betamax-junit:2.0.0-alpha-1'
+    testCompile 'net.sourceforge.nekohtml:nekohtml:1.9.14'
+    testCompile 'org.mockito:mockito-all:1.9.5'
+//    build "org.grails:release:3.0.1"                          // not available
+//    testCompile "org.grails.plugins:code-coverage:1.2.4"       // pervious version was 2.0.3-3
+    testCompile('com.github.detro.ghostdriver:phantomjsdriver:1.1.0') {
+        transitive = false
+    }
+
+}
+
+task setupJasmine(type: NpmTask) {
+    outputs.dir file('node_modules')
+    args = ['install','--loglevel', 'error']
+}
+
+task jasmineRun(type: NodeTask, dependsOn: ['setupJasmine']) {
+    script = karmaExec
+    args = ['start', karmaConfig, '--single-run']
+}
+
+task jasmineWatch(type: NodeTask, dependsOn: 'setupJasmine') {
+    script = karmaExec
+    args = ['start', karmaConfig]
+}
+
+test.dependsOn jasmineRun
+
+task wrapper(type: Wrapper) {
+    gradleVersion = gradleWrapperVersion
+}
+
+assets {
+    minifyJs = true
+    minifyCss = true
+    configOptions = [:]
+    includes = ['bootstrap-custom.less']
+    excludes = ['**/*.less']
+}
+
+//TODO: this is a workaround for: https://github.com/kensiprell/bootstrap-framework/issues/10
+//Hopefully this dependsOn can be removed if issue is fixed
+assetCompile.dependsOn {[
+    createBootstrapLess,
+    createBootstrapJs,
+    createBootstrapMixins,
+    createFontAwesomeCssAll,
+    createFontAwesomeCssIndividual,
+    createFontAwesomeFonts,
+    createFontAwesomeLessLess,
+    createFontAwesomeLess
+]}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'grails-app/migrations'
+        }
+    }
+}
+'dbmGormDiff' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}
+
+'dbmUpdate' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}
+'dbmClearChecksums' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}
+'dbmChangelogSync' {
+    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+}

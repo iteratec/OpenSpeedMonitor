@@ -1,40 +1,130 @@
-/*
-* OpenSpeedMonitor (OSM)
-* Copyright 2014 iteratec GmbH
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* 	http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
-
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.util.I18nService
-
+import org.springframework.dao.DataIntegrityViolationException
+import static org.springframework.http.HttpStatus.*
+//TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
+//TODO: loadLocations was NOT generated
 class WebPageTestServerController {
 
-	ProxyService proxyService
-	I18nService i18nService
+    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    ProxyService proxyService
+    I18nService i18nService
 
-    static scaffold = true
+    static scaffold = WebPageTestServer
 
-	public Map<String, Object> loadLocations() {
-		WebPageTestServer webPageTestServer = WebPageTestServer.get(params.id)
-		if (webPageTestServer == null){
-			flash.message i18nService.msg('', "No WebPageTestServer found with id ${params.id}")
-		}else{
-			proxyService.fetchLocations(webPageTestServer)
-		}
-		redirect(action: show, id: params.id)
- 	}
+    public Map<String, Object> loadLocations() {
+        WebPageTestServer webPageTestServer = WebPageTestServer.get(params.id)
+        if (webPageTestServer == null){
+            flash.message = i18nService.msg('', "No WebPageTestServer found with id ${params.id}")
+        }else{
+            List<Location> addedLocations = proxyService.fetchLocations(webPageTestServer)
+            String message = "Location-Request was successful."
+            if(addedLocations.empty) {
+                message += " But no locations were added"
+            } else {
+                message += " And some locations were added: <br>"
+                addedLocations.each {
+                    message += it.toString() + " <br>"
+                }
+            }
+            flash.message = message
 
+        }
+        redirect(action: "show", id: params.id)
+    }
+
+    def index(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        respond WebPageTestServer.list(params), model:[webPageTestServerCount: WebPageTestServer.count()]
+    }
+
+    def show(WebPageTestServer webPageTestServer) {
+        respond webPageTestServer
+    }
+
+    def create() {
+        respond new WebPageTestServer(params)
+    }
+
+    def save(WebPageTestServer webPageTestServer) {
+        if (webPageTestServer == null) {
+            
+            notFound()
+            return
+        }
+
+        if (webPageTestServer.hasErrors()) {
+
+            respond webPageTestServer.errors, view:'create'
+            return
+        }
+
+        webPageTestServer.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'webPageTestServer.label', default: 'WebPageTestServer'), webPageTestServer.id])
+                redirect webPageTestServer
+            }
+            '*' { respond webPageTestServer, [status: CREATED] }
+        }
+    }
+
+    def edit(WebPageTestServer webPageTestServer) {
+        respond webPageTestServer
+    }
+
+    def update(WebPageTestServer webPageTestServer) {
+        if (webPageTestServer == null) {
+
+            notFound()
+            return
+        }
+
+        if (webPageTestServer.hasErrors()) {
+
+            respond webPageTestServer.errors, view:'edit'
+            return
+        }
+
+        webPageTestServer.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'webPageTestServer.label', default: 'WebPageTestServer'), webPageTestServer.id])
+                redirect webPageTestServer
+            }
+            '*'{ respond webPageTestServer, [status: OK] }
+        }
+    }
+
+    def delete(WebPageTestServer webPageTestServer) {
+
+        if (webPageTestServer == null) {
+            notFound()
+            return
+        }
+
+        try {
+            webPageTestServer.delete(flush: true)
+            flash.message = message(code: 'default.deleted.message', args: [message(code: 'webPageTestServer.label', default: 'WebPageTestServer'), params.id])
+            redirect(action: "index")
+        }
+        catch (DataIntegrityViolationException e) {
+            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'webPageTestServer.label', default: 'WebPageTestServer'), params.id])
+            redirect(action: "show", id: params.id)
+        }
+    }
+
+    protected void notFound() {
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.not.found.message', args: [message(code: 'webPageTestServer.label', default: 'WebPageTestServer'), params.id])
+                redirect action: "index", method: "GET"
+            }
+            '*'{ render status: NOT_FOUND }
+        }
+    }
 }

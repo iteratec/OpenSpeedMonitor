@@ -17,13 +17,15 @@
 
 package de.iteratec.osm.measurement.schedule
 
+import grails.transaction.Transactional
+
 /**
  * ConnectivityProfileDaoService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class ConnectivityProfileDaoService {
 
-    static transactional = true
 
     List<ConnectivityProfile> findAll() {
         return ConnectivityProfile.list()

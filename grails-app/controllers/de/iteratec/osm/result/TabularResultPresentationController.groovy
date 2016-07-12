@@ -23,8 +23,6 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.persistence.OsmDataSourceService
@@ -35,14 +33,10 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.validation.Validateable
 import org.joda.time.DateTime
 import org.joda.time.Interval
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
 
 import java.text.SimpleDateFormat
-import java.util.regex.Pattern
 
 /**
  * <p>
@@ -54,7 +48,7 @@ import java.util.regex.Pattern
  */
 class TabularResultPresentationController {
 
-    private final static String DATE_FORMAT_STRING = 'dd.mm.yyyy'
+    private final static String DATE_FORMAT_STRING = 'dd.MM.yyyy'
     private final static int MONDAY_WEEKSTART = 1
 
     JobGroupDaoService jobGroupDaoService
@@ -85,7 +79,7 @@ class TabularResultPresentationController {
             {
                 modelToRender.put('command', cmd)
             } else {
-                Interval timeFrame = cmd.getSelectedTimeFrame();
+                Interval timeFrame = cmd.receiveSelectedTimeFrame();
                 List<EventResult> eventResults = null
                 if (cmd instanceof TabularResultListResultsCommand) {
                     eventResults = eventResultDaoService.getCountedByStartAndEndTimeAndMvQueryParams(
@@ -167,7 +161,7 @@ class TabularResultPresentationController {
             cmd.toHour = cmd.to.getAt(Calendar.HOUR_OF_DAY) +":"+ cmd.to.getAt(Calendar.MINUTE);
 
 
-            Interval timeFrame = cmd.getSelectedTimeFrame();
+            Interval timeFrame = cmd.receiveSelectedTimeFrame();
 
             SimpleDateFormat fmtDate = new SimpleDateFormat("dd.MM.yyyy");
             SimpleDateFormat fmtTime = new SimpleDateFormat("hh:mm");

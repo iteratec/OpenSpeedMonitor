@@ -1,3 +1,4 @@
+<%@ page defaultCodec="none" %></page>
 <%@ page contentType="text/html;charset=UTF-8" %>
 <% def springSecurityService %>
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
