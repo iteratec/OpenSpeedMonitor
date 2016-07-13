@@ -1,5 +1,6 @@
 package geb.pages.de.iteratec.osm.csi
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.BrowserConnectivityWeight
 import de.iteratec.osm.csi.CsTargetGraph
 import de.iteratec.osm.csi.CsTargetValue
@@ -25,9 +26,11 @@ import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.security.Role
+import de.iteratec.osm.security.User
+import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
-import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -62,6 +65,10 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
     String measureEvent1Name = "MeasureEvent1-564892#Afef1"
     @Shared
     String csiConfigurationName = "CsiConfiguration1-564892#Afef1"
+
+    void cleanupSpec(){
+        cleanUpData()
+    }
 
     void "Login makes \"Save as Dashboard\"-Button visible"() {
         when: "User is not logged in"
@@ -100,7 +107,6 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         timeFrameSelect.click()
         selectDateInDatepicker(fromDatepicker, "01.06.2016")
         selectDateInDatepicker(toDatepicker, "11.06.2016")
-        while(true)sleep(1)
         jobGroupList[0].click()
         pageList[0].click()
         basedOnVisuallyCompleteButton.click()
@@ -125,7 +131,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "No Data Warning is displayed"
-        true
+        waitFor {$(".span12")[5].attr("innerHTML").contains("No data available for your selection.")}
     }
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
@@ -137,7 +143,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "Graphs are displayed"
-        true
+        waitFor {graphLineDiv.displayed}
+        graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
+        graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
     void "Graph is shown for \"Select all Browsers\""(){
@@ -150,7 +158,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "Graphs are displayed"
-        true
+        waitFor {graphLineDiv.displayed}
+        graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
+        graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
     void "NotUsedLocation leads to no data"(){
@@ -164,7 +174,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "No Data Warning is displayed"
-        true
+        waitFor {$(".span12")[5].attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Graph is shown for correct Location"(){
@@ -178,7 +188,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "Graphs are displayed"
-        true
+        waitFor {graphLineDiv.displayed}
+        graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
+        graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
     void "Graph is shown for \"Select all Locations\""(){
@@ -191,7 +203,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "Graphs are displayed"
-        true
+        waitFor {graphLineDiv.displayed}
+        graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
+        graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
     void "NotUsedConnectivity leads to no data"(){
@@ -204,7 +218,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "No Data Warning is displayed"
-        true
+        waitFor {$(".span12")[5].attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Graph is shown for correct Connectivity Profile"(){
@@ -217,7 +231,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "Graphs are displayed"
-        true
+        waitFor {graphLineDiv.displayed}
+        graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
+        graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
     void "Graph is shown for \"Select all Connectivity Profiles\""(){
@@ -230,7 +246,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "Graphs are displayed"
-        true
+        waitFor {graphLineDiv.displayed}
+        graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
+        graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
     void "Graph for \"Daily mean per Page\""(){
@@ -615,4 +633,79 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     }
 
+    private cleanUpData() {
+        doLogout()
+        Job.withNewTransaction {
+
+            CsiAggregation.list().each {
+                it.delete()
+            }
+            CsiAggregationInterval.list().each {
+                it.delete()
+            }
+            MeasuredEvent.list().each {
+                it.delete()
+            }
+            BrowserConnectivityWeight.list().each {
+                it.delete()
+            }
+            ConnectivityProfile.list().each {
+                it.delete()
+            }
+            JobResult.list().each {
+                it.delete()
+            }
+            TimeToCsMapping.list().each {
+                it.delete()
+            }
+            PageWeight.list().each {
+                it.delete()
+            }
+            Page.list().each {
+                it.delete()
+            }
+            Job.list().each {
+                it.delete()
+            }
+            Location.list().each {
+                it.delete()
+            }
+            Browser.list().each {
+                it.delete()
+            }
+            WebPageTestServer.list().each {
+                it.delete()
+            }
+            JobGroupWeight.list().each {
+                it.delete()
+            }
+            JobGroup.list().each {
+                it.delete()
+            }
+            CsiConfiguration.list().each {
+                it.delete()
+            }
+            CsiDay.list().each {
+                it.delete()
+            }
+            Script.list().each {
+                it.delete()
+            }
+            AggregatorType.list().each {
+                it.delete()
+            }
+            UserRole.list().each {
+                it.delete()
+            }
+            User.list().each {
+                it.delete()
+            }
+            Role.list().each {
+                it.delete()
+            }
+            OsmConfiguration.list().each {
+                it.delete()
+            }
+        }
+    }
 }

@@ -135,9 +135,221 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
         waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
-        waitFor {
-            graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+    }
+    void "NotUsedBrowser leads to no data"(){
+        given: "User selects NotUsedBrowser"
+
+        clickFilterJobAccordion()
+        browserTab.click()
+        waitFor {selectBrowsersList.displayed}
+        selectBrowsersList[0].click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+
+        showButton.click()
+
+        then: "No Data Warning is displayed"
+        waitFor {$(".span12")[7].attr("innerHTML").contains("No data available for your selection.")}
+    }
+    void "Graph is shown for correct Browser"(){
+        given: "User selects NotUsedBrowser"
+        clickFilterJobAccordion()
+        browserTab.click()
+        waitFor {selectBrowsersList.displayed}
+        selectBrowsersList[1].click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+    }
+
+    void "Graph is shown for \"Select all Browsers\""(){
+        given: "User selects NotUsedBrowser"
+        clickFilterJobAccordion()
+        browserTab.click()
+        waitFor {selectAllBrowserButton.displayed}
+        selectAllBrowserButton.click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+    }
+
+    void "NotUsedLocation leads to no data"(){
+        given: "User selects NotUsedLocation"
+        clickFilterJobAccordion()
+        browserTab.click()
+        waitFor {selectLocationField.displayed}
+        selectLocationField.click()
+        waitFor { selectLocationList[0].displayed }
+        selectLocationList[0].click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "No Data Warning is displayed"
+        waitFor {$(".span12")[7].attr("innerHTML").contains("No data available for your selection.")}
+    }
+
+    void "Graph is shown for correct Location"(){
+        given: "User selects NotUsedLocation"
+        clickFilterJobAccordion()
+        browserTab.click()
+        waitFor {selectLocationField.displayed}
+        selectLocationField.click()
+        waitFor {selectLocationList[0].displayed}
+        selectLocationList[0].click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+    }
+
+    void "Graph is shown for \"Select all Locations\""(){
+        given: "User selects NotUsedBrowser"
+        clickFilterJobAccordion()
+        browserTab.click()
+        waitFor {selectAllLocationsButton.displayed}
+        selectAllLocationsButton.click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+    }
+
+    void "NotUsedConnectivity leads to no data"(){
+        given: "User selects NotUsedBrowser"
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {selectConnectivityProfilesList.displayed}
+        selectConnectivityProfilesList[1].click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "No Data Warning is displayed"
+        waitFor {$(".span12")[7].attr("innerHTML").contains("No data available for your selection.")}
+    }
+
+    void "Graph is shown for correct Connectivity Profile"(){
+        given: "User selects NotUsedBrowser"
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {selectConnectivityProfilesList.displayed}
+        selectConnectivityProfilesList[0].click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+    }
+    void "Graph is shown for native connectivity"(){
+        given: "User selects native connectivity"
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {includeNativeConnectivityButton.displayed}
+        includeNativeConnectivityButton.click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine2 == "M404,324.5881403408821L1010,277.11152257513174" }
+
+        cleanup:
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {includeNativeConnectivityButton.displayed}
+        includeNativeConnectivityButton.click()
+        pageTab.click()
+        clickFilterJobAccordion()
+    }
+
+    void "Graph is shown for custom connectivity"(){
+        given: "User selects custom connectivity"
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {includeCustomConnectivityButton.displayed}
+        includeCustomConnectivityButton.click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine2 == "M404,182.15828704363096L1010,134.6816692778806" }
+
+        cleanup:
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {includeCustomConnectivityButton.displayed}
+        includeCustomConnectivityButton.click()
+        pageTab.click()
+        clickFilterJobAccordion()
+    }
+
+    void "Graph is shown for \"Select all Connectivity Profiles\""(){
+        given: "User selects NotUsedBrowser"
+        clickFilterJobAccordion()
+        connectivityTab.click()
+        waitFor {selectAllConnectivityButton.displayed}
+        selectAllConnectivityButton.click()
+
+        when: "User clicks on \"Show\" button"
+        waitFor{showButton.displayed}
+        sleep(100)
+        showButton.click()
+
+        then: "Graphs are displayed"
+        waitFor { graphLineDiv.displayed }
+        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
 
     void "Trimm minimal time"() {
@@ -870,9 +1082,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             Page page1 = TestDataUtil.createPage(page1Name, 1.0)
             JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 5, 13).toDate(), job1, location1)
             JobResult jobResult2 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 5, 18).toDate(), job1, location1)
-            JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 5, 15).toDate(), job2, location1)
+            JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 5, 15).toDate(), job1, location1)
             ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
             MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
+
+            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser",0)
+            TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
+            TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
 
             new EventResult(
                     numberOfWptRun: 1,
@@ -959,6 +1175,118 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     noTrafficShapingAtAll: false,
                     tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
             ).save()
+
+            new EventResult(
+                    numberOfWptRun: 1,
+                    cachedView: CachedView.UNCACHED,
+                    medianValue: true,
+                    wptStatus: 200,
+                    docCompleteIncomingBytes: 15976,
+                    docCompleteRequests: 35,
+                    docCompleteTimeInMillisecs: 158,
+                    domTimeInMillisecs: 150,
+                    firstByteInMillisecs: 153,
+                    fullyLoadedIncomingBytes: 15360,
+                    fullyLoadedRequestCount: 15,
+                    fullyLoadedTimeInMillisecs: 1505,
+                    loadTimeInMillisecs: 156,
+                    startRenderInMillisecs: 155,
+                    csByWptDocCompleteInPercent: 15.6157,
+                    csByWptVisuallyCompleteInPercent: 15,
+                    speedIndex: 157,
+                    visuallyCompleteInMillisecs: 156,
+                    jobResult: jobResult3,
+                    jobResultDate: jobResult3.date,
+                    jobResultJobConfigId: jobResult3.job.ident(),
+                    measuredEvent: measuredEvent1,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: true,
+                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+            ).save()
+
+            new EventResult(
+                    numberOfWptRun: 1,
+                    cachedView: CachedView.UNCACHED,
+                    medianValue: true,
+                    wptStatus: 200,
+                    docCompleteIncomingBytes: 25976,
+                    docCompleteRequests: 25,
+                    docCompleteTimeInMillisecs: 258,
+                    domTimeInMillisecs: 250,
+                    firstByteInMillisecs: 253,
+                    fullyLoadedIncomingBytes: 25360,
+                    fullyLoadedRequestCount: 25,
+                    fullyLoadedTimeInMillisecs: 2505,
+                    loadTimeInMillisecs: 256,
+                    startRenderInMillisecs: 255,
+                    csByWptDocCompleteInPercent: 25.6157,
+                    csByWptVisuallyCompleteInPercent: 25,
+                    speedIndex: 257,
+                    visuallyCompleteInMillisecs: 256,
+                    jobResult: jobResult2,
+                    jobResultDate: jobResult2.date,
+                    jobResultJobConfigId: jobResult2.job.ident(),
+                    measuredEvent: measuredEvent1,
+                    customConnectivityName: null,
+                    noTrafficShapingAtAll: true,
+                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+            ).save()
+
+            new EventResult(
+                    numberOfWptRun: 1,
+                    cachedView: CachedView.UNCACHED,
+                    medianValue: true,
+                    wptStatus: 200,
+                    docCompleteIncomingBytes: 45976,
+                    docCompleteRequests: 45,
+                    docCompleteTimeInMillisecs: 458,
+                    domTimeInMillisecs: 450,
+                    firstByteInMillisecs: 453,
+                    fullyLoadedIncomingBytes: 45360,
+                    fullyLoadedRequestCount: 45,
+                    fullyLoadedTimeInMillisecs: 4505,
+                    loadTimeInMillisecs: 456,
+                    startRenderInMillisecs: 455,
+                    csByWptDocCompleteInPercent: 45.6157,
+                    csByWptVisuallyCompleteInPercent: 45,
+                    speedIndex: 457,
+                    visuallyCompleteInMillisecs: 456,
+                    jobResult: jobResult3,
+                    jobResultDate: jobResult3.date,
+                    jobResultJobConfigId: jobResult3.job.ident(),
+                    measuredEvent: measuredEvent1,
+                    customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
+                    noTrafficShapingAtAll: false,
+                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+            ).save()
+
+            new EventResult(
+                    numberOfWptRun: 1,
+                    cachedView: CachedView.UNCACHED,
+                    medianValue: true,
+                    wptStatus: 200,
+                    docCompleteIncomingBytes: 55976,
+                    docCompleteRequests: 55,
+                    docCompleteTimeInMillisecs: 558,
+                    domTimeInMillisecs: 550,
+                    firstByteInMillisecs: 553,
+                    fullyLoadedIncomingBytes: 55360,
+                    fullyLoadedRequestCount: 55,
+                    fullyLoadedTimeInMillisecs: 5505,
+                    loadTimeInMillisecs: 556,
+                    startRenderInMillisecs: 555,
+                    csByWptDocCompleteInPercent: 55.6157,
+                    csByWptVisuallyCompleteInPercent: 55,
+                    speedIndex: 557,
+                    visuallyCompleteInMillisecs: 556,
+                    jobResult: jobResult2,
+                    jobResultDate: jobResult2.date,
+                    jobResultJobConfigId: jobResult2.job.ident(),
+                    measuredEvent: measuredEvent1,
+                    customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
+                    noTrafficShapingAtAll: false,
+                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+            ).save()
         }
 
     }
@@ -1002,6 +1330,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_SPEED_INDEX, MeasurandGroup.UNDEFINED);
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_VISUALLY_COMPLETE, MeasurandGroup.LOAD_TIMES);
         TestDataUtil.createAggregatorType(AggregatorType.RESULT_CACHED_CS_BASED_ON_VISUALLY_COMPLETE_IN_PERCENT, MeasurandGroup.PERCENTAGES);
+
 
     }
 

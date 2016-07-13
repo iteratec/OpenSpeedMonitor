@@ -41,6 +41,7 @@ class EventResultDashboardPage extends Page {
         graphColorField { $(".swatch").attr("style") }
         graphLineDiv { $(".path") }
         graphLine { $(".path").attr("d") }
+        graphLine2{ $(".path")[1].attr("d")}
         dataMarker { $(".pointMarker") }
         dataLabel { $(".dataLabel") }
         saveAsDashboardButton(required: false) { $("a", href: "#CreateUserspecifiedDashboardModal") }
@@ -56,6 +57,20 @@ class EventResultDashboardPage extends Page {
         appendedInputBelowRequestSizesTimesTextField { $("#appendedInputBelowRequestSizes") }
         appendedInputAboveRequestSizesTextField { $("#appendedInputAboveRequestSizes") }
 
+        pageTab{$("a",href:"#tab1")}
+        browserTab{$("a",href:"#tab2")}
+        connectivityTab{$("a",href:"#tab3")}
+        selectBrowsersList{$("#selectedBrowsersHtmlId").find("option").contextElements }
+        selectAllBrowserButton{$("#selectedAllBrowsers")}
+        selectConnectivityProfilesList{$("#selectedConnectivityProfilesHtmlId").find("option").contextElements }
+        selectAllConnectivityButton{$("#selectedAllConnectivityProfiles")}
+        selectLocationField{$("#selectedLocationsHtmlId_chosen")}
+        selectLocationList{$(".active-result")}
+        selectAllLocationsButton{$("#selectedAllLocations")}
+        includeNativeConnectivityButton{$("#includeNativeConnectivity")}
+        includeCustomConnectivityButton{$("#includeCustomConnectivity")}
+
+
 
     }
 
@@ -68,6 +83,17 @@ class EventResultDashboardPage extends Page {
         js.exec('document.body.scrollTop -= 70;')// scroll a little more cause of the sticky header
         sleep(100)
         $('.accordion-toggle')[2].click()
+    }
+
+    public void clickFilterJobAccordion() {
+        // Scroll object into view so it becomes clickable
+        sleep(100)
+        String jqueryString = "jQuery(\'.accordion-toggle\')[1].scrollIntoView();"
+        js.exec(jqueryString)
+        sleep(100)
+        js.exec('document.body.scrollTop -= 70;')// scroll a little more cause of the sticky header
+        sleep(100)
+        $('.accordion-toggle')[1].click()
     }
 
     public void clickAdjustChartAccordion() {

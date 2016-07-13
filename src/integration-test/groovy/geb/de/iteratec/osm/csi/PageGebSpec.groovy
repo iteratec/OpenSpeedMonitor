@@ -138,7 +138,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
     void "test delete page"() {
         given: "user is at detail page of page"
         go "/page/show/" + pageId
-        at PageShowPage
+        waitFor {at PageShowPage}
 
         when: "user clicks delete button"
         deleteButton.click()

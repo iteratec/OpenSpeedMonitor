@@ -308,7 +308,7 @@ class TestDataUtil implements OsmTestLogin {
         return new CsiSystem(
                 label: label,
                 jobGroupWeights: jobGroupWeights
-        ).save(failOnError: true)
+        )
     }
 
     static JobGroupWeight createJobGroupWeight(
@@ -320,7 +320,7 @@ class TestDataUtil implements OsmTestLogin {
                 csiSystem: csiSystem,
                 jobGroup: jobGroup,
                 weight: weight
-        ).save(failOnError: true)
+        )
     }
 
     /*
