@@ -46,13 +46,19 @@ String oldVersion = buildFile.getVersion()
 println "Old AppVersion from build file is ${oldVersion}"
 
 def bamboo_jira_version = System.getenv("bamboo_jira_version") ?: ""
+def bamboo_jira_version_manually = System.getenv("bamboo_jira_version_manually") ?: ""
 String newVersion
-if ("${bamboo_jira_version}") {
-    println 'Given release-version from jira: ' + bamboo_jira_version + '...'
-    newVersion = "${bamboo_jira_version}"
-} else {
+if ( !bamboo_jira_version && !bamboo_jira_version_manually ) {
     println 'None release-version given from jira...'
     newVersion = "${oldVersion}"
+}
+if (bamboo_jira_version) {
+    println 'Given release-version from jira: ' + bamboo_jira_version + '...'
+    newVersion = bamboo_jira_version
+}
+if (bamboo_jira_version_manually) {
+    println 'Given release-version from manual run: ' + bamboo_jira_version_manually + '...'
+    newVersion = bamboo_jira_version_manually
 }
 def bamboo_build_number = System.getenv("bamboo_buildNumber")
 println "... and adding build-number ${bamboo_build_number} to version-number"
