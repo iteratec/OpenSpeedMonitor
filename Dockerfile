@@ -18,22 +18,15 @@ RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSI
 # get osm-sources and build war-file
 RUN mkdir -p $OSM_HOME $OSM_HOME/logs $OSM_CONFIG_HOME
 WORKDIR $OSM_HOME
-RUN wget https://github.com/IteraSpeed/OpenSpeedMonitor/archive/feature/detailAnalysis.zip && \
-    unzip detailAnalysis.zip -d $OSM_HOME && \
-    rm -rf detailAnalysis.zip && \
-    cd $OSM_HOME/OpenSpeedMonitor-feature-detailAnalysis && \
-    ./gradlew assemble && \
-    mv ./build/libs/*.war $OSM_HOME/OpenSpeedMonitor.war && \
-    cd $OSM_HOME/ && \
-    rm -r $OSM_HOME/OpenSpeedMonitor-feature-detailAnalysis /root/.gradle && \
-    chown osm:osm -R $OSM_HOME $OSM_CONFIG_HOME
+ADD ./build/libs/OpenSpeedMonitor*.war $OSM_HOME/OpenSpeedMonitor.war
 
 # add osm config file
-ADD templates/osm-config.yml.j2 $OSM_CONFIG_HOME/OpenSpeedMonitor-config.yml.j2
+ADD docker/templates/osm-config.yml.j2 $OSM_CONFIG_HOME/OpenSpeedMonitor-config.yml.j2
 
 # add entrypoint script
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+ADD docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && \
+    chown osm:osm -R $OSM_HOME $OSM_CONFIG_HOME
 
 USER osm
 VOLUME ["$OSM_CONFIG_HOME","$OSM_HOME/logs"]
