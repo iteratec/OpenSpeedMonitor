@@ -9,6 +9,7 @@ curl -T ./osm_war_to_deploy.war -u $bamboo_tomcat_TOMCAT_ADMIN_USERNAME:$bamboo_
 	> ./deploy_osm_war_output.txt
 
 curl_output=$(cat ./deploy_osm_war_output.txt)
+cat curl_output
 if [[ $curl_output == *"Failed to deploy application"* ]]
 then
   exit 1;
