@@ -142,6 +142,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         clickFilterJobAccordion()
         browserTab.click()
+        waitFor {selectAllBrowserButton.click()}
         waitFor {selectBrowsersList.displayed}
         selectBrowsersList[0].click()
 
@@ -196,6 +197,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         given: "User selects NotUsedLocation"
         clickFilterJobAccordion()
         browserTab.click()
+        waitFor {selectAllLocationsButton.displayed}
+        selectAllLocationsButton.click()
         waitFor {selectLocationField.displayed}
         selectLocationField.click()
         waitFor { selectLocationList[0].displayed }
@@ -253,6 +256,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         given: "User selects NotUsedBrowser"
         clickFilterJobAccordion()
         connectivityTab.click()
+        waitFor {selectAllConnectivityButton.displayed}
+        selectAllConnectivityButton.click()
         waitFor {selectConnectivityProfilesList.displayed}
         selectConnectivityProfilesList[1].click()
 
@@ -988,6 +993,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         waitFor { graphLine == "M0,-9.272183449651038L216,484.247258225324L540,35.593220338982974" }
     }
 
+    @Ignore
     void "Load custom dashboard"() {
         given: "User visits the EventResultDashboardPage"
         to EventResultDashboardPage
