@@ -123,7 +123,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     void "NotUsedBrowser leads to no data"(){
         given: "User selects NotUsedBrowser"
-        browserTab.click()
+        waitFor {browserTab.click()}
         selectBrowsersList[0].click()
 
         when: "User clicks on \"Show\" button"
@@ -131,7 +131,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$(".span12")[5].attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
@@ -174,7 +174,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$(".span12")[5].attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Graph is shown for correct Location"(){
@@ -218,7 +218,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$(".span12")[5].attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Graph is shown for correct Connectivity Profile"(){

@@ -19,7 +19,6 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page

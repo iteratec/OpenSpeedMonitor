@@ -388,7 +388,7 @@
     <g:if test="${request.queryString}">
         <g:if test="${!warnAboutLongProcessingTime}">
             <div class="row">
-                <div class="span12">
+                <div class="span12" id="noDataForCurrentSelectionWarning">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
                 </div>

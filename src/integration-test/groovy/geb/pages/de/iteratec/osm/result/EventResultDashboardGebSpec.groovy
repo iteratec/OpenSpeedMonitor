@@ -113,7 +113,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { $(".span12")[7].attr("innerHTML").contains("No data available for your selection.") }
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Valid selection graph is shown"() {
@@ -152,7 +152,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$(".span12")[7].attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
@@ -207,7 +207,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$(".span12")[7].attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Graph is shown for correct Location"(){
@@ -262,7 +262,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$(".span12")[7].attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
     }
 
     void "Graph is shown for correct Connectivity Profile"(){
