@@ -43,8 +43,8 @@ else
       echo "pull --rebase $remote release"
       git pull --rebase $remote release >> ./push_new_versionnumber_out
 
-      echo "git tag 'Release ${jira_version}'"
-      git tag "Release ${jira_version}" >> ./push_new_versionnumber_out
+      echo "git tag 'v${jira_version}'"
+      git tag "v${jira_version}" >> ./push_new_versionnumber_out
       echo "git push --tags $remote HEAD:refs/heads/release"
       git push --tags $remote HEAD:refs/heads/release >> ./push_new_versionnumber_out
 
