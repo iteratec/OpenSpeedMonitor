@@ -44,7 +44,7 @@ import spock.lang.Specification
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
-@TestFor(LocationAndResultPersisterService)
+@TestFor(ResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, ConnectivityProfile])
 class PersistConnectivityInNewEventResultSpec extends Specification{
 
@@ -63,7 +63,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     public static final String LABEL_SINGLESTEP_JOB = 'IE_otto_hp_singlestep'
     public static final String NAME_PREDEFINED_CONNECTIVITY_PROFILE = 'DSL 6.000'
 
-    LocationAndResultPersisterService serviceUnderTest
+    ResultPersisterService serviceUnderTest
     ServiceMocker mocker
     def doWithSpring = {
         pageService(PageService)

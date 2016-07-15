@@ -682,15 +682,6 @@ class EventResultServiceTests {
 		assertEquals(2, result.size())
 	}
 
-	@Ignore("Currently tested with integration test cause GORM does not support EQL in unit tests. After method is changed to use the criteria API this need to be tested in an integration test.")
-	@Test
-	void _testFindByAgentAndByBrowserBetweenDateAsMap() {
-		def result = serviceUnderTest.findByAgentAndByBrowserBetweenDateAsMap(null, null, twoHoursAgo, now)
-
-		assertNotNull(result)
-		assertEquals(9, result.size())
-	}
-
 	/**
 	 * <p>
 	 * Tests the query in a real world scenario, so all data is generated as 

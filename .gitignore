@@ -45,7 +45,6 @@ src/java/logging.properties
 # misc
 testorder*.txt
 test/resources/**/private_*
-node_modules/
 
 # ignore h2 dumps
 *.h2.gzip
@@ -62,3 +61,9 @@ grails-app/assets/javascripts/lib
 grails-app/assets/stylesheets/lib
 # the bootstrap.js was not created by the plugin
 !grails-app/assets/javascripts/lib/bootstrap/bootstrap.js
+
+# ci/bamboo specifics
+version.properties
+
+# local scripts
+scripts/local

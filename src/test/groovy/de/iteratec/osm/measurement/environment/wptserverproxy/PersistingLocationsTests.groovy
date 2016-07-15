@@ -18,17 +18,15 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.BrowserService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.issc.*
-import de.iteratec.osm.ConfigService
-import de.iteratec.osm.measurement.schedule.*
-import de.iteratec.osm.result.*
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import groovy.mock.interceptor.MockFor
@@ -37,7 +35,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-import static org.junit.Assert.*
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 
 /**
  * Tests the saving of locations and results. These functions are used in proxy-mechanism.
@@ -46,7 +45,7 @@ import static org.junit.Assert.*
  * @see {@link ProxyService}
  * 
  */
-@TestFor(LocationAndResultPersisterService)
+@TestFor(LocationPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 class PersistingLocationsTests {
 
@@ -56,7 +55,7 @@ class PersistingLocationsTests {
 	
 	Browser undefinedBrowser;
 	
-	LocationAndResultPersisterService serviceUnderTest
+	LocationPersisterService serviceUnderTest
 
 	@Before 
 	void setUp() {

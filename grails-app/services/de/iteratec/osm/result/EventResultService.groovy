@@ -250,49 +250,7 @@ class EventResultService {
 		def zipStream = new GZIPInputStream(inputStream)
 		return zipStream.text
 	}
-	
-	/**
-	 * CSI Dashboard Kramz
-	 */	
-	Map findByAgentAndByBrowserBetweenDateAsMap(String agent, String browser, Date fromDate, Date toDate) {
-		String agentCondition = agent?agent:"'%'"
-		String browserCondition = browser?browser:"'%'"
-		
-		JobResult jobResultsInDateRange = JobResult.findAllByDateBetween(fromDate, toDate)
-		Collection<EventResult> temp = []
-		
-		jobResultsInDateRange.each {temp.addAll(it.getEventResults())}
-		
-		/**
-		 * Convert to Map in format
-		 * [
-		 *   jobname1: [timestamp1:customerSatisfaction1, ..., timestampN:customerSatisfactionN,],
-		 *   ...,
-		 *   jobnameN: [...]
-		 * ]
-		 */
-		Map resultMap = new TreeMap();
-		if (temp.size() > 0) {
-			temp.each { curObj ->
-				
-				String jobName = curObj[0];
-				Long date = ((Date) curObj[1]).getTime();
-				Integer customerSatisfactionInPercent = curObj[2];
-				
-				Map map = resultMap.get(jobName);
-				if (map == null) {
-					map = [:];
-					resultMap.put(jobName, map);
-				}
-				
-				map.put(date, customerSatisfactionInPercent);	
-				map.sort()
-			}
-		}
-		
-		return resultMap
-	}
-	
+
 	/**
 	 * <p>
 	 * Proofs whether toProof is relevant for calculation of customer satisfaction index (csi). 

@@ -13,11 +13,11 @@ grails:
       osm:
         security:
           initialOsmAdminUser:
-            username: '%OSM_ADMIN_USER%'
-            password: '%OSM_ADMIN_PASSWORD%'
+            username: '{{ default .Env.OSM_ADMIN_USER "admin" }}'
+            password: '{{ default .Env.OSM_ADMIN_PASSWORD "secret123" }}'
           initialOsmRootUser:
-            username: '%OSM_ROOT_USER%'
-            password: '%OSM_ROOT_PASSWORD%'
+            username: '{{ default .Env.OSM_ROOT_USER "root" }}'
+            password: '{{ default .Env.OSM_ROOT_PASSWORD "muchMoreSecret!123" }}'
       report:
         chart:
           chartTagLib: RICKSHAW
@@ -28,11 +28,11 @@ grails:
 environments:
   production:
     grails:
-      serverURL: "%OSM_URL%"
+      serverURL: '{{ default .Env.OSM_URL "http://localhost:8080"}}'
     dataSource:
-      url: "jdbc:mysql://%MYSQL_HOST%/%MYSQL_DATABASE%"
-      username: "%MYSQL_USER%"
-      password: "%MYSQL_PASSWORD%"
+      url: 'jdbc:mysql://{{ default .Env.MYSQL_HOST "osm-mysql" }}/{{ default .Env.MYSQL_DATABASE "osm" }}'
+      username: '{{ default .Env.MYSQL_USER "osm" }}'
+      password: '{{ default .Env.MYSQL_PASSWORD "osm123" }}'
       dbCreate: "managed by liquibase"
       driverClassName: "com.mysql.jdbc.Driver"
       pooled: true

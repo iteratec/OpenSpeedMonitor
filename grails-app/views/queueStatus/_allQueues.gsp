@@ -96,7 +96,7 @@
                   <%-- <a href="../job/edit/${jobResult.job.id}">${jobResult.getStatusCodeMessage()}</a> --%>
 								 </td>
 								 <td>
-									<g:render template="../job/timeago" model="${[date: jobResult.date]}" />
+									<g:render template="/job/timeago" model="${[date: jobResult.date]}" />
 								</td>
 								</tr>
 							</g:each>

@@ -42,7 +42,7 @@ import static org.junit.Assert.assertEquals
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
-@TestFor(LocationAndResultPersisterService)
+@TestFor(ResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
@@ -52,7 +52,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
     Browser undefinedBrowser;
 
-    LocationAndResultPersisterService serviceUnderTest
+    ResultPersisterService serviceUnderTest
 
     def doWithSpring = {
         metricReportingService(MetricReportingService)

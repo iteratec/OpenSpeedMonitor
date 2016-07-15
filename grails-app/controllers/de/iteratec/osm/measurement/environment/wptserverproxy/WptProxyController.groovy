@@ -121,7 +121,7 @@ class WptProxyController {
 	 * Redirects to /xmlResult.php of wptserver afterwards.
 	 * 
 	 * @return
-	 * @see LocationAndResultPersisterService
+	 * @see ResultPersisterService
 	 */
 	def xmlResult() {
 		def wptserver = WebPageTestServer.findByProxyIdentifier(params.wptserver)

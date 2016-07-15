@@ -37,10 +37,10 @@ import spock.util.mop.ConfineMetaClassChanges
  */
 @Integration
 @Rollback
-@ConfineMetaClassChanges([LocationAndResultPersisterService, TimeToCsMappingService, CsiAggregationUpdateService, MetricReportingService])
+@ConfineMetaClassChanges([ResultPersisterService, TimeToCsMappingService, CsiAggregationUpdateService, MetricReportingService])
 class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
-    LocationAndResultPersisterService locationAndResultPersisterService
+    ResultPersisterService resultPersisterService
 
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     private static Closure originalPersistJobResultsMethod
@@ -49,8 +49,8 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
     def setup() {
 
-        originalPersistJobResultsMethod = locationAndResultPersisterService.&persistJobResult
-        originalPersistEventResultsMethod = locationAndResultPersisterService.&persistResultsOfOneTeststep
+        originalPersistJobResultsMethod = resultPersisterService.&persistJobResult
+        originalPersistEventResultsMethod = resultPersisterService.&persistResultsOfOneTeststep
         WebPageTestServer.withNewTransaction {
             createTestDataCommonToAllTests()
         }
@@ -77,7 +77,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int expectedNumberOfResults = runs * events * cachedViews
 
         when:
-        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
         JobResult.list().size() == 1
@@ -100,7 +100,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int expectedNumberOfResults = runs * events * cachedViews
 
         when:
-        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
         JobResult.list().size() == 1
@@ -121,7 +121,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int expectedNumberOfResults = 0
 
         when:
-        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
         JobResult.list().size() == expectedNumberOfResults
@@ -147,7 +147,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
         int expectedNumberOfEventResults = runs * (events - failedEvents) * cachedViews
 
         when:
-        locationAndResultPersisterService.listenToResult(xmlResult, server1)
+        resultPersisterService.listenToResult(xmlResult, server1)
 
         then:
         JobResult.list().size() == expectedNumberOfJobResults
@@ -222,13 +222,13 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     }
 
     void letPersistingJobResultThrowAnException(boolean throwException) {
-        locationAndResultPersisterService.metaClass.persistJobResult = { WptResultXml resultXml ->
+        resultPersisterService.metaClass.persistJobResult = { WptResultXml resultXml ->
             if (throwException) throw new OsmResultPersistanceException('Faked failing of JobResult persistance in integration test')
         }
     }
 
     void letPersistingEventResultsOfSpecificStepThrowAnException(int stepNumber) {
-        locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = { Integer testStepZeroBasedIndex, WptResultXml resultXml ->
+        resultPersisterService.metaClass.persistResultsOfOneTeststep = { Integer testStepZeroBasedIndex, WptResultXml resultXml ->
             if (testStepZeroBasedIndex == stepNumber) {
                 throw new OsmResultPersistanceException('Faked failing of EventResult persistance in integration test')
             } else {
@@ -238,7 +238,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     }
 
     void resetLarpServiceMetaclass() {
-        locationAndResultPersisterService.metaClass.persistJobResult = originalPersistJobResultsMethod
-        locationAndResultPersisterService.metaClass.persistResultsOfOneTeststep = originalPersistEventResultsMethod
+        resultPersisterService.metaClass.persistJobResult = originalPersistJobResultsMethod
+        resultPersisterService.metaClass.persistResultsOfOneTeststep = originalPersistEventResultsMethod
     }
 }

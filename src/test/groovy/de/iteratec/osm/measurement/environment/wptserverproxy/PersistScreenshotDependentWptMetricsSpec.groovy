@@ -42,7 +42,7 @@ import static org.junit.Assert.assertThat
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
-@TestFor(LocationAndResultPersisterService)
+@TestFor(ResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script])
 class PersistScreenshotDependentWptMetricsSpec {
 
@@ -72,7 +72,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     public static final String RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
     public static final String RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
 
-    LocationAndResultPersisterService serviceUnderTest
+    ResultPersisterService serviceUnderTest
     ServiceMocker mocker
 
     def doWithSpring = {

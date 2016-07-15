@@ -14,14 +14,26 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-//= require jquery/jquery-1.12.3.js
-//= require jquery/jquery-ui-1.10.4.js
-//= require lib/bootstrap-all
+//= require jquery/jquery-1.12.3
+//= require jquery/jquery-ui-1.10.4
+//= require lib/bootstrap/bootstrap-transition
+//= require lib/bootstrap/bootstrap-alert
+//= require lib/bootstrap/bootstrap-button
+//= require lib/bootstrap/bootstrap-carousel
+//= require lib/bootstrap/bootstrap-collapse
+//= require lib/bootstrap/bootstrap-dropdown
+//= require lib/bootstrap/bootstrap-modal
+//= require lib/bootstrap/bootstrap-tooltip
+//= require lib/bootstrap/bootstrap-popover
+//= require lib/bootstrap/bootstrap-scrollspy
+//= require lib/bootstrap/bootstrap-tab
+//= require lib/bootstrap/bootstrap-typeahead
+//= require lib/bootstrap/bootstrap-affix
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
-//= require date-time-picker/bootstrap-datepicker.min.js
-//= require postload/PostLoader.js
-//= require chosen/chosen.jquery.min.js
+//= require date-time-picker/bootstrap-datepicker.min
+//= require postload/PostLoader
+//= require chosen/chosen.jquery.min
 //= require_self
 
 /**
