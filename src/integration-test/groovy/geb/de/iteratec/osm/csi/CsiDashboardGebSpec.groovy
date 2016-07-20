@@ -1,4 +1,4 @@
-package geb.pages.de.iteratec.osm.csi
+package geb.de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.BrowserConnectivityWeight
@@ -31,6 +31,7 @@ import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
+import geb.pages.de.iteratec.osm.csi.CsiDashboardPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime

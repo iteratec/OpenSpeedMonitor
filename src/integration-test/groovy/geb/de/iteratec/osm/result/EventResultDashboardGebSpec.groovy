@@ -1,4 +1,4 @@
-package geb.pages.de.iteratec.osm.result
+package geb.de.iteratec.osm.result
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.Page
@@ -18,6 +18,7 @@ import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.OsmTestLogin
 import geb.CustomUrlGebReportingSpec
+import geb.pages.de.iteratec.osm.result.EventResultDashboardPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
