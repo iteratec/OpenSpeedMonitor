@@ -18,15 +18,7 @@
 package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.api.dto.BrowserDto
-import de.iteratec.osm.api.dto.CsiConfigurationDto
-import de.iteratec.osm.api.dto.JobDto
-import de.iteratec.osm.api.dto.JobGroupDto
-import de.iteratec.osm.api.dto.LocationDto
-import de.iteratec.osm.api.dto.MeasuredEventDto
-import de.iteratec.osm.api.dto.PageDto
-import de.iteratec.osm.api.dto.CsiByEventResultsDto
-import de.iteratec.osm.api.dto.EventResultDto
+import de.iteratec.osm.api.dto.*
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
@@ -41,11 +33,9 @@ import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.report.chart.EventDaoService
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
@@ -54,16 +44,16 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import grails.converters.JSON
+import grails.databinding.BindUsing
 import grails.web.mapping.LinkGenerator
 import groovy.json.JsonSlurper
-
-import javax.persistence.NoResultException
-
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import org.quartz.CronExpression
+
+import javax.persistence.NoResultException
 
 /**
  * RestApiController
@@ -79,7 +69,8 @@ import org.quartz.CronExpression
 class RestApiController {
 
     public static final DateTimeFormatter API_DATE_FORMAT = ISODateTimeFormat.basicDateTimeNoMillis()
-    public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
+    public static
+    final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 
     JobGroupDaoService jobGroupDaoService;
     PageDaoService pageDaoService;
@@ -383,7 +374,7 @@ class RestApiController {
                         endDateTimeInclusive,
                         queryParams,
                         [WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
-            }else if (cmd.system) {
+            } else if (cmd.system) {
                 csiDtoToReturn = csiByEventResultsService.retrieveCsi(
                         startDateTimeInclusive,
                         endDateTimeInclusive,
@@ -434,12 +425,10 @@ class RestApiController {
             if (page == null) {
                 sendSimpleResponseAsStream(response, 400, "Page with name ${cmd.pageName} couldn't be found.\n")
                 return
-            }
-            else if (csiConfig == null) {
+            } else if (csiConfig == null) {
                 sendSimpleResponseAsStream(response, 400, "CsiConfiguration couldn't be found\n")
                 return
-            }
-            else {
+            } else {
                 return sendObjectAsJSON(
                         ['loadTimeInMillisecs'          : cmd.loadTimeInMillisecs,
                          'customerSatisfactionInPercent': timeToCsMappingService.getCustomerSatisfactionInPercent(cmd.loadTimeInMillisecs, page, csiConfig)],
@@ -509,6 +498,68 @@ class RestApiController {
                 jsonCsiConfiguration,
                 params.pretty && params.pretty == 'true'
         )
+    }
+
+    /**
+     * Returns the names for given ids for each requested domain
+     * @param mappingRequestCmd
+     * @return
+     */
+    public Map<String, Object> getNamesForIds(MappingRequestCommand mappingRequestCmd) {
+        Map<String, Map<Long, String>> resultMappings = [:].withDefault { [:] }
+
+        mappingRequestCmd.requestedDomains.each { domain, idList ->
+            switch (domain) {
+                case "JobGroup":
+                    List<JobGroup> jobGroups = JobGroup.findAllByIdInList(idList)
+                    jobGroups.each {
+                        resultMappings[domain].put(it.id, it.name)
+                    }
+                    break;
+                default:
+                    sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
+                    return
+            }
+        }
+
+        return sendObjectAsJSON(resultMappings as HashMap, params.pretty && params.pretty == 'true')
+    }
+
+    /**
+     * Returns the ids for given names for each requested domain
+     * @param mappingRequestCmd
+     * @return
+     */
+    public Map<String, Object> getIdsForNames(MappingRequestCommand mappingRequestCmd) {
+        Map<String, Map<Long, String>> resultMappings = [:].withDefault { [:] }
+
+        mappingRequestCmd.requestedDomains.each { domain, names ->
+            switch (domain) {
+                case "Browser":
+                    List<Browser> browsers = Browser.findAllByNameInList(names)
+                    browsers.each {
+                        resultMappings[domain].put(it.id, it.name)
+                    }
+                    break;
+                case "Location":
+                    List<Location> locations = Location.findAllByLabelInList(names)
+                    locations.each {
+                        resultMappings[domain].put(it.id, it.label)
+                    }
+                    break;
+                case "Page":
+                    List<Page> pages = Page.findAllByNameInList(names)
+                    pages.each {
+                        resultMappings[domain].put(it.id, it.name)
+                    }
+                    break;
+                default:
+                    sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
+                    return
+            }
+        }
+
+        return sendObjectAsJSON(resultMappings as HashMap, params.pretty && params.pretty == 'true')
     }
 
     /**
@@ -603,7 +654,7 @@ class RestApiController {
             return
         }
 
-        if (!CronExpression.isValidExpression(schedule)){
+        if (!CronExpression.isValidExpression(schedule)) {
             sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
                     "(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
             return
@@ -1056,4 +1107,20 @@ class TranslateCustomerSatisfactionCommand {
             return jobGroup ? jobGroup.csiConfiguration : null
         }
     }
+}
+
+/**
+ * The command object for the rest methods
+ * /rest/domain/idsForNames
+ * /rest/domain/namesForIds
+ */
+class MappingRequestCommand {
+    @BindUsing({ obj, source ->
+        if (source['requestedDomains'] instanceof HashMap) {
+            obj = source['requestedDomains']
+        } else {
+            obj = JSON.parse(source['requestedDomains'])
+        }
+    })
+    Map<String, List> requestedDomains = [:].withDefault { [] }
 }

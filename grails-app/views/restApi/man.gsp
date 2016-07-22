@@ -16,7 +16,9 @@
 					<li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
 					<li><a href="#system-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;JobGroup CSI</a></li>
                     <li><a href="#page-csi">&raquo;&nbsp;<strong>GET</strong>&nbsp;Page CSI</a></li>
-					<li><a href="#getCsiConfiguration">&raquo;&nbsp;<strong>GET</strong>&nbsp;Get CsiConfiguration as JSON</a></li>
+					<li><a href="#getCsiConfiguration">&raquo;&nbsp;<strong>GET</strong>&nbsp;CsiConfiguration as JSON</a></li>
+					<li><a href="#getNamesForIds">&raquo;&nbsp;<strong>GET</strong>&nbsp;names for Ids for several domains</a></li>
+					<li><a href="#getIdsForNames">&raquo;&nbsp;<strong>GET</strong>&nbsp;ids for names for several domains</a></li>
 					<li><a href="#translateToCustomerSatisfaction">&raquo;&nbsp;<strong>GET</strong>&nbsp;Translate to Customer Satisfaction</a></li>
 					<li><a href="#get-result-urls">&raquo;&nbsp;<strong>GET</strong>&nbsp;Result URL's of Job</a></li>
 					<li><a href="#job-activation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;Job activation</a></li>
@@ -318,7 +320,7 @@
 					</dl>
 
 					<h3>Potential outcomes of a request</h3>
-					<dl>
+					<dl>[timestampFrom]
 						<dt>HTTP status 200 OK</dt>
 						<dd>
 							The request handled successfully, a result in JSON notation is
@@ -338,7 +340,101 @@
 
 				</div>
 
-				<div id="translateToCustomerSatisfaction">
+				<div id="getNamesForIds">
+
+					<h2>GET Method:&nbsp;<span class="text-info">Get names for ids for several domains</span></h2>
+
+					<h3>Request signature</h3>
+					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/domain/namesForIds/[requestedDomains]</code></p>
+					<p>
+						The request URL consists of <a href="#rest_base_path">REST-base-path</a> the word <em>domain</em> and the name of the method <em>namesForIds</em>.
+					</p>
+                    <p>
+                        Example URI for the JobGroups with id 1 and 2
+                        <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/domain/namesForIds/%7B%22JobGroup%22%3A%5B1%2C2%5D%7D</code>
+                    </p>
+
+					<h3>Potential outcomes of a request</h3>
+					<dl>
+						<dt>HTTP status 200 OK</dt>
+						<dd>
+							The request handled successfully, a result in JSON notation is
+							returned. It contains all requested domains. They again map the requested ids to the names.<br>
+                            Response example:
+    <pre>
+    {"Target":
+        {"JobGroup":
+            {
+            "1":"NameForJobGroupWithId1",
+            "2":"NameForJobGroupWithId2"
+            }
+        }
+    }</pre>
+                            <br />
+							The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.
+						</dd>
+						<dt>HTTP status 400 Bad Request</dt>
+						<dd>One or more requested domains doesn't exist. An error message with details is attached as response.
+							<br />
+							The response is of type text/plain (encoding UTF-8).
+						</dd>
+					</dl>
+
+					<hr>
+
+				</div>
+
+                <div id="getIdsForNames">
+
+                    <h2>GET Method:&nbsp;<span class="text-info">Get ids for names for several domains</span></h2>
+
+                    <h3>Request signature</h3>
+                    <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/domain/idsForNames/[requestedDomains]</code></p>
+                    <p>
+                        The request URL consists of <a href="#rest_base_path">REST-base-path</a> the word <em>domain</em> and the name of the method <em>idsForNames</em>.
+                    </p>
+                    <p>
+                        Example URI for the browsers with name chrome and firefox
+                        <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/domain/idsForNames/%7B"Browser"%3A%5B"Chrome"%2C"Firefox"%5D%7D</code>
+                    </p>
+
+                    <h3>Potential outcomes of a request</h3>
+                    <dl>
+                        <dt>HTTP status 200 OK</dt>
+                        <dd>
+                            The request handled successfully, a result in JSON notation is
+                            returned. It contains all requested domains. They again map the requested ids to the names.<br>
+                            Response example:
+                            <pre>
+    {"Target:"
+        {"Browser":
+            {
+            "1":"NameForBrowserWithId1",
+            "2":"NameForBrowserWithId2"
+            },
+        "Page":
+            {
+            "1":"NameForPageWithId1",
+            "2":"NameForPageWithId2"
+            }
+        }
+    }</pre>
+                            <br />
+                            The response is of type application/json (encoding UTF-8) as described in <a href="http://tools.ietf.org/html/rfc4627">RFC4627</a>.
+                        </dd>
+                        <dt>HTTP status 400 Bad Request</dt>
+                        <dd>One or more requested domains doesn't exist. An error message with details is attached as response.
+                            <br />
+                            The response is of type text/plain (encoding UTF-8).
+                        </dd>
+                    </dl>
+
+                    <hr>
+
+                </div>
+
+
+                <div id="translateToCustomerSatisfaction">
 
 					<h2>GET Method:&nbsp;<span class="text-info">Translate to Customer Satisfaction</span></h2>
 

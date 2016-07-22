@@ -1,35 +1,22 @@
 package de.iteratec.osm.api
 
-import de.iteratec.osm.api.dto.BrowserDto
-import de.iteratec.osm.api.dto.CsiConfigurationDto
-import de.iteratec.osm.api.dto.JobGroupDto
-import de.iteratec.osm.api.dto.LocationDto
-import de.iteratec.osm.api.dto.MeasuredEventDto
-import de.iteratec.osm.api.dto.PageDto
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMapping
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.DefaultBrowserDaoService
-import de.iteratec.osm.measurement.environment.DefaultLocationDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.api.dto.*
+import de.iteratec.osm.csi.*
+import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import grails.converters.JSON
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import grails.test.runtime.FreshRuntime
 import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
 @TestFor(RestApiController)
-@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent,Page, Browser, Location, WebPageTestServer])
+@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job])
 class RestApiControllerSpec extends Specification {
     RestApiController controllerUnderTest
     CsiConfiguration csiConfiguration
@@ -49,6 +36,7 @@ class RestApiControllerSpec extends Specification {
         defaultPageDaoService(DefaultPageDaoService)
         defaultLocationDaoService(DefaultLocationDaoService)
     }
+
     void "setup"() {
         controllerUnderTest = controller
 
@@ -181,6 +169,94 @@ class RestApiControllerSpec extends Specification {
         controllerUnderTest.getCsiConfiguration()
 
         then:
+        response.status == 400
+    }
+
+    void "getting correct mappings for domain classes"() {
+        when: "user requests mappings"
+        def requestMap = [:]
+        requestMap.put(requestedDomain, requestedIDs)
+        params.requestedDomains = requestMap
+        controllerUnderTest.getNamesForIds()
+
+        then: "response contains correct mappings"
+        response.status == 200
+        JSONObject resultJSON = JSON.parse(response.text)
+        resultJSON.target[requestedDomain].size() == expectedMappings.size()
+        resultJSON.target[requestedDomain].each { key, value ->
+            expectedMappings[key] == value
+        }
+
+        where:
+        requestedDomain | requestedIDs || expectedMappings
+        "JobGroup"      | [1, 2, 3, 4] || [1: "jobGroup1", 2: "jobGroup2", 3: "jobGroup3", 4: "jobGroup4"]
+    }
+
+    void "getting correct ids for names"() {
+        given: "some data for retrievable domain clases"
+        WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer("wptServer", "identifier", false, "http://internet.de")
+        TestDataUtil.createLocation(wptServer, "location1", browser1, false)
+        TestDataUtil.createLocation(wptServer, "location2", browser2, false)
+
+        when: "user requests mappings"
+        def requestMap = [:]
+        requestMap.put(requestedDomain, requestedNames)
+        params.requestedDomains = requestMap
+        controllerUnderTest.getIdsForNames()
+
+        then: "response contains correct mappings"
+        response.status == 200
+        JSONObject resultJSON = JSON.parse(response.text)
+        resultJSON.target[requestedDomain].size() == expectedMappings.size()
+        resultJSON.target[requestedDomain].each { key, value ->
+            expectedMappings[key] == value
+        }
+
+        where:
+        requestedDomain | requestedNames             || expectedMappings
+        "Browser"       | ["browser1", "browser2"]   || [1: "browser1", 2: "browser2"]
+        "Page"          | ["testPage1", "testPage2"] || [1: "testPage1", 2: "testPage2"]
+        "Location"      | ["location1", "location2"] || [1: "location1", 2: "location2"]
+    }
+
+    void "getting correct mappings for domain classes with serveral domains"() {
+        when: "user requests mappings"
+        def requestMap = [:]
+        requestMap.put("Browser", ["browser1", "browser2"])
+        requestMap.put("Page", ["testPage1", "testPage2"])
+        params.requestedDomains = requestMap
+        controllerUnderTest.getIdsForNames()
+
+        then: "response contains correct mappings"
+        response.status == 200
+        JSONObject resultJSON = JSON.parse(response.text)
+        resultJSON.target["Browser"].size() == 2
+        resultJSON.target["Browser"]["1"] ==  "browser1"
+        resultJSON.target["Browser"]["2"] ==  "browser2"
+        resultJSON.target["Page"].size() == 2
+        resultJSON.target["Page"]["1"] ==  "testPage1"
+        resultJSON.target["Page"]["2"] ==  "testPage2"
+    }
+
+    void "return 400 if requested domain class does not exists"() {
+        when: "user requests names for ids with bad request"
+        def requestMap = [:]
+        requestMap.put("JobGroup", [1, 2])
+        requestMap.put("wrong domain", [1, 2])
+        params.requestedDomains = requestMap
+        controllerUnderTest.getNamesForIds()
+
+        then: "response contains correct mappings"
+        response.status == 400
+
+        when: "user requests ids for names with bad request"
+        requestMap = [:]
+        requestMap.put("Browser", ["browser1"])
+        requestMap.put("wrong domain", ["name"])
+        params.requestedDomains = requestMap
+        controllerUnderTest.getIdsForNames()
+
+        then: "response contains correct mappings"
         response.status == 400
     }
 
