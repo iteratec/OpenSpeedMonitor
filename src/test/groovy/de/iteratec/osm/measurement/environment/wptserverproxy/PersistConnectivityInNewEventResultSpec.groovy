@@ -40,22 +40,25 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import groovy.util.slurpersupport.GPathResult
 import spock.lang.Specification
+
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(ResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, ConnectivityProfile])
-class PersistConnectivityInNewEventResultSpec extends Specification{
+class PersistConnectivityInNewEventResultSpec extends Specification {
 
     public static final String PROXY_IDENTIFIER_WPT_SERVER = 'dev.server02.wpt.iteratec.de'
 
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml'
+    public static
+    final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2 = 'otto_search_shoes'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3 = 'otto_product_boot'
 
-    public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'Result_wptserver2.15_singlestep_1Run_WithVideo.xml'
+    public static
+    final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'Result_wptserver2.15_singlestep_1Run_WithVideo.xml'
     public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
 
     public static Page UNDEFINED_PAGE
@@ -69,6 +72,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         pageService(PageService)
         performanceLoggingService(PerformanceLoggingService)
     }
+
     void setup() {
 
         serviceUnderTest = service
@@ -88,11 +92,11 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         UNDEFINED_PAGE = TestDataUtil.createUndefinedPage()
 
         Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
-        TestDataUtil.createJob(LABEL_MULTISTEP_JOB, testScript, locationFirefox, jobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob(LABEL_MULTISTEP_JOB, testScript, locationFirefox, jobGroup, '', 1, false, 60)
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1, UNDEFINED_PAGE)
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2, UNDEFINED_PAGE)
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3, UNDEFINED_PAGE)
-        TestDataUtil.createJob(LABEL_SINGLESTEP_JOB, testScript, locationIe, jobGroup, '', 1 , false, 60)
+        TestDataUtil.createJob(LABEL_SINGLESTEP_JOB, testScript, locationIe, jobGroup, '', 1, false, 60)
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME, UNDEFINED_PAGE)
         TestDataUtil.createConnectivityProfile(NAME_PREDEFINED_CONNECTIVITY_PROFILE)
     }
@@ -114,7 +118,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     void "MULTISTEP: persisting predefined connectivity profile in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.setPredefinedConnectivityForJob(
                 ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
                 Job.findByLabel(LABEL_MULTISTEP_JOB)
@@ -134,10 +138,11 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         allResults[2].customConnectivityName == null
 
     }
+
     void "MULTISTEP: persisting custom connectivity in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
         TestDataUtil.setCustomConnectivityForJob(multistepJob)
         multistepJob.refresh()
@@ -156,10 +161,11 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
         allResults[2].customConnectivityName == multistepJob.customConnectivityName
 
     }
+
     void "MULTISTEP: persisting native connectivity in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_MULTISTEP_JOB)
         TestDataUtil.setNativeConnectivityForJob(multistepJob)
         multistepJob.refresh()
@@ -187,7 +193,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     void "SINGLESTEP: persisting predefined connectivity profile in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.setPredefinedConnectivityForJob(
                 ConnectivityProfile.findByName(NAME_PREDEFINED_CONNECTIVITY_PROFILE),
                 Job.findByLabel(LABEL_SINGLESTEP_JOB)
@@ -209,7 +215,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     void "SINGLESTEP: persisting custom connectivity in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
         TestDataUtil.setCustomConnectivityForJob(multistepJob)
         multistepJob.refresh()
@@ -230,7 +236,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification{
     void "SINGLESTEP: persisting native connectivity in event result"() {
         setup:
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         Job multistepJob = Job.findByLabel(LABEL_SINGLESTEP_JOB)
         TestDataUtil.setNativeConnectivityForJob(multistepJob)
         multistepJob.refresh()

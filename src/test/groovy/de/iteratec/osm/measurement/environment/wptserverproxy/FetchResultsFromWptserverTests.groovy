@@ -167,7 +167,7 @@ class FetchResultsFromWptserverTests extends Specification {
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('test/resources/WptResultXmls/Multistep_1Run_11Events_JustFirstView.xml')
-        GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
+        WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
         // Run the test:
@@ -179,7 +179,7 @@ class FetchResultsFromWptserverTests extends Specification {
         assertThat(statusCode, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
-        assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
+        listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
     }
     //	TestSkript:
     //	setEventName	otto_homepage
@@ -196,7 +196,7 @@ class FetchResultsFromWptserverTests extends Specification {
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml')
-        GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
+        WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
         // Run the test:
@@ -208,7 +208,7 @@ class FetchResultsFromWptserverTests extends Specification {
         assertThat(statusCode, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
-        assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
+        listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
     }
 
     //	TestSkript:
@@ -226,7 +226,7 @@ class FetchResultsFromWptserverTests extends Specification {
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo.xml')
-        GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
+        WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
         // Run the test:
@@ -238,7 +238,7 @@ class FetchResultsFromWptserverTests extends Specification {
         assertThat(statusCode, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
-        assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
+        listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
     }
     //	TestSkript:
     //	setEventName	IE_otto_hp_singlestep
@@ -251,7 +251,7 @@ class FetchResultsFromWptserverTests extends Specification {
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml')
-        GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
+        WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
         // Run the test:
@@ -263,7 +263,7 @@ class FetchResultsFromWptserverTests extends Specification {
         assertThat(statusCode, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
-        assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
+        listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
     }
     //	TestSkript:
     //	setEventName	IE_otto_hp_singlestep
@@ -276,7 +276,7 @@ class FetchResultsFromWptserverTests extends Specification {
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
         File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.15_singlestep_1Run_WithVideo.xml')
-        GPathResult expectedResult = new XmlSlurper().parseText(resultXmlFile.text)
+        WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
         // Run the test:
@@ -288,13 +288,13 @@ class FetchResultsFromWptserverTests extends Specification {
         assertThat(statusCode, is(200))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
-        assertThat(listener.resultOfLastListening.data, is(expectedResult.data))
+        listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
     }
 
     class TestResultResultListener implements iResultListener {
 
         int resultListeningCounter = 0
-        GPathResult resultOfLastListening
+        WptResultXml resultOfLastListening
         WebPageTestServer wptserverOfLastListening
 
         public String getListenerName() { return 'test-resultListeners' }
@@ -302,10 +302,10 @@ class FetchResultsFromWptserverTests extends Specification {
         public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserver) { return [] }
 
         public void listenToResult(
-                GPathResult result,
+                WptResultXml xmlResult,
                 WebPageTestServer wptserver
         ) {
-            resultOfLastListening = result
+            resultOfLastListening = xmlResult
             wptserverOfLastListening = wptserver
             resultListeningCounter++
         }

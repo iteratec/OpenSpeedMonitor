@@ -74,7 +74,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                 active: true
         ).save(failOnError: true, validate: false)
 
-        undefinedJobGroup=new JobGroup(
+        undefinedJobGroup = new JobGroup(
                 name: JobGroup.UNDEFINED_CSI
         );
         undefinedJobGroup.save(failOnError: true);
@@ -89,10 +89,10 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
-    void createLocationsAndJobs(){
+    void createLocationsAndJobs() {
         Location testLocation = TestDataUtil.createLocation(server, 'test-location', Browser.findByName('IE'), true)
-        if(Job.findByLabel('FF_Otto_multistep') == null) TestDataUtil.createJob('FF_Otto_multistep', Script.createDefaultScript('FF_Otto_multistep'), testLocation, undefinedJobGroup, '', 1 , false, 60)
-        if(Job.findByLabel('IE_otto_hp_singlestep') == null) TestDataUtil.createJob('IE_otto_hp_singlestep', Script.createDefaultScript('IE_otto_hp_singlestep'), testLocation, undefinedJobGroup, '', 1 , false, 60)
+        if (Job.findByLabel('FF_Otto_multistep') == null) TestDataUtil.createJob('FF_Otto_multistep', Script.createDefaultScript('FF_Otto_multistep'), testLocation, undefinedJobGroup, '', 1, false, 60)
+        if (Job.findByLabel('IE_otto_hp_singlestep') == null) TestDataUtil.createJob('IE_otto_hp_singlestep', Script.createDefaultScript('IE_otto_hp_singlestep'), testLocation, undefinedJobGroup, '', 1, false, 60)
     }
 
     @Test
@@ -100,7 +100,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        GPathResult xmlResult = new XmlSlurper().parse(file)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', true)
@@ -113,7 +113,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationTagService('notTheConcernOfThisTest')
 
         // Mock Location needed!
-        mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
+        mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
 
         //test execution
 
@@ -149,7 +149,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        GPathResult xmlResult = new XmlSlurper().parse(file)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', false)
@@ -162,7 +162,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationTagService('notTheConcernOfThisTest')
 
         // Mock Location needed!
-        mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
+        mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
 
         //test execution
         serviceUnderTest.listenToResult(xmlResult, server)
@@ -191,7 +191,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        GPathResult xmlResult = new XmlSlurper().parse(file)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', true)
@@ -203,9 +203,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockPageService()
         mockCsiAggregationTagService('notTheConcernOfThisTest')
 
-
         // Mock Location needed!
-        mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
+        mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
 
         //test execution
 
@@ -235,7 +234,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        GPathResult xmlResult = new XmlSlurper().parse(file)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', false)
         deleteResults()
@@ -248,7 +247,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationTagService('notTheConcernOfThisTest')
 
         // Mock Location needed!
-        mockLocation(xmlResult.data.location.toString(), undefinedBrowser, server);
+        mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
 
         //test execution
 
@@ -273,7 +272,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         assertEquals("Test expected size of all non median values", 0, EventResult.findAllByMedianValue(false).size())
     }
 
-    private void deleteResults(){
+    private void deleteResults() {
         EventResult.list()*.delete(flush: true)
         JobResult.list()*.delete(flush: true)
         MeasuredEvent.list()*.delete(flush: true)
@@ -294,7 +293,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                 lastUpdated: new Date()
         ).save(failOnError: true);
     }
-    private void mockTimeToCsMappingService(){
+
+    private void mockTimeToCsMappingService() {
         def timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
         timeToCsMappingService.metaClass.getCustomerSatisfactionInPercent = { Integer docCompleteTime, Page testedPage, csiConfiguration ->
             return 1
@@ -307,7 +307,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         }
         serviceUnderTest.timeToCsMappingService = timeToCsMappingService
     }
-    private void mockCsiAggregationUpdateService(){
+
+    private void mockCsiAggregationUpdateService() {
         def csiAggregationUpdateServiceMocked = grailsApplication.mainContext.getBean('csiAggregationUpdateService')
         csiAggregationUpdateServiceMocked.metaClass.createOrUpdateDependentMvs = { EventResult newResult ->
             //not the concern of this test
@@ -315,24 +316,26 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         }
         serviceUnderTest.csiAggregationUpdateService = csiAggregationUpdateServiceMocked
     }
-    private void mockPageService(){
+
+    private void mockPageService() {
         def pageServiceMocked = grailsApplication.mainContext.getBean('pageService')
         pageServiceMocked.metaClass.getPageByStepName = { String pageName ->
             def tokenized = pageName.tokenize(PageService.STEPNAME_DELIMITTER)
-            return tokenized.size() == 2 ? Page.findByName(tokenized[0]):Page.findByName(Page.UNDEFINED)
+            return tokenized.size() == 2 ? Page.findByName(tokenized[0]) : Page.findByName(Page.UNDEFINED)
         }
         pageServiceMocked.metaClass.getDefaultStepNameForPage = { Page page ->
             //not the concern of this test
             return Page.findByName('HP').name + PageService.STEPNAME_DELIMITTER + PageService.STEPNAME_DEFAULT_STEPNUMBER
         }
         pageServiceMocked.metaClass.excludePagenamePart = { String stepName ->
-            return stepName.contains(PageService.STEPNAME_DELIMITTER)?
-                    stepName.substring(stepName.indexOf(PageService.STEPNAME_DELIMITTER)+PageService.STEPNAME_DELIMITTER.length(), stepName.length()):
+            return stepName.contains(PageService.STEPNAME_DELIMITTER) ?
+                    stepName.substring(stepName.indexOf(PageService.STEPNAME_DELIMITTER) + PageService.STEPNAME_DELIMITTER.length(), stepName.length()) :
                     stepName
         }
         serviceUnderTest.pageService = pageServiceMocked
     }
-    private void mockCsiAggregationTagService(String tagToReturn){
+
+    private void mockCsiAggregationTagService(String tagToReturn) {
         def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
         csiAggregationTagService.metaClass.createEventResultTag = {
             JobGroup jobGroup,
@@ -348,7 +351,8 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         }
         serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
-    private void mockMetricReportingService(){
+
+    private void mockMetricReportingService() {
         def metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
         metricReportingService.metaClass.reportEventResultToGraphite = {
             EventResult result ->
@@ -359,15 +363,15 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
 
     // create testdata common to all tests /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private createBrowsers(){
-        String browserName=Browser.UNDEFINED
-        undefinedBrowser=new Browser(
+    private createBrowsers() {
+        String browserName = Browser.UNDEFINED
+        undefinedBrowser = new Browser(
                 name: browserName,
                 weight: 0)
                 .addToBrowserAliases(alias: Browser.UNDEFINED)
                 .save(failOnError: true)
 
-        browserName="IE"
+        browserName = "IE"
         new Browser(
                 name: browserName,
                 weight: 45)
@@ -376,7 +380,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
-        browserName="FF"
+        browserName = "FF"
         new Browser(
                 name: browserName,
                 weight: 55)
@@ -386,23 +390,24 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                 .addToBrowserAliases(alias: "Firefox7")
                 .save(failOnError: true)
 
-        browserName="Chrome"
+        browserName = "Chrome"
         new Browser(
                 name: browserName,
                 weight: 55)
                 .addToBrowserAliases(alias: "Chrome")
                 .save(failOnError: true)
     }
-    private static createPages(){
-        ['HP', 'MES', Page.UNDEFINED].each{pageName ->
+
+    private static createPages() {
+        ['HP', 'MES', Page.UNDEFINED].each { pageName ->
             Double weight = 0
-            switch(pageName){
-                case 'HP' : weight = 6		; break
-                case 'MES' : weight = 9		; break
-                case 'SE' : weight = 36		; break
-                case 'ADS' : weight = 43		; break
-                case 'WKBS' : weight = 3		; break
-                case 'WK' : weight = 3		; break
+            switch (pageName) {
+                case 'HP': weight = 6; break
+                case 'MES': weight = 9; break
+                case 'SE': weight = 36; break
+                case 'ADS': weight = 43; break
+                case 'WKBS': weight = 3; break
+                case 'WK': weight = 3; break
             }
             new Page(
                     name: pageName,

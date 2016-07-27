@@ -33,7 +33,7 @@ interface iResultListener {
     public String getListenerName()
 
     public void listenToResult(
-            GPathResult result,
+            WptResultXml resultXml,
             WebPageTestServer wptserver
     )
 
@@ -153,6 +153,8 @@ class ProxyService {
             log.info("xmlResultResponse.data.runs.toString().isInteger()=${bolIsInteger}|")
         }
 
+        WptResultXml resultXml = convertGPathToWptResultXML(xmlResultResponse)
+
         if (jobLabel.length() > 0 && statusCode >= 200 && xmlResultResponse.data.runs.toString().isInteger()) {
             try {
 
@@ -161,13 +163,13 @@ class ProxyService {
                     if (listener.callListenerAsync()) {
                         Promise p = task {
                             JobResult.withNewSession {
-                                listener.listenToResult(xmlResultResponse, wptserverOfResult)
+                                listener.listenToResult(resultXml, wptserverOfResult)
                             }
                         }
                         p.onError { Throwable err -> log.error(err) }
                         p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
                     } else {
-                        listener.listenToResult(xmlResultResponse, wptserverOfResult)
+                        listener.listenToResult(resultXml, wptserverOfResult)
                     }
                 }
 
@@ -179,6 +181,11 @@ class ProxyService {
 
         return statusCode
 
+    }
+
+    private WptResultXml convertGPathToWptResultXML(GPathResult xmlResultResponse) {
+        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
+        return resultXml
     }
 
     private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, Map params) {

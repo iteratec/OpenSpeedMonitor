@@ -74,10 +74,8 @@ class ResultPersisterService implements iResultListener {
 
     @Override
     public void listenToResult(
-            GPathResult xmlResultResponse,
+            WptResultXml resultXml,
             WebPageTestServer wptserverOfResult) {
-
-        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
 
         try {
             checkJobAndLocation(resultXml, wptserverOfResult)

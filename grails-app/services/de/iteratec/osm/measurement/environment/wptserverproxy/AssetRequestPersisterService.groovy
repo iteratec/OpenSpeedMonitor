@@ -57,10 +57,8 @@ class AssetRequestPersisterService implements iResultListener {
 
     @Override
     public void listenToResult(
-            GPathResult xmlResultResponse,
+            WptResultXml resultXml,
             WebPageTestServer wptserverOfResult) {
-
-        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
 
         try {
             persistAssetRequests(resultXml, wptserverOfResult)
@@ -96,22 +94,26 @@ class AssetRequestPersisterService implements iResultListener {
         def resp
         int attempts = 0
 
-        while (!resp && resp.status != 200 && attempts < MAX_ATTEMPTS) {
+        while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
             attempts++
-            resp = client.post(path: 'restApi/persistAssetsForWptResult',
-                    body: [osmUrl: osmUrl, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
-                    requestContentType: JSON)
-            sleep(1000 * TIMEOUT_IN_SECONDS)
+            try {
+                resp = client.post(path: 'restApi/persistAssetsForWptResult',
+                        body: [osmUrl: osmUrl, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
+                        requestContentType: JSON)
+            } catch (ConnectException) {
+                sleep(1000 * TIMEOUT_IN_SECONDS)
+            }
+
         }
 
-        if(resp.status != 200)
+        if (!resp || resp.status != 200)
             throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId())
     }
 
 
     public void enablePersistenceOfAssetRequestsForJobResults(String microserviceUrl) {
         this.microserviceUrl = microserviceUrl.endsWith('/') ? microserviceUrl : microserviceUrl + "/"
-        persistenceOfAssetRequestsEnabled = true
+        this.persistenceOfAssetRequestsEnabled = true
     }
 
     public void disablePersitenceOfAssetRequestsForJobResults() {
