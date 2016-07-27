@@ -512,6 +512,7 @@ class RestApiController {
             switch (domain) {
                 case "JobGroup":
                     List<JobGroup> jobGroups = JobGroup.findAllByIdInList(idList)
+                    resultMappings[domain] = [:]
                     jobGroups.each {
                         resultMappings[domain].put(it.id, it.name)
                     }
@@ -537,18 +538,21 @@ class RestApiController {
             switch (domain) {
                 case "Browser":
                     List<Browser> browsers = Browser.findAllByNameInList(names)
+                    resultMappings[domain] = [:]
                     browsers.each {
                         resultMappings[domain].put(it.id, it.name)
                     }
                     break;
                 case "Location":
                     List<Location> locations = Location.findAllByLabelInList(names)
+                    resultMappings[domain] = [:]
                     locations.each {
                         resultMappings[domain].put(it.id, it.label)
                     }
                     break;
                 case "Page":
                     List<Page> pages = Page.findAllByNameInList(names)
+                    resultMappings[domain] = [:]
                     pages.each {
                         resultMappings[domain].put(it.id, it.name)
                     }

@@ -124,9 +124,9 @@ class RestApiControllerSpec extends Specification {
 
     void "get all Locations as JSON, when existing"() {
         given:
-        WebPageTestServer server = TestDataUtil.createWebPageTestServer("server1","web.de",true,"http://internet.de")
-        Location location1 = TestDataUtil.createLocation(server,"location1",browser1,true)
-        Location location2 = TestDataUtil.createLocation(server,"location2",browser2,true)
+        WebPageTestServer server = TestDataUtil.createWebPageTestServer("server1", "web.de", true, "http://internet.de")
+        Location location1 = TestDataUtil.createLocation(server, "location1", browser1, true)
+        Location location2 = TestDataUtil.createLocation(server, "location2", browser2, true)
 
         Collection<LocationDto> locationsAsJson = LocationDto.create([location1, location2])
 
@@ -231,11 +231,11 @@ class RestApiControllerSpec extends Specification {
         response.status == 200
         JSONObject resultJSON = JSON.parse(response.text)
         resultJSON.target["Browser"].size() == 2
-        resultJSON.target["Browser"]["1"] ==  "browser1"
-        resultJSON.target["Browser"]["2"] ==  "browser2"
+        resultJSON.target["Browser"]["1"] == "browser1"
+        resultJSON.target["Browser"]["2"] == "browser2"
         resultJSON.target["Page"].size() == 2
-        resultJSON.target["Page"]["1"] ==  "testPage1"
-        resultJSON.target["Page"]["2"] ==  "testPage2"
+        resultJSON.target["Page"]["1"] == "testPage1"
+        resultJSON.target["Page"]["2"] == "testPage2"
     }
 
     void "return 400 if requested domain class does not exists"() {
@@ -258,6 +258,24 @@ class RestApiControllerSpec extends Specification {
 
         then: "response contains correct mappings"
         response.status == 400
+    }
+
+    void "return empty map if id is not found"() {
+        when: "user requests names for non exiisting ids"
+        def requestMap = [:]
+        requestMap.put(domainName, idList)
+        params.requestedDomains = requestMap
+        controllerUnderTest.getNamesForIds()
+
+        then: "a empty map is returned"
+        response.status == 200
+        JSONObject resultJSON = JSON.parse(response.text)
+        resultJSON.target[domainName] == expectedResult
+
+        where:
+        domainName | idList      || expectedResult
+        "JobGroup" | [20, 30]    || [:]
+        "JobGroup" | [1, 20, 30] || ["1": "jobGroup1"]
     }
 
     private void mockServices() {
