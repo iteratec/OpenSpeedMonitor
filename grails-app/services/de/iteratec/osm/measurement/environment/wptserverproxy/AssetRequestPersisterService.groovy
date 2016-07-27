@@ -63,7 +63,7 @@ class AssetRequestPersisterService implements iResultListener {
         WptResultXml resultXml = new WptResultXml(xmlResultResponse)
 
         try {
-            persistAssetRequests(resultXml, wptserverOfResult, jobResultId)
+            persistAssetRequests(resultXml, wptserverOfResult)
 
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
