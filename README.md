@@ -13,9 +13,9 @@ Installation
 
 Prerequisites
 ---------------------
-* Java runtime environment (JRE), version 7.
-    Java 8 is not supported, yet.
-* [optional, but recommended] Dedicated servlet container.
+* Java runtime environment (JRE), version 8.
+
+* [optional] Dedicated servlet container.
 
     Mainly tested with Apache Tomcat, version 7. Should run on most servlet containers. See [full list of supported Java EE containers][11] in grails documentation for further details.
 
@@ -23,46 +23,54 @@ Prerequisites
 
     Tested with MySQL. Should run with Oracle out of the box. OpenSpeedMonitor uses regular expressions via `rlike` command in grails object relational mapper gorm. `rlike` is supported for MySQL and Oracle. Other DBMS supporting regular expressions in sql queries would necessitate slight modifications to run performant.
 
-* Operating system (OS) to run OpenSpeedMonitor can be any server OS for which JRE 7 and the servlet container and dbms of choice are available.
+* Operating system (OS) to run OpenSpeedMonitor can be any server OS for which JRE 8 and the servlet container and dbms of choice are available.
 
     Mainly tested on [debian][13].
 
+* Alternatively to run OpenSpeedMonitor directly on a server one can use docker-compose file in _docker/_ folder to run OpenSpeedMonitor in docker containers. All you need is the docker daemon on the target host in order to run OpenSpeedMonitor in docker.  All the other prerequisites defined in this section aren't necessary because these already exist inside the containers.
+
 Installation OpenSpeedMonitor
 ---------------------
-As a [grails][3] application OpenSpeedMonitor is jvm and servlet API based. So its runtime environment is a servlet container. The deployment artefact of servlet API based web applications is a war file (web application archive). 
+As a [grails][3] application OpenSpeedMonitor is jvm and servlet API based. So its runtime environment is a servlet container. The deployment artefact of servlet API based web applications is a war file (web application archive).
 
-The recommended way to install OpenSpeedMonitor is to create a war file through running grails war command.
+One way to install OpenSpeedMonitor is to create a war file through running _gradle assemble_.
 
 From project root on Linux/MAC:
 
-    ./grailsw war
+    ./gradlew assemble
 
 or on Windows:
 
-    ./grailsw.bat war
+    ./gradlew.bat assemble
 
 Created war file can be deployed to servlet container of choice.
-See grails documentation for details on [grails war command][10].
+See [grails build documentation][10] for details.
 
-Grails also provides possibility to run application **in embedded tomcat container**.
+Since version 3 Grails is based on Spring Boot and so can be run easily **in embedded tomcat container**.
 
 From project root on Linux/MAC:
 
-    ./grailsw prod run-war
+    ./gradlew prod bootRun
 
 or on Windows:
 
-    ./grailsw.bat prod run-war
+    ./gradlew.bat prod bootRun
 
-See grails documentation for details on [grails run-war command][9].
+Created war file can be deployed to servlet container of choice.
+See [grails build documentation][10] for details.
+
+Like described in previous prerequisites section OpenSpeedMonitor can be deployed and run in docker containers. One can use docker-compose file _docker/docker-compose.yml_  to start multiple containers via this simple call:
+
+    cd docker
+    docker-compose up
 
 Configuration
 =====================
 Grails framework implements convention over configuration pattern. So a lot of configuration settings are preset with sensible defaults and you won't have to touch them ever. Default configuration files are located in `./grails-app/conf/`.
 
-Configuration settings you have to change from defaults should be located in an external configuration file. A sample for such an external config file can be found in `./grails-app/config/OpenSpeedMonitor-config.groovy.sample`. A copy of that file can be located in
+Configuration settings you have to change from defaults should be located in an external configuration file. A sample for such an external config file can be found in `./grails-app/config/OpenSpeedMonitor-config.yml.sample`. A copy of that file can be located in
 
-    ~/.grails/OpenSpeedMonitor-config.groovy
+    ~/.grails/OpenSpeedMonitor-config.yml
 
 Settings in that external config file will override defaults configured in `./grails-app/conf/` on startup.
 
@@ -105,14 +113,14 @@ After wpt server(s), locations and browsers of your measurement environment are 
 * A wpt script
 
     > Describes what the browser should do while test execution. That can be a sequence of different pages illustrating a whole use case of the web application under test. For each of the steps in the sequence a single result will be available after test execution. Single steps should be named via `setEventName` command.
-    > 
+    >
     > Scripts has to be written in WebPagetest DSL. See [scripting documentation][7] for details.
-    > 
+    >
     > Example measuring a single page:
     >
     >       setEventName  Amazon_Homepage
     >       navigate    http://www.amazon.de
-    > 
+    >
     > Example surfing through an online shop to a product page:
     >
     >       setEventName  Amazon_Homepage
@@ -121,7 +129,7 @@ After wpt server(s), locations and browsers of your measurement environment are 
     >       navigate    http://www.amazon.de/s/ref=nb_sb_noss_1?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&url=search-alias%3Daps&field-keywords=Douglas%20adams
     >       setEventName    amazon_product_DouglasAdams
     >       navigate    http://www.amazon.de/Per-Anhalter-durch-die-Galaxis/dp/3453146972/ref=sr_1_1?ie=UTF8&qid=1415398775&sr=8-1&keywords=Douglas+adams
-    > 
+    >
     > **Measurements with more than one test step as described above require adapted version of wpt server and agent. This adaption is available as a [pull request][14] to official WebPagetest repository.**
     > If you have any further questions on that feel free to [contact us][15]
 
@@ -137,7 +145,7 @@ Activate measurements
 After each start of OpenSpeedMonitor application, measurements are disabled genarally. So even if you set up measurements as described in previous section none of your measurement jobs will start any measurements at all. You will have to activate measurements, initially (requires login with admin rights):
 
 * Navigate to OsmConfiguration (http://[your-app-base-url]/osmConfiguration/edit/1), turn measurement activation _on_ and save configuration.
-* Alternatively you can navigate to OsmConfiguration via menu entry _Go to >> OsmConfigurationController_ 
+* Alternatively you can navigate to OsmConfiguration via menu entry _Go to >> OsmConfigurationController_
 
 Visualize results
 ---------------------
@@ -210,7 +218,7 @@ Although it works with an H2 in memory database out of the box it's highly recom
 [7]: https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/scripting "Scripting DSL WebPagetest"
 [8]: http://grails.github.io/grails-doc/2.5.0/ref/Command%20Line/run-app.html "grails documentation: run-app"
 [9]: http://grails.github.io/grails-doc/2.5.0/ref/Command%20Line/run-war.html "grails documentation: run-war"
-[10]: http://grails.org/doc/2.5.0/ref/Command%20Line/war.html "grails documentation: war"
+[10]: http://docs.grails.org/3.1.5/guide/commandLine.html#gradleBuild "grails buld documentation"
 [11]: http://grails.org/doc/2.5.0/guide/gettingStarted.html#supportedJavaEEContainers "grails: supported servlet containers"
 [12]: http://www.apache.org/licenses/LICENSE-2.0 "Apache License 2.0"
 [13]: https://www.debian.org/ "debian"
