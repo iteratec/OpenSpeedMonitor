@@ -29,6 +29,7 @@ import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
@@ -36,6 +37,7 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
+@Transactional
 class CsiSystemCsiAggregationService {
 
     ShopCsiAggregationService shopCsiAggregationService

@@ -22,17 +22,17 @@
 			</tr>
 		</thead>
 		<tbody>
-		<g:each in="${csiSystemInstanceList}" status="i" var="csiSystemInstance">
+		<g:each in="${csiSystemList}" status="i" var="csiSystem">
 			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
 			
-				<td><g:link action="show" id="${csiSystemInstance.id}">${fieldValue(bean: csiSystemInstance, field: "label")}</g:link></td>
+				<td><g:link action="show" id="${csiSystem.id}">${fieldValue(bean: csiSystem, field: "label")}</g:link></td>
 			
 			</tr>
 		</g:each>
 		</tbody>
 	</table>
 	<div class="pagination">
-		<bs:paginate total="${csiSystemInstanceTotal}" />
+		<bs:paginate total="${csiSystemCount}" />
 	</div>
 </section>
 

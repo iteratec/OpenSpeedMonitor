@@ -18,14 +18,14 @@
 package de.iteratec.osm.report
 
 import grails.plugin.springsecurity.SpringSecurityUtils
+import grails.transaction.Transactional
 
 /**
  * UserspecificDashboardService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class UserspecificDashboardService {
-
-    static transactional = true
 
     def springSecurityService
 

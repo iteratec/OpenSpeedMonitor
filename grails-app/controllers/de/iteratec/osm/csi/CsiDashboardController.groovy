@@ -32,6 +32,7 @@ import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
+import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.EventResultService
@@ -44,8 +45,8 @@ import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.TreeMapOfTreeMaps
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
-import org.codehaus.groovy.grails.web.json.JSONObject
-import org.codehaus.groovy.grails.web.mapping.LinkGenerator
+import grails.web.mapping.LinkGenerator
+import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
 import org.joda.time.Days
 import org.joda.time.Duration
@@ -92,6 +93,7 @@ class CsiDashboardController {
     TimeToCsMappingService timeToCsMappingService
     ConfigService configService
     CustomDashboardService customDashboardService
+    UserspecificDashboardService userspecificDashboardService
 
     /**
      * The Grails engine to generate links.
@@ -275,7 +277,7 @@ class CsiDashboardController {
                         countOfSelectedEvents = ((Collection) modelToRender.get('measuredEvents')).size()
                     }
 
-                    int selectedAggregationIntervallInMintues = cmd.getSelectedMeasuredIntervalInMinutes()
+                    int selectedAggregationIntervallInMintues = cmd.receiveSelectedMeasuredIntervalInMinutes()
 
                     int countOfSelectedBrowser = cmd.selectedBrowsers.size()
                     if (countOfSelectedBrowser < 1) {
@@ -283,7 +285,7 @@ class CsiDashboardController {
                     }
 
                     warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(
-                            fixTimeFrame(cmd.getSelectedTimeFrame(), selectedAggregationIntervallInMintues),
+                            fixTimeFrame(cmd.receiveSelectedTimeFrame(), selectedAggregationIntervallInMintues),
                             selectedAggregationIntervallInMintues,
                             cmd.selectedFolder.size(),
                             cmd.selectedPages.size(),
@@ -406,7 +408,7 @@ class CsiDashboardController {
         requiresArgumentNotNull('modelToRender', modelToRender)
         requiresArgumentNotNull('cmd', cmd)
 
-        Interval timeFrame = cmd.getSelectedTimeFrame()
+        Interval timeFrame = cmd.receiveSelectedTimeFrame()
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         MvQueryParams csiAggregationsQueryParams = cmd.createMvQueryParams()
@@ -801,7 +803,6 @@ class CsiDashboardController {
         writeCSV(csiValues, responseWriter, RequestContextUtils.getLocale(request), false)
 
         response.getOutputStream().flush()
-        response.sendError(200, 'OK')
         return null
     }
 
@@ -834,10 +835,19 @@ class CsiDashboardController {
         Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
         Collection<Long> selectedCsiSystems = customDashboardService.getValuesFromJSON(dashboardValues, "selectedCsiSystems")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
-
+        if ( !dashboardValues.graphAliases.isEmpty()) {
+            dashboardValues.graphAliases.each{
+                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.GERMAN)){
+                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.ENGLISH)] = it.value
+                }
+                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.ENGLISH)){
+                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.GERMAN)] = it.value
+                }
+            }
+        }
         // Create command for validation
-        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour, fromMinute: dashboardValues.fromMinute,
-                toHour: dashboardValues.toHour, toMinute: dashboardValues.toMinute, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
+        CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
+                toHour: dashboardValues.toHour,  aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,
@@ -1115,7 +1125,7 @@ class CsiDashboardController {
         long expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / selectedAggregationIntervallInMintues)
         long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph
 
-        return expectedTotalNumberOfPoints > 10000
+        return expectedTotalNumberOfPoints > 50000
     }
 
     /**

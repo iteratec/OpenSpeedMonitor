@@ -25,8 +25,8 @@ class CustomerFrustration {
 	Integer investigationVersion
 
 	static constraints = {
-		page()
-		loadTimeInMilliSecs()
-		investigationVersion()
+		page(nullable: false)
+		loadTimeInMilliSecs(nullable: false)
+		investigationVersion(nullable: false)
 	}
 }

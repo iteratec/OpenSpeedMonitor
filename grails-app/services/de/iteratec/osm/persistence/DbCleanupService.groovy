@@ -26,6 +26,7 @@ import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.dao.EventResultDaoService
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.DetachedCriteria
 
@@ -35,13 +36,12 @@ import grails.gorm.DetachedCriteria
  */
 class DbCleanupService {
 
-    static transactional = false
 
     BatchActivityService batchActivityService
 	EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService
 
-    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
+//    def propertyInstanceMap = org.codehaus.groovy.grails.plugins.DomainClassGrailsPlugin.PROPERTY_INSTANCE_MAP
 
     /**
      * Deletes all {@link EventResult}s {@link JobResult}s before date toDeleteBefore.
@@ -200,7 +200,5 @@ class DbCleanupService {
 
         log.info "end with $jobName"
     }
-
-
 }
 

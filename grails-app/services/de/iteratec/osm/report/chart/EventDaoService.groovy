@@ -18,7 +18,7 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.measurement.schedule.JobGroup
-
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
@@ -26,7 +26,6 @@ import org.joda.time.DateTime
  */
 class EventDaoService {
 
-    static transactional = true
 
     /**
      * Creates an {@link Event} with given attributes, associates given jobGroups to it and persists it.

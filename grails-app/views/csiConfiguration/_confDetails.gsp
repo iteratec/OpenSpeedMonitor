@@ -1,4 +1,5 @@
 <%@ page import="grails.converters.JSON" %>
+<%@ defaultCodec="none" %>
 <div class="row">
     <div class="span12">
         <div class="btn-group" data-toggle="buttons-radio">

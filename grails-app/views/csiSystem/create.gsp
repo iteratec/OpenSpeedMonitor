@@ -18,9 +18,9 @@
         <div class="alert alert-error" style="display: block">${flash.error}</div>
     </g:if>
     <g:else>
-        <g:hasErrors bean="${csiSystemInstance}">
+        <g:hasErrors bean="${csiSystem}">
             <div class="alert alert-error" style="display: none">
-                <g:renderErrors bean="${csiSystemInstance}" as="list"/>
+                <g:renderErrors bean="${csiSystem}" as="list"/>
             </div>
         </g:hasErrors>
     </g:else>

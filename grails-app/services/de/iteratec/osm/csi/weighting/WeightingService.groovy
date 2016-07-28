@@ -33,8 +33,8 @@ import org.joda.time.DateTime
  * @author nkuhn
  *
  */
-@Transactional
 class WeightingService {
+
 
     CsiAggregationTagService csiAggregationTagService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
@@ -152,7 +152,7 @@ class WeightingService {
                 value = getCsiValueClosure(csiValue)
                 JobGroup jobGroupOfCsiValue = JobGroup.findById(csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
                 JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
-                    it.jobGroup == jobGroupOfCsiValue
+                    it.jobGroup.id == jobGroupOfCsiValue.id
                 }
                 weight = jobGroupWeightOfCsiValue.weight
                 underlyingResultIds = getUnderlyingEventresultsClosure(csiValue)

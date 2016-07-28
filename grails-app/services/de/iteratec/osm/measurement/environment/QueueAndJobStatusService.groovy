@@ -27,6 +27,7 @@ import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
+import grails.transaction.Transactional
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.ContentType
 import org.joda.time.DateTime
@@ -37,8 +38,8 @@ import org.quartz.CronExpression
  *
  * @uathor dri
  */
+@Transactional
 class QueueAndJobStatusService {
-    static transactional = true
 
     HttpRequestService httpRequestService
     CsiAggregationTagService csiAggregationTagService
@@ -187,7 +188,7 @@ class QueueAndJobStatusService {
                     status    : result.httpStatusCode,
                     date      : result.date,
                     terminated: result.httpStatusCode >= 200,
-                    message   : result.getSatusCodeMessage() + (result.httpStatusCode >= 400 && result.wptStatus ? ': ' + result.wptStatus : ''),
+                    message   : result.getStatusCodeMessage() + (result.httpStatusCode >= 400 && result.wptStatus ? ': ' + result.wptStatus : ''),
                     wptStatus : result.wptStatus,
                     testUrl   : (result.wptServerBaseurl.endsWith('/') ? result.wptServerBaseurl : "${result.wptServerBaseurl}/") + "result/${result.testId}"]
         }

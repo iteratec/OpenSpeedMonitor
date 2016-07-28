@@ -45,6 +45,7 @@ environments {
 			url = "jdbc:mysql://localhost/[your-dev-mysql-scheme]"
 			username = "[your-dev-mysql-user]"
 			password = "[password-of-your-dev-mysql-user]"
+			dbCreate = "managed by liquibase"
 			driverClassName = "com.mysql.jdbc.Driver"
 			logSql = false
 			pooled = true

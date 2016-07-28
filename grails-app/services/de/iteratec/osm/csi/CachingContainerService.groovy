@@ -21,12 +21,14 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiAggregationTagService
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
  * CachingContainerService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class CachingContainerService {
     CsiAggregationTagService csiAggregationTagService
     PageCsiAggregationService pageCsiAggregationService

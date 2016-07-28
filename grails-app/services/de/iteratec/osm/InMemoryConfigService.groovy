@@ -17,6 +17,8 @@
 
 package de.iteratec.osm
 
+import grails.transaction.Transactional
+
 /**
  * InMemoryConfigService
  * A service class encapsulates the core business logic of a Grails application
@@ -24,8 +26,6 @@ package de.iteratec.osm
 class InMemoryConfigService {
 
     def grailsApplication
-
-    static transactional = true
 
     static final Boolean DEFAULT_MEASUREMENTS_GENERALLY_ENABLED = false
 

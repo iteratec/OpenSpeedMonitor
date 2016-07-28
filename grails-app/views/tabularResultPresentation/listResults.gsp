@@ -82,7 +82,7 @@
             </g:if>
             <g:else>
                 <g:render
-                      template="../eventResultDashboard/selectMeasurings"
+                      template="/eventResultDashboard/selectMeasurings"
                       model="${['locationsOfBrowsers'               :locationsOfBrowsers,
                                 'eventsOfPages'                     :eventsOfPages,
                                 'folders'                           :csiGroups,

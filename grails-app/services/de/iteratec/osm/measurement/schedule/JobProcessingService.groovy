@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.isj.quartzjobs.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -25,12 +24,16 @@ import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
+import grails.transaction.NotTransactional
+import grails.transaction.Transactional
 import groovy.time.TimeCategory
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.HttpResponseDecorator
 import org.apache.commons.lang.exception.ExceptionUtils
+import org.joda.time.DateTime
 import org.quartz.*
 import org.hibernate.StaleObjectStateException
+import org.springframework.transaction.annotation.Propagation
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -66,9 +69,8 @@ enum TriggerGroup {
  *
  * @author dri
  */
+@Transactional
 class JobProcessingService {
-
-    static transactional = false
 
 	ProxyService proxyService
 	def quartzScheduler
@@ -89,6 +91,7 @@ class JobProcessingService {
 	public void setPollDelaySeconds(int pollDelaySeconds) {
 		this.pollDelaySeconds = pollDelaySeconds
 	}
+
 
 	/**
 	 * Maps the properties of a Job to the parameters expected by
@@ -163,9 +166,10 @@ class JobProcessingService {
 	 * specified Job/test is running and that this is not the result of a finished
 	 * test execution.
 	 */
-	private JobResult persistUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus = null) {
-
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null) {
 		// If no testId was provided some error occurred and needs to be logged
+		Job job = Job.get(jobId)
 		JobResult result
 		if (testId) {
 			result = JobResult.findByJobConfigLabelAndTestId(job.label, testId)
@@ -185,13 +189,11 @@ class JobProcessingService {
 
     private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus){
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
-
         if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)){
 
             updateStatus(result, statusCode, wptStatus)
 
             try{
-
                 result.save(failOnError: true, flush: true)
 
             }catch(StaleObjectStateException staleObjectStateException){
@@ -336,7 +338,7 @@ class JobProcessingService {
 			return true
 		} catch (Exception e) {
             log.error("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
-			persistUnfinishedJobResult(job, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
+			persistUnfinishedJobResult(job.id, params.testId, statusCode < 400 ? 400 : statusCode, e.getMessage())
 			return false
 		}
 	}
@@ -369,18 +371,18 @@ class JobProcessingService {
 		int statusCode
 		try
 		{
-//            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: fetching results from wptrserver.", PerformanceLoggingService.IndentationDepth.TWO){
                 statusCode = proxyService.fetchResult(job.location.wptServer, [resultId: testId])
-//            }
-//            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
+            }
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.label}: updating jobresult.", PerformanceLoggingService.IndentationDepth.TWO){
                 if (statusCode < 200){
-                    persistUnfinishedJobResult(job, testId, statusCode, wptStatus)
+                    persistUnfinishedJobResult(job.id, testId, statusCode, wptStatus)
                 }
-//            }
+            }
 		} catch (Exception e) {
 			statusCode = 400
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-			persistUnfinishedJobResult(job, testId, statusCode, e.getMessage())
+			persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
 		} finally {
 			if (statusCode >= 200) {
 				CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
@@ -401,7 +403,7 @@ class JobProcessingService {
 		if (!result)
 			return
 		if (result.httpStatusCode < 200 && pollJobRun(job, testId) < 200) {
-			persistUnfinishedJobResult(job, testId, 504, '')
+			persistUnfinishedJobResult(job.id, testId, 504, '')
 			proxyService.cancelTest(job.location.wptServer, [test: testId])
 		}
 	}
@@ -430,6 +432,7 @@ class JobProcessingService {
 	/**
 	 * Schedules a Quartz trigger to launch the given Job at the time(s) determined by its execution schedule Cron expression.
 	 */
+	@NotTransactional
 	public void scheduleJob(Job job, boolean rescheduleIfAlreadyScheduled = true) {
 		if (!job.executionSchedule) {
 			return
@@ -460,7 +463,7 @@ class JobProcessingService {
 			}
 		}
 	}
-
+	@NotTransactional
 	public void scheduleAllActiveJobs() {
 		if (log.infoEnabled) log.info("Launching all active jobs")
 		Job.findAll { active == true }.each { scheduleJob(it, false) }
@@ -469,8 +472,56 @@ class JobProcessingService {
 	/**
 	 * Removes the Quartz trigger for the specified Job
 	 */
+	@NotTransactional
 	public void unscheduleJob(Job job) {
 		if (log.infoEnabled) log.info("Unscheduling Job ${job.label}")
 		CronDispatcherQuartzJob.unschedule(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value())
+	}
+
+	public Map<String, Integer> handleOldJobResults(){
+		log.info("handleOldJobResults() OSM starts")
+
+		def jobResultsToDelete = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200,new DateTime().minusHours(2))
+		def jobResultsToDeleteCount = jobResultsToDelete.size()
+		if (!jobResultsToDelete.isEmpty()){
+			log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with HttpStatusCode < 200 that are to old. Start deleting...")
+			jobResultsToDelete.each { JobResult jobResult ->
+				try {
+					jobResult.delete()
+				} catch (Exception e){
+					log.error ("Wasn't able to delete old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+				}
+			}
+			log.debug("Deleting done.")
+		}
+
+		def jobResultsToReschedule = JobResult.findAllByHttpStatusCodeLessThanAndDateGreaterThan(200,new DateTime().minusHours(2))
+		def jobResultsToRescheduleCount = jobResultsToReschedule.size()
+		if (!jobResultsToReschedule.isEmpty()){
+			log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with HttpStatusCode < 200 fresh enough for rescheduling. Start rescheduling ...")
+			jobResultsToReschedule.each { JobResult jobResult ->
+				Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
+				Date endDate = new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).toDate()
+				Date timeoutDate = new DateTime(endDate).plusSeconds( declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate()
+				if ( new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate() > new Date()) {
+					try {
+						CronDispatcherQuartzJob.schedule(buildSubTrigger(jobResult.job, jobResult.testId, endDate), jobDataMap)
+						CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, timeoutDate), jobDataMap)
+					} catch (Exception e){
+						log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+					}
+				} else {
+
+					try {
+						CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(1).toDate()), jobDataMap)
+					} catch (Exception e){
+						log.error ("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}"+e)
+					}
+				}
+			}
+			log.debug("Rescheduling done.")
+		}
+		log.info("handleOldJobResults() OSM ends")
+		return ["JobResultsToDeleteCount":jobResultsToDeleteCount, "JobResultsToRescheduleCount":jobResultsToRescheduleCount]
 	}
 }

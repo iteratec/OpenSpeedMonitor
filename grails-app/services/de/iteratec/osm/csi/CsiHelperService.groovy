@@ -17,11 +17,13 @@
 
 package de.iteratec.osm.csi
 
+import grails.transaction.Transactional
+
 import static de.iteratec.osm.util.Constants.COOKIE_KEY_CSI_DASHBOARD_TITLE
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.OsmCookieService
-
+@Transactional
 class CsiHelperService {
 
 	OsmCookieService osmCookieService

@@ -21,7 +21,7 @@ function createMatrixView(data, chartDivIdentifier) {
     var color = "#DC381F";
     var colorScale = d3.scale.linear()
         .domain([data.weightMin, data.weightMax])
-        .range([0.2,1]);
+        .range([0,1]);
 
     // does tooltip at mouse position
     var mousemove = function () {
@@ -94,7 +94,9 @@ function createMatrixView(data, chartDivIdentifier) {
 
     // Color tiles using weights from data
     for(var e = 0; e < data.entries.length; e++) {
-        var entry = data.entries[e];
+        if (data.entries[e].weight != 0) { // value 0 not set to make the rectangle grey
+            var entry = data.entries[e];
+        }
 
         svg.select("[name=" + makeValidString(entry.columnName + entry.rowName) + "]")
             .select("rect")

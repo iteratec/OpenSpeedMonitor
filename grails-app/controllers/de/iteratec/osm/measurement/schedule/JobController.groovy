@@ -17,15 +17,13 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.util.I18nService
-
-import static grails.async.Promises.*
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -34,9 +32,10 @@ import grails.converters.JSON
 import grails.gsp.PageRenderer
 import groovy.json.JsonBuilder
 import groovy.time.TimeCategory
-
 import org.quartz.CronExpression
 import org.springframework.http.HttpStatus
+
+import static grails.async.Promises.task
 
 class JobController {
 
@@ -63,7 +62,7 @@ class JobController {
         def flashMessageArgs = [getJobI18n(), id]
         if (!job) {
             flash.message = message(code: 'default.not.found.message', args: flashMessageArgs)
-            redirect(action: "list")
+            redirect(action: "index")
         }
     }
 
@@ -108,12 +107,12 @@ class JobController {
         }
     }
 
-    public Map<String, Object> list() {
-        getListModel()
+    def list() {
+        redirect(action: 'index')
     }
 
     def index() {
-        redirect(action: 'list')
+        getListModel()
     }
 
     def create() {
@@ -123,6 +122,7 @@ class JobController {
     }
 
     def save() {
+        def tagParam = params.remove('tags')
         Job job = new Job(params)
         setVariablesOnJob(params.variables, job)
 
@@ -141,13 +141,14 @@ class JobController {
             } else {
                 // Tags can only be set after first successful save.
                 // This is why Job needs to be saved again.
-                job.tags = params.list('tags')
+                def tags = [tagParam].flatten()
+                job.tags = tags
                 job.save(flush: true)
 
                 def flashMessageArgs = [getJobI18n(), job.label]
                 Map<Long, Object> massExecutionResults = [:]
                 massExecutionResults[job.id] = [status: 'success', message: message(code: 'default.created.message', args: flashMessageArgs)]
-                render(view: 'list', model: getListModel(!job.active) << ['massExecutionResults': massExecutionResults])
+                render(view: 'index', model: getListModel(!job.active) << ['massExecutionResults': massExecutionResults])
             }
         }
     }
@@ -197,7 +198,7 @@ class JobController {
             } else {
                 Map<Long, Object> massExecutionResults = [:]
                 massExecutionResults[job.id] = [status: 'success', message: message(code: 'default.updated.message', args: flashMessageArgs)]
-                render(view: 'list', model: getListModel(!job.active) << ['massExecutionResults': massExecutionResults])
+                render(view: 'index', model: getListModel(!job.active) << ['massExecutionResults': massExecutionResults])
             }
         }
     }
@@ -240,7 +241,7 @@ class JobController {
         p.onComplete {
             log.info("Deletion of Job ${job} completed.")
         }
-        redirect(controller: "batchActivity", action: "list", params: [max: 10])
+        redirect(controller: "batchActivity", action: "index", params: [max: 10])
     }
 
     /**
@@ -256,9 +257,9 @@ class JobController {
                 Job job = Job.get(it)
                 handler(job, massExecutionResults)
             }
-            render(view: 'list', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, filters: params.filters])
+            render(view: 'index', model: getListModel(true) << ['selectedIds': selectedIds, 'massExecutionResults': massExecutionResults, filters: params.filters])
         } else {
-            redirect(action: 'list', model: [filters: params.filters])
+            redirect(action: 'index', model: [filters: params.filters])
         }
     }
 
@@ -283,7 +284,6 @@ class JobController {
 
     def toggleActive(boolean active) {
         handleSelectedJobs { Job job, Map<Long, Object> massExecutionResults ->
-            println job.label
             job.active = active
             if (job.save(flush: true)) {
                 massExecutionResults[job.id] = [status : 'success',
@@ -381,6 +381,8 @@ class JobController {
     def cancelJobRun(long jobId, String testId) {
         Job job = Job.get(jobId)
         jobProcessingService.cancelJobRun(job, testId)
+
+        sendSimpleResponseAsStream(response, HttpStatus.OK, '')
     }
 
     /**
@@ -392,7 +394,7 @@ class JobController {
 
     def activateMeasurementsGenerally() {
         inMemoryConfigService.activateMeasurementsGenerally()
-        redirect(action: 'list')
+        redirect(action: 'index')
     }
 
     private void setVariablesOnJob(Map variables, Job job) {
@@ -426,13 +428,13 @@ class JobController {
                     jobSet.addToJobs(Job.get(it))
                 }
                 if (!jobSet.save(flush: true)) {
-                    render(view: 'list', model: getListModel() << [selectedIds: selectedIds, filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetUniqueError", "unique")])
+                    render(view: 'index', model: getListModel() << [selectedIds: selectedIds, filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetUniqueError", "unique")])
                     return
                 }
-                render(view: 'list', model: getListModel() << [filters: params.filters, saveSuccess: i18nService.msg("de.iteratec.osm.job.jobSetSuccess", "success")])
+                render(view: 'index', model: getListModel() << [filters: params.filters, saveSuccess: i18nService.msg("de.iteratec.osm.job.jobSetSuccess", "success")])
                 return
             }
         }
-        render(view: 'list', model: getListModel() << [filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetEmptyJobList", "empty list")])
+        render(view: 'index', model: getListModel() << [filters: params.filters, saveError: i18nService.msg("de.iteratec.osm.job.jobSetEmptyJobList", "empty list")])
     }
 }

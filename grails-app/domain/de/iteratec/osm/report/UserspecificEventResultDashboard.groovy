@@ -18,6 +18,9 @@
 package de.iteratec.osm.report
 
 import de.iteratec.osm.result.EventResultDashboardShowAllCommand
+import grails.plugin.springsecurity.SpringSecurityUtils
+
+import java.text.SimpleDateFormat
 
 /**
  * UserspecificEventResultDashboard
@@ -110,7 +113,7 @@ class UserspecificEventResultDashboard extends UserspecificDashboardBase{
     UserspecificEventResultDashboard(EventResultDashboardShowAllCommand cmd, String dashboardName, Boolean publiclyVisible, String wideScreenDiagramMontage, String username) {
 
         this.dashboardName = dashboardName
-        this.publiclyVisible = publiclyVisible
+        this.publiclyVisible = Boolean.valueOf(publiclyVisible)
         this.wideScreenDiagramMontage = wideScreenDiagramMontage == "true"
         this.username = username
 

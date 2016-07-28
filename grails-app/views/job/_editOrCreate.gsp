@@ -30,7 +30,7 @@
 
             <p><g:message code="default.form.asterisk"/></p>
 
-            <g:form method="post" role="form" class="form-horizontal">
+            <g:form resource="${entity}" method="post" role="form" class="form-horizontal">
                 <g:hiddenField name="id" value="${entity?.id}"/>
                 <g:hiddenField name="version" value="${entity?.version}"/>
                 <fieldset class="form">

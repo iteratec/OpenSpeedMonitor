@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.transaction.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 import org.springframework.dao.DataIntegrityViolationException
 
@@ -24,9 +25,9 @@ import org.springframework.dao.DataIntegrityViolationException
  * EventService
  * A service class encapsulates the core business logic of a Grails application
  */
+@Transactional
 class EventService {
 
-    static transactional = true
 
     /**
      * Deletes an Event, if this action will be successful action.success will be called,
@@ -59,7 +60,7 @@ class EventService {
             def version = params.version.toLong()
             if (eventInstance.version > version) {
                 eventInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                        [message(code: 'event.label', default: 'Event')] as Object[],
+                        [message(code: 'event.label', default: 'Event')],
                         "Another user has updated this Event while you were editing")
                 delegateMap.action.failure.call()
                 return

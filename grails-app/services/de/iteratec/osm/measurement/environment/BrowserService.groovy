@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment
 
+import grails.transaction.Transactional
 import org.joda.time.DateTime
 import org.joda.time.Duration
 
@@ -25,6 +26,7 @@ import org.joda.time.Duration
  * @deprecated Move database access to {@link de.iteratec.osm.measurement.environment.dao.BrowserDaoService}.
  */
 @Deprecated
+@Transactional
 class BrowserService {
 	
 	Map<Long, Browser> browsermap

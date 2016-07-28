@@ -17,7 +17,6 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
-import groovy.json.JsonSlurper
 import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
@@ -82,6 +81,19 @@ class HttpRequestService {
 	}
 	String removeLeadingSlashIfExisting(String urlPart){
 		return urlPart.startsWith('/') ? urlPart.drop(1) : urlPart
+	}
+	/**
+	 * Turn a String representation of the query from a URL into a map of parameter
+	 * which can be used with other Methods from this service
+	 * @param query
+	 * @return
+	 */
+	Map splitQueryStringToMap(String query){
+		def map = [:]
+		query.split("&").each {keyValue ->
+			keyValue.split("=").with {map[it[0]] = it[1]}
+		}
+		return map
 	}
 
 }

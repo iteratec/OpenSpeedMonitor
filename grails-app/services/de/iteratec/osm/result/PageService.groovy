@@ -29,8 +29,6 @@ import de.iteratec.osm.csi.Page
  */
 class PageService {
 	
-	static transactional = false
-	
 	Map<Long, Page> pagemap
 	private DateTime lastFetchOfPagemap = new DateTime(1980,1,1,0,0)
 	/** Stepname can contain information of tested {@link Page} and teststep-number. Both informations are delimitted through this. */

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.transaction.Transactional
+
 import java.util.Map.Entry;
 
 import org.joda.time.DateTime
@@ -29,6 +31,7 @@ import org.joda.time.DateTimeZone
  * TODO mze-2013-07-15: This service seems to translate Model-data to view-data. Move to controller? 
  * </p>
  */
+@Transactional
 class CsiAggregationToHighChartService {
 
 	static final String HIGHCHART_LABEL_MESSAGE_CODE = "de.iteratec.isocsi.csi.highchart.label"

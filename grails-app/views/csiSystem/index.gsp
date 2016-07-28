@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta name="layout" content="main">
+		<meta name="layout" content="kickstart">
 		<g:set var="entityName" value="${message(code: 'csiSystem.label', default: 'CsiSystem')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
@@ -29,17 +29,17 @@
 					</tr>
 				</thead>
 				<tbody>
-				<g:each in="${csiSystemInstanceList}" status="i" var="csiSystemInstance">
+				<g:each in="${csiSystemList}" status="i" var="csiSystem">
 					<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 					
-						<td><g:link action="show" id="${csiSystemInstance.id}">${fieldValue(bean: csiSystemInstance, field: "label")}</g:link></td>
+						<td><g:link action="show" id="${csiSystem.id}">${fieldValue(bean: csiSystem, field: "label")}</g:link></td>
 					
 					</tr>
 				</g:each>
 				</tbody>
 			</table>
 			<div class="pagination">
-				<g:paginate total="${csiSystemInstanceCount ?: 0}" />
+				<g:paginate total="${csiSystemCount ?: 0}" />
 			</div>
 		</div>
 	</body>

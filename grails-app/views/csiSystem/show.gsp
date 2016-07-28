@@ -19,7 +19,7 @@
         <tr class="prop">
             <td valign="top" class="name"><g:message code="csiSystem.label.label" default="Label"/></td>
 
-            <td valign="top" class="value">${fieldValue(bean: csiSystemInstance, field: "label")}</td>
+            <td valign="top" class="value">${fieldValue(bean: csiSystem, field: "label")}</td>
 
         </tr>
 
@@ -29,7 +29,7 @@
 
             <td valign="top" style="text-align: left;" class="value">
                 <table class="table">
-                    <g:each in="${csiSystemInstance.jobGroupWeights}" var="j">
+                    <g:each in="${csiSystem.jobGroupWeights}" var="j">
                         <tr>
                             <td style="border: none">${j.jobGroup.name}</td>
                             <td style="border: none">${j.weight}</td>
