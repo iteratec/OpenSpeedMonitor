@@ -519,7 +519,7 @@ class RestApiController {
                     break;
                 default:
                     sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
-                    return
+                    return null
             }
         }
 
@@ -547,7 +547,7 @@ class RestApiController {
                     List<Location> locations = Location.findAllByUniqueIdentifierForServerInList(names)
                     resultMappings[domain] = [:]
                     locations.each {
-                        resultMappings[domain].put(it.id, it.label)
+                        resultMappings[domain].put(it.id, it.uniqueIdentifierForServer)
                     }
                     break;
                 case "Page":

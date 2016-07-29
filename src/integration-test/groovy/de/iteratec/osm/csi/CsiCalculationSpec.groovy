@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserverproxy.WptResultXml
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
@@ -42,7 +43,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
     static final String jobGroupName_csi_05 = "jobGroup2"
     static final List<Page> allPages = ['HP', 'MES', 'PL', 'SE', 'HP_entry', 'ADS', 'WK', Page.UNDEFINED]
 
-    GPathResult xmlResult
+    WptResultXml xmlResult
     CsiConfiguration csiConfiguration_all_1
     CsiConfiguration csiConfiguration_all_05
 
@@ -122,7 +123,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
             String nameOfResultXmlFile = 'Result_wptserver2.15_multistep_1Run_WithVideo.xml'
             File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-            xmlResult = new XmlSlurper().parse(file)
+            xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
             TestDataUtil.createCsiAggregationIntervals()
             TestDataUtil.createAggregatorTypes()
