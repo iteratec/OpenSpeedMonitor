@@ -153,7 +153,7 @@ class WptResultXml {
         } else if (version == WptXmlResultVersion.MULTISTEP_1) {
             return viewNode.results.testStep.getAt(testStepZeroBasedIndex)
         } else {
-            return viewNode.step.getAt(testStepZeroBasedIndex)
+            return viewNode.step.getAt(testStepZeroBasedIndex).results
         }
     }
 

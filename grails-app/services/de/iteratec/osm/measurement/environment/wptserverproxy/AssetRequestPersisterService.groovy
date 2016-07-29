@@ -22,7 +22,6 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.web.mapping.LinkGenerator
-import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.RESTClient
 
 import static groovyx.net.http.ContentType.JSON
@@ -84,7 +83,7 @@ class AssetRequestPersisterService implements iResultListener {
 
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
-        String wptVersion = "2.18"
+        String wptVersion = "2.19"
         List<String> wptTestIds = [resultXml.getTestId()]
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
