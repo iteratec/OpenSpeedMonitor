@@ -2,7 +2,7 @@
 # One of that locations is ~/.grails/OpenSpeedMonitor-config.groovy
 #
 # Settings in this file will override defaults in grails-app/config!
-# 
+#
 # @author nkuhn
 # @see Config.groovy
 # @see http://grails.org/doc/latest/guide/conf.html#configExternalized
@@ -24,7 +24,12 @@ grails:
           availableChartTagLibs:
             - RICKSHAW
         highchartsExportServerUrl: 'http://export.highcharts.com'
-
+      test:
+        geb:
+          login: admin
+          password: password
+          #You can run the tets against a different osm instance. Only uncomment this if you want to run the tests against another instance
+          #baseUrl: [your-osm-instance]
 environments:
   development:
      grails:

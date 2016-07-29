@@ -33,9 +33,13 @@ import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.external.GraphitePath
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.*
-
+import de.iteratec.osm.security.Role
+import de.iteratec.osm.security.User
+import de.iteratec.osm.security.UserRole
+import de.iteratec.osm.util.OsmTestLogin
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.util.Holders
 import org.joda.time.DateTime
 import org.springframework.transaction.TransactionStatus
 
@@ -59,7 +63,7 @@ import static org.junit.Assert.assertNotNull
  * @since IT-8
  */
 @TestMixin(GrailsUnitTestMixin)
-class TestDataUtil {
+class TestDataUtil implements OsmTestLogin {
     /**
      * <p>
      * Creates a map of {@link CsiAggregation}s referenced by a key consists
@@ -226,7 +230,7 @@ class TestDataUtil {
 
     static createCsTargetGraph(CsTargetValue pointOne, CsTargetValue pointTwo) {
         new CsTargetGraph(
-                label: '',
+                label: 'TestCsTargetGraph',
                 pointOne: pointOne,
                 pointTwo: pointTwo,
                 defaultVisibility: true
@@ -1399,15 +1403,17 @@ class TestDataUtil {
      * </p>
      */
     public static void createOsmConfig() {
-        new OsmConfiguration(
-                detailDataStorageTimeInWeeks: 2,
-                defaultMaxDownloadTimeInMinutes: 60,
-                minDocCompleteTimeInMillisecs: 250,
-                maxDocCompleteTimeInMillisecs: 180000,
-                initialChartHeightInPixels: 400,
-                maxDataStorageTimeInMonths: 12,
-                csiTransformation: CsiTransformation.BY_MAPPING
-        ).save(failOnError: true)
+        if (OsmConfiguration.count == 0) {
+            new OsmConfiguration(
+                    detailDataStorageTimeInWeeks: 2,
+                    defaultMaxDownloadTimeInMinutes: 60,
+                    minDocCompleteTimeInMillisecs: 250,
+                    maxDocCompleteTimeInMillisecs: 180000,
+                    initialChartHeightInPixels: 400,
+                    maxDataStorageTimeInMonths: 12,
+                    csiTransformation: CsiTransformation.BY_MAPPING
+            ).save(failOnError: true)
+        }
     }
 
     /**
@@ -1553,5 +1559,15 @@ class TestDataUtil {
                 createBrowser("FF", 1), true)
         return createJob("label", createScript("label1", "description", "navi", false),
                 location, group, "description", 1, false, 10)
+    }
+
+    public static User createAdminUser() {
+        def user = User.findByUsername(getConfiguredUsername())
+        if (!user) {
+            Role adminRole = new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
+            user = new User(username: getConfiguredUsername(), password: getConfiguredPassword(), enabled: true, accountExpired: false, accountLocked: false, passwordExpired: false).save(failOnError: true)
+            new UserRole(user: user, role: adminRole).save(failOnError: true)
+        }
+        return user
     }
 }

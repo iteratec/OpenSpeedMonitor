@@ -412,6 +412,8 @@ class CsiDashboardController {
         log.info("Timeframe for CSI-Dashboard=$timeFrame")
 
         MvQueryParams csiAggregationsQueryParams = cmd.createMvQueryParams()
+        modelToRender.put("yAxisMax", cmd.loadTimeMaximum)
+        modelToRender.put("yAxisMin", cmd.loadTimeMinimum)
 
         switch (cmd.aggrGroupAndInterval) {
             case WEEKLY_AGGR_GROUP_PAGE:
