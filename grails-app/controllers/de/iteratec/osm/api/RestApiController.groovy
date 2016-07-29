@@ -557,9 +557,16 @@ class RestApiController {
                         resultMappings[domain].put(it.id, it.name)
                     }
                     break;
+                case "MeasuredEvent":
+                    List<MeasuredEvent> measuredEvents = MeasuredEvent.findAllByNameInList(names)
+                    resultMappings[domain] = [:]
+                    measuredEvents.each {
+                        resultMappings[domain].put(it.id, it.name)
+                    }
+                    break;
                 default:
                     sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
-                    return
+                    return null
             }
         }
 

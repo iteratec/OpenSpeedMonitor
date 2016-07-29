@@ -197,6 +197,8 @@ class RestApiControllerSpec extends Specification {
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer("wptServer", "identifier", false, "http://internet.de")
         TestDataUtil.createLocation(wptServer, "location1", browser1, false)
         TestDataUtil.createLocation(wptServer, "location2", browser2, false)
+        TestDataUtil.createMeasuredEvent("measuredEvent1", page1)
+        TestDataUtil.createMeasuredEvent("measuredEvent2", page2)
 
         when: "user requests mappings"
         def requestMap = [:]
@@ -213,10 +215,11 @@ class RestApiControllerSpec extends Specification {
         }
 
         where:
-        requestedDomain | requestedNames             || expectedMappings
-        "Browser"       | ["browser1", "browser2"]   || [1: "browser1", 2: "browser2"]
-        "Page"          | ["testPage1", "testPage2"] || [1: "testPage1", 2: "testPage2"]
-        "Location"      | ["location1", "location2"] || [1: "location1", 2: "location2"]
+        requestedDomain | requestedNames                       || expectedMappings
+        "Browser"       | ["browser1", "browser2"]             || [1: "browser1", 2: "browser2"]
+        "Page"          | ["testPage1", "testPage2"]           || [1: "testPage1", 2: "testPage2"]
+        "Location"      | ["location1", "location2"]           || [1: "location1", 2: "location2"]
+        "MeasuredEvent" | ["measuredEvent1", "measuredEvent2"] || [1: "measuredEvent1", 2: "measuredEvent2"]
     }
 
     void "getting correct mappings for domain classes with serveral domains"() {
