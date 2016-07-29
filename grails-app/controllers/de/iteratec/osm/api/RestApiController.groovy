@@ -544,7 +544,7 @@ class RestApiController {
                     }
                     break;
                 case "Location":
-                    List<Location> locations = Location.findAllByLabelInList(names)
+                    List<Location> locations = Location.findAllByUniqueIdentifierForServerInList(names)
                     resultMappings[domain] = [:]
                     locations.each {
                         resultMappings[domain].put(it.id, it.label)
