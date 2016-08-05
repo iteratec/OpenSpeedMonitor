@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import grails.converters.JSON
@@ -16,7 +17,7 @@ import org.grails.web.json.JSONObject
 import spock.lang.Specification
 
 @TestFor(RestApiController)
-@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job])
+@Mock([CsiConfiguration, CsiDay, Page, TimeToCsMapping, JobGroup, MeasuredEvent, Page, Browser, Location, WebPageTestServer, Job, Script])
 class RestApiControllerSpec extends Specification {
     RestApiController controllerUnderTest
     CsiConfiguration csiConfiguration
@@ -173,6 +174,13 @@ class RestApiControllerSpec extends Specification {
     }
 
     void "getting correct mappings for domain classes"() {
+        given: "some data in db"
+        WebPageTestServer server = TestDataUtil.createWebPageTestServer("server1", "web.de", true, "http://internet.de")
+        Location location1 = TestDataUtil.createLocation(server, "location1", browser1, true)
+        Script script = TestDataUtil.createScript("script1", "description", "unused", false)
+        TestDataUtil.createJob("job1", script, location1, jobGroupWithoutCsiConfiguration1, "description", 1, false, 200)
+        TestDataUtil.createJob("job2", script, location1, jobGroupWithoutCsiConfiguration1, "description", 1, false, 200)
+
         when: "user requests mappings"
         def requestMap = [:]
         requestMap.put(requestedDomain, requestedIDs)
@@ -190,6 +198,7 @@ class RestApiControllerSpec extends Specification {
         where:
         requestedDomain | requestedIDs || expectedMappings
         "JobGroup"      | [1, 2, 3, 4] || [1: "jobGroup1", 2: "jobGroup2", 3: "jobGroup3", 4: "jobGroup4"]
+        "Job"           | [1, 2]       || [1: "job1", 2: "job2"]
     }
 
     void "getting correct ids for names"() {

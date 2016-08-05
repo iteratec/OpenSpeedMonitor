@@ -517,6 +517,13 @@ class RestApiController {
                         resultMappings[domain].put(it.id, it.name)
                     }
                     break;
+                case "Job":
+                    List<Job> jobs = Job.findAllByIdInList(idList)
+                    resultMappings[domain] = [:]
+                    jobs.each {
+                        resultMappings[domain].put(it.id, it.label)
+                    }
+                    break;
                 default:
                     sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
                     return null
