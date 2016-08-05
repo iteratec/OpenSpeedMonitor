@@ -88,7 +88,9 @@ class AssetRequestPersisterService implements iResultListener {
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
         final String jobLabel = resultXml.getLabel()
-        Long jobGroupId = Job.findByLabel(jobLabel).jobGroup.id
+        Job job = Job.findByLabel(jobLabel)
+        Long jobId = job.id
+        Long jobGroupId = job.jobGroup.id
 
         def resp
         int attempts = 0
@@ -97,7 +99,7 @@ class AssetRequestPersisterService implements iResultListener {
             attempts++
             try {
                 resp = client.post(path: 'restApi/persistAssetsForWptResult',
-                        body: [osmUrl: osmUrl, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
+                        body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
                         requestContentType: JSON)
             } catch (ConnectException) {
                 sleep(1000 * TIMEOUT_IN_SECONDS)
