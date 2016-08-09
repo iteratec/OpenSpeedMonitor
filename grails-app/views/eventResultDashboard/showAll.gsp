@@ -259,7 +259,7 @@
 
                                 <div class="span4">
                                     <label for="selectAggregatorCachedHtmlId"><g:message
-                                            code="de.iteratec.isr.wptrd.labels.filterRepeateView"
+                                            code="de.iteratec.isr.wptrd.labels.filterRepeatedView"
                                             default="Repeated View:"/></label>
                                     <iteratec:optGroupedSelect id="selectAggregatorCachedHtmlId"
                                                                dataMap="${aggrGroupValuesCached}"

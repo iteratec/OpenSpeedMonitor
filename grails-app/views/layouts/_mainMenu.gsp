@@ -3,7 +3,7 @@
 <%-- determine main-tab an set variable respectively --%>
 <g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation')}"><g:set
         var="mainTab" value="results"/></g:if>
-<g:elseif test="${controllerName.equals('detailAnalysisDashboard')}"><g:set var="mainTab" value="results"/></g:elseif>
+<g:elseif test="${controllerName.equals('detailAnalysis')}"><g:set var="mainTab" value="results"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -73,6 +73,12 @@
                         class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                               default="Einzelergebnisse"/></g:link>
             </li>
+            %{--TODO Toggled until detailAnalysis is releasable--}%
+            %{--<li class="controller ${controllerName.equals('detailAnalysis') ? 'active' : ''}">--}%
+                %{--<g:link controller="detailAnalysis" action="show"><i--}%
+                        %{--class="fa fa-search-plus"></i> <g:message code="de.iteratec.detailAnalysis.title"--}%
+                                                              %{--default="detail analysis"/></g:link>--}%
+            %{--</li>--}%
         </g:elseif>
 
     <%-- CSI --%>
