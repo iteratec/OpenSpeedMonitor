@@ -31,7 +31,7 @@ class DetailAnalysisController {
             } else {
 //                show DetailData
                 String url = grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.microserviceUrl')
-                redirect(url: url + "detailAnalysisDashboard/show" + "?" +request.queryString)
+                redirect(url: url + "/detailAnalysisDashboard/show" + "?" +request.queryString)
             }
         }
 
