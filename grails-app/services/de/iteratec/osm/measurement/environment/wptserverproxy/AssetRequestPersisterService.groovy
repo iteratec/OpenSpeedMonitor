@@ -98,9 +98,10 @@ class AssetRequestPersisterService implements iResultListener {
         while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
             attempts++
             try {
-                resp = client.post(path: 'restApi/persistAssetsForWptResult',
+                resp = client.post(path: '/restApi/persistAssetsForWptResult',
                         body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
                         requestContentType: JSON)
+                println(resp)
             } catch (ConnectException) {
                 sleep(1000 * TIMEOUT_IN_SECONDS)
             }

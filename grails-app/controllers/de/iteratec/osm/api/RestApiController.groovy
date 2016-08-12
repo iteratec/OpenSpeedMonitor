@@ -69,8 +69,7 @@ import javax.persistence.NoResultException
 class RestApiController {
 
     public static final DateTimeFormatter API_DATE_FORMAT = ISODateTimeFormat.basicDateTimeNoMillis()
-    public static
-    final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
+    public static final String DEFAULT_ACCESS_DENIED_MESSAGE = "Access denied! A valid API-Key with sufficient access rights is required!"
 
     JobGroupDaoService jobGroupDaoService;
     PageDaoService pageDaoService;

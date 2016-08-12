@@ -1,11 +1,16 @@
 package de.iteratec.osm.result
 
+import de.iteratec.osm.api.ApiKey
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
+import groovyx.net.http.ContentType
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.HttpResponseDecorator
+import groovyx.net.http.RESTClient
 
 class DetailAnalysisController {
     EventResultDashboardService eventResultDashboardService
@@ -31,7 +36,14 @@ class DetailAnalysisController {
             } else {
 //                show DetailData
                 String url = grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.microserviceUrl')
-                redirect(url: url + "/detailAnalysisDashboard/show" + "?" +request.queryString)
+//                def osmDetailDatenResponse = getRestClient(url).get(
+//                        path: "/detailAnalysisDashboard/show",
+//                        query: [from:"29.07.2016",fromHour:"0%3A00",to:"30.07.2017",toHour:"23%3A59",apiKey:"CoVi44waaZ1i5F0YrpnO"],
+//                        contentType: ContentType.HTML,
+//                )
+//                modelToRender.put('osmDetailAnalysisResponse',osmDetailDatenResponse)
+
+                modelToRender.put("osmDetailAnalysisRequest",url + "/detailAnalysisDashboard/show" + "?apiKey="+ApiKey.findByDescription("OsmDetailAnalysis").secretKey+"&" +request.queryString)
             }
         }
 
@@ -109,5 +121,9 @@ class DetailAnalysisController {
 
         // Done! :)
         return result;
+    }
+
+    RESTClient getRestClient(String url) {
+        return new RESTClient(url)
     }
 }

@@ -182,6 +182,13 @@
                                 </div>
                             </div>
                         </div>
+                            <g:if test="${osmDetailAnalysisRequest}">
+                                <div>
+                                    <iframe id="osmDetailAnalysisRsultIFrame" src="${osmDetailAnalysisRequest}" style="width: 100%; height: 800px;overflow:hidden;" name="internal"
+                                            scrolling="yes" marginwidth="0" marginheight="0" frameborder="0" vspace="0" hspace="0"></iframe>
+                                </div>
+
+                            </g:if>
                         </div>
                             <div class="row">
                                 <div class="span12" id="bottomCommitButtons">
@@ -194,6 +201,7 @@
                         </div>
         </form>
     </div>
+
     <g:if test="${request.queryString && command && !command.hasErrors() && !eventResultValues}">
         <div class="span12">
             <div class="alert alert-danger">
@@ -235,6 +243,7 @@
         });
 
     </asset:script>
+
 </content>
 
 </body>
