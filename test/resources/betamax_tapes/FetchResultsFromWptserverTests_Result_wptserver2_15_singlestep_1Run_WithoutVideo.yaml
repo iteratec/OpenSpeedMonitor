@@ -4,7 +4,7 @@ interactions:
 - recorded: 2016-04-21T12:12:52.981Z
   request:
     method: GET
-    uri: http://www.webpagetest.org/xmlResult.php?f=xml&test=160421_VP_ZMG&r=160421_VP_ZMG
+    uri: http://www.webpagetest.org/xmlResult.php?f=xml&test=160421_VP_ZMG&r=160421_VP_ZMG&multistepFormat=1
     headers:
       Accept: application/xml
       Host: www.webpagetest.org
