@@ -12,6 +12,8 @@ grails:
     iteratec:
       osm:
         security:
+          initialApiKey: [apikey-for-communication-with-microservice]
+          initialMicroServiceName: [name-of-microservice] #e.g. OsmDetailAnalysis
           initialOsmAdminUser:
             username: [username-of-admin-user-to-be-bootsrapped]
             password: [password-of-admin-user-to-be-bootsrapped]

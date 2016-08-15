@@ -17,6 +17,7 @@
 
 
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
@@ -183,6 +184,17 @@ class BootStrap {
             if (createDefaultUsers) createUser('root', 'root', rootRole)
         } else {
             createUser(appRootUserName, appRootPassword, rootRole)
+        }
+
+//        //apiKey for microService
+        if(MicroServiceApiKey.list().isEmpty()){
+            String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey.isEmpty() ?
+                    null : grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey
+            String initialMicroServiceName = grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName.isEmpty() ?
+                    null : grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName
+            if(!initialApiKey || !initialMicroServiceName) log.warn("initial ApiKey configuration missing")
+            else new MicroServiceApiKey([secretKey:initialApiKey,microService:initialMicroServiceName, valid: true]).save(failOnError:true)
+
         }
 
         log.info "initUserData() OSM ends"

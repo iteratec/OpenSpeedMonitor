@@ -1,12 +1,14 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.api.ApiKey
+import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
+import grails.web.mapping.LinkGenerator
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
@@ -15,6 +17,7 @@ import groovyx.net.http.RESTClient
 class DetailAnalysisController {
     EventResultDashboardService eventResultDashboardService
     JobGroupDaoService jobGroupDaoService
+    LinkGenerator grailsLinkGenerator
 
     public final
     static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
@@ -43,7 +46,10 @@ class DetailAnalysisController {
 //                )
 //                modelToRender.put('osmDetailAnalysisResponse',osmDetailDatenResponse)
 
-                modelToRender.put("osmDetailAnalysisRequest",url + "/detailAnalysisDashboard/show" + "?apiKey="+ApiKey.findByDescription("OsmDetailAnalysis").secretKey+"&" +request.queryString)
+
+                String osmUrl = grailsLinkGenerator.getServerBaseURL()
+                String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
+                modelToRender.put("osmDetailAnalysisRequest",url + "detailAnalysisDashboard/show" + "?apiKey="+apiKey+"&osmUrl="+osmUrl+"&" +request.queryString)
             }
         }
 

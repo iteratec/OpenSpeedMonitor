@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.EventResult
@@ -83,6 +84,7 @@ class AssetRequestPersisterService implements iResultListener {
 
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
+        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
         String wptVersion = "2.19"
         List<String> wptTestIds = [resultXml.getTestId()]
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
@@ -98,10 +100,9 @@ class AssetRequestPersisterService implements iResultListener {
         while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
             attempts++
             try {
-                resp = client.post(path: '/restApi/persistAssetsForWptResult',
-                        body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
+                resp = client.post(path: 'restApi/persistAssetsForWptResult',
+                        body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId, apiKey: apiKey],
                         requestContentType: JSON)
-                println(resp)
             } catch (ConnectException) {
                 sleep(1000 * TIMEOUT_IN_SECONDS)
             }
