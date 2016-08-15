@@ -26,6 +26,8 @@ import grails.web.mapping.LinkGenerator
 import groovyx.net.http.RESTClient
 
 import static groovyx.net.http.ContentType.JSON
+import static groovyx.net.http.ContentType.URLENC
+import static groovyx.net.http.ContentType.XML
 
 /**
  * Persists locations and results. Observer of ProxyService.
@@ -84,6 +86,7 @@ class AssetRequestPersisterService implements iResultListener {
 
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
+        if(osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0,osmUrl.length()-1)
         String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
         String wptVersion = "2.19"
         List<String> wptTestIds = [resultXml.getTestId()]
@@ -102,7 +105,7 @@ class AssetRequestPersisterService implements iResultListener {
             try {
                 resp = client.post(path: 'restApi/persistAssetsForWptResult',
                         body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId, apiKey: apiKey],
-                        requestContentType: JSON)
+                        requestContentType: URLENC)
             } catch (ConnectException) {
                 sleep(1000 * TIMEOUT_IN_SECONDS)
             }

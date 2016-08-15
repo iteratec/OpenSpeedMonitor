@@ -48,6 +48,7 @@ class DetailAnalysisController {
 
 
                 String osmUrl = grailsLinkGenerator.getServerBaseURL()
+                if(osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0,osmUrl.length()-1)
                 String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
                 modelToRender.put("osmDetailAnalysisRequest",url + "detailAnalysisDashboard/show" + "?apiKey="+apiKey+"&osmUrl="+osmUrl+"&" +request.queryString)
             }
