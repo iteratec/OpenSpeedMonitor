@@ -30,6 +30,21 @@
 
 <div class="row">
     <div class="span12">
+        <g:if test="${errorList && !errorList.empty}">
+            <div class="alert alert-error">
+                <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
+                <ul>
+                    <g:each in="${errorList}">
+                        <li><g:message error = "${it}"/></li>
+                    </g:each>
+                </ul>
+            </div>
+        </g:if>
+    </div>
+</div>
+
+<div class="row">
+    <div class="span12">
         <form method="get" action="" id="dashBoardParamsForm">
             <div class="accordion">
                 <div class="accordion-group">

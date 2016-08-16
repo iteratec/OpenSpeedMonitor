@@ -38,7 +38,6 @@ class DetailAnalysisController {
                 modelToRender.put('command', cmd)
             } else {
 //                show DetailData
-                String url = grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.microserviceUrl')
 //                def osmDetailDatenResponse = getRestClient(url).get(
 //                        path: "/detailAnalysisDashboard/show",
 //                        query: [from:"29.07.2016",fromHour:"0%3A00",to:"30.07.2017",toHour:"23%3A59",apiKey:"CoVi44waaZ1i5F0YrpnO"],
@@ -48,9 +47,29 @@ class DetailAnalysisController {
 
 
                 String osmUrl = grailsLinkGenerator.getServerBaseURL()
-                if(osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0,osmUrl.length()-1)
+                def errorList = []
+                if (!osmUrl){
+                    errorList << message(code: 'default.serverUrl.undefined', args: [message(code: 'default.serverUrl.undefined', default: 'The server url is undefined. You can set it in the custom osm-properties.\n')])
+                }
+                String microServiceUrl = grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.microserviceUrl')
+                if (!microServiceUrl){
+                    errorList << message(code: 'default.microService.osmDetailAnalysis.url.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.url.undefined', default: 'The url for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
+                }
                 String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
-                modelToRender.put("osmDetailAnalysisRequest",url + "detailAnalysisDashboard/show" + "?apiKey="+apiKey+"&osmUrl="+osmUrl+"&" +request.queryString)
+                if (!apiKey){
+                    errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', default: 'The api key for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
+                }
+                if (osmUrl &&  microServiceUrl && apiKey ) {
+                    try {
+
+                        if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
+                        modelToRender.put("osmDetailAnalysisRequest", microServiceUrl + "detailAnalysisDashboard/show" + "?apiKey=" + apiKey + "&osmUrl=" + osmUrl + "&" + request.queryString)
+                    }catch (Exception ex){
+                        throw ex
+                    }
+                }
+                modelToRender.put("errorList", errorList)
+
             }
         }
 
