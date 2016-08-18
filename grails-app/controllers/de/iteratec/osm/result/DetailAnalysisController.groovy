@@ -9,10 +9,14 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
 import grails.web.mapping.LinkGenerator
+import groovy.xml.XmlUtil
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
 import groovyx.net.http.RESTClient
+import org.springframework.web.util.HtmlUtils
+
+import java.lang.reflect.InvocationTargetException
 
 class DetailAnalysisController {
     EventResultDashboardService eventResultDashboardService
@@ -63,9 +67,11 @@ class DetailAnalysisController {
                     try {
 
                         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-                        modelToRender.put("osmDetailAnalysisRequest", microServiceUrl + "detailAnalysisDashboard/show" + "?apiKey=" + apiKey + "&osmUrl=" + osmUrl + "&" + request.queryString)
-                    }catch (Exception ex){
-                        throw ex
+                        String detailDataWebPageAsString = new URL(microServiceUrl + "detailAnalysisDashboard/show" + "?apiKey=" + apiKey + "&osmUrl=" + osmUrl + "&" + request.queryString).getText()
+                        def detailDataWebPageBodyAsString = detailDataWebPageAsString.substring(detailDataWebPageAsString.indexOf('<div id="dcChart">'), detailDataWebPageAsString.indexOf("</body>"))
+                        modelToRender.put("osmDetailAnalysisRequest",detailDataWebPageBodyAsString)
+                    }catch (InvocationTargetException  ex){
+                        errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.unreachable', default: 'Microservice unreachable\n')])
                     }
                 }
                 modelToRender.put("errorList", errorList)
