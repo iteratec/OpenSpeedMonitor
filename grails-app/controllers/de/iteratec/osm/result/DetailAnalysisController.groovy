@@ -68,8 +68,7 @@ class DetailAnalysisController {
 
                         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
                         String detailDataWebPageAsString = new URL(microServiceUrl + "detailAnalysisDashboard/show" + "?apiKey=" + apiKey + "&osmUrl=" + osmUrl + "&" + request.queryString).getText()
-                        def detailDataWebPageBodyAsString = detailDataWebPageAsString.substring(detailDataWebPageAsString.indexOf('<div id="dcChart">'), detailDataWebPageAsString.indexOf("</body>"))
-                        modelToRender.put("osmDetailAnalysisRequest",detailDataWebPageBodyAsString)
+                        modelToRender.put("osmDetailAnalysisRequest",detailDataWebPageAsString)
                     }catch (InvocationTargetException  ex){
                         errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.unreachable', default: 'Microservice unreachable\n')])
                     }
