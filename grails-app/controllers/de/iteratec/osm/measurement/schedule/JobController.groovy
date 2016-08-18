@@ -189,9 +189,10 @@ class JobController {
                 }
             }
 
+            def tags = params.remove("tags")
             job.properties = params
             setVariablesOnJob(params.variables, job)
-            job.tags = params.list('tags')
+            job.tags = [tags].flatten()
             if (!job.save()) {
                 render(view: 'edit', model: [job: job] << getStaticModelPartForEditOrCreateView())
                 return
