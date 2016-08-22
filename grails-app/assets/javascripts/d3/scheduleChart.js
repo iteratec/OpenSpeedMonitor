@@ -18,7 +18,6 @@
  * @param htmlIdOfShowOverusedDiv HTML id of the div with show overused toggle buttons
  */
 function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfShowOverusedDiv, linkToEditPage) {
-
     var data = rawdata;
 
     // pick div and set width
@@ -374,7 +373,6 @@ function getJobNames(location) {
         var job = location.jobs[j];
         var linkId = parseInt(job.linkId);
         jobNames.push({name: job.name, description: job.description, linkId: linkId});
-        console.log(linkId)
     }
     return jobNames;
 }
