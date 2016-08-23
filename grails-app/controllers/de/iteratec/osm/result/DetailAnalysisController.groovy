@@ -71,6 +71,8 @@ class DetailAnalysisController {
                         modelToRender.put("osmDetailAnalysisRequest",detailDataWebPageAsString)
                     }catch (InvocationTargetException  ex){
                         errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.unreachable', default: 'Microservice unreachable\n')])
+                    }catch (ConnectException  ex){
+                        errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.unreachable', default: 'Microservice unreachable\n')])
                     }
                 }
                 modelToRender.put("errorList", errorList)
