@@ -73,12 +73,13 @@
                         class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                               default="Einzelergebnisse"/></g:link>
             </li>
-            %{--TODO Toggled until detailAnalysis is releasable--}%
-            %{--<li class="controller ${controllerName.equals('detailAnalysis') ? 'active' : ''}">--}%
-                %{--<g:link controller="detailAnalysis" action="show"><i--}%
-                        %{--class="fa fa-search-plus"></i> <g:message code="de.iteratec.detailAnalysis.title"--}%
-                                                              %{--default="detail analysis"/></g:link>--}%
-            %{--</li>--}%
+            <g:if test = "${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')}">
+                <li class="controller ${controllerName.equals('detailAnalysis') ? 'active' : ''}">
+                    <g:link controller="detailAnalysis" action="show"><i
+                            class="fa fa-search-plus"></i> <g:message code="de.iteratec.detailAnalysis.title"
+                                                                  default="detail analysis"/></g:link>
+                </li>
+            </g:if>
         </g:elseif>
 
     <%-- CSI --%>
