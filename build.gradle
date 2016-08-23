@@ -182,10 +182,8 @@ task bowerSyncJavascript(type: Sync) {
     from 'bower_components'
     into "grails-app/assets/javascripts/bower_components"
     include 'jquery/jquery.min.js'
-    include 'jquery-ui/ui/jquery-ui.js'
+    include 'jquery-ui/ui/minified/jquery-ui.min.js'
     include 'bootstrap/docs/assets/js/bootstrap.min.js'
-    include 'bootstrap/js/*.js'
-    include 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'
     dependsOn bowerInstall
 }
 
@@ -194,7 +192,6 @@ task bowerSyncStylesheets(type: Sync) {
     into "grails-app/assets/stylesheets/bower_components"
     include 'bootstrap/docs/assets/css/bootstrap*.css'
     include 'bootstrap/less/*.less'
-    include 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
     dependsOn bowerInstall

@@ -80,7 +80,7 @@ function PostLoaded(dataFromGsp){
             var text = domainDeleteConfirmation(dataFromGsp.i18n_deletionConfirmMessage, dataFromGsp.idOfItemToDelete, link);
             spinner.stop();
             $('#DeleteModal').find('p').html(text);
-        },1);
+        },10);
     };
 
 

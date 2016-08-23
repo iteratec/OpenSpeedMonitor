@@ -126,7 +126,6 @@ $.extend({
 function domainDeleteConfirmation(message,id,link){
 	var confirmMessage = "";
 	if(typeof link !== "undefined" && link !== null && link !== ""){
-		console.log("a");
 		jQuery.ajax({
 			type : 'GET',
 			url : link,
