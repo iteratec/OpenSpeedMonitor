@@ -21,6 +21,7 @@ import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.web.mapping.LinkGenerator
@@ -86,22 +87,25 @@ class AssetRequestPersisterService implements iResultListener {
         if (!persistenceOfAssetRequestsEnabled)
             return
 
-        RESTClient client = new RESTClient(microserviceUrl)
-        String osmUrl = grailsLinkGenerator.getServerBaseURL()
-        if(osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0,osmUrl.length()-1)
-        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
-        String wptVersion = "2.19"
-        List<String> wptTestIds = [resultXml.getTestId()]
-        String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
-
         final String jobLabel = resultXml.getLabel()
         Job job = jobDaoService.getJob(jobLabel)
-        if(!job) {
+        if (!job) {
             throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId() +
                     "\n Job with name " + jobLabel + "doesn't exist")
         }
         Long jobId = job.id
         Long jobGroupId = job.jobGroup.id
+
+        if(!JobGroup.get(jobGroupId).persistDetailData)
+            return
+
+        RESTClient client = new RESTClient(microserviceUrl)
+        String osmUrl = grailsLinkGenerator.getServerBaseURL()
+        if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
+        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
+        String wptVersion = "2.19"
+        List<String> wptTestIds = [resultXml.getTestId()]
+        String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
         def resp
         int attempts = 0

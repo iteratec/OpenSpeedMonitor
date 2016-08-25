@@ -54,7 +54,7 @@
                                                                    default="Persist Detaildata"/></label>
 
     <div class="controls">
-        <bs:checkBox name="persistHar" />
+        <bs:checkBox name="persistDetailData"/>
     </div>
 
 </div>

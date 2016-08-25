@@ -31,4 +31,12 @@ databaseChangeLog = {
             }
         }
     }
+
+    changeSet(author: "marcus (generated)", id: "1472133595073-1") {
+        addColumn(tableName: "job_group") {
+            column(name: "persist_detail_data", type: "bit") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 }
