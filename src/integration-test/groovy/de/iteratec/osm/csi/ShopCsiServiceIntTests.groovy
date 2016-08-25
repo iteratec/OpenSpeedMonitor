@@ -197,7 +197,7 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     private void createEventResult(MeasuredEvent event, String tag, double value) {
         //data is needed to create a JobResult
         JobGroup group = JobGroup.list()[0]
-        Script script = TestDataUtil.createScript("label${groups}", "description", "navigationScript", true)
+        Script script = TestDataUtil.createScript("label${groups}", "description", "navigationScript")
         WebPageTestServer webPageTestServer = TestDataUtil.createWebPageTestServer("label", "1", true, "http://www.url.de")
         Browser browser = TestDataUtil.createBrowser("browser${groups}", 1)
         Location location = TestDataUtil.createLocation(webPageTestServer, "id", browser, true)

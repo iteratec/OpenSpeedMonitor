@@ -131,7 +131,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
             createPages()
             server1 = TestDataUtil.createServer()
             testLocation = TestDataUtil.createLocation(server1, 'otto-prod-hetzner:Firefox', Browser.findByName('FF'), true)
-            testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+            testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de')
             TestDataUtil.createJobGroup(jobGroupName_csi_1)
             TestDataUtil.createJobGroup(jobGroupName_csi_05)
 

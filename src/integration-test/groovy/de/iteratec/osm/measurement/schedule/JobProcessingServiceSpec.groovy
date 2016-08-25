@@ -51,6 +51,7 @@ import static org.junit.Assert.assertNotNull
 class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
     JobProcessingService jobProcessingService
     QueueAndJobStatusService queueAndJobStatusService
+    JobDaoService jobDaoService
 
     final static String UNNAMED_JOB_LABEL = 'Unnamed Job'
     /**
@@ -215,14 +216,14 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         }
 
         Job.withNewTransaction {
-            job = Job.findById(jobId)
+            job = jobDaoService.getJobById(jobId)
             //launchJobRun returns false, because it fails and catch the exception
             jobProcessingService.launchJobRun(job)
         }
         // manual first execution
         // cause quartz scheduling doesn't seem to work trustable in tests
         Job.withNewTransaction {
-            job = Job.findById(jobId)
+            job = jobDaoService.getJobById(jobId)
         jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
         }
         TriggerKey subtriggerKey
@@ -251,7 +252,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                 assertEquals(HttpRequestServiceMock.statusCodes[i], unfinishedResult.httpStatusCode)
             }
             Job.withNewTransaction {
-                job = Job.findById(jobId)
+                job = jobDaoService.getJobById(jobId)
                 jobProcessingService.pollJobRun(job, HttpRequestServiceMock.testId)
             }
         }
@@ -281,7 +282,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
         Job.withNewTransaction {
             createJob(false)
         }
-        Job job = Job.findById(1)
+        Job job = jobDaoService.getJobById(1)
         Date now = new Date()
         Date oldestDate = now - 5
 

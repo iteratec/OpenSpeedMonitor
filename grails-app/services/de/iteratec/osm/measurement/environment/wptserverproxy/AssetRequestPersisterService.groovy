@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.web.mapping.LinkGenerator
@@ -44,6 +45,7 @@ class AssetRequestPersisterService implements iResultListener {
     private final int TIMEOUT_IN_SECONDS = 5
 
     LinkGenerator grailsLinkGenerator
+    JobDaoService jobDaoService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -93,7 +95,11 @@ class AssetRequestPersisterService implements iResultListener {
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
         final String jobLabel = resultXml.getLabel()
-        Job job = Job.findByLabel(jobLabel)
+        Job job = jobDaoService.getJob(jobLabel)
+        if(!job) {
+            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId() +
+                    "\n Job with name " + jobLabel + "doesn't exist")
+        }
         Long jobId = job.id
         Long jobGroupId = job.jobGroup.id
 

@@ -182,7 +182,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
                 undefBrowser,
                 true
         )
-        Script script = TestDataUtil.createScript('script', 'description', 'navigate tralala', false)
+        Script script = TestDataUtil.createScript('script', 'description', 'navigate tralala')
         TestDataUtil.createJob(
                 'FF_BV1_Multistep_2',
                 script,

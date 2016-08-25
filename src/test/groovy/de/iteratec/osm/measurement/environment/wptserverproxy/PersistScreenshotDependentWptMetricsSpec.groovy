@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
@@ -78,6 +79,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     def doWithSpring = {
         pageService(PageService)
         performanceLoggingService(PerformanceLoggingService)
+        jobDaoService(JobDaoService)
     }
     void setUp() {
 
@@ -99,7 +101,7 @@ class PersistScreenshotDependentWptMetricsSpec {
         Location locationIe_old = TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
         List<Page> pages = TestDataUtil.createPages(['HP', 'SE'])
 
-        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de')
         TestDataUtil.createJob('FF_Otto_multistep', testScript, locationFirefox, jobGroup, '', 1 , false, 60)
         TestDataUtil.createJob('IE_otto_hp_singlestep', testScript, locationIe, jobGroup, '', 1 , false, 60)
     }

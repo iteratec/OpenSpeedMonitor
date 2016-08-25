@@ -29,6 +29,8 @@ class ConnectivityProfileController {
 
     static allowedMethods = [save: "POST", update: "PUT", deactivate: "PUT"]
 
+    JobDaoService jobDaoService
+
     def index() {
         redirect(action: "list", params: params)
     }
@@ -89,7 +91,7 @@ class ConnectivityProfileController {
         connectivityProfile.active = true
         if (!connectivityProfile.save(flush: true)) {
             render(view: 'create', model: [connectivityProfileInstance: connectivityProfile])
-        } else{
+        } else {
             def flashMessageArgs = [message(code: 'connectivityProfile.label', default: 'Connection'), connectivityProfile.name]
             flash.message = message(code: 'default.created.message', args: flashMessageArgs)
             redirect(action: "list")
@@ -136,7 +138,7 @@ class ConnectivityProfileController {
         }
 
         // Switch all the jobs concerned to the new ConnectivityProfile
-        Job.findAllByConnectivityProfile(connectivityProfileInstance).each {
+        jobDaoService.getJobs(connectivityProfileInstance).each {
             it.connectivityProfile = connectivityProfileInstanceCopy
             it.save()
         }
@@ -145,10 +147,10 @@ class ConnectivityProfileController {
             newBrowserConnectivityWeight.browser = oldBrowserConnectivityWeight.browser
             newBrowserConnectivityWeight.weight = oldBrowserConnectivityWeight.weight
             newBrowserConnectivityWeight.connectivity = connectivityProfileInstanceCopy
-            CsiConfiguration.findAll().each {CsiConfiguration currentCsiConfiguration ->
-                if (currentCsiConfiguration.browserConnectivityWeights.contains(oldBrowserConnectivityWeight) ){
+            CsiConfiguration.findAll().each { CsiConfiguration currentCsiConfiguration ->
+                if (currentCsiConfiguration.browserConnectivityWeights.contains(oldBrowserConnectivityWeight)) {
                     currentCsiConfiguration.browserConnectivityWeights.add(newBrowserConnectivityWeight)
-                    currentCsiConfiguration.save(flush:true)
+                    currentCsiConfiguration.save(flush: true)
                 }
             }
             newBrowserConnectivityWeight.save(flush: true)

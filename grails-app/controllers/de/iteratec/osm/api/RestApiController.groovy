@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.measurement.schedule.JobService
@@ -86,6 +87,7 @@ class RestApiController {
     EventDaoService eventDaoService
     InMemoryConfigService inMemoryConfigService
     JobProcessingService jobProcessingService
+    JobDaoService jobDaoService
 
     /**
      * <p>
@@ -517,7 +519,7 @@ class RestApiController {
                     }
                     break;
                 case "Job":
-                    List<Job> jobs = Job.findAllByIdInList(idList)
+                    List<Job> jobs = jobDaoService.getJobsByIds(idList)
                     resultMappings[domain] = [:]
                     jobs.each {
                         resultMappings[domain].put(it.id, it.label)

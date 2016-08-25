@@ -23,4 +23,12 @@ databaseChangeLog = {
             }
         }
     }
+
+    changeSet(author: "marcus (generated)", id: "1471947455462-1") {
+        addColumn(tableName: "job") {
+            column(name: "deleted", type: "BOOLEAN") {
+                constraints(nullable: "false")
+            }
+        }
+    }
 }

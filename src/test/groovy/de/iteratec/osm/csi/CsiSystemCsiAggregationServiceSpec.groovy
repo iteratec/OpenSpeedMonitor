@@ -386,7 +386,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 wptServer: server
         ).save(failOnError: true)
 
-        job1 = TestDataUtil.createJob("job1", TestDataUtil.createScript("script1", "", "auf gehts", false), ffAgent1, jobGroup1, "", 1, false, 20)
+        job1 = TestDataUtil.createJob("job1", TestDataUtil.createScript("script1", "", "auf gehts"), ffAgent1, jobGroup1, "", 1, false, 20)
         conn1 = TestDataUtil.createConnectivityProfile("conn1")
 
         JobResult jobResult1 = new JobResult(

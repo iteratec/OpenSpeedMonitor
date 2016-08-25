@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
 import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.MeasuredEvent
@@ -175,9 +176,9 @@ class RestApiControllerSpec extends Specification {
 
     void "getting correct mappings for domain classes"() {
         given: "some data in db"
-        WebPageTestServer server = TestDataUtil.createWebPageTestServer("server1", "web.de", true, "http://internet.de")
+        WebPageTestServer server = TestDataUtil.createUnusedWptServer()
         Location location1 = TestDataUtil.createLocation(server, "location1", browser1, true)
-        Script script = TestDataUtil.createScript("script1", "description", "unused", false)
+        Script script = TestDataUtil.createScript("script1", "description", "unused")
         TestDataUtil.createJob("job1", script, location1, jobGroupWithoutCsiConfiguration1, "description", 1, false, 200)
         TestDataUtil.createJob("job2", script, location1, jobGroupWithoutCsiConfiguration1, "description", 1, false, 200)
 
@@ -296,5 +297,6 @@ class RestApiControllerSpec extends Specification {
         controllerUnderTest.browserDaoService = grailsApplication.mainContext.getBean('defaultBrowserDaoService')
         controllerUnderTest.pageDaoService = grailsApplication.mainContext.getBean('defaultPageDaoService')
         controllerUnderTest.locationDaoService = grailsApplication.mainContext.getBean('defaultLocationDaoService')
+        controllerUnderTest.jobDaoService = new JobDaoService()
     }
 }

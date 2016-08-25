@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
@@ -71,6 +72,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     def doWithSpring = {
         pageService(PageService)
         performanceLoggingService(PerformanceLoggingService)
+        jobDaoService(JobDaoService)
     }
 
     void setup() {
@@ -91,7 +93,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
         Location locationIe = TestDataUtil.createLocation(wptServer, 'NewYork:IE 11', ie, true)
         UNDEFINED_PAGE = TestDataUtil.createUndefinedPage()
 
-        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de')
         TestDataUtil.createJob(LABEL_MULTISTEP_JOB, testScript, locationFirefox, jobGroup, '', 1, false, 60)
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1, UNDEFINED_PAGE)
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2, UNDEFINED_PAGE)

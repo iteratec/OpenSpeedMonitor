@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
@@ -66,6 +67,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     @Before
     void setUp() {
         serviceUnderTest = service
+        serviceUnderTest.jobDaoService = new JobDaoService()
 
         server = new WebPageTestServer(
                 label: "TestServer 1",
@@ -100,7 +102,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', true)
@@ -111,6 +113,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockTimeToCsMappingService()
         mockPageService()
         mockCsiAggregationTagService('notTheConcernOfThisTest')
+        
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -149,7 +152,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', false)
@@ -160,6 +163,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockTimeToCsMappingService()
         mockPageService()
         mockCsiAggregationTagService('notTheConcernOfThisTest')
+        
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -191,7 +195,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', true)
@@ -202,6 +206,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockTimeToCsMappingService()
         mockPageService()
         mockCsiAggregationTagService('notTheConcernOfThisTest')
+        
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -234,7 +239,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         //create test-specific data
         String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         String har = new File('test/resources/HARs/singleResult.har').getText()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', false)
         deleteResults()
@@ -245,6 +250,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockTimeToCsMappingService()
         mockPageService()
         mockCsiAggregationTagService('notTheConcernOfThisTest')
+        
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);

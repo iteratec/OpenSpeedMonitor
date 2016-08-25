@@ -399,17 +399,15 @@ class TestDataUtil implements OsmTestLogin {
         return createScript(
                 'script label',
                 'script description',
-                'navigate http://www.osm.org',
-                false
+                'navigate http://www.osm.org'
         )
     }
 
-    static Script createScript(String label, String description, String navigationScript, boolean provideAuthenticateInformation) {
+    static Script createScript(String label, String description, String navigationScript) {
         return new Script(
                 label: label,
                 description: description,
                 navigationScript: navigationScript,
-                provideAuthenticateInformation: provideAuthenticateInformation,
         ).save(failOnError: true)
     }
 
@@ -1553,11 +1551,15 @@ class TestDataUtil implements OsmTestLogin {
         job.save()
     }
 
+    public static WebPageTestServer createUnusedWptServer() {
+        return createWebPageTestServer("webPageTestServer", "proxyId", true, "http://internet.de/")
+    }
+
     public static Job createSimpleJob() {
         JobGroup group = createJobGroup("group")
         Location location = createLocation(createWebPageTestServer("label2", "proxyId", true, "http://server1.iteratec.de/"), "veryUnique",
                 createBrowser("FF", 1), true)
-        return createJob("label", createScript("label1", "description", "navi", false),
+        return createJob("label", createScript("label1", "description", "navi",),
                 location, group, "description", 1, false, 10)
     }
 

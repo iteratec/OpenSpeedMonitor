@@ -2,16 +2,19 @@ package de.iteratec.osm.batch
 
 class BatchActivityService {
 
-
-
     /**
      */
     public BatchActivityUpdater getActiveBatchActivity(Class c, Activity activity, String name, int maxStages, boolean observe, int saveThreshold = 10) {
-        if(observe){
-            return new BatchActivityUpdater(name,c.name,activity, maxStages, saveThreshold)
-        } else{
-            return new BatchActivityUpdaterDummy(name,c.name,activity, maxStages,1)
+        def result
+        BatchActivity.withSession {
+            if (observe) {
+                result = new BatchActivityUpdater(name, c.name, activity, maxStages, saveThreshold)
+            } else {
+                result = new BatchActivityUpdaterDummy(name, c.name, activity, maxStages, 1)
+            }
+
         }
+        return result
     }
 
     /**
@@ -21,7 +24,11 @@ class BatchActivityService {
      * @return
      */
     public boolean runningBatch(Class c, String name, Activity activity) {
-        return (BatchActivity.findByNameAndDomainAndActivityAndStatus(name, c.name, activity, Status.ACTIVE) != null)
+        def result
+        BatchActivity.withNewSession {
+            result = BatchActivity.findByNameAndDomainAndActivityAndStatus(name, c.name, activity, Status.ACTIVE) != null
+        }
+        return result
     }
 
 }

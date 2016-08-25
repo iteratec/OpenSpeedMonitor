@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
@@ -165,6 +166,7 @@ class PersistingNewEventResultsTests {
         pageService(PageService)
         csiAggregationTagService(CsiAggregationTagService)
         csiValueService(CsiValueService)
+        jobDaoService(JobDaoService)
     }
 
     @Before
@@ -976,7 +978,7 @@ class PersistingNewEventResultsTests {
         createPages()
         createBrowsers()
         Location testLocation = TestDataUtil.createLocation(server1, 'test-location', Browser.findByName('IE'), true)
-        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de')
         TestDataUtil.createJob('ie_step_testjob', testScript, testLocation, undefinedJobGroup, '', 1, false, 60)
         TestDataUtil.createJob('http://www.example.de.de - Multiple steps with event names + dom elements', testScript, testLocation, undefinedJobGroup, '', 1, false, 60)
         TestDataUtil.createJob('FF_BV1_Step01_Homepage - netlab', testScript, testLocation, undefinedJobGroup, '', 1, false, 60)
