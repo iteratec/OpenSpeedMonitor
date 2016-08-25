@@ -1077,8 +1077,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             TestDataUtil.createAdminUser()
             initChartData()
 
-            Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff", false)
-            Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff", false)
+            Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
+            Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
             JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
             WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
             Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen", 1d)

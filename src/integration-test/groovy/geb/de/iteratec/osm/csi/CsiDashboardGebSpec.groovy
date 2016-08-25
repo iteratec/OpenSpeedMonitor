@@ -481,7 +481,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
     private void createTestSpecificData(){
 
 
-        Script script1 = TestDataUtil.createScript(script1Name,"This is for test purposes","stuff",false)
+        Script script1 = TestDataUtil.createScript(script1Name,"This is for test purposes","stuff")
         Browser browser = TestDataUtil.createBrowser("TestFireFox",1d)
         ConnectivityProfile connectivityProfile =TestDataUtil.createConnectivityProfile(connectivityProfileName)
         BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
