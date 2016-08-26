@@ -186,15 +186,19 @@ class BootStrap {
             createUser(appRootUserName, appRootPassword, rootRole)
         }
 
-//        //apiKey for microService
-        if(MicroServiceApiKey.list().isEmpty()){
-            String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey.isEmpty() ?
-                    null : grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey
-            String initialMicroServiceName = grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName.isEmpty() ?
-                    null : grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName
-            if(!initialApiKey || !initialMicroServiceName) log.warn("initial ApiKey configuration missing")
-            else new MicroServiceApiKey([secretKey:initialApiKey,microService:initialMicroServiceName, valid: true]).save(failOnError:true)
 
+        //apiKey for microService
+        Boolean enablePersistenceOfAssetRequests = grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests == null ?
+                null :  grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests
+        if(enablePersistenceOfAssetRequests) {
+            if (MicroServiceApiKey.list().isEmpty()) {
+                String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey.isEmpty() ?
+                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey
+                String initialMicroServiceName = grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName.isEmpty() ?
+                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName
+                if (!initialApiKey || !initialMicroServiceName) log.warn("initial MicroserviceApiKey configuration missing")
+                else new MicroServiceApiKey([secretKey: initialApiKey, microService: initialMicroServiceName, valid: true]).save(failOnError: true)
+            }
         }
 
         log.info "initUserData() OSM ends"
