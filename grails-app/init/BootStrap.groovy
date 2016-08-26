@@ -188,8 +188,7 @@ class BootStrap {
 
 
         //apiKey for microService
-        Boolean enablePersistenceOfAssetRequests = grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests == null ?
-                null :  grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests
+        Boolean enablePersistenceOfAssetRequests = grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests
         if(enablePersistenceOfAssetRequests) {
             if (MicroServiceApiKey.list().isEmpty()) {
                 String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey.isEmpty() ?
