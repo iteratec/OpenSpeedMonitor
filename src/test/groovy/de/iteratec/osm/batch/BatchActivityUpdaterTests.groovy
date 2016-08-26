@@ -2,7 +2,6 @@ package de.iteratec.osm.batch
 
 import grails.test.mixin.Mock
 import spock.lang.Specification
-import spock.lang.Unroll
 
 @Mock([BatchActivity])
 class BatchActivityUpdaterTests extends Specification{
