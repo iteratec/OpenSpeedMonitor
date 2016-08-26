@@ -73,7 +73,7 @@
                         class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                               default="Einzelergebnisse"/></g:link>
             </li>
-            <g:if test = "${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')}">
+            <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
                 <li class="controller ${controllerName.equals('detailAnalysis') ? 'active' : ''}">
                     <g:link controller="detailAnalysis" action="show"><i
                             class="fa fa-search-plus"></i> <g:message code="de.iteratec.detailAnalysis.title"
