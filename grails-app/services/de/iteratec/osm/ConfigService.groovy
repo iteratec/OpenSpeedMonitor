@@ -27,7 +27,6 @@ import de.iteratec.osm.csi.CsiTransformation
 class ConfigService {
 
 	def grailsApplication
-
 	InMemoryConfigService inMemoryConfigService
 
 
@@ -38,7 +37,7 @@ class ConfigService {
 	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#detailDataStorageTimeInWeeks} isn't set.
 	 */
     Integer getDetailDataStorageTimeInWeeks() {
-		return (Integer)retrieveConfigValue('detailDataStorageTimeInWeeks')
+        return getConfig().detailDataStorageTimeInWeeks
     }
 	
     /**
@@ -48,7 +47,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#detailDataStorageTimeInWeeks} isn't set.
      */
     Integer getDefaultMaxDownloadTimeInMinutes() {
-    	return (Integer)retrieveConfigValue('defaultMaxDownloadTimeInMinutes')
+        return getConfig().defaultMaxDownloadTimeInMinutes
     }
 	
 	/** 
@@ -59,7 +58,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#minDocCompleteTimeInMillisecs} isn't set.
 	 */
 	Integer getMinDocCompleteTimeInMillisecs(){
-		return (Integer)retrieveConfigValue('minDocCompleteTimeInMillisecs')
+        return getConfig().minDocCompleteTimeInMillisecs
 	}
 	
 	/**
@@ -70,7 +69,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#maxDocCompleteTimeInMillisecs} isn't set.
 	 */
 	Integer getMaxDocCompleteTimeInMillisecs(){
-		return (Integer)retrieveConfigValue('maxDocCompleteTimeInMillisecs')
+        return getConfig().maxDocCompleteTimeInMillisecs
 	}
 	
 	/**
@@ -79,7 +78,7 @@ class ConfigService {
 	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
 	 */
 	Integer getInitialChartHeightInPixels(){
-		return (Integer)retrieveConfigValue('initialChartHeightInPixels')
+        return getConfig().initialChartHeightInPixels
 	}
 
 	/**
@@ -88,7 +87,7 @@ class ConfigService {
 	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
 	 */
 	Integer getInitialChartWidthInPixels(){
-		return (Integer)retrieveConfigValue('initialChartWidthInPixels')
+        return getConfig().initialChartWidthInPixels
 	}
 
 	/**
@@ -97,7 +96,7 @@ class ConfigService {
 	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
 	 */
 	String getMainUrlUnderTest(){
-		return (String)retrieveConfigValue('mainUrlUnderTest')
+        return getConfig().mainUrlUnderTest
 	}
 
     /**
@@ -107,7 +106,7 @@ class ConfigService {
      * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
      */
     Integer getMaxDataStorageTimeInMonths(){
-		return (Integer)retrieveConfigValue('maxDataStorageTimeInMonths')
+        return getConfig().maxDataStorageTimeInMonths
     }
 
 	/**
@@ -117,7 +116,7 @@ class ConfigService {
 	 * @throws IllegalStateException if single {@link OsmConfiguration} can't be read from db or {@link OsmConfiguration#measurementsGenerallyEnabled} isn't set.
 	 */
 	Integer getMaxBatchActivityStorageTimeInDays(){
-		return (Integer)retrieveConfigValue('maxBatchActivityStorageTimeInDays')
+        return getConfig().maxBatchActivityStorageTimeInDays
 	}
 
 	/**
@@ -134,23 +133,25 @@ class ConfigService {
      * users which are satisfied by that load time.
      */
     CsiTransformation getCsiTransformation(){
-        return (CsiTransformation)retrieveConfigValue('csiTransformation')
+        return getConfig().csiTransformation
     }
 
-	private Object retrieveConfigValue(String name) {
-		List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
-		if (osmConfigs.size() != 1 || osmConfigs[0]."${name}" == null) {
-			throw new IllegalStateException("${name} couldn\'t be read from Configuration!")
-		}else{
-			return osmConfigs[0]."${name}"
-		}
-	}
+    /**
+     * Gets the name of the used database driver of running environment
+     * @return {@link String} of the used database driver name
+     */
+    public String getDatabaseDriverClassName() {
+        return grailsApplication.config.dataSource.driverClassName;
+    }
+
+    private OsmConfiguration getConfig(){
+        List<OsmConfiguration> osmConfigs = OsmConfiguration.list()
+        int confCount = osmConfigs.size()
+        if (confCount != 1) {
+            throw new IllegalStateException("It must exist exact one Configuration in database. Found ${confCount}!")
+        }else{
+            return osmConfigs[0]
+        }
+    }
 	
-	/**
-	 * Gets the name of the used database driver of running environment 
-	 * @return {@link String} of the used database driver name
-	 */
-	public String getDatabaseDriverClassName() {
-		return grailsApplication.config.dataSource.driverClassName;
-	}
 }
