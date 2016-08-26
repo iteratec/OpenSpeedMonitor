@@ -25,7 +25,6 @@ grails:
           chartTagLib: RICKSHAW
           availableChartTagLibs:
             - RICKSHAW
-        highchartsExportServerUrl: 'http://export.highcharts.com'
       test:
         geb:
           login: admin
