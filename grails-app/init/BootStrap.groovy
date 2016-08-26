@@ -350,15 +350,7 @@ class BootStrap {
             Map indexToMappingName = [1: '1 - impatient', 2: '2', 3: '3', 4: '4', 5: '5 - patient']
             String pathToFile
             String fileName = 'Default_CSI_Mappings.csv'
-            InputStream csvIs
-            if (grailsApplication.warDeployed) {
-                pathToFile = '/WEB-INF/classes/' + fileName
-                Resource csvFileAsResource = defaultResourceLoader.getResource(pathToFile)
-                csvIs = csvFileAsResource.getInputStream()
-            } else {
-                pathToFile = BuildSettings.BASE_DIR.absolutePath + "/src/main/resources/" + fileName
-                csvIs = new FileInputStream(pathToFile)
-            }
+            InputStream csvIs = this.class.classLoader.getResourceAsStream(fileName)
             BufferedReader csvFileReader = new BufferedReader(new InputStreamReader(csvIs))
             int lineCounter = 0
             String line
