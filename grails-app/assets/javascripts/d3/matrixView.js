@@ -94,15 +94,14 @@ function createMatrixView(data, chartDivIdentifier) {
 
     // Color tiles using weights from data
     for(var e = 0; e < data.entries.length; e++) {
-        if (data.entries[e].weight != 0) { // value 0 not set to make the rectangle grey
+        if (data.entries[e].weight != 0) { // The value 0 makes the rectangle white but we want the same (grey) color for 0 and undefined
             var entry = data.entries[e];
+            svg.select("[name=" + makeValidString(entry.columnName + entry.rowName) + "]")
+                .select("rect")
+                .attr("matrixWeight", entry.weight)
+                .style("fill", color)
+                .style("opacity", colorScale(entry.weight));
         }
-
-        svg.select("[name=" + makeValidString(entry.columnName + entry.rowName) + "]")
-            .select("rect")
-            .attr("matrixWeight", entry.weight)
-            .style("fill", color)
-            .style("opacity", colorScale(entry.weight));
     }
 
     // draw axis
