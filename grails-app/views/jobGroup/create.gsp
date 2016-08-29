@@ -40,6 +40,13 @@
 
             $("ul[name='tags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags', absolute: true)}'});
         });
+
+		function selectAllGraphiteServer(select) {
+            var obj = $("#graphiteServers")[0];
+            for (var i=0; i<obj.options.length; i++) {
+                obj.options[i].selected = select;
+            }
+        }
 	</asset:script>
 </content>
 		
