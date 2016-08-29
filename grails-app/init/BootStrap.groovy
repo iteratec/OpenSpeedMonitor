@@ -440,7 +440,7 @@ class BootStrap {
         proxyService.addResultListener(resultPersisterService)
 
         // enable peristence of assetRequests for JobResults if configured
-        boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.assetRequests?.enablePersistenceOfAssetRequests?.toLowerCase() == "true"
+        boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.assetRequests?.enablePersistenceOfAssetRequests
         if (persistenceEnabled) {
             String microserviceUrl = grailsApplication.config.grails?.de?.iteratec?.osm?.assetRequests?.microserviceUrl
             UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS)
