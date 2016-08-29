@@ -16,7 +16,7 @@ You can pass some environment-variables to your osm-container for configuring it
 * MYSQL_PASSWORD: user-password for mysql-user, f.e.: ``` MYSQL_PASSWORD="DatSecret456" ```, default: ``` osm123 ```
 
 ## Run your own dockerized OSM
-In this directory is a docker-compose-file for you. This file will ensure there is a mysql-db running which is linked to the OSM-container.
+In the [OSM-git-repo](https://github.com/iteratec/OpenSpeedMonitor/tree/master/docker) is a docker-compose-file for you placed. This file will ensure there is a mysql-db running which is linked to the OSM-container.
 
 For testing purposes just start this OSM-environment by typing ``` docker-compose up ```.
 

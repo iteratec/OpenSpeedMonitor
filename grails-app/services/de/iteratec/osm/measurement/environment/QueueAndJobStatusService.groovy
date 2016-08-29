@@ -22,6 +22,7 @@ import de.iteratec.osm.d3Data.ScheduleChartJob
 import de.iteratec.osm.measurement.environment.wptserverproxy.HttpRequestService
 import de.iteratec.osm.measurement.schedule.CronExpressionFormatter
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.*
@@ -46,6 +47,7 @@ class QueueAndJobStatusService {
     EventResultDaoService eventResultDaoService
     I18nService i18nService
     JobService jobService
+    JobDaoService jobDaoService
     PageService pageService
 
     /**
@@ -144,7 +146,7 @@ class QueueAndJobStatusService {
         int totalJobRunsDue = 0
         int totalEventsCountDue = 0
         Date now = new Date()
-        Job.findAllByActiveAndLocation(true, location).each {
+        jobDaoService.getJobs(true, location).each {
             CronExpression expr = new CronExpression(it.executionSchedule)
             Date date = now
             int jobRunsDue = 0
@@ -229,12 +231,11 @@ class QueueAndJobStatusService {
 
                 // collect all Jobs
                 List<Job> jobs = []
-                Location.findAllByWptServerAndLocation(server, locString).each {l ->
-                    jobs.addAll(Job.findAllByLocation(l))
+                Location.findAllByWptServerAndLocation(server, locString).each { l ->
+                    jobs.addAll(jobDaoService.getJobs(l))
                 }
 
                 // iterate over jobs
-//                List<Job> jobs = Job.findAllByLocation(loc)
                 jobs.each { job ->
                     if (job.active) {
                         ScriptParser parser = new ScriptParser(pageService, job.script.navigationScript);

@@ -14,21 +14,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-//= require jquery/jquery-1.12.3
-//= require jquery/jquery-ui-1.10.4
-//= require lib/bootstrap/bootstrap-transition
-//= require lib/bootstrap/bootstrap-alert
-//= require lib/bootstrap/bootstrap-button
-//= require lib/bootstrap/bootstrap-carousel
-//= require lib/bootstrap/bootstrap-collapse
-//= require lib/bootstrap/bootstrap-dropdown
-//= require lib/bootstrap/bootstrap-modal
-//= require lib/bootstrap/bootstrap-tooltip
-//= require lib/bootstrap/bootstrap-popover
-//= require lib/bootstrap/bootstrap-scrollspy
-//= require lib/bootstrap/bootstrap-tab
-//= require lib/bootstrap/bootstrap-typeahead
-//= require lib/bootstrap/bootstrap-affix
+//= require_tree bower_components/jquery
+//= require_tree bower_components/jquery-ui
+//= require_tree bower_components
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
 //= require date-time-picker/bootstrap-datepicker.min
@@ -40,7 +28,14 @@
  * Global namespace for OpenSpeedMonitor application.
  */
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
-
+/**
+ * Loads all registered JavaScript files. Used by microservices.
+ * @type {Array}
+ */
+OpenSpeedMonitor.postLoadUrls = OpenSpeedMonitor.postLoadUrls || [];
+OpenSpeedMonitor.postLoadUrls.forEach( function (scriptUrl) {
+   $.getScript(scriptUrl);
+});
 /**
  * Global string utilities module.
  * @returns {{
@@ -138,7 +133,6 @@ $.extend({
 function domainDeleteConfirmation(message,id,link){
 	var confirmMessage = "";
 	if(typeof link !== "undefined" && link !== null && link !== ""){
-		console.log("a");
 		jQuery.ajax({
 			type : 'GET',
 			url : link,

@@ -24,7 +24,6 @@
  * @param dataFromGsp This contains all init data and is filled in _common/_postloadInitializedJS.gsp
  * @constructor
  */
-//= require /lib/bootstrap/bootstrap-dropdown.js
 //= require spin/spin.min.js
 //= require_self
 function PostLoaded(dataFromGsp){
@@ -80,7 +79,7 @@ function PostLoaded(dataFromGsp){
             var text = domainDeleteConfirmation(dataFromGsp.i18n_deletionConfirmMessage, dataFromGsp.idOfItemToDelete, link);
             spinner.stop();
             $('#DeleteModal').find('p').html(text);
-        },1);
+        },10);
     };
 
 

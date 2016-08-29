@@ -66,3 +66,7 @@ grails-app/assets/stylesheets/lib
 version.properties
 # local scripts
 scripts/local
+
+# node/bower build files
+/node_modules
+bower_components

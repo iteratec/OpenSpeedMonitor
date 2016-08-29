@@ -25,7 +25,7 @@ class BatchActivityUpdater {
     }
 
     protected void createActivity(name, domain, activity, maximumStages) {
-        BatchActivity.withTransaction {
+        BatchActivity.withNewTransaction {
             this.batchActivity = new BatchActivity(name: name, domain: domain, activity: activity,
                     status: Status.ACTIVE, maximumStages: maximumStages, startDate: new Date(),
                     lastUpdate: new Date()).save(flush: true, failOnError: true)

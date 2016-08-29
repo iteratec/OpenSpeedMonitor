@@ -1,0 +1,58 @@
+package de.iteratec.osm.measurement.schedule
+
+import de.iteratec.osm.measurement.environment.Location
+
+/**
+ * A DaoService for Jobs.
+ * Should be used due to jobs not being deleted just marked as such
+ */
+class JobDaoService {
+    public List<Job> getAllJobs() {
+        return Job.findAllByDeleted(false)
+    }
+
+    public List<Job> getJobsByIds(List<Long> jobIds) {
+        return Job.findAllByDeletedAndIdInList(false, jobIds)
+    }
+
+    public Job getJobById(Long jobId) {
+        Job job = Job.get(jobId)
+        if(!job || job.deleted) {
+            return null
+        }
+        return job
+    }
+
+    public Job getJob(String label) {
+        Job.findByDeletedAndLabel(false, label)
+    }
+
+    public List<Job> getJobs(boolean active) {
+        return Job.findAllByDeletedAndActive(false, active)
+    }
+
+    public List<Job> getJobs(Location location) {
+        return Job.findAllByDeletedAndLocation(false, location)
+    }
+
+    public List<Job> getJobs(ConnectivityProfile connectivityProfile) {
+        return Job.findAllByDeletedAndConnectivityProfile(false, connectivityProfile)
+    }
+
+    public List<Job> getJobs(Map listParams) {
+        return Job.list(listParams).findAll {it.deleted == false}
+    }
+
+    public List<Job> getJobs(JobGroup jobGroup) {
+        return Job.findAllByDeletedAndJobGroup(false, jobGroup)
+    }
+
+
+    public List<Job> getJobs(boolean active, Location location) {
+        return Job.findAllByDeletedAndActiveAndLocation(false, active, location)
+    }
+
+    public List<String> getTags(String term, int max) {
+        return Job.findAllTagsWithCriteria([max: max]) { ilike('name', "${term}%") }
+    }
+}

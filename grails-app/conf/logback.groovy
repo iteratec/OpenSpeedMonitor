@@ -2,7 +2,10 @@ import ch.qos.logback.classic.AsyncAppender
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.filter.ThresholdFilter
 import ch.qos.logback.core.ConsoleAppender
+import ch.qos.logback.core.rolling.FixedWindowRollingPolicy
 import ch.qos.logback.core.rolling.RollingFileAppender
+import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
+import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
 import grails.util.BuildSettings
 import grails.util.Environment
 
@@ -17,15 +20,13 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     def logFolder = "${catalinaBase}/logs/"
     appender('CONSOLE', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
-            pattern = "%c{2} %m%n"
+            pattern = "%logger %m%n"
         }
         filter(ThresholdFilter) {
             level = ERROR
         }
     }
     appenders << "CONSOLE"
-
-
 
     appender("osmAppender", RollingFileAppender) {
         file = "${logFolder}/OpenSpeedMonitor.log"
@@ -35,7 +36,7 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
         }
 
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} : %m%n"
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
             level = ERROR
@@ -44,34 +45,32 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     }
     appenders << "osmAppender"
 
-
     appender("osmAppenderDetails", RollingFileAppender) {
         file = "${logFolder}/OpenSpeedMonitorDetails.log"
         append = true
         rollingPolicy(FixedWindowRollingPolicy ) {
             FileNamePattern = "${logFolder}/OpenSpeedMonitorDetails%i.log.zip"
             minIndex = 1
-            minIndex = 10
+            maxIndex = 20
         }
         triggeringPolicy(SizeBasedTriggeringPolicy){
             maxFileSize= '20MB'
         }
 
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} : %m%n"
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
             level = DEBUG
         }
     }
-//    appenders << "osmAppenderDetails"
-
     appender('asyncOsmAppenderDetails', AsyncAppender){
         discardingThreshold=0
         appenderRef('osmAppenderDetails')
 
     }
     appenders << "asyncOsmAppenderDetails"
+
     logger("grails.app", ALL,["osmAppender"])
     logger("grails.app", ALL,["asyncOsmAppenderDetails"])
     logger("liquibase", ALL,["asyncOsmAppenderDetails"])
@@ -105,13 +104,14 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     logger("org.grails.orm.hibernate", ERROR,["asyncOsmAppenderDetails"])
     logger("org.hibernate.SQL", ERROR,["asyncOsmAppenderDetails"])
     logger("org.hibernate.transaction", ERROR,["asyncOsmAppenderDetails"])
+
     root(DEBUG, appenders)
 }
 
 if (Environment.isDevelopmentMode() && targetDir) {
     appender('CONSOLE', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
-            pattern = "%c{2} %m%n"
+            pattern = "%logger %m%n"
         }
         filter(ThresholdFilter) {
             level = WARN
@@ -129,7 +129,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
         }
 
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} : %m%n"
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
             level = ERROR
@@ -145,14 +145,14 @@ if (Environment.isDevelopmentMode() && targetDir) {
         rollingPolicy(FixedWindowRollingPolicy ) {
             FileNamePattern = "logs/OpenSpeedMonitorDetails%i.log.zip"
             minIndex = 1
-            minIndex = 10
+            maxIndex = 20
         }
         triggeringPolicy(SizeBasedTriggeringPolicy){
             maxFileSize= '20MB'
         }
 
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %c{2} : %m%n"
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
             level = DEBUG
@@ -204,16 +204,13 @@ if (Environment.isDevelopmentMode() && targetDir) {
 if (Environment.getCurrent() == Environment.TEST && targetDir) {
     appender('CONSOLE', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
-            pattern = "%c{2} %m%n"
+            pattern = "%logger %m%n"
         }
         filter(ThresholdFilter) {
             level = ERROR
         }
     }
     appenders << "CONSOLE"
-
-
-
 
     logger("grails.app", INFO)
     logger("org.grails.commons",INFO)

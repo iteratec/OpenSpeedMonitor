@@ -1,4 +1,7 @@
 {
+  "engines": {
+    "node": "6.2.2"
+  },
   "name": "open_speed_monitor",
   "version": "0.0.0",
   "description": "Summary ===================== OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1]. It also processes, aggregates and visualizes the results. So it perfectly fits the need for a continuous monitoring of your most important pages.",
@@ -11,15 +14,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/IteraSpeed/OpenSpeedMonitor.git"
+    "url": "git+https://github.com/iteratec/OpenSpeedMonitor.git"
   },
-  "author": "iteraSpeed",
-  "license": "ISC",
+  "author": "iteratec",
+  "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/IteraSpeed/OpenSpeedMonitor/issues"
+    "url": "https://github.com/iteratec/OpenSpeedMonitor/issues"
   },
-  "homepage": "https://github.com/IteraSpeed/OpenSpeedMonitor#readme",
-  "devDependencies": {
+  "homepage": "https://github.com/iteratec/OpenSpeedMonitor#readme",
+  "dependencies": {
     "karma": "^0.13.22",
     "jasmine-core": "2.4.1",
     "karma-cli": "^0.1.2",
@@ -28,6 +31,7 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-remote-reporter": "^0.2.0",
     "phantomjs-prebuilt": "^2.1.4",
-    "karma-htmlfile-reporter": "~0.3"
+    "karma-htmlfile-reporter": "~0.3",
+    "bower": "^1.6.5"
   }
 }

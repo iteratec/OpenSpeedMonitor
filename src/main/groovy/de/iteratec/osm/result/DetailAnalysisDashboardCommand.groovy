@@ -1,19 +1,42 @@
 package de.iteratec.osm.result
 
 import grails.validation.Validateable
+import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
+import java.text.SimpleDateFormat
 import java.util.regex.Pattern
 
-class DetailAnalysisDashboardCommand implements Validateable{
+/**
+ * <p>
+ * Command of {@link DetailAnalysisController#show(DetailAnalysisDashboardCommand)
+ *}.
+ * </p>
+ *
+ */
+public class DetailAnalysisDashboardCommand implements Validateable {
+
     /**
      * The selected start date.
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+
+            def dateObject = source['from']
+            if (dateObject) {
+                if (dateObject instanceof Date) {
+                    return dateObject
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
+                    return dateFormat.parse(dateObject)
+                }
+            }
+    })
     Date from
 
     /**
@@ -21,6 +44,19 @@ class DetailAnalysisDashboardCommand implements Validateable{
      *
      * Please use {@link #getSelectedTimeFrame()}.
      */
+    @BindUsing({
+        obj, source ->
+
+            def dateObject = source['to']
+            if (dateObject) {
+                if (dateObject instanceof Date) {
+                    return dateObject
+                } else {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
+                    return dateFormat.parse(dateObject)
+                }
+            }
+    })
     Date to
 
     /**
@@ -41,7 +77,6 @@ class DetailAnalysisDashboardCommand implements Validateable{
      * A predefined time frame.
      */
     int selectedTimeFrameInterval = 259200
-
 
     /**
      * The database IDs of the selected {@linkplain de.iteratec.osm.measurement.schedule.JobGroup CSI groups}
@@ -134,6 +169,17 @@ class DetailAnalysisDashboardCommand implements Validateable{
      */
     Boolean selectedAllConnectivityProfiles = true
 
+    /**
+     * Database name of the selected {@link de.iteratec.osm.report.chart.AggregatorType}, selected by the user.
+     * Determines wich {@link CachedView#CACHED} results should be shown.
+     */
+    Collection<String> selectedAggrGroupValuesCached = []
+
+    /**
+     * Database name of the selected {@link de.iteratec.osm.report.chart.AggregatorType}, selected by the user.
+     * Determines wich {@link CachedView#UNCACHED} results should be shown.
+     */
+    Collection<String> selectedAggrGroupValuesUnCached = []
 
     /**
      * Whether or not the time of the start-date should be selected manually.
@@ -160,53 +206,54 @@ class DetailAnalysisDashboardCommand implements Validateable{
      */
     String customConnectivityName
 
-
-
     /**
      * Constraints needs to fit.
      */
     static constraints = {
         from(nullable: true, validator: { Date currentFrom, DetailAnalysisDashboardCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentFrom == null) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.from.nullWithManualSelection']
+            if (manualTimeframe && currentFrom == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.from.nullWithManualSelection']
         })
         to(nullable: true, validator: { Date currentTo, DetailAnalysisDashboardCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentTo == null) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.to.nullWithManualSelection']
-            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.to.beforeFromDate']
+            if (manualTimeframe && currentTo == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.nullWithManualSelection']
+            else if (manualTimeframe && currentTo != null && cmd.from != null && currentTo.before(cmd.from)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.to.beforeFromDate']
         })
         fromHour(nullable: true, validator: { String currentFromHour, DetailAnalysisDashboardCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
-            if (manualTimeframe && currentFromHour == null) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.fromHour.nullWithManualSelection']
+            if (manualTimeframe && currentFromHour == null) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.fromHour.nullWithManualSelection']
         })
         toHour(nullable: true, validator: { String currentToHour, DetailAnalysisDashboardCommand cmd ->
             boolean manualTimeframe = cmd.selectedTimeFrameInterval == 0
             if (manualTimeframe && currentToHour == null) {
-                return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.toHour.nullWithManualSelection']
+                return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.nullWithManualSelection']
             } else if (manualTimeframe && cmd.from != null && cmd.to != null && cmd.from.equals(cmd.to) && cmd.fromHour != null && currentToHour != null) {
                 DateTime firstDayWithFromDaytime = getFirstDayWithTime(cmd.fromHour)
                 DateTime firstDayWithToDaytime = getFirstDayWithTime(currentToHour)
-                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.toHour.inCombinationWithDateBeforeFrom']
+                if (!firstDayWithToDaytime.isAfter(firstDayWithFromDaytime)) return ['de.iteratec.osm.gui.startAndEndDateSelection.error.toHour.inCombinationWithDateBeforeFrom']
             }
+        })
+        selectedAggrGroupValuesCached(nullable: false, validator: { Collection<String> selectedCheckedAggregators, DetailAnalysisDashboardCommand cmd ->
+            if (cmd.selectedAggrGroupValuesCached.size() < 1 && cmd.selectedAggrGroupValuesUnCached.size() < 1) return ['de.iteratec.osm.gui.selectedAggrGroupValuesCached.error.validator.error.selectedAggrGroupValuesCached']
         })
         selectedAllMeasuredEvents(nullable: true)
         selectedAllBrowsers(nullable: true)
         selectedAllLocations(nullable: true)
 
         selectedFolder(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardCommand cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedFolder.validator.error.selectedFolder']
+            if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder']
         })
         selectedPages(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardCommand cmd ->
-            if (currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedPage.validator.error.selectedPage']
+            if (currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage']
         })
         selectedBrowsers(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardCommand cmd ->
-            if (!cmd.selectedAllBrowsers && currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedBrowsers.validator.error.selectedBrowsers']
+            if (!cmd.selectedAllBrowsers && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedBrowsers.error.validator.error.selectedBrowsers']
         })
         selectedMeasuredEventIds(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardCommand cmd ->
-            if (!cmd.selectedAllMeasuredEvents && currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
+            if (!cmd.selectedAllMeasuredEvents && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectMeasurings.error.selectedMeasuredEvents.validator.error.selectedMeasuredEvents']
         })
         selectedLocations(nullable: false, validator: { Collection currentCollection, DetailAnalysisDashboardCommand cmd ->
-            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.isr.EventResultDashboardController$ShowAllCommand.selectedLocations.validator.error.selectedLocations']
+            if (!cmd.selectedAllLocations && currentCollection.isEmpty()) return ['de.iteratec.osm.gui.selectedLocations.error.validator.error.selectedLocations']
         })
         selectedAllConnectivityProfiles(nullable: true)
 
@@ -215,9 +262,10 @@ class DetailAnalysisDashboardCommand implements Validateable{
         includeCustomConnectivity(nullable: true)
 
         customConnectivityName(nullable: true)
-    }
 
-    static transients = ['selectedTimeFrame']
+        setToHour(nullable: true)
+        setFromHour(nullable: true)
+    }
 
     /**
      * <p>
@@ -231,7 +279,6 @@ class DetailAnalysisDashboardCommand implements Validateable{
      *         if called on an invalid instance.
      */
     public Interval getSelectedTimeFrame() throws IllegalStateException {
-
         DateTime start
         DateTime end
 
@@ -300,6 +347,7 @@ class DetailAnalysisDashboardCommand implements Validateable{
      *         The argument might not be <code>null</code>.
      */
     public void copyRequestDataToViewModelMap(Map<String, Object> viewModelToCopyTo) {
+
         viewModelToCopyTo.put('selectedTimeFrameInterval', this.selectedTimeFrameInterval)
 
         viewModelToCopyTo.put('selectedFolder', this.selectedFolder)
@@ -329,6 +377,8 @@ class DetailAnalysisDashboardCommand implements Validateable{
         if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }
+        viewModelToCopyTo.put('selectedAggrGroupValuesCached', this.selectedAggrGroupValuesCached)
+        viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', this.selectedAggrGroupValuesUnCached)
 
         viewModelToCopyTo.put('setFromHour', this.setFromHour)
         viewModelToCopyTo.put('setToHour', this.setToHour)

@@ -4,7 +4,7 @@ interactions:
 - recorded: 2016-04-21T12:12:50.487Z
   request:
     method: GET
-    uri: http://dev.server02.wpt.iteratec.de/xmlResult.php?f=xml&test=160421_Q1_AR&r=160421_Q1_AR
+    uri: http://dev.server02.wpt.iteratec.de/xmlResult.php?f=xml&test=160421_Q1_AR&r=160421_Q1_AR&multistepFormat=1
     headers:
       Accept: application/xml
       Host: dev.server02.wpt.iteratec.de

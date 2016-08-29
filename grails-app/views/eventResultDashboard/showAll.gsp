@@ -259,7 +259,7 @@
 
                                 <div class="span4">
                                     <label for="selectAggregatorCachedHtmlId"><g:message
-                                            code="de.iteratec.isr.wptrd.labels.filterRepeateView"
+                                            code="de.iteratec.isr.wptrd.labels.filterRepeatedView"
                                             default="Repeated View:"/></label>
                                     <iteratec:optGroupedSelect id="selectAggregatorCachedHtmlId"
                                                                dataMap="${aggrGroupValuesCached}"
@@ -447,7 +447,7 @@
     <g:else>
         <g:if test="${request.queryString}">
             <g:if test="${!warnAboutLongProcessingTime}">
-                <div class="span12">
+                <div class="span12" id="noDataForCurrentSelectionWarning">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
                 </div>

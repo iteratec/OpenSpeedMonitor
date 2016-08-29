@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.MetricReportingService
@@ -59,6 +60,7 @@ class ResultPersisterService implements iResultListener {
     PerformanceLoggingService performanceLoggingService
     CsiValueService csiValueService
     LinkGenerator grailsLinkGenerator
+    JobDaoService jobDaoService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -74,10 +76,8 @@ class ResultPersisterService implements iResultListener {
 
     @Override
     public void listenToResult(
-            GPathResult xmlResultResponse,
+            WptResultXml resultXml,
             WebPageTestServer wptserverOfResult) {
-
-        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
 
         try {
             checkJobAndLocation(resultXml, wptserverOfResult)
@@ -101,7 +101,7 @@ class ResultPersisterService implements iResultListener {
         Job job
         performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
             String jobLabel = resultXml.getLabel()
-            job = Job.findByLabel(jobLabel)
+            job = jobDaoService.getJob(jobLabel)
             if (job == null) throw new OsmResultPersistanceException("No measurement job could be found for label from result xml: ${jobLabel}")
         }
         performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
@@ -130,7 +130,7 @@ class ResultPersisterService implements iResultListener {
     private JobResult removePendingAndCreateFinishedJobResult(resultXml, String testId) {
 
         String jobLabel = resultXml.getLabel()
-        Job job = Job.findByLabel(jobLabel)
+        Job job = jobDaoService.getJob(jobLabel)
         if (job == null) throw new RuntimeException("No measurement job could be found for label from result xml: ${jobLabel}")
 
         deleteResultsMarkedAsPendingAndRunning(resultXml.getLabel(), testId)
@@ -234,7 +234,7 @@ class ResultPersisterService implements iResultListener {
                     "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
             )
         }
-        Job job = Job.findByLabel(labelInXml)
+        Job job = jobDaoService.getJob(labelInXml)
         if (job == null) {
             throw new OsmResultPersistanceException(
                     "No Job exists with label '${labelInXml}' while persting associated EventResults!"

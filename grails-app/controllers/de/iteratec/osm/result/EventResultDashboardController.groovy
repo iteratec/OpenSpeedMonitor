@@ -80,11 +80,9 @@ class EventResultDashboardController {
     LinkGenerator grailsLinkGenerator
 
     public final static Integer EXPECTED_RESULTS_PER_DAY = 50;
-    public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+    public final static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final
-    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
+    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
 
     List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
@@ -446,6 +444,8 @@ class EventResultDashboardController {
         modelToRender.put("eventResultValues", chart.osmChartGraphs);
 
         modelToRender.put("labelSummary", chart.osmChartGraphsCommonLabel);
+        modelToRender.put("yAxisMax", cmd.loadTimeMaximum)
+        modelToRender.put("yAxisMin", cmd.loadTimeMinimum)
 
         if (isHighchartGraphLimitReached(chart.osmChartGraphs)) {
             modelToRender.put("warnAboutExceededPointsPerGraphLimit", true);

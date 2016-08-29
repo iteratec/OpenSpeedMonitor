@@ -46,9 +46,8 @@ class JobController {
     PageRenderer groovyPageRenderer
     JobProcessingService jobProcessingService
     JobService jobService
+    JobDaoService jobDaoService
     QueueAndJobStatusService queueAndJobStatusService
-    def quartzScheduler
-    def messageSource
     PerformanceLoggingService performanceLoggingService
     ConfigService configService
     InMemoryConfigService inMemoryConfigService
@@ -72,7 +71,7 @@ class JobController {
         // database nor derived. Thus it cannot be passed to database layer sorting
         if (params.sort == 'nextExecutionTime') {
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: query jobs from db', IndentationDepth.ONE) {
-                jobs = Job.list()
+                jobs = jobDaoService.getAllJobs()
             }
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting via nextExecutionTime: sorting', IndentationDepth.ONE) {
                 jobs.sort { if (it.active) it.getNextExecutionTime() }
@@ -82,10 +81,10 @@ class JobController {
             }
         } else if (params.sort || request.xhr || forceShowAllJobs) {
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'NOT sorting via nextExecutionTime: query jobs from db', IndentationDepth.ONE) {
-                jobs = Job.list(params)
+                jobs = jobDaoService.getJobs(params)
             }
         } else {
-            jobs = Job.list()
+            jobs = jobDaoService.getAllJobs()
         }
         def model = [
                 jobs                                           : jobs,
@@ -189,9 +188,10 @@ class JobController {
                 }
             }
 
+            def tags = params.remove("tags")
             job.properties = params
             setVariablesOnJob(params.variables, job)
-            job.tags = params.list('tags')
+            job.tags = [tags].flatten()
             if (!job.save()) {
                 render(view: 'edit', model: [job: job] << getStaticModelPartForEditOrCreateView())
                 return
@@ -235,13 +235,9 @@ class JobController {
         //TODO find out why we get the same id twice
         Job job = Job.get(params.list("id")[0] as long)
 
-        Promise p = task {
-            jobService.deleteJob(job)
-        }
-        p.onComplete {
-            log.info("Deletion of Job ${job} completed.")
-        }
-        redirect(controller: "batchActivity", action: "index", params: [max: 10])
+        jobService.deleteJob(job)
+
+        redirect(action: "index", model: [saveSuccess: i18nService.msg("de.iteratec.osm.job.delete", "success")])
     }
 
     /**
@@ -389,7 +385,7 @@ class JobController {
      * List tags starting with term
      */
     def tags(String term) {
-        render Job.findAllTagsWithCriteria([max: 5]) { ilike('name', "${term}%") } as JSON
+        render jobDaoService.getTags(term, 5) as JSON
     }
 
     def activateMeasurementsGenerally() {

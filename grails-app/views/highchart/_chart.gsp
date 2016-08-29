@@ -34,6 +34,8 @@
 		markerEnabled="${markerShouldBeEnabled}"
 		dataLabelsActivated="${labelShouldBeEnabled}"
 		yAxisScalable="false"
+		yAxisMin="${yAxisMin}"
+		yAxisMax="${yAxisMax}"
         optimizeForExport="false"
 		highChartLabels="${highChartLabels}"
 		highChartsTurboThreshold="${highChartsTurboThreshold}"
