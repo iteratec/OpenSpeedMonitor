@@ -28,7 +28,14 @@
  * Global namespace for OpenSpeedMonitor application.
  */
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
-
+/**
+ * Loads all registered JavaScript files. Used by microservices.
+ * @type {Array}
+ */
+OpenSpeedMonitor.postLoadUrls = OpenSpeedMonitor.postLoadUrls || [];
+OpenSpeedMonitor.postLoadUrls.forEach( function (scriptUrl) {
+   $.getScript(scriptUrl);
+});
 /**
  * Global string utilities module.
  * @returns {{
