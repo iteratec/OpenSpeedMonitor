@@ -194,10 +194,10 @@ class EventResultDashboardController {
         return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
     }
 /**
-     * Gets data for the showAllCommand from a saved userspecificCsiDashboard
-     * @param cmd the command where the attribute gets set
-     * @param dashboardID the id of the saved userspecificCsiDashboard
-     */
+ * Gets data for the showAllCommand from a saved userspecificCsiDashboard
+ * @param cmd the command where the attribute gets set
+ * @param dashboardID the id of the saved userspecificCsiDashboard
+ */
     private void fillWithUserspecificDashboardValues(EventResultDashboardShowAllCommand cmd, String dashboardID) {
         UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(Long.parseLong(dashboardID))
 
@@ -752,6 +752,7 @@ class EventResultDashboardController {
         } else {
             expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / interval);
         }
+        !ControllerUtils.isEmptyRequest(params)
 
         if (expectedPointsOfEachGraph > 5000) {
             return true;
@@ -873,4 +874,22 @@ class EventResultDashboardController {
         render answer as JSON
     }
 
+    public def showDetailData(EventResultDashboardShowAllCommand cmd) {
+        if (!ControllerUtils.isEmptyRequest(params)) {
+            if (!cmd.validate()) {
+                Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
+                cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
+                cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
+                cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+
+                cmd.copyRequestDataToViewModelMap(modelToRender);
+                modelToRender.put('command', cmd)
+                render(view: "showAll", model: modelToRender)
+            } else {
+                params.remove("action")
+                params.remove("_action_showDetailData")
+                redirect(controller: "detailAnalysis", action: "show", params: params)
+            }
+        }
+    }
 }

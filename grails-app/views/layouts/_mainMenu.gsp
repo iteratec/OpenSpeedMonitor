@@ -1,9 +1,8 @@
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 
 <%-- determine main-tab an set variable respectively --%>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation')}"><g:set
-        var="mainTab" value="results"/></g:if>
-<g:elseif test="${controllerName.equals('detailAnalysis')}"><g:set var="mainTab" value="results"/></g:elseif>
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('detailAnalysis')}">
+    <g:set var="mainTab" value="results"/></g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('script')}"><g:set var="mainTab" value="management"/></g:elseif>
@@ -20,7 +19,7 @@
     <ul class="nav nav-tabs" data-role="listview" data-split-icon="gear" data-filter="true">
         <li class="controller ${mainTab.equals('management') ? 'active' : ''}">
             <g:link controller="job" action="index"><g:message code="de.iteratec.isr.managementDashboard"
-                                                              default="Verwaltung"/></g:link>
+                                                               default="Verwaltung"/></g:link>
         </li>
         <li class="controller ${mainTab.equals('results') ? 'active' : ''}">
             <g:link controller="eventResultDashboard" action="showAll"><g:message
@@ -64,7 +63,7 @@
     <%-- Results --%>
 
         <g:elseif test="${mainTab.equals('results')}">
-            <li class="controller ${controllerName.equals('eventResultDashboard') ? 'active' : ''}">
+            <li class="controller ${(controllerName.equals('eventResultDashboard') || controllerName.equals('detailAnalysis')) ? 'active' : ''}">
                 <g:link controller="eventResultDashboard" action="showAll"><i class="fa fa-signal"></i>
                     <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard"/></g:link>
             </li>
@@ -73,13 +72,6 @@
                         class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                               default="Einzelergebnisse"/></g:link>
             </li>
-            <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
-                <li class="controller ${controllerName.equals('detailAnalysis') ? 'active' : ''}">
-                    <g:link controller="detailAnalysis" action="show"><i
-                            class="fa fa-search-plus"></i> <g:message code="de.iteratec.detailAnalysis.title"
-                                                                  default="detail analysis"/></g:link>
-                </li>
-            </g:if>
         </g:elseif>
 
     <%-- CSI --%>
