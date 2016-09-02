@@ -259,7 +259,7 @@
 
                                 <div class="span4">
                                     <label for="selectAggregatorCachedHtmlId"><g:message
-                                            code="de.iteratec.isr.wptrd.labels.filterRepeateView"
+                                            code="de.iteratec.isr.wptrd.labels.filterRepeatedView"
                                             default="Repeated View:"/></label>
                                     <iteratec:optGroupedSelect id="selectAggregatorCachedHtmlId"
                                                                dataMap="${aggrGroupValuesCached}"
@@ -358,6 +358,12 @@
                                             value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
                                             action="downloadCsv"
                                             class="btn btn-primary" style="margin-top: 16px;"/>
+                                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+                                        <g:actionSubmit
+                                                value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
+                                                action="showDetailData"
+                                                class="btn btn-primary" style="margin-top: 16px;"/>
+                                    </g:if>
                                     <sec:ifLoggedIn>
                                         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                                             <a href="#CreateUserspecifiedDashboardModal" role="button"
@@ -447,7 +453,7 @@
     <g:else>
         <g:if test="${request.queryString}">
             <g:if test="${!warnAboutLongProcessingTime}">
-                <div class="span12">
+                <div class="span12" id="noDataForCurrentSelectionWarning">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
                 </div>

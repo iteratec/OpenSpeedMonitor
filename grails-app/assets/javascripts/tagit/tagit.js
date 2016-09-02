@@ -1,2 +1,2 @@
-//= require js/jquery-ui-1.10.4.custom.min
+//= require_tree bower_components/jquery-ui
 //= require tag-it.min.js

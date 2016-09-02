@@ -17,15 +17,19 @@
 
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
+import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.web.mapping.LinkGenerator
-import groovy.util.slurpersupport.GPathResult
 import groovyx.net.http.RESTClient
 
 import static groovyx.net.http.ContentType.JSON
+import static groovyx.net.http.ContentType.URLENC
+import static groovyx.net.http.ContentType.XML
 
 /**
  * Persists locations and results. Observer of ProxyService.
@@ -42,6 +46,7 @@ class AssetRequestPersisterService implements iResultListener {
     private final int TIMEOUT_IN_SECONDS = 5
 
     LinkGenerator grailsLinkGenerator
+    JobDaoService jobDaoService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -57,13 +62,11 @@ class AssetRequestPersisterService implements iResultListener {
 
     @Override
     public void listenToResult(
-            GPathResult xmlResultResponse,
+            WptResultXml resultXml,
             WebPageTestServer wptserverOfResult) {
 
-        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
-
         try {
-            persistAssetRequests(resultXml, wptserverOfResult, jobResultId)
+            persistAssetRequests(resultXml, wptserverOfResult)
 
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
@@ -84,34 +87,49 @@ class AssetRequestPersisterService implements iResultListener {
         if (!persistenceOfAssetRequestsEnabled)
             return
 
+        final String jobLabel = resultXml.getLabel()
+        Job job = jobDaoService.getJob(jobLabel)
+        if (!job) {
+            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId() +
+                    "\n Job with name " + jobLabel + "doesn't exist")
+        }
+        Long jobId = job.id
+        Long jobGroupId = job.jobGroup.id
+
+        if(!JobGroup.get(jobGroupId).persistDetailData)
+            return
+
         RESTClient client = new RESTClient(microserviceUrl)
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
-        String wptVersion = "2.18"
+        if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
+        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
+        String wptVersion = "2.19"
         List<String> wptTestIds = [resultXml.getTestId()]
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
-
-        final String jobLabel = resultXml.getLabel()
-        Long jobGroupId = Job.findByLabel(jobLabel).jobGroup.id
 
         def resp
         int attempts = 0
 
-        while (!resp && resp.status != 200 && attempts < MAX_ATTEMPTS) {
+        while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
             attempts++
-            resp = client.post(path: 'restApi/persistAssetsForWptResult',
-                    body: [osmUrl: osmUrl, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId],
-                    requestContentType: JSON)
-            sleep(1000 * TIMEOUT_IN_SECONDS)
+            try {
+                resp = client.post(path: 'restApi/persistAssetsForWptResult',
+                        body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId, apiKey: apiKey],
+                        requestContentType: URLENC)
+            } catch (ConnectException) {
+                sleep(1000 * TIMEOUT_IN_SECONDS)
+            }
+
         }
 
-        if(resp.status != 200)
+        if (!resp || resp.status != 200)
             throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId())
     }
 
 
     public void enablePersistenceOfAssetRequestsForJobResults(String microserviceUrl) {
         this.microserviceUrl = microserviceUrl.endsWith('/') ? microserviceUrl : microserviceUrl + "/"
-        persistenceOfAssetRequestsEnabled = true
+        this.persistenceOfAssetRequestsEnabled = true
     }
 
     public void disablePersitenceOfAssetRequestsForJobResults() {

@@ -17,21 +17,6 @@
 buildscript {
     ext {
         grailsVersion = project.grailsVersion
-
-        bootstrapFramework = [
-            version             : "2.3.2",
-            cssPath             : "grails-app/assets/stylesheets/lib",
-            jsPath              : "grails-app/assets/javascripts/lib",
-            useIndividualJs     : true,
-            useLess             : true,
-        //    invalidVersionFails : false,
-            fontAwesome : [
-               install             : true,
-               version             : "4.2.0",
-               useLess             : false,
-               invalidVersionFails : false
-            ]
-        ]
     }
     repositories {
         mavenLocal()
@@ -41,24 +26,22 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath 'org.grails.plugins:database-migration:2.0.0.RC4'
-        classpath "com.siprell.plugins:bootstrap-framework:1.0.3"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.7.4"
         classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
         classpath "org.grails.plugins:hibernate4:5.0.4"
-        classpath 'com.moowork.gradle:gradle-node-plugin:0.12'
+        classpath 'com.moowork.gradle:gradle-node-plugin:0.13'
     }
 }
 
-version "3.5.0"
+version "3.5.2"
 group "OpenSpeedMonitor"
 
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"war"
-apply plugin:"org.grails.grails-web"
-apply plugin:"org.grails.grails-gsp"
-apply plugin:"asset-pipeline"
-apply plugin: "com.siprell.plugins.bootstrap-framework"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "war"
+apply plugin: "org.grails.grails-web"
+apply plugin: "org.grails.grails-gsp"
+apply plugin: "asset-pipeline"
 apply plugin: 'com.moowork.node'
 
 ext {
@@ -67,12 +50,15 @@ ext {
 
     karmaExec = file('node_modules/karma/bin/karma')
     karmaConfig = 'src/test/js/karma.conf.js'
+
+    seleniumVersion = "2.46.0"
+    phantomJsVersion = '2.1.1'
 }
 
 repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
-    maven { url  "http://dl.bintray.com/iteratec/grails-plugins" }
+    maven { url "http://dl.bintray.com/iteratec/grails-plugins" }
 }
 
 dependencyManagement {
@@ -103,6 +89,13 @@ dependencies {
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
     profile "org.grails.profiles:web:3.1.5"
+
+    testCompile "org.grails.plugins:hibernate"
+    testCompile "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-remote-driver:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
+    testCompile "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+
     //Custom OSM-Stuff
     runtime 'mysql:mysql-connector-java:5.1.26'
     compile 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
@@ -124,31 +117,12 @@ dependencies {
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
     testCompile 'org.hamcrest:hamcrest-all:1.3'
     testCompile 'software.betamax:betamax-junit:2.0.0-alpha-1'
-    testCompile 'net.sourceforge.nekohtml:nekohtml:1.9.14'
     testCompile 'org.mockito:mockito-all:1.9.5'
-    testCompile('com.github.detro.ghostdriver:phantomjsdriver:1.1.0') {
+    testCompile('com.codeborne:phantomjsdriver:1.2.1') {
         transitive = false
     }
 
 }
-
-task setupJasmine(type: NpmTask) {
-    outputs.dir file('node_modules')
-    args = ['install','--loglevel', 'error']
-}
-
-task jasmineRun(type: NodeTask, dependsOn: ['setupJasmine']) {
-    script = karmaExec
-    args = ['start', karmaConfig, '--single-run']
-}
-
-task jasmineWatch(type: NodeTask, dependsOn: 'setupJasmine') {
-    script = karmaExec
-    args = ['start', karmaConfig]
-}
-
-test.dependsOn jasmineRun
-
 task wrapper(type: Wrapper) {
     gradleVersion = gradleWrapperVersion
 }
@@ -161,18 +135,81 @@ assets {
     excludes = ['**/*.less']
 }
 
-//TODO: this is a workaround for: https://github.com/kensiprell/bootstrap-framework/issues/10
-// We will remove bootstrap-framework plugin soon and install bootstrap and font-awesome libraries via bower
-assetCompile.dependsOn {[
-    createBootstrapLess,
-    createBootstrapJs,
-    createBootstrapMixins,
-    createFontAwesomeCssAll,
-    createFontAwesomeCssIndividual,
-    createFontAwesomeFonts,
-    createFontAwesomeLessLess,
-    createFontAwesomeLess
-]}
+node {
+    //node version to use
+    version = '6.2.2'
+    //npm version to use
+    npmVersion = '3.10.3'
+    // If true, it will download node using above parameters.
+    // If false, it will try to use globally installed node.
+    download = true
+    // Set the work directory for unpacking node
+    workDir = file("${project.buildDir}/nodejs")
+    // Set the work directory where node_modules should be located
+    nodeModulesDir = file("${project.projectDir}/node_modules")
+}
+
+
+npmInstall {
+    outputs.files file('node_modules')
+}
+
+task jasmineRun(type: NodeTask, dependsOn: ['npmInstall']) {
+    script = karmaExec
+    args = ['start', karmaConfig, '--single-run']
+}
+
+task jasmineWatch(type: NodeTask, dependsOn: 'npmInstall') {
+    script = karmaExec
+    args = ['start', karmaConfig]
+}
+
+test.dependsOn jasmineRun
+
+
+task bowerInstall(type: NodeTask) {
+    script = file('node_modules/bower/bin/bower')
+    args = ["--config.storage.cache=${gradle.getGradleUserHomeDir()}/caches/bower/cache",
+            "--config.storage.packages=${gradle.getGradleUserHomeDir()}/caches/bower/packages",
+            "--config.storage.registry=${gradle.getGradleUserHomeDir()}/caches/bower/registry",
+            'install']
+    inputs.files file('bower.json')
+    outputs.files file('bower_components')
+    dependsOn npmInstall
+}
+
+task bowerSyncJavascript(type: Sync) {
+    from 'bower_components'
+    into "grails-app/assets/javascripts/bower_components"
+    include 'jquery/jquery.min.js'
+    include 'jquery-ui/ui/minified/jquery-ui.min.js'
+    include 'bootstrap/docs/assets/js/bootstrap.min.js'
+    dependsOn bowerInstall
+}
+
+task bowerSyncStylesheets(type: Sync) {
+    from 'bower_components'
+    into "grails-app/assets/stylesheets/bower_components"
+    include 'bootstrap/docs/assets/css/bootstrap*.css'
+    include 'bootstrap/less/*.less'
+    include 'components-font-awesome/css/font-awesome.min.css'
+    include 'components-font-awesome/fonts/*'
+    dependsOn bowerInstall
+}
+
+task bowerPackages() {
+    dependsOn bowerSyncJavascript, bowerSyncStylesheets
+}
+
+processResources.dependsOn bowerPackages
+assetCompile.dependsOn bowerPackages
+
+clean.delete << file('grails-app/assets/javascripts/bower_components')
+clean.delete << file('grails-app/assets/stylesheets/bower_components')
+clean.delete << file('node_modules')
+clean.delete << file('bower_components')
+
+
 
 sourceSets {
     main {
@@ -182,15 +219,15 @@ sourceSets {
     }
 }
 'dbmGormDiff' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 
 'dbmUpdate' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 'dbmClearChecksums' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
 'dbmChangelogSync' {
-    jvmArgs = ["-XX:MaxPermSize=512m","-Xms1G", "-Xmx2G"]
+    jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }

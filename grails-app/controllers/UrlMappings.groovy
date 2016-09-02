@@ -155,6 +155,16 @@ class UrlMappings {
 			controller = "RestApi"
 			action = [GET: "getCsiConfiguration"]
 		}
+		/* Since IT-1115 */
+		"/rest/domain/idsForNames/$requestedDomains" {
+			controller = "RestApi"
+			action = [GET: "getIdsForNames"]
+		}
+        /* Since IT-1115 */
+        "/rest/domain/namesForIds/$requestedDomains" {
+            controller = "RestApi"
+            action = [GET: "getNamesForIds"]
+        }
 
 		/*
 		 * Following PUT/POST rest api functions are secured via filter de.iteratec.osm.filters.SecureApiFunctionsFilters by

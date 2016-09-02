@@ -60,6 +60,11 @@ function RickshawGraphBuilder(args) {
 
         new ChartAdjuster(args);
         new ChartExporter(args);
+        self.updateBorders({
+                measurandGroupName: this.measurandGroup,
+                bottom: args.bottom,
+                top: args.top
+            });
     }
 
     this.addDataLabels = function () {

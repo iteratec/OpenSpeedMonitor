@@ -8,6 +8,8 @@ class JobSetController {
     static scaffold = JobSet
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    JobDaoService jobDaoService
+
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond JobSet.list(params), model:[jobSetCount: JobSet.count()]
@@ -18,12 +20,11 @@ class JobSetController {
     }
 
     def create() {
-        respond new JobSet(params)
+        respond new JobSet(params), model:[allJobs: jobDaoService.getAllJobs()]
     }
 
     def save(JobSet jobSet) {
         if (jobSet == null) {
-            
             notFound()
             return
         }
@@ -46,7 +47,7 @@ class JobSetController {
     }
 
     def edit(JobSet jobSet) {
-        respond jobSet
+        respond jobSet, model:[allJobs: jobDaoService.getAllJobs()]
     }
 
     def update(JobSet jobSet) {
@@ -58,7 +59,7 @@ class JobSetController {
 
         if (jobSet.hasErrors()) {
 
-            respond jobSet.errors, view:'edit'
+            respond jobSet.errors, view:'edit', model:[allJobs: jobDaoService.getAllJobs()]
             return
         }
 

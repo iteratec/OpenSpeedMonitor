@@ -17,18 +17,13 @@
 
 package de.iteratec.osm.measurement.schedule
 
-import de.iteratec.osm.batch.Activity
-import de.iteratec.osm.batch.BatchActivityService
-import de.iteratec.osm.batch.BatchActivityUpdater
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import grails.gorm.DetachedCriteria
 import grails.transaction.Transactional
 import org.joda.time.DateTime
 import org.quartz.CronExpression
 
 class JobService {
-    BatchActivityService batchActivityService
+
+    JobDaoService jobDaoService
 
     /**
      * <p>
@@ -55,14 +50,11 @@ class JobService {
         }
     }
 
-    private List<Job> findByJobGroup(JobGroup group) {
-        return Job.findAllByJobGroup(group)
-    }
 
     List<Job> getAllCsiJobs() {
         List<Job> csiJobs = []
         JobGroup.findAllByCsiConfigurationIsNotNull().each {
-            csiJobs.addAll(findByJobGroup(it))
+            csiJobs.addAll(jobDaoService.getJobs(it))
         }
         return csiJobs
     }
@@ -96,70 +88,47 @@ class JobService {
     }
 
     /**
-     * Deletes a Job with all JobResults and EventResults
+     * If there are csiAggregations for a job it can't be delted.
+     * So jobs are getting marked as delted and renamed so the user doesn't see a differents.
      *
      * @param job Job that should be deleted
      */
     void deleteJob(Job job) {
-        String activityName = "Job ${job.label} delete"
-        if (batchActivityService.runningBatch(Job.class, activityName, Activity.DELETE)) {
-            return
-        }
-        BatchActivityUpdater activity = batchActivityService.getActiveBatchActivity(Job.class, Activity.DELETE, "Job ${job.label} delete", 2, true)
-        def dc = new DetachedCriteria(JobResult).build {
-            eq 'job', job
-        }
-        int count = 0
-        Job.withTransaction {
-            count = dc.count()
-        }
-        activity.beginNewStage("Delete JobResults", count)
-        int batchSize = 100
-        Job.withSession { session ->
-            0.step(count, batchSize) { offset ->
-                Job.withTransaction {
-                    dc.list(offset: 0, max: batchSize).eachWithIndex { JobResult jobResult, int index ->
-                        try {
-                            log.info("try to delete JobResult with depended objects, ID: ${jobResult.id}")
-                            List<EventResult> eventResults = jobResult.getEventResults()
-                            batchDelete(eventResults, batchSize)
-                            jobResult.delete()
-                            activity.addProgressToStage()
-                        } catch (Exception e) {
-                            log.error("Couldn't delete JobResult ${e}")
-                            activity.addFailures("Couldn't delete JobResult: ${jobResult.id}")
-                        }
-                    }
-                    session.flush()
-                    session.clear()
-                }
-            }
-            activity.beginNewStage("Delete Job",1)
-            Job.withTransaction {
-                try {
-                    job.delete(flush: true)
-                } catch (Exception e) {
-                    activity.addFailures("Job could't be deleted")
-                    e.printStackTrace()
-                }
-            }
-            activity.addProgressToStage().done()
+        Job.withSession {
+            removeJobFromJobSet(job)
+            markAsDeleted(job)
         }
     }
 
+    private void markAsDeleted(Job job) {
+        job.label = job.label + "_deleted_id_" + job.id
+        job.active = false
+        job.deleted = true
+        job.save(failOnError: true, flush: true)
+    }
+
     /**
-     * Deletes a List of objects with a new Transaction and will delete up to batchSize objects with one transaction
-     * @param objects Objects to be deleted
-     * @param batchSize maximum delete interval
+     * Removes deleted Job from JobSets.
+     * If it was the last job in JobSet, the jobSet gets deleted
      */
-    private void batchDelete(List objects, int batchSize) {
-        0.step(objects.size(), batchSize) { off ->
-            Job.withTransaction {
-                int max = off + batchSize
-                max = (max > objects.size()) ? objects.size() : max
-                objects.subList(off, max)*.delete()
+    private void removeJobFromJobSet(Job job) {
+        List<JobSet> jobSets = JobSet.createCriteria().list {
+            'jobs' {
+                idEq(job.id)
             }
         }
+
+        List<JobSet> jobSetsToRemove = []
+        jobSets.each {
+            if (it.jobs.size() == 1) {
+                jobSetsToRemove << it
+            } else {
+                it.jobs.remove(job)
+                it.save(flush: true)
+            }
+        }
+
+        jobSetsToRemove*.delete(flush: true)
     }
 
     /**

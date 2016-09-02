@@ -1,7 +1,6 @@
 package de.iteratec.osm.csi
 
 import org.grails.orm.hibernate.cfg.DefaultGrailsDomainConfiguration
-import org.hibernate.SessionFactory
 import org.hibernate.cfg.Configuration
 import org.hibernate.tool.hbm2ddl.SchemaExport
 import spock.lang.Shared

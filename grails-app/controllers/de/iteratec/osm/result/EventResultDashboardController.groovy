@@ -80,11 +80,9 @@ class EventResultDashboardController {
     LinkGenerator grailsLinkGenerator
 
     public final static Integer EXPECTED_RESULTS_PER_DAY = 50;
-    public final
-    static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
+    public final static Map<CachedView, Map<String, List<String>>> AGGREGATOR_GROUP_VALUES = ResultCsiAggregationService.getAggregatorMapForOptGroupSelect()
 
-    public final
-    static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
+    public final static List<String> AGGREGATOR_GROUP_LABELS = ['de.iteratec.isocsi.csi.per.job', 'de.iteratec.isocsi.csi.per.page', 'de.iteratec.isocsi.csi.per.csi.group']
 
     List<Long> csiAggregationIntervals = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
 
@@ -196,10 +194,10 @@ class EventResultDashboardController {
         return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
     }
 /**
-     * Gets data for the showAllCommand from a saved userspecificCsiDashboard
-     * @param cmd the command where the attribute gets set
-     * @param dashboardID the id of the saved userspecificCsiDashboard
-     */
+ * Gets data for the showAllCommand from a saved userspecificCsiDashboard
+ * @param cmd the command where the attribute gets set
+ * @param dashboardID the id of the saved userspecificCsiDashboard
+ */
     private void fillWithUserspecificDashboardValues(EventResultDashboardShowAllCommand cmd, String dashboardID) {
         UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(Long.parseLong(dashboardID))
 
@@ -446,6 +444,8 @@ class EventResultDashboardController {
         modelToRender.put("eventResultValues", chart.osmChartGraphs);
 
         modelToRender.put("labelSummary", chart.osmChartGraphsCommonLabel);
+        modelToRender.put("yAxisMax", cmd.loadTimeMaximum)
+        modelToRender.put("yAxisMin", cmd.loadTimeMinimum)
 
         if (isHighchartGraphLimitReached(chart.osmChartGraphs)) {
             modelToRender.put("warnAboutExceededPointsPerGraphLimit", true);
@@ -752,6 +752,7 @@ class EventResultDashboardController {
         } else {
             expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / interval);
         }
+        !ControllerUtils.isEmptyRequest(params)
 
         if (expectedPointsOfEachGraph > 5000) {
             return true;
@@ -873,4 +874,22 @@ class EventResultDashboardController {
         render answer as JSON
     }
 
+    public def showDetailData(EventResultDashboardShowAllCommand cmd) {
+        if (!ControllerUtils.isEmptyRequest(params)) {
+            if (!cmd.validate()) {
+                Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
+                cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
+                cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
+                cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+
+                cmd.copyRequestDataToViewModelMap(modelToRender);
+                modelToRender.put('command', cmd)
+                render(view: "showAll", model: modelToRender)
+            } else {
+                params.remove("action")
+                params.remove("_action_showDetailData")
+                redirect(controller: "detailAnalysis", action: "show", params: params)
+            }
+        }
+    }
 }

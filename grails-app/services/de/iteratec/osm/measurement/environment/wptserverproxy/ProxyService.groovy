@@ -19,7 +19,6 @@ package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.async.Promise
@@ -28,11 +27,13 @@ import groovyx.net.http.ContentType
 import groovyx.net.http.HttpResponseDecorator
 
 import java.util.concurrent.locks.ReentrantLock
+import static grails.async.Promises.*
 
 interface iResultListener {
     public String getListenerName()
+
     public void listenToResult(
-            GPathResult result,
+            WptResultXml resultXml,
             WebPageTestServer wptserver
     )
 
@@ -41,6 +42,7 @@ interface iResultListener {
 
 interface iLocationListener {
     public String getListenerName()
+
     public List<Location> listenToLocations(GPathResult result, WebPageTestServer wptserver)
 }
 
@@ -151,17 +153,23 @@ class ProxyService {
             log.info("xmlResultResponse.data.runs.toString().isInteger()=${bolIsInteger}|")
         }
 
+        WptResultXml resultXml = convertGPathToWptResultXML(xmlResultResponse)
+
         if (jobLabel.length() > 0 && statusCode >= 200 && xmlResultResponse.data.runs.toString().isInteger()) {
             try {
 
                 lock.lockInterruptibly();
                 this.resultListeners.each { listener ->
                     if (listener.callListenerAsync()) {
-                        Promise p = task { listener.listenToResult(xmlResultResponse, wptserverOfResult) }
-                        p.onError {Throwable err -> log.error(err)}
-                        p.onComplete {log.info("${listener.getListenerName()} successfully returned from async task")}
+                        Promise p = task {
+                            JobResult.withNewSession {
+                                listener.listenToResult(resultXml, wptserverOfResult)
+                            }
+                        }
+                        p.onError { Throwable err -> log.error(err) }
+                        p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
                     } else {
-                        listener.listenToResult(xmlResultResponse, wptserverOfResult)
+                        listener.listenToResult(resultXml, wptserverOfResult)
                     }
                 }
 
@@ -175,9 +183,14 @@ class ProxyService {
 
     }
 
-    private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, Map params) {
+    private WptResultXml convertGPathToWptResultXML(GPathResult xmlResultResponse) {
+        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
+        return resultXml
+    }
+
+    private GPathResult  getXmlResult(WebPageTestServer wptserverOfResult, Map params) {
         return httpRequestService.getWptServerHttpGetResponseAsGPathResult(wptserverOfResult, 'xmlResult.php',
-                ['f': 'xml', 'test': params.resultId, 'r': params.resultId], ContentType.TEXT, [Accept: 'application/xml'])
+                ['f': 'xml', 'test': params.resultId, 'r': params.resultId, 'multistepFormat': '1'], ContentType.TEXT, [Accept: 'application/xml'])
     }
 
 }

@@ -133,7 +133,7 @@
                             "${"ScheduleChart" + i + j}",
                             "${"duration-to-show" + i + j}",
                             "${"show-overused-queues" + i + j}",
-                            "<g:createLink controller="job" action="edit"/>"
+                            "${createLink(controller: 'job', action: 'edit', absolute: true)}"
                         )
                         $('#${"show-overused-queues" + i + j} button[value="on"]').click()
                     </g:if>

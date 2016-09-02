@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.*
@@ -78,6 +79,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     def doWithSpring = {
         pageService(PageService)
         performanceLoggingService(PerformanceLoggingService)
+        jobDaoService(JobDaoService)
     }
     void setUp() {
 
@@ -99,7 +101,7 @@ class PersistScreenshotDependentWptMetricsSpec {
         Location locationIe_old = TestDataUtil.createLocation(wptServer, 'iteratec-dev-netlab-win7:IE', ie, true)
         List<Page> pages = TestDataUtil.createPages(['HP', 'SE'])
 
-        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de', false)
+        Script testScript = TestDataUtil.createScript('test-script', 'description', 'navigate   http://my-url.de')
         TestDataUtil.createJob('FF_Otto_multistep', testScript, locationFirefox, jobGroup, '', 1 , false, 60)
         TestDataUtil.createJob('IE_otto_hp_singlestep', testScript, locationIe, jobGroup, '', 1 , false, 60)
     }
@@ -132,7 +134,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void testPersistingScreenshotDependentMetricsForMultistep1Run3EventsFvOnlyWithVideo() {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2, Page.findByName('SE'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3, Page.findByName('SE'))
@@ -155,7 +157,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void testPersistingScreenshotDependentMetricsForMultistep1Run3EventsFvOnlyWithoutVideo() {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2, Page.findByName('SE'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3, Page.findByName('SE'))
@@ -177,7 +179,7 @@ class PersistScreenshotDependentWptMetricsSpec {
 
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1, Page.findByName('HP'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2, Page.findByName('SE'))
         TestDataUtil.createMeasuredEvent(RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3, Page.findByName('SE'))
@@ -243,7 +245,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void testPersistingScreenshotDependentMetricsForSinglestep1RunWithVideo() {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME, Page.findByName('HP'))
         //test execution
         serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
@@ -260,7 +262,7 @@ class PersistScreenshotDependentWptMetricsSpec {
     void testPersistingScreenshotDependentMetricsForSinglestep1RunWithoutVideo() {
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO_EVENTNAME, Page.findByName('HP'))
         //test execution
         serviceUnderTest.listenToResult(xmlResult, WebPageTestServer.findByProxyIdentifier(PROXY_IDENTIFIER_WPT_SERVER))
@@ -278,7 +280,7 @@ class PersistScreenshotDependentWptMetricsSpec {
 
         //test data specific for this test
         File xmlResultFile = new File("test/resources/WptResultXmls/${RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO}")
-        GPathResult xmlResult = new XmlSlurper().parse(xmlResultFile)
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         TestDataUtil.createMeasuredEvent(RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO_EVENTNAME, Page.findByName('HP'))
 
         //test execution

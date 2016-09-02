@@ -50,6 +50,12 @@ class Job implements Taggable {
     boolean firstViewOnly;
     boolean captureVideo;
     boolean persistNonMedianResults = true;
+
+    /**
+     * If a job can't be deleted due to existing csiAggregations, it's marked as deleted
+     */
+    boolean deleted = false
+
     /**
      * Stop Test at Document Complete.
      */
@@ -135,7 +141,6 @@ class Job implements Taggable {
      */
     Integer packetLoss
 
-
     /**
      * @deprecated Use executionSchedule instead
      */
@@ -164,7 +169,7 @@ class Job implements Taggable {
      * The {@link JobGroup} this job is assigned to <em>or</em>
      */
     JobGroup jobGroup;
-    static belongsTo=[jobGroup: JobGroup];
+    static belongsTo = [jobGroup: JobGroup];
 
     static transients = ['nextExecutionTime']
 
@@ -197,13 +202,13 @@ class Job implements Taggable {
             boolean notNull = profile != null
             boolean nullAndCustom =
                     profile == null &&
-                    instance.customConnectivityProfile == true &&
-                    instance.noTrafficShapingAtAll == false &&
-                    instance.bandwidthDown != null && instance.bandwidthUp != null && instance.latency != null && instance.packetLoss != null
+                            instance.customConnectivityProfile == true &&
+                            instance.noTrafficShapingAtAll == false &&
+                            instance.bandwidthDown != null && instance.bandwidthUp != null && instance.latency != null && instance.packetLoss != null
             boolean nullAndNative =
                     profile == null &&
-                    instance.customConnectivityProfile == false &&
-                    instance.noTrafficShapingAtAll == true
+                            instance.customConnectivityProfile == false &&
+                            instance.noTrafficShapingAtAll == true
 
             return notNull || nullAndCustom || nullAndNative;
 
@@ -225,7 +230,6 @@ class Job implements Taggable {
         eventNameIfUnknown(nullable: true, maxSize: 255)
         variables(nullable: true)
 
-
         // if an executionSchedule is set, make sure that it is a valid Cron expression
         executionSchedule(nullable: true, validator: {
             if ((it != null) && (!(CronExpression.isValidExpression(it)))) {
@@ -245,7 +249,7 @@ class Job implements Taggable {
     }
 
     static mapping = {
-        sort 'label':'asc'
+        sort 'label': 'asc'
         noTrafficShapingAtAll defaultValue: false
         customConnectivityProfile defaultValue: false
         persistNonMedianResults defaultValue: '1'
@@ -256,7 +260,7 @@ class Job implements Taggable {
         description = description?.trim()
     }
 
-    String toString(){
+    String toString() {
         label
     }
 

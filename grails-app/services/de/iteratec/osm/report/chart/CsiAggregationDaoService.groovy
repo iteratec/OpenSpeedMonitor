@@ -144,7 +144,7 @@ class CsiAggregationDaoService {
 			result =  CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndTagRlike(fromDate,toDate,toDate,interval,aggregator,rlikePattern)
 		} else {
 			result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate, toDate, toDate, interval, aggregator)
-			result.grep{ it.tag ==~ rlikePattern }
+			result = result.grep{ it.tag ==~ rlikePattern }
 		}
 
 		result.findAll {

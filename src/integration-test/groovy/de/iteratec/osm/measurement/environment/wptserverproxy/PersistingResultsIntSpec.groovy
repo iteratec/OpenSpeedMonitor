@@ -66,7 +66,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(true)
         mockMetricReportingService(false)
@@ -89,7 +89,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(true)
@@ -112,7 +112,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(false)
@@ -133,7 +133,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
 
         setup:
         //create test-specific data
-        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml"))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_1Run_2EventNames_PagePrefix.xml")))
         //test specific mocks
         mockCsiAggregationUpdateService(false)
         mockMetricReportingService(false)
@@ -182,7 +182,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
                 undefBrowser,
                 true
         )
-        Script script = TestDataUtil.createScript('script', 'description', 'navigate tralala', false)
+        Script script = TestDataUtil.createScript('script', 'description', 'navigate tralala')
         TestDataUtil.createJob(
                 'FF_BV1_Multistep_2',
                 script,

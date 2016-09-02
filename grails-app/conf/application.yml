@@ -88,6 +88,8 @@ environments:
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
 
+server:
+    'contextPath': '/'
 ---
 ---
 grails:
@@ -247,6 +249,7 @@ grails:
                             {pattern: '/csiConfigIO/downloadHourOfDayWeights',          access: ["permitAll"]},
                             {pattern: '/csiConfigIO/downloadBrowserConnectivityWeights',access: ["permitAll"]},
                             {pattern: '/csiConfigIO/downloadDefaultTimeToCsMappings',   access: ["permitAll"]},
+                            {pattern: '/detailAnalysis/**',                             access: ["permitAll"]},
                             {pattern: '/eventResultDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
                             {pattern: '/highchartPointDetails/**',                      access: ["permitAll"]},
@@ -279,6 +282,25 @@ grails:
                     chart:
                         chartTagLib: RICKSHAW
                         availableChartTagLibs: RICKSHAW
+                test:
+                    geb:
+                        login: admin
+                        password: password
+                        driver: phantomJs
+    assets:
+        less:
+            compile: logback
+        plugin:
+            'twitter-bootstrap':
+                excludes:
+                    - '**/*.less'
+            'font-awesome-resources':
+                excludes:
+                    -  '**/*.less'
+        excludes:
+            - 'openspeedmonitor.less'
+        minifyJs: true
+        minifyCss: true
     i18n:
         locales:
             - en

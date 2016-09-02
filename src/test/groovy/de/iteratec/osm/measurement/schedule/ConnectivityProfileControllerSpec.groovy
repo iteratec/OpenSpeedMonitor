@@ -25,6 +25,7 @@ class ConnectivityProfileControllerSpec extends Specification {
 
     void "setup"() {
         controllerUnderTest = controller
+        controllerUnderTest.jobDaoService = new JobDaoService()
         existingConnectivityProfile = new ConnectivityProfile(name: "ConnectivityProfile1", active: true, bandwidthDown: 2000, bandwidthUp: 100, packetLoss: 0, latency: 0).save(failOnError: true)
 
         existingConnectivityProfile.metaClass.toString = { -> "unused" }

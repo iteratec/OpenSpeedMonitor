@@ -24,15 +24,29 @@ import de.iteratec.osm.csi.CsiAggregationUpdateEventCleanupService;
  * @author nkuhn
  */
 class CsiAggregationUpdateEventCleanupJob {
-	
-	CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
+
+    CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
     boolean createBatchActivity = true
-	
+    static boolean isCurrentlyRunning = false
+
     static triggers = {
-		/** Each Day at 5:30 am. */
-		cron(name: 'dailyUpdateEventCleanup', cronExpression: '0 30 5 ? * *')
+        /** Each Day at 5:30 am. */
+        cron(name: 'dailyUpdateEventCleanup', cronExpression: '0 30 5 ? * *')
     }
+
     def execute() {
-		csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, createBatchActivity)
+        if (isCurrentlyRunning) {
+            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Job is already running.")
+            return
+        }
+
+        isCurrentlyRunning = true
+        try {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, createBatchActivity)
+        } catch (Exception e) {
+            log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents throws an exception: " + e.getMessage())
+        } finally {
+            isCurrentlyRunning = false
+        }
     }
 }

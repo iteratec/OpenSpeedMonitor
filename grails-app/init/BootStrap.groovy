@@ -16,7 +16,9 @@
 */
 
 
+
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.api.MicroServiceApiKey
 import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.batch.Status
 import de.iteratec.osm.csi.*
@@ -24,11 +26,10 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.LocationPersisterService
-import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
+import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.measurement.schedule.JobProcessingService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -36,17 +37,14 @@ import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.HealthReportService
-import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
 import de.iteratec.osm.util.I18nService
-import grails.util.BuildSettings
 import grails.util.Environment
 import org.apache.commons.validator.routines.UrlValidator
 import org.joda.time.DateTime
 import org.springframework.core.io.DefaultResourceLoader
-import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 
 class BootStrap {
@@ -183,6 +181,20 @@ class BootStrap {
             if (createDefaultUsers) createUser('root', 'root', rootRole)
         } else {
             createUser(appRootUserName, appRootPassword, rootRole)
+        }
+
+
+        //apiKey for microService
+        Boolean enablePersistenceOfAssetRequests = grailsApplication.config.grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests
+        if(enablePersistenceOfAssetRequests) {
+            if (MicroServiceApiKey.list().isEmpty()) {
+                String initialApiKey = grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey.isEmpty() ?
+                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialApiKey
+                String initialMicroServiceName = grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName.isEmpty() ?
+                        null : grailsApplication.config.grails.de.iteratec.osm.security.initialMicroServiceName
+                if (!initialApiKey || !initialMicroServiceName) log.warn("initial MicroserviceApiKey configuration missing")
+                else new MicroServiceApiKey([secretKey: initialApiKey, microService: initialMicroServiceName, valid: true]).save(failOnError: true)
+            }
         }
 
         log.info "initUserData() OSM ends"
