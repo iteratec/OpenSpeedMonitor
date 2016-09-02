@@ -16,7 +16,7 @@ class DbCleanupOldBatchActivitiesJob {
         /**
          * Each Day at 3:00 am.
          */
-        cron(name: 'DbCleanupOldBatchActivities', cronExpression: '0 35 * ? * *')
+        cron(name: 'DbCleanupOldBatchActivities', cronExpression: '0 0 3 ? * *')
     }
 
     def execute() {
