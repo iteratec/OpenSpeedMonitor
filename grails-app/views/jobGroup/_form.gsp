@@ -17,7 +17,10 @@
                                                                   default="Graphite Servers"/></label>
 
     <div class="controls">
-        <g:select name="graphiteServers" from="${de.iteratec.osm.report.external.GraphiteServer.list()}"
+        <a href="#" id="selectAllGraphiteServer" onclick="selectAllGraphiteServer(true)"><g:message message="de.iteratec.isocsi.jobGroup.select.all.graphiteServer" default="select all" /></a> |
+        <a href="#" id="deselectAllGraphiteServer" onclick="selectAllGraphiteServer(false)"><g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="deselect all" /></a>
+        <br/>
+        <g:select id="graphiteServers" name="graphiteServers" from="${de.iteratec.osm.report.external.GraphiteServer.list()}"
                   multiple="multiple" optionKey="id" size="5" value="${jobGroup?.graphiteServers*.id}"
                   class="many-to-many"/>
     </div>
@@ -60,4 +63,3 @@
     </g:if>
 
 </div>
-

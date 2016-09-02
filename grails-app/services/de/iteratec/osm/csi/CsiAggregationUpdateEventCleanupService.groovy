@@ -25,6 +25,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.CsiAggregationTagService
 import grails.gorm.DetachedCriteria
+import grails.transaction.Transactional
 
 /**
  * Contains the logic to ...
@@ -78,28 +79,21 @@ class CsiAggregationUpdateEventCleanupService {
         BatchActivityUpdater activityUpdater = batchActivityService.getActiveBatchActivity(this.class, Activity.UPDATE, "Close and Calculate CsiAggregations", 2, createBatchActivity)
         activityUpdater.beginNewStage("closing and calculating CsiAggregations", csiAggregationsOpenAndExpired.size())
 
-        if (csiAggregationsOpenAndExpired.size() > 0) {
-            CsiAggregation.withSession { session ->
-                csiAggregationsOpenAndExpired.each { csiAggregationToCalcAndClose ->
+        csiAggregationsOpenAndExpired.each { csiAggregationToCalcAndClose ->
 
-                    log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Calculating and closing open and expired csi aggregations...")
-                    activityUpdater.addProgressToStage()
+            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Calculating and closing open and expired csi aggregations...")
+            activityUpdater.addProgressToStage()
 
-                    try {
-                        closeAndCalculateIfNecessary(csiAggregationToCalcAndClose)
-                    } catch (Exception e) {
-                        log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation: \n" +
-                                e.getMessage() +
-                                "\n Processing with the next csiAggregations")
-                        activityUpdater.addFailures().setLastFailureMessage(e.getMessage()).update()
-                    }
-
-
-                    session.flush()
-                }
-
-                log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Done calculating and closing open and expired csi aggregations.")
+            try {
+                closeAndCalculateIfNecessary(csiAggregationToCalcAndClose)
+            } catch (Exception e) {
+                log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation: \n" +
+                        e.getMessage() +
+                        "\n Processing with the next csiAggregations")
+                activityUpdater.addFailures(e.getMessage())
             }
+
+            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Done calculating and closing open and expired csi aggregations.")
         }
 
         deleteUpdateEventsForClosedAndCalculatedMvs(activityUpdater)
@@ -108,46 +102,36 @@ class CsiAggregationUpdateEventCleanupService {
         activityUpdater.done()
     }
 
+    @Transactional
     void closeAndCalculateIfNecessary(CsiAggregation csiAggregationOpenAndExpired) {
         CsiAggregationUpdateEvent latestUpdateEvent = csiAggregationDaoService.getLatestUpdateEvent(csiAggregationOpenAndExpired.ident())
         def latestUpdateEventList = latestUpdateEvent ? [latestUpdateEvent] : []
 
         if (csiAggregationOpenAndExpired.hasToBeCalculatedAccordingEvents(latestUpdateEventList)) {
             calculateAndCloseCsiAggregation(csiAggregationOpenAndExpired)
-        } else {
-            closeOpenAndExpiredCsiAggregation(csiAggregationOpenAndExpired.id)
         }
+
+        csiAggregationOpenAndExpired.closedAndCalculated = true
     }
 
     void calculateAndCloseCsiAggregation(CsiAggregation csiAggregation) {
         switch (csiAggregation.aggregator.name) {
             case AggregatorType.PAGE:
                 calculatePageMvs(csiAggregation)
-                closeOpenAndExpiredCsiAggregation(csiAggregation.id)
                 break
 
             case AggregatorType.SHOP:
                 calculateShopMvs(csiAggregation)
-                closeOpenAndExpiredCsiAggregation(csiAggregation.id)
                 break
 
             case AggregatorType.CSI_SYSTEM:
                 calculateCsiSystemCsiAggregation(csiAggregation)
-                closeOpenAndExpiredCsiAggregation(csiAggregation.id)
                 break
         }
     }
 
     private void calculateCsiSystemCsiAggregation(CsiAggregation csiAggregationToCalculate) {
         csiSystemCsiAggregationService.calcCa(csiAggregationToCalculate, csiAggregationToCalculate.csiSystem)
-    }
-
-    void closeOpenAndExpiredCsiAggregation(Long csiAggregationToCloseId) {
-        CsiAggregation.withTransaction {
-            CsiAggregation csiAggregationToClose = CsiAggregation.findById(csiAggregationToCloseId)
-            csiAggregationToClose.closedAndCalculated = true
-            csiAggregationToClose.save()
-        }
     }
 
     void calculatePageMvs(CsiAggregation pageMvsToCalculateAndClose) {

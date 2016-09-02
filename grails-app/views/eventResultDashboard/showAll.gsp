@@ -358,6 +358,12 @@
                                             value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
                                             action="downloadCsv"
                                             class="btn btn-primary" style="margin-top: 16px;"/>
+                                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+                                        <g:actionSubmit
+                                                value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
+                                                action="showDetailData"
+                                                class="btn btn-primary" style="margin-top: 16px;"/>
+                                    </g:if>
                                     <sec:ifLoggedIn>
                                         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                                             <a href="#CreateUserspecifiedDashboardModal" role="button"
