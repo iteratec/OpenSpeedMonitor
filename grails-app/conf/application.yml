@@ -89,7 +89,7 @@ environments:
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
 
 server:
-    'context-path': '/'
+    'contextPath': '/'
 ---
 ---
 grails:
