@@ -24,6 +24,7 @@ import java.text.DecimalFormat
  * Representation of a batch activity like job deletion
  */
 class BatchActivity {
+    long id
 
     String name
     String domain

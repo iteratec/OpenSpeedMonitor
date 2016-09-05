@@ -21,7 +21,11 @@ class BatchActivityUpdater {
     public BatchActivityUpdater(String name, String domain, Activity activity, int maximumStages, int saveThreshold = 10){
         this.threshold = saveThreshold
         this.count = count
-        createActivity(name,domain,activity,maximumStages)
+        batchActivity = BatchActivity.findByNameAndDomainAndActivityAndStatus(name, domain, activity, Status.ACTIVE)
+        if(!batchActivity) createActivity(name,domain,activity,maximumStages)
+    }
+    public BatchActivityUpdater(long id){
+        batchActivity = BatchActivity.findById(id)
     }
 
     protected void createActivity(name, domain, activity, maximumStages) {
@@ -115,5 +119,14 @@ class BatchActivityUpdater {
 
     protected void setStatus(Status status) {
         batchActivity.status = status
+    }
+    protected  int getCurrentProgress(){
+        return batchActivity.stepInStage
+    }
+    protected  int getCurrentFailures(){
+        return batchActivity.failures
+    }
+    protected  long getBatchActivityId(){
+        return batchActivity.id
     }
 }

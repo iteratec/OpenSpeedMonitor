@@ -1,5 +1,7 @@
 package de.iteratec.osm.batch
 
+import org.hibernate.engine.jdbc.batch.spi.Batch
+
 class BatchActivityService {
 
     /**
@@ -15,6 +17,16 @@ class BatchActivityService {
 
         }
         return result
+    }
+    /**
+     */
+    public BatchActivityUpdater getActiveBatchActivity(long id) {
+        def batchActivityUpdater
+        BatchActivity.withSession {
+            batchActivityUpdater = new BatchActivityUpdater(id)
+
+        }
+        return batchActivityUpdater
     }
 
     /**

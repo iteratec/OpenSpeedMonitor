@@ -71,6 +71,17 @@
 
 <div class="row">
     <div class="span12">
+        <g:if test="${startedBatchActivity}">
+            <div class="alert alert-info">
+                <g:message code="default.microService.osmDetailAnalysis.batchCreated"/>
+                <g:link controller="batchActivity">Batch Activity</g:link>
+            </div>
+        </g:if>
+    </div>
+</div>
+
+<div class="row">
+    <div class="span12">
         <form method="get" action="" id="dashBoardParamsForm">
             <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message
                     code="de.iteratec.ism.ui.labels.save.success"
@@ -83,8 +94,7 @@
                             code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
 
                     <p>
-                        <g:message
-                                code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.message"/>
+
                     </p>
 
                     <p>
@@ -379,9 +389,18 @@
                                                style="margin-top: 16px;"
                                                onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
                                             <g:render template="/_common/modals/deleteCustomDashboard"/>
-
                                         </g:if>
                                     </g:if>
+                                    <sec:ifLoggedIn>
+                                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                                            <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+                                                <g:actionSubmit
+                                                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
+                                                        action="sendFetchAssetsAsBatchCommand"
+                                                        class="btn btn-primary" style="margin-top: 16px;"/>
+                                            </g:if>
+                                        </sec:ifAnyGranted>
+                                    </sec:ifLoggedIn>
                                 </div>
 
                                 <div class="span3" style="display: none;">

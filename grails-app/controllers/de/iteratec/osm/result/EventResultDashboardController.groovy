@@ -21,8 +21,12 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.LocationController
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.measurement.environment.dao.LocationDaoService
+import de.iteratec.osm.measurement.environment.wptserverproxy.AssetRequestPersisterService
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
@@ -45,6 +49,7 @@ import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.web.servlet.FlashMap
 import org.springframework.web.servlet.support.RequestContextUtils
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
@@ -71,6 +76,7 @@ class EventResultDashboardController {
     ConfigService configService
     CustomDashboardService customDashboardService
     UserspecificDashboardService userspecificDashboardService
+    AssetRequestPersisterService assetRequestPersisterService
 
     /**
      * The Grails engine to generate links.
@@ -891,5 +897,57 @@ class EventResultDashboardController {
                 redirect(controller: "detailAnalysis", action: "show", params: params)
             }
         }
+    }
+
+    public def sendFetchAssetsAsBatchCommand(EventResultDashboardShowAllCommand cmd){
+        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
+
+        boolean requestedAllowedDashboard = true;
+
+        cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
+        cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+
+        cmd.copyRequestDataToViewModelMap(modelToRender);
+
+        def connectivityProfiles
+        if (cmd.selectedConnectivityProfiles){
+            connectivityProfiles=ConnectivityProfile.findAllByIdInList(cmd.selectedConnectivityProfiles)
+        }
+
+        List<Job> jobs = Job.createCriteria().list {
+            if(cmd.includeCustomConnectivity)inList("customConnectivityName",[cmd.customConnectivityName,null]) // if custom connectivity is included
+            else eq("customConnectivityProfile",cmd.includeCustomConnectivity)
+            if(!cmd.includeNativeConnectivity)eq("noTrafficShapingAtAll", cmd.includeNativeConnectivity)
+            if(!cmd.selectedAllConnectivityProfiles)inList("connectivityProfile", connectivityProfiles)
+        }
+        def jobsSize = jobs.size()
+        Interval timeFrame = cmd.getSelectedTimeFrame();
+        def jobGroupList = []
+        cmd.selectedFolder.each{
+            jobGroupList.add(JobGroup.findById(it).name)
+        }
+        def selectedBrowsersList = []
+        cmd.selectedBrowsers.each{
+            selectedBrowsersList.add(Browser.findById(it).name)
+        }
+        def selectedLocationsList = []
+        cmd.selectedLocations.each {
+            selectedLocationsList.add(Location.findById(it).location)
+        }
+        List<JobResult> jobResults =[]
+        if(jobs) {
+            jobResults = JobResult.createCriteria().list {
+                inList("job", jobs)
+                if (cmd.selectedFolder) inList("jobGroupName", jobGroupList)
+                if (!cmd.selectedAllBrowsers) inList("locationBrowser", selectedBrowsersList)
+                if (!cmd.selectedAllLocations) inList("locationLocation", selectedLocationsList)
+                between("date", timeFrame.getStart().toDate(), timeFrame.getEnd().toDate())
+
+            }
+        }
+        assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
+        modelToRender.put("startedBatchActivity","true")
+        render(view: "showAll", model: modelToRender)
     }
 }

@@ -19,6 +19,10 @@ package de.iteratec.osm.api
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.api.dto.*
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdater
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
@@ -88,6 +92,7 @@ class RestApiController {
     InMemoryConfigService inMemoryConfigService
     JobProcessingService jobProcessingService
     JobDaoService jobDaoService
+    BatchActivityService batchActivityService
 
     /**
      * <p>
@@ -581,6 +586,22 @@ class RestApiController {
         return sendObjectAsJSON(resultMappings as HashMap, params.pretty && params.pretty == 'true')
     }
 
+    public Map<String, Object> receiveCallback(CallbackCommand cmd){
+        BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(cmd.callBackId)
+        if(cmd.failureCount > 0 ) {
+            int newFailures = cmd.failureCount - batchActivity.getCurrentFailures()
+            if(newFailures){
+                batchActivity.addFailures("${cmd.failureCount} FetchJobs failed",newFailures)
+            }
+        }
+        if (cmd.loadedAssets > 0){
+            int currentProgress = batchActivity.getCurrentProgress()
+            batchActivity.addProgressToStage(cmd.loadedAssets-currentProgress)
+            if(cmd.loadedAssets == cmd.countAssets) batchActivity.done()
+        }
+
+        sendObjectAsJSON("ok",true)
+    }
     /**
      * Activates the job of submitted id. It gets activated no matter whether it was active/inactive before.
      * This function can't be called without a valid apiKey as parameter.
@@ -1142,4 +1163,11 @@ class MappingRequestCommand {
         }
     })
     Map<String, List> requestedDomains = [:].withDefault { [] }
+}
+
+class CallbackCommand {
+    int countAssets
+    int loadedAssets
+    int callBackId
+    int failureCount
 }

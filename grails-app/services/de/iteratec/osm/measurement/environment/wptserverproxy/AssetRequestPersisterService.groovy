@@ -18,18 +18,23 @@
 package de.iteratec.osm.measurement.environment.wptserverproxy
 
 import de.iteratec.osm.api.MicroServiceApiKey
+import de.iteratec.osm.batch.Activity
+import de.iteratec.osm.batch.BatchActivity
+import de.iteratec.osm.batch.BatchActivityService
+import de.iteratec.osm.batch.BatchActivityUpdater
+
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.web.mapping.LinkGenerator
+import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 
-import static groovyx.net.http.ContentType.JSON
 import static groovyx.net.http.ContentType.URLENC
-import static groovyx.net.http.ContentType.XML
 
 /**
  * Persists locations and results. Observer of ProxyService.
@@ -45,6 +50,7 @@ class AssetRequestPersisterService implements iResultListener {
     private final int MAX_ATTEMPTS = 3
     private final int TIMEOUT_IN_SECONDS = 5
 
+    BatchActivityService batchActivityService
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
 
@@ -124,6 +130,49 @@ class AssetRequestPersisterService implements iResultListener {
 
         if (!resp || resp.status != 200)
             throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId())
+    }
+    public void sendFetchAssetsAsBatchCommand(List<JobResult> jobResults) {
+        if (!persistenceOfAssetRequestsEnabled || !jobResults || jobResults.empty)
+            return
+        def persistanceJobList = []
+        jobResults.each { JobResult jobResult ->
+            persistanceJobList.add([wptVersion: "2.19",
+                    jobId: jobResult.job.id,
+                    wptTestId: jobResult.testId,
+                    wptServerBaseUrl: jobResult.wptServerBaseurl,
+                    jobGroupId: jobResult.job.jobGroup.id])
+        }
+
+        RESTClient client = new RESTClient(microserviceUrl)
+        String osmUrl = grailsLinkGenerator.getServerBaseURL() //"http://localhost:8080/"
+        if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
+        String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
+        String callbackUrl = "rest/receiveCallback"
+//        Thread.start {
+//            client.withNewSession {
+                def resp
+                int attempts = 0
+                while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
+                    attempts++
+                    try {
+                        BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload Asset Job" ,1, true, 1)
+                        resp = client.post(path: 'restApi/persistAssetsBatchJob',
+                                body: [osmUrl: osmUrl, apiKey: apiKey, callbackUrl: callbackUrl, callbackJobId: batchActivity.getBatchActivityId(), persistanceJobList: persistanceJobList],
+                        contentType: ContentType.JSON)
+                        if(resp.data["target"]) {
+                            batchActivity.beginNewStage("Update Stats",  resp.data["target"], 1)
+                        }
+
+                    } catch (ConnectException ex) {
+                        sleep(1000 * TIMEOUT_IN_SECONDS)
+                    }
+                }
+
+
+                if (!resp || resp.status != 200)
+                    throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests")
+//            }
+//        }
     }
 
 
