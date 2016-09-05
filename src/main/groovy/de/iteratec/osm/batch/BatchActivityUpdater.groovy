@@ -18,11 +18,11 @@ class BatchActivityUpdater {
      * @param saveThreshold A threshold after which updates should be persisted.
      * If you have a few long steps set this low. If you expect many short steps you could increase this value
      */
-    public BatchActivityUpdater(String name, String domain, Activity activity, int maximumStages, int saveThreshold = 10){
+    public BatchActivityUpdater(String name, String domain, Activity activity, int maximumStages, int saveThreshold = 10, boolean forceNew = false){
         this.threshold = saveThreshold
         this.count = count
-        batchActivity = BatchActivity.findByNameAndDomainAndActivityAndStatus(name, domain, activity, Status.ACTIVE)
-        if(!batchActivity) createActivity(name,domain,activity,maximumStages)
+        if(!forceNew) batchActivity = BatchActivity.findByNameAndDomainAndActivityAndStatus(name, domain, activity, Status.ACTIVE)
+        if(!batchActivity || forceNew) createActivity(name,domain,activity,maximumStages)
     }
     public BatchActivityUpdater(long id){
         batchActivity = BatchActivity.findById(id)

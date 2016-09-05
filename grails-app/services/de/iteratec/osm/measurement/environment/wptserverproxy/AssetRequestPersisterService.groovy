@@ -155,7 +155,7 @@ class AssetRequestPersisterService implements iResultListener {
                 while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
                     attempts++
                     try {
-                        BatchActivityUpdater batchActivity = batchActivityService.getActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload Asset Job" ,1, true, 1)
+                        BatchActivityUpdater batchActivity = batchActivityService.createActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload Asset Job" ,1, true, 1)
                         resp = client.post(path: 'restApi/persistAssetsBatchJob',
                                 body: [osmUrl: osmUrl, apiKey: apiKey, callbackUrl: callbackUrl, callbackJobId: batchActivity.getBatchActivityId(), persistanceJobList: persistanceJobList],
                         contentType: ContentType.JSON)

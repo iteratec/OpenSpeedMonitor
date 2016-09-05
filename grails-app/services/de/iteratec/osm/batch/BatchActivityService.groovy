@@ -18,6 +18,16 @@ class BatchActivityService {
         }
         return result
     }
+    public BatchActivityUpdater createActiveBatchActivity(Class c, Activity activity, String name, int maxStages, boolean observe, int saveThreshold = 10) {
+        def result
+        BatchActivity.withSession {
+            if (observe) {
+                result = new BatchActivityUpdater(name, c.name, activity, maxStages, saveThreshold, true)
+            }
+
+        }
+        return result
+    }
     /**
      */
     public BatchActivityUpdater getActiveBatchActivity(long id) {
