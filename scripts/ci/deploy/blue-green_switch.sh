@@ -25,6 +25,12 @@ echo "stdout of blue-green-switch remote execution:"
 cat ./$stdout_file
 echo "END of stdout of blue-green-switch remote execution"
 
+# let this script fail if osm_blue_green_switch.sh failed to run
+cat ./$stdout_file | egrep ".*"
+if [ $? -eq 0 ]; then
+  exit 1
+fi
+
 # undeploy old version
 if [ $PORT_TO_SWITCH_FROM -ne -1 ];
 	then
