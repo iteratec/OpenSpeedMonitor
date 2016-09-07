@@ -13,7 +13,7 @@ echo "PORT_TO_SWITCH_TO=$PORT_TO_SWITCH_TO"
 # echo variables of previous (deploy) job
 echo "PORT_TO_DEPLOY=$bamboo_tomcat_PORT_TO_DEPLOY"
 echo "PORT_TO_UNDEPLOY=$bamboo_tomcat_PORT_TO_UNDEPLOY"
-stdout_file="osm_$bamboo_tomcat_HOST_TO_REVERSE_PROXY_$PORT_TO_SWITCH_TO_blue-green-switch-stdout.txt"
+stdout_file="osm_${bamboo_tomcat_HOST_TO_REVERSE_PROXY}_${PORT_TO_SWITCH_TO}_blue-green-switch-stdout.txt"
 
 # run blue/green switch on target machine
 
