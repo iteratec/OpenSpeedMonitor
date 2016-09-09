@@ -202,7 +202,7 @@ function setCollapseJobInfos(){
             selectedConnectivities += ", NATIVE"
         }
         if(document.getElementById('includeCustomConnectivity').checked){
-            selectedConnectivities += ", CUSTOM"
+            selectedConnectivities += ", CUSTOM";
             var customConnNameRegex = document.getElementById('customConnectivityName').value;
             if(customConnNameRegex){
                 selectedConnectivities += ", '" + customConnNameRegex + "'"

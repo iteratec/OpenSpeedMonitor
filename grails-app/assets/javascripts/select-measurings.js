@@ -86,9 +86,9 @@ var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
 var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
 	$(checkBox).on('change', function(event) {
 		if(event.currentTarget.checked == true) {
-			$(textField).removeProp('disabled');
+			$(textField).prop('disabled', false);
 		} else {
-			$(textField).prop('disabled', 'disabled');
+			$(textField).prop('disabled', true);
 		}
 	});
 };

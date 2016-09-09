@@ -29,7 +29,7 @@
                           title="${message(code: 'batchActivity.endDate.label', default: 'End Date')}"/>
 
         <g:sortableColumn property="remainingTime"
-                          title="${message(code: 'batchActivity.remainingTime.label', default: 'End Date')}"/>
+                          title="${message(code: 'batchActivity.remainingTime.label', default: 'Remaining Time')}"/>
 
     </tr>
     </thead>
