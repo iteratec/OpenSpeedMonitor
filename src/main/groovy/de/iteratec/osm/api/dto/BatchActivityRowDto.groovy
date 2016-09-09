@@ -14,4 +14,5 @@ class BatchActivityRowDto {
     String lastUpdated
     String endDate
     String statusEN
+    String remainingTime
 }

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.batch
 
+import org.joda.time.DateTime
+
 import java.text.DecimalFormat
 
 /**
@@ -81,6 +83,28 @@ class BatchActivity {
         return returnValue
     }
 
+    public String calculateRemainingTime(){
+        if(status != Status.ACTIVE || stepInStage <= 0) return "" // we can only predict the remaining time for active jobs, that already made progress
+        def msSinceBatchStart = new Date().time - startDate.time
+        def timesSinceBatchStart = maximumStepsInStage / stepInStage
+        def predictedRemainingTimeInS = msSinceBatchStart*timesSinceBatchStart/1000
+        def result =""
+        if(predictedRemainingTimeInS / 86400 > 1){
+            result += String.valueOf((int)((int)predictedRemainingTimeInS/86400)) + "d "
+            predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 86400
+        }
+
+        if(predictedRemainingTimeInS / 3600 > 1){
+            result += String.valueOf((int)((int)predictedRemainingTimeInS/3600)) + "h "
+            predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 3600
+        }
+        if(predictedRemainingTimeInS / 60 > 1){
+            result += String.valueOf((int)((int) predictedRemainingTimeInS/60)) + "m "
+            predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 60
+        }
+        result += String.valueOf(predictedRemainingTimeInS) +"s"
+        return result
+    }
     @Override
     public String toString() {
         return "Domain: $domain, Name: $name ,Stage: $actualStage/$maximumStages, Step: $stepInStage/$maximumStepsInStage";

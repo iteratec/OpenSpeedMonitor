@@ -21,4 +21,5 @@
 
     <td><g:formatDate type="datetime" date="${batchActivityInstance.endDate}" style="LONG"
                       timeStyle="SHORT"/></td>
+    <td></td>
 </tr>

@@ -1,5 +1,5 @@
 <%@ page import="de.iteratec.osm.batch.BatchActivity" %>
-<table class="table table-bordered">
+<table class="table table-bordered" id="batchActivityTable">
     <thead>
     <tr>
 
@@ -27,6 +27,9 @@
 
         <g:sortableColumn property="endDate"
                           title="${message(code: 'batchActivity.endDate.label', default: 'End Date')}"/>
+
+        <g:sortableColumn property="remainingTime"
+                          title="${message(code: 'batchActivity.remainingTime.label', default: 'End Date')}"/>
 
     </tr>
     </thead>

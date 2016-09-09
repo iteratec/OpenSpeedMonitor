@@ -45,7 +45,7 @@ class BatchActivityController {
     }
 
     def index(){
-        redirect(action: 'list',params: [max:10])
+        redirect(action: 'list',params: [max:100])
     }
 
     def edit(){
@@ -70,14 +70,27 @@ class BatchActivityController {
 
         params.order = "desc"
         params.sort = "startDate"
-        params.max = 10
+        params.max = params.max as Integer
+        params.offset = params.offset as Integer
+
+        List<BatchActivity> result
+        int count
+        if(params.filter == "" ) {
+            result = BatchActivity.list(params)
+            count = BatchActivity.list().size()
+        }
+        else {
+            result = BatchActivity.findAllByNameIlike("%"+params.filter+"%",params)
+            count = BatchActivity.findAllByNameIlike("%"+params.filter+"%").size()
+        }
 
         String templateAsPlainText = g.render(
                 template: 'batchActivityTable',
-                model: [batchActivities:  BatchActivity.list(params),batchActivityCount:BatchActivity.count()]
+                model: [batchActivities: result]
         )
-        sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
+        def jsonResult = [table:templateAsPlainText, count:count]as JSON
 
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 
     /**
@@ -94,18 +107,20 @@ class BatchActivityController {
                 BatchActivity batchActivity = BatchActivity.get(new Long(activeId as String))
                 if(batchActivity){
                     updates.add(
-                            new BatchActivityRowDto (
-                                    htmlId: "batchActivity_${activeId}",
-                                    activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
-                                    status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
-                                    stage: batchActivity.actualStage + "/" + batchActivity.maximumStages ,
-                                    progress: batchActivity.calculateProgressInStage() ,
-                                    lastFailureMessage: batchActivity.lastFailureMessage,
-                                    startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
-                                    lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdate)),
-                                    endDate: (batchActivity.endDate)? DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate)):"",
-                                    statusEN: batchActivity.status.toString()
-                            )
+                        new BatchActivityRowDto (
+                                htmlId: "batchActivity_${activeId}",
+                                activity: i18nService.msg(batchActivity.activity.getI18nCode(), batchActivity.activity.toString()),
+                                status: i18nService.msg(batchActivity.status.getI18nCode(),batchActivity.status.toString()),
+                                stage: batchActivity.actualStage + "/" + batchActivity.maximumStages ,
+                                progress: batchActivity.calculateProgressInStage() ,
+                                lastFailureMessage: batchActivity.lastFailureMessage,
+                                startDate: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.startDate)),
+                                lastUpdated: DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.lastUpdate)),
+                                endDate: (batchActivity.endDate)? DATE_FORMAT_BATCH_ACTIVITIES.print(new DateTime(batchActivity.endDate)):"",
+                                remainingTime: batchActivity.calculateRemainingTime(),
+                                statusEN: batchActivity.status.toString()
+
+                        )
                     )
                 } else{
                     log.error("Couldn't find a matching BatchActivty with id: $activeId")
@@ -118,7 +133,12 @@ class BatchActivityController {
     }
 
     def checkForUpdate(){
-        if(BatchActivity.findByStatus(Status.ACTIVE)){
+        def activeOnSite = 0
+        if(params.activeCount && params.activeCount != ""){
+            activeOnSite = params.activeCount as Integer
+        }
+        def activeBatches = BatchActivity.findAllByStatus(Status.ACTIVE).size()
+        if(activeBatches!= activeOnSite){
             render("true")
         } else{
             render("false")
