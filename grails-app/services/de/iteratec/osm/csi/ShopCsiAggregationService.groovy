@@ -261,6 +261,7 @@ class ShopCsiAggregationService {
             toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
         }
         csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+        toBeCalculated.save(failOnError: true)
         return toBeCalculated
     }
 

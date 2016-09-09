@@ -75,6 +75,9 @@ class GraphiteServer {
     static hasMany = [graphitePaths:GraphitePath, graphiteEventSourcePaths:GraphiteEventSourcePath]
     static transients = ['serverInetAddress']
 
+    Boolean reportCsiAggregationsToGraphiteServer = false
+    Boolean reportEventResultsToGraphiteServer = true
+
     /**
      * Configuration for {@link HealthReportService} with standard values.
      */

@@ -336,6 +336,8 @@ class PageCsiAggregationService {
             }
             csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         }
+
+        toBeCalculated.save(failOnError: true)
         return toBeCalculated
     }
 }

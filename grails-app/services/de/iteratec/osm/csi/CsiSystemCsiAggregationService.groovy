@@ -83,7 +83,7 @@ class CsiSystemCsiAggregationService {
             return result
         }
 
-        result = csiAggregationDaoService.getMvs(fromDate, toDate, targetInterval, AggregatorType.findByName(AggregatorType.CSI_SYSTEM),csiSystems)
+        result = csiAggregationDaoService.getMvs(fromDate, toDate, targetInterval, AggregatorType.findByName(AggregatorType.CSI_SYSTEM), csiSystems)
         return result
     }
 
@@ -253,10 +253,11 @@ class CsiSystemCsiAggregationService {
         if (weightedCsiValues.size() > 0) {
             toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
         }
-        if(weightedCsiValuesVisuallyComplete.size() > 0) {
+        if (weightedCsiValuesVisuallyComplete.size() > 0) {
             toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
         }
         csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+        toBeCalculated.save(failOnError: true)
         return toBeCalculated
     }
 }
