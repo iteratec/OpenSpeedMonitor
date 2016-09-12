@@ -26,7 +26,9 @@ class OsmConfigurationController {
     }
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        def maxDefault = 100
+        if (max) maxDefault = max
+        params.max = maxDefault
         respond OsmConfiguration.list(params), model:[osmConfigurationCount: OsmConfiguration.count()]
     }
 

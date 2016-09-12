@@ -11,7 +11,9 @@ class JobSetController {
     JobDaoService jobDaoService
 
     def index(Integer max) {
-        params.max = Math.min(max ?: 10, 100)
+        def maxDefault = 100
+        if (max) maxDefault = max
+        params.max = maxDefault
         respond JobSet.list(params), model:[jobSetCount: JobSet.count()]
     }
 

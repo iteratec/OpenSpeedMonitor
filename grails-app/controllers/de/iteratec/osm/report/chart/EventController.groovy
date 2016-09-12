@@ -33,8 +33,10 @@ class EventController {
         redirect(action: "list", params: params)
     }
 
-    def list() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+    def list(Integer max) {
+        def maxDefault = 100
+        if (max) maxDefault = max
+        params.max = maxDefault
         [eventInstanceList: Event.list(params), eventInstanceTotal: Event.count()]
     }
 
