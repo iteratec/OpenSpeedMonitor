@@ -80,7 +80,9 @@ var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
 			}
 			$(selectBox).trigger("chosen:updated");
 		});
-	$(selectBox).css({opacity: 0.5});
+	if($(checkBox).is(':checked')){
+		$(selectBox).css({opacity: 0.5});
+	}
 };
 
 var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
