@@ -194,16 +194,16 @@ class CsTargetGraphGebSpec extends CustomUrlGebReportingSpec {
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 csTargetGraphs"
-        List<Long> csTargetGraphIDs = createManyCsTargetGraphs(25)
+        List<Long> csTargetGraphIDs = createManyCsTargetGraphs(250)
 
         and: "user navigates to index csTargetGraph"
         to CsTargetGraphIndexPage
 
-        then: "only ten csTargetGraphs are shown"
-        csTargetGraphTableRows.size() == 10
+        then: "only one hundred csTargetGraphs are shown"
+        csTargetGraphTableRows.size() == 100
 
         and: "there is pagination"
-        def csTargetGraphCount = (int) (25 / 10) + 1
+        def csTargetGraphCount = (int) (250 / 100) + 1
         pageButtons.size() == csTargetGraphCount + 2 // next and previous button
 
         cleanup:

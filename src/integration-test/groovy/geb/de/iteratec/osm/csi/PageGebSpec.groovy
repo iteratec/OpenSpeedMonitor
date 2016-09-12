@@ -166,16 +166,16 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 pages"
-        List<Long> pageIDs = createManyPages(25)
+        List<Long> pageIDs = createManyPages(250)
 
         and: "user navigates to index page"
         to PageIndexPage
 
-        then: "only ten pages are shown"
-        pageTableRows.size() == 10
+        then: "only one hundred pages are shown"
+        pageTableRows.size() == 100
 
         and: "there is pagination"
-        def pageCount = (int) (25 / 10) + 1
+        def pageCount = (int) (250 / 100) + 1
         pageButtons.size() == pageCount + 2 // next and previous button
 
         cleanup:

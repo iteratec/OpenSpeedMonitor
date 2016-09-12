@@ -184,16 +184,16 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 browsers"
-        List<Long> browserIDs = createManyBrowsers(25)
+        List<Long> browserIDs = createManyBrowsers(250)
 
         and: "user navigates to index page"
         to BrowserIndexPage
 
-        then: "only ten browsers are shown"
-        browserTableRows.size() == 10
+        then: "only one hundred browsers are shown"
+        browserTableRows.size() == 100
 
         and: "there is pagination"
-        def pageCount = (int) (25 / 10) + 1
+        def pageCount = (int) (250 / 100) + 1
         pageButtons.size() == pageCount + 2 // next and previous button
 
         cleanup:

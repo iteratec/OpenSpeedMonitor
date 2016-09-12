@@ -51,7 +51,7 @@ ext {
     karmaExec = file('node_modules/karma/bin/karma')
     karmaConfig = 'src/test/js/karma.conf.js'
 
-    seleniumVersion = "2.46.0"
+    seleniumVersion = "2.53.1"
     phantomJsVersion = '2.1.1'
 }
 

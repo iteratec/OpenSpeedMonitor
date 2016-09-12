@@ -198,16 +198,16 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 browserAliass"
-        List<Long> browserAliasIDs = createManyBrowserAliases(25)
+        List<Long> browserAliasIDs = createManyBrowserAliases(250)
 
         and: "user navigates to index page"
         to BrowserAliasIndexPage
 
-        then: "only ten browserAliass are shown"
-        browserAliasTableRows.size() == 10
+        then: "only one hundred browserAliases are shown"
+        browserAliasTableRows.size() == 100
 
         and: "there is pagination"
-        def pageCount = (int) (25 / 10) + 1
+        def pageCount = (int) (250 / 100) + 1
         pageButtons.size() == pageCount + 2 // next and previous button
 
         cleanup:
