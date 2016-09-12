@@ -61,9 +61,6 @@
                   model="${['batchActivities': batchActivities, 'batchActivityCount': batchActivityCount]}"/>
     </div>
 </section>
-<div class="pagination">
-    <bs:paginate total="${batchActivityCount}"/>
-</div>
 
 <g:form>
     <g:if test="${dbCleanupEnabled}">
