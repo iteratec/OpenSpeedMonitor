@@ -188,8 +188,8 @@ class TabularResultPresentationController {
      * 	       not <code>null</code> and never
      *         {@linkplain Map#isEmpty() empty}.
      */
-    public Map<String, Object> ShowListResultsForJob(TabularResultListResultsForSpecificJobCommand cmd) {
-        if (cmd.job!=null && cmd.from==null && cmd.to==null){
+    public Map<String, Object> showListResultsForJob(TabularResultListResultsForSpecificJobCommand cmd) {
+        if (cmd.job!=null && (cmd.from==null || cmd.to==null)){
             redirect(action: 'listResultsForJob', params:['job.id': cmd.job.getId()])
         }
         Map<String, Object> modelToRender = listResultsByCommand(cmd)

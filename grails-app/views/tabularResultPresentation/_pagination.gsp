@@ -11,6 +11,7 @@
 		 		<li><a href="${model.getPrevLink()}"><g:message code="de.iteratec.isr.pagination.prev" /></a></li>
 		 	</g:if>
              <g:if test="${model.moreThenFivePagesBefore()}">
+                 <li><a href="${model.getFirstLink()}">1</a></li>
                  <li><a>...</a></li>
              </g:if>
              <g:each in="${model.calculateStartListing()..model.calculateEndListing()}" var="i" >
@@ -25,6 +26,7 @@
              </g:each>
              <g:if test="${model.moreThenFivePagesAfter()}">
                  <li><a>...</a></li>
+                 <li><a href="${model.getLastLink()}">${model.rows.size()}</a></li>
              </g:if>
 			<g:if test="${model.isNotLast()}">
 				<li><a href="${model.getNextLink()}"><g:message code="de.iteratec.isr.pagination.next" /></a></li>

@@ -16,6 +16,9 @@
 */
 
 package de.iteratec.osm.report.ui
+
+import grails.web.mapping.LinkGenerator
+
 /**
  * <p>
  * Visualization of a list of page buttons for pagination.
@@ -31,7 +34,7 @@ package de.iteratec.osm.report.ui
  *
  */
 public class PaginationListing {
-	
+	LinkGenerator grailsLinkGenerator
 	/**
 	 * <p>
 	 * Adds a row to this listing.
@@ -58,6 +61,15 @@ public class PaginationListing {
 		this.nextLink = nextLink
 		this.prevLink = prevLink
 	}
+
+	public String getFirstLink(){
+		return paginationRows.first().pageLink
+	}
+
+	public String getLastLink(){
+		return paginationRows.last().pageLink
+	}
+
 	
 	/**
 	 * <p>
@@ -182,9 +194,9 @@ public class PaginationListing {
     public Integer calculateEndListing(){
         Integer end;
         if(moreThenFivePagesAfter())
-            return ( (offset + max*5)/max )
+            return ( (offset + max*5 -1)/max )
         else
-            return total/max
+            return (total -1)/max
     }
 
     /**
@@ -234,8 +246,7 @@ public class PaginationListing {
 	/**
 	 * The listing rows.
 	 */
-	private final List<PaginationListingRow> paginationRows = //
-	Collections.checkedList(new LinkedList(), PaginationListingRow.class)
+	private final List<PaginationListingRow> paginationRows = Collections.checkedList(new LinkedList(), PaginationListingRow.class)
 	
 	private Integer currentOffset
 	
