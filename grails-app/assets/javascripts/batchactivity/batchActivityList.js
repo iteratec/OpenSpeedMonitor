@@ -54,11 +54,13 @@ function createPagination(size,updateTableUrl){
         }
     }else{
         var max_i = 8-curr;
-        if(curr >6 ) {
+        if(curr >=5 ) {
             $('<li><a href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#batchActivityPager');
+            if( curr >= 5 ) $('<li><a href="#" class="page_link">' + "..." + '</a></li>').appendTo('#batchActivityPager');
             i = curr - 3;
-            max_i = 3
+            max_i = 4
         }
+        if(i + 7 >=numPages) i= numPages -7;
         while (curr+max_i > i && numPages> i) {
             if(i == curr) {
                 $('<li><a style="background-color: rgb(219,219,219);" href="#" class="page_link">' + (i + 1) + '</a></li>').appendTo('#batchActivityPager');
@@ -68,6 +70,7 @@ function createPagination(size,updateTableUrl){
             i++;
         }
         if(i!= numPages) {
+            if(i+1 != numPages)$('<li><a href="#" class="page_link">' + "..." + '</a></li>').appendTo('#batchActivityPager');
             $('<li><a href="#" class="page_link">' + (numPages) + '</a></li>').appendTo('#batchActivityPager');
         }
     }
@@ -76,8 +79,10 @@ function createPagination(size,updateTableUrl){
 
 
     $('#batchActivityPager li a').click(function(){
-        var clickedPage = $(this).html() - 1;
-        goTo(clickedPage,perPage);
+        if($.isNumeric( $(this).html())) {
+            var clickedPage = $(this).html() - 1;
+            goTo(clickedPage, perPage);
+        }
     });
     $('<li><a href="#" class="prevLink">'+'Previous'+'</a></li>').click(function () {
         previous();
