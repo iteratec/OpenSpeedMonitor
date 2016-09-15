@@ -26,8 +26,8 @@ buildscript {
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath 'org.grails.plugins:database-migration:2.0.0.RC4'
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.7.4"
-        classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.2"
+        classpath 'com.bertramlabs.plugins:less-asset-pipeline:2.11.2'
         classpath "org.grails.plugins:hibernate4:5.0.4"
         classpath 'com.moowork.gradle:gradle-node-plugin:0.13'
     }
@@ -51,7 +51,7 @@ ext {
     karmaExec = file('node_modules/karma/bin/karma')
     karmaConfig = 'src/test/js/karma.conf.js'
 
-    seleniumVersion = "2.46.0"
+    seleniumVersion = "2.53.1"
     phantomJsVersion = '2.1.1'
 }
 

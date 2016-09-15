@@ -30,8 +30,10 @@ class PageController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index() {
-        params.max = Math.min(params.max ? params.int('max') : 10, 100)
+    def index(Integer max) {
+        def maxDefault = 100
+        if (max) maxDefault = max
+        params.max = maxDefault
         [pageInstanceList: Page.list(params), pageInstanceTotal: Page.count()]
     }
 
