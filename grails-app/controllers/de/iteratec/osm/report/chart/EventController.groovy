@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import org.joda.time.DateTime
 import org.springframework.web.servlet.support.RequestContextUtils
 
 /**
@@ -33,11 +34,49 @@ class EventController {
         redirect(action: "list", params: params)
     }
 
-    def list(Integer max) {
+    def list(Integer max, String filterDate, String filterTime, String filterName, String filterDescription) {
         def maxDefault = 100
         if (max) maxDefault = max
         params.max = maxDefault
-        [eventInstanceList: Event.list(params), eventInstanceTotal: Event.count()]
+        DateTime timeToFilterStart
+        DateTime timeToFilterEnd
+        def errorList = []
+        List<Event> result
+        int count
+        try{
+            if(filterTime) {
+                timeToFilterStart=new DateTime(filterDate+"T"+filterTime).minusMinutes(1)
+                timeToFilterEnd = timeToFilterStart.plusMinutes(2)
+            } else{
+                timeToFilterStart=new DateTime(filterDate)
+                timeToFilterEnd = timeToFilterStart.plusDays(1)
+            }
+        }catch(IllegalArgumentException ex){
+            errorList << message(code: 'event.dateTime.notValid', default: 'Unable to parse date input.\n')
+            return [eventInstanceList: result, eventInstanceTotal: count, filterDate:filterDate?filterDate:"", filterTime:filterTime?filterTime:"",
+                    filterName:filterName?filterName:"", filterDescription:filterDescription?filterDescription:"", errorList:errorList]
+        }
+        if(!filterDate && !filterTime && !filterName && !filterDescription) {
+            result = Event.list(params)
+            count = Event.list().size()
+        }
+        else {
+            result = Event.createCriteria().list(params) {
+                if(filterName) ilike("shortName", "%"+filterName+"%")
+                if(filterDescription) ilike("description", "%"+filterDescription+"%")
+                if(timeToFilterStart && timeToFilterEnd) between("eventDate",timeToFilterStart.toDate(),timeToFilterEnd.toDate())
+            }
+            count = Event.createCriteria().list {
+                if(filterName) ilike("shortName", "%"+filterName+"%")
+                if(filterDescription) ilike("description", "%"+filterDescription+"%")
+                if(timeToFilterStart && timeToFilterEnd) between("eventDate",timeToFilterStart.toDate(),timeToFilterEnd.toDate())
+            }.size()
+        }
+
+
+        [eventInstanceList: result, eventInstanceTotal: count, filterDate:filterDate?filterDate:"", filterTime:filterTime?filterTime:"",
+                               filterName:filterName?filterName:"", filterDescription:filterDescription?filterDescription:"", errorList:errorList]
+
     }
 
     def create() {

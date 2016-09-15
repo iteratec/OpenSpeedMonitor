@@ -2,6 +2,7 @@ package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.util.I18nService
+import groovy.json.JsonSlurper
 import org.springframework.dao.DataIntegrityViolationException
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
@@ -35,11 +36,24 @@ class WebPageTestServerController {
         redirect(action: "show", id: params.id)
     }
 
-    def index(Integer max) {
+    def index(Integer max, String filter) {
         def maxDefault = 100
         if (max) maxDefault = max
         params.max = maxDefault
-        respond WebPageTestServer.list(params), model:[webPageTestServerCount: WebPageTestServer.count()]
+
+        List<WebPageTestServer> result
+        int count
+        if(!filter) {
+            result = WebPageTestServer.list(params)
+            count = WebPageTestServer.list().size()
+        }
+        else {
+            result = WebPageTestServer.findAllByLabelIlike("%"+filter+"%",params)
+            count = WebPageTestServer.findAllByLabelIlike("%"+filter+"%").size()
+        }
+
+
+        respond result, model:[webPageTestServerCount: count, filter:filter?filter:""]
     }
 
     def show(WebPageTestServer webPageTestServer) {

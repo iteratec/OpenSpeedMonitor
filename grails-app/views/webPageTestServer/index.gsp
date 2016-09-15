@@ -13,6 +13,16 @@
 
 <section id="list-webPageTestServer" class="first">
 
+
+    <form class="form-inline">
+        <div class="form-group">
+            <input id="filterListWPT" name="filter" value="${filter}" type="text" placeholder="${message(code: 'default.tableFilter.placeholder', default: 'Filter by label')}">
+            <g:hiddenField name="propertiesToFilter" value="['label']"/>
+            <g:actionSubmit class="btn btn-primary" action="index" value="${message(code: 'default.button.filter.label', default: 'Filter')}" />
+        </div>
+    </form>
+
+
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -55,7 +65,6 @@
         <bs:paginate total="${webPageTestServerCount ?: 0}" />
     </div>
 </section>
-
 </body>
 
 </html>
