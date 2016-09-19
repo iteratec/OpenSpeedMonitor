@@ -7,7 +7,8 @@ PORT_TO_SWITCH_FROM=$bamboo_tomcat_PORT_TO_UNDEPLOY
 PORT_TO_SWITCH_TO=$bamboo_tomcat_PORT_TO_DEPLOY
 ########################################################################################
 
-# echo variables of this job
+echo "echoing variables of this job"
+echo "#######################################"
 echo "PORT_TO_SWITCH_FROM=$PORT_TO_SWITCH_FROM"
 echo "PORT_TO_SWITCH_TO=$PORT_TO_SWITCH_TO"
 # echo variables of previous (deploy) job
@@ -26,7 +27,9 @@ echo "stderr of blue-green-switch remote execution:"
 cat ./$stderr_file
 echo "END of stderr of blue-green-switch remote execution"
 cat ./$stderr_file | egrep ".*"
-if [ $? -eq 0 ]; then
+exit_code_greping_stderr=$?
+echo "exit_code_greping_stderr=${exit_code_greping_stderr}"
+if [ $exit_code_greping_stderr -eq 0 ]; then
     exit 1
 fi
 
@@ -35,7 +38,9 @@ echo "#######################################"
 if [ $PORT_TO_SWITCH_FROM -ne -1 ]; then
     curl -u $bamboo_tomcat_TOMCAT_ADMIN_USERNAME:$bamboo_tomcat_TOMCAT_ADMIN_PASSWORD http://$bamboo_tomcat_HOST_TO_DEPLOY_TO:$PORT_TO_SWITCH_FROM/manager/text/undeploy\?path\=/OpenSpeedMonitor
 fi
-if [ $? -ne 0 ]; then
+exit_code_undeploying_old_osm=$?
+echo "exit_code_undeploying_old_osm=${exit_code_undeploying_old_osm}"
+if [ $exit_code_undeploying_old_osm -ne 0 ]; then
     exit 1
 fi
 
