@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 ########################################################################################
 PORT_TO_SWITCH_FROM=$bamboo_tomcat_PORT_TO_UNDEPLOY
 PORT_TO_SWITCH_TO=$bamboo_tomcat_PORT_TO_DEPLOY
