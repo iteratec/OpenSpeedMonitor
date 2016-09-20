@@ -45,10 +45,7 @@ trait ExternalConfig implements EnvironmentAware {
             defaultLocations = ["file:" +  osmConfLocationBasedOnEnvVar]
         } else {
             defaultLocations = [
-                    "classpath:${appName}-config.properties",
-                    "classpath:${appName}-config.groovy",
-                    "file:${userHome}/.grails/${appName}-config.properties",
-                    "file:${userHome}/.grails/${appName}-config.groovy",
+                    "classpath:${appName}-config.yml",
                     "file:${userHome}/.grails/${appName}-config.yml"]
         }
 
