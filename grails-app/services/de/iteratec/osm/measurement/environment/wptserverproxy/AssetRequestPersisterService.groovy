@@ -30,6 +30,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.WptXmlResultVersion
 import grails.web.mapping.LinkGenerator
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
@@ -109,7 +110,7 @@ class AssetRequestPersisterService implements iResultListener {
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
         String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
-        String wptVersion = "2.19"
+        String wptVersion = getWptVersion(resultXml)
         List<String> wptTestIds = [resultXml.getTestId()]
         String wptServerBaseUrl = wptServerOfResult.getBaseUrl()
 
@@ -131,6 +132,25 @@ class AssetRequestPersisterService implements iResultListener {
         if (!resp || resp.status != 200)
             throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests for TestID: " + resultXml.getTestId())
     }
+
+    /**
+     * Creates a OSM-DA conform representation of the wpt version
+     * @param resultXml
+     * @return String of the version
+     */
+    private String getWptVersion(WptResultXml resultXml){
+        //The version is only noted since 2.19. So we for Versions < 2.19 we can
+        //just tell that they are smaller then 2.19 and we just call them "undefined", since the DA only supports version >= 2.19
+        resultXml.version == WptXmlResultVersion.VERSION_2_19 ? "2.19":"2.18"
+        switch (resultXml.version){
+            case WptXmlResultVersion.VERSION_2_19:
+                return "2.19"
+            default:
+                return "undefined"
+
+        }
+    }
+
     public void sendFetchAssetsAsBatchCommand(List<JobResult> jobResults) {
         if (!persistenceOfAssetRequestsEnabled || !jobResults || jobResults.empty)
             return
