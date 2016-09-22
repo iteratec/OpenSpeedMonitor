@@ -39,7 +39,7 @@ environments:
         iteratec:
           osm:
             assetRequests:
-              #enablePersistenceOfAssetRequests: true
+              enablePersistenceOfAssetRequests: false
               #microserviceUrl: "http://localhost:8081"
     dataSource:
       # You can use jdbc proxy p6spy to intercept all sql statements to your relational database.
