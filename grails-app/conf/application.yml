@@ -66,7 +66,7 @@ environments:
                     enabled: true
                     fileStore:
                         remote:
-                            enabled: true
+                            enabled: false
         dataSource:
             url: jdbc:h2:mem:prodDb;MVCC=TRUE;LOCK_TIMEOUT=10000
             properties:
