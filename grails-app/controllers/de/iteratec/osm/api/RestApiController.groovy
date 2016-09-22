@@ -303,7 +303,7 @@ class RestApiController {
 
         MvQueryParams queryParams = null;
         try {
-            queryParams = cmd.createMvQueryParams(jobGroupDaoService, pageDaoService, measuredEventDaoService, browserDaoService, locationDaoService);
+            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
         } catch (NoResultException nre) {
             sendSimpleResponseAsStream(response, 404, 'Some of the request arguments could not be found: ' + nre.getMessage())
             return
@@ -329,47 +329,35 @@ class RestApiController {
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
 
         if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
-            response.setContentType('text/plain;charset=UTF-8');
-            response.status = 400; // BAD REQUEST
-
-            Writer textOut = new OutputStreamWriter(response.getOutputStream());
-            textOut.write('The end of requested time-frame could not be before start of time-frame.');
-
-            textOut.flush();
-            response.getOutputStream().flush();
-            return null;
+            sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
+            return
         }
 
         Duration requestedDuration = new Duration(startDateTimeInclusive, endDateTimeInclusive);
 
         if (requestedDuration.getStandardDays() > MAX_TIME_FRAME_DURATION_IN_DAYS_CSI) {
-            response.setContentType('text/plain;charset=UTF-8');
-            response.status = 413; // Request Entity Too Large
+            sendSimpleResponseAsStream(
+                    response,
+                    413,
+                    'The requested time-frame is wider than ' +
+                            MAX_TIME_FRAME_DURATION_IN_DAYS_CSI +
+                            ' days. This is too large to process. Please choose a smaler time-frame.'
+            )
+            return
+        }
 
-            Writer textOut = new OutputStreamWriter(response.getOutputStream());
-            textOut.write('The requested time-frame is wider than ' +
-                    MAX_TIME_FRAME_DURATION_IN_DAYS_CSI +
-                    ' days. This is too large to process. Please choose a smaler time-frame.');
-
-            textOut.flush();
-            response.getOutputStream().flush();
-            return null;
+        JobGroup csiSystem = JobGroup.findByName(cmd.system)
+        if (csiSystem?.csiConfiguration == null) {
+            sendSimpleResponseAsStream(response, 404, "The JobGroup ${csiSystem} has no csi configuration.")
+            return
         }
 
         MvQueryParams queryParams = null;
         try {
-            queryParams = cmd.createMvQueryParams(jobGroupDaoService, pageDaoService, measuredEventDaoService, browserDaoService, locationDaoService);
+            queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
         } catch (NoResultException nre) {
-            response.setContentType('text/plain;charset=UTF-8');
-            response.status = 404;
-            // NOT FOUND (send Error does not work probably with Grails, it would render the default error page. So we use the deprecated setter.)
-
-            Writer textOut = new OutputStreamWriter(response.getOutputStream());
-            textOut.write('Some request arguements could not be found: ' + nre.getMessage());
-
-            textOut.flush();
-            response.getOutputStream().flush();
-            return null;
+            sendSimpleResponseAsStream(response, 404, 'Some request arguements could not be found: ' + nre.getMessage())
+            return
         }
 
         CsiByEventResultsDto csiDtoToReturn
@@ -388,16 +376,8 @@ class RestApiController {
                         [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
             }
         } catch (IllegalArgumentException e) {
-            response.setContentType('text/plain;charset=UTF-8');
-            response.status = 404;
-            // NOT FOUND (send Error does not work probably with Grails, it would render the default error page. So we use the deprecated setter.)
-
-            Writer textOut = new OutputStreamWriter(response.getOutputStream());
-            textOut.write(e.getMessage())
-
-            textOut.flush();
-            response.getOutputStream().flush();
-            return null;
+            sendSimpleResponseAsStream(response, 404, e.getMessage())
+            return
         }
 
         return sendObjectAsJSON(csiDtoToReturn, params.pretty && params.pretty == 'true');
@@ -957,11 +937,10 @@ public class ResultsRequestCommand {
      *         event, location) could not be found.
      */
     public MvQueryParams createMvQueryParams(
-            JobGroupDaoService jobGroupDaoService,
-            PageDaoService pageDaoService,
             MeasuredEventDaoService measuredEventDaoService,
-            BrowserDaoService browserDaoService,
-            LocationDaoService locationDaoService) throws IllegalStateException, NoResultException {
+            BrowserDaoService browserDaoService
+    ) throws IllegalStateException, NoResultException {
+
         if (!this.validate()) {
             throw new IllegalStateException('Query params are not available from an invalid command.')
         }
@@ -972,8 +951,6 @@ public class ResultsRequestCommand {
         JobGroup theSystem = JobGroup.findByName(system)
         if (theSystem == null) {
             throw new NoResultException("Can not find CSI system named: " + system);
-        } else if (theSystem.csiConfiguration == null) {
-            throw new NoResultException("The JobGroup ${system} has no csi configuration")
         }
         result.jobGroupIds.add(theSystem.getId());
 
