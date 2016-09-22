@@ -72,17 +72,17 @@ class BatchActivityController {
         params.sort = "startDate"
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-
+        params.onlyActive = params.onlyActive=="true"?true:false
         List<BatchActivity> result
         int count
-        if(params.filter == "" ) {
-            result = BatchActivity.list(params)
-            count = BatchActivity.list().size()
+        result = BatchActivity.createCriteria().list(params) {
+            if(params.filter)ilike("name","%"+params.filter+"%")
+            if(params.onlyActive)eq("status",Status.ACTIVE)
         }
-        else {
-            result = BatchActivity.findAllByNameIlike("%"+params.filter+"%",params)
-            count = BatchActivity.findAllByNameIlike("%"+params.filter+"%").size()
-        }
+        count = BatchActivity.createCriteria().list {
+            if(params.filter)ilike("name","%"+params.filter+"%")
+            if(params.onlyActive)eq("status",Status.ACTIVE)
+        }.size()
 
         String templateAsPlainText = g.render(
                 template: 'batchActivityTable',
