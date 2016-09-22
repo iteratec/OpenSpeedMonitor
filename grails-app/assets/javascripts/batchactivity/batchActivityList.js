@@ -8,11 +8,13 @@
  *          url to update all rows (method getUpdate within BatchActivityController)
  */
 
-function init(updateTableUrl, checkUrl, rowUpdateUrl,batchActivityCount) {
+function init(updateTableUrl, checkUrl, rowUpdateUrl,batchActivityCount, i18nParameter) {
+    i18n = i18nParameter;
     curr = 0;
     max = $('#batchElementsPerPage').val();
     lastFilter = $('#batchNameFilter').val();
     offset = 0;
+    onlyActive = false;
 
     $('#batchElementsPerPage').on("keyup input",function (element) {
         var max_temp = $('#batchElementsPerPage').val();
@@ -27,6 +29,10 @@ function init(updateTableUrl, checkUrl, rowUpdateUrl,batchActivityCount) {
         lastFilter = $('#batchNameFilter').val();
         curr = 0;
         offset = 0;
+        updateBatchActivityTable(updateTableUrl);
+    });
+    $('#filterBatchesByActiveCheckbox').change(function () {
+        onlyActive =$('#filterBatchesByActiveCheckbox').is(":checked");
         updateBatchActivityTable(updateTableUrl);
     });
     updateIfNecessary(updateTableUrl, checkUrl, rowUpdateUrl);
@@ -84,10 +90,10 @@ function createPagination(size,updateTableUrl){
             goTo(clickedPage, perPage);
         }
     });
-    $('<li><a href="#" class="prevLink">'+'Previous'+'</a></li>').click(function () {
+    $('<li><a href="#" class="prevLink">'+i18n["previous"]+'</a></li>').click(function () {
         previous();
     }).prependTo('#batchActivityPager');
-    $('<li><a href="#" class="nextLink">'+'Next'+'</a></li>').click(function(){
+    $('<li><a href="#" class="nextLink">'+i18n["next"]+'</a></li>').click(function(){
         next();
     }).appendTo('#batchActivityPager');
 
@@ -138,7 +144,8 @@ function updateIfNecessary(updateTableUrl, checkUrl, rowUpdateUrl) {
 function updateBatchActivityTable(updateTableUrl) {
     jQuery.ajax({
         type: 'GET',
-        url: updateTableUrl +"?filter="+lastFilter+"&offset="+offset +"&max="+max,
+        url: updateTableUrl,
+        data:{filter:lastFilter,offset:offset,max:max,onlyActive:onlyActive},
         success: function (content) {
             var jsonResponse = JSON.parse(content);
             $("#tabelle").html(jsonResponse.table);

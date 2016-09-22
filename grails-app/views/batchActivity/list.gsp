@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="de.iteratec.osm.batch.BatchActivity" %>
 <!doctype html>
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="layout" content="kickstart_osm"/>
@@ -34,13 +34,12 @@
                default="A list of all larger activities and their current status."/>
 </p>
 
-
 <div class="container">
     <div class="row">
         <div class="span3">
             <div class="form-group">
-                <label for="batchNameFilter">Filter:</label>
-                <input type="text" class="form-control" id="batchNameFilter">
+                <br>
+                <input placeholder="${message(code: 'de.iteratec.osm.batch.filter.label', default: 'Filter by name')}" type="text" class="form-control" id="batchNameFilter">
             </div>
         </div>
         <div class="span6">
@@ -54,7 +53,14 @@
         </div>
     </div>
 </div>
-
+<label class="checkbox inline">
+    <g:checkBox name="filterBatchesByActiveCheckbox" id="filterBatchesByActiveCheckbox"
+                checked="${false}" value="${false}"/>
+    <g:message code="de.iteratec.osm.batch.onlyOpenActivities.label"
+               default="Show only open activities"/>
+</label>
+<br>
+<br>
 <section id="list-batchActivity" class="first">
     <div id="tabelle">
         <g:render template="batchActivityTable"
@@ -77,7 +83,9 @@
             init( '${createLink(action: 'updateTable', absolute: true)}',
                     '${createLink(action: 'checkForUpdate', absolute: true)}',
                     '${createLink(action: 'getUpdate', absolute: true)}',
-                    '${batchActivityCount}')
+                    '${batchActivityCount}',
+                    {"next":"${message(code: 'de.iteratec.osm.batch.next.label', default: 'Next')}",
+                    "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"})
         );
 
     </asset:script>
