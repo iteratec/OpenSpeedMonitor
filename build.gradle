@@ -59,6 +59,7 @@ repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "http://dl.bintray.com/iteratec/grails-plugins" }
+    maven { url "https://dl.bintray.com/longwa/plugins" }
 }
 
 dependencyManagement {
@@ -102,7 +103,10 @@ dependencies {
     runtime 'org.grails.plugins:database-migration:2.0.0.RC4'
     compile 'net.sf.supercsv:super-csv:2.4.0'
     compile 'org.grails.plugins:joda-time:2.0.0'
-    compile 'org.grails.plugins:spring-security-core:3.0.4'
+    compile 'org.grails.plugins:spring-security-core:3.1.1'
+    compile 'org.grails.plugins:spring-security-ui:3.0.0.M2'
+    compile 'org.grails.plugins:greenmail:2.0.0.M1'
+    compile 'org.grails.plugins:mail:2.0.0.RC6'
     compile 'org.grails.plugins:quartz:2.0.8'
     compile 'org.grails.plugins:http-builder-helper:1.0.2'
     compile 'org.grails.plugins:taggable:2.0.1-SNAPSHOT'
@@ -112,6 +116,7 @@ dependencies {
     compile 'io.dropwizard.metrics:metrics-core:3.1.0'
     compile 'io.dropwizard.metrics:metrics-graphite:3.1.2'
     compile 'io.dropwizard.metrics:metrics-jvm:3.1.2'
+
     runtime 'net.sf.supercsv:super-csv:2.4.0'
     runtime "org.grails.plugins:asset-pipeline"
     assets 'com.bertramlabs.plugins:less-asset-pipeline:2.9.4'

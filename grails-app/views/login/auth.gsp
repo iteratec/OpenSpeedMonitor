@@ -40,6 +40,11 @@
 			</fieldset>
 			<div class="controls">
 				<input type='submit' id="submit" class="btn btn-success" value='${message([code:'springSecurity.login.button', locale:lang])}'/>
+				<g:if test="${grailsApplication.config.getProperty('grails.mail.disabled')?.toLowerCase() == "false"}">
+					<span class="forgot-link">
+						<g:link controller='register' action='forgotPassword'><g:message code='spring.security.ui.login.forgotPassword'/></g:link>
+					</span>
+				</g:if>
 			</div>
 		</form>
 	</div>

@@ -34,6 +34,10 @@ grails:
 environments:
   development:
     grails:
+      mail:
+        disabled: true   # set this to true if you want to enable user registration and forgot passwort function
+        host: 'localhost'
+        port: 3025       # port 3025 is used by greenmail
       serverURL: "http://localhost:8080" #the server needs to know its URL to communicate with the microservice
       de:
         iteratec:
@@ -67,6 +71,24 @@ environments:
   production:
     grails:
       serverURL: 'https://[base-url-of-your-prod-osm-instance]'
+      mail:
+        disabled: true # set this to true if you want to enable user registration and forgot passwort function
+        #host: '[smtp.your.domain.com]'
+        #port: 25
+        #username: '[your username]'
+        #password: '[your password]'
+      #plugin:
+        #springsecurity:
+          #ui:
+            #register:
+              #defaultRoleNames: ["YourRoleName1","YourRoleName2"] # Roles every user gets during registration
+              #emailBody: "Here you can define a custom email body. You can use <br> for new line and also use some grails variables such as $user.username and $url."
+              #emailFrom: "Here you can define the from field in all sent emails [xyz@yourdomain.com]"
+              #emailSubject: "Here you can define the email subject [New Account]"
+            #forgotPassword:
+              #emailBody: "Here you can define a custom email body. You can use <br> for new line and also use some grails variables such as $user.username and $url."
+              #emailFrom: "Here you can define the from field in all sent emails [xyz@yourdomain.com]"
+              #emailSubject: "Here you can define the email subject [Password Reset]"
     dataSource:
       url: "jdbc:mysql://localhost/[your-prod-mysql-scheme]"
       username: "[your-prod-mysql-user]"

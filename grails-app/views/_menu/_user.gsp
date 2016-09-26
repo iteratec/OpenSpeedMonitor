@@ -1,72 +1,71 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <ul class="nav pull-right">
 	<li class="dropdown dropdown-btn">
-<sec:ifNotLoggedIn>
+		<sec:ifNotLoggedIn>
 
-		<a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#" tabindex="-1">
-			<!-- TODO: integrate Springsource Security etc. and show User's name ... -->
-    		<i class="fa fa-user"></i>
-    		<g:message code="security.signin.label" locale="${lang}"/><b class="caret"></b>
-		</a>
 
-		<ul class="dropdown-menu" role="menu">
-			<li class="form-container">
-				<g:form controller="login" action="auth" method="POST" accept-charset="UTF-8">
-					<!-- <input style="margin-bottom: 15px;" type="text" placeholder="Username" id="username" name="username">
-					<input style="margin-bottom: 15px;" type="password" placeholder="Password" id="password" name="password">
-					<input style="float: left; margin-right: 10px;" type="checkbox" name="remember-me" id="remember-me" value="1">
-					<label class="string optional" for="user_remember_me"> Remember me</label> -->
-					<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="${g.message([code:'security.signin.label', locale:lang])}">
-				</g:form>
-			</li>
-		</ul>
-</sec:ifNotLoggedIn>
-<sec:ifLoggedIn>
-						
-						<a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#" tabindex="-1">
-							<i class="fa fa-user"></i>
-				    		<sec:username/><b class="caret"></b>
-						</a>
-				
-						<ul class="dropdown-menu" role="menu">
-							<li class="form-container">
-								<g:form controller="logout" action="index" method="POST" accept-charset="UTF-8">
-									<input class="btn btn-primary btn-block" type="submit" id="sign-in" value="${g.message([code:'security.signout.label', locale:lang])}">
-								</g:form>
+
+			<ul class="nav">
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><g:message code="security.signin.label" default="Log in" locale="${lang}"/> <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+
+						%{--measurement --------------------------------------------------------}%
+
+						<li class="controller">
+							<g:link controller="login" action="auth"><i class="fa fa-sign-in" aria-hidden="true"></i> <g:message
+									code="security.signin.label" default="Log in"/></g:link>
+						</li>
+						<g:if test="${grailsApplication.config.getProperty('grails.mail.disabled')?.toLowerCase() == "false"}">
+							<li class="controller">
+								<g:link controller="register" action="register"><i class="fa fa-book" aria-hidden="true"></i> <g:message
+										code="security.register.label" default="Register"/></g:link>
 							</li>
-		</ul>
-						
-</sec:ifLoggedIn>
-					
+						</g:if>
 
-<%--</sec:ifNotLoggedIn>--%>
-<%--<sec:ifLoggedIn>--%>
 
-<%--		<a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="#">--%>
-<%--			<!-- TODO: Only show menu items based on permissions (e.g., Guest has no account page) -->--%>
-<%--			<i class="icon-user icon-large icon-white"></i>--%>
-<%--			${user.name}--%>
-<%--			<g:message code="default.user.unknown.label" default="Guest"/> <b class="caret"></b>--%>
-<%--		</a>--%>
-<%--		<ul class="dropdown-menu" role="menu">--%>
-<%--			<!-- TODO: Only show menu items based on permissions -->--%>
-<%--			<li class=""><a href="${createLink(uri: '/')}">--%>
-<%--				<i class="icon-user"></i>--%>
-<%--				<g:message code="user.show.label"/>--%>
-<%--			</a></li>--%>
-<%--			<li class=""><a href="${createLink(uri: '/')}">--%>
-<%--				<i class="icon-cogs"></i>--%>
-<%--				<g:message code="user.settings.change.label"/>--%>
-<%--			</a></li>--%>
-<%--			--%>
-<%--			<li class="divider"></li>--%>
-<%--			<li class=""><a href="${createLink(uri: '/')}">--%>
-<%--				<i class="icon-off"></i>--%>
-<%--				<g:message code="security.signoff.label"/>--%>
-<%--			</a></li>--%>
-<%--		</ul>--%>
+					</ul>
+				</li>
+			</ul>
 
-<%--</sec:ifLoggedIn>--%>
+		</sec:ifNotLoggedIn>
+		<sec:ifLoggedIn>
+			<ul class="nav">
+				<li class="dropdown">
+					<a class="dropdown-toggle" data-toggle="dropdown" href="#"><sec:username/> <b class="caret"></b></a>
+					<ul class="dropdown-menu">
+
+
+						%{--Logout --------------------------------------------------------}%
+
+						<li class="controller">
+							<g:link controller="logout" action="index"><i class="fa fa-sign-out" aria-hidden="true"></i>
+								<g:message code="security.signout.label" default="Log out"/></g:link>
+						</li>
+
+						<sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
+							%{--csi --------------------------------------------------------}%
+							<li class="divider"></li>
+
+							<li class="controller">
+								<g:link controller="user" action="index"><i class="fa fa-user" aria-hidden="true"></i> <g:message
+										code="user.label" default="User"/></g:link>
+							</li>
+
+							<li class="controller">
+								<g:link controller="role" action="index"><i class="fa fa-trophy" aria-hidden="true"></i> <g:message
+										code="role.label" default="Role"/></g:link>
+							</li>
+							<li class="controller">
+								<g:link controller="registrationCode" action="index"><i class="fa fa-key" aria-hidden="true"></i> <g:message
+										code="registrationCode.label" default="RegistrationCode"/></g:link>
+							</li>
+						</sec:ifAnyGranted>
+
+					</ul>
+				</li>
+			</ul>
+		</sec:ifLoggedIn>
 	</li>
 </ul>
 
@@ -77,3 +76,4 @@
 	</li>
 </ul>
 </noscript>
+

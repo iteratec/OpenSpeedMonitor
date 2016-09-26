@@ -123,6 +123,8 @@ spring:
 
 ---
 grails:
+    mail:
+        disabled: true
     mime:
         disable:
             accept:
@@ -224,10 +226,9 @@ grails:
                 authorityJoinClassName: 'de.iteratec.osm.security.UserRole'
             authority:
                 className: 'de.iteratec.osm.security.Role'
+            logout:
+                postOnly: false
             securityConfigType: 'InterceptUrlMap'
-            successHandler:
-                alwaysUseDefault: true
-                defaultTargetUrl: '/'
             interceptUrlMap: [{pattern: '/static/**',                                     access: ["permitAll"]},
                             {pattern: '/static/*',                                      access: ["permitAll"]},
                             {pattern: '/assets/**',                                     access: ["permitAll"]},
@@ -262,6 +263,7 @@ grails:
                             {pattern: '/job/nextExecution',                             access: ["permitAll"]},
                             {pattern: '/job/getLastRun',                                access: ["permitAll"]},
                             {pattern: '/script/list',                                   access: ["permitAll"]},
+                            {pattern: '/register/*',                                    access: ["permitAll"]},
                             {pattern: '/queueStatus/list',                              access: ["permitAll"]},
                             {pattern: '/queueStatus/refresh',                           access: ["permitAll"]},
                             {pattern: '/jobSchedule/schedules',                         access: ["permitAll"]},
@@ -272,9 +274,12 @@ grails:
                             {pattern: '/csiDashboard/validateDashboardName',            access: ["permitAll"]},
                             {pattern: '/csiDashboard/validateAndSaveDashboardValues',   access: ["permitAll"]},
                             {pattern: '/i18n/getAllMessages',                           access: ["permitAll"]},
+                            {pattern: '/securityInfo/config',                           access: ["denyAll"]},
+                            {pattern: '/securityInfo/mappings',                         access: ["denyAll"]},
                             {pattern: '/console/**',                                    access: ['ROLE_SUPER_ADMIN']},
                             {pattern: '/apiKey/**',                                     access: ['ROLE_SUPER_ADMIN']},
                             {pattern: '/**',                                            access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']}]
+
     de:
         iteratec:
             osm:
