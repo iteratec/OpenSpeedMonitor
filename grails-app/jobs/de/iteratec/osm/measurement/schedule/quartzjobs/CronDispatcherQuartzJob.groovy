@@ -17,16 +17,15 @@
 
 package de.iteratec.osm.measurement.schedule.quartzjobs
 
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.TriggerGroup
+import de.iteratec.osm.util.PerformanceLoggingService
+import org.quartz.JobExecutionContext
+
 import java.util.concurrent.locks.ReentrantLock
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-
-import de.iteratec.osm.util.PerformanceLoggingService
-import org.quartz.JobExecutionContext;
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.TriggerGroup
-import de.iteratec.osm.measurement.schedule.JobProcessingService
-
 
 class CronDispatcherQuartzJob {
 
@@ -39,41 +38,43 @@ class CronDispatcherQuartzJob {
 
     def execute(JobExecutionContext context) {
 
-        String triggerGroup = context.getTrigger().getKey().getGroup();
-        Long jobId = context.mergedJobDataMap.getLong("jobId")
-        String testId = context.mergedJobDataMap.getString("testId")
-        String id = context.getTrigger().getKey().getName()
-        Job job = Job.get(jobId)
+        Job.withNewSession {
+            String triggerGroup = context.getTrigger().getKey().getGroup();
+            Long jobId = context.mergedJobDataMap.getLong("jobId")
+            String testId = context.mergedJobDataMap.getString("testId")
+            String id = context.getTrigger().getKey().getName()
+            Job job = Job.get(jobId)
 
-                if (!job) {
-                    println "CronDispatcherJob: No job found with id $id"
-                } else {
+            if (!job) {
+                println "CronDispatcherJob: No job found with id $id"
+            } else {
 
-                    String jobLabel = job.label
-                    if (triggerGroup == TriggerGroup.QUARTZ_TRIGGER_GROUP.value()) {
-                        performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Launching job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE) {
-                            jobProcessingService.launchJobRun(job)
-                        }
-                    } else if (triggerGroup == TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value()) {
-                        if (!locks[jobId]){
-                            locks[jobId] = new ReentrantLock();
-                        }
-                        if (locks[jobId].tryLock()) {
-                            try{
-                                performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Polling of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE) {
-                                    jobProcessingService.pollJobRun(job, testId)
-                                }
-                            }finally{
-                                locks[jobId].unlock()
+                String jobLabel = job.label
+                if (triggerGroup == TriggerGroup.QUARTZ_TRIGGER_GROUP.value()) {
+                    performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Launching job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE) {
+                        jobProcessingService.launchJobRun(job)
+                    }
+                } else if (triggerGroup == TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value()) {
+                    if (!locks[jobId]){
+                        locks[jobId] = new ReentrantLock();
+                    }
+                    if (locks[jobId].tryLock()) {
+                        try{
+                            performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Polling of job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE) {
+                                jobProcessingService.pollJobRun(job, testId)
                             }
-                        }
-                    } else if (triggerGroup == TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value()) {
-                        performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Handle Job run timeout for job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE) {
-                            jobProcessingService.handleJobRunTimeout(job, testId)
+                        }finally{
+                            locks[jobId].unlock()
                         }
                     }
-
+                } else if (triggerGroup == TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value()) {
+                    performanceLoggingService.logExecutionTime(DEBUG, "CronDispatcherJob: Handle Job run timeout for job ${jobLabel}", PerformanceLoggingService.IndentationDepth.ONE) {
+                        jobProcessingService.handleJobRunTimeout(job, testId)
+                    }
                 }
+
+            }
+        }
 
     }
 }
