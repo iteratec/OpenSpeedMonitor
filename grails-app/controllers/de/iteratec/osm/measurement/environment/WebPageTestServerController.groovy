@@ -2,8 +2,13 @@ package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
 import de.iteratec.osm.util.I18nService
+import grails.converters.JSON
 import groovy.json.JsonSlurper
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
+
+import javax.servlet.http.HttpServletResponse
+
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 //TODO: loadLocations was NOT generated
@@ -36,24 +41,7 @@ class WebPageTestServerController {
         redirect(action: "show", id: params.id)
     }
 
-    def index(Integer max, String filter) {
-        def maxDefault = 100
-        if (max) maxDefault = max
-        params.max = maxDefault
-
-        List<WebPageTestServer> result
-        int count
-        if(!filter) {
-            result = WebPageTestServer.list(params)
-            count = WebPageTestServer.list().size()
-        }
-        else {
-            result = WebPageTestServer.findAllByLabelIlike("%"+filter+"%",params)
-            count = WebPageTestServer.findAllByLabelIlike("%"+filter+"%").size()
-        }
-
-
-        respond result, model:[webPageTestServerCount: count, filter:filter?filter:""]
+    def index() {
     }
 
     def show(WebPageTestServer webPageTestServer) {
@@ -132,6 +120,51 @@ class WebPageTestServerController {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'webPageTestServer.label', default: 'WebPageTestServer'), params.id])
             redirect(action: "show", id: params.id)
         }
+    }
+
+    def updateTable(){
+        params.order = params.order ? params.order : "desc"
+        params.sort = params.sort ? params.sort : "label"
+        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
+        params.max = params.max as Integer
+        params.offset = params.offset as Integer
+        List<WebPageTestServer> result
+        int count
+        result = WebPageTestServer.createCriteria().list(params) {
+            if(params.filter)
+                or{
+                    ilike("label","%"+params.filter+"%")
+                    ilike("proxyIdentifier","%"+params.filter+"%")
+                    ilike("description","%"+params.filter+"%")
+                }
+        }
+        count = WebPageTestServer.createCriteria().list(paramsForCount) {
+            if(params.filter)
+                or{
+                    ilike("label","%"+params.filter+"%")
+                    ilike("proxyIdentifier","%"+params.filter+"%")
+                    ilike("description","%"+params.filter+"%")
+                }
+        }.size()
+        String templateAsPlainText = g.render(
+                template: 'webPageTestServerTable',
+                model: [webPageTestServers: result]
+        )
+        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
+    }
+
+
+    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
+
+        response.setContentType('text/plain;charset=UTF-8')
+        response.status=httpStatus.value()
+
+        Writer textOut = new OutputStreamWriter(response.getOutputStream())
+        textOut.write(message)
+        textOut.flush()
+        response.getOutputStream().flush()
+
     }
 
     protected void notFound() {

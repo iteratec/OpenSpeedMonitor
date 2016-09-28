@@ -67,9 +67,13 @@ class BatchActivityController {
      * @return new Content from BatchActivityTable
      */
     def updateTable(){
+        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
 
-        params.order = "desc"
-        params.sort = "startDate"
+        params.order = params.order ? params.order : "desc"
+        params.sort = params.sort ? params.sort : "startDate"
+        params.sort = params.sort == "remainingTime"? "status":params.sort  // remainingTime is a transient value - mysql
+                                                                            // can't sort by it. But sorting by status should
+                                                                            //display active batches first
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         params.onlyActive = params.onlyActive=="true"?true:false
@@ -79,11 +83,12 @@ class BatchActivityController {
             if(params.filter)ilike("name","%"+params.filter+"%")
             if(params.onlyActive)eq("status",Status.ACTIVE)
         }
-        count = BatchActivity.createCriteria().list {
+        count = BatchActivity.createCriteria().list(paramsForCount) {
             if(params.filter)ilike("name","%"+params.filter+"%")
             if(params.onlyActive)eq("status",Status.ACTIVE)
         }.size()
 
+        println(result[0].name)
         String templateAsPlainText = g.render(
                 template: 'batchActivityTable',
                 model: [batchActivities: result]

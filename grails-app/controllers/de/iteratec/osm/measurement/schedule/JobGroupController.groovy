@@ -14,6 +14,10 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
+
+import javax.servlet.http.HttpServletResponse
+
 import static org.springframework.http.HttpStatus.*
 
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
@@ -172,11 +176,7 @@ class JobGroupController {
 
 
 
-    def index(Integer max) {
-        def maxDefault = 100
-        if (max) maxDefault = max
-        params.max = maxDefault
-        respond JobGroup.list(params), model:[jobGroupCount: JobGroup.count()]
+    def index() {
     }
 
 
@@ -209,6 +209,52 @@ class JobGroupController {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
             redirect(action: "show", id: params.id)
         }
+    }
+    def updateTable(){
+        params.order = params.order ? params.order : "desc"
+        params.sort = params.sort ? params.sort : "name"
+        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
+        params.max = params.max as Integer
+        params.offset = params.offset as Integer
+        List<JobGroup> result
+        int count
+        result = JobGroup.createCriteria().list(params) {
+            if(params.filter)
+                or{
+                    ilike("name","%"+params.filter+"%")
+                    csiConfiguration{
+                        ilike("label","%"+params.filter+"%")
+                    }
+                }
+        }
+        count = JobGroup.createCriteria().list(paramsForCount) {
+            if(params.filter)
+                or{
+                    ilike("name","%"+params.filter+"%")
+                    csiConfiguration{
+                        ilike("label","%"+params.filter+"%")
+                    }
+                }
+        }.size()
+        String templateAsPlainText = g.render(
+                template: 'jobGroupTable',
+                model: [jobGroups: result]
+        )
+        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
+    }
+
+
+    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
+
+        response.setContentType('text/plain;charset=UTF-8')
+        response.status=httpStatus.value()
+
+        Writer textOut = new OutputStreamWriter(response.getOutputStream())
+        textOut.write(message)
+        textOut.flush()
+        response.getOutputStream().flush()
+
     }
 
     protected void notFound() {

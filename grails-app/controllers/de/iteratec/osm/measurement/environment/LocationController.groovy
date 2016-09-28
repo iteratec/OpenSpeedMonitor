@@ -1,6 +1,11 @@
 package de.iteratec.osm.measurement.environment
 
+import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
+
+import javax.servlet.http.HttpServletResponse
+
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 
@@ -9,11 +14,7 @@ class LocationController {
     static scaffold = Location
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index(Integer max) {
-        def maxDefault = 100
-        if (max) maxDefault = max
-        params.max = maxDefault
-        respond Location.list(params), model:[locationCount: Location.count()]
+    def index() {
     }
 
     def show(Location location) {
@@ -92,6 +93,57 @@ class LocationController {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
             redirect(action: "show", id: params.id)
         }
+    }
+
+    def updateTable(){
+        params.order = params.order ? params.order : "desc"
+        params.sort = params.sort ? params.sort : "label"
+        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
+        params.max = params.max as Integer
+        params.offset = params.offset as Integer
+        List<Location> result
+        int count
+        result = Location.createCriteria().list(params) {
+            if(params.filter)
+                or{
+                    ilike("label","%"+params.filter+"%")
+                    ilike("uniqueIdentifierForServer","%"+params.filter+"%")
+                    ilike("location","%"+params.filter+"%")
+                    wptServer{
+                        ilike("label","%"+params.filter+"%")
+                    }
+                }
+        }
+        count = Location.createCriteria().list(paramsForCount) {
+            if(params.filter)
+                or{
+                    ilike("label","%"+params.filter+"%")
+                    ilike("uniqueIdentifierForServer","%"+params.filter+"%")
+                    ilike("location","%"+params.filter+"%")
+                    wptServer{
+                        ilike("label","%"+params.filter+"%")
+                    }
+                }
+        }.size()
+        String templateAsPlainText = g.render(
+                template: 'locationTable',
+                model: [locations: result]
+        )
+        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
+    }
+
+
+    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
+
+        response.setContentType('text/plain;charset=UTF-8')
+        response.status=httpStatus.value()
+
+        Writer textOut = new OutputStreamWriter(response.getOutputStream())
+        textOut.write(message)
+        textOut.flush()
+        response.getOutputStream().flush()
+
     }
 
     protected void notFound() {

@@ -39,30 +39,46 @@
         <div class="span3">
             <div class="form-group">
                 <br>
-                <input placeholder="${message(code: 'de.iteratec.osm.batch.filter.label', default: 'Filter by name')}" type="text" class="form-control" id="batchNameFilter">
+                <input placeholder="${message(code: 'de.iteratec.osm.batch.filter.label', default: 'Filter by name')}" type="text" class="form-control" id="elementNameFilter">
             </div>
         </div>
         <div class="span6">
-            <div align="center" class="pagination"><ul id="batchActivityPager"></ul></div>
+            <div align="center" class="pagination"><ul id="elementPager"></ul></div>
         </div>
         <div class="span3">
             <div align="right" class="form-group">
-                <label  for="batchElementsPerPage">${message(code: 'de.iteratec.osm.batch.batchactivity.batchesPerPage.label', default: 'Batches per page:')}</label>
-                <input type="Number" class="form-control" id="batchElementsPerPage" value=100 min = 1>
+                <label  for="elementsPerPage">${message(code: 'de.iteratec.osm.batch.batchactivity.batchesPerPage.label', default: 'Batches per page:')}</label>
+                <input type="Number" class="form-control" id="elementsPerPage" value=100 min = 1>
             </div>
         </div>
     </div>
 </div>
-<label class="checkbox inline">
-    <g:checkBox name="filterBatchesByActiveCheckbox" id="filterBatchesByActiveCheckbox"
-                checked="${false}" value="${false}"/>
-    <g:message code="de.iteratec.osm.batch.onlyOpenActivities.label"
-               default="Show only open activities"/>
-</label>
+<div class="container">
+    <div class="row">
+        <div class="span3">
+            <label class="checkbox inline">
+            <g:checkBox name="filterBatchesByActiveCheckbox" id="filterBatchesByActiveCheckbox"
+                        checked="${false}" value="${false}"/>
+            <g:message code="de.iteratec.osm.batch.onlyOpenActivities.label"
+                       default="Show only open activities"/>
+            </label>
+        </div>
+        <div style="display: none;" id="limitResultsCheckboxContainer">
+            <div class="span3">
+                <label class="checkbox inline">
+                <g:checkBox name="limitResultsCheckbox" id="limitResultsCheckbox"
+                            checked="${true}" value="${true}"/>
+                <g:message code="de.iteratec.osm.responsiveTable.limitedResults.lable"
+                           default="Show only 1000 elements"/>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
 <br>
 <br>
 <section id="list-batchActivity" class="first">
-    <div id="tabelle">
+    <div id="elementTable">
         <g:render template="batchActivityTable"
                   model="${['batchActivities': batchActivities, 'batchActivityCount': batchActivityCount]}"/>
     </div>
@@ -80,12 +96,13 @@
     <asset:javascript src="batchactivity/batchActivityList.js"/>
     <asset:script type="text/javascript">
         $(document).ready(
-            init( '${createLink(action: 'updateTable', absolute: true)}',
+            initBatch( '${createLink(action: 'updateTable', absolute: true)}',
                     '${createLink(action: 'checkForUpdate', absolute: true)}',
                     '${createLink(action: 'getUpdate', absolute: true)}',
                     '${batchActivityCount}',
                     {"next":"${message(code: 'de.iteratec.osm.batch.next.label', default: 'Next')}",
-                    "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"})
+                    "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"},
+                    "startDate")
         );
 
     </asset:script>

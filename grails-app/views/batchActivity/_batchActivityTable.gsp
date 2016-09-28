@@ -2,34 +2,25 @@
 <table class="table table-bordered" id="batchActivityTable">
     <thead>
     <tr>
+        <th><g:link action="index" onclick="sortBy('name'); return false;" >${message(code: 'batchActivity.name.label', default: 'Name')}</g:link></th>
 
-        <g:sortableColumn property="name" title="${message(code: 'batchActivity.name.label', default: 'Name')}"/>
+        <th><g:link action="index" onclick="sortBy('activity'); return false;" >${message(code: 'batchActivity.activity.label', default: 'Activity')}</g:link></th>
 
-        <g:sortableColumn property="activity"
-                          title="${message(code: 'batchActivity.activity.label', default: 'Activity')}"/>
+        <th><g:link action="index" onclick="sortBy('status'); return false;" >${message(code: 'batchActivity.status.label', default: 'Status')}</g:link></th>
 
-        <g:sortableColumn property="status" title="${message(code: 'batchActivity.status.label', default: 'Status')}"/>
+        <th><g:link action="index" onclick="sortBy('actualStage'); return false;" >${message(code: 'batchActivity.stage.label', default: 'Stage')}</g:link></th>
 
-        <g:sortableColumn property="stage"
-                          title="${message(code: 'batchActivity.stage.label', default: 'Stage')}"/>
+        <th><g:link action="index" onclick="sortBy('stepInStage'); return false;" >${message(code: 'batchActivity.stepInStage.label', default: 'Progress in Stage')}</g:link></th>
 
-        <g:sortableColumn property="stepInStage"
-                          title="${message(code: 'batchActivity.stepInStage.label', default: 'Progress in Stage')}"/>
+        <th><g:link action="index" onclick="sortBy('lastFailureMessage'); return false;" >${message(code: 'batchActivity.lastFailureMessage.label', default: 'Last Failure Message')}</g:link></th>
 
-        <g:sortableColumn property="lastFailureMessage"
-                          title="${message(code: 'batchActivity.lastFailureMessage.label', default: 'Last Failure Message')}"/>
+        <th><g:link action="index" onclick="sortBy('startDate'); return false;" >${message(code: 'batchActivity.startDate.label', default: 'Start Date')}</g:link></th>
 
-        <g:sortableColumn property="startDate"
-                          title="${message(code: 'batchActivity.startDate.label', default: 'Start Date')}"/>
+        <th><g:link action="index" onclick="sortBy('lastUpdate'); return false;" >${message(code: 'batchActivity.lastUpdated.label', default: 'Last Update')}</g:link></th>
 
-        <g:sortableColumn property="lastUpdate"
-                          title="${message(code: 'batchActivity.lastUpdated.label', default: 'Last Update')}"/>
+        <th><g:link action="index" onclick="sortBy('endDate'); return false;" >${message(code: 'batchActivity.endDate.label', default: 'End Date')}</g:link></th>
 
-        <g:sortableColumn property="endDate"
-                          title="${message(code: 'batchActivity.endDate.label', default: 'End Date')}"/>
-
-        <g:sortableColumn property="remainingTime"
-                          title="${message(code: 'batchActivity.remainingTime.label', default: 'Remaining Time')}"/>
+        <th><g:link action="index" onclick="sortBy('remainingTime'); return false;" >${message(code: 'batchActivity.remainingTime.label', default: 'Remaining Time')}</g:link></th>
 
     </tr>
     </thead>

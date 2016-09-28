@@ -17,8 +17,12 @@
 
 package de.iteratec.osm.report.chart
 
+import grails.converters.JSON
 import org.joda.time.DateTime
+import org.springframework.http.HttpStatus
 import org.springframework.web.servlet.support.RequestContextUtils
+
+import javax.servlet.http.HttpServletResponse
 
 /**
  * EventController
@@ -31,52 +35,10 @@ class EventController {
     EventService eventService
 
     def index() {
-        redirect(action: "list", params: params)
     }
 
-    def list(Integer max, String filterDate, String filterTime, String filterName, String filterDescription) {
-        def maxDefault = 100
-        if (max) maxDefault = max
-        params.max = maxDefault
-        DateTime timeToFilterStart
-        DateTime timeToFilterEnd
-        def errorList = []
-        List<Event> result
-        int count
-        try{
-            if(filterTime) {
-                timeToFilterStart=new DateTime(filterDate+"T"+filterTime).minusMinutes(1)
-                timeToFilterEnd = timeToFilterStart.plusMinutes(2)
-            } else{
-                timeToFilterStart=new DateTime(filterDate)
-                timeToFilterEnd = timeToFilterStart.plusDays(1)
-            }
-        }catch(IllegalArgumentException ex){
-            errorList << message(code: 'event.dateTime.notValid', default: 'Unable to parse date input.\n')
-            return [eventInstanceList: result, eventInstanceTotal: count, filterDate:filterDate?filterDate:"", filterTime:filterTime?filterTime:"",
-                    filterName:filterName?filterName:"", filterDescription:filterDescription?filterDescription:"", errorList:errorList]
-        }
-        if(!filterDate && !filterTime && !filterName && !filterDescription) {
-            result = Event.list(params)
-            count = Event.list().size()
-        }
-        else {
-            result = Event.createCriteria().list(params) {
-                if(filterName) ilike("shortName", "%"+filterName+"%")
-                if(filterDescription) ilike("description", "%"+filterDescription+"%")
-                if(timeToFilterStart && timeToFilterEnd) between("eventDate",timeToFilterStart.toDate(),timeToFilterEnd.toDate())
-            }
-            count = Event.createCriteria().list {
-                if(filterName) ilike("shortName", "%"+filterName+"%")
-                if(filterDescription) ilike("description", "%"+filterDescription+"%")
-                if(timeToFilterStart && timeToFilterEnd) between("eventDate",timeToFilterStart.toDate(),timeToFilterEnd.toDate())
-            }.size()
-        }
-
-
-        [eventInstanceList: result, eventInstanceTotal: count, filterDate:filterDate?filterDate:"", filterTime:filterTime?filterTime:"",
-                               filterName:filterName?filterName:"", filterDescription:filterDescription?filterDescription:"", errorList:errorList]
-
+    def list() {
+        redirect(action: "index", params: params)
     }
 
     def create() {
@@ -119,6 +81,7 @@ class EventController {
     }
 
     def update() {
+        println("Update")
         def eventInstance = Event.get(params.id)
         if (!eventInstance) {
             flash.message = message(code: 'default.not.found.message', args: [message(code: 'event.label', default: 'Event'), params.id])
@@ -184,5 +147,48 @@ class EventController {
         } else {
             return false
         }
+    }
+
+    def updateTable(){
+        params.order = params.order ? params.order : "desc"
+        params.sort = params.sort ? params.sort : "eventDate"
+        params.max = params.max as Integer
+        params.offset = params.offset as Integer
+        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
+        List<Event> result
+        int count
+        result = Event.createCriteria().list(params) {
+            if(params.filter)
+                or{
+                    ilike("shortName","%"+params.filter+"%")
+                    ilike("description","%"+params.filter+"%")
+                }
+        }
+        count = Event.createCriteria().list(paramsForCount) {
+            if(params.filter)
+                or{
+                    ilike("shortName","%"+params.filter+"%")
+                    ilike("description","%"+params.filter+"%")
+                }
+        }.size()
+        String templateAsPlainText = g.render(
+                template: 'eventTable',
+                model: [events: result]
+        )
+        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
+    }
+
+
+    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
+
+        response.setContentType('text/plain;charset=UTF-8')
+        response.status=httpStatus.value()
+
+        Writer textOut = new OutputStreamWriter(response.getOutputStream())
+        textOut.write(message)
+        textOut.flush()
+        response.getOutputStream().flush()
+
     }
 }

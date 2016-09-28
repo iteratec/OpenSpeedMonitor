@@ -1,46 +1,33 @@
-
 <%@ page import="de.iteratec.osm.measurement.schedule.JobGroup" %>
 <!doctype html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="kickstart" />
-	<g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}" />
-	<title><g:message code="default.list.label" args="[entityName]" /></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="layout" content="kickstart"/>
+	<g:set var="entityName" value="${message(code: 'jobGroup.label', default: 'JobGroup')}"/>
+	<title><g:message code="default.list.label" args="[entityName]"/></title>
 </head>
 
 <body>
-	
+
 <section id="list-jobGroup" class="first">
 
-	<table class="table table-bordered">
-		<thead>
-			<tr>
-			
-				<g:sortableColumn property="name" title="${message(code: 'jobGroup.name.label', default: 'Name')}" />
+	<g:render template="/layouts/responsiveTable"/>
 
-                <g:sortableColumn property="csiConfiguration" title="${message(code: 'de.iteratec.osm.csi.configuration.label', default: 'CSI Configuration')}" />
-			
-			</tr>
-		</thead>
-		<tbody>
-		<g:each in="${jobGroupList}" status="i" var="jobGroup">
-			<tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-			
-				<td><g:link action="show" id="${jobGroup.id}">${fieldValue(bean: jobGroup, field: "name")}</g:link></td>
 
-                <td>${fieldValue(bean: jobGroup, field: "csiConfiguration")}</td>
-			
-			</tr>
-		</g:each>
+	<content tag="include.bottom">
+		<asset:javascript src="responsiveTable/responsiveTable.js"/>
+		<asset:script type="text/javascript">
+			$(document).ready(
+                init( '${createLink(action: 'updateTable', absolute: true)}',
+                    {"next":"${message(code: 'de.iteratec.osm.batch.next.label', default: 'Next')}",
+                    "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"},
+                    "name")
+        );
 
-		</tbody>
-	</table>
-	<div class="pagination">
-		<bs:paginate total="${jobGroupCount ?: 0}" />
-	</div>
+		</asset:script>
+	</content>
 </section>
-
 </body>
 
 </html>

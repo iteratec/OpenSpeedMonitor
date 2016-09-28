@@ -1,20 +1,33 @@
-<!DOCTYPE html>
+<%@ page import="de.iteratec.osm.measurement.schedule.JobSet" %>
+<!doctype html>
 <html>
-    <head>
-        <meta name="layout" content="kickstart" />
-        <g:set var="entityName" value="${message(code: 'jobSet.label', default: 'JobSet')}" />
-        <title><g:message code="default.list.label" args="[entityName]" /></title>
-    </head>
-    <body>
-        <div id="list-jobSet" class="content scaffold-list" role="main">
-            <g:if test="${flash.message}">
-                <div class="message" role="status">${flash.message}</div>
-            </g:if>
-            <f:table collection="${jobSetList}" />
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="layout" content="kickstart"/>
+    <g:set var="entityName" value="${message(code: 'jobSet.label', default: 'JobSet')}"/>
+    <title><g:message code="default.list.label" args="[entityName]"/></title>
+</head>
 
-            <div class="pagination">
-                <bs:paginate total="${jobSetCount ?: 0}" />
-            </div>
-        </div>
-    </body>
+<body>
+
+<section id="list-jobSet" class="first">
+
+    <g:render template="/layouts/responsiveTable"/>
+
+
+    <content tag="include.bottom">
+        <asset:javascript src="responsiveTable/responsiveTable.js"/>
+        <asset:script type="text/javascript">
+            $(document).ready(
+                init( '${createLink(action: 'updateTable', absolute: true)}',
+                    {"next":"${message(code: 'de.iteratec.osm.batch.next.label', default: 'Next')}",
+                    "previous":"${message(code: 'de.iteratec.osm.batch.previous.label', default: 'Previous')}"},
+                    "name")
+        );
+
+        </asset:script>
+    </content>
+</section>
+</body>
+
 </html>

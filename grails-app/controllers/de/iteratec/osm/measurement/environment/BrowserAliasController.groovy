@@ -1,6 +1,11 @@
 package de.iteratec.osm.measurement.environment
 
+import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
+
+import javax.servlet.http.HttpServletResponse
+
 import static org.springframework.http.HttpStatus.*
 //TODO: This controller was generated due to a scaffolding bug (https://github.com/grails3-plugins/scaffolding/issues/24). The dynamically scaffolded controllers cannot handle database exceptions
 
@@ -9,11 +14,7 @@ class BrowserAliasController {
     static scaffold = BrowserAlias
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    def index(Integer max) {
-        def maxDefault = 100
-        if (max) maxDefault = max
-        params.max = maxDefault
-        respond BrowserAlias.list(params), model:[browserAliasCount: BrowserAlias.count()]
+    def index() {
     }
 
     def show(BrowserAlias browserAlias) {
@@ -92,6 +93,41 @@ class BrowserAliasController {
             flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'browserAlias.label', default: 'BrowserAlias'), params.id])
             redirect(action: "show", id: params.id)
         }
+    }
+
+    def updateTable(){
+        params.order = params.order ? params.order : "desc"
+        params.sort = params.sort ? params.sort : "alias"
+        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
+        params.max = params.max as Integer
+        params.offset = params.offset as Integer
+        List<Browser> result
+        int count
+        result = BrowserAlias.createCriteria().list(params) {
+            if(params.filter)ilike("alias","%"+params.filter+"%")
+        }
+        count = BrowserAlias.createCriteria().list(paramsForCount) {
+            if(params.filter)ilike("alias","%"+params.filter+"%")
+        }.size()
+        String templateAsPlainText = g.render(
+                template: 'browserAliasTable',
+                model: [browserAliases: result]
+        )
+        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
+    }
+
+
+    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
+
+        response.setContentType('text/plain;charset=UTF-8')
+        response.status=httpStatus.value()
+
+        Writer textOut = new OutputStreamWriter(response.getOutputStream())
+        textOut.write(message)
+        textOut.flush()
+        response.getOutputStream().flush()
+
     }
 
     protected void notFound() {
