@@ -414,6 +414,9 @@ public class EventResultDashboardService {
                         points: highChartPoints))
             }
         }
+        graphs.each {graph->
+            graph.points.sort{it.time}
+        }
         return graphs.sort()
     }
 
