@@ -19,7 +19,7 @@ class LoginPage extends I18nGebPage {
 
         password { loginForm.find("#password") }
 
-        submitButton(to: [LoginPage, EventResultDashboardPage]) { loginForm.find("input", type: "submit") }
+        submitButton { loginForm.find("input", type: "submit") }
 
         errorMessageBox { $("div.alert") }
     }
