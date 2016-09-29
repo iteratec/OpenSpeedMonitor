@@ -124,7 +124,8 @@
                             linkParseScriptAction: '${createLink(controller: 'script', action: 'parseScript', absolute: true)}',
                             linkMergeDefinedAndUsedPlaceholders: '${createLink(action: 'mergeDefinedAndUsedPlaceholders', absolute: true)}',
                             linkGetScriptSource: '${createLink(action: 'getScriptSource', absolute: true)}',
-                            readonly: true
+                            readonly: true,
+                            parsedScriptUrl: '${createLink(controller: 'script', action: 'getParsedScript', absolute: true)}'
                         });
                         $('#scriptTabLink').bind("click", function() {
                             editor.update();

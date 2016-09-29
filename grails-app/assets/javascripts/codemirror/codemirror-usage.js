@@ -28,6 +28,8 @@ function CodemirrorEditor(data) {
     this.measuredEvents = data.measuredEvents;
     this.idCodemirrorElement = data.idCodemirrorElement;
     this.editorReadonly = data.readonly;
+    this.parsedScriptUrl = data.parsedScriptUrl;
+    this.clipboard;
 
     this.init = function(){
 
@@ -89,6 +91,25 @@ function CodemirrorEditor(data) {
                 $("#placeholderCandidates").html('');
             }
         });
+        if(this.clipboard != null) this.clipboard.destroy();
+        $.ajax({
+            type : 'GET',
+            url : codeMirrorEditor.parsedScriptUrl,
+            data: {
+                'jobId': $('input#id').val(),
+                'scriptId': $('#script').val()
+            },
+            success : function(result) {
+                codeMirrorEditor.clipboard = new Clipboard("#copyToClipboard",{
+                    text :function (trigger) {
+                        return result
+                    }
+                });
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown) {
+                return ""
+            }
+        });
 
         $.ajax({
             type : 'POST',
@@ -105,6 +126,8 @@ function CodemirrorEditor(data) {
                 codeMirrorEditor.loadNewContent('Error');
             }
         });
+
+
 
     }
 

@@ -23,13 +23,6 @@
     </a>:
 </p>
 <g:render template="/script/codemirror" model="${['code': job?.script?.navigationScript, 'measuredEvents': null, 'autoload': false, 'readOnly': true]}" />
-
+<g:if test="${mode == 'edit'}">
 <button class="btn btn-default" type="button" id="copyToClipboard"><g:message code="job.script.copyToClipboard" default="Copy to Clipboard"/></button>
-<script>
-	new Clipboard('#copyToClipboard', {
-		text: function(trigger) {
-			//We have to escape the quote symbol and replace new lines with escape new lines, so js is able to handle this string.
-			return "${raw(job.script.getParsedNavigationScript(job).replaceAll("\r","").replaceAll("[\n]","\\\\n").trim().replace("\"","\\\""))}";
-		}
-	});
-</script>
+</g:if>
