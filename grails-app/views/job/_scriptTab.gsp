@@ -28,7 +28,8 @@
 <script>
 	new Clipboard('#copyToClipboard', {
 		text: function(trigger) {
-			return `${raw(job.script.getParsedNavigationScript(job))}`;
+			//We have to escape the quote symbol and replace new lines with escape new lines, so js is able to handle this string.
+			return "${raw(job.script.getParsedNavigationScript(job).replaceAll("\r","").replaceAll("[\n]","\\\\n").trim().replace("\"","\\\""))}";
 		}
 	});
 </script>
