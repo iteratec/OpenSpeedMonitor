@@ -189,6 +189,7 @@ task bowerSyncJavascript(type: Sync) {
     include 'jquery/jquery.min.js'
     include 'jquery-ui/ui/minified/jquery-ui.min.js'
     include 'bootstrap/docs/assets/js/bootstrap.min.js'
+    include 'clipboard/dist/clipboard.min.js'
     dependsOn bowerInstall
 }
 
