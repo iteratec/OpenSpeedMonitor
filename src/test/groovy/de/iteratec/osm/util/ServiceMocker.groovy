@@ -562,8 +562,6 @@ class ServiceMocker {
             Date toDate,
             Set<CachedView> cachedViews,
             ErQueryParams queryParams,
-            Map<String, Number> gtConstraints,
-            Map<String, Number> ltConstraints,
             Map listCriteriaRestrictionMap,
             CriteriaSorting sorting ->
                 return eventResults

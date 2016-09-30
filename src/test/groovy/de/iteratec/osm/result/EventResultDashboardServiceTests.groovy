@@ -681,8 +681,6 @@ class EventResultDashboardServiceTests {
             Date toDate,
             Set<CachedView> cachedViews,
             ErQueryParams queryParams,
-            Map<String, Number> gtConstraints,
-            Map<String, Number> ltConstraints,
             Map listCriteriaRestrictionMap,
             CriteriaSorting sorting ->
 

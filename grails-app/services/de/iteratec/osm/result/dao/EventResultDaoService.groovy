@@ -131,7 +131,7 @@ public class EventResultDaoService {
         List<EventResult> eventResults
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getCountedByStartAndEndTimeAndMvQueryParams - getLimitedMedianEventResultsBy', IndentationDepth.ONE) {
             eventResults = getLimitedMedianEventResultsBy(
-                    fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [:], [:], [max: max, offset: offset], sorting
+                    fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [max: max, offset: offset], sorting
             )
         }
         return eventResults
@@ -152,8 +152,6 @@ public class EventResultDaoService {
         Date toDate,
         Set<CachedView> cachedViews,
         ErQueryParams queryParams,
-        Map<String, Number> gtConstraints,
-        Map<String, Number> ltConstraints,
         Map listCriteriaRestrictionMap,
         CriteriaSorting sorting
     ){
@@ -167,8 +165,6 @@ public class EventResultDaoService {
                     fromDate,
                     toDate,
                     cachedViews,
-                    gtConstraints,
-                    ltConstraints,
                     queryParams,
                     sorting,
                     listCriteriaRestrictionMap
@@ -182,8 +178,6 @@ public class EventResultDaoService {
                     fromDate,
                     toDate,
                     cachedViews,
-                    gtConstraints,
-                    ltConstraints,
                     rlikePattern,
                     queryParams
             )
@@ -196,8 +190,6 @@ public class EventResultDaoService {
             Date fromDate,
             Date toDate,
             Set<CachedView> cachedViews,
-            Map<String, Number> gtConstraints,
-            Map<String, Number> ltConstraints,
             Pattern rlikePattern,
             ErQueryParams queryParams
     ) {
@@ -206,12 +198,6 @@ public class EventResultDaoService {
             between('jobResultDate', fromDate, toDate)
             eq('medianValue', true)
             'in'('cachedView', cachedViews)
-            gtConstraints.each { attr, gtValue ->
-                gt(attr, gtValue)
-            }
-            ltConstraints.each { attr, ltValue ->
-                lt(attr, ltValue)
-            }
         }.grep { it.tag ==~ rlikePattern }
 
         return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
@@ -223,15 +209,13 @@ public class EventResultDaoService {
             Date fromDate,
             Date toDate,
             Set<CachedView> cachedViews,
-            Map<String, Number> gtConstraints,
-            Map<String, Number> ltConstraints,
             ErQueryParams queryParams,
             CriteriaSorting sorting,
             Map listCriteriaRestrictionMap
     ) {
 
         CriteriaAggregator eventResultQueryAggregator = getAggregatedCriteriasFor(
-                rlikePattern, fromDate, toDate, cachedViews, gtConstraints, ltConstraints, queryParams, sorting
+                rlikePattern, fromDate, toDate, cachedViews, queryParams, sorting
         )
 
         return eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap);
@@ -243,8 +227,6 @@ public class EventResultDaoService {
             Date fromDate,
             Date toDate,
             Set<CachedView> cachedViews,
-            Map<String, Number> gtConstraints,
-            Map<String, Number> ltConstraints,
             ErQueryParams queryParams,
             CriteriaSorting sorting) {
 
@@ -256,18 +238,6 @@ public class EventResultDaoService {
             eq('medianValue', true)
             'in'('cachedView', cachedViews)
         }
-
-        gtConstraints.each { attr, gtValue ->
-            eventResultQueryAggregator.addCriteria {
-                gt(attr, gtValue)
-            }
-        }
-        ltConstraints.each { attr, ltValue ->
-            eventResultQueryAggregator.addCriteria {
-                lt(attr, ltValue)
-            }
-        }
-
         addConnectivityRelatedCriteria(queryParams, eventResultQueryAggregator)
 
         if (sorting.sortingActive) {

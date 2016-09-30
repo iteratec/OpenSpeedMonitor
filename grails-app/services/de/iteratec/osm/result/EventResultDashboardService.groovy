@@ -205,15 +205,11 @@ public class EventResultDashboardService {
                     endDate,
                     [CachedView.CACHED, CachedView.UNCACHED] as Set,
                     queryParams,
-                    gtValues,
-                    ltValues,
                     [:],
                     new CriteriaSorting(sortingActive: false)
             )
         }
-
-        return calculateResultMap(eventResults, aggregators, interval)
-
+        return calculateResultMap(eventResults, aggregators, interval, gtValues,ltValues)
     }
 
     /**
@@ -227,13 +223,13 @@ public class EventResultDashboardService {
      * @param interval
      * @return
      */
-    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval) {
+    private OsmRickshawChart calculateResultMap(Collection<EventResult> eventResults, List<AggregatorType> aggregators, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
         Map<String, List<OsmChartPoint>> calculatedResultMap
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', IndentationDepth.ONE) {
             if (interval == CsiAggregationInterval.RAW) {
-                calculatedResultMap = calculateResultMapForRawData(aggregators, eventResults)
+                calculatedResultMap = calculateResultMapForRawData(aggregators, eventResults, gtBoundary, ltBoundary)
             } else {
-                calculatedResultMap = calculateResultMapForAggregatedData(aggregators, eventResults, interval)
+                calculatedResultMap = calculateResultMapForAggregatedData(aggregators, eventResults, interval, gtBoundary, ltBoundary)
             }
         }
         List<OsmChartGraph> graphs = []
@@ -249,7 +245,7 @@ public class EventResultDashboardService {
         return chart
     }
 
-    private Map<String, List<OsmChartPoint>> calculateResultMapForRawData(List<AggregatorType> aggregators, Collection<EventResult> eventResults) {
+    private Map<String, List<OsmChartPoint>> calculateResultMapForRawData(List<AggregatorType> aggregators, Collection<EventResult> eventResults, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
 
         Map<String, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
 
@@ -268,7 +264,7 @@ public class EventResultDashboardService {
 
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
                     Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
-                    if (value != null) {
+                    if (value != null && isInBounds(eventResult, aggregator, gtBoundary,ltBoundary)) {
                         String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
                         OsmChartPoint chartPoint = new OsmChartPoint(time: eventResult.getJobResultDate().getTime(), csiAggregation: value, countOfAggregatedResults: 1, sourceURL: testsDetailsURL, testingAgent: eventResult.testAgent)
                         if (chartPoint.isValid())
@@ -280,7 +276,19 @@ public class EventResultDashboardService {
         return highchartPointsForEachGraph
     }
 
-    private Map<String, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<AggregatorType> aggregators, Collection<EventResult> eventResults, Integer interval) {
+    private boolean isInBounds(EventResult eventResult, AggregatorType aggregatorType, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary){
+        String name = aggregatorType.getName().replace("Uncached","").replace("cached","") //TODO make this pretty
+        Number lt = gtBoundary[name]
+        Number gt = ltBoundary[name]
+
+        boolean inBound = true
+        if(lt) inBound &= eventResult."$name" > lt
+        if(gt) inBound &= eventResult."$name" < gt
+
+        return inBound
+    }
+
+    private Map<String, List<OsmChartPoint>> calculateResultMapForAggregatedData(List<AggregatorType> aggregators, Collection<EventResult> eventResults, Integer interval, Map<String, Number> gtBoundary, Map<String, Number> ltBoundary) {
 
         Map<String, List<OsmChartPoint>> highchartPointsForEachGraph = [:].withDefault { [] }
         Map<String, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
@@ -290,7 +298,7 @@ public class EventResultDashboardService {
                 aggregators.each { AggregatorType aggregator ->
                     if (isCachedViewEqualToAggregatorTypesView(eventResult, resultCsiAggregationService.getAggregatorTypeCachedViewType(aggregator))) {
                         Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
-                        if (value != null) {
+                        if (value != null && isInBounds(eventResult, aggregator, gtBoundary, ltBoundary)) {
                             String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             eventResultsToAggregate["${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${millisStartOfInterval}${UNIQUE_STRING_DELIMITTER}${connectivity}"] << value

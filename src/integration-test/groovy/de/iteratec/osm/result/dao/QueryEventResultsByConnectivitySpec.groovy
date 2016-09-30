@@ -75,8 +75,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
             ] as Set,
             queryParams,
             [:],
-            [:],
-            [:],
             new CriteriaSorting(sortingActive: false)
         )
 
@@ -107,8 +105,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                         CachedView.UNCACHED
                 ] as Set,
                 queryParams,
-                [:],
-                [:],
                 [:],
                 new CriteriaSorting(sortingActive: false)
         )
@@ -144,8 +140,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                 ] as Set,
                 queryParams,
                 [:],
-                [:],
-                [:],
                 new CriteriaSorting(sortingActive: false)
         )
 
@@ -176,8 +170,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                         CachedView.UNCACHED
                 ] as Set,
                 queryParams,
-                [:],
-                [:],
                 [:],
                 new CriteriaSorting(sortingActive: false)
         )
@@ -213,8 +205,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                 ] as Set,
                 queryParams,
                 [:],
-                [:],
-                [:],
                 new CriteriaSorting(sortingActive: false)
         )
 
@@ -248,8 +238,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                 ] as Set,
                 queryParams,
                 [:],
-                [:],
-                [:],
                 new CriteriaSorting(sortingActive: false)
         )
 
@@ -281,8 +269,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                         CachedView.UNCACHED
                 ] as Set,
                 queryParams,
-                [:],
-                [:],
                 [:],
                 new CriteriaSorting(sortingActive: false)
         )
@@ -317,8 +303,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                 ] as Set,
                 queryParams,
                 [:],
-                [:],
-                [:],
                 new CriteriaSorting(sortingActive: false)
         )
 
@@ -349,8 +333,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
                         CachedView.UNCACHED
                 ] as Set,
                 queryParams,
-                [:],
-                [:],
                 [:],
                 new CriteriaSorting(sortingActive: false)
         )
