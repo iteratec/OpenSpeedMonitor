@@ -126,12 +126,14 @@ class PageCsiAggregationService {
             return result
         }
         String tagPattern = csiAggregationTagService.getTagPatternForWeeklyPageCasWithJobGroupsAndPages(groups, pages)
-        result = csiAggregationDaoService.getMvs(
-                fromDate,
-                toDate,
-                tagPattern,
-                targetInterval,
-                AggregatorType.findByName(AggregatorType.PAGE))
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', IndentationDepth.ONE) {
+            result = csiAggregationDaoService.getMvs(
+                    fromDate,
+                    toDate,
+                    tagPattern,
+                    targetInterval,
+                    AggregatorType.findByName(AggregatorType.PAGE))
+        }
         return result
     }
 

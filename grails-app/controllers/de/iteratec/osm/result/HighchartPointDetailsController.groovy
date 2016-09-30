@@ -19,6 +19,9 @@ package de.iteratec.osm.result
 
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
+import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.AggregatorType
@@ -41,6 +44,7 @@ class HighchartPointDetailsController {
 	CsiAggregationDaoService csiAggregationDaoService;
 	EventResultDaoService eventResultDaoService
 	JobResultDaoService jobResultDaoService;
+	PerformanceLoggingService performanceLoggingService;
 	/**
 	 * The Grails engine to generate links.
 	 *
@@ -388,9 +392,11 @@ class HighchartPointDetailsController {
 		modelToRender.put('listAggregatedResultsByQueryParams', true)
 			
 		// Load relevant data:
-		List<EventResult> eventResults = eventResultDaoService.getMedianEventResultsBy(
-				fromDate.toDate(), toDate.toDate(), relevantCachedViews, tag)
-		
+		List<EventResult> eventResults
+		performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - listAggregatedResultsByQueryParams - getMedianEventResultsBy', IndentationDepth.ONE) {
+			eventResults = eventResultDaoService.getMedianEventResultsBy(
+					fromDate.toDate(), toDate.toDate(), relevantCachedViews, tag)
+		}
 		if( lastKnownCountOfAggregatedResultsOrNull != null )
 		{
 			addWaringIfResultCountDiffersFromExpectation(lastKnownCountOfAggregatedResultsOrNull, eventResults.size(), modelToRender);

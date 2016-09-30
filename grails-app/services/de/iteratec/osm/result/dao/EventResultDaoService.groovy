@@ -24,7 +24,9 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.result.*
 import org.hibernate.criterion.CriteriaSpecification
-
+import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import java.util.regex.Pattern
 
 /**
@@ -39,6 +41,7 @@ public class EventResultDaoService {
 	OsmDataSourceService osmDataSourceService
 	JobResultDaoService jobResultDaoService
 	CsiAggregationTagService csiAggregationTagService
+    PerformanceLoggingService performanceLoggingService
 
 	/**
 	 * <p>
@@ -97,7 +100,12 @@ public class EventResultDaoService {
     ){
 
 		Pattern rlikePattern=csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams)
-		return getMedianEventResultsBy(fromDate, toDate, cachedViews, rlikePattern.pattern)
+
+        List<EventResult> eventResults
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getMedianEventResultsBy - getMedianEventResultsBy', IndentationDepth.ONE) {
+            eventResults = getMedianEventResultsBy(fromDate, toDate, cachedViews, rlikePattern.pattern)
+        }
+        return eventResults
 
 	}
 
@@ -120,9 +128,13 @@ public class EventResultDaoService {
             ErQueryParams erQueryParams, Date fromDate, Date toDate, Integer max, Integer offset, CriteriaSorting sorting
     ){
 
-        return getLimitedMedianEventResultsBy(
-            fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [:], [:], [max: max, offset:offset], sorting
-        )
+        List<EventResult> eventResults
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getCountedByStartAndEndTimeAndMvQueryParams - getLimitedMedianEventResultsBy', IndentationDepth.ONE) {
+            eventResults = getLimitedMedianEventResultsBy(
+                    fromDate, toDate, [CachedView.UNCACHED, CachedView.CACHED] as Set, erQueryParams, [:], [:], [max: max, offset: offset], sorting
+            )
+        }
+        return eventResults
 
 	}
 	

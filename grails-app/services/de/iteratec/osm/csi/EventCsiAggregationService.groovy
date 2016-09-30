@@ -136,15 +136,18 @@ class EventCsiAggregationService {
 	private getAllCalculatedHourlyCas(MvQueryParams mvQueryParams, DateTime fromDateTime, DateTime toDateTimeEndOfInterval){
 		String queryPattern = csiAggregationTagService.getTagPatternForHourlyCsiAggregations(mvQueryParams).pattern();
 		List<ConnectivityProfile> connectivityProfilesInQuery = ConnectivityProfile.findAllByIdInList(new ArrayList<Long>(mvQueryParams.connectivityProfileIds))
-		return queryPattern != null ?
-			   csiAggregationDaoService.getMvs(
-					fromDateTime.toDate(), 
-					toDateTimeEndOfInterval.toDate(),
-					queryPattern,
-					CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
-					AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
-					connectivityProfilesInQuery)
-			: []
+		def result = []
+		if(queryPattern != null)
+			performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - getAllCalculatedHourlyCas - getMvs', IndentationDepth.ONE) {
+				result= csiAggregationDaoService.getMvs(
+						fromDateTime.toDate(),
+						toDateTimeEndOfInterval.toDate(),
+						queryPattern,
+						CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY),
+						AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
+						connectivityProfilesInQuery)
+			}
+		return result
 	}
 	
 	private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, String tag, AggregatorType eventAggregator, boolean initiallyClosed, ConnectivityProfile connectivityProfile) {

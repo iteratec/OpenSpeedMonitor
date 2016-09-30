@@ -93,7 +93,9 @@ class ShopCsiAggregationService {
             return result
         }
         String tagPattern = csiAggregationTagService.getTagPatternForWeeklyShopCasWithJobGroups(csiGroups)
-        result = csiAggregationDaoService.getMvs(fromDate, toDate, tagPattern, targetInterval, AggregatorType.findByName(AggregatorType.SHOP))
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', IndentationDepth.ONE) {
+            result = csiAggregationDaoService.getMvs(fromDate, toDate, tagPattern, targetInterval, AggregatorType.findByName(AggregatorType.SHOP))
+        }
         return result
     }
 

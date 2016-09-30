@@ -199,7 +199,7 @@ public class EventResultDashboardService {
         }
 
         Collection<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results', IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getEventResultDashboardHighchartGraphs - getLimitedMedianEventResultsBy', IndentationDepth.ONE) {
             eventResults = eventResultDaoService.getLimitedMedianEventResultsBy(
                     startDate,
                     endDate,
@@ -359,59 +359,77 @@ public class EventResultDashboardService {
         Map<Serializable, Location> locationMap = [:]
 
         highchartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
-            List<String> tokenizedGraphLabel = graphLabel.tokenize(UNIQUE_STRING_DELIMITTER)
-            if (tokenizedGraphLabel.size() != 3) {
-                throw new IllegalArgumentException("The graph-label should consist of three parts: AggregatorType and tag. This is no correct graph-label: ${graphLabel}")
-            }
-            AggregatorType aggregator = AggregatorType.findByName(tokenizedGraphLabel[0])
-            if (!aggregator) {
-                throw new IllegalArgumentException("First part of graph-label should be the name of AggregatorType. This is no correct aggregator-name: ${tokenizedGraphLabel[0]}")
-            }
-            String connectivity = tokenizedGraphLabel[2]
-            if(!connectivity) {
-                throw new IllegalArgumentException("Thrid part of graph-label should be the the connectivity. This is no correct connectivity: ${tokenizedGraphLabel[2]}")
-            }
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', IndentationDepth.ONE) {
+                List<String> tokenizedGraphLabel
+                AggregatorType aggregator
+                String measurand
+                String connectivity
+                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'PART1', IndentationDepth.ONE) {
+                    tokenizedGraphLabel= graphLabel.tokenize(UNIQUE_STRING_DELIMITTER)
+                    if (tokenizedGraphLabel.size() != 3) {
+                        throw new IllegalArgumentException("The graph-label should consist of three parts: AggregatorType and tag. This is no correct graph-label: ${graphLabel}")
+                    }
+                    performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'Aggregator', IndentationDepth.ONE) {
+                        aggregator = AggregatorType.findByName(tokenizedGraphLabel[0])
+                    }
 
-            String measurand = i18nService.msg("de.iteratec.isr.measurand.${tokenizedGraphLabel[0].replace('Uncached', '').replace('Cached', '')}", tokenizedGraphLabel[0], null)
+                    if (!aggregator) {
+                        throw new IllegalArgumentException("First part of graph-label should be the name of AggregatorType. This is no correct aggregator-name: ${tokenizedGraphLabel[0]}")
+                    }
+                    connectivity= tokenizedGraphLabel[2]
+                    if (!connectivity) {
+                        throw new IllegalArgumentException("Thrid part of graph-label should be the the connectivity. This is no correct connectivity: ${tokenizedGraphLabel[2]}")
+                    }
 
-            if (tokenizedGraphLabel[0].endsWith("Uncached")) {
-                if (!repeatedViewEnding.isEmpty()) {
-                    measurand = repeatedViewEnding + " " + measurand;
+                    measurand = i18nService.msg("de.iteratec.isr.measurand.${tokenizedGraphLabel[0].replace('Uncached', '').replace('Cached', '')}", tokenizedGraphLabel[0], null)
+
+                    if (tokenizedGraphLabel[0].endsWith("Uncached")) {
+                        if (!repeatedViewEnding.isEmpty()) {
+                            measurand = repeatedViewEnding + " " + measurand;
+                        }
+                    } else {
+                        if (!firstViewEnding.isEmpty()) {
+                            measurand = firstViewEnding + " " + measurand;
+                        }
+                    }
+
                 }
-            } else {
-                if (!firstViewEnding.isEmpty()) {
-                    measurand = firstViewEnding + " " + measurand;
-                }
-            }
-
-            String tag = tokenizedGraphLabel[1]
-            if (tag) {
-                Long jobGroupId = Long.valueOf(csiAggregationTagService.findJobGroupIdOfHourlyEventTag(tag))
-                JobGroup group = jobGroupMap[jobGroupId] ?: JobGroup.get(jobGroupId)
-                Long eventId = Long.valueOf(csiAggregationTagService.findMeasuredEventIdOfHourlyEventTag(tag))
-                MeasuredEvent measuredEvent = measuredEventMap[eventId] ?: MeasuredEvent.get(eventId)
-                Long locationId = Long.valueOf(csiAggregationTagService.findLocationIdOfHourlyEventTag(tag))
-                Location location = locationMap[locationId] ?: Location.get(locationId)
-
-                if (group && measuredEvent && location) {
-                    String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
-                            "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
-                            "${HIGHCHART_LEGEND_DELIMITTER}${connectivity}"
-                    graphs.add(new OsmChartGraph(
-                            label: newGraphLabel,
-                            measurandGroup: aggregator.measurandGroup,
-                            points: highChartPoints))
+                String tag = tokenizedGraphLabel[1]
+                if (tag) {
+                    Long jobGroupId
+                    JobGroup group
+                    MeasuredEvent measuredEvent
+                    Long eventId
+                    Long locationId
+                    Location location
+                    performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'Extract IDS', IndentationDepth.ONE) {
+                        jobGroupId= Long.valueOf(csiAggregationTagService.findJobGroupIdOfHourlyEventTag(tag))
+                        group = jobGroupMap[jobGroupId] ?: JobGroup.get(jobGroupId)
+                        eventId= Long.valueOf(csiAggregationTagService.findMeasuredEventIdOfHourlyEventTag(tag))
+                        measuredEvent= measuredEventMap[eventId] ?: MeasuredEvent.get(eventId)
+                        locationId= Long.valueOf(csiAggregationTagService.findLocationIdOfHourlyEventTag(tag))
+                        location = locationMap[locationId] ?: Location.get(locationId)
+                    }
+                    if (group && measuredEvent && location) {
+                        String newGraphLabel = "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${group.name}${HIGHCHART_LEGEND_DELIMITTER}" +
+                                "${measuredEvent.name}${HIGHCHART_LEGEND_DELIMITTER}${location.uniqueIdentifierForServer == null ? location.location : location.uniqueIdentifierForServer}" +
+                                "${HIGHCHART_LEGEND_DELIMITTER}${connectivity}"
+                        graphs.add(new OsmChartGraph(
+                                label: newGraphLabel,
+                                measurandGroup: aggregator.measurandGroup,
+                                points: highChartPoints))
+                    } else {
+                        graphs.add(new OsmChartGraph(
+                                label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${tokenizedGraphLabel[1]}",
+                                measurandGroup: aggregator.measurandGroup,
+                                points: highChartPoints))
+                    }
                 } else {
                     graphs.add(new OsmChartGraph(
                             label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${tokenizedGraphLabel[1]}",
                             measurandGroup: aggregator.measurandGroup,
                             points: highChartPoints))
                 }
-            } else {
-                graphs.add(new OsmChartGraph(
-                        label: "${measurand}${HIGHCHART_LEGEND_DELIMITTER}${tokenizedGraphLabel[1]}",
-                        measurandGroup: aggregator.measurandGroup,
-                        points: highChartPoints))
             }
         }
         graphs.each {graph->
