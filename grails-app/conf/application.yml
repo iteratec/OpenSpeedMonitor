@@ -64,6 +64,8 @@ environments:
                 enabled: true
                 urlRoot: '/admin/dbconsole'
             plugin:
+                greenmail:
+                    disabled: true
                 console:
                     enabled: true
                     fileStore:
