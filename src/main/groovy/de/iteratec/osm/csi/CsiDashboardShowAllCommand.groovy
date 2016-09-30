@@ -8,6 +8,7 @@ import grails.converters.JSON
 import grails.validation.Validateable
 import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
+import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -628,5 +629,44 @@ public class CsiDashboardShowAllCommand implements Validateable {
         } else {
             throw new IllegalArgumentException("The following ")
         }
+    }
+
+    /**
+     * <p>
+     * Tests weather the UI should warn the user about an expected long
+     * execution time for calculations on a time frame.
+     * </p>
+     *
+     * @param timeFrame
+     *         The time frame to guess weather a user should be warned
+     *         about potently very long calculation time;
+     *         not <code>null</code>.
+     * @param selectedAggregationIntervallInMintues
+     *         The number of minutes in selected measuring interval; >= 1.
+     * @param countOfSelectedSystems
+     *         The number of selected systems / {@link de.iteratec.osm.measurement.schedule.JobGroup}s; >= 1.
+     * @param countOfSelectedPages
+     *         The number of selected pages; >= 1.
+     * @param countOfSelectedBrowser
+     *         The number of selected browser; >= 1.
+     *
+     * @return <code>true</code> if the user should be warned,
+     *         <code>false</code> else.
+     * @since IT-95, significantly changed for IT-152.
+     */
+    public boolean shouldWarnAboutLongProcessingTime(
+            Interval timeFrame,
+            int selectedAggregationIntervallInMintues,
+            int countOfSelectedBrowser) {
+
+        int countOfSelectedSystems = selectedFolder.size()
+        int countOfSelectedPages = selectedPages.size()
+        int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes()
+
+        long expectedCountOfGraphs = countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser
+        long expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / selectedAggregationIntervallInMintues)
+        long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph
+
+        return expectedTotalNumberOfPoints > 50000
     }
 }

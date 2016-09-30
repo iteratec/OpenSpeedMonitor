@@ -1743,69 +1743,6 @@ class CsiDashboardControllerTests {
     }
 
     @Test
-    public void testShouldWarnAboutLongProcessingTime_Design_Weekly_40_Points_Total() {
-        int countOfSelectedSystems = 2;
-        int countOfSelectedPages = 5;
-        int countOfSelectedBrowser = 2;
-
-        DateTime start = new DateTime(2013, 9, 30, 0, 0);
-        DateTime end = new DateTime(2013, 10, 13, 23, 59);
-        Interval timeFrameTwoWeeks = new Interval(start, end);
-
-        int selectedAggregationIntervallInMintues = 7 * 24 * 60; // one week
-
-        assertFalse(controllerUnderTest.shouldWarnAboutLongProcessingTime(
-                timeFrameTwoWeeks,
-                selectedAggregationIntervallInMintues,
-                countOfSelectedSystems,
-                countOfSelectedPages,
-                countOfSelectedBrowser)
-        );
-    }
-
-    @Test
-    public void testShouldWarnAboutLongProcessingTime_Design_Hourly_2_weeks_6720_Points_Total_LessThan10000() {
-        int countOfSelectedSystems = 2;
-        int countOfSelectedPages = 5;
-        int countOfSelectedBrowser = 2;
-
-        DateTime start = new DateTime(2013, 9, 30, 0, 0);
-        DateTime end = new DateTime(2013, 10, 13, 23, 59);
-        Interval timeFrameTwoWeeks = new Interval(start, end);
-
-        int selectedAggregationIntervallInMintues = 60; // one hour
-
-        assertFalse(controllerUnderTest.shouldWarnAboutLongProcessingTime(
-                timeFrameTwoWeeks,
-                selectedAggregationIntervallInMintues,
-                countOfSelectedSystems,
-                countOfSelectedPages,
-                countOfSelectedBrowser)
-        );
-    }
-
-    @Test
-    public void testShouldWarnAboutLongProcessingTime_Design_Hourly_1_year() {
-        int countOfSelectedSystems = 2;
-        int countOfSelectedPages = 5;
-        int countOfSelectedBrowser = 2;
-
-        DateTime start = new DateTime(2013, 9, 30, 0, 0);
-        DateTime end = new DateTime(2014, 9, 30, 0, 0);
-        Interval timeFrameOneYear = new Interval(start, end);
-
-        int selectedAggregationIntervallInMintues = 60; // one hour
-
-        assertTrue(controllerUnderTest.shouldWarnAboutLongProcessingTime(
-                timeFrameOneYear,
-                selectedAggregationIntervallInMintues,
-                countOfSelectedSystems,
-                countOfSelectedPages,
-                countOfSelectedBrowser)
-        );
-    }
-
-    @Test
     public void testGetControlnameForCsiType() {
         assertEquals(CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.DOC_COMPLETE), 'csiTypeDocComplete')
         assertEquals(CsiDashboardShowAllCommand.receiveControlnameFor(CsiType.VISUALLY_COMPLETE), 'csiTypeVisuallyComplete')

@@ -2,19 +2,19 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.DateValueConverter
 import grails.converters.JSON
 import grails.validation.Validateable
 import org.grails.databinding.BindUsing
 import org.joda.time.DateTime
+import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.regex.Pattern
-
 /**
  * <p>
  * Command of {@link EventResultDashboardController#showAll(EventResultDashboardShowAllCommand)
@@ -591,5 +591,56 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         }
 
         return result;
+    }
+
+    /**
+     * <p>
+     * Tests weather the UI should warn the user about an expected long
+     * execution time for calculations on a time frame.
+     * </p>
+     *
+     * @param timeFrame
+     *         The time frame to guess weather a user should be warned
+     *         about potently very long calculation time;
+     *         not <code>null</code>.
+     * @param countOfSelectedAggregatorTypes
+     *         The number of selected aggregatorTypes; >= 1.
+     * @param countOfSelectedSystems
+     *         The number of selected systems / {@link de.iteratec.osm.measurement.schedule.JobGroup}s; >= 1.
+     * @param countOfSelectedPages
+     *         The number of selected pages; >= 1.
+     * @param countOfSelectedBrowser
+     *         The number of selected browser; >= 1.
+     *
+     * @return <code>true</code> if the user should be warned,
+     *         <code>false</code> else.
+     * @since IT-157
+     */
+    public boolean shouldWarnAboutLongProcessingTime(int countOfSelectedAggregatorTypes, int countOfSelectedBrowser) {
+
+        int countOfSelectedSystems = selectedFolder.size()
+        Interval timeFrame = getSelectedTimeFrame()
+        int interval = getSelectedInterval()
+        int countOfSelectedPages = selectedPages.size()
+        int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes();
+
+        long expectedPointsOfEachGraph;
+        if (interval == CsiAggregationInterval.RAW || interval == 0 || interval == null) {
+            //50 results per Day
+            expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / 60 / 24 * EXPECTED_RESULTS_PER_DAY);
+        } else {
+            expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / interval);
+        }
+        !ControllerUtils.isEmptyRequest(params)
+
+        if (expectedPointsOfEachGraph > 5000) {
+            return true;
+        } else {
+
+            long expectedCountOfGraphs = countOfSelectedAggregatorTypes * countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser;
+            long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph;
+
+            return expectedTotalNumberOfPoints > 50000;
+        }
     }
 }

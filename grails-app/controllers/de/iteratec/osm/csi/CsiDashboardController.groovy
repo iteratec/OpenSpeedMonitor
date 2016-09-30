@@ -284,11 +284,9 @@ class CsiDashboardController {
                         countOfSelectedBrowser = ((List) modelToRender.get('browsers')).size()
                     }
 
-                    warnAboutLongProcessingTimeInsteadOfShowingData = shouldWarnAboutLongProcessingTime(
+                    warnAboutLongProcessingTimeInsteadOfShowingData = cmd.shouldWarnAboutLongProcessingTime(
                             fixTimeFrame(cmd.receiveSelectedTimeFrame(), selectedAggregationIntervallInMintues),
                             selectedAggregationIntervallInMintues,
-                            cmd.selectedFolder.size(),
-                            cmd.selectedPages.size(),
                             countOfSelectedBrowser)
                 }
 
@@ -1090,44 +1088,6 @@ class CsiDashboardController {
 
         // Done! :)
         return result
-    }
-
-    /**
-     * <p>
-     * Tests weather the UI should warn the user about an expected long
-     * execution time for calculations on a time frame.
-     * </p>
-     *
-     * @param timeFrame
-     *         The time frame to guess weather a user should be warned
-     *         about potently very long calculation time;
-     *         not <code>null</code>.
-     * @param selectedAggregationIntervallInMintues
-     *         The number of minutes in selected measuring interval; >= 1.
-     * @param countOfSelectedSystems
-     *         The number of selected systems / {@link JobGroup}s; >= 1.
-     * @param countOfSelectedPages
-     *         The number of selected pages; >= 1.
-     * @param countOfSelectedBrowser
-     *         The number of selected browser; >= 1.
-     *
-     * @return <code>true</code> if the user should be warned,
-     *         <code>false</code> else.
-     * @since IT-95, significantly changed for IT-152.
-     */
-    public boolean shouldWarnAboutLongProcessingTime(
-            Interval timeFrame,
-            int selectedAggregationIntervallInMintues,
-            int countOfSelectedSystems,
-            int countOfSelectedPages,
-            int countOfSelectedBrowser) {
-        int minutesInTimeFrame = new Duration(timeFrame.getStart(), timeFrame.getEnd()).getStandardMinutes()
-
-        long expectedCountOfGraphs = countOfSelectedSystems * countOfSelectedPages * countOfSelectedBrowser
-        long expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / selectedAggregationIntervallInMintues)
-        long expectedTotalNumberOfPoints = expectedCountOfGraphs * expectedPointsOfEachGraph
-
-        return expectedTotalNumberOfPoints > 50000
     }
 
     /**
