@@ -15,7 +15,7 @@ class ResultXmlWptServer219Spec extends Specification {
 
     void "test correct version"() {
         expect:
-        resultXml.version == WptXmlResultVersion.VERSION_2_19
+        resultXml.version == WptXmlResultVersion.MULTISTEP
     }
 
     void "test getStepCount"() {

@@ -141,9 +141,9 @@ class AssetRequestPersisterService implements iResultListener {
     private String getWptVersion(WptResultXml resultXml){
         //The version is only noted since 2.19. So we for Versions < 2.19 we can
         //just tell that they are smaller then 2.19 and we just call them "undefined", since the DA only supports version >= 2.19
-        resultXml.version == WptXmlResultVersion.VERSION_2_19 ? "2.19":"2.18"
+        resultXml.version == WptXmlResultVersion.MULTISTEP ? "2.19":"2.18"
         switch (resultXml.version){
-            case WptXmlResultVersion.VERSION_2_19:
+            case WptXmlResultVersion.MULTISTEP:
                 return "2.19"
             default:
                 return "undefined"

@@ -85,7 +85,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfSteps'                  : 6,
                      'expectedNumberOfStepsWithAssociatedPage': 0,
                      'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_1
+                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
                     ],
             'Result_NoMultistep_1Run_NotCsiRelevantCauseDocTimeTooHighResponse.xml':
                     ['expectedNumberOfLocations'              : 1,
@@ -118,7 +118,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfSteps'                  : 2,
                      'expectedNumberOfStepsWithAssociatedPage': 2,
                      'expectedNumberOfCachedViews'            : 1,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_1
+                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
                     ],
             'Result_Multistep_1Run_2EventNames_PagePrefix.xml'                     :
                     ['expectedNumberOfLocations'              : 1,
@@ -129,7 +129,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfSteps'                  : 2,
                      'expectedNumberOfStepsWithAssociatedPage': 2,
                      'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_1
+                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
                     ],
             'Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml'                :
                     ['expectedNumberOfLocations'              : 1,

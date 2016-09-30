@@ -25,10 +25,10 @@ class WptResultXml {
         this.responseNode = baseNode
         version = WptXmlResultVersion.BEFORE_MULTISTEP
         if (!this.responseNode.data.median.firstView.testStep.isEmpty()) {
-            version = WptXmlResultVersion.MULTISTEP_1
+            version = WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
         }
         if (!this.responseNode.webPagetestVersion.isEmpty()) {
-            version = WptXmlResultVersion.VERSION_2_19
+            version = WptXmlResultVersion.MULTISTEP
         }
     }
 
@@ -91,9 +91,9 @@ class WptResultXml {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
                 return responseNode.data.median.isEmpty() ? 0 : 1
                 break
-            case WptXmlResultVersion.MULTISTEP_1:
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
                 return responseNode.data.median.firstView.testStep.size()
-            case WptXmlResultVersion.VERSION_2_19:
+            case WptXmlResultVersion.MULTISTEP:
                 return responseNode.data.run.getAt(0).firstView.numSteps.toString() as Integer
         }
     }
@@ -106,7 +106,7 @@ class WptResultXml {
         if (version == WptXmlResultVersion.BEFORE_MULTISTEP) {
             measuredEventName = job.getEventNameIfUnknown();
             if (!measuredEventName) measuredEventName = job.getLabel()
-        } else if (version == WptXmlResultVersion.MULTISTEP_1) {
+        } else if (version == WptXmlResultVersion.MULTISTEP_FORK_ITERATEC) {
             measuredEventName = responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).eventName.toString();
         } else {
             measuredEventName = responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex).eventName.toString();
@@ -150,7 +150,7 @@ class WptResultXml {
         GPathResult viewNode = getResultNodeForRunAndView(runZeroBasedIndex, cachedView)
         if (version == WptXmlResultVersion.BEFORE_MULTISTEP) {
             return viewNode.results
-        } else if (version == WptXmlResultVersion.MULTISTEP_1) {
+        } else if (version == WptXmlResultVersion.MULTISTEP_FORK_ITERATEC) {
             return viewNode.results.testStep.getAt(testStepZeroBasedIndex)
         } else {
             return viewNode.step.getAt(testStepZeroBasedIndex).results
@@ -183,9 +183,9 @@ class WptResultXml {
         switch (version) {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
                 return firstView ? responseNode.data.median.firstView.run.getAt(0).toInteger() : responseNode.data.median.repeatView.run.getAt(0).toInteger()
-            case WptXmlResultVersion.MULTISTEP_1:
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
                 return firstView ? responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).run.getAt(0).toInteger() : responseNode.data.median.repeatView.testStep.getAt(testStepZeroBasedIndex).run.getAt(0).toInteger()
-            case WptXmlResultVersion.VERSION_2_19:
+            case WptXmlResultVersion.MULTISTEP:
                 return firstView ? responseNode.data.median.firstView.run.getAt(0).toInteger() : responseNode.data.median.repeatView.run.getAt(0).toInteger()
             default:
                 throw new IllegalArgumentException("Unknown WptXmlResultVersion: ${version}")

@@ -18,10 +18,17 @@
 package de.iteratec.osm.result;
 
 public enum WptXmlResultVersion {
-    /** XML-result measured with a webpagetest-server/-agent without multistep-adaption. */
+    /**
+     * XML-result measured with a webpagetest-server/-agent without multistep-capabilities.
+     */
     BEFORE_MULTISTEP,
-    /** XML-result measured with a webpagetest-server/-agent with first version of multistep-adaption. */
-            MULTISTEP_1,
-    /** XML-result measured with a webpagetest-server/-agent with Version 2.19. */
-            VERSION_2_19
+    /**
+     * XML-result measured with a webpagetest-server/-agent with forked multistep-adaption of iteratec.
+     */
+    MULTISTEP_FORK_ITERATEC,
+    /**
+     * XML-result measured with a multistep capable webpagetest-server/-agent > version 2.19.
+     * Multistep fork of iteratec was merged into main code with version 2.19.
+     */
+    MULTISTEP
 }
