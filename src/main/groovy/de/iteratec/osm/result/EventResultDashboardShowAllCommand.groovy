@@ -34,7 +34,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
-
+    public final static Integer EXPECTED_RESULTS_PER_DAY = 50;
     /**
      * The selected start date.
      *
@@ -631,7 +631,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         } else {
             expectedPointsOfEachGraph = Math.round(minutesInTimeFrame / interval);
         }
-        !ControllerUtils.isEmptyRequest(params)
 
         if (expectedPointsOfEachGraph > 5000) {
             return true;

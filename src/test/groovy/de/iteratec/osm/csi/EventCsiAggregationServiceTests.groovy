@@ -19,6 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.util.PerformanceLoggingService
 import groovy.mock.interceptor.MockFor
 
 import static org.hamcrest.Matchers.*
@@ -80,7 +81,7 @@ class EventCsiAggregationServiceTests {
 	
     void setUp() {
 		serviceUnderTest = service
-//		serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
+		serviceUnderTest.performanceLoggingService = new PerformanceLoggingService()
 		
 		new JobGroup(name: jobGroupName1).save(validate: false) 
 		new JobGroup(name: jobGroupName2).save(validate: false)
