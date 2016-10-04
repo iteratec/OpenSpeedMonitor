@@ -265,17 +265,19 @@ class PersistingNewEventResultsTests {
 
         //TestDetailsUrl uncached and without page
         EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
-        String[] tokensUncached = eventResultUncachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensUncached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensUncached[2].contains("1"))
-        assertTrue(tokensUncached[3].contains("0#waterfall_viewProdukt auswaehlen"))
+        String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+            "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen",
+            detailsUrl
+        )
 
         //TestDetailsUrl cached and without page
         EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
-        String[] tokensCached = eventResultCachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensCached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensCached[2].contains("1"))
-        assertTrue(tokensCached[3].contains("1#waterfall_viewArtikel suchen"))
+        detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+            "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen",
+            detailsUrl
+        )
     }
 
     @Test
@@ -337,18 +339,20 @@ class PersistingNewEventResultsTests {
 
         //TestDetailsUrl uncached and without page
         EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
-        String[] tokensUncached = eventResultUncachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensUncached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensUncached[2].contains("1"))
+        String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         //replacing check: in database with a dot 'Produkt ausw.aehlen'
-        assertTrue(tokensUncached[3].contains("0#waterfall_viewHPProdukt auswaehlen"))
+        assertEquals(
+            'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen',
+            detailsUrl
+        )
 
         //TestDetailsUrl cached and without page
         EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
-        String[] tokensCached = eventResultCachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensCached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensCached[2].contains("1"))
-        assertTrue(tokensCached[3].contains("1#waterfall_viewHPArtikel suchen"))
+        detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+            'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen',
+            detailsUrl
+        )
     }
 
     @Test
@@ -529,17 +533,19 @@ class PersistingNewEventResultsTests {
 
         //TestDetailsUrl uncached and without page
         EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
-        String[] tokensUncached = eventResultUncachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensUncached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensUncached[2].contains("2"))
-        assertTrue(tokensUncached[3].contains("0#waterfall_viewHPFF_BV1_Step01_Homepage - netlab"))
+        String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab",
+                detailsUrl
+        )
 
         //TestDetailsUrl cached and without page
         EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
-        String[] tokensCached = eventResultCachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensCached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensCached[2].contains("3"))
-        assertTrue(tokensCached[3].contains("1#waterfall_viewHPFF_BV1_Step01_Homepage - netlab"))
+        detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab",
+                detailsUrl
+        )
     }
 
     /**

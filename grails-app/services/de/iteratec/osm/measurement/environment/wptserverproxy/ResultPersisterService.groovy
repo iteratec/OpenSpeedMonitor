@@ -48,6 +48,7 @@ import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 class ResultPersisterService implements iResultListener {
 
     public static final String STATIC_PART_WATERFALL_ANCHOR = '#waterfall_view'
+
     private boolean callListenerAsync = false
 
     BrowserService browserService
@@ -210,14 +211,14 @@ class ResultPersisterService implements iResultListener {
         Integer testStepCount = resultXml.getTestStepCount()
 
         log.debug("starting persistance of ${testStepCount} event results for test steps")
-        testStepCount.times { nullBasedTeststepIndex ->
+        testStepCount.times { zeroBasedTeststepIndex ->
 
             //TODO: possible to catch non median results at this position  and check if they should persist or not
 
             try {
-                persistResultsOfOneTeststep(nullBasedTeststepIndex, resultXml)
+                persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml)
             } catch (Exception e) {
-                log.error("an error occurred while persisting EventResults of teststep ${nullBasedTeststepIndex}", e)
+                log.error("an error occurred while persisting EventResults of teststep ${zeroBasedTeststepIndex}", e)
             }
 
         }
@@ -244,9 +245,6 @@ class ResultPersisterService implements iResultListener {
         log.debug('getting event name from xml result ...')
         String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
         log.debug('getting event name from xml result ... DONE')
-        log.debug('getting waterfall anchor ...')
-        String waterfallAnchor = "${STATIC_PART_WATERFALL_ANCHOR}${measuredEventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
-        log.debug('getting waterfall anchor ... DONE')
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
         MeasuredEvent event = getMeasuredEvent(measuredEventName);
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
@@ -259,12 +257,12 @@ class ResultPersisterService implements iResultListener {
         resultXml.getRunCount().times { Integer runNumber ->
             if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event, waterfallAnchor)
+                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
                 if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
             }
             if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
                     (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event, waterfallAnchor)
+                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
                 if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
             }
         }
@@ -282,11 +280,21 @@ class ResultPersisterService implements iResultListener {
      * @return Persisted result. Null if the view node is empty, i.e. the test was a "first view only" and this is the repeated view node
      */
     private EventResult persistSingleResult(
-            WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event, String waterfallAnchor) {
+            WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event) {
 
         EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
-        result = persistResult(jobRun, event, cachedView, runZeroBasedIndex + 1, resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex), viewResultsNodeOfThisRun, waterfallAnchor)
+        GString waterfallAnchor = getWaterfallAnchor(resultXml, event.name, testStepZeroBasedIndex + 1)
+        result = persistResult(
+            jobRun,
+            event,
+            cachedView,
+            runZeroBasedIndex + 1,
+            resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex),
+            viewResultsNodeOfThisRun,
+            testStepZeroBasedIndex + 1,
+            waterfallAnchor
+        )
 
         return result
     }
@@ -302,10 +310,10 @@ class ResultPersisterService implements iResultListener {
      * @return
      */
     protected EventResult persistResult(
-            JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, String waterfallAnchor) {
+            JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, testStepOneBasedIndex, GString waterfallAnchor) {
 
         EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult()
-        return saveResult(result, jobRun, event, view, run, median, viewTag, waterfallAnchor)
+        return saveResult(result, jobRun, event, view, run, median, viewTag, testStepOneBasedIndex, waterfallAnchor)
 
     }
 
@@ -335,10 +343,11 @@ class ResultPersisterService implements iResultListener {
      * @return Saved {@link EventResult}.
      */
     protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run, Boolean median,
-                                     GPathResult viewTag, String waterfallAnchor) {
+                                     GPathResult viewTag, Integer testStepOneBasedIndex, GString waterfallAnchor) {
 
         log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
         Integer docCompleteTime = viewTag.docTime.toInteger()
+
         result.measuredEvent = step
         result.numberOfWptRun = run
         result.cachedView = view
@@ -358,23 +367,22 @@ class ResultPersisterService implements iResultListener {
         result.jobResult = jobRun
         result.jobResultDate = jobRun.date
         result.jobResultJobConfigId = jobRun.job.ident()
-        JobGroup csiGroup = jobRun.job.jobGroup ?: JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-        result.tag = csiAggregationTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
-        if (!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0) {
-            result.speedIndex = viewTag.SpeedIndex.toInteger()
-        } else {
-            result.speedIndex = EventResult.SPEED_INDEX_DEFAULT_VALUE
-        }
-        if (!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0) {
-            result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
-        }
-        try {
-            result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
-        } catch (MalformedURLException mue) {
-            log.error("Failed to build test's detail url for result: ${result}!")
-        } catch (Exception e) {
-            log.error("An unexpected error occurred while trying to build test's detail url (result=${result})!", e)
-        }
+        setSpeedIndex(jobRun, step, result, viewTag)
+        setVisuallyCompleteTime(viewTag, result)
+        setWaterfallUrl(result, jobRun, waterfallAnchor)
+        setCustomerSatisfaction(step, result, docCompleteTime)
+        result.testAgent = jobRun.testAgent
+        setConnectivity(result, jobRun)
+        result.oneBasedStepIndexInJourney = testStepOneBasedIndex
+
+        jobRun.merge(failOnError: true)
+        result.save(failOnError: true)
+
+        return result
+
+    }
+
+    private void setCustomerSatisfaction(MeasuredEvent step, EventResult result, int docCompleteTime) {
         try {
             log.debug("step=${step}")
             log.debug("step.testedPage=${step.testedPage}")
@@ -387,14 +395,45 @@ class ResultPersisterService implements iResultListener {
         } catch (Exception e) {
             log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
         }
-        result.testAgent = jobRun.testAgent
-        setConnectivity(result, jobRun)
+    }
 
-        jobRun.merge(failOnError: true)
-        result.save(failOnError: true)
+    private void setWaterfallUrl(EventResult result, JobResult jobRun, GString waterfallAnchor) {
+        try {
+            result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
+        } catch (MalformedURLException mue) {
+            log.error("Failed to build test's detail url for result: ${result}!")
+        } catch (Exception e) {
+            log.error("An unexpected error occurred while trying to build test's detail url (result=${result})!", e)
+        }
+    }
 
-        return result
+    private GString getWaterfallAnchor(WptResultXml xmlResult, String eventName, Integer testStepOneBasedIndex) {
+        switch (xmlResult.version) {
+            case WptXmlResultVersion.BEFORE_MULTISTEP:
+                return "${STATIC_PART_WATERFALL_ANCHOR}${eventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
+                return "${STATIC_PART_WATERFALL_ANCHOR}${eventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
+            case WptXmlResultVersion.MULTISTEP:
+                return  "${STATIC_PART_WATERFALL_ANCHOR}_step${testStepOneBasedIndex}"
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified!")
+        }
+    }
 
+    private void setVisuallyCompleteTime(GPathResult viewTag, EventResult result) {
+        if (!viewTag.visualComplete.isEmpty() && viewTag.visualComplete.toString().isInteger() && viewTag.visualComplete.toInteger() > 0) {
+            result.visuallyCompleteInMillisecs = viewTag.visualComplete.toInteger()
+        }
+    }
+
+    private void setSpeedIndex(JobResult jobRun, MeasuredEvent step, EventResult result, GPathResult viewTag) {
+        JobGroup csiGroup = jobRun.job.jobGroup ?: JobGroup.findByName(JobGroup.UNDEFINED_CSI)
+        result.tag = csiAggregationTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
+        if (!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0) {
+            result.speedIndex = viewTag.SpeedIndex.toInteger()
+        } else {
+            result.speedIndex = EventResult.SPEED_INDEX_DEFAULT_VALUE
+        }
     }
 
     private void setConnectivity(EventResult result, JobResult jobRun) {

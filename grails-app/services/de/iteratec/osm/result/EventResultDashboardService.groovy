@@ -257,10 +257,7 @@ public class EventResultDashboardService {
 
                 String connectivity = eventResult.connectivityProfile != null ? eventResult.connectivityProfile.name : eventResult.customConnectivityName;
 
-                URL testsDetailsURL = eventResult.getTestDetailsWaterfallURL()
-                if (!testsDetailsURL) {
-                    testsDetailsURL = this.buildTestsDetailsURL(eventResult)
-                }
+                URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
 
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
                     Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)

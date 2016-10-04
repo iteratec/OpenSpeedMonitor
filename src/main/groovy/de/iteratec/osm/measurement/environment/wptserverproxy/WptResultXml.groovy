@@ -84,34 +84,30 @@ class WptResultXml {
      * @return Number of steps in this test.
      */
     Integer getTestStepCount() {
-
-        if (version == null) throw new IllegalStateException("Version of result xml isn't specified!")
-
         switch (version) {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
                 return responseNode.data.median.isEmpty() ? 0 : 1
-                break
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
                 return responseNode.data.median.firstView.testStep.size()
             case WptXmlResultVersion.MULTISTEP:
                 return responseNode.data.run.getAt(0).firstView.numSteps.toString() as Integer
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified!")
         }
     }
 
     String getEventName(Job job, Integer testStepZeroBasedIndex) {
+        switch (version) {
+            case WptXmlResultVersion.BEFORE_MULTISTEP:
+                return job.getEventNameIfUnknown() ?: job.getLabel()
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
+                return responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).eventName.toString();
+            case WptXmlResultVersion.MULTISTEP:
+                return responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex).eventName.toString();
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified!")
 
-        if (version == null) throw new IllegalStateException("Version of result xml isn't specified!")
-
-        String measuredEventName
-        if (version == WptXmlResultVersion.BEFORE_MULTISTEP) {
-            measuredEventName = job.getEventNameIfUnknown();
-            if (!measuredEventName) measuredEventName = job.getLabel()
-        } else if (version == WptXmlResultVersion.MULTISTEP_FORK_ITERATEC) {
-            measuredEventName = responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).eventName.toString();
-        } else {
-            measuredEventName = responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex).eventName.toString();
         }
-        return measuredEventName
     }
 
     def getRunNodes() {
@@ -145,15 +141,17 @@ class WptResultXml {
      */
     GPathResult getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex) {
 
-        if (version == null) throw new IllegalStateException("Version of result xml isn't specified!")
-
         GPathResult viewNode = getResultNodeForRunAndView(runZeroBasedIndex, cachedView)
-        if (version == WptXmlResultVersion.BEFORE_MULTISTEP) {
-            return viewNode.results
-        } else if (version == WptXmlResultVersion.MULTISTEP_FORK_ITERATEC) {
-            return viewNode.results.testStep.getAt(testStepZeroBasedIndex)
-        } else {
-            return viewNode.step.getAt(testStepZeroBasedIndex).results
+
+        switch (version) {
+            case WptXmlResultVersion.BEFORE_MULTISTEP:
+                return viewNode.results
+            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
+                return viewNode.results.testStep.getAt(testStepZeroBasedIndex)
+            case WptXmlResultVersion.MULTISTEP:
+                return viewNode.step.getAt(testStepZeroBasedIndex).results
+            default:
+                throw new IllegalStateException("Version of result xml isn't specified!")
         }
     }
 

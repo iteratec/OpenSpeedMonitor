@@ -78,6 +78,13 @@ public enum CachedView {
 class EventResult implements CsiValue {
 
 	public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
+    /**
+     * This is value is to be used for {@link #speedIndex} if no value is
+     * available.
+     *
+     * @since IT-223
+     */
+    public static final Integer SPEED_INDEX_DEFAULT_VALUE = -1;
 
 	OsmConfigCacheService osmConfigCacheService
 
@@ -85,16 +92,13 @@ class EventResult implements CsiValue {
 	Date dateCreated
 	Date lastUpdated
 	URL testDetailsWaterfallURL
-
 	MeasuredEvent measuredEvent
-
 	/** number of the run in wpt */
 	Integer numberOfWptRun
 	CachedView cachedView
 	/** whether this result's doc-ready-time is the median time of all runs (if this jobrun includes just one run allways true) */
 	Boolean medianValue
 	Integer wptStatus
-
 	Integer docCompleteIncomingBytes
 	Integer docCompleteRequests
 	Integer docCompleteTimeInMillisecs
@@ -107,7 +111,6 @@ class EventResult implements CsiValue {
 	Integer startRenderInMillisecs
 	Double csByWptDocCompleteInPercent
 	Double csByWptVisuallyCompleteInPercent
-
 	/**
 	 * The WPT speed index received from WPT server.
 	 *
@@ -120,48 +123,38 @@ class EventResult implements CsiValue {
 	Integer visuallyCompleteInMillisecs
     /** tester from result xml */
     String testAgent
-
-	/**
-	 * This is value is to be used for {@link #speedIndex} if no value is
-	 * available.
-	 *
-	 * @since IT-223
-	 */
-	public static final Integer SPEED_INDEX_DEFAULT_VALUE = -1;
-
 	Integer downloadAttempts
 	Date firstStatusUpdate
 	Date lastStatusUpdate
 	String validationState
 	String tag
-
-	// from JobResult 
+	// from JobResult
 	Date jobResultDate
 	Long jobResultJobConfigId
-
 	/**
 	 * This result was measured with a predefined connectivity profile.
 	 *
 	 */
 	ConnectivityProfile connectivityProfile;
-
     /**
      * If this is not null this result was measured with a connectivity configured in {@link Job}.
      *
      */
 	String customConnectivityName;
-
     /**
      * True if this result was measured without traffic shaping at all.
      */
     boolean noTrafficShapingAtAll
+    /**
+     * One based index of the measured step of this result within the (multistep) journey.
+     */
+    Integer oneBasedStepIndexInJourney
 
 
 	//static belongsTo = JobResult
 	static belongsTo = [jobResult: JobResult]
 
 	static constraints = {
-//		id()
 		measuredEvent(nullable: true) // FIXME mze-2013-07-30: CAHNGE IMMEDIATELLY to never be null!
 		wptStatus(nullable: false)
 		medianValue(nullable: false)
@@ -233,6 +226,7 @@ class EventResult implements CsiValue {
             return notNullAndNothingElse || nullAndNative || nullAndPredefined
 
         })
+        oneBasedStepIndexInJourney(nullable: true)
 	}
 
 	static mapping = {
