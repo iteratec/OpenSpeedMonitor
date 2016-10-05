@@ -9,6 +9,7 @@
             http://dev.server01.wpt.iteratec.de/result/160727_EV_4/
         </summary>
         <testUrl>https://www.example.org</testUrl>
+        <label>FF_Otto_multistep</label>
         <location>iteratec-dev-hetzner-win7:Chrome</location>
         <from>
             Firefox, Internet Explorer and Chrome -

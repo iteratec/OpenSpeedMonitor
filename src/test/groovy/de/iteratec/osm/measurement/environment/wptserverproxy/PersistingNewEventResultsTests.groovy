@@ -29,131 +29,29 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
 import static org.junit.Assert.*
+import static de.iteratec.osm.result.CachedView.*
 
 /**
- * Tests the saving of locations and results. These functions are used in proxy-mechanism.
+ * Tests the saving of EventResults.
  * Testing the mapping of load-times to customer satisfactions or the persisting of dependent {@link CsiAggregation}s is not the concern of the tests in this class.
  * @author nkuhn
  * @see {@link ProxyService}
  *
- * TODO: This test is to complicated - make it simpler!
  */
 @TestFor(ResultPersisterService)
 @Mock([WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page, MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay])
 class PersistingNewEventResultsTests {
+
     private static final ServiceMocker SERVICE_MOCKER = ServiceMocker.create()
 
     WebPageTestServer server1, server2
-
     JobGroup undefinedJobGroup;
-
     Browser undefinedBrowser;
-
-    /**
-     * Map with expected values for assertions in test {@link #testListenToSuccessfullyMeasuredResults}.
-     * 			Structure of the map:<br>
-     * 			[name of expected value 1: expectedValue1,<br>
-     * 			name of expected value 2: expectedValue2,<br>
-     * 			...<br>
-     * 			name of expected value n: expectedValueN]
-     */
-    static final Map expectedAfterResultListening = [
-            'BEFORE_MULTISTEP_3Runs.xml'                                         :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'ie_step_testjob',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 3,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Thu, 25 Apr 2013 09:52:21 +0000')),
-                     'expectedNumberOfSteps'                  : 1,
-                     'expectedNumberOfStepsWithAssociatedPage': 0,
-                     'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
-                    ],
-            'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml'                               :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'http://www.example.de.de - Multiple steps with event names + dom elements',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 3,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Thu, 25 Apr 2013 09:52:21 +0000')),
-                     'expectedNumberOfSteps'                  : 6,
-                     'expectedNumberOfStepsWithAssociatedPage': 0,
-                     'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
-                    ],
-            'BEFORE_MULTISTEP_1Run_NotCsiRelevantCauseDocTimeTooHighResponse.xml':
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'FF_BV1_Step01_Homepage - netlab',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 1,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Wed, 03 Apr 2013 11:46:22 +0000')),
-                     'expectedNumberOfSteps'                  : 1,
-                     'expectedNumberOfStepsWithAssociatedPage': 0,
-                     'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
-                    ],
-            'BEFORE_MULTISTEP_1Run_JustFirstView.xml'                            :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'testjob',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 1,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Sat, 22 Jun 2013 20:33:35 +0000')),
-                     'expectedNumberOfSteps'                  : 1,
-                     'expectedNumberOfStepsWithAssociatedPage': 0,
-                     'expectedNumberOfCachedViews'            : 1,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
-                    ],
-            'MULTISTEP_FORK_ITERATEC_1Run_2EventNamesWithPagePrefix_JustFirstView.xml'    :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'testjob',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 1,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Wed, 30 Jan 2013 12:00:48 +0000')),
-                     'expectedNumberOfSteps'                  : 2,
-                     'expectedNumberOfStepsWithAssociatedPage': 2,
-                     'expectedNumberOfCachedViews'            : 1,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
-                    ],
-            'MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml'                     :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'FF_BV1_Multistep_2',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 1,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Wed, 11 Dec 2013 15:42:43 +0000')),
-                     'expectedNumberOfSteps'                  : 2,
-                     'expectedNumberOfStepsWithAssociatedPage': 2,
-                     'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
-                    ],
-            'BEFORE_MULTISTEP_1Run_WithoutVideo.xml'                :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'IE_otto_hp_singlestep',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 1,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Wed, 21 Apr 2016 12:06:53 +0000')),
-                     'expectedNumberOfSteps'                  : 1,
-                     'expectedNumberOfStepsWithAssociatedPage': 0,
-                     'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
-                    ],
-            'BEFORE_MULTISTEP_1Run_WithVideo.xml'                   :
-                    ['expectedNumberOfLocations'              : 1,
-                     'expectedJobLabel'                       : 'IE_otto_hp_singlestep',
-                     'expectedNumberOfJobRuns'                : 1,
-                     'expectedNumberOfRuns'                   : 1,
-                     'expectedResultExecutionDateTime'        : new DateTime(new Date('Wed, 21 Apr 2016 12:03:14 +0000')),
-                     'expectedNumberOfSteps'                  : 1,
-                     'expectedNumberOfStepsWithAssociatedPage': 0,
-                     'expectedNumberOfCachedViews'            : 2,
-                     'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
-                    ]
-    ]
 
     ResultPersisterService serviceUnderTest
 
@@ -180,34 +78,132 @@ class PersistingNewEventResultsTests {
         serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
     }
 
-    @After
-    void tearDown() {
-    }
-
-    // tests///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Tests the determination of teststep-count from webpagetest-xml-result. Uses testdata from test/resources.
-     * @see #expectedAfterResultListening
-     */
     @Test
-    void testgetTeststepCount() {
-        expectedAfterResultListening.each { k, v ->
-            GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${k}"))
-            assertEquals(v['expectedNumberOfSteps'], new WptResultXml(xmlResult).getTestStepCount())
+    void testPersistingNewResult_BEFORE_MULTISTEP() {
+
+        //create test-specific data
+        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_CsiRelevant.xml'
+        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
+
+        //mocking of inner services
+
+        mockCsiAggregationUpdateService()
+        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
+        mockPageService()
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
+        deleteAllRelevantDomains()
+
+        //test execution
+        serviceUnderTest.listenToResult(xmlResult, server1)
+
+        //assertions
+
+        List<MeasuredEvent> events = MeasuredEvent.list()
+        assertEquals('Count of events', 1, events.size())
+
+        MeasuredEvent event1 = MeasuredEvent.findByName('FF_BV1_Step01_Homepage - netlab')
+        assertNotNull(event1)
+
+        //exemplarily testing some results
+        List<EventResult> medianUncachedResultsOfsingleEvent = EventResult.findAllByMeasuredEvent(event1).findAll {
+            it.medianValue == true && it.cachedView == CachedView.UNCACHED
         }
-    }
+        assertEquals('Count of median uncached-EventResults for single event - ', 1, medianUncachedResultsOfsingleEvent.size())
+        assertEquals('loadTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
+        assertEquals('docCompleteRequests of median uncached-EventResults for single event - ', 157, medianUncachedResultsOfsingleEvent[0].docCompleteRequests)
+        assertEquals('wptStatus of median uncached-EventResults for single event - ', 0, medianUncachedResultsOfsingleEvent[0].wptStatus)
 
-    @Test
-    void testCreationOfWptResultXml() {
-        expectedAfterResultListening.each { k, v ->
-            GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/${k}"))
-            assertEquals(v['expectedWptResultVersion'], new WptResultXml(xmlResult).version)
+        List<EventResult> medianCachedResultsOfsingleEventRun3 = EventResult.findAllByMeasuredEvent(event1).findAll {
+            it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
         }
+        assertEquals('Count of median cached-EventResults for single event, third run - ', 1, medianCachedResultsOfsingleEventRun3.size())
+        assertEquals('loadTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
+        assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
+        assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
+
+        //TestDetailsUrl uncached and without page
+        EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
+        String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab',
+                detailsUrl
+        )
+
+        //TestDetailsUrl cached and without page
+        EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
+        detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab',
+                detailsUrl
+        )
     }
 
     @Test
-    void testCreatedEventsAfterListeningToMultistepResult() {
+    void testPersistingNewResultWithPageName_BEFORE_MULTISTEP() {
+
+        //create test-specific data
+        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_WithPageName_CsiRelevant.xml'
+        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
+
+        //mocking of inner services
+
+        mockCsiAggregationUpdateService()
+        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
+        mockPageService()
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
+        deleteAllRelevantDomains()
+
+        //test execution
+        serviceUnderTest.listenToResult(xmlResult, server1)
+
+        //assertions
+
+        List<MeasuredEvent> events = MeasuredEvent.list()
+        assertEquals('Count of events', 1, events.size())
+
+        MeasuredEvent event1 = MeasuredEvent.findByName('FF_BV1_Step01_Homepage - netlab')
+        assertNotNull(event1)
+
+        //exemplarily testing some results
+        List<EventResult> medianUncachedResultsOfsingleEvent = EventResult.findAllByMeasuredEvent(event1).findAll {
+            it.medianValue == true && it.cachedView == CachedView.UNCACHED
+        }
+        assertEquals('Count of median uncached-EventResults for single event - ', 1, medianUncachedResultsOfsingleEvent.size())
+        assertEquals('loadTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
+        assertEquals('docCompleteRequests of median uncached-EventResults for single event - ', 157, medianUncachedResultsOfsingleEvent[0].docCompleteRequests)
+        assertEquals('wptStatus of median uncached-EventResults for single event - ', 0, medianUncachedResultsOfsingleEvent[0].wptStatus)
+
+        List<EventResult> medianCachedResultsOfsingleEventRun3 = EventResult.findAllByMeasuredEvent(event1).findAll {
+            it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
+        }
+        assertEquals('Count of median cached-EventResults for single event, third run - ', 1, medianCachedResultsOfsingleEventRun3.size())
+        assertEquals('loadTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
+        assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
+        assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
+
+        //TestDetailsUrl uncached and without page
+        EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
+        String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab",
+                detailsUrl
+        )
+
+        //TestDetailsUrl cached and without page
+        EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
+        detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab",
+                detailsUrl
+        )
+    }
+
+    @Test
+    void testPersistingNewResult_MULTISTEP_FORK_ITERATEC() {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml'
@@ -280,7 +276,7 @@ class PersistingNewEventResultsTests {
     }
 
     @Test
-    void testCreatedEventsAfterListeningToMultistepResultWithPageName() {
+    void testPersistingNewResultWithPageName_MULTISTEP_FORK_ITERATEC() {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames_WithPageName.xml'
@@ -354,7 +350,7 @@ class PersistingNewEventResultsTests {
     }
 
     @Test
-    void testCreatedEventsAfterListeningToMultistepResultHasCsByVisuallyComplete() {
+    void testPersistingNewResultHasCsByVisuallyComplete_MULTISTEP_FORK_ITERATEC() {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
@@ -389,7 +385,111 @@ class PersistingNewEventResultsTests {
     }
 
     @Test
-    void testPageAssignement() {
+    void testCreationOfDetailUrls_MULTISTEP() {
+
+        //create test-specific data
+        String nameOfResultXmlFile = 'MULTISTEP_2Run.xml'
+        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
+
+        //mocking of inner services
+
+        mockCsiAggregationUpdateService()
+        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
+        mockPageService()
+        mockCsiAggregationTagService('notTheConcernOfThisTest')
+        deleteAllRelevantDomains()
+
+        //test execution
+
+        serviceUnderTest.listenToResult(xmlResult, server1)
+
+        //assertions
+
+        List<EventResult> eventResults = EventResult.list()
+        assertEquals(8, eventResults.size())
+
+        // UNCACHED
+
+        EventResult run1Step1Uncached = eventResults.find {
+            it.numberOfWptRun == 1 && it.measuredEvent.name.equals('beforeTest') && it.cachedView == UNCACHED
+        }
+        String detailsUrl = run1Step1Uncached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=1&cached=0#waterfall_view_step1',
+                detailsUrl
+        )
+
+        EventResult run1Step2Uncached = eventResults.find {
+            it.numberOfWptRun == 1 && it.measuredEvent.name.equals('testExecution') && it.cachedView == UNCACHED
+        }
+        detailsUrl = run1Step2Uncached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=1&cached=0#waterfall_view_step2',
+                detailsUrl
+        )
+
+        EventResult run2Step1Uncached = eventResults.find {
+            it.numberOfWptRun == 2 && it.measuredEvent.name.equals('beforeTest') && it.cachedView == UNCACHED
+        }
+        detailsUrl = run2Step1Uncached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=2&cached=0#waterfall_view_step1',
+                detailsUrl
+        )
+
+        EventResult run2Step2Uncached = eventResults.find {
+            it.numberOfWptRun == 2 && it.measuredEvent.name.equals('testExecution') && it.cachedView == UNCACHED
+        }
+        detailsUrl = run2Step2Uncached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=2&cached=0#waterfall_view_step2',
+                detailsUrl
+        )
+
+        //CACHED
+
+        EventResult run1Step1Cached = eventResults.find {
+            it.numberOfWptRun == 1 && it.measuredEvent.name.equals('beforeTest') && it.cachedView == CACHED
+        }
+        detailsUrl = run1Step1Cached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=1&cached=1#waterfall_view_step1',
+                detailsUrl
+        )
+
+        EventResult run1Step2Cached = eventResults.find {
+            it.numberOfWptRun == 1 && it.measuredEvent.name.equals('testExecution') && it.cachedView == CACHED
+        }
+        detailsUrl = run1Step2Cached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=1&cached=1#waterfall_view_step2',
+                detailsUrl
+        )
+
+        EventResult run2Step1Cached = eventResults.find {
+            it.numberOfWptRun == 2 && it.measuredEvent.name.equals('beforeTest') && it.cachedView == CACHED
+        }
+        detailsUrl = run2Step1Cached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=2&cached=1#waterfall_view_step1',
+                detailsUrl
+        )
+
+        EventResult run2Step2Cached = eventResults.find {
+            it.numberOfWptRun == 2 && it.measuredEvent.name.equals('testExecution') && it.cachedView == CACHED
+        }
+        detailsUrl = run2Step2Cached.getTestDetailsWaterfallURL().toString()
+        assertEquals(
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=160727_EV_4&run=2&cached=1#waterfall_view_step2',
+                detailsUrl
+        )
+
+    }
+
+    @Test
+    void testPageAssignementWhilePersistingNewResult_MULTISTEP_FORK_ITERATEC() {
 
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml'
@@ -420,366 +520,7 @@ class PersistingNewEventResultsTests {
 
     }
 
-    @Test
-    void testCreatedEventsAfterListeningToNonMultistepResult() {
-
-        //create test-specific data
-        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_CsiRelevant.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
-
-        //mocking of inner services
-
-        mockCsiAggregationUpdateService()
-        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-        mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
-
-        //test execution
-        serviceUnderTest.listenToResult(xmlResult, server1)
-
-        //assertions
-
-        List<MeasuredEvent> events = MeasuredEvent.list()
-        assertEquals('Count of events', 1, events.size())
-
-        MeasuredEvent event1 = MeasuredEvent.findByName('FF_BV1_Step01_Homepage - netlab')
-        assertNotNull(event1)
-
-        //exemplarily testing some results
-        List<EventResult> medianUncachedResultsOfsingleEvent = EventResult.findAllByMeasuredEvent(event1).findAll {
-            it.medianValue == true && it.cachedView == CachedView.UNCACHED
-        }
-        assertEquals('Count of median uncached-EventResults for single event - ', 1, medianUncachedResultsOfsingleEvent.size())
-        assertEquals('loadTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
-        assertEquals('docCompleteRequests of median uncached-EventResults for single event - ', 157, medianUncachedResultsOfsingleEvent[0].docCompleteRequests)
-        assertEquals('wptStatus of median uncached-EventResults for single event - ', 0, medianUncachedResultsOfsingleEvent[0].wptStatus)
-
-        List<EventResult> medianCachedResultsOfsingleEventRun3 = EventResult.findAllByMeasuredEvent(event1).findAll {
-            it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
-        }
-        assertEquals('Count of median cached-EventResults for single event, third run - ', 1, medianCachedResultsOfsingleEventRun3.size())
-        assertEquals('loadTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
-        assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
-        assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
-
-        //TestDetailsUrl uncached and without page
-        EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
-        String[] tokensUncached = eventResultUncachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensUncached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensUncached[2].contains("2"))
-        assertTrue(tokensUncached[3].contains("0#waterfall_viewFF_BV1_Step01_Homepage - netlab"))
-
-        //TestDetailsUrl cached and without page
-        EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
-        String[] tokensCached = eventResultCachedTest.getTestDetailsWaterfallURL().toString().split("[=]")
-        assertTrue(tokensCached[1].contains(xmlResult.responseNode.data.testId.toString()))
-        assertTrue(tokensCached[2].contains("3"))
-        assertTrue(tokensCached[3].contains("1#waterfall_viewFF_BV1_Step01_Homepage - netlab"))
-    }
-
-    @Test
-    void testCreatedEventsAfterListeningToNonMultistepResultWithPageName() {
-
-        //create test-specific data
-        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_WithPageName_CsiRelevant.xml'
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
-
-        //mocking of inner services
-
-        mockCsiAggregationUpdateService()
-        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-        mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
-
-        //test execution
-        serviceUnderTest.listenToResult(xmlResult, server1)
-
-        //assertions
-
-        List<MeasuredEvent> events = MeasuredEvent.list()
-        assertEquals('Count of events', 1, events.size())
-
-        MeasuredEvent event1 = MeasuredEvent.findByName('FF_BV1_Step01_Homepage - netlab')
-        assertNotNull(event1)
-
-        //exemplarily testing some results
-        List<EventResult> medianUncachedResultsOfsingleEvent = EventResult.findAllByMeasuredEvent(event1).findAll {
-            it.medianValue == true && it.cachedView == CachedView.UNCACHED
-        }
-        assertEquals('Count of median uncached-EventResults for single event - ', 1, medianUncachedResultsOfsingleEvent.size())
-        assertEquals('loadTimeInMillisecs of median uncached-EventResults for single event - ', 5873, medianUncachedResultsOfsingleEvent[0].docCompleteTimeInMillisecs)
-        assertEquals('docCompleteRequests of median uncached-EventResults for single event - ', 157, medianUncachedResultsOfsingleEvent[0].docCompleteRequests)
-        assertEquals('wptStatus of median uncached-EventResults for single event - ', 0, medianUncachedResultsOfsingleEvent[0].wptStatus)
-
-        List<EventResult> medianCachedResultsOfsingleEventRun3 = EventResult.findAllByMeasuredEvent(event1).findAll {
-            it.cachedView == CachedView.CACHED && it.numberOfWptRun == 3
-        }
-        assertEquals('Count of median cached-EventResults for single event, third run - ', 1, medianCachedResultsOfsingleEventRun3.size())
-        assertEquals('loadTimeInMillisecs of median cached-EventResults for single event, third run - ', 3977, medianCachedResultsOfsingleEventRun3[0].docCompleteTimeInMillisecs)
-        assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
-        assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
-
-        //TestDetailsUrl uncached and without page
-        EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
-        String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
-        assertEquals(
-                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab",
-                detailsUrl
-        )
-
-        //TestDetailsUrl cached and without page
-        EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
-        detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
-        assertEquals(
-                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab",
-                detailsUrl
-        )
-    }
-
-    /**
-     * Tests the persisting of various domain-objects while listening to incoming {@link EventResult}s.
-     * @see #listenToResult(String)
-     * @see #expectedAfterResultListening
-     */
-    @Test
-    void testCreationOfDomainsAfterListenToIncomingResults() {
-        mockInnerServices()
-
-        //test execution and assertions
-        expectedAfterResultListening.each { k, v ->
-            deleteAllRelevantDomains()
-            listenToResultAndProofCreatedDomains(k, v)
-        }
-    }
-
-    /**
-     * Tests the persisting of various domain-objects while listening to incoming {@link EventResult}s.
-     * @see #listenToResult(String)
-     * @see #expectedAfterResultListening
-     */
-    @Test
-    void testCreationOfDomainsAfterListenToIncomingInvalidResults() {
-        mockInnerServices()
-
-        //test execution and assertions
-        String k = 'BEFORE_MULTISTEP_Error_testCompletedButThereWereNoSuccessfulResults.xml'
-        Map v = ['expectedNumberOfLocations'              : 1,
-                 'expectedJobLabel'                       : 'vb_agent1_IE8_BV1_Step05_Warenkorbbestaetigung',
-                 'expectedNumberOfJobRuns'                : 1,
-                 'expectedNumberOfRuns'                   : 0,
-                 'expectedResultExecutionDateTime'        : new DateTime(new Date('Wed, 30 Jan 2013 12:00:48 +0000')),
-                 'expectedNumberOfSteps'                  : 0,
-                 'expectedNumberOfStepsWithAssociatedPage': 0,
-                 'expectedNumberOfCachedViews'            : 0,
-        ]
-
-        deleteAllRelevantDomains()
-        shouldFail() {
-            listenToResultAndProofCreatedDomains(k, v)
-        }
-        assertEquals(0, JobResult.count())
-    }
-
-    @Test
-    void testFetchLocationIfNoneIsFound() {
-
-        //create test-specific data
-        String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
-        File file = new File("test/resources/WptResultXmls/${testNameXML}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-
-        //mocking of inner services
-
-        mockCsiAggregationUpdateService()
-        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-        mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        mockProxyService(xmlResult.responseNode.data.location.toString())
-
-        deleteAllRelevantDomains() // No Locations left!
-
-        //test execution
-        serviceUnderTest.listenToResult(xmlResult, server1)
-
-        //assertions
-        Job job = Job.findByLabel('testjob')
-        assertEquals(job.getLocation().getWptServer(), server1);
-    }
-
-    @Test
-    void testSaveOfWptServerOfJob() {
-
-        //create test-specific data
-        String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
-        File file = new File("test/resources/WptResultXmls/${testNameXML}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
-
-        //mocking of inner services
-
-        mockCsiAggregationUpdateService()
-        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-        mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
-
-        //test execution
-
-        serviceUnderTest.listenToResult(xmlResult, server1)
-
-        //assertions
-        Job job = Job.findByLabel('testjob')
-        assertEquals(job.getLocation().getWptServer(), server1);
-    }
-
-    @Test
-    void testUpdateOfWptServerOfJob() {
-
-        //create test-specific data
-        String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
-        File file = new File("test/resources/WptResultXmls/${testNameXML}")
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server2);
-
-        //XML-Result (TestID) reset:
-        String newTestId = "130622_FA_1AX2"
-
-        //mocking of inner services
-
-        mockCsiAggregationUpdateService()
-        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-        mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
-
-        //test execution
-
-        serviceUnderTest.listenToResult(xmlResult, server1)
-
-        //reset xmlResultID
-        xmlResult.responseNode.data.testId = newTestId;
-        serviceUnderTest.listenToResult(xmlResult, server2)
-
-        System.out.println(xmlResult.responseNode.data.testId);
-
-        //assertions
-
-        Job job = Job.findByLabel('testjob')
-        assertEquals(server2, job.getLocation().getWptServer());
-
-        List<JobResult> jobResults = JobResult.findAll();
-        assertEquals(2, jobResults.size());
-
-        jobResults.each { JobResult jr ->
-            if (jr.getTestId() == newTestId) {
-                assertEquals(server2.getBaseUrl(), jr.getWptServerBaseurl());
-                assertEquals(server2.getLabel(), jr.getWptServerLabel());
-            } else {
-                assertEquals(server1.getBaseUrl(), jr.getWptServerBaseurl());
-                assertEquals(server1.getLabel(), jr.getWptServerLabel());
-
-            }
-
-        }
-    }
-
-    /**
-     * Executes test for given webpagetest-result-xml-file (nameOfResultXmlFile) and proofs existing domain-objects afterwards:<br>
-     * Proofs for {@link Location}:
-     * <ul>
-     * <li>Number of created objects</li>
-     * </ul>
-     * Proofs for {@link Job}:
-     * <ul>
-     * <li>Number of created objects</li>
-     * <li>Whether {@link Job#lastRun} is expectedResultExecutionDateTime</li>
-     * </ul>
-     * Proofs for {@link JobResult}:
-     * <ul>
-     * <li>Number of created objects</li>
-     * <li>Whether {@link JobResult#date} is expectedResultExecutionDateTime</li>
-     * </ul>
-     * Proofs for {@link MeasuredEvent}:
-     * <ul>
-     * <li>Number of created objects</li>
-     * </ul>
-     * Proofs for {@link EventResult}:
-     * <ul>
-     * <li>various tests</li>
-     * </ul>
-     * @param nameOfResultXmlFile
-     * 			Name of the result-xml-file from webpagetest (testdata from test/resources/).
-     * @param expectedValues
-     * 			Map with expected values for assertions.
-     * 			Structure of the map:<br>
-     * 			[name of expected value 1: expectedValue1,<br>
-     * 			name of expected value 2: expectedValue2,<br>
-     * 			...<br>
-     * 			name of expected value n: expectedValueN]
-     */
-    private void listenToResultAndProofCreatedDomains(String nameOfResultXmlFile, Map expectedValues) {
-        //test specific data
-        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
-
-        //test execution
-        serviceUnderTest.listenToResult(xmlResult, server1)
-
-        //check for job-runs
-        Collection<JobResult> jobRuns = JobResult.list()
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfJobRuns - ", expectedValues['expectedNumberOfJobRuns'], jobRuns.size())
-
-        //check dates of job and job_results
-        Job job = Job.findByLabel(expectedValues['expectedJobLabel'])
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedResultExecutionDateTime in job.lastRun - ",
-                expectedValues['expectedResultExecutionDateTime'], new DateTime(job.lastRun))
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedResultExecutionDateTime in jobResult.date - ",
-                expectedValues['expectedResultExecutionDateTime'], new DateTime(jobRuns[0].date))
-        //TODO 2013-10-24: proof all CSI-relevant attributes of job_results
-
-        //check for steps
-        List<MeasuredEvent> steps = MeasuredEvent.list()
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfSteps - ", expectedValues['expectedNumberOfSteps'], steps.size())
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedNumberOfStepsWithAssociatedPage - ", expectedValues['expectedNumberOfStepsWithAssociatedPage'],
-                steps.findAll { !it.testedPage.isUndefinedPage() }.size())
-
-        //check for results
-        List<EventResult> allResults = EventResult.list()
-        int expectedSizeOfAllResults = expectedValues['expectedNumberOfRuns'] * expectedValues['expectedNumberOfCachedViews'] * expectedValues['expectedNumberOfSteps']
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedSizeOfAllResults - ", expectedSizeOfAllResults, allResults.size())
-
-        int expectedSizeOfAllMedianValues = expectedValues['expectedNumberOfCachedViews'] * expectedValues['expectedNumberOfSteps']
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedSizeOfAllMedianValues - ", expectedSizeOfAllMedianValues, EventResult.findAllByMedianValue(true).size())
-
-        int expectedSizeOfAllNonMedianValues = (expectedValues['expectedNumberOfRuns'] - 1) * expectedValues['expectedNumberOfCachedViews'] * expectedValues['expectedNumberOfSteps']
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedSizeOfAllNonMedianValues - ", expectedSizeOfAllNonMedianValues, EventResult.findAllByMedianValue(false).size())
-
-        expectedValues['expectedNumberOfRuns'].times {
-            int expectedSizeOfResults = expectedValues['expectedNumberOfCachedViews'] * expectedValues['expectedNumberOfSteps']
-            assertEquals("xml-result '${nameOfResultXmlFile}' expectedSizeOfResults - ", expectedSizeOfResults, EventResult.findAllByNumberOfWptRun(it + 1).size())
-        }
-
-        int expectedSizeOfUnCachedViewResults = expectedValues['expectedNumberOfRuns'] * expectedValues['expectedNumberOfSteps']
-        assertEquals("xml-result '${nameOfResultXmlFile}' expectedSizeOfUnCachedViewResults - ", expectedSizeOfUnCachedViewResults, EventResult.findAllByCachedView(CachedView.UNCACHED).size())
-
-        // TODO Do not use branches in verification part
-        if (expectedValues['expectedNumberOfCachedViews'] == 2) {
-            int expectedSizeOfCachedResultsForTwoViews = expectedValues['expectedNumberOfRuns'] * expectedValues['expectedNumberOfSteps']
-            assertEquals("xml-result '${nameOfResultXmlFile}' expectedSizeOfCachedResultsForTwoViews - ", expectedSizeOfCachedResultsForTwoViews, EventResult.findAllByCachedView(CachedView.CACHED).size())
-        }
-    }
-
     private void deleteAllRelevantDomains() {
-//		Location.findAll().each {it.delete(flush: true)}
-//		Job.list()*.delete(flush: true)
         JobResult.list()*.delete(flush: true)
         MeasuredEvent.list()*.delete(flush: true)
         EventResult.list()*.delete(flush: true)
@@ -787,15 +528,6 @@ class PersistingNewEventResultsTests {
 
     // mocks ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    private void mockInnerServices() {
-        //mocking of inner services
-
-        mockCsiAggregationUpdateService()
-        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
-        mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-    }
 
     private void createLocationIfNotExistent(String locationIdentifier, Browser browser, WebPageTestServer server) {
         Location alreadyExistent = Location.findByWptServerAndUniqueIdentifierForServer(server, locationIdentifier)
@@ -812,31 +544,6 @@ class PersistingNewEventResultsTests {
                     lastUpdated: new Date()
             ).save(failOnError: true);
         }
-    }
-
-    private void mockProxyService(String locationIdentifier) {
-        def proxyService = grailsApplication.mainContext.getBean('proxyService')
-        proxyService.metaClass.fetchLocations = { WebPageTestServer server ->
-            createLocationIfNotExistent(locationIdentifier, undefinedBrowser, server);
-        }
-        serviceUnderTest.proxyService = proxyService
-    }
-
-    private void mockBrowserService() {
-        def browserService = grailsApplication.mainContext.getBean('browserService')
-        browserService.metaClass.findByNameOrAlias = { String nameOrAlias ->
-            //not the concern of this test
-            if (nameOrAlias.startsWith("IE"))
-                return Browser.findByName('IE');
-            else if (nameOrAlias.startsWith("FF") || nameOrAlias.startsWith("Firefox"))
-                return Browser.findByName('FF');
-            else if (nameOrAlias.startsWith("Chrome"))
-                return Browser.findByName('Chrome');
-            else {
-                return Browser.findByName(Browser.UNDEFINED);
-            }
-        }
-        serviceUnderTest.browserService = browserService
     }
 
     private void mockCsiAggregationUpdateService() {
