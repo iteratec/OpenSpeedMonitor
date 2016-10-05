@@ -9,7 +9,7 @@ class ResultXmlWptServer219Spec extends Specification {
     private static WptResultXml resultXml
 
     void "setupSpec"() {
-        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_Multistep_2Run_WptServer_2_19.xml"))
+        GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_2Run.xml"))
         resultXml = new WptResultXml(xmlResult)
     }
 

@@ -44,7 +44,7 @@ class ResultXmlProcessingSpec {
 
     void testIsMedianMultistep1Run() {
 		//test specific data
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
 		//test execution and assertions
 		assertThat(resultXml.isMedian(0, CachedView.UNCACHED, 0), is(true))
@@ -53,7 +53,7 @@ class ResultXmlProcessingSpec {
     }
 	void testIsMedianMultistep5Runs() {
 		//test specific data
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
 
 		//test execution and assertions
@@ -76,7 +76,7 @@ class ResultXmlProcessingSpec {
 	}
 	void testIsMedianSinglestep1Run() {
 		//test specific data
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_1Run_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
 		//test execution and assertions
 		
@@ -85,7 +85,7 @@ class ResultXmlProcessingSpec {
 	}
 	void testIsMedianSinglestep5Runs() {
 		//test specific data
-		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+		GPathResult xmlResult = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
 		WptResultXml resultXml = new WptResultXml(xmlResult)
 
 		//test execution and assertions
@@ -103,9 +103,9 @@ class ResultXmlProcessingSpec {
 	}
     void testGetBwDown(){
         //test specific data
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
 
         //test execution and assertions
@@ -114,9 +114,9 @@ class ResultXmlProcessingSpec {
     }
     void testGetBwUp(){
         //test specific data
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
 
         //test execution and assertions
@@ -125,9 +125,9 @@ class ResultXmlProcessingSpec {
     }
     void testGetLatency(){
         //test specific data
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
 
         //test execution and assertions
@@ -136,9 +136,9 @@ class ResultXmlProcessingSpec {
     }
     void testGetPlr(){
         //test specific data
-        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_singlestep_5Runs_WithVideo.xml"))
+        GPathResult xmlResultSinglestep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/BEFORE_MULTISTEP_5Runs_WithVideo.xml"))
         WptResultXml resultXmlSinglestep = new WptResultXml(xmlResultSinglestep)
-        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/Result_wptserver2.15_multistep_1Run_WithVideo.xml"))
+        GPathResult xmlResultMultistep = new XmlSlurper().parse(new File("test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml"))
         WptResultXml resultXmlMultistep = new WptResultXml(xmlResultMultistep)
 
         //test execution and assertions

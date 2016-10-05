@@ -65,7 +65,7 @@ class PersistingNewEventResultsTests {
      * 			name of expected value n: expectedValueN]
      */
     static final Map expectedAfterResultListening = [
-            'Result_NoMultistep_3Runs.xml'                                         :
+            'BEFORE_MULTISTEP_3Runs.xml'                                         :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'ie_step_testjob',
                      'expectedNumberOfJobRuns'                : 1,
@@ -76,7 +76,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 2,
                      'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
                     ],
-            'Result_Multistep_3Runs_6EventNames.xml'                               :
+            'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml'                               :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'http://www.example.de.de - Multiple steps with event names + dom elements',
                      'expectedNumberOfJobRuns'                : 1,
@@ -87,7 +87,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 2,
                      'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
                     ],
-            'Result_NoMultistep_1Run_NotCsiRelevantCauseDocTimeTooHighResponse.xml':
+            'BEFORE_MULTISTEP_1Run_NotCsiRelevantCauseDocTimeTooHighResponse.xml':
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'FF_BV1_Step01_Homepage - netlab',
                      'expectedNumberOfJobRuns'                : 1,
@@ -98,7 +98,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 2,
                      'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
                     ],
-            'Result_NoMultistep_1Run_JustFirstView.xml'                            :
+            'BEFORE_MULTISTEP_1Run_JustFirstView.xml'                            :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'testjob',
                      'expectedNumberOfJobRuns'                : 1,
@@ -109,7 +109,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 1,
                      'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
                     ],
-            'Result_Multistep_1Run_2EventNamesWithPagePrefix_JustFirstView.xml'    :
+            'MULTISTEP_FORK_ITERATEC_1Run_2EventNamesWithPagePrefix_JustFirstView.xml'    :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'testjob',
                      'expectedNumberOfJobRuns'                : 1,
@@ -120,7 +120,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 1,
                      'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
                     ],
-            'Result_Multistep_1Run_2EventNames_PagePrefix.xml'                     :
+            'MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml'                     :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'FF_BV1_Multistep_2',
                      'expectedNumberOfJobRuns'                : 1,
@@ -131,7 +131,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 2,
                      'expectedWptResultVersion'               : WptXmlResultVersion.MULTISTEP_FORK_ITERATEC
                     ],
-            'Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml'                :
+            'BEFORE_MULTISTEP_1Run_WithoutVideo.xml'                :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'IE_otto_hp_singlestep',
                      'expectedNumberOfJobRuns'                : 1,
@@ -142,7 +142,7 @@ class PersistingNewEventResultsTests {
                      'expectedNumberOfCachedViews'            : 2,
                      'expectedWptResultVersion'               : WptXmlResultVersion.BEFORE_MULTISTEP
                     ],
-            'Result_wptserver2.15_singlestep_1Run_WithVideo.xml'                   :
+            'BEFORE_MULTISTEP_1Run_WithVideo.xml'                   :
                     ['expectedNumberOfLocations'              : 1,
                      'expectedJobLabel'                       : 'IE_otto_hp_singlestep',
                      'expectedNumberOfJobRuns'                : 1,
@@ -210,10 +210,9 @@ class PersistingNewEventResultsTests {
     void testCreatedEventsAfterListeningToMultistepResult() {
 
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_Multistep_3Runs_6EventNames.xml'
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -284,10 +283,9 @@ class PersistingNewEventResultsTests {
     void testCreatedEventsAfterListeningToMultistepResultWithPageName() {
 
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_Multistep_3Runs_6EventNames_WithPageName.xml'
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames_WithPageName.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -359,10 +357,9 @@ class PersistingNewEventResultsTests {
     void testCreatedEventsAfterListeningToMultistepResultHasCsByVisuallyComplete() {
 
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -395,10 +392,9 @@ class PersistingNewEventResultsTests {
     void testPageAssignement() {
 
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_Multistep_1Run_2EventNames_PagePrefix.xml'
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -428,10 +424,9 @@ class PersistingNewEventResultsTests {
     void testCreatedEventsAfterListeningToNonMultistepResult() {
 
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_NoMultistep_3Runs_CsiRelevant.xml'
+        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_CsiRelevant.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -489,10 +484,9 @@ class PersistingNewEventResultsTests {
     void testCreatedEventsAfterListeningToNonMultistepResultWithPageName() {
 
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_NoMultistep_3Runs_WithPageName_CsiRelevant.xml'
+        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_WithPageName_CsiRelevant.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -574,7 +568,7 @@ class PersistingNewEventResultsTests {
         mockInnerServices()
 
         //test execution and assertions
-        String k = 'Result_NoMultistep_Error_testCompletedButThereWereNoSuccessfulResults.xml'
+        String k = 'BEFORE_MULTISTEP_Error_testCompletedButThereWereNoSuccessfulResults.xml'
         Map v = ['expectedNumberOfLocations'              : 1,
                  'expectedJobLabel'                       : 'vb_agent1_IE8_BV1_Step05_Warenkorbbestaetigung',
                  'expectedNumberOfJobRuns'                : 1,
@@ -596,10 +590,9 @@ class PersistingNewEventResultsTests {
     void testFetchLocationIfNoneIsFound() {
 
         //create test-specific data
-        String testNameXML = "Result_NoMultistep_1Run_JustFirstView.xml";
+        String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
         File file = new File("test/resources/WptResultXmls/${testNameXML}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
 
         //mocking of inner services
 
@@ -623,10 +616,9 @@ class PersistingNewEventResultsTests {
     void testSaveOfWptServerOfJob() {
 
         //create test-specific data
-        String testNameXML = "Result_NoMultistep_1Run_JustFirstView.xml";
+        String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
         File file = new File("test/resources/WptResultXmls/${testNameXML}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -650,10 +642,9 @@ class PersistingNewEventResultsTests {
     void testUpdateOfWptServerOfJob() {
 
         //create test-specific data
-        String testNameXML = "Result_NoMultistep_1Run_JustFirstView.xml";
+        String testNameXML = "BEFORE_MULTISTEP_1Run_JustFirstView.xml";
         File file = new File("test/resources/WptResultXmls/${testNameXML}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server2);
 
@@ -737,7 +728,6 @@ class PersistingNewEventResultsTests {
         //test specific data
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //test execution

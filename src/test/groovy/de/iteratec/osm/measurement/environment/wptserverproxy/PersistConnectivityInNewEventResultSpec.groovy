@@ -32,16 +32,13 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
-
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import groovy.util.slurpersupport.GPathResult
 import spock.lang.Specification
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
@@ -53,13 +50,13 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     public static final String PROXY_IDENTIFIER_WPT_SERVER = 'dev.server02.wpt.iteratec.de'
 
     public static
-    final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml'
+    final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2 = 'otto_search_shoes'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3 = 'otto_product_boot'
 
     public static
-    final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'Result_wptserver2.15_singlestep_1Run_WithVideo.xml'
+    final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'BEFORE_MULTISTEP_1Run_WithVideo.xml'
     public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
 
     public static Page UNDEFINED_PAGE

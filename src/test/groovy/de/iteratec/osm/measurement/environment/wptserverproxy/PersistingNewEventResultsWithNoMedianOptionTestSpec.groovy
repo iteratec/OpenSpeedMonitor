@@ -34,12 +34,10 @@ import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import groovy.util.slurpersupport.GPathResult
 import org.junit.Before
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
@@ -100,10 +98,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     @Test
     void testCreatedEventsAfterListeningToMultistepResultAndPersistNonMedian() {
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', true)
 
@@ -150,10 +147,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     @Test
     void testCreatedEventsAfterListeningToMultistepResultAndPersistOnlyMedian() {
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
+        String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('FF_Otto_multistep', false)
 
@@ -193,10 +189,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     @Test
     void testCreatedEventsAfterListeningToSinglestepResultAndPersistNonMedian() {
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
+        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_5Runs_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         deleteResults()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', true)
 
@@ -237,10 +232,9 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
     @Test
     void testCreatedEventsAfterListeningToSinglestepResultAndPersistOnlyMedian() {
         //create test-specific data
-        String nameOfResultXmlFile = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
+        String nameOfResultXmlFile = 'BEFORE_MULTISTEP_5Runs_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        String har = new File('test/resources/HARs/singleResult.har').getText()
         setNonMedianPersistanceForJob('IE_otto_hp_singlestep', false)
         deleteResults()
 

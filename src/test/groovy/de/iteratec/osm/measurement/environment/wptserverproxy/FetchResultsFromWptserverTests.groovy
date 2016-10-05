@@ -166,7 +166,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/Multistep_1Run_11Events_JustFirstView.xml')
+        File resultXmlFile = new File('test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_11Events_JustFirstView.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -195,7 +195,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml')
+        File resultXmlFile = new File('test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -225,7 +225,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo.xml')
+        File resultXmlFile = new File('test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -250,7 +250,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml')
+        File resultXmlFile = new File('test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithoutVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:
@@ -275,7 +275,7 @@ class FetchResultsFromWptserverTests extends Specification {
         //create test specific data
         def listener = new TestResultResultListener()
         serviceUnderTest.resultListeners[0] = listener
-        File resultXmlFile = new File('test/resources/WptResultXmls/Result_wptserver2.15_singlestep_1Run_WithVideo.xml')
+        File resultXmlFile = new File('test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_WithVideo.xml')
         WptResultXml expectedResult = new WptResultXml(new XmlSlurper().parseText(resultXmlFile.text))
 
         when:

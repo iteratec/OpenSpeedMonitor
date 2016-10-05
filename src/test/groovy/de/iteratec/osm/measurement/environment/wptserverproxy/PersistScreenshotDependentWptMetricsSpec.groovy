@@ -34,11 +34,9 @@ import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
-import groovy.util.slurpersupport.GPathResult
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
-
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
@@ -49,28 +47,28 @@ class PersistScreenshotDependentWptMetricsSpec {
 
     public static final String PROXY_IDENTIFIER_WPT_SERVER = 'dev.server02.wpt.iteratec.de'
 
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithVideo.xml'
+    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO = 'MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithVideo.xml'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2 = 'otto_search_shoes'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3 = 'otto_product_boots'
 
-    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'Result_wptserver2.13-multistep7_1Run_3Events_JustFirstView_WithoutVideo.xml'
+    public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO = 'MULTISTEP_FORK_ITERATEC_1Run_3Events_JustFirstView_WithoutVideo.xml'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_2 = 'otto_search_shoes'
     public static final String RESULT_XML_MULTISTEP_1RUN_3EVENTS_FVONLY_WITHOUTVIDEO_EVENTNAME_3 = 'otto_product_boots'
 
-    public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO = 'Result_wptserver2.13-multistep7_5Runs_3Events_JustFirstView_WithVideo.xml'
+    public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
     public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_1 = 'otto_homepage'
     public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_2 = 'otto_search_shoes'
     public static final String RESULT_XML_MULTISTEP_5RUNS_3EVENTS_FVONLY_WITHVIDEO_EVENTNAME_3 = 'otto_product_boot'
 
-    public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'Result_wptserver2.15_singlestep_1Run_WithVideo.xml'
+    public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO = 'BEFORE_MULTISTEP_1Run_WithVideo.xml'
     public static final String RESULT_XML_SINGLESTEP_1RUN_WITHVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
 
-    public static final String RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO = 'Result_wptserver2.15-singlestep_1Run_WithoutVideo.xml'
+    public static final String RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO = 'BEFORE_MULTISTEP_1Run_WithoutVideo.xml'
     public static final String RESULT_XML_SINGLESTEP_1RUN_WITHOUTVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
 
-    public static final String RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO = 'Result_wptserver2.15_singlestep_5Runs_WithVideo.xml'
+    public static final String RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO = 'BEFORE_MULTISTEP_5Runs_WithVideo.xml'
     public static final String RESULT_XML_SINGLESTEP_5RUNS_FVONLY_WITHVIDEO_EVENTNAME = 'IE_otto_hp_singlestep'
 
     ResultPersisterService serviceUnderTest

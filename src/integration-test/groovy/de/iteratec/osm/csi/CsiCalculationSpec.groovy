@@ -121,7 +121,7 @@ class CsiCalculationSpec extends NonTransactionalIntegrationSpec {
 
             TestDataUtil.createOsmConfig()
 
-            String nameOfResultXmlFile = 'Result_wptserver2.15_multistep_1Run_WithVideo.xml'
+            String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_WithVideo.xml'
             File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
             xmlResult = new WptResultXml(new XmlSlurper().parse(file))
 
