@@ -51,3 +51,12 @@
 				</div>
 			</div>
 
+            <div class="control-group fieldcontain ${hasErrors(bean: webPageTestServer, field: 'apiKey', 'error')}">
+                <label for="api-key" class="control-label">
+                    <g:message code="webPageTestServer.apiKey.label" default="API key" />
+                </label>
+                <div class="controls">
+                    <g:passwordField name="apiKey" id="api-key" value="${webPageTestServer?.apiKey}" />
+                </div>
+            </div>
+

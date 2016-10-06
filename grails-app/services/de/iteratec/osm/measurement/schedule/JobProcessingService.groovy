@@ -144,6 +144,11 @@ class JobProcessingService {
             }
         }
 
+        String apiKey = job.location.wptServer.apiKey
+        if (apiKey){
+            parameters.k = apiKey
+        }
+
         // convert all boolean parameters to 0 or 1
         parameters = parameters.each {
             if (it.value instanceof Boolean && it.value != null)

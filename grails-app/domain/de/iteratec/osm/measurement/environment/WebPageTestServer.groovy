@@ -38,6 +38,10 @@ class WebPageTestServer {
     String description
     String contactPersonName
     String contactPersonEmail
+    /**
+     * API Key of WebPagetest server.
+     */
+    String apiKey
 
     static constraints = {
         label(blank: false, maxSize: 150)
@@ -47,6 +51,7 @@ class WebPageTestServer {
         baseUrl(blank: false, url: ["localhost(:(\\d{1,5}))?"], maxSize: 255)
         contactPersonName(maxSize: 200, nullable: true)
         contactPersonEmail(email: true, nullable: true, maxSize: 255)
+        apiKey(nullable: true, maxSize: 255, password: true)
     }
 
     public String getBaseUrl() {
@@ -65,4 +70,5 @@ class WebPageTestServer {
     public String toString() {
         return "${this.label}";
     }
+
 }
