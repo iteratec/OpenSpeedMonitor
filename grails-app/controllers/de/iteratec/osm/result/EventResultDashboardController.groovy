@@ -141,6 +141,7 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         boolean requestedAllowedDashboard = true;
@@ -809,6 +810,8 @@ class EventResultDashboardController {
         result.put("warnAboutExceededPointsPerGraphLimit", false);
 
         result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
+
+        result.put('persistenceOfAssetRequestsEnabled', grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')=='true')
 
         // Done! :)
         return result;
