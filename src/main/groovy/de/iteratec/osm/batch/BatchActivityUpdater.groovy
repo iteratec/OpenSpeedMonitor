@@ -116,6 +116,9 @@ class BatchActivityUpdater {
             batchActivity.save(flush: flush)
         }
     }
+    protected  boolean delete(){
+        batchActivity.delete(failOnError: true)
+    }
 
     protected void setStatus(Status status) {
         batchActivity.status = status
