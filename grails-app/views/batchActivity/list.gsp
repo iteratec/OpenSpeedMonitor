@@ -39,7 +39,7 @@
         <div class="span3">
             <div class="form-group">
                 <br>
-                <input placeholder="${message(code: 'de.iteratec.osm.batch.filter.label', default: 'Filter by name')}" type="text" class="form-control" id="elementNameFilter">
+                <input placeholder="${message(code: 'de.iteratec.osm.batch.filter.label', default: 'Filter by name')}" type="text" class="form-control" id="elementFilter">
             </div>
         </div>
         <div class="span6">

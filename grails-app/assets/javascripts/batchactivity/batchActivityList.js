@@ -16,6 +16,7 @@ function initBatch(updateTableUrlParameter, checkUrl, rowUpdateUrl,batchActivity
         updateElementTable(updateTableUrlParameter);
     });
     init(updateTableUrlParameter, i18nParameter, columnToSortByParameter);
+    updateIfNecessary(updateTableUrl, checkUrl, rowUpdateUrl);
 }
 
 
