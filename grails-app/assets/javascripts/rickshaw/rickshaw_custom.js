@@ -2571,11 +2571,11 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 		var graph = this.graph;
 		var points = args.points;
 		var point = points.filter( function(p) { return p.active } ).shift();
+        var pointsAtSameTimepoint = points.filter( function(p) { return p.value.x == point.value.x } );
 
 		if (point.value.y === null) return;
 
 		var formattedXValue = point.formattedXValue;
-		var formattedYValue = point.formattedYValue;
 
 		if (point.value.y < 0 || point.value.y > 1) {
 			return;
@@ -2593,29 +2593,34 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		item.className = 'item';
 
-		// invert the scale if this series displays using a scale
-		var series = point.series;
+        // sort the hover detail entries according to the graph
+        pointsAtSameTimepoint.sort( function(a, b) {
+            pxTopA = this.graph.y(a.value.y0 + a.value.y);
+            pxTopB = this.graph.y(b.value.y0 + b.value.y);
+            return pxTopA - pxTopB;
+        }.bind(this));
 
-		item.innerHTML = this.formatter(series, point.value.x, point.value.y, formattedXValue, formattedYValue, point, point.testAgent);
+		item.innerHTML = this.formatter(point, pointsAtSameTimepoint, formattedXValue, point.testAgent);
 		item.style.top = this.graph.y(point.value.y0 + point.value.y) + 'px';
 
 		this.element.appendChild(item);
 
-		var dot = document.createElement('div');
-		dot.className = 'dot';
-		dot.style.top = item.style.top;
-		dot.style.borderColor = series.color;
-		
-		var link = $("<a href='"+ point.url  + "'></a>");
-		link.append($(dot));
-		$(this.element).append(link);
+		// Plot the points on the graphs which match the same x value
+		pointsAtSameTimepoint.forEach( function(point) {
+            var dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.top = this.graph.y(point.value.y0 + point.value.y) + 'px';
+            dot.style.borderColor = point.series.color;
 
-		if (point.active) {
-			item.classList.add('active');
-			dot.classList.add('active');
-		}
+            item.classList.add('active');
+            dot.classList.add('active');
 
-		// Assume left alignment until the element has been displayed and
+            var link = $("<a href='"+ point.url  + "'></a>");
+            link.append($(dot));
+            $(this.element).append(link);
+        }.bind(this));
+
+        // Assume left alignment until the element has been displayed and
 		// bounding box calculations are possible.
 		var alignables = [xLabel, item];
 		alignables.forEach(function(el) {

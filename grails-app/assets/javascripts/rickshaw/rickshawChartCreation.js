@@ -279,20 +279,35 @@ function RickshawGraphBuilder(args) {
             xFormatter: xFormatter,
             graph: self.graph
         });
-        hoverDetail.formatter = function (series, x, y, formattedX, formattedY, d, testingAgent) {
-            var measurandGroup = d.series.measurandGroup;
-            var scale = $.grep(self.yAxes, function (e) {
-                return e.measurandGroup == measurandGroup;
-            })[0];
-            var name = series.name;
-            var aliasDiv = $(makeValidSelector("#graphAlias_" + name));
-            if (aliasDiv.length >= 1) {
-                name = aliasDiv.find("#alias").val();
-            }
+        hoverDetail.formatter = function (activePoint, pointsAtSameTimepoint, formattedX, testingAgent) {
+            // create html content for the hover detail table
+            var pointData = "";
+            pointsAtSameTimepoint.forEach( function (point) {
+                // get the correct scale depending on the yAxis
+                var scale = $.grep(self.yAxes, function (e) {
+                    return e.measurandGroup == point.series.measurandGroup;
+                })[0];
+                // update names if they are customized
+                var name = point.name;
+                var aliasDiv = $(makeValidSelector("#graphAlias_" + name));
+                if (aliasDiv.length >= 1) {
+                    name = aliasDiv.find("#alias").val();
+                }
+                // highlight the value of the active point
+                var optionalHighlighting = "<tr>"
+                if (point == activePoint) {
+                    optionalHighlighting = "<tr class=\"highlighted_detail_value\">";
+                }
+                // insert values in the table
+                pointData += optionalHighlighting + "<td>" + name + ": " + "</td>" +
+                    "<td>" + "<i class=\"fa fa-circle\" style=\"color:" + point.series.color + "\"></i> " +
+                    scale.scale.invert(point.value.y).toFixed(0) + "</td>" + "</tr>";
+            });
+
+
             return "<table border=\"0\" class=\"chart-tiptext\">" +
                 "<tr>" + "<td>Timestamp: </td>" + "<td>" + formattedX + "</td>" + "</tr>" +
-                "<tr>" + "<td>Label: </td>" + "<td>" + name + "</td>" + "</tr>" +
-                "<tr>" + "<td>Value: </td>" + "<td>" + scale.scale.invert(y).toFixed(0) + "</td>" + "</tr>" +
+                pointData +
                 "<tr>" + "<td>Test agent: </td>" + "<td>" + testingAgent + "</td>" + "</tr>" +
                 "</table>";
         };
