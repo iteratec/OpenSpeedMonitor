@@ -21,7 +21,7 @@
 
             <td>
                 <g:each in ="${browserInstance.browserAliases}" var = "browserAlias">
-                    <g:link controller="BrowserAlias" action="show" id="${browserAlias.id}">${fieldValue(bean: browserAlias, field: "alias")}</g:link>
+                    <g:link controller="BrowserAlias" action="show" id="${browserAlias.id}" absolute="true">${fieldValue(bean: browserAlias, field: "alias")}</g:link>
                     <br>
                 </g:each>
             </td>

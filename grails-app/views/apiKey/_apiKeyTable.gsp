@@ -28,7 +28,7 @@
     <g:each in="${apiKeys}" status="i" var="apiKeyInstance">
         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
-            <td><g:link action="show" id="${apiKeyInstance.id}">${fieldValue(bean: apiKeyInstance, field: "secretKey")}</g:link></td>
+            <td><g:link method="GET" resource="${apiKeyInstance}">${fieldValue(bean: apiKeyInstance, field: "secretKey")}</g:link></td>
 
             <td>${fieldValue(bean: apiKeyInstance, field: "description")}</td>
 
