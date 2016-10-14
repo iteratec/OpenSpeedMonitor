@@ -26,7 +26,10 @@ class DetailAnalysisController {
         microServiceUrl = microServiceUrl.endsWith("/")?microServiceUrl: microServiceUrl + "/"
         if (!microServiceUrl) {
             errorList << message(code: 'default.microService.osmDetailAnalysis.url.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.url.undefined', default: 'The url for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
+        } else {
+            microServiceUrl = microServiceUrl.endsWith("/") ? microServiceUrl : "${microServiceUrl}/"
         }
+
         String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
         if (!apiKey) {
             errorList << message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', args: [message(code: 'default.microService.osmDetailAnalysis.apiKey.undefined', default: 'The api key for the OsmDetailAnalysis micro service is undefined. You can set it in the custom osm-properties.\n')])
