@@ -34,7 +34,7 @@ fi
 echo "undeploy old version"
 echo "#######################################"
 if [ $PORT_TO_SWITCH_FROM -ne -1 ]; then
-    curl -u $bamboo_tomcat_TOMCAT_ADMIN_USERNAME:$bamboo_tomcat_TOMCAT_ADMIN_PASSWORD http://$bamboo_tomcat_HOST_TO_DEPLOY_TO:$PORT_TO_SWITCH_FROM/manager/text/undeploy\?path\=/
+    curl -u $bamboo_tomcat_TOMCAT_ADMIN_USERNAME:$bamboo_tomcat_TOMCAT_ADMIN_PASSWORD http://$bamboo_tomcat_HOST_TO_DEPLOY_TO:$PORT_TO_SWITCH_FROM/manager/text/undeploy\?path\=
 fi
 exit_code_undeploying_old_osm=$?
 echo "exit_code_undeploying_old_osm=${exit_code_undeploying_old_osm}"
