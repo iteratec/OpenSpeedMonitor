@@ -8,7 +8,7 @@
 
   <body>
   
-	<section id="overview" class="">
+	<section id="overview">
     	<div class="alert alert-danger">
 			<g:if test="${request.'javax.servlet.error.message' == null}">
 			</g:if>
@@ -25,7 +25,7 @@
  	   </div>
 	</section>
 		
-	<section id="details" class="">
+	<section id="details">
 	    <h2>Error Details</h2>
 	  	<div class="message">
 			<table class="table">

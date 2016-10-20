@@ -11,7 +11,7 @@
 		<!-- Empty Header -->
 	</content>
 	
-  	<section id="Error" class="">
+  	<section id="Error">
 		<div class="big-message">
 			<div class="container">
 				<h1>

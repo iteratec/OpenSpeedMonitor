@@ -309,7 +309,7 @@ class BootstrapTagLib {
 //				${messageSource.getMessage(name + '.label', null, '', locale)}
 //			</label>
 //
-//			<div class="">
+//			<div>
 //"""
 
 		out << "				<input type=\"hidden\" name=\"_${name}\"";

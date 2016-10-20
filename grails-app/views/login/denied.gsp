@@ -13,7 +13,7 @@
 		<!-- Empty Header -->
 	</content>
 
-  	<section id="Error" class="">
+  	<section id="Error">
 		<div class="big-message">
 			<div class="container">
 				<h1><g:message code="springSecurity.denied.title" locale="${lang}"/>!</h1>

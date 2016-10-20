@@ -21,7 +21,7 @@
                     <g:message code="de.iteratec.osm.api.manual.label" locale="${lang}"/>
                 </a>
             </li>
-            <li class="">
+            <li>
                 <a href="${createLink(uri: '/about')}" target="_blank">
                     <i class="fa fa-info-circle"></i>
                     <g:message code="de.iteratec.osm.about.label" locale="${lang}"/>
