@@ -198,7 +198,7 @@ GSP-Template Mappings:
                                                default="Show measurements with custom connectivity (filter by regex expression):"/>
                                 </label>
                                 <br>
-                                <g:textField name="customConnectivityName" class="form-control input-xxlarge"
+                                <g:textField name="customConnectivityName" class="form-control"
                                              value="${customConnectivityName}" id="customConnectivityName"
                                              placeholder="${g.message(code: 'de.iteratec.osm.result.filter-custom-connectivity.placeholder', default: 'Search via regex')}"
                                              disabled="${!includeCustomConnectivity}">

@@ -6,7 +6,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 <legend><g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" /></legend>
 <div class="row">	<%--------------------------------------------------------------------- pre-selections --%>
 	<div class="col-md-3">
-		<g:select id="timeframeSelect" class="input-large"
+		<g:select id="timeframeSelect" class="form-control"
 				name="selectedTimeFrameInterval" from="${[0, 3600, 43200, 86400, 259200, 604800, 1209600, 2419200]}"
 				valueMessagePrefix="de.iteratec.isr.wptrd.timeframes"
 				value="${selectedTimeFrameInterval}" />
@@ -20,7 +20,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 					default="Start" />:
 		</div>
 		<div class="col-md-2">
-			<input type="text" class="input-medium-height30" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" disabled/>
+			<input type="text" class="form-control" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" disabled/>
 		</div>
 	</div>
 	<div class="row">
@@ -34,7 +34,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 			<fieldset id="fldset-startdate-hour">
 				<div class="col-md-2">
 					<div class="input-group bootstrap-timepicker">
-						<input id="fromHourTimepicker" type="text" class="input-small content-box" value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled>
+						<input id="fromHourTimepicker" type="text" class="form-control content-box" value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled>
 						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</div>
@@ -52,7 +52,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 					default="End" />:
 		</div>
 		<div class="col-md-2">
-			<input type="text" class=".date input-medium-height30" type="text" id="toDatepicker" placeholder="end..." value="${to}" disabled/>
+			<input type="text" class="date form-control" type="text" id="toDatepicker" placeholder="end..." value="${to}" disabled/>
 		</div>
 	</div>
 	<div class="row">
@@ -66,7 +66,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 			<fieldset id="fldset-enddate-hour">
 				<div class="col-md-2">
 					<div class="input-group bootstrap-timepicker">
-						<input id="toHourTimepicker" type="text" class="input-small content-box" value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled>
+						<input id="toHourTimepicker" type="text" class="form-control content-box" value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled>
 						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</div>

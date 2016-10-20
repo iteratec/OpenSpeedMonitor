@@ -137,7 +137,7 @@
             <g:message code="job.customConnectivityProfile.label" default="Name of custom connectivity profile" />
         </label>
         <div class="col-md-8">
-            <g:textField class="form-control input-xxlarge" name="customConnectivityName" id="custom-connectivity-name"
+            <g:textField class="form-control" name="customConnectivityName" id="custom-connectivity-name"
                          value="${job?.customConnectivityName}" readonly="readonly" />
             <label class="checkbox-inline">
                 <g:checkBox name="setCustomConnNameManually" id="setCustomConnNameManually"></g:checkBox>

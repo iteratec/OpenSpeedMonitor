@@ -158,7 +158,7 @@
                                     </div>
 
                                     <div class="col-md-2">
-                                        <g:select id="selectedIntervalHtmlId" class="input-medium"
+                                        <g:select id="selectedIntervalHtmlId" class="form-control"
                                                   name="selectedInterval" from="${csiAggregationIntervals}"
                                                   valueMessagePrefix="de.iteratec.isr.wptrd.intervals"
                                                   value="${selectedInterval}"/>
@@ -418,7 +418,7 @@
                                     <g:message
                                             code="de.iteratec.isr.wptrd.labels.timeframes.charttype"
                                             default="Timeframe:" style="margin-top: 16px"/>
-                                    <g:select id="charttypeSelect" class="input-medium"
+                                    <g:select id="charttypeSelect" class="form-control"
                                               name="selectedChartType" from="${[0]}"
                                               valueMessagePrefix="de.iteratec.isr.wptrd.charttypes"
                                               value="${selectedChartType}"

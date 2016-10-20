@@ -16,7 +16,7 @@
 
     <div>
         <div class="input-group bootstrap-timepicker" }>
-            <input id="fromHourTimepicker" name="time" type="text" class="input-small content-box"
+            <input id="fromHourTimepicker" name="time" type="text" class="form-control content-box"
                    value="<g:if
                            test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
                        ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}

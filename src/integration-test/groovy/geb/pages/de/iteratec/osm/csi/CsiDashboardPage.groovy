@@ -44,7 +44,7 @@ class CsiDashboardPage extends Page{
         showDataLabelsCheckBox { $("#to-enable-label") }
         optimizeForWideScreenCheckBox { $("#wide-screen-diagram-montage") }
         addAliasButton { $("#addAliasButton") }
-        aliasInputField { $(".input-xxlarge")[2] }
+        aliasInputField { $(".input-alias")[0] }
         graphName { $("span.label").attr("innerHTML") }
         dataMarker { $(".pointMarker") }
         dataLabel { $(".dataLabel") }

@@ -20,7 +20,7 @@
                     <div class="row">
                         <div class="col-md-2 text-right"><g:message code="de.iteratec.chart.title.name"/></div>
 
-                        <div class="col-md-9"><input id="dia-title" class="input-xxlarge" type="text"
+                        <div class="col-md-9"><input id="dia-title" class="form-control" type="text"
                                                   value="${chartTitle}"></div>
                     </div>
                     <!-- diagram-size -->
@@ -118,7 +118,7 @@
 
     <div class="row">
         <div class="col-md-6">
-            <g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "enter alias" )}" name='alias' class="input-xxlarge"/>
+            <g:textField placeholder="${message(code: "de.iteratec.chart.adjustment.newAlias", default: "enter alias" )}" name='alias' class="input-alias"/>
         </div>
 
         <div class="col-md-2">

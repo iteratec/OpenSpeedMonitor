@@ -12,7 +12,7 @@
         <label for="input-default-csi-dashboard-title">
             <g:message code="de.iteratec.osm.p13n.cookiebased.default-csi-dashboard-title.label" default="Default Title CSI-Dashboard"/>:
         </label>
-        <input type="text" name="defaultCsiDashboardTitle" id="input-default-csi-dashboard-title" class="input-xlarge"
+        <input type="text" name="defaultCsiDashboardTitle" id="input-default-csi-dashboard-title" class="form-control"
                placeholder="${g.message([code:'de.iteratec.isocsi.csi.defaultdashboard.chart.title', default: 'Customer Satisfaction Index (CSI)'])}">
     </div>
     <div class="modal-footer">

@@ -54,7 +54,7 @@
                     <label><g:message code="de.iteratec.ism.label.upload_new_browser_connectivity_weights"
                                       default="Neue Browser-Verbindung-Gewichtung hochladen (csv)"/>
                     </label>
-                    <input id="theBrowserConnectivityCsvFileTwitter" class="input-large" type="text">
+                    <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text">
                     <a class="btn btn-default" onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
                         <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                     </a>
@@ -91,7 +91,7 @@
                         <g:message code="de.iteratec.ism.label.upload_new_page_weights"
                                    default="Neue Page-Gewichtung hochladen (csv)"/>
                     </label>
-                    <input id="thePageCsvFileTwitter" class="input-large" type="text">
+                    <input id="thePageCsvFileTwitter" class="form-control" type="text">
                     <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
                         <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                     </a>
@@ -128,7 +128,7 @@
                         <g:message code="de.iteratec.ism.label.upload_default_mappings"
                                    default="Neue Default-Mappings hochladen (CSV)"/>
                     </label>
-                    <input id="theHourOfDayCsvFileTwitter" class="input-large" type="text">
+                    <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text">
                     <a class="btn btn-default" onclick="$('input[id=theHourOfDayCsvFile]').click();">
                         <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                     </a>
@@ -330,7 +330,7 @@
                                     <g:message code="de.iteratec.ism.label.upload_default_mappings"
                                                default="Neue Default-Mappings hochladen (CSV)"/>
                                 </label>
-                                <input id="defaultTimeToCsMappingCsvFileVisible" class="input-large" type="text">
+                                <input id="defaultTimeToCsMappingCsvFileVisible" class="form-control" type="text">
                                 <a class="btn btn-default" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
                                     <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                                 </a>
