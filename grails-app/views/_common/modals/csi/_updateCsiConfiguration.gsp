@@ -8,7 +8,7 @@
     </div>
     <div class="modal-body">
         %{--container for errors --}%
-        <div class="alert alert-error" id="errorUpdatingCsiConfiguration" style="display: none">
+        <div class="alert alert-danger" id="errorUpdatingCsiConfiguration" style="display: none">
             <strong>
                 <g:message code="de.iteratec.osm.csiConfiguration.updateErrorTitle"/>
             </strong>
@@ -16,7 +16,7 @@
         </div>
         %{--controls for attributes to update--}%
         <form class="form-horizontal">
-            <div class="control-group">
+            <div class="form-group">
                 <label class="control-label" for="confLabelFromModal">
                     ${message(code: 'de.iteratec.osm.gui.label.notation', default: 'Label')}
                 </label>
@@ -25,7 +25,7 @@
                     <g:textField name="confLabelFromModal" id="confLabelFromModal"></g:textField>
                 </div>
             </div>
-            <div class="control-group">
+            <div class="form-group">
                 <label class="control-label" for="confDescriptionFromModal">
                     ${message(code: 'de.iteratec.osm.gui.description.notation', default: 'Description')}
                 </label>
@@ -37,7 +37,7 @@
     </div>
     <div class="modal-footer">
         %{--buttons--}%
-        <button class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="default.button.cancel.label" default="Cancel"/></button>
+        <button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><g:message code="default.button.cancel.label" default="Cancel"/></button>
         <a href="#" class="btn btn-primary" onclick="updateCsiConfiguration()">
             <g:message code="de.iteratec.ism.ui.labels.save" default="Save"/>
         </a>

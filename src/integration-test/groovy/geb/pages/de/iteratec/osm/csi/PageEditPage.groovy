@@ -19,7 +19,7 @@ class PageEditPage extends I18nGebPage{
 
         addPageAliasButton { $("li.add").$("a") }
 
-        errorMessageBox { $("div", class: "alert alert-error") }
+        errorMessageBox { $("div", class: "alert alert-danger") }
         errorMessageBoxText { errorMessageBox.attr("innerHTML") }
     }
 }

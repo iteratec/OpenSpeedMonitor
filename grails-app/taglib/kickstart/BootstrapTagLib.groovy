@@ -343,8 +343,8 @@ class BootstrapTagLib {
 
 		out << """
 				<div id="btngroup" class="btn-group radiocheckbox" data-toggle="buttons-radio">
-					<div class="btn btn-small on   ${value ? 'active btn-primary' : ''}">${messageSource.getMessage(onLabel, null, onLabel, locale)}</div>
-					<div class="btn btn-small off ${!value ? 'active btn-primary' : ''}">${messageSource.getMessage(offLabel, null, offLabel, locale)}</div>
+					<div class="btn btn-sm on   ${value ? 'active btn-primary' : 'btn-default'}">${messageSource.getMessage(onLabel, null, onLabel, locale)}</div>
+					<div class="btn btn-sm off ${!value ? 'active btn-primary' : 'btn-default'}">${messageSource.getMessage(offLabel, null, offLabel, locale)}</div>
 				</div>
 		"""
 	}

@@ -57,7 +57,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="btn-group">
-            <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+            <a class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                 <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
                            default="Dashboard-Ansicht ausw&auml;hlen"/>
                 <span class="caret"></span>
@@ -101,7 +101,7 @@
 
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
                     <ul>
                         <g:eachError var="eachError" bean="${command}">
@@ -117,9 +117,9 @@
                     code="de.iteratec.ism.ui.labels.save.success"
                     default="Successfully saved these settings as custom dashboard."/></div>
 
-            <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
+            <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
             <g:if test="${warnAboutLongProcessingTime}">
-                <div class="alert">
+                <div class="alert alert-warning">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
 
@@ -223,7 +223,7 @@
                     </legend>
 
                     <div class="col-md-12">
-                        <div class="control-group">
+                        <div class="form-group">
                             <div class="controls">
                                 <label class="checkbox" for="csiTypeDocComplete">
                                     <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
@@ -297,9 +297,9 @@
     <div class="row">
         <div class="col-md-1">
             <div id="chart-table-toggle" class="btn-group" data-toggle="buttons-radio" id="job-filter-toggle">
-                <button type="button" class="btn btn-small active" id="chart-toggle"><g:message
+                <button type="button" class="btn btn-sm btn-default active" id="chart-toggle"><g:message
                         code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
-                <button type="button" class="btn btn-small" id="table-toggle"><g:message
+                <button type="button" class="btn btn-sm btn-default" id="table-toggle"><g:message
                         code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung"/></button>
             </div>
         </div>
@@ -366,7 +366,7 @@
         <%-- table --%>
         <div id="csi-table" class="col-md-12" style="display: none;">
             <g:if test="${flash.tableDataError}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <g:message error="${flash.tableDataError}"/>
                 </div>
             </g:if>

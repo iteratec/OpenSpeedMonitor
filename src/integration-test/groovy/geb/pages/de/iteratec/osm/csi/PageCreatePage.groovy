@@ -16,7 +16,7 @@ class PageCreatePage extends I18nGebPage{
 
         createPageButton(to: [PageCreatePage, PageShowPage]) { $("#create") }
 
-        errorMessageBox { $("div", class: "alert alert-error") }
+        errorMessageBox { $("div", class: "alert alert-danger") }
         errorMessageBoxText { errorMessageBox.attr("innerHTML") }
     }
 }

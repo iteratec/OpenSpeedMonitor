@@ -2,7 +2,7 @@
 <%@ defaultCodec="none" %>
 
 
-<div class="control-group fieldcontain ${hasErrors(bean: jobGroup, field: 'name', 'error')} required">
+<div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'name', 'error')} required">
     <label for="name" class="control-label"><g:message code="jobGroup.name.label" default="Name"/><span
             class="required-indicator">*</span></label>
 
@@ -12,7 +12,7 @@
 </div>
 
 
-<div class="control-group fieldcontain ${hasErrors(bean: jobGroup, field: 'graphiteServers', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'graphiteServers', 'error')} ">
     <label for="graphiteServers" class="control-label"><g:message code="jobGroup.graphiteServers.label"
                                                                   default="Graphite Servers"/></label>
 
@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain">
+<div class="form-group fieldcontain">
     <label for="tags" class="control-label">
         <g:message code="job.tags.label" default="tags"/>
     </label>
@@ -40,7 +40,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain">
+<div class="form-group fieldcontain">
     <label for="csiConfiguration" class="control-label"><g:message code="jobGroup.csi_configuration.label"
                                                                    default="CSI Configuration"/></label>
 

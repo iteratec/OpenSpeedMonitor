@@ -88,13 +88,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "The system shows him a helpful error message"
         waitFor { at EventResultDashboardPage }
         waitFor {
-            $("div", class: "alert alert-error")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
+            $("div", class: "alert alert-danger")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
         } //check that the error box appears
         waitFor {
-            $("div", class: "alert alert-error")[0].find("li")[0].attr("innerHTML").contains("Please select at least one system")
+            $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one system")
         } //check that the correct error message is displayed
         waitFor {
-            $("div", class: "alert alert-error")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page")
+            $("div", class: "alert alert-danger")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page")
         } //check that the correct error message is displayed
     }
 

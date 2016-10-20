@@ -1,6 +1,6 @@
 <fieldset class="form">
 
-    <div class="control-group fieldcontain ${hasErrors(bean: jobSet, field: 'name', 'error')} ">
+    <div class="form-group fieldcontain ${hasErrors(bean: jobSet, field: 'name', 'error')} ">
         <label for="name" class="control-label"><g:message code="jobSet.name.label" default="Name"/></label>
 
         <div class="controls">
@@ -9,7 +9,7 @@
     </div>
 
 
-    <div class="control-group fieldcontain ${hasErrors(bean: csiSystem, field: 'jobGroupWeights', 'error')} ">
+    <div class="form-group fieldcontain ${hasErrors(bean: csiSystem, field: 'jobGroupWeights', 'error')} ">
         <label for="jobs" class="control-label"><g:message code="jobSet.jobs.label"
                                                            default="Jobs"/></label>
 

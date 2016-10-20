@@ -10,7 +10,7 @@
 		<div class="col-md-12">
 			<g:if test="${resetPasswordCommand}">
 				<g:hasErrors bean="${resetPasswordCommand}">
-					<div class="alert alert-error">
+					<div class="alert alert-danger">
 						<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 						<ul>
 							<g:eachError var="eachError" bean="${resetPasswordCommand}">
@@ -27,7 +27,7 @@
 	<label class="control-label">
 		<g:message code="security.password.label" default="Username" />
 	</label>
-	<div class="control-group">
+	<div class="form-group">
 		<div class="controls">
 			<g:passwordField  name='password' value="" />
 		</div>
@@ -35,7 +35,7 @@
 	<label class="control-label">
 		<g:message code="security.password2.label" default="Username" />
 	</label>
-	<div class="control-group">
+	<div class="form-group">
 		<div class="controls">
 			<g:passwordField name='password2' value="" />
 		</div>

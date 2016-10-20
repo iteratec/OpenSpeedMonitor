@@ -14,7 +14,7 @@
         <section id="edit-page" class="first">
 
             <g:hasErrors bean="${pageInstance}">
-            <div class="alert alert-error">
+            <div class="alert alert-danger">
                 <g:renderErrors bean="${pageInstance}" as="list" />
             </div>
             </g:hasErrors>
@@ -27,7 +27,7 @@
                 <div class="form-actions">
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
 

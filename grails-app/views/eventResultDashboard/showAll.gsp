@@ -22,7 +22,7 @@
     <div class="col-md-12">
         <div class="btn-toolbar" style="margin: 0;">
             <div class="btn-group">
-                <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                <a class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                     <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
                                default="Dashboard-Ansicht ausw&auml;hlen"/>
                     <span class="caret"></span>
@@ -56,7 +56,7 @@
     <div class="col-md-12">
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
                     <ul>
                         <g:eachError var="eachError" bean="${command}">
@@ -79,7 +79,7 @@
                 </div>
             </g:if>
             <g:if test="${startedBatchActivity == false}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <g:message code="default.microService.osmDetailAnalysis.batchNotCreated" />
                 </div>
             </g:if>
@@ -94,9 +94,9 @@
                     code="de.iteratec.ism.ui.labels.save.success"
                     default="Successfully saved these settings as custom dashboard."/></div>
 
-            <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
+            <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
             <g:if test="${warnAboutLongProcessingTime}">
-                <div class="alert">
+                <div class="alert alert-warning">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
 

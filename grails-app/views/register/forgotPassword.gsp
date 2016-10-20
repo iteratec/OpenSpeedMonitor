@@ -13,7 +13,7 @@
 		<div class="col-md-12">
 			<g:if test="${forgotPasswordCommand}">
 				<g:hasErrors bean="${forgotPasswordCommand}">
-					<div class="alert alert-error">
+					<div class="alert alert-danger">
 						<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 						<ul>
 							<g:eachError var="eachError" bean="${forgotPasswordCommand}">
@@ -34,7 +34,7 @@
 		<label class="control-label">
 			<g:message code="security.user.label" default="Username" />
 		</label>
-		<div class="control-group">
+		<div class="form-group">
 			<div class="controls">
 				<g:textField  name="username" value="" />
 			</div>

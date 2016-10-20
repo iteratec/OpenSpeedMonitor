@@ -16,10 +16,10 @@
                placeholder="${g.message([code:'de.iteratec.isocsi.csi.defaultdashboard.chart.title', default: 'Customer Satisfaction Index (CSI)'])}">
     </div>
     <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">
+        <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">
             <g:message code="default.button.cancel.label" default="Cancel"/>
         </button>
-        <button id="modal-p13n-save-btn" class="btn" data-dismiss="modal" aria-hidden="true">
+        <button id="modal-p13n-save-btn" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
             <g:message code="default.button.save.label" default="Save"/>
         </button>
     </div>
@@ -37,7 +37,7 @@
                 //p13n message
                 $('#modal-p13n-message').text('${g.message(code: 'de.iteratec.osm.p13n.cookiebased.description')}');
                 if (!navigator.cookieEnabled){
-                    $('#modal-p13n-warning').append('<div class="alert alert-error">'+'${g.message(code: 'de.iteratec.osm.p13n.cookiebased.warning')}'+'</div>');
+                    $('#modal-p13n-warning').append('<div class="alert alert-danger">'+'${g.message(code: 'de.iteratec.osm.p13n.cookiebased.warning')}'+'</div>');
                 }
                 //csi dashboard default chart title
                 $('#input-default-csi-dashboard-title').val(osmClientSideStorageUtils.getCookie(cookieKeyCsiDashboardTitle));

@@ -43,7 +43,7 @@
 					<td>
 						<g:if test="${location.pendingJobs > 0}">
 								<a href="#" class="jobDetail" data-status="100">
-									<span class="arrow icon-chevron-up"></span>
+									<span class="arrow glyphicon glyphicon-chevron-up"></span>
 						</g:if>
 						${location.pendingJobs}
 						<g:if test="${location.pendingJobs > 0}">
@@ -53,7 +53,7 @@
 					<td>
 						<g:if test="${location.runningJobs > 0}">
 								<a href="#" class="jobDetail" data-status="101">
-									<span class="arrow icon-chevron-up"></span>
+									<span class="arrow glyphicon glyphicon-chevron-up"></span>
 						</g:if>
 						${location.runningJobs}
 						<g:if test="${location.runningJobs > 0}">

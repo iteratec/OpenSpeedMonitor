@@ -31,7 +31,7 @@
                     </div>
                     <div id="userMenu" class="tab-pane fade">
                         <g:if test='${users.empty}'><g:message code='spring.security.ui.role_no_users'/></g:if>
-                        <div class="control-group">
+                        <div class="form-group">
                             <g:each var='u' in='${users}'>
                                 <g:link class="control-label" controller='user' action='edit' id='${u.id}'>${uiPropertiesStrategy.getProperty(u, 'username')}</g:link><br/>
                             </g:each>
@@ -44,7 +44,7 @@
                 <div class="form-actions">
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
         </div>

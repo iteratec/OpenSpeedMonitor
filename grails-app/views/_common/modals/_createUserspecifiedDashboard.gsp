@@ -9,9 +9,9 @@
     </div>
 
     <div class="modal-body">
-        <div class="alert alert-error renderInvisible" id="validateDashboardNameErrorDiv"></div>
+        <div class="alert alert-danger renderInvisible" id="validateDashboardNameErrorDiv"></div>
 
-        <div class="control-group">
+        <div class="form-group">
             <label class="control-label"
                    for="dashboardNameFromModal">${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}</label>
 
@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="control-group">
+        <div class="form-group">
             <div class="controls">
                 <label class="checkbox" for="publiclyVisibleFromModal">
                     <input type="checkbox" name="publiclyVisibleFromModal" id="publiclyVisibleFromModal">
@@ -36,7 +36,7 @@
         <g:form>
             <g:hiddenField name="id" value="${item ? item.id : params.id}"/>
             <g:hiddenField name="_method" value="POST"/>
-            <button class="btn" data-dismiss="modal"><g:message code="default.button.cancel.label"
+            <button class="btn btn-default" data-dismiss="modal"><g:message code="default.button.cancel.label"
                                                                 default="Cancel"/></button>
             <a id="saveDashboardButton" href="#" class="btn btn-primary"
                onclick="checkDashboardAlreadyExists()"><g:message

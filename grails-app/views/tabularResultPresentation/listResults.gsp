@@ -47,7 +47,7 @@
 
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"
                             default="You missed something on selection" /></strong>

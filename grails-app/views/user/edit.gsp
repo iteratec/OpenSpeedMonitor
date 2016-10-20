@@ -32,7 +32,7 @@
                     <div id="roleMenu" class="tab-pane fade">
                         <g:each var='entry' in='${roleMap}'>
                             <g:set var='roleName' value='${uiPropertiesStrategy.getProperty(entry.key, 'authority')}'/>
-                            <div class="control-group">
+                            <div class="form-group">
                                 <g:link class="control-label" controller='role' action='edit' id='${entry.key.id}'>${roleName}</g:link>
                                 <div class="controls">
                                     <bs:checkBox name="${roleName}" value="${entry.value}" />
@@ -48,7 +48,7 @@
                 <div class="form-actions">
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
         </div>

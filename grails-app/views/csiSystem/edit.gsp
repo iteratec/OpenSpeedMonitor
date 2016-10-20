@@ -13,13 +13,13 @@
 <g:render template="/_menu/submenubarWithoutDelete"/>
 <section id="edit-csiSystem" class="first">
 
-    <div class="alert alert-error" id="errorDiv" style="display: none" > </div>
+    <div class="alert alert-danger" id="errorDiv" style="display: none" > </div>
     <g:if test="${flash.error}">
-        <div class="alert alert-error" style="display: block">${flash.error}</div>
+        <div class="alert alert-danger" style="display: block">${flash.error}</div>
     </g:if>
     <g:else>
         <g:hasErrors bean="${csiSystem}">
-            <div class="alert alert-error">
+            <div class="alert alert-danger">
                 <g:renderErrors bean="${csiSystem}" as="list"/>
             </div>
         </g:hasErrors>
@@ -37,7 +37,7 @@
                             value="${message(code: 'default.button.update.label', default: 'Update')}"
                             onclick="return validateInput()"/>
             <g:render template="/_common/modals/deleteSymbolLink" model="[controllerLink:createLink([controller: 'csiSystem', action: 'createDeleteConfirmationText', absolute: true])]"/>
-            <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
+            <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
         </div>
     </g:form>
 

@@ -14,7 +14,7 @@
 <section id="create-webPageTestServer" class="first">
 
 	<g:hasErrors bean="${webPageTestServer}">
-	<div class="alert alert-error">
+	<div class="alert alert-danger">
 		<g:renderErrors bean="${webPageTestServer}" as="list" />
 	</div>
 	</g:hasErrors>
@@ -25,7 +25,7 @@
 		</fieldset>
 		<div class="form-actions">
 			<g:submitButton name="create" class="btn btn-primary" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-            <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+            <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
 		</div>
 	</g:form>
 	

@@ -3,11 +3,11 @@
 <div class="row">
     <div class="col-md-12">
         <div class="btn-group" data-toggle="buttons-radio">
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-mapping"
+            <button type="button" class="btn btn-sm btn-info" id="btn-csi-mapping"
                     onclick="$('#csi-mapping').show();
                     $('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton"
                                                           default="Weights CSI"/></button>
-            <button type="button" class="btn btn-small btn-info" id="btn-csi-weights"
+            <button type="button" class="btn btn-sm btn-info" id="btn-csi-weights"
                     onclick="$('#csi-mapping').hide();
                     $('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton"
                                                           default="Mapping CSI"/></button>
@@ -55,10 +55,10 @@
                                       default="Neue Browser-Verbindung-Gewichtung hochladen (csv)"/>
                     </label>
                     <input id="theBrowserConnectivityCsvFileTwitter" class="input-large" type="text">
-                    <a class="btn" onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
+                    <a class="btn btn-default" onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
                         <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                     </a>
-                    <button type="submit" class="btn">
+                    <button type="submit" class="btn btn-default">
                         <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
                     </button>
                 </div>
@@ -92,10 +92,10 @@
                                    default="Neue Page-Gewichtung hochladen (csv)"/>
                     </label>
                     <input id="thePageCsvFileTwitter" class="input-large" type="text">
-                    <a class="btn" onclick="$('input[id=thePageCsvFile]').click();">
+                    <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
                         <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                     </a>
-                    <button type="submit" class="btn">
+                    <button type="submit" class="btn btn-default">
                         <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
                     </button>
                 </div>
@@ -129,10 +129,10 @@
                                    default="Neue Default-Mappings hochladen (CSV)"/>
                     </label>
                     <input id="theHourOfDayCsvFileTwitter" class="input-large" type="text">
-                    <a class="btn" onclick="$('input[id=theHourOfDayCsvFile]').click();">
+                    <a class="btn btn-default" onclick="$('input[id=theHourOfDayCsvFile]').click();">
                         <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                     </a>
-                    <button type="submit" class="btn">
+                    <button type="submit" class="btn btn-default">
                         <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
                     </button>
                 </div>
@@ -152,7 +152,7 @@
 
         <div id="csi-mapping"></div>
 
-        <div class="alert" id="warnAboutOverwritingBox">
+        <div class="alert alert-warning" id="warnAboutOverwritingBox">
             <strong><g:message
                     code="de.iteratec.osm.defaults.confirmationMessage"/></strong>
 
@@ -161,7 +161,7 @@
 
         </div>
 
-        <div class="alert alert-error" id="errorBoxDefaultMappingCsv">
+        <div class="alert alert-danger" id="errorBoxDefaultMappingCsv">
             <strong><g:message
                     code="de.iteratec.osm.csi.csvErrors.title"/></strong>
 
@@ -206,9 +206,9 @@
             </div>
         </div>
         <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <div class="row-fluid">
+            <div class="row">
                 <div class="col-md-12">
-                    <div class="row-fluid">
+                    <div class="row">
                         <div class="col-md-2">
                             <button href="#" type="button" class="btn btn-primary" style="display: none;"
                                     id="removePageMapping"
@@ -274,12 +274,12 @@
             <g:set var="customDefaultCsiMappingDeletePrefix" value='DeleteDefaultCsiMapping'/>
             <div class="col-md-6" id="defaultMultilineGraphButtonLine">
                 <g:if test="${!readOnly}">
-                    <button type="button" class="btn btn-small btn-primary" data-toggle="modal" href="#CsiMappingModal"
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" href="#CsiMappingModal"
                             disabled="true"
                             id="btn-apply-mapping" onclick="showMappingDialog()">
                         <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
                                    default="Delete Default Mapping"/></button>
-                    <button type="button" class="btn btn-small btn-danger" data-toggle="modal"
+                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
                             href="#DeleteModal${customDefaultCsiMappingDeletePrefix}" disabled="true"
                             id="btn-delete-default">
                         <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
@@ -331,10 +331,10 @@
                                                default="Neue Default-Mappings hochladen (CSV)"/>
                                 </label>
                                 <input id="defaultTimeToCsMappingCsvFileVisible" class="input-large" type="text">
-                                <a class="btn" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
+                                <a class="btn btn-default" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
                                     <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
                                 </a>
-                                <button type="submit" class="btn" id="defaultMappingUploadButton"
+                                <button type="submit" class="btn btn-default" id="defaultMappingUploadButton"
                                         onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);">
                                     <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
                                 </button>

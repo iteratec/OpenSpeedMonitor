@@ -13,7 +13,7 @@ This is the standard dialog that initiates the delete action.
     </div>
     <div class="modal-footer">
         <g:form controller="${customController}">
-            <button class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="default.button.cancel.label" default="Cancel"/></button>
+            <button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><g:message code="default.button.cancel.label" default="Cancel"/></button>
             <g:hiddenField id='deleteValue' name="${customID?:'id'}" value="${item ? item.id : params.id}" />
             <g:hiddenField name="_method" value="POST" />
             <span class="button">

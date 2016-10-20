@@ -4,12 +4,12 @@
 		<div class="container">
 			<!-- .navbar-btn is used as the toggle for collapsed navbar content -->
 			<a class="btn navbar-btn" data-toggle="collapse" data-target=".nav-collapse">
-				<span class="icon-bar"></span>
-            	<span class="icon-bar"></span>
-            	<span class="icon-bar"></span>
+				<span class="glyphicon-bar"></span>
+            	<span class="glyphicon-bar"></span>
+            	<span class="glyphicon-bar"></span>
 			</a>
 
-			<a class="brand" href="${createLink(uri: '/')}">
+			<a class="navbar-brand" href="${createLink(uri: '/')}">
         <img class="logo" src="${resource(dir:'images',file:'OpenSpeedMonitor-onblack-monitorWritingLight_39pxHeight.gif')}" alt="${meta(name:'app.name')}" />
 			</a>
 
@@ -26,7 +26,7 @@
 					<g:render template="/_menu/info"/>														
 					<g:render template="/_menu/admin"/>
 					<g:render template="/_menu/user"/><!-- NOTE: the renderDialog for the "Register" modal dialog MUST be placed outside the NavBar (at least for Bootstrap 2.1.1): see bottom of main.gsp -->
-					<ul class="nav">
+					<ul class="nav pull-right">
 						<li class="dropdown">
 							<a class="dropdown-toggle" data-toggle="dropdown" href="#"><g:message code="navbar.browse" default="Browse" locale="${lang}"/> <b class="caret"></b></a>
 							<ul class="dropdown-menu">

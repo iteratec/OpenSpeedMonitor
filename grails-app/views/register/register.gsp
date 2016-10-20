@@ -14,7 +14,7 @@
 		<div class="col-md-12">
 			<g:if test="${registerCommand}">
 				<g:hasErrors bean="${registerCommand}">
-					<div class="alert alert-error">
+					<div class="alert alert-danger">
 						<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 						<ul>
 							<g:eachError var="eachError" bean="${registerCommand}">
@@ -35,7 +35,7 @@
 		<label class="control-label">
 			<g:message code="security.user.label" default="Username" />
 		</label>
-		<div class="control-group">
+		<div class="form-group">
 			<div class="controls">
 				<g:textField  name="username" value="" />
 			</div>
@@ -43,7 +43,7 @@
 		<label class="control-label">
 			<g:message code="security.email.label" default="E-mail" />
 		</label>
-		<div class="control-group">
+		<div class="form-group">
 			<div class="controls">
 				<g:textField  name="email" value="" />
 			</div>
@@ -51,7 +51,7 @@
 		<label class="control-label">
 			<g:message code="security.password.label" default="Password" />
 		</label>
-		<div class="control-group">
+		<div class="form-group">
 			<div class="controls">
 				<g:passwordField  name="password" value="" />
 			</div>
@@ -59,7 +59,7 @@
 		<label class="control-label">
 			<g:message code="security.password2.label" default="Password (again)" />
 		</label>
-		<div class="control-group">
+		<div class="form-group">
 			<div class="controls">
 				<g:passwordField  name="password2" value="" />
 			</div>

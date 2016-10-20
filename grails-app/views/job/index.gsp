@@ -28,7 +28,7 @@
                             default="Measurements are generally disabled! Even active jobs won't get started until measurements are generally enabled again. Ask your administrator for activation."/>
                     <br>
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
-                        <g:actionSubmit class="btn btn-small btn-warning" action="activateMeasurementsGenerally"
+                        <g:actionSubmit class="btn btn-sm btn-warning" action="activateMeasurementsGenerally"
                                         value="${message(code: 'de.iteratec.osm.measurement.schedule.general.activation.label', default: 'Activate measurements')}"/>
                     </sec:ifAnyGranted>
                 </div>
@@ -46,7 +46,7 @@
             <g:if test="${saveError}">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="alert alert-error">
+                        <div class="alert alert-danger">
                             <g:message error="${saveError}"/>
                         </div>
                     </div>
@@ -100,7 +100,7 @@
                     <div class="col-md-2" style="margin: 0px">
 
                         <div class="btn-group pull-left">
-                            <a id="jobSetButton" class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                            <a id="jobSetButton" class="btn-default btn btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                                 <g:message code="de.iteratec.osm.job.filterHeadline" default="Filter by JobSet"/>
                                 <span class="caret"></span>
                             </a>
@@ -181,7 +181,7 @@
         </div>
 
 
-        <div class="alert" id="serverdown">
+        <div class="alert alert-warning" id="serverdown">
             <a class="close" data-dismiss="alert">×</a>
             <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
         </div>

@@ -148,7 +148,7 @@
 <g:render template="/layouts/mainMenu"/>
 
 %{--container for errors --}%
-<div class="alert alert-error" id="errorDeletingCsiConfiguration" style="display: none">
+<div class="alert alert-danger" id="errorDeletingCsiConfiguration" style="display: none">
     <strong>
         <g:message code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/>
     </strong>
@@ -178,8 +178,8 @@
 
         <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
 
-            <div class="btn-group pull-left">
-                <button class="btn btn-small btn-info dropdown-toggle text-right" data-toggle="dropdown">
+            <div class="btn btn-group pull-left">
+                <button class="btn btn-sm btn-info dropdown-toggle text-right" data-toggle="dropdown">
                     <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration"
                                default="This Configuration..."></g:message>
                     <span class="caret"></span>

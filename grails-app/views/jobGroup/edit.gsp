@@ -17,7 +17,7 @@
 <section id="edit-jobGroup" class="first">
 
     <g:hasErrors bean="${jobGroup}">
-        <div class="alert alert-error">
+        <div class="alert alert-danger">
             <g:renderErrors bean="${jobGroup}" as="list"/>
         </div>
     </g:hasErrors>
@@ -33,7 +33,7 @@
             <g:actionSubmit class="btn btn-primary" action="update"
                             value="${message(code: 'default.button.update.label', default: 'Update')}"/>
             <g:render template="/_common/modals/deleteSymbolLink"/>
-            <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
+            <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
         </div>
     </g:form>
 

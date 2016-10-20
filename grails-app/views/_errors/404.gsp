@@ -25,11 +25,11 @@
 				</p>
 				
 				<div class="actions">
-					<a href="${createLink(uri: '/')}" class="btn btn-large btn-primary">
+					<a href="${createLink(uri: '/')}" class="btn btn-lg btn-primary">
 						<i class="fa fa-chevron-left"></i>
 						<g:message code="error.button.backToHome"/>
 					</a>
-					<a href="${createLink(uri: '/contact')}" class="btn btn-large btn-success">
+					<a href="${createLink(uri: '/contact')}" class="btn btn-lg btn-success">
 						<i class="fa fa-envelope-o"></i>
 						<g:message code="error.button.contactSupport"/>
 					</a>					

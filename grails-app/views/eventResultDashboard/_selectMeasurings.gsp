@@ -35,7 +35,7 @@ GSP-Template Mappings:
             multiple="true"/>
         <div class="btn-group" data-toggle="buttons-radio">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-mini" onclick="filterJobGroupSelect('')">
+                    <button type="button" class="btn btn-xs" onclick="filterJobGroupSelect('')">
                         <i class="fa fa-remove"></i>&nbsp;<g:message code="de.iteratec.osm.ui.filter.clear" default="Clear filter"/>
                     </button>
                 </div>
@@ -43,7 +43,7 @@ GSP-Template Mappings:
                     <div class="btn-group-justified">
                         <div class="btn-group">
                             <g:each in="${tagSubset}" var="tag">
-                                <button type="button" class="btn btn-mini" onclick="filterJobGroupSelect('${tag}')">
+                                <button type="button" class="btn btn-xs" onclick="filterJobGroupSelect('${tag}')">
                                     <i class="fa fa-filter"></i>&nbsp;${tag}
                                 </button>
                             </g:each>

@@ -17,21 +17,21 @@
 		<h3> <g:message code="springSecurity.login.header" locale="${lang}"/> </h3>
 		<form id='loginForm' class='form-horizontal' action='${postUrl}' method='POST' autocomplete='off'>
 			<fieldset class="form">
-				<div class="control-group fieldcontain">
+				<div class="form-group fieldcontain">
 					<label for='username' class="control-label"><g:message code="springSecurity.login.username.label" locale="${lang}"/>:</label>
 					<div class="controls">
 						<input type='text' class='col-md-offset-4' name='username' id='username'/>
 					</div>
 				</div>
 	
-				<div class="control-group fieldcontain">
+				<div class="form-group fieldcontain">
 					<label for='password' class="control-label"><g:message code="springSecurity.login.password.label" locale="${lang}"/>:</label>
 					<div class="controls">
 						<input type='password' class='col-md-offset-4' name='password' id='password'/>
 					</div>
 				</div>
 				
-				<div id="remember_me_holder" class="control-group fieldcontain">
+				<div id="remember_me_holder" class="form-group fieldcontain">
 					<label for='remember_me' class="control-label"><g:message code="springSecurity.login.remember.me.label" locale="${lang}"/></label>
 					<div class="controls">
 						<bs:checkBox class="col-md-4" name="${rememberMeParameter}" value="${hasCookie}" />

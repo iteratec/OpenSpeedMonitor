@@ -41,7 +41,7 @@
                                        value="${initialChartHeight}">
                                 <span class="add-on">px</span>
                             </div>
-                            <button class="btn" id="dia-change-chartsize" style="vertical-align: top;"><g:message
+                            <button class="btn btn-default" id="dia-change-chartsize" style="vertical-align: top;"><g:message
                                     code="de.iteratec.ism.ui.button.apply.name"/></button>
                         </div>
                     </div>
@@ -64,7 +64,7 @@
                                        value="${yAxisMax ?: ''}">
                                 <span class="add-on" id="maximumUnit"></span>
                             </div>
-                            <button class="btn" id="dia-change-yaxis" style="vertical-align: top;"><g:message
+                            <button class="btn btn-default" id="dia-change-yaxis" style="vertical-align: top;"><g:message
                                     code="de.iteratec.ism.ui.button.apply.name"/></button>
                         </div>
                     </div>

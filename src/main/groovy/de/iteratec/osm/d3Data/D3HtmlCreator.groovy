@@ -30,7 +30,7 @@ class D3HtmlCreator {
         StringWriter writer = new StringWriter()
 
         if(modal){
-            return writer << """<div class="span4" id="${chartIdentifier}">
+            return writer << """<div class="col-md-4" id="${chartIdentifier}">
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
@@ -38,7 +38,7 @@ class D3HtmlCreator {
                                 </div>"""
         }
         else {
-            return writer << """<div class="span8" id="${chartIdentifier}">
+            return writer << """<div class="col-md-8" id="${chartIdentifier}">
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
@@ -53,7 +53,7 @@ class D3HtmlCreator {
     def generateBarChartHtml = {chartIdentifier ->
         StringWriter writer = new StringWriter()
             return writer << """<div class="row">
-                                    <div class="span8" id="barChartSpan">
+                                    <div class="col-md-8" id="barChartSpan">
                                         <svg class="chart" id="${chartIdentifier}"></svg>
                                     </div>
                                 </div>"""
@@ -65,7 +65,7 @@ class D3HtmlCreator {
     def generateMatrixViewHtml = {chartIdentifier ->
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
-                                <div class="span8" id="${chartIdentifier}"></div>
+                                <div class="col-md-8" id="${chartIdentifier}"></div>
                                     <div id="tooltipMatrixView" class="hidden">
                                     <p><strong id="columnName"></strong></p>
                                     <p><strong id="rowName"></strong></p>
@@ -82,14 +82,14 @@ class D3HtmlCreator {
     def generateTreemapHtml = {chartIdentifier ->
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
-                                <div class="span8" id="treemapSpan">
+                                <div class="col-md-8" id="treemapSpan">
                                     <div class="treemap" id= ${chartIdentifier}></div>
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
                                     </div>
                                 </div>
-                                <div class="span3git" id="zeroWeightSpan">
+                                <div class="col-md-3git" id="zeroWeightSpan">
                                 </div>
                             </div>"""
     }
@@ -103,29 +103,29 @@ class D3HtmlCreator {
 
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
-                                <div class="span12" id="${"ScheduleChart" + chartIdentifier}">
+                                <div class="col-md-12" id="${"ScheduleChart" + chartIdentifier}">
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
                                     </div>
                                 </div>
-                                <div class="span12 text-center" id="${"duration-to-show" + chartIdentifier}">
+                                <div class="col-md-12 text-center" id="${"duration-to-show" + chartIdentifier}">
                                     <br>
                                     ${showLabel}
                                     <div class="btn-group">
-                                        <button class="btn btn-info btn-small" value="1">1</button>
-                                        <button class="btn btn-info btn-small" value="2">2</button>
-                                        <button class="btn btn-info btn-small" value="4">4</button>
-                                        <button class="btn btn-info btn-small" value="6">6</button>
-                                        <button class="btn btn-info btn-small" value="12">12</button>
-                                        <button class="btn btn-info btn-small" value="24">24</button>
+                                        <button class="btn btn-info btn-sm" value="1">1</button>
+                                        <button class="btn btn-info btn-sm" value="2">2</button>
+                                        <button class="btn btn-info btn-sm" value="4">4</button>
+                                        <button class="btn btn-info btn-sm" value="6">6</button>
+                                        <button class="btn btn-info btn-sm" value="12">12</button>
+                                        <button class="btn btn-info btn-sm" value="24">24</button>
                                     </div>
                                     ${unitMultiple}
                                 </div>
-                                <div class="span12 text-center" id="${"show-overused-queues" + chartIdentifier}">
+                                <div class="col-md-12 text-center" id="${"show-overused-queues" + chartIdentifier}">
                                     <div class="btn-group">
-                                        <button class="btn btn-info btn-small" value="on">${showIntersectionLabel}</button>
-                                        <button class="btn btn-info btn-small" value="off">${hideIntersectionLabel}</button>
+                                        <button class="btn btn-info btn-sm" value="on">${showIntersectionLabel}</button>
+                                        <button class="btn btn-info btn-sm" value="off">${hideIntersectionLabel}</button>
                                     </div>
                                 </div>
                             </div>"""

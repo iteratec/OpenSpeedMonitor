@@ -1,6 +1,6 @@
 <%@ page import="de.iteratec.osm.report.chart.Event" %>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'eventDate', 'error')} required">
+<div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'eventDate', 'error')} required">
     <label for="eventDate" class="control-label"><g:message code="event.date.label" default="Date"/><span
             class="required-indicator">*</span></label>
 
@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain  required">
+<div class="form-group fieldcontain  required">
     <label class="control-label"><g:message code="event.time.label" default="Uhrzeit"/><span
             class="required-indicator">*</span></label>
 
@@ -27,7 +27,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'shortName', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'shortName', 'error')} ">
     <label for="shortName" class="control-label"><g:message code="event.shortName.label" default="Short Name"/></label>
 
     <div class="controls">
@@ -35,7 +35,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'description', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'description', 'error')} ">
     <label for="description" class="control-label"><g:message code="event.description.label"
                                                               default="Html Description"/></label>
 
@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')} ">
     <label for="globallyVisible" class="control-label"><g:message code="event.globallyVisible.label"
                                                                   default="Globally Visible"/></label>
 
@@ -55,7 +55,7 @@
     </div>
 </div>
 
-<div class="control-group fieldcontain ${hasErrors(bean: eventInstance, field: 'jobGroups', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'jobGroups', 'error')} ">
     <label for="jobGroups" class="control-label"><g:message code="event.jobGroup.label" default="Job Group"/></label>
 
     <div class="controls">

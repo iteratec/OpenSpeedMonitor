@@ -22,7 +22,7 @@
                     default="Nightly Database cleanup is disabled!"/>
             <br>
             <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
-                <g:actionSubmit class="btn btn-small btn-warning" action="activateDatabaseCleanup"
+                <g:actionSubmit class="btn btn-sm btn-warning" action="activateDatabaseCleanup"
                                 value="${message(code: 'de.iteratec.osm.batch.cleanup.activation.label', default: 'Activate nightly cleanup')}"/>
             </sec:ifAnyGranted>
         </div>
@@ -87,7 +87,7 @@
 <g:form>
     <g:if test="${dbCleanupEnabled}">
         <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
-            <g:actionSubmit class="btn btn-small btn-info" action="deactivateDatabaseCleanup"
+            <g:actionSubmit class="btn btn-sm btn-info" action="deactivateDatabaseCleanup"
                             value="${message(code: 'de.iteratec.osm.batch.cleanup.deactivation.label', default: 'Deactivate nightly cleanup')}"/>
         </sec:ifAnyGranted>
     </g:if>
