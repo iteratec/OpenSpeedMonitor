@@ -28,7 +28,7 @@
 		<g:message code="security.password.label" default="Username" />
 	</label>
 	<div class="form-group">
-		<div class="controls">
+		<div>
 			<g:passwordField  name='password' value="" />
 		</div>
 	</div>
@@ -36,7 +36,7 @@
 		<g:message code="security.password2.label" default="Username" />
 	</label>
 	<div class="form-group">
-		<div class="controls">
+		<div>
 			<g:passwordField name='password2' value="" />
 		</div>
 	</div>

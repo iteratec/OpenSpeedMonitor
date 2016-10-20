@@ -19,26 +19,26 @@
 			<fieldset class="form">
 				<div class="form-group fieldcontain">
 					<label for='username' class="control-label"><g:message code="springSecurity.login.username.label" locale="${lang}"/>:</label>
-					<div class="controls">
+					<div>
 						<input type='text' class='col-md-offset-4' name='username' id='username'/>
 					</div>
 				</div>
 	
 				<div class="form-group fieldcontain">
 					<label for='password' class="control-label"><g:message code="springSecurity.login.password.label" locale="${lang}"/>:</label>
-					<div class="controls">
+					<div>
 						<input type='password' class='col-md-offset-4' name='password' id='password'/>
 					</div>
 				</div>
 				
 				<div id="remember_me_holder" class="form-group fieldcontain">
 					<label for='remember_me' class="control-label"><g:message code="springSecurity.login.remember.me.label" locale="${lang}"/></label>
-					<div class="controls">
+					<div>
 						<bs:checkBox class="col-md-4" name="${rememberMeParameter}" value="${hasCookie}" />
 					</div>
 				</div>
 			</fieldset>
-			<div class="controls">
+			<div>
 				<input type='submit' id="submit" class="btn btn-success" value='${message([code:'springSecurity.login.button', locale:lang])}'/>
 				<g:if test="${grailsApplication.config.getProperty('grails.mail.disabled')?.toLowerCase() == "false"}">
 					<span class="forgot-link">

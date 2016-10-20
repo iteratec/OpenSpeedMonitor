@@ -35,7 +35,7 @@
 			<g:message code="security.user.label" default="Username" />
 		</label>
 		<div class="form-group">
-			<div class="controls">
+			<div>
 				<g:textField  name="username" value="" />
 			</div>
 		</div>

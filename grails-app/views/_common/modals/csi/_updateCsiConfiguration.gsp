@@ -20,7 +20,7 @@
                 <label class="control-label" for="confLabelFromModal">
                     ${message(code: 'de.iteratec.osm.gui.label.notation', default: 'Label')}
                 </label>
-                <div class="controls">
+                <div>
                     <div id="spinner-position"></div>
                     <g:textField name="confLabelFromModal" id="confLabelFromModal"></g:textField>
                 </div>
@@ -29,7 +29,7 @@
                 <label class="control-label" for="confDescriptionFromModal">
                     ${message(code: 'de.iteratec.osm.gui.description.notation', default: 'Description')}
                 </label>
-                <div class="controls">
+                <div>
                     <g:textArea name="confDescriptionFromModal" id="confDescriptionFromModal"></g:textArea>
                 </div>
             </div>

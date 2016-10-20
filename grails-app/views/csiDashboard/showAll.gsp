@@ -224,7 +224,7 @@
 
                     <div class="col-md-12">
                         <div class="form-group">
-                            <div class="controls">
+                            <div>
                                 <label class="checkbox" for="csiTypeDocComplete">
                                     <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
                                             test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">

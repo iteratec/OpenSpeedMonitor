@@ -15,7 +15,7 @@
             <label class="control-label"
                    for="dashboardNameFromModal">${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}</label>
 
-            <div class="controls">
+            <div>
                 <div id="spinner-position"></div>
                 <input type="text" class="col-md-3" name="dashboardNameFromModal" id="dashboardNameFromModal"
                        placeholder="${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}">
@@ -23,7 +23,7 @@
         </div>
 
         <div class="form-group">
-            <div class="controls">
+            <div>
                 <label class="checkbox" for="publiclyVisibleFromModal">
                     <input type="checkbox" name="publiclyVisibleFromModal" id="publiclyVisibleFromModal">
                     ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.publiclyVisible.label', default: 'Everybody is entitled to view this custom dashboard.')}

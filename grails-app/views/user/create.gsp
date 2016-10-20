@@ -34,7 +34,7 @@
                             <g:set var='roleName' value='${uiPropertiesStrategy.getProperty(entry, 'authority')}'/>
                             <div class="form-group">
                                 <g:link class="control-label" controller='role' action='edit' id='${entry.id}'>${roleName}</g:link>
-                                <div class="controls">
+                                <div>
                                     <bs:checkBox name="${roleName}" />
                                 </div>
                             </div>
