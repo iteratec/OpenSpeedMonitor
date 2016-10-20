@@ -1,6 +1,6 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <footer class="footer">
-	<div class="container">
+	<div class="container-fluid">
 		<div class="row">
 			<div class="col-md-2">
 				<h4><g:message code="default.product.title" locale="${lang}"/></h4>
