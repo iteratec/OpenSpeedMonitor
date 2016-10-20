@@ -296,7 +296,7 @@
 
     <div class="row">
         <div class="col-md-1">
-            <div id="chart-table-toggle" class="btn-group" data-toggle="buttons-radio" id="job-filter-toggle">
+            <div id="chart-table-toggle" class="btn-group" data-toggle="buttons" id="job-filter-toggle">
                 <button type="button" class="btn btn-sm btn-default active" id="chart-toggle"><g:message
                         code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
                 <button type="button" class="btn btn-sm btn-default" id="table-toggle"><g:message

@@ -33,7 +33,7 @@ GSP-Template Mappings:
             name="selectedFolder" from="${folders}" optionKey="id"
             optionValue="name" value="${selectedFolder}"
             multiple="true"/>
-        <div class="btn-group" data-toggle="buttons-radio">
+        <div class="btn-group" data-toggle="buttons">
                 <div class="btn-group">
                     <button type="button" class="btn btn-xs" onclick="filterJobGroupSelect('')">
                         <i class="fa fa-remove"></i>&nbsp;<g:message code="de.iteratec.osm.ui.filter.clear" default="Clear filter"/>

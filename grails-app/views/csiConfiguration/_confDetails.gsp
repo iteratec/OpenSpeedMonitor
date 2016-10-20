@@ -2,7 +2,7 @@
 <%@ defaultCodec="none" %>
 <div class="row">
     <div class="col-md-12">
-        <div class="btn-group" data-toggle="buttons-radio">
+        <div class="btn-group" data-toggle="buttons">
             <button type="button" class="btn btn-sm btn-info" id="btn-csi-mapping"
                     onclick="$('#csi-mapping').show();
                     $('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton"
