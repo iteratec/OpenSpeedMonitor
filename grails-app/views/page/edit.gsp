@@ -24,7 +24,7 @@
                 <fieldset class="form">
                     <g:render template="form"/>
                 </fieldset>
-                <div class="form-actions">
+                <div>
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
                     <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>

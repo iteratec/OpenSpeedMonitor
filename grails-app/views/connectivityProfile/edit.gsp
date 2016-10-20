@@ -27,7 +27,7 @@
                     <g:render template="form"/>
                 </fieldset>
 
-                <div class="form-actions">
+                <div>
                     <%-- Save as copy--%>
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}"/>
 

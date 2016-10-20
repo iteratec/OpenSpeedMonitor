@@ -64,7 +64,7 @@
 				<g:passwordField  name="password2" value="" />
 			</div>
 		</div>
-		<div class="form-actions">
+		<div>
 			<g:actionSubmit class="btn btn-primary" action="register" value="${message(code: 'spring.security.ui.register.submit', default: 'Create your account')}" />
 		</div>
 	</g:else>

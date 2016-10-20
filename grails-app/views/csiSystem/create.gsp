@@ -30,7 +30,7 @@
             <g:render template="form"/>
         </fieldset>
 
-        <div class="form-actions">
+        <div>
             <g:submitButton name="create" class="btn btn-primary"
                             value="${message(code: 'default.button.create.label', default: 'Create')}"
                             onclick="return validateInput()"/>

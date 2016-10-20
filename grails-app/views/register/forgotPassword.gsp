@@ -39,7 +39,7 @@
 				<g:textField  name="username" value="" />
 			</div>
 		</div>
-		<div class="form-actions">
+		<div>
 			<g:actionSubmit class="btn btn-primary" action="forgotPassword" value="${message(code: 'spring.security.ui.forgotPassword.submit', default: 'Reset password')}" />
 		</div>
 	</g:else>

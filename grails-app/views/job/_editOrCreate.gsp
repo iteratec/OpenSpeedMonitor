@@ -37,7 +37,7 @@
                     <g:render template="form"/>
                 </fieldset>
 
-                <div class="form-actions">
+                <div>
                     <g:if test="${mode == 'edit'}">
                         <g:actionSubmit class="btn btn-primary" action="update"
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>

@@ -40,7 +40,7 @@
 			<g:passwordField name='password2' value="" />
 		</div>
 	</div>
-	<div class="form-actions">
+	<div>
 		<g:actionSubmit class="btn btn-primary" action="resetPassword" value="${message(code: 'spring.security.ui.resetPassword.submit', default: 'Reset password')}" />
 	</div>
 </g:form>
