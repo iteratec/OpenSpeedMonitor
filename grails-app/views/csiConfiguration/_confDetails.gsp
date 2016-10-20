@@ -23,7 +23,7 @@
 
         <g:if test="${errorMessagesCsi}">
             <ul>
-                <g:each var="errMessage" in="${errorMessagesCsi ?}"><li class="text-error">${errMessage}</li></g:each>
+                <g:each var="errMessage" in="${errorMessagesCsi ?}"><li class="text-danger">${errMessage}</li></g:each>
             </ul>
         </g:if>
 
@@ -32,7 +32,7 @@
     <div class="row">
         <div class="col-md-12">
             <h3>
-                <span class="muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
+                <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
                 <g:message code="de.iteratec.isocsi.browser_connectivity_weight" default="BrowserConnectivity"/>
             </h3>
         </div>
@@ -50,7 +50,7 @@
                        value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
-                <div class="input-append">
+                <div class="input-group">
                     <label><g:message code="de.iteratec.ism.label.upload_new_browser_connectivity_weights"
                                       default="Neue Browser-Verbindung-Gewichtung hochladen (csv)"/>
                     </label>
@@ -72,7 +72,7 @@
     <hr/>
 
     <h3>
-        <span class="muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
+        <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
         <g:message code="de.iteratec.isocsi.page_weight" default="Page"/>
     </h3>
     <g:if test="${!readOnly}">
@@ -86,7 +86,7 @@
                        value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
-                <div class="input-append">
+                <div class="input-group">
                     <label>
                         <g:message code="de.iteratec.ism.label.upload_new_page_weights"
                                    default="Neue Page-Gewichtung hochladen (csv)"/>
@@ -109,7 +109,7 @@
     <hr/>
 
     <h3>
-        <span class="muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
+        <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
         <g:message code="de.iteratec.isocsi.hour_weight" default="Tageszeit"/>
     </h3>
     <g:if test="${!readOnly}">
@@ -123,7 +123,7 @@
                        value="${selectedCsiConfiguration.ident()}"
                        style="display:none">
 
-                <div class="input-append">
+                <div class="input-group">
                     <label>
                         <g:message code="de.iteratec.ism.label.upload_default_mappings"
                                    default="Neue Default-Mappings hochladen (CSV)"/>
@@ -174,7 +174,7 @@
     <div class="row">
         <div class="col-md-12">
             <h3>
-                <span class="muted"><g:message code="de.iteratec.osm.csi.mapping.label"
+                <span class="text-muted"><g:message code="de.iteratec.osm.csi.mapping.label"
                                                default="Mapping"/>:&nbsp;</span>
                 <g:message code="de.iteratec.osm.csi.configuration.mapping.heading"
                            default="Mapping Load time&nbsp;&rArr;&nbsp;Customer satisfaction"/>
@@ -325,7 +325,7 @@
                             <input id="defaultTimeToCsMappingCsvFile" type="file" name="defaultTimeToCsMappingCsv"
                                    style="display:none">
 
-                            <div class="input-append">
+                            <div class="input-group">
                                 <label>
                                     <g:message code="de.iteratec.ism.label.upload_default_mappings"
                                                default="Neue Default-Mappings hochladen (CSV)"/>

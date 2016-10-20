@@ -98,12 +98,12 @@
     %{--<g:each in="${chartList}" var="notUsed" status="i">--}%
     <g:each in="${chartMap}" var="server" status="i">
         <h3>
-            <span class="muted"><g:message code="de.iteratec.osm.webpagetest.server.label" default="WPT Server"/>:</span> ${server.key}
+            <span class="text-muted"><g:message code="de.iteratec.osm.webpagetest.server.label" default="WPT Server"/>:</span> ${server.key}
         </h3>
         <hr />
         <g:each in="${server.value}" var="location" status="j">
             <h4>
-                <span class="muted"><g:message code="de.iteratec.isocsi.csi.labels.filterLocations" default="Location:"/></span> ${location.name} (${location.agentCount} agents)
+                <span class="text-muted"><g:message code="de.iteratec.isocsi.csi.labels.filterLocations" default="Location:"/></span> ${location.name} (${location.agentCount} agents)
             </h4>
             <g:if test="${location.jobs.size() > 0}">
                 <iteratec:scheduleChart chartIdentifier="${i}${j}"/>

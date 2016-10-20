@@ -291,7 +291,7 @@
                                     <h6><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES"
                                                    default="Ladezeiten [ms]"/></h6>
 
-                                    <div class="input-append">
+                                    <div class="input-group">
                                         <label for="appendedInputBelowLoadTimes">
                                             <g:message code="de.iteratec.isr.wptrd.labels.trimbelow"
                                                        default="Trim below"/>
@@ -299,10 +299,10 @@
                                         <input name="trimBelowLoadTimes" id="appendedInputBelowLoadTimes"
                                                value="${trimBelowLoadTimes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
-                                        <span class="add-on">ms</span>
+                                        <span class="input-group-addon">ms</span>
                                     </div>
 
-                                    <div class="input-append">
+                                    <div class="input-group">
                                         <label for="appendedInputAboveLoadTimes">
                                             <g:message code="de.iteratec.isr.wptrd.labels.trimabove"
                                                        default="Trim above"/>
@@ -310,12 +310,12 @@
                                         <input name="trimAboveLoadTimes" id="appendedInputAboveLoadTimes"
                                                value="${trimAboveLoadTimes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
-                                        <span class="add-on">ms</span>
+                                        <span class="input-group-addon">ms</span>
                                     </div>
                                     <h6><g:message code="de.iteratec.isr.measurand.group.REQUEST_COUNTS"
                                                    default="Anzahl Requests [c]"/></h6>
 
-                                    <div class="input-append">
+                                    <div class="input-group">
                                         <label for="appendedInputBelowRequestCounts">
                                             <g:message code="de.iteratec.isr.wptrd.labels.trimbelow"
                                                        default="Trim below"/>
@@ -323,10 +323,10 @@
                                         <input name="trimBelowRequestCounts" id="appendedInputBelowRequestCounts"
                                                value="${trimBelowRequestCounts}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
-                                        <span class="add-on">REQ</span>
+                                        <span class="input-group-addon">REQ</span>
                                     </div>
 
-                                    <div class="input-append">
+                                    <div class="input-group">
                                         <label for="appendedInputAboveRequestCounts">
                                             <g:message code="de.iteratec.isr.wptrd.labels.trimabove"
                                                        default="Trim above"/>
@@ -334,12 +334,12 @@
                                         <input name="trimAboveRequestCounts" id="appendedInputAboveRequestCounts"
                                                value="${trimAboveRequestCounts}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
-                                        <span class="add-on">REQ</span>
+                                        <span class="input-group-addon">REQ</span>
                                     </div>
                                     <h6><g:message code="de.iteratec.isr.measurand.group.REQUEST_SIZES"
                                                    default="Gr&ouml;&szlig;e Requests [kb]"/></h6>
 
-                                    <div class="input-append">
+                                    <div class="input-group">
                                         <label for="appendedInputBelowRequestSizes">
                                             <g:message code="de.iteratec.isr.wptrd.labels.trimbelow"
                                                        default="Trim below"/>
@@ -347,10 +347,10 @@
                                         <input name="trimBelowRequestSizes" id="appendedInputBelowRequestSizes"
                                                value="${trimBelowRequestSizes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
-                                        <span class="add-on">KB</span>
+                                        <span class="input-group-addon">KB</span>
                                     </div>
 
-                                    <div class="input-append">
+                                    <div class="input-group">
                                         <label for="appendedInputAboveRequestSizes">
                                             <g:message code="de.iteratec.isr.wptrd.labels.trimabove"
                                                        default="Trim above"/>
@@ -358,7 +358,7 @@
                                         <input name="trimAboveRequestSizes" id="appendedInputAboveRequestSizes"
                                                value="${trimAboveRequestSizes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
-                                        <span class="add-on">KB</span>
+                                        <span class="input-group-addon">KB</span>
                                     </div>
                                 </div>
                             </div>

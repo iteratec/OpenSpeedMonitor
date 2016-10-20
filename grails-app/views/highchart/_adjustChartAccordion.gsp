@@ -28,18 +28,18 @@
                         <div class="col-md-2 text-right"><g:message code="de.iteratec.chart.size.name"/></div>
 
                         <div class="col-md-9">
-                            <div class="input-prepend input-append">
-                                <span class="add-on"><g:message code="de.iteratec.chart.width.name"/></span>
+                            <div class="input-group">
+                                <span class="input-group-addon"><g:message code="de.iteratec.chart.width.name"/></span>
                                 <input class="col-md-1 content-box" id="dia-width" type="text"
                                        value="${initialChartWidth}">
-                                <span class="add-on">px</span>
+                                <span class="input-group-addon">px</span>
                             </div>
 
-                            <div class="input-prepend input-append">
-                                <span class="add-on"><g:message code="de.iteratec.chart.height.name"/></span>
+                            <div class="input-group">
+                                <span class="input-group-addon"><g:message code="de.iteratec.chart.height.name"/></span>
                                 <input class="col-md-1 content-box" id="dia-height" type="text"
                                        value="${initialChartHeight}">
-                                <span class="add-on">px</span>
+                                <span class="input-group-addon">px</span>
                             </div>
                             <button class="btn btn-default" id="dia-change-chartsize" style="vertical-align: top;"><g:message
                                     code="de.iteratec.ism.ui.button.apply.name"/></button>
@@ -51,18 +51,18 @@
                         <div class="col-md-2 text-right"><g:message code="de.iteratec.chart.axis.y.name"/></div>
 
                         <div class="col-md-9">
-                            <div class="input-prepend input-append ">
-                                <span class="add-on"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
+                            <div class="input-group ">
+                                <span class="input-group-addon"><g:message code="de.iteratec.chart.axis.y.minimum.name"/></span>
                                 <input class="col-md-1 content-box" id="dia-y-axis-min" type="text"
                                        value="${yAxisMin ?: ''}">
-                                <span class="add-on" id="minimumUnit"></span>
+                                <span class="input-group-addon" id="minimumUnit"></span>
                             </div>
 
-                            <div class="input-append input-prepend">
-                                <span class="add-on"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
+                            <div class="input-group">
+                                <span class="input-group-addon"><g:message code="de.iteratec.chart.axis.y.maximum.name"/></span>
                                 <input class="col-md-1 content-box" id="dia-y-axis-max" type="text"
                                        value="${yAxisMax ?: ''}">
-                                <span class="add-on" id="maximumUnit"></span>
+                                <span class="input-group-addon" id="maximumUnit"></span>
                             </div>
                             <button class="btn btn-default" id="dia-change-yaxis" style="vertical-align: top;"><g:message
                                     code="de.iteratec.ism.ui.button.apply.name"/></button>

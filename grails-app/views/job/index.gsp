@@ -125,22 +125,22 @@
 
             <div>
                 <g:checkBox onchange="filterJobList()"
-                            id="filterCheckedJobs" class="checkbox inline"
+                            id="filterCheckedJobs" class="checkbox-inline"
                             name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/><label
                     for="filterCheckedJobs"><g:message
                         code="job.filter.filterCheckedJobs"/></label>
                 <g:checkBox
-                        onchange="filterJobList()" id="filterHighlightedJobs" class="checkbox inline"
+                        onchange="filterJobList()" id="filterHighlightedJobs" class="checkbox-inline"
                         name="filters.filterHighlightedJobs" value="${filters?.filterHighlightedJobs}"/><label
                     for="filterHighlightedJobs"><g:message
                         code="job.filter.filterHighlightedJobs"/></label>
                 <g:checkBox
-                        onchange="filterJobList()" id="filterRunningJobs" class="checkbox inline"
+                        onchange="filterJobList()" id="filterRunningJobs" class="checkbox-inline"
                         name="filters.filterRunningJobs" value="${filters?.filterRunningJobs}"/><label
                     for="filterRunningJobs"><g:message
                         code="job.filter.filterRunningJobs"/></label>
                 <g:checkBox
-                        onchange="filterJobList()" id="filterInactiveJobs" class="checkbox inline"
+                        onchange="filterJobList()" id="filterInactiveJobs" class="checkbox-inline"
                         name="filters.filterInactiveJobs" value="${filters?.filterInactiveJobs}"/><label
                     for="filterInactiveJobs"><g:message
                         code="job.filter.filterInactiveJobs"/></label>

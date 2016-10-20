@@ -161,7 +161,7 @@
 
                     <fieldset id="includeInterval">
                         <div class="col-md-3">
-                            <label class="checkbox inline">
+                            <label class="checkbox-inline">
                                 <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
                                 &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
                                                  default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
@@ -269,21 +269,21 @@
                 </p>
                 <g:if test="${exceedsTimeframeBoundary}">
                     <g:if test="${selectedInterval.intervalInMinutes == 60}">
-                        <p class="text-error"><g:message
+                        <p class="text-danger"><g:message
                                 code="de.iteratec.isocsi.csi.timeframe.boundary.hourly.exceeded"
                                 default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
                     </g:if>
                     <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
-                        <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
+                        <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
                                                          default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
                     </g:elseif>
                     <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
-                        <p class="text-error"><g:message
+                        <p class="text-danger"><g:message
                                 code="de.iteratec.isocsi.csi.timeframe.boundary.weekly.exceeded"
                                 default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
                     </g:elseif>
                     <g:else>
-                        <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
+                        <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
                                                          default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
                     </g:else>
                 </g:if>

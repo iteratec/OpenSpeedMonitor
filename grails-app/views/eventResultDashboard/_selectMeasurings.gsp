@@ -103,7 +103,7 @@ GSP-Template Mappings:
                                   optionValue="name"
                                   value="${selectedMeasuredEventIds}"
                                   multiple="true"/>
-                        <label class="checkbox inline">
+                        <label class="checkbox-inline">
                             <g:checkBox name="selectedAllMeasuredEvents"
                                         checked="${selectedAllMeasuredEvents}" value="${true}"/>
                             <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllMeasuredEvents.label"
@@ -126,7 +126,7 @@ GSP-Template Mappings:
                                       name="selectedBrowsers" from="${browsers}" optionKey="id"
                                       optionValue="${{ it.name + ' (' + it.name + ')' }}" multiple="true"
                                       value="${selectedBrowsers}"/>
-                            <label class="checkbox inline">
+                            <label class="checkbox-inline">
                                 <g:checkBox name="selectedAllBrowsers"
                                             checked="${selectedAllBrowsers}" value="${true}"/>
                                 <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllBrowsers.label"
@@ -149,7 +149,7 @@ GSP-Template Mappings:
                                       optionValue="${it}"
                                       multiple="true" value="${selectedLocations}"/>
                             <br>
-                            <label class="checkbox inline">
+                            <label class="checkbox-inline">
                                 <g:checkBox name="selectedAllLocations"
                                             checked="${selectedAllLocations}" value="${true}"/>
                                 <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllLocations.label"
@@ -176,7 +176,7 @@ GSP-Template Mappings:
                                       name="selectedConnectivityProfiles" from="${connectivityProfiles}" optionKey="id"
                                           multiple="true"
                                       value="${selectedConnectivityProfiles}"/>
-                            <label class="checkbox inline">
+                            <label class="checkbox-inline">
                                 <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
                                             checked="${selectedAllConnectivityProfiles}" value="${true}"/>
                                 <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
@@ -184,14 +184,14 @@ GSP-Template Mappings:
                             </label>
                             <g:if test="${showExtendedConnectivitySettings}">
                                 <br>
-                                <label class="checkbox inline">
+                                <label class="checkbox-inline">
                                     <g:checkBox name="includeNativeConnectivity" id="includeNativeConnectivity"
                                                 checked="${includeNativeConnectivity}" value="${true}"/>
                                     <g:message code="de.iteratec.osm.result.include-native-connectivity.label"
                                                default="Show measurements with native connectivity"/>
                                 </label>
                                 <br>
-                                <label class="checkbox inline" for="customConnectivityName">
+                                <label class="checkbox-inline" for="customConnectivityName">
                                     <g:checkBox name="includeCustomConnectivity" id="includeCustomConnectivity"
                                                 checked="${includeCustomConnectivity}" value="${true}"/>
                                     <g:message code="de.iteratec.osm.result.include-custom-connectivity.label"

@@ -15,14 +15,14 @@
 
 
     <div class="controls">
-        <div class="input-append bootstrap-timepicker" }>
+        <div class="input-group bootstrap-timepicker" }>
             <input id="fromHourTimepicker" name="time" type="text" class="input-small content-box"
                    value="<g:if
                            test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
                        ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
                    </g:if>
                    <g:else>00:00</g:else>">
-            <span class="add-on"><i class="fa fa-clock-o"></i></span>
+            <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
         </div>
     </div>
 </div>

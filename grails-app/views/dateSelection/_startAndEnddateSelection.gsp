@@ -26,16 +26,16 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 	<div class="row">
 		<div class="col-md-1">&nbsp;</div>
 			<div class="col-md-2">
-				<label class="checkbox inline">
+				<label class="checkbox-inline">
 					<g:checkBox name="setFromHour" id="setFromHour" checked="${setFromHour}"/>
 					&nbsp;<g:message code="de.iteratec.osm.report.ui.labels.set-time-manually" default="Uhrzeit&nbsp;manuell&nbsp;setzen" />
 				</label>
 			</div>
 			<fieldset id="fldset-startdate-hour">
 				<div class="col-md-2">
-					<div class="input-append bootstrap-timepicker">
+					<div class="input-group bootstrap-timepicker">
 						<input id="fromHourTimepicker" type="text" class="input-small content-box" value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled>
-						<span class="add-on"><i class="fa fa-clock-o"></i></span>
+						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</div>
 			</fieldset>
@@ -58,16 +58,16 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 	<div class="row">
 		<div class="col-md-1">&nbsp;</div>
 			<div class="col-md-2">
-				<label class="checkbox inline">
+				<label class="checkbox-inline">
 					<g:checkBox name="setToHour" id="setToHour" checked="${setFromHour}"/>
 					&nbsp;<g:message code="de.iteratec.osm.report.ui.labels.set-time-manually" default="Uhrzeit&nbsp;manuell&nbsp;setzen" />
 				</label>
 			</div>
 			<fieldset id="fldset-enddate-hour">
 				<div class="col-md-2">
-					<div class="input-append bootstrap-timepicker">
+					<div class="input-group bootstrap-timepicker">
 						<input id="toHourTimepicker" type="text" class="input-small content-box" value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled>
-						<span class="add-on"><i class="fa fa-clock-o"></i></span>
+						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</div>
 			</fieldset>

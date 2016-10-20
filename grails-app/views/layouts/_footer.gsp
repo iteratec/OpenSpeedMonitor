@@ -4,7 +4,7 @@
 		<div class="row">
 			<div class="col-md-2">
 				<h4><g:message code="default.product.title" locale="${lang}"/></h4>
-				<ul class="unstyled">
+				<ul class="list-unstyled">
 					<li>
 			    		<i class="fa fa-home"></i>
 						<a href="${createLink(uri: '/')}"><g:message code="default.home.label" locale="${lang}"/></a>
@@ -14,7 +14,7 @@
 			</div>
 			<div class="col-md-10">
 				<h4><g:message code="default.info.title" locale="${lang}"/></h4>
-                <ul class="unstyled">
+                <ul class="list-unstyled">
                     <li>
                         <i class="fa fa-info-circle"></i>
                         <a href="${createLink(uri: '/about')}">

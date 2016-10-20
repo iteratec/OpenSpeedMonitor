@@ -56,7 +56,7 @@
 <div class="container">
     <div class="row">
         <div class="col-md-3">
-            <label class="checkbox inline">
+            <label class="checkbox-inline">
             <g:checkBox name="filterBatchesByActiveCheckbox" id="filterBatchesByActiveCheckbox"
                         checked="${false}" value="${false}"/>
             <g:message code="de.iteratec.osm.batch.onlyOpenActivities.label"
@@ -65,7 +65,7 @@
         </div>
         <div style="display: none;" id="limitResultsCheckboxContainer">
             <div class="col-md-3">
-                <label class="checkbox inline">
+                <label class="checkbox-inline">
                 <g:checkBox name="limitResultsCheckbox" id="limitResultsCheckbox"
                             checked="${true}" value="${true}"/>
                 <g:message code="de.iteratec.osm.responsiveTable.limitedResults.lable"
