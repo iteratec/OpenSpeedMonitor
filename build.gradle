@@ -188,7 +188,7 @@ task bowerSyncJavascript(type: Sync) {
     into "grails-app/assets/javascripts/bower_components"
     include 'jquery/jquery.min.js'
     include 'jquery-ui/ui/minified/jquery-ui.min.js'
-    include 'bootstrap/docs/assets/js/bootstrap.min.js'
+    include 'bootstrap/dist/js/bootstrap.min.js'
     include 'clipboard/dist/clipboard.min.js'
     dependsOn bowerInstall
 }
@@ -196,8 +196,9 @@ task bowerSyncJavascript(type: Sync) {
 task bowerSyncStylesheets(type: Sync) {
     from 'bower_components'
     into "grails-app/assets/stylesheets/bower_components"
-    include 'bootstrap/docs/assets/css/bootstrap*.css'
+    include 'bootstrap/dist/css/bootstrap*.min.css'
     include 'bootstrap/less/*.less'
+    include 'bootstrap/less/mixins/*.less'
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
     dependsOn bowerInstall

@@ -9,8 +9,8 @@
 }
 
 .iteratec-grid-border-left {
-  margin-left: ((@gridGutterWidth - 4) / 2) !important;
-  padding-left: ((@gridGutterWidth - 4) / 2) !important;
+  margin-left: ((@grid-gutter-width - 4) / 2) !important;
+  padding-left: ((@grid-gutter-width - 4) / 2) !important;
   border-left: 2px solid #cdcdcd;
 
   height: 250px !important;
@@ -57,7 +57,6 @@
 }
 
 .input-medium-height30 {
-  .input-medium;
   height: 24px !important;
   padding: 2px 6px !important;
 }
@@ -68,7 +67,7 @@
 }
 
 .chart-tiptext {
-  color: @white;
+  color: @gray-lighter;
   font-size: 10pt;
   white-space: nowrap;
 }
@@ -180,7 +179,7 @@ input.ui-autocomplete-input {
   position: relative;
   height: 0;
   overflow: auto;
-  .transition(height .35s ease);
+  transition: height .35s ease;
   &.in {
     height: auto;
   }
@@ -191,19 +190,18 @@ input.ui-autocomplete-input {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: @zindexPopover;
+  z-index: @zindex-popover;
   display: none;
   max-width: 800px;
   padding: 1px;
   text-align: left; // Reset given new insertion method
-  background-color: @popoverBackground;
+  background-color: @popover-bg;
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-  border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, .2);
-  .border-radius(6px);
-  .box-shadow(0 5px 10px rgba(0, 0, 0, .2));
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
 
   // Overrides for proper insertion
   white-space: normal;
@@ -230,12 +228,12 @@ input.ui-autocomplete-input {
   float: left;
   display: block;
   // Vertically center the text given @navbarHeight
-  padding: ((@navbarHeight - @baseLineHeight) / 2) 20px 6px !important;
+  //padding: ((@navbar-height - @base-line-height) / 2) 20px 6px !important;
   margin-left: -20px; // negative indent to left-align the text down the page
   font-size: 20px;
   font-weight: 200;
-  color: @navbarBrandColor;
-  text-shadow: 0 1px 0 @navbarBackgroundHighlight;
+  color: @navbar-default-brand-color;
+  text-shadow: 0 1px 0 @navbar-default-bg;
   &:hover,
   &:focus {
     text-decoration: none;
@@ -248,7 +246,7 @@ input.ui-autocomplete-input {
 }
 
 //bootstrap variables
-@navbarBackgroundHighlight: #AB0C0C; /*ffffff;*/
+@navbar-default-bg: #AB0C0C; /*ffffff;*/
 
 //bootstrap responsive-utilities
 // Required for Windows 8 Metro split-screen snapping with IE10
