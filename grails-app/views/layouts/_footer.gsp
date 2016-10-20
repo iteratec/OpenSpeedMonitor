@@ -2,7 +2,7 @@
 <footer class="footer">
 	<div class="container">
 		<div class="row">
-			<div class="span2">
+			<div class="col-md-2">
 				<h4><g:message code="default.product.title" locale="${lang}"/></h4>
 				<ul class="unstyled">
 					<li>
@@ -12,7 +12,7 @@
 
 				</ul>
 			</div>
-			<div class="span10">
+			<div class="col-md-10">
 				<h4><g:message code="default.info.title" locale="${lang}"/></h4>
                 <ul class="unstyled">
                     <li>

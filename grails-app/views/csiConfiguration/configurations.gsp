@@ -159,7 +159,7 @@
 <div class="row">
 
     %{--Name and description of actual config----------------------------------------------}%
-    <div class="span8">
+    <div class="col-md-8">
         <blockquote>
             <p class="text-info">
                 <strong id="headerCsiConfLabel">${selectedCsiConfiguration.label}</strong>
@@ -174,7 +174,7 @@
 
     <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner-25"></div>
     %{--dropdown button----------------------------------------------}%
-    <div class="span2 offset1">
+    <div class="col-md-2 col-md-offset-1">
 
         <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
 

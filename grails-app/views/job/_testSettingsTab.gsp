@@ -6,18 +6,18 @@
 
 <div class="form-group ${hasErrors(bean: job, field: 'firstViewOnly', 'error')}">
 	<div class="row">
-		<label for="chkbox-first-view" class="span3 text-right">
+		<label for="chkbox-first-view" class="col-md-3 text-right">
 			<g:message code="job.firstView.label" default="first view" />
 		</label>
-		<div class="span8">
+		<div class="col-md-8">
 			<input type="checkbox" class="form-control" id="chkbox-first-view" checked disabled>
 		</div>
 	</div>
 	<div class="row">
-		<label for="chkbox-repeated-view" class="span3 text-right">
+		<label for="chkbox-repeated-view" class="col-md-3 text-right">
 			<g:message code="job.repeatedView.label" default="repeated view" />
 		</label>
-		<div class="span8">
+		<div class="col-md-8">
 			<g:checkBox class="form-control" name="repeatedView" value="${ job ? !job.firstViewOnly : false }" id="chkbox-repeated-view"/>
 		</div>
 	</div>
@@ -26,19 +26,19 @@
 <g:render template="checkbox" model="${['booleanAttribute': 'persistNonMedianResults', 'job': job]}" />
 
 <div class="row form-group ${hasErrors(bean: job, field: 'description', 'error')} required">
-	<label for="description" class="span3 text-right">
+	<label for="description" class="col-md-3 text-right">
 		<g:message code="job.description.label" default="description" />
 	</label>
-	<div class="span8">
+	<div class="col-md-8">
 		<textarea class="form-control width_31em" name="description" id="description" rows="3">${job?.description?.trim()}</textarea>
 	</div>
 </div>
 
 <div class="row">
-	<label for="tags" class="span3 text-right">
+	<label for="tags" class="col-md-3 text-right">
 		<g:message code="job.tags.label" default="tags" />
 	</label>
-	<div class="span8">
+	<div class="col-md-8">
 		<ul name="tags" style="margin-left:0px;" id="tags" class="width_31em">
 		      <g:each in="${job?.tags}">
 		        <li>${it}</li>
@@ -49,13 +49,13 @@
 
 
 <div class="row form-group ${hasErrors(bean: job, field: 'maxDownloadTimeInMinutes', 'error')}">
-	<label class="span3 text-right" for="maxDownloadTimeInMinutesValue">
+	<label class="col-md-3 text-right" for="maxDownloadTimeInMinutesValue">
 		<abbr title="${message(code: 'job.maxDownloadTimeInMinutes.description', args: [defaultMaxDownloadTimeInMinutes])}" data-placement="bottom" rel="tooltip">
 			<g:message code="job.maxDownloadTimeInMinutes.label" default="maxDownloadTimeInMinutes" />
 		</abbr>
 		<span class="required-indicator">*</span>
 	</label> 
-	<div class="span8">
+	<div class="col-md-8">
 		<span id="maxDownloadTimeInMinutes">
 			<g:set var="isEditable" value="${job?.maxDownloadTimeInMinutes != defaultMaxDownloadTimeInMinutes}" />
 			<input type="text" class="form-control ${ isEditable ? '' : 'non-editable' }"
@@ -72,10 +72,10 @@
 	</div>
 </div>
 <div class="row form-group ${hasErrors(bean: job, field: 'executionSchedule', 'error')}">
-	<label class="span3 text-right" for="executionScheduleShown">
+	<label class="col-md-3 text-right" for="executionScheduleShown">
 		<g:message code="job.executionSchedule.label" default="executionSchedule" />
 	</label>
-	<div class="span8">
+	<div class="col-md-8">
 
         <input type="text" id="execution-schedule-shown" class="form-control"
                value="${job.executionSchedule ? job.executionSchedule.substring(job.executionSchedule.indexOf(' ')+1, job.executionSchedule.size()) : ''}"
@@ -94,32 +94,32 @@
 
 
 <div class="row form-group ${hasErrors(bean: job, field: 'jobGroup', 'error')} required">
-	<label class="span3 text-right" for="jobGroup">
+	<label class="col-md-3 text-right" for="jobGroup">
 		<g:message code="job.jobGroup.label" default="jobGroup" />
 		<span class="required-indicator">*</span>
 	</label>
-	<div class="span8">
+	<div class="col-md-8">
 		<g:select id="jobgroup" class="form-control chosen" name="jobGroup.id" from="${JobGroup.list()}"
 			value="${job?.jobGroup?.id}" optionValue="name" optionKey="id" />
 	</div>
 </div>
 
 <div class="row form-group ${hasErrors(bean: job, field: 'runs', 'error')} required">
-	<label class="span3 text-right" for="runs"> <g:message
+	<label class="col-md-3 text-right" for="runs"> <g:message
 			code="job.runs.label" default="runs" /> <span
 		class="required-indicator">*</span>
 	</label>
-	<div class="span8">
+	<div class="col-md-8">
 		<g:textField class="form-control" name="runs" value="${job?.runs ?: 1}" />
 	</div>
 </div>
 
 <div class="row form-group">
-    <label class="span3 text-right" for="connectivityProfile"> <g:message
+    <label class="col-md-3 text-right" for="connectivityProfile"> <g:message
             code="connectivityProfile.label" default="connectivityProfile" />
     <span class="required-indicator">*</span>
     </label>
-    <div class="span8">
+    <div class="col-md-8">
         <g:select id="connectivityProfile"
                   class="iteratec-element-select chosen"
                   data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
@@ -133,10 +133,10 @@
     <input type="hidden" id="customConnectivityProfile" name="customConnectivityProfile" value="${job?.customConnectivityProfile}" />
     <input type="hidden" id="noTrafficShapingAtAll" name="noTrafficShapingAtAll" value="${job?.noTrafficShapingAtAll}" />
     <div class="row form-group">
-        <label class="span3 text-right" for="customConnectivityName">
+        <label class="col-md-3 text-right" for="customConnectivityName">
             <g:message code="job.customConnectivityProfile.label" default="Name of custom connectivity profile" />
         </label>
-        <div class="span8">
+        <div class="col-md-8">
             <g:textField class="form-control input-xxlarge" name="customConnectivityName" id="custom-connectivity-name"
                          value="${job?.customConnectivityName}" readonly="readonly" />
             <label class="checkbox inline">
@@ -147,11 +147,11 @@
     </div>
     <g:each var="attribute" in="['bandwidthDown', 'bandwidthUp', 'latency', 'packetLoss']">
         <div class="row form-group ${hasErrors(bean: job, field: attribute, 'error')}">
-            <label class="span3 text-right" for="${attribute}">
+            <label class="col-md-3 text-right" for="${attribute}">
                 <g:message code="connectivityProfile.${attribute}.label"
                            default="${attribute}" />
             </label>
-            <div class="span8">
+            <div class="col-md-8">
                 <g:textField class="form-control" name="${attribute}" id="custom-${attribute}"
                              value="${job?."$attribute"}" />
             </div>

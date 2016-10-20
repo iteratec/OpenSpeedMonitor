@@ -8,31 +8,31 @@
 		<div class="control-group">
 			<label class="control-label" for="firstname">${message(code: 'security.firstname.label', default: 'Firstname')}</label>
 			<div class="controls">
-				<input type="text" class="span3" name="firstname" id="firstname" placeholder="${message(code: 'security.firstname.label', default: 'Firstname')}">
+				<input type="text" class="col-md-3" name="firstname" id="firstname" placeholder="${message(code: 'security.firstname.label', default: 'Firstname')}">
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="lastname">${message(code: 'security.lastname.label', default: 'Lastname')}</label>
 			<div class="controls">
-				<input type="text" class="span3" name="lastname" id="lastname" placeholder="${message(code: 'security.lastname.label', default: 'Lastname')}">
+				<input type="text" class="col-md-3" name="lastname" id="lastname" placeholder="${message(code: 'security.lastname.label', default: 'Lastname')}">
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="email">${message(code: 'security.email.label', default: 'Email')}</label>
 			<div class="controls">
-				<input type="text" class="span3" name="email" id="email" placeholder="${message(code: 'security.email.label', default: 'Email')}">
+				<input type="text" class="col-md-3" name="email" id="email" placeholder="${message(code: 'security.email.label', default: 'Email')}">
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="password">${message(code: 'security.password.label', default: 'Password')}</label>
 			<div class="controls">
-				<input type="password" class="span3" name="password" id="password" placeholder="${message(code: 'security.password.label', default: 'Password')}">
+				<input type="password" class="col-md-3" name="password" id="password" placeholder="${message(code: 'security.password.label', default: 'Password')}">
 			</div>
 		</div>
 		<div class="control-group">
 			<label class="control-label" for="confirmpasswd">${message(code: 'security.password.confirm.label', default: 'Confirm')}</label>
 			<div class="controls">
-				<input type="password" class="span3" name="confirmpasswd" id="confirmpasswd" placeholder="${message(code: 'security.password.confirm.label', default: 'Confirm')}">
+				<input type="password" class="col-md-3" name="confirmpasswd" id="confirmpasswd" placeholder="${message(code: 'security.password.confirm.label', default: 'Confirm')}">
 			</div>
 		</div>
 		<div class="control-group">

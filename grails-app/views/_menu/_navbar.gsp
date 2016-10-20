@@ -2,8 +2,8 @@
 <div id="Navbar" class="navbar navbar-fixed-top navbar-inverse">
 	<div class="navbar-inner">
 		<div class="container">
-			<!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+			<!-- .navbar-btn is used as the toggle for collapsed navbar content -->
+			<a class="btn navbar-btn" data-toggle="collapse" data-target=".nav-collapse">
 				<span class="icon-bar"></span>
             	<span class="icon-bar"></span>
             	<span class="icon-bar"></span>
@@ -13,7 +13,7 @@
         <img class="logo" src="${resource(dir:'images',file:'OpenSpeedMonitor-onblack-monitorWritingLight_39pxHeight.gif')}" alt="${meta(name:'app.name')}" />
 			</a>
 
-       		<div class="nav-collapse">
+       		<div class="navbar-collapse">
 
 	  			<div class="pull-left">
 					<%--Left-side entries--%>

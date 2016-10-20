@@ -21,7 +21,7 @@ GSP-Template Mappings:
 * selectedAllLocations
  --%>
 <div class="row">
-    <div class="span4" id="filter-navtab-jobGroup">
+    <div class="col-md-4" id="filter-navtab-jobGroup">
     %{--JobGroups----------------------------------------------------------------------------------------------}%
         <div style="padding-top: 60px;"></div>
         <label for="folderSelectHtmlId">
@@ -56,7 +56,7 @@ GSP-Template Mappings:
     %{--the rest----------------------------------------------------------------------------------------------}%
     <div id="filter-complete-tabbable">
 
-        <div class="span7 tabbable">
+        <div class="col-md-7 tabbable">
             <ul class="nav nav-tabs">
                 <li class="active" id="filter-navtab-page">
                     <a href="#tab1" data-toggle="tab">
@@ -77,7 +77,7 @@ GSP-Template Mappings:
 
             <div class="tab-content">
                 <div class="tab-pane active" id="tab1">
-                    <div class="span6">
+                    <div class="col-md-6">
                         <label for="pageSelectHtmlId">
                             <strong>
                                 <g:message code="de.iteratec.isr.wptrd.labels.filterPage" default="Pages:"/>
@@ -87,7 +87,7 @@ GSP-Template Mappings:
                                   from="${pages}" optionKey="id" optionValue="name" multiple="true"
                                   value="${selectedPages}"/>
                     </div>
-                    <div id="filter-measured-event" class="span6">
+                    <div id="filter-measured-event" class="col-md-6">
                         <label for="selectedMeasuredEventsHtmlId">
                             <strong>
                                 <g:message code="de.iteratec.isr.wptrd.labels.filterMeasuredEvent"
@@ -114,7 +114,7 @@ GSP-Template Mappings:
 
                 <div class="tab-pane" id="tab2">
                     <div id="filter-browser-and-location">
-                        <div class="span6">
+                        <div class="col-md-6">
                             <label for="selectedBrowsersHtmlId">
                                 <strong>
                                     <g:message code="de.iteratec.isr.wptrd.labels.filterBrowser"
@@ -134,7 +134,7 @@ GSP-Template Mappings:
                             </label>
                         </div>
 
-                        <div class="span6">
+                        <div class="col-md-6">
                             <br>
                             <label for="selectedLocationsHtmlId">
                                 <strong>
@@ -160,7 +160,7 @@ GSP-Template Mappings:
                 </div>
                     <div class="tab-pane" id="tab3">
                         <div id="filter-connectivityprofile">
-                        <div class="span6">
+                        <div class="col-md-6">
                             <label for="selectedConnectivityProfilesHtmlId">
                                 <strong>
                                     <g:message code="de.iteratec.isr.wptrd.labels.filterConnectivityProfile"

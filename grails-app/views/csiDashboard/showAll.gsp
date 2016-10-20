@@ -55,7 +55,7 @@
 <g:render template="/layouts/mainMenu"/>
 <%-- user specific dashboards --%>
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <div class="btn-group">
             <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
                 <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
@@ -91,7 +91,7 @@
 
 <%-- Überschrift --%>
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <h3><g:message code="de.iteratec.isocsi.csi.heading" default="Kundenzufriedenheit (CSI)"/></h3>
 
         <p>
@@ -140,7 +140,7 @@
 
 
             <div class="row">
-                <div class="span6">
+                <div class="col-md-6">
                     <fieldset>
                         <legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading"
                                            default="Aggregator"/></legend>
@@ -155,12 +155,12 @@
                     </fieldset>
                 </div>
 
-                <div class="span6">
+                <div class="col-md-6">
                     <g:render template="/dateSelection/startAndEnddateSelection"
                               model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'fromHour': fromHour, 'to': to, 'toHour': toHour, 'includeInterval': includeInterval]}"/>
 
                     <fieldset id="includeInterval">
-                        <div class="span3">
+                        <div class="col-md-3">
                             <label class="checkbox inline">
                                 <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
                                 &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
@@ -172,7 +172,7 @@
             </div>
 
             <div class="row">
-                <div class="span12">
+                <div class="col-md-12">
                     <legend>
                         <g:message code="de.iteratec.isocsi.csi.filter.heading" default="Filter"/>
                     </legend>
@@ -180,7 +180,7 @@
             </div>
 
             <div class="row">
-                <div class="span4" id="filter-navtab-csiSystem">
+                <div class="col-md-4" id="filter-navtab-csiSystem">
                     <div style="padding-top: 60px;"></div>
                     <label for="folderSelectCsiSystem">
                         <strong>
@@ -217,12 +217,12 @@
             <div style="clear:both;"></div>
 
             <div class="row">
-                <div class="span12">
+                <div class="col-md-12">
                     <legend>
                         <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
                     </legend>
 
-                    <div class="span12">
+                    <div class="col-md-12">
                         <div class="control-group">
                             <div class="controls">
                                 <label class="checkbox" for="csiTypeDocComplete">
@@ -295,7 +295,7 @@
     <hr>
 
     <div class="row">
-        <div class="span1">
+        <div class="col-md-1">
             <div id="chart-table-toggle" class="btn-group" data-toggle="buttons-radio" id="job-filter-toggle">
                 <button type="button" class="btn btn-small active" id="chart-toggle"><g:message
                         code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
@@ -340,7 +340,7 @@
             </g:elseif>
         </g:if>
         <div id="chartbox">
-            <div class="span12 well">
+            <div class="col-md-12 well">
                 <g:render template="/highchart/chart"
                           model="[
                                   singleYAxis                  : 'false',
@@ -364,7 +364,7 @@
             </div>
         </div>
         <%-- table --%>
-        <div id="csi-table" class="span12" style="display: none;">
+        <div id="csi-table" class="col-md-12" style="display: none;">
             <g:if test="${flash.tableDataError}">
                 <div class="alert alert-error">
                     <g:message error="${flash.tableDataError}"/>
@@ -388,7 +388,7 @@
     <g:if test="${request.queryString}">
         <g:if test="${!warnAboutLongProcessingTime}">
             <div class="row">
-                <div class="span12" id="noDataForCurrentSelectionWarning">
+                <div class="col-md-12" id="noDataForCurrentSelectionWarning">
                     <strong><g:message
                             code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
                 </div>

@@ -19,7 +19,7 @@
 
 <%-- userspecific dashboards --%>
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <div class="btn-toolbar" style="margin: 0;">
             <div class="btn-group">
                 <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
@@ -53,7 +53,7 @@
 <br/>
 
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
                 <div class="alert alert-error">
@@ -70,7 +70,7 @@
 </div>
 
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <g:if test="${startedBatchActivity != null}">
             <g:if test="${startedBatchActivity == true}">
                 <div class="alert alert-info">
@@ -88,7 +88,7 @@
 </div>
 
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <form method="get" action="" id="dashBoardParamsForm">
             <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message
                     code="de.iteratec.ism.ui.labels.save.success"
@@ -115,13 +115,13 @@
             </g:if>
 
 
-            <div class="accordion">
-                <div class="accordion-group">
-                    <div class="accordion-heading accordion-custom-heading">
+            <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-heading accordion-custom-heading">
                         <div class="row">
-                            <div class="span12">
+                            <div class="col-md-12">
                                 <div class="row">
-                                    <div class="span3">
+                                    <div class="col-md-3">
                                         <a class="accordion-toggle accordion-link fa fa-chevron-up"
                                            data-toggle="collapse" data-parent="#accordion2" href="#collapseOne">
                                             <g:message code="de.iteratec.sri.wptrd.time.filter.heading"
@@ -129,35 +129,35 @@
                                         </a>
                                     </div>
 
-                                    <div class="span2 accordion-info text-right">
+                                    <div class="col-md-2 accordion-info text-right">
                                         <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
                                                    default="Aggregation"/>:<br>
                                         <g:message code="de.iteratec.isocsi.csi.timeframe.heading"
                                                    default="Timeframe"/>:
                                     </div>
 
-                                    <div class="span7 accordion-info" id="accordion-info-date"></div>
+                                    <div class="col-md-7 accordion-info" id="accordion-info-date"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <g:if test="${request.queryString}"><div id="collapseOne" class="accordion-body collapse"></g:if>
-                    <g:else><div id="collapseOne" class="accordion-body collapse in"></g:else>
-                    <div class="accordion-inner" id="accordion-inner-date">
+                    <g:if test="${request.queryString}"><div id="collapseOne" class="panel-collapse collapse"></g:if>
+                    <g:else><div id="collapseOne" class="panel-collapse collapse in"></g:else>
+                    <div class="panel-body" id="accordion-inner-date">
 
                         <div class="row">
-                            <div class="span5">
+                            <div class="col-md-5">
                                 <legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading"
                                                    default="Aggregation"/></legend>
 
                                 <div class="row">
-                                    <div class="span1">
+                                    <div class="col-md-1">
                                         <g:message
                                                 code="de.iteratec.isr.wptrd.labels.timeframes.interval"
                                                 default="Interval"/>:
                                     </div>
 
-                                    <div class="span2">
+                                    <div class="col-md-2">
                                         <g:select id="selectedIntervalHtmlId" class="input-medium"
                                                   name="selectedInterval" from="${csiAggregationIntervals}"
                                                   valueMessagePrefix="de.iteratec.isr.wptrd.intervals"
@@ -166,7 +166,7 @@
                                 </div>
                             </div>
 
-                            <div class="span5">
+                            <div class="col-md-5">
                                 <g:render template="/dateSelection/startAndEnddateSelection"
                                           model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'fromHour': fromHour, 'to': to, 'toHour': toHour]}"/>
                             </div>
@@ -174,12 +174,12 @@
                     </div>
                 </div>
                 </div>
-                    <div class="accordion-group">
-                        <div class="accordion-heading accordion-custom-heading">
+                    <div class="panel panel-default">
+                        <div class="panel-heading accordion-custom-heading">
                             <div class="row">
-                                <div class="span12">
+                                <div class="col-md-12">
                                     <div class="row">
-                                        <div class="span3">
+                                        <div class="col-md-3">
                                             <a class="accordion-toggle accordion-link fa fa-chevron-up"
                                                data-toggle="collapse" data-parent="#accordion2" href="#collapseTwo">
                                                 <g:message code="de.iteratec.sri.wptrd.jobs.filter.heading"
@@ -187,7 +187,7 @@
                                             </a>
                                         </div>
 
-                                        <div class="span2 accordion-info text-right">
+                                        <div class="col-md-2 accordion-info text-right">
                                             <g:message code="de.iteratec.isr.wptrd.labels.filterFolder"
                                                        default="Job Group"/>:<br>
                                             <g:message code="de.iteratec.osm.result.page.label"
@@ -200,14 +200,14 @@
                                                        default="Connectivity"/>:<br>
                                         </div>
 
-                                        <div class="span7 accordion-info" id="accordion-info-jobs"></div>
+                                        <div class="col-md-7 accordion-info" id="accordion-info-jobs"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <g:if test="${request.queryString}"><div id="collapseTwo" class="accordion-body collapse"></g:if>
-                        <g:else><div id="collapseTwo" class="accordion-body collapse in"></g:else>
-                        <div class="accordion-inner" style="margin: 0px; padding: 4px;">
+                        <g:if test="${request.queryString}"><div id="collapseTwo" class="panel-collapse collapse"></g:if>
+                        <g:else><div id="collapseTwo" class="panel-collapse collapse in"></g:else>
+                        <div class="panel-body" style="margin: 0px; padding: 4px;">
                             <g:render template="selectMeasurings"
                                       model="${['locationsOfBrowsers'             : locationsOfBrowsers,
                                                 'eventsOfPages'                   : eventsOfPages,
@@ -231,12 +231,12 @@
                         </div>
                     </div>
                     </div>
-                        <div class="accordion-group">
-                            <div class="accordion-heading accordion-custom-heading">
+                        <div class="panel panel-default">
+                            <div class="panel-heading accordion-custom-heading">
                                 <div class="row">
-                                    <div class="span12">
+                                    <div class="col-md-12">
                                         <div class="row">
-                                            <div class="span3">
+                                            <div class="col-md-3">
                                                 <a class="accordion-toggle accordion-link fa fa-chevron-up"
                                                    data-toggle="collapse" data-parent="#accordion2"
                                                    href="#collapseThree">
@@ -245,20 +245,20 @@
                                                 </a>
                                             </div>
 
-                                            <div class="span2 accordion-info text-right">
+                                            <div class="col-md-2 accordion-info text-right">
                                                 <g:message code="job.firstView.label" default="First View"/>:<br>
                                                 <g:message code="job.repeatedView.label" default="Repeated View"/>:<br>
                                             </div>
 
-                                            <div class="span7 accordion-info" id="accordion-info-measurements"></div>
+                                            <div class="col-md-7 accordion-info" id="accordion-info-measurements"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <g:if test="${request.queryString}"><div id="collapseThree" class="accordion-body collapse"></g:if>
-                            <g:else><div id="collapseThree" class="accordion-body collapse in"></g:else>
-                            <div class="accordion-inner">
-                                <div class="span4">
+                            <g:if test="${request.queryString}"><div id="collapseThree" class="panel-collapse collapse"></g:if>
+                            <g:else><div id="collapseThree" class="panel-collapse collapse in"></g:else>
+                            <div class="panel-body">
+                                <div class="col-md-4">
                                     <label for="selectAggregatorUncachedHtmlId"><g:message
                                             code="de.iteratec.isr.wptrd.labels.filterFirstView"
                                             default="First View:"/></label>
@@ -274,7 +274,7 @@
                                                                value="${selectedAggrGroupValuesUnCached}"/>
                                 </div>
 
-                                <div class="span4">
+                                <div class="col-md-4">
                                     <label for="selectAggregatorCachedHtmlId"><g:message
                                             code="de.iteratec.isr.wptrd.labels.filterRepeatedView"
                                             default="Repeated View:"/></label>
@@ -287,7 +287,7 @@
                                                                value="${selectedAggrGroupValuesCached}"/>
                                 </div>
 
-                                <div class="span3">
+                                <div class="col-md-3">
                                     <h6><g:message code="de.iteratec.isr.measurand.group.LOAD_TIMES"
                                                    default="Ladezeiten [ms]"/></h6>
 
@@ -297,7 +297,7 @@
                                                        default="Trim below"/>
                                         </label>
                                         <input name="trimBelowLoadTimes" id="appendedInputBelowLoadTimes"
-                                               value="${trimBelowLoadTimes}" class="span1 content-box" type="text"
+                                               value="${trimBelowLoadTimes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
                                         <span class="add-on">ms</span>
                                     </div>
@@ -308,7 +308,7 @@
                                                        default="Trim above"/>
                                         </label>
                                         <input name="trimAboveLoadTimes" id="appendedInputAboveLoadTimes"
-                                               value="${trimAboveLoadTimes}" class="span1 content-box" type="text"
+                                               value="${trimAboveLoadTimes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
                                         <span class="add-on">ms</span>
                                     </div>
@@ -321,7 +321,7 @@
                                                        default="Trim below"/>
                                         </label>
                                         <input name="trimBelowRequestCounts" id="appendedInputBelowRequestCounts"
-                                               value="${trimBelowRequestCounts}" class="span1 content-box" type="text"
+                                               value="${trimBelowRequestCounts}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
                                         <span class="add-on">REQ</span>
                                     </div>
@@ -332,7 +332,7 @@
                                                        default="Trim above"/>
                                         </label>
                                         <input name="trimAboveRequestCounts" id="appendedInputAboveRequestCounts"
-                                               value="${trimAboveRequestCounts}" class="span1 content-box" type="text"
+                                               value="${trimAboveRequestCounts}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
                                         <span class="add-on">REQ</span>
                                     </div>
@@ -345,7 +345,7 @@
                                                        default="Trim below"/>
                                         </label>
                                         <input name="trimBelowRequestSizes" id="appendedInputBelowRequestSizes"
-                                               value="${trimBelowRequestSizes}" class="span1 content-box" type="text"
+                                               value="${trimBelowRequestSizes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
                                         <span class="add-on">KB</span>
                                     </div>
@@ -356,7 +356,7 @@
                                                        default="Trim above"/>
                                         </label>
                                         <input name="trimAboveRequestSizes" id="appendedInputAboveRequestSizes"
-                                               value="${trimAboveRequestSizes}" class="span1 content-box" type="text"
+                                               value="${trimAboveRequestSizes}" class="col-md-1 content-box" type="text"
                                                placeholder="...">
                                         <span class="add-on">KB</span>
                                     </div>
@@ -365,7 +365,7 @@
                         </div>
                         </div>
                             <div class="row">
-                                <div class="span12" id="bottomCommitButtons">
+                                <div class="col-md-12" id="bottomCommitButtons">
                                     <g:actionSubmit
                                             value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                                             action="showAll"
@@ -410,7 +410,7 @@
                                     </sec:ifLoggedIn>
                                 </div>
 
-                                <div class="span3" style="display: none;">
+                                <div class="col-md-3" style="display: none;">
                                     <%-- Not used as the point chatType isn't requested.
                                          To reactivate remove display: none; from outer div
                                          and set selectedChartType from="${[0,1]}"
@@ -429,7 +429,7 @@
         </form>
     </div>
     <g:if test="${request.queryString && command && !command.hasErrors() && !eventResultValues}">
-        <div class="span12">
+        <div class="col-md-12">
             <div class="alert alert-danger">
                 <strong><g:message code="de.iteratec.ism.no.data.on.current.selection.heading"/></strong>
                 <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
@@ -438,7 +438,7 @@
     </g:if>
 
     <g:if test="${warnAboutExceededPointsPerGraphLimit}">
-        <div class="span12">
+        <div class="col-md-12">
             <div class="alert alert-danger">
                 <strong><g:message
                         code="de.iteratec.isr.EventResultDashboardController.warnAboutExceededPointsPerGraphLimit.title"/></strong>
@@ -455,7 +455,7 @@
         <a name="chart-table"></a>
 
         <div id="chartbox">
-            <div class="span12 well">
+            <div class="col-md-12 well">
                 <g:render template="/highchart/chart"
                           model="[
                                   chartData                    : eventResultValues,
@@ -481,7 +481,7 @@
         <g:if test="${startedBatchActivity == null}"> %{--User tried to load assets--}%
             <g:if test="${request.queryString}">
                 <g:if test="${!warnAboutLongProcessingTime}">
-                    <div class="span12" id="noDataForCurrentSelectionWarning">
+                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
                         <strong><g:message
                                 code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
                     </div>

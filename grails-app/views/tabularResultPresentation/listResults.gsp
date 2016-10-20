@@ -62,14 +62,14 @@
 
         <form method="get" action="">
             <div class="row">
-                <div class="span5">
+                <div class="col-md-5">
                     <g:render template="/dateSelection/startAndEnddateSelection"
                         model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from, 'fromHour':fromHour, 'to':to, 'toHour':toHour]}"/>
                 </div>
-                <div class="span5"></div>
+                <div class="col-md-5"></div>
             </div>
             <div class="row">
-                <div class="span12">
+                <div class="col-md-12">
                     <legend>
                         <g:message code="de.iteratec.isocsi.csi.filter.heading"
                             default="Filter" />

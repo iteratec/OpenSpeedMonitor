@@ -17,7 +17,7 @@
 
             <div class="controls">
                 <div id="spinner-position"></div>
-                <input type="text" class="span3" name="dashboardNameFromModal" id="dashboardNameFromModal"
+                <input type="text" class="col-md-3" name="dashboardNameFromModal" id="dashboardNameFromModal"
                        placeholder="${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}">
             </div>
         </div>

@@ -1,15 +1,15 @@
 <div class="container">
     <div class="row">
-        <div class="span3">
+        <div class="col-md-3">
             <div class="form-group">
                 <br>
                 <input placeholder="${message(code: 'de.iteratec.osm.responsiveTable.filter.lable', default: 'Filter')}" type="text" class="form-control" id="elementFilter">
             </div>
         </div>
-        <div class="span6">
+        <div class="col-md-6">
             <div align="center" class="pagination"><ul id="elementPager"></ul></div>
         </div>
-        <div class="span3">
+        <div class="col-md-3">
             <div align="right" class="form-group">
                 <label  for="elementsPerPage">${message(code: 'de.iteratec.osm.responsiveTable.elementsPerPage.lable', default: 'Elements per page:')}</label>
                 <input type="Number" class="form-control" id="elementsPerPage" value=100 min = 1>

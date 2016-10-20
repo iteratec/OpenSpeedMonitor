@@ -11,7 +11,7 @@
 		<div class="message" role="status">${flash.message}</div>
 	</g:if>
 	<div class="row">
-		<div class="span12">
+		<div class="col-md-12">
 			<g:if test="${registerCommand}">
 				<g:hasErrors bean="${registerCommand}">
 					<div class="alert alert-error">

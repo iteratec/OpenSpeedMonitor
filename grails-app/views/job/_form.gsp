@@ -2,19 +2,19 @@
 <%@ page import="de.iteratec.osm.measurement.environment.WebPageTestServer" %>
 
 <div class="row form-group ${hasErrors(bean: job, field: 'label', 'error')} required">
-	<label for="label" class="span3 text-right" style="width: 70px !important;">
+	<label for="label" class="col-md-3 text-right" style="width: 70px !important;">
 		<g:message code="job.label.label" default="label" /><span class="required-indicator">*</span>
 	</label>
-	<div class="span9">
+	<div class="col-md-9">
 		<g:textField class="form-control width_31em" name="label" value="${job?.label}" />
 	</div>
 </div>
 
 <div class="row form-group ${hasErrors(bean: job, field: 'location', 'error')} required">
-	<label class="span3 text-right" for="location" style="width: 70px !important;"> 
+	<label class="col-md-3 text-right" for="location" style="width: 70px !important;">
 		<g:message code="job.location.label" default="location" /><span class="required-indicator">*</span>
 	</label> 
-	<div class="span9">
+	<div class="col-md-9">
 		<select id="location" class="form-control chosen" name="location.id">
 			<g:each in="${WebPageTestServer.findAllByActive(true)}" var="server">
 				<optgroup label="${server.label}">

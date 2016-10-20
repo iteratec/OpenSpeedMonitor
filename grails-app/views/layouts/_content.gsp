@@ -4,7 +4,7 @@
 	<!-- Main menu in one row (e.g., controller entry points -->
 	<g:if test="${!layout_nomainmenu}">
 		<div class="row">
-			<div class="span12">
+			<div class="col-md-12">
 				<g:render template="/_menu/menubar"/>
 			</div>
 		</div>
@@ -13,7 +13,7 @@
 	<!-- Secondary menu in one row (e.g., actions for current controller) -->
 	<g:if test="${!layout_nosecondarymenu}">
 		<div class="row">
-			<div class="span12">
+			<div class="col-md-12">
 				<g:render template="/_menu/submenubar"/>														
 			</div>
 		</div>

@@ -15,7 +15,7 @@
 
 <g:form>
     <g:if test="${!dbCleanupEnabled}">
-        <div class="alert alert-block">
+        <div class="alert alert-warning">
             <h4><g:message code="de.iteratec.osm.batch.gui.warningdisabled.header" default="Warning!"/></h4>
             <g:message
                     code="de.iteratec.osm.batch.gui.warningdisabled.content"
@@ -36,16 +36,16 @@
 
 <div class="container">
     <div class="row">
-        <div class="span3">
+        <div class="col-md-3">
             <div class="form-group">
                 <br>
                 <input placeholder="${message(code: 'de.iteratec.osm.batch.filter.label', default: 'Filter by name')}" type="text" class="form-control" id="elementFilter">
             </div>
         </div>
-        <div class="span6">
+        <div class="col-md-6">
             <div align="center" class="pagination"><ul id="elementPager"></ul></div>
         </div>
-        <div class="span3">
+        <div class="col-md-3">
             <div align="right" class="form-group">
                 <label  for="elementsPerPage">${message(code: 'de.iteratec.osm.batch.batchactivity.batchesPerPage.label', default: 'Batches per page:')}</label>
                 <input type="Number" class="form-control" id="elementsPerPage" value=100 min = 1>
@@ -55,7 +55,7 @@
 </div>
 <div class="container">
     <div class="row">
-        <div class="span3">
+        <div class="col-md-3">
             <label class="checkbox inline">
             <g:checkBox name="filterBatchesByActiveCheckbox" id="filterBatchesByActiveCheckbox"
                         checked="${false}" value="${false}"/>
@@ -64,7 +64,7 @@
             </label>
         </div>
         <div style="display: none;" id="limitResultsCheckboxContainer">
-            <div class="span3">
+            <div class="col-md-3">
                 <label class="checkbox inline">
                 <g:checkBox name="limitResultsCheckbox" id="limitResultsCheckbox"
                             checked="${true}" value="${true}"/>

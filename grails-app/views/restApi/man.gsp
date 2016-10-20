@@ -10,7 +10,7 @@
 
 		<div class="row">
 
-			<div class="span3" id="spied-nav">
+			<div class="col-md-3" id="spied-nav">
 				<ul class="nav nav-pills nav-stacked affix">
 					<li><a href="#rest_base_path">REST API OpenSpeedMonitor</a></li>
 					<li><a href="#resultsbetween">&raquo;&nbsp;<strong>GET</strong>&nbsp;Results&nbsp;between</a></li>
@@ -31,7 +31,7 @@
 					<li><a href="#nightlyDatabaseCleanup-deactivation">&raquo;&nbsp;<strong>PUT</strong>&nbsp;NightlyDatabaseCleanup deactivation</a></li>
 				</ul>
 			</div>
-			<div class="span9 content">
+			<div class="col-md-9 content">
 
 				<h1 id="rest_base_path">Manual of REST API</h1>
 				<p>(English version only)</p>

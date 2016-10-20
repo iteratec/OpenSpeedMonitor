@@ -1,17 +1,17 @@
 <%@ page import="de.iteratec.osm.measurement.script.Script"%>
 <asset:javascript src="bower_components/clipboard/dist/clipboard.min.js"/>
 <div class="row form-group ${hasErrors(bean: job, field: 'script', 'error')}">
-	<label class="span3 text-right" for="script"> <g:message code="job.selectedScript.label" default="script" /> <span class="required-indicator">*</span>
+	<label class="col-md-3 text-right" for="script"> <g:message code="job.selectedScript.label" default="script" /> <span class="required-indicator">*</span>
 	</label>	
-	<div class="span9">
+	<div class="col-md-9">
 		<g:select class="form-control chosen" name="script.id" id="script" from="${Script.list()}"
 			value="${job?.script?.id}" optionValue="label" optionKey="id" onchange="updateScriptEditHref('${ createLink(controller: 'script', action: 'edit', absolute: true) }', \$(this).val());" />
 		</div>
 </div>
 
 <div class="row form-group">
-	<label class="span3 text-right"><g:message code="job.placeholders.label" default="script" /></label>
-	<div class="span9">
+	<label class="col-md-3 text-right"><g:message code="job.placeholders.label" default="script" /></label>
+	<div class="col-md-9">
 		<div id="placeholderCandidates" 
 			data-noneUsedInScript-message="${ message(code: 'job.placeholders.usedInScript.none') }"></div>
 	</div>
