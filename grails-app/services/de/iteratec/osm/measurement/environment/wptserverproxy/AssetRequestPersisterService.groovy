@@ -151,9 +151,10 @@ class AssetRequestPersisterService implements iResultListener {
         }
     }
 
-    public void sendFetchAssetsAsBatchCommand(List<JobResult> jobResults) {
+    public boolean sendFetchAssetsAsBatchCommand(List<JobResult> jobResults) {
         if (!persistenceOfAssetRequestsEnabled || !jobResults || jobResults.empty)
-            return
+            return false
+        def returnValue = false
         def persistanceJobList = []
         jobResults.each { JobResult jobResult ->
             persistanceJobList.add([wptVersion: "2.19",
@@ -164,35 +165,38 @@ class AssetRequestPersisterService implements iResultListener {
         }
 
         RESTClient client = new RESTClient(microserviceUrl)
-        String osmUrl = grailsLinkGenerator.getServerBaseURL() //"http://localhost:8080/"
+        String osmUrl = grailsLinkGenerator.getServerBaseURL()
         if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
         String apiKey = MicroServiceApiKey.findByMicroService("OsmDetailAnalysis").secretKey
         String callbackUrl = "rest/receiveCallback"
-//        Thread.start {
-//            client.withNewSession {
-                def resp
-                int attempts = 0
-                while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
-                    attempts++
-                    try {
-                        BatchActivityUpdater batchActivity = batchActivityService.createActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload Asset Job" ,1, true, 1)
-                        resp = client.post(path: 'restApi/persistAssetsBatchJob',
-                                body: [osmUrl: osmUrl, apiKey: apiKey, callbackUrl: callbackUrl, callbackJobId: batchActivity.getBatchActivityId(), persistanceJobList: persistanceJobList],
-                        contentType: ContentType.JSON)
-                        if(resp.data["target"]) {
-                            batchActivity.beginNewStage("Update Stats",  resp.data["target"], 1)
-                        }
 
-                    } catch (ConnectException ex) {
-                        sleep(1000 * TIMEOUT_IN_SECONDS)
-                    }
+        def resp
+        int attempts = 0
+        while ((!resp || resp.status != 200) && attempts < MAX_ATTEMPTS) {
+            attempts++
+            BatchActivityUpdater batchActivity
+            try {
+                batchActivity = batchActivityService.createActiveBatchActivity(BatchActivity.class, Activity.UPDATE, "Postload Asset Job" ,1, true, 1)
+                resp = client.post(path: 'restApi/persistAssetsBatchJob',
+                        body: [osmUrl: osmUrl, apiKey: apiKey, callbackUrl: callbackUrl, callbackJobId: batchActivity.getBatchActivityId(), persistanceJobList: persistanceJobList],
+                contentType: ContentType.JSON)
+                if(resp.data["target"]) {
+                    batchActivity.beginNewStage("Update Stats",  resp.data["target"], 1)
+                    returnValue=true
                 }
 
+            } catch (ConnectException ex) {
+                if(batchActivity)batchActivity.delete()
+                sleep(1000 * TIMEOUT_IN_SECONDS)
 
-                if (!resp || resp.status != 200)
-                    throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests")
-//            }
-//        }
+            }
+        }
+
+
+//        if (!resp || resp.status != 200)
+//            throw new OsmResultPersistanceException("Can't trigger persistence of assetRequests")
+        return returnValue
+
     }
 
 

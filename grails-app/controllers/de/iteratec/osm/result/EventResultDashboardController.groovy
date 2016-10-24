@@ -141,6 +141,7 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
         boolean requestedAllowedDashboard = true;
@@ -810,6 +811,8 @@ class EventResultDashboardController {
 
         result.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
+        result.put('persistenceOfAssetRequestsEnabled', grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')=='true')
+
         // Done! :)
         return result;
     }
@@ -850,8 +853,6 @@ class EventResultDashboardController {
     public def sendFetchAssetsAsBatchCommand(EventResultDashboardShowAllCommand cmd){
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
 
-        boolean requestedAllowedDashboard = true;
-
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
         cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
@@ -869,7 +870,6 @@ class EventResultDashboardController {
             if(!cmd.includeNativeConnectivity)eq("noTrafficShapingAtAll", cmd.includeNativeConnectivity)
             if(!cmd.selectedAllConnectivityProfiles)inList("connectivityProfile", connectivityProfiles)
         }
-        def jobsSize = jobs.size()
         Interval timeFrame = cmd.getSelectedTimeFrame();
         def jobGroupList = []
         cmd.selectedFolder.each{
@@ -891,11 +891,10 @@ class EventResultDashboardController {
                 if (!cmd.selectedAllBrowsers) inList("locationBrowser", selectedBrowsersList)
                 if (!cmd.selectedAllLocations) inList("locationLocation", selectedLocationsList)
                 between("date", timeFrame.getStart().toDate(), timeFrame.getEnd().toDate())
-
             }
         }
-        assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
-        modelToRender.put("startedBatchActivity","true")
+        def batchIsQueued = assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
+        modelToRender.put("startedBatchActivity",batchIsQueued)
         render(view: "showAll", model: modelToRender)
     }
 }

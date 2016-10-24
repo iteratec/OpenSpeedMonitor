@@ -71,11 +71,18 @@
 
 <div class="row">
     <div class="span12">
-        <g:if test="${startedBatchActivity}">
-            <div class="alert alert-info">
-                <g:message code="default.microService.osmDetailAnalysis.batchCreated"/>
-                <g:link controller="batchActivity">Batch Activity</g:link>
-            </div>
+        <g:if test="${startedBatchActivity != null}">
+            <g:if test="${startedBatchActivity == true}">
+                <div class="alert alert-info">
+                    <g:message code="default.microService.osmDetailAnalysis.batchCreated"/>
+                    <g:link controller="batchActivity">Batch Activity</g:link>
+                </div>
+            </g:if>
+            <g:if test="${startedBatchActivity == false}">
+                <div class="alert alert-error">
+                    <g:message code="default.microService.osmDetailAnalysis.batchNotCreated" />
+                </div>
+            </g:if>
         </g:if>
     </div>
 </div>
@@ -368,7 +375,7 @@
                                             value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
                                             action="downloadCsv"
                                             class="btn btn-primary" style="margin-top: 16px;"/>
-                                    <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+                                    <g:if test="${persistenceOfAssetRequestsEnabled}">
                                         <g:actionSubmit
                                                 value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
                                                 action="showDetailData"
@@ -393,7 +400,7 @@
                                     </g:if>
                                     <sec:ifLoggedIn>
                                         <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                            <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+                                            <g:if test="${persistenceOfAssetRequestsEnabled}">
                                                 <g:actionSubmit
                                                         value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
                                                         action="sendFetchAssetsAsBatchCommand"
@@ -470,12 +477,15 @@
         </div>
     </g:if>
     <g:else>
-        <g:if test="${request.queryString}">
-            <g:if test="${!warnAboutLongProcessingTime}">
-                <div class="span12" id="noDataForCurrentSelectionWarning">
-                    <strong><g:message
-                            code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
-                </div>
+
+        <g:if test="${startedBatchActivity == null}"> %{--User tried to load assets--}%
+            <g:if test="${request.queryString}">
+                <g:if test="${!warnAboutLongProcessingTime}">
+                    <div class="span12" id="noDataForCurrentSelectionWarning">
+                        <strong><g:message
+                                code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
+                    </div>
+                </g:if>
             </g:if>
         </g:if>
     </g:else>

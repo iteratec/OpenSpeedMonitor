@@ -107,6 +107,14 @@
 	display: block;
 	background-clip: padding-box;
 }
+.chart-tiptext td {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+.highlighted_detail_value {
+    background-color: rgba(255, 255, 255, 0.75);
+    color: black;
+}
 
 
 
@@ -163,7 +171,7 @@
 	position: absolute;
 	z-index: 2;
 	border-radius: 3px;
-	padding: 0.25em;
+	padding: 0.25em 0em 0.25em 0em;
 	font-size: 12px;
 	font-family: Arial, sans-serif;
 	opacity: 0;

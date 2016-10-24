@@ -830,7 +830,7 @@ class EventResultDashboardControllerTests {
 
 		// Verify result (lists should be sorted by UI visible name or label):
 		assertNotNull(result);
-		assertEquals(17, result.size());
+		assertEquals(18, result.size());
 
 		// AggregatorType
 		assertTrue(result.containsKey('aggrGroupLabels'))

@@ -444,6 +444,7 @@ class BootStrap {
             if (!microserviceUrl || !urlValidator.isValid(microserviceUrl)) {
                 throw new IllegalStateException("A valid url for the microservice is required, if persistence of assetRequests is to be enabled")
             }
+            microserviceUrl = microserviceUrl.endsWith("/")?microserviceUrl: microserviceUrl + "/"
             assetRequestPersisterService.enablePersistenceOfAssetRequestsForJobResults(microserviceUrl)
             proxyService.addResultListener(assetRequestPersisterService)
         }

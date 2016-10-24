@@ -27,7 +27,7 @@ class ApiKeyController {
 
     def save(ApiKey apiKey) {
         if (apiKey == null) {
-            
+
             notFound()
             return
         }

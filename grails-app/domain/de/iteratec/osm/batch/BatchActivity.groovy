@@ -85,10 +85,14 @@ class BatchActivity {
 
     public String calculateRemainingTime(){
         if(status != Status.ACTIVE || stepInStage <= 0) return "" // we can only predict the remaining time for active jobs, that already made progress
-        def msSinceBatchStart = new Date().time - startDate.time
-        def timesSinceBatchStart = maximumStepsInStage / stepInStage
-        def predictedRemainingTimeInS = msSinceBatchStart*timesSinceBatchStart/1000
+        def currentTime = new Date()
+        def lastUpdateTime = lastUpdate
+        def timeSinceLastUpdate= currentTime.time - lastUpdateTime.time
+        def msSinceBatchStart = lastUpdateTime.time - startDate.time
+        def howManyTimesStepInStageIsMaximumStepsInStage = maximumStepsInStage / stepInStage
+        def predictedRemainingTimeInS = (msSinceBatchStart*howManyTimesStepInStageIsMaximumStepsInStage-msSinceBatchStart - timeSinceLastUpdate)/1000
         def result =""
+        predictedRemainingTimeInS = predictedRemainingTimeInS>0?predictedRemainingTimeInS:0
         if(predictedRemainingTimeInS / 86400 > 1){
             result += String.valueOf((int)((int)predictedRemainingTimeInS/86400)) + "d "
             predictedRemainingTimeInS = ((int)predictedRemainingTimeInS) % 86400

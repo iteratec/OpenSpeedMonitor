@@ -2,6 +2,9 @@
  * Created by marko on 27.09.16.
  */
 
+
+
+
 function sortBy(columnToSortByParameter){
     if(columnToSortBy == columnToSortByParameter){
         sortingDirection = sortingDirection=="asc"?"desc":"asc";
@@ -43,11 +46,9 @@ function init(updateTableUrlParameter, i18nParameter, columnToSortByParameter) {
     });
 
     $('#limitResultsCheckbox').change(function () {
-        console.log($('#limitResultsCheckbox').is(":checked"));
         limitResults = $('#limitResultsCheckbox').is(":checked");
         updateElementTable(updateTableUrlParameter);
     });
-    // updateIfNecessary(updateTableUrl, checkUrl, rowUpdateUrl);
     updateElementTable(updateTableUrl);
 }
 
@@ -56,7 +57,6 @@ function createPagination(size,updateTableUrl){
     var perPage = max;
     var numItems = size;
     var numPages = Math.ceil(numItems/perPage);
-    console.log(numItems);
     if (numItems >= 1000){
         var limitResultsCheckboxContainer = document.getElementById("limitResultsCheckboxContainer");
         limitResultsCheckboxContainer.style.display = 'block';

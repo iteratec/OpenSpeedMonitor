@@ -88,7 +88,6 @@ class BatchActivityController {
             if(params.onlyActive)eq("status",Status.ACTIVE)
         }.size()
 
-        println(result[0].name)
         String templateAsPlainText = g.render(
                 template: 'batchActivityTable',
                 model: [batchActivities: result]
