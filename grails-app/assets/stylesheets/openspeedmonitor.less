@@ -237,10 +237,14 @@ input.ui-autocomplete-input {
   margin-top: 7px;
 }
 
-// TODO: sburnicki: Test responsiveness and remove maybe
-.navbar .navbar-btn {
-  float: left;
+@media (min-width: 768px) {
+  #main-navbar .navbar-right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
 }
+
 
 // second navigation (pills)
 .nav {
@@ -262,9 +266,7 @@ input.ui-autocomplete-input {
 }
 
 //bootstrap dropdown
-//was deleted with IT-508, removed body to remove behavior TODO maybe there is a better way
-.dropdown-submenu:hover > .dropdown-menu {
-}
+
 
 .spinner-content-spinner {
   padding-top: 20px;

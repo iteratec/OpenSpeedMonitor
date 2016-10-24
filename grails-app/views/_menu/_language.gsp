@@ -2,7 +2,7 @@
        value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE' ?: org.springframework.web.servlet.support.RequestContextUtils.getLocale(request).toString().substring(0, 2)}"/>
 <g:set var="currentURL" value="${request.forwardURI}"/>
 
-    <li class="dropdown dropdown-btn js-language-dropdown">
+    <li class="dropdown js-language-dropdown">
         <a class="dropdown-toggle" role="button" data-toggle="dropdown" data-target="#" href="javascript:;">
             <img class="flag flag-${lang.toString()}"/>
         </a>

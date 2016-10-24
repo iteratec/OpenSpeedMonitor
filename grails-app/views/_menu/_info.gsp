@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-	<li class="dropdown dropdown-btn">
+	<li class="dropdown">
 		
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
     		<i class="fa fa-info-circle"></i>
