@@ -1,5 +1,4 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<ul class="nav pull-right">
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="fa fa-wrench"></i>
@@ -78,4 +77,3 @@
             </g:if>
         </ul>
     </li>
-</ul>
