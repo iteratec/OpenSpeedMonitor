@@ -84,31 +84,126 @@
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <form method="get" action="" id="dashBoardParamsForm">
-            <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message
-                    code="de.iteratec.ism.ui.labels.save.success"
-                    default="Successfully saved these settings as custom dashboard."/></div>
 
-            <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
-            <g:if test="${warnAboutLongProcessingTime}">
-                <div class="alert alert-warning">
-                    <strong><g:message
-                            code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
+    <g:if test="${request.queryString && command && !command.hasErrors() && !eventResultValues}">
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <strong><g:message code="de.iteratec.ism.no.data.on.current.selection.heading"/></strong>
+                <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
+            </div>
+        </div>
+    </g:if>
 
-                    <p>
+    <g:if test="${warnAboutExceededPointsPerGraphLimit}">
+        <div class="col-md-12">
+            <div class="alert alert-danger">
+                <strong><g:message
+                        code="de.iteratec.isr.EventResultDashboardController.warnAboutExceededPointsPerGraphLimit.title"/></strong>
 
-                    </p>
+                <p>
+                    <g:message
+                            code="de.iteratec.isr.EventResultDashboardController.warnAboutExceededPointsPerGraphLimit"/>
+                </p>
+            </div>
+        </div>
+    </g:if>
 
-                    <p>
-                        <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
-                                    style="display:none;"/>
-                        <g:actionSubmit id="override-long-processing-time"
-                                        value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
-                                        action="showAll" class="btn btn-warning"/>
-                    </p>
-                </div>
+    <g:if test="${eventResultValues}">
+        <a name="chart-table"></a>
+
+        <div id="chartbox">
+            <div class="col-md-12 well">
+                <g:render template="/highchart/chart"
+                          model="[
+                                  chartData                    : eventResultValues,
+                                  chartTitle                   : chartTitle,
+                                  yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
+                                  initialChartWidth            : chartWidth,
+                                  initialChartHeight           : chartHeight,
+                                  chartUnit                    : '%',
+                                  globalLineWidth              : '2',
+                                  xAxisMin                     : fromTimestampForHighChart,
+                                  xAxisMax                     : toTimestampForHighChart,
+                                  markerEnabled                : markerShouldBeEnabled,
+                                  dataLabelsActivated          : labelShouldBeEnabled,
+                                  yAxisScalable                : 'false',
+                                  optimizeForExport            : 'false',
+                                  openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
+                                  annotations                  : annotations]"/>
+            </div>
+        </div>
+    </g:if>
+    <g:else>
+
+        <g:if test="${startedBatchActivity == null}"> %{--User tried to load assets--}%
+            <g:if test="${request.queryString}">
+                <g:if test="${!warnAboutLongProcessingTime}">
+                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
+                        <strong><g:message
+                                code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
+                    </div>
+                </g:if>
             </g:if>
+        </g:if>
+    </g:else>
+</div>
+
+<div class="row" id="selectionSummary">
+    <div class="col-md-2 accordion-info text-right">
+        <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
+                   default="Aggregation"/>:<br>
+        <g:message code="de.iteratec.isocsi.csi.timeframe.heading"
+                   default="Timeframe"/>:
+    </div>
+    <div class="col-md-2 accordion-info" id="accordion-info-date"></div>
+    <div class="col-md-2 accordion-info text-right">
+        <g:message code="de.iteratec.isr.wptrd.labels.filterFolder"
+                   default="Job Group"/>:<br>
+        <g:message code="de.iteratec.osm.result.page.label"
+                   default="Page"/>&nbsp;|&nbsp;<g:message
+                code="de.iteratec.osm.result.measured-event.label"
+                default="Measured step"/>:<br>
+        <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message
+                code="job.location.label" default="Location"/>:<br>
+        <g:message code="de.iteratec.osm.result.connectivity.label"
+                   default="Connectivity"/>:<br>
+    </div>
+    <div class="col-md-2 accordion-info" id="accordion-info-jobs"></div>
+    <div class="col-md-2 accordion-info text-right">
+        <g:message code="job.firstView.label" default="First View"/>:<br>
+        <g:message code="job.repeatedView.label" default="Repeated View"/>:<br>
+    </div>
+
+    <div class="col-md-2 accordion-info" id="accordion-info-measurements"></div>
+</div>
+
+<div class="row">
+    <form method="get" action="" id="dashBoardParamsForm">
+        <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv">
+            <g:message
+                code="de.iteratec.ism.ui.labels.save.success"
+                default="Successfully saved these settings as custom dashboard."/>
+        </div>
+
+        <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
+        <g:if test="${warnAboutLongProcessingTime}">
+            <div class="alert alert-warning">
+                <strong><g:message
+                        code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
+
+                <p>
+
+                </p>
+
+                <p>
+                    <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
+                                style="display:none;"/>
+                    <g:actionSubmit id="override-long-processing-time"
+                                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
+                                    action="showAll" class="btn btn-warning"/>
+                </p>
+            </div>
+        </g:if>
 
 
             <div class="panel-group">
@@ -125,14 +220,7 @@
                                         </a>
                                     </div>
 
-                                    <div class="col-md-2 accordion-info text-right">
-                                        <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
-                                                   default="Aggregation"/>:<br>
-                                        <g:message code="de.iteratec.isocsi.csi.timeframe.heading"
-                                                   default="Timeframe"/>:
-                                    </div>
 
-                                    <div class="col-md-7 accordion-info" id="accordion-info-date"></div>
                                 </div>
                             </div>
                         </div>
@@ -183,20 +271,7 @@
                                             </a>
                                         </div>
 
-                                        <div class="col-md-2 accordion-info text-right">
-                                            <g:message code="de.iteratec.isr.wptrd.labels.filterFolder"
-                                                       default="Job Group"/>:<br>
-                                            <g:message code="de.iteratec.osm.result.page.label"
-                                                       default="Page"/>&nbsp;|&nbsp;<g:message
-                                                    code="de.iteratec.osm.result.measured-event.label"
-                                                    default="Measured step"/>:<br>
-                                            <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message
-                                                    code="job.location.label" default="Location"/>:<br>
-                                            <g:message code="de.iteratec.osm.result.connectivity.label"
-                                                       default="Connectivity"/>:<br>
-                                        </div>
 
-                                        <div class="col-md-7 accordion-info" id="accordion-info-jobs"></div>
                                     </div>
                                 </div>
                             </div>
@@ -241,12 +316,6 @@
                                                 </a>
                                             </div>
 
-                                            <div class="col-md-2 accordion-info text-right">
-                                                <g:message code="job.firstView.label" default="First View"/>:<br>
-                                                <g:message code="job.repeatedView.label" default="Repeated View"/>:<br>
-                                            </div>
-
-                                            <div class="col-md-7 accordion-info" id="accordion-info-measurements"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -422,70 +491,10 @@
                                 </div>
                             </div>
                         </div>
-        </form>
-    </div>
-    <g:if test="${request.queryString && command && !command.hasErrors() && !eventResultValues}">
-        <div class="col-md-12">
-            <div class="alert alert-danger">
-                <strong><g:message code="de.iteratec.ism.no.data.on.current.selection.heading"/></strong>
-                <g:message code="de.iteratec.ism.no.data.on.current.selection"/>
-            </div>
-        </div>
-    </g:if>
 
-    <g:if test="${warnAboutExceededPointsPerGraphLimit}">
-        <div class="col-md-12">
-            <div class="alert alert-danger">
-                <strong><g:message
-                        code="de.iteratec.isr.EventResultDashboardController.warnAboutExceededPointsPerGraphLimit.title"/></strong>
-
-                <p>
-                    <g:message
-                            code="de.iteratec.isr.EventResultDashboardController.warnAboutExceededPointsPerGraphLimit"/>
-                </p>
-            </div>
-        </div>
-    </g:if>
-
-    <g:if test="${eventResultValues}">
-        <a name="chart-table"></a>
-
-        <div id="chartbox">
-            <div class="col-md-12 well">
-                <g:render template="/highchart/chart"
-                          model="[
-                                  chartData                    : eventResultValues,
-                                  chartTitle                   : chartTitle,
-                                  yAxisLabel                   : g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.yType.label'),
-                                  initialChartWidth            : chartWidth,
-                                  initialChartHeight           : chartHeight,
-                                  chartUnit                    : '%',
-                                  globalLineWidth              : '2',
-                                  xAxisMin                     : fromTimestampForHighChart,
-                                  xAxisMax                     : toTimestampForHighChart,
-                                  markerEnabled                : markerShouldBeEnabled,
-                                  dataLabelsActivated          : labelShouldBeEnabled,
-                                  yAxisScalable                : 'false',
-                                  optimizeForExport            : 'false',
-                                  openDataPointLinksInNewWindow: openDataPointLinksInNewWindow,
-                                  annotations                  : annotations]"/>
-            </div>
-        </div>
-    </g:if>
-    <g:else>
-
-        <g:if test="${startedBatchActivity == null}"> %{--User tried to load assets--}%
-            <g:if test="${request.queryString}">
-                <g:if test="${!warnAboutLongProcessingTime}">
-                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
-                        <strong><g:message
-                                code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
-                    </div>
-                </g:if>
-            </g:if>
-        </g:if>
-    </g:else>
+    </form>
 </div>
+
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 
 <content tag="include.bottom">
