@@ -152,7 +152,7 @@ var initTimepicker = function(whetherToShowMeridian) {
 
 	$('#setFromHour').on('change', function(ev){
 		var manualFromHourSelection = $('#setFromHour').is(':checked');
-		$('#fldset-startdate-hour :input').attr("disabled", !manualFromHourSelection);
+		$('#fromHourTimepicker').attr("disabled", !manualFromHourSelection);
 		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.manualFromHour', manualFromHourSelection);
 	});
 	$('#setToHour').on('change', function(ev){

@@ -12,7 +12,7 @@
 <g:elseif test="${controllerName.equals('connectivityProfile')}"><g:set var="mainTab" value="management"/></g:elseif>
 <g:else><g:set var="mainTab" value="unnknown"/></g:else>
 
-<div>
+<div id="main-menu">
 
     <%-- ---------------------------------------------------------------------------------------------- tabs --%>
 

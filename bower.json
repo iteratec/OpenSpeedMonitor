@@ -19,7 +19,7 @@
   ],
   "dependencies": {
     "bootstrap": "3.3.7",
-    "bootstrap-datepicker": "1.6.2",
+    "bootstrap-datepicker": "1.6.4",
     "components-font-awesome": "4.2.0",
     "crossfilter2": "1.3.14",
     "dcjs": "2.0.0-beta.32",

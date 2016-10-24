@@ -46,5 +46,11 @@
 </g:else>
 <div class="row">
 	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
-    <button class="btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.save.name"/></button>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<button class="btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;">
+			<g:message code="de.iteratec.ism.ui.button.save.name"/>
+		</button>
+	</div>
 </div>
