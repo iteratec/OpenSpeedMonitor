@@ -157,7 +157,7 @@ var initTimepicker = function(whetherToShowMeridian) {
 	});
 	$('#setToHour').on('change', function(ev){
 		var manualToHourSelection = $('#setToHour').is(':checked');
-		$('#fldset-enddate-hour :input').attr("disabled", !manualToHourSelection);
+		$('#toHourTimepicker').attr("disabled", !manualToHourSelection);
 		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.manualToHour', manualToHourSelection);
 	});
 	$('#fromHourTimepicker').on('changeTime.timepicker', function(ev){
@@ -181,15 +181,15 @@ var addLeadingZeroIfNecessary = function(date) {
 var disOrEnableFieldsetsOfManualDateTimeSelection = function(preSelection){
 	var manualSelection = !preSelection
 	//dis-/enable hole fieldset of manual date/time selection 
-	$('#fldset-startdate :input').attr("disabled", preSelection);
-	$('#fldset-enddate :input').attr("disabled", preSelection);
+	$('#fromHourTimepicker').attr("disabled", preSelection);
+	$('#toHourTimepicker').attr("disabled", preSelection);
 	//disable fieldsets for manual time selection if parent fieldset of date/time selection
 	//is enabled and checkbox for manual time selection isn't checked (default)
 	if(manualSelection && !$('#setFromHour').is(':checked')){
-		$('#fldset-startdate-hour :input').attr("disabled", true);
+		$('#fromHourTimepicker').attr("disabled", true);
 	}
 	if(manualSelection && !$('#setToHour').is(':checked')){
-		$('#fldset-enddate-hour :input').attr("disabled", true);
+		$('#toHourTimepicker').attr("disabled", true);
 	}
 };
 

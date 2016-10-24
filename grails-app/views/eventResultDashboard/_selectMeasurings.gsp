@@ -26,25 +26,23 @@ GSP-Template Mappings:
         <legend>
                 <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>
         </legend>
-        <g:select id="folderSelectHtmlId" class="iteratec-element-select"
+        <g:select id="folderSelectHtmlId" class="form-control"
             name="selectedFolder" from="${folders}" optionKey="id"
             optionValue="name" value="${selectedFolder}"
             multiple="true"/>
-        <div class="btn-group" data-toggle="buttons">
+        <div data-toggle="buttons" class="filter-buttons">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-xs" onclick="filterJobGroupSelect('')">
+                    <button type="button" class="btn btn-xs btn-default" onclick="filterJobGroupSelect('')">
                         <i class="fa fa-remove"></i>&nbsp;<g:message code="de.iteratec.osm.ui.filter.clear" default="Clear filter"/>
                     </button>
                 </div>
                 <g:each in="${tagToJobGroupNameMap.keySet().collate(5)}" var="tagSubset">
-                    <div class="btn-group-justified">
-                        <div class="btn-group">
-                            <g:each in="${tagSubset}" var="tag">
-                                <button type="button" class="btn btn-xs" onclick="filterJobGroupSelect('${tag}')">
-                                    <i class="fa fa-filter"></i>&nbsp;${tag}
-                                </button>
-                            </g:each>
-                        </div>
+                    <div class="btn-group">
+                        <g:each in="${tagSubset}" var="tag">
+                            <button type="button" class="btn btn-xs btn-default" onclick="filterJobGroupSelect('${tag}')">
+                                <i class="fa fa-filter"></i>&nbsp;${tag}
+                            </button>
+                        </g:each>
                     </div>
                 </g:each>
         </div>
@@ -75,14 +73,10 @@ GSP-Template Mappings:
         <div class="tab-content">
             <div class="tab-pane active" id="tab1">
                 <div class="form-group">
-                    <label for="pageSelectHtmlId">
-                        <strong>
-                            <g:message code="de.iteratec.isr.wptrd.labels.filterPage" default="Pages:"/>
-                        </strong>
-                    </label>
                     <g:select id="pageSelectHtmlId" class="form-control" name="selectedPages"
                               from="${pages}" optionKey="id" optionValue="name" multiple="true"
-                              value="${selectedPages}"/>
+                              value="${selectedPages}"
+                              title="${message(code:'de.iteratec.isr.wptrd.labels.filterPage')}"/>
                 </div>
                 <div id="filter-measured-event" class="form-group">
                     <label for="selectedMeasuredEventsHtmlId">
@@ -111,17 +105,12 @@ GSP-Template Mappings:
 
             <div class="tab-pane" id="tab2">
                 <div id="filter-browser-and-location">
-                        <label for="selectedBrowsersHtmlId">
-                            <strong>
-                                <g:message code="de.iteratec.isr.wptrd.labels.filterBrowser"
-                                           default="Browser:"/>
-                            </strong>
-                        </label>
                         <g:select id="selectedBrowsersHtmlId"
-                                  class="iteratec-element-select"
+                                  class="form-control"
                                   name="selectedBrowsers" from="${browsers}" optionKey="id"
                                   optionValue="${{ it.name + ' (' + it.name + ')' }}" multiple="true"
-                                  value="${selectedBrowsers}"/>
+                                  value="${selectedBrowsers}"
+                                  title="${message(code:'de.iteratec.isr.wptrd.labels.filterBrowser')}" />
                         <label class="checkbox-inline">
                             <g:checkBox name="selectedAllBrowsers"
                                         checked="${selectedAllBrowsers}" value="${true}"/>
@@ -153,26 +142,21 @@ GSP-Template Mappings:
             </div>
             <div class="tab-pane" id="tab3">
                 <div id="filter-connectivityprofile">
-                    <label for="selectedConnectivityProfilesHtmlId">
-                        <strong>
-                            <g:message code="de.iteratec.isr.wptrd.labels.filterConnectivityProfile"
-                                       default="Connectivity Profiles:"/>
-                            (<a href="${g.createLink(controller: 'ConnectivityProfile', action: 'list', absolute: true)}">
-                            <g:message code="de.iteratec.osm.result.predefined.linktext"
-                                       default="predefined"/>
-                        </a>):
-                        </strong>
-                    </label>
                     <g:select id="selectedConnectivityProfilesHtmlId"
-                              class="iteratec-element-select"
+                              class="form-control"
                               name="selectedConnectivityProfiles" from="${connectivityProfiles}" optionKey="id"
                                   multiple="true"
-                              value="${selectedConnectivityProfiles}"/>
+                              value="${selectedConnectivityProfiles}"
+                              title="${message(code:'de.iteratec.isr.wptrd.labels.filterConnectivityProfile')}" />
                     <label class="checkbox-inline">
                         <g:checkBox name="selectedAllConnectivityProfiles" id="selectedAllConnectivityProfiles"
                                     checked="${selectedAllConnectivityProfiles}" value="${true}"/>
                         <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
                                    default="Select all Connectivity Profiles"/>
+                        (<a href="${g.createLink(controller: 'ConnectivityProfile', action: 'list', absolute: true)}">
+                        <g:message code="de.iteratec.osm.result.predefined.linktext"
+                                   default="predefined"/>
+                        </a>)
                     </label>
                     <g:if test="${showExtendedConnectivitySettings}">
                         <br>
