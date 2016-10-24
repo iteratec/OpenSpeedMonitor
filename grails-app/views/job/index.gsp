@@ -59,51 +59,57 @@
                     </div>
                 </div>
             </g:if>
-            <div class="row noIdent">
-                <h5><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern"/></h5>
-                <input class="col-md-2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
-                       placeholder="<g:message code="Job.list.filter" default="Jobs filtern"/>"
-                       name="filters.filterByLabel" value="${filters?.filterByLabel}"/>
-                <input class="col-md-2" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                       id="filterByJobGroup"
-                       placeholder="<g:message code="Job.list.filterByGroup" default="Job-Gruppen filtern"/>"
-                       name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}"/>
-                <input class="col-md-2" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                       id="filterByLocation"
-                       placeholder="<g:message code="Job.list.filterByLocation" default="Locations filtern"/>"
-                       name="filters.filterByLocation" value="${filters?.filterByLocation}"/>
-                <select id="filterTags" multiple data-placeholder="${message(code: 'job.filter.filterTags')}"
-                        class="chosen-select col-md-offset-2"
-                        name="filters.filterTags">
-                    <g:each in="${Job.allTags}">
-                        <option ${filters && it in filters.filterTags ? 'selected' : ''}>${it}</option>
-                    </g:each>
-                </select>
+            <label><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" class="control-label"/></label>
+            <div class="row">
+                <div class="col-md-3">
+                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
+                           placeholder="<g:message code="Job.list.filter" default="Jobs filtern"/>"
+                           name="filters.filterByLabel" value="${filters?.filterByLabel}"/>
+                </div>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
+                           id="filterByJobGroup"
+                           placeholder="<g:message code="Job.list.filterByGroup" default="Job-Gruppen filtern"/>"
+                           name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}"/>
+                </div>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
+                           id="filterByLocation"
+                           placeholder="<g:message code="Job.list.filterByLocation" default="Locations filtern"/>"
+                           name="filters.filterByLocation" value="${filters?.filterByLocation}"/>
+                </div>
+                <div class="col-md-3">
+                    <select id="filterTags" multiple data-placeholder="${message(code: 'job.filter.filterTags')}"
+                            class="chosen-select form-control"
+                            name="filters.filterTags">
+                        <g:each in="${Job.allTags}">
+                            <option ${filters && it in filters.filterTags ? 'selected' : ''}>${it}</option>
+                        </g:each>
+                    </select>
+                </div>
             </div>
 
-            <div class="row noIdent">
-                <input class="col-md-2" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterBySkript"
-                       placeholder="<g:message code="Job.list.filterBySkript" default="Nach Skriptname filtern"/>"
-                       name="filters.filterBySkript" value="${filters?.filterBySkript}"/>
-                <input class="col-md-2" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                       id="filterByJobGroup"
-                       placeholder="<g:message code="de.iteratec.isj.Job.list.filterByGroup"
-                                               default="Job-Gruppen filtern"/>"
-                       name="filters.filterByJobGroup" value="${filters?.filterByJobGroup}"
-                       style="visibility: hidden; "/>
-                <input class="col-md-2" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
-                       id="filterByBrowser"
-                       placeholder="<g:message code="Job.list.filterByBrowser" default="Browser filtern"/>"
-                       name="filters.filterByBrowser" value="${filters?.filterByBrowser}"/>
+            <div class="row">
+                <div class="col-md-3">
+                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterBySkript"
+                           placeholder="<g:message code="Job.list.filterBySkript" default="Nach Skriptname filtern"/>"
+                           name="filters.filterBySkript" value="${filters?.filterBySkript}"/>
+                </div>
+                <div class="col-md-3 offset-md-3">
+                    <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
+                           id="filterByBrowser"
+                           placeholder="<g:message code="Job.list.filterByBrowser" default="Browser filtern"/>"
+                           name="filters.filterByBrowser" value="${filters?.filterByBrowser}"/>
+                </div>
                 %{--Filter by JobSet--}%
-                <div class="col-md-6 pull-right" style="margin: 0px; margin-right: 65px">
-                    <div class="col-md-2" style="margin: 0px">
-
-                        <div class="btn-group pull-left">
-                            <a id="jobSetButton" class="btn-default btn btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+                <div class="col-md-3">
+                    <div class="btn-group">
+                        <div class="btn-group">
+                            <button id="jobSetButton" class="btn-default btn btn-sm dropdown-toggle"
+                                    type="button" data-toggle="dropdown">
                                 <g:message code="de.iteratec.osm.job.filterHeadline" default="Filter by JobSet"/>
                                 <span class="caret"></span>
-                            </a>
+                            </button>
                             <ul class="dropdown-menu">
                                 <g:if test="${jobSets.size > 0}">
                                     <g:each in="${jobSets}" var="jobSet">
@@ -117,8 +123,9 @@
                                 </g:else>
                             </ul>
                         </div>
-                        <a class="close pull-left" href="#"
-                           onclick="clearFilterJobSet('<g:message code="de.iteratec.osm.job.filterHeadline" default="Filter by JobSet" />')">&#160;&times;</a>
+                        <button type="button" class="btn-default btn btn-sm"
+                                onclick="clearFilterJobSet('<g:message code="de.iteratec.osm.job.filterHeadline"
+                                default="Filter by JobSet" />')">&#160;&times;</button>
                     </div>
                 </div>
             </div>
