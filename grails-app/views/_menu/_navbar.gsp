@@ -1,6 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
 <div id="Navbar" class="navbar navbar-fixed-top navbar-inverse">
-	<div class="navbar-inner">
 		<div class="container-fluid">
 			<!-- .navbar-btn is used as the toggle for collapsed navbar content -->
 			<a class="btn navbar-btn" data-toggle="collapse" data-target=".nav-collapse">
@@ -86,6 +85,5 @@
 
 			</div>
 			
-		</div>
 	</div>
 </div>

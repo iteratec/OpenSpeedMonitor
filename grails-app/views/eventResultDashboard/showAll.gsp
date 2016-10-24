@@ -20,8 +20,6 @@
 <%-- userspecific dashboards --%>
 <div class="row">
     <div class="col-md-12">
-        <div class="btn-toolbar" style="margin: 0;">
-            <div class="btn-group">
                 <a class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                     <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
                                default="Dashboard-Ansicht ausw&auml;hlen"/>
@@ -46,8 +44,6 @@
                                 default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
                     </g:else>
                 </ul>
-            </div>
-        </div>
     </div>
 </div>
 <br/>
