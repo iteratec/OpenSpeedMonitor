@@ -35,6 +35,8 @@ import grails.web.mapping.LinkGenerator
 import groovyx.net.http.ContentType
 import groovyx.net.http.RESTClient
 
+import java.lang.reflect.InvocationTargetException
+
 import static groovyx.net.http.ContentType.URLENC
 
 /**
@@ -152,8 +154,14 @@ class AssetRequestPersisterService implements iResultListener {
     }
 
     public boolean sendFetchAssetsAsBatchCommand(List<JobResult> jobResults) {
-        if (!persistenceOfAssetRequestsEnabled || !jobResults || jobResults.empty)
+        if (!persistenceOfAssetRequestsEnabled){
+            log.debug("Can not sendFetchAssetsAsBatchCommand since persistenceOfAssetRequests is disabled")
             return false
+        }
+        if ( !jobResults || jobResults.empty) {
+            log.debug("Can not sendFetchAssetsAsBatchCommand since jobResultsList is emtpy")
+            return false
+        }
         def returnValue = false
         def persistanceJobList = []
         jobResults.each { JobResult jobResult ->
@@ -185,7 +193,8 @@ class AssetRequestPersisterService implements iResultListener {
                     returnValue=true
                 }
 
-            } catch (ConnectException ex) {
+            } catch (Exception ex) {
+                log.error("Couldn't queue assetRequestBatch", ex)
                 if(batchActivity)batchActivity.delete()
                 sleep(1000 * TIMEOUT_IN_SECONDS)
 
