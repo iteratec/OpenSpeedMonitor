@@ -69,7 +69,7 @@ class RickshawHtmlCreater {
 			<div id="rickshaw_label_summary_box">
                 <div id="rickshaw_chart_label_summary" class="rickshaw_legend">${labelSummary}</div>
             </div>
-			<div id="rickshaw_main">
+			<div id="rickshaw_main" style="height: ${height}">
 				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
 				<div id="rickshaw_chart"></div>
@@ -92,7 +92,7 @@ class RickshawHtmlCreater {
                     title: "${title}",
                     data : ${data},
                     height: ${height},
-                    width: ${width},
+                    width: 'auto',
                     top: "${yAxisMax}",
                     bottom: "${yAxisMin}",
                     dataLabelsActivated : ${dataLabelsActivated},

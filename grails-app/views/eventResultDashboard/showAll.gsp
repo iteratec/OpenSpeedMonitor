@@ -108,10 +108,9 @@
     </g:if>
 
     <g:if test="${eventResultValues}">
-        <a name="chart-table"></a>
-
-        <div id="chartbox">
-            <div class="col-md-12">
+        <div class="col-md-12">
+            <a name="chart-table"></a>
+            <div id="chartbox">
                 <g:render template="/highchart/chart"
                           model="[
                                   chartData                    : eventResultValues,

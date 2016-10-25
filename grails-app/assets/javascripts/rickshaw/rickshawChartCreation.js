@@ -65,6 +65,7 @@ function RickshawGraphBuilder(args) {
                 bottom: args.bottom,
                 top: args.top
             });
+        self.initializeEventListeners();
     }
 
     this.addDataLabels = function () {
@@ -134,6 +135,10 @@ function RickshawGraphBuilder(args) {
             args.height = self.htmlProvider.HEIGHT_OF_CHART;
         }
 
+        if (args.width == "auto") {
+            args.width = $(window).width() - 90;
+        }
+
         $("#rickshaw_main").width(args.width);
         var widthOfChartSvg = $(self.graph.element).width();
 
@@ -144,13 +149,14 @@ function RickshawGraphBuilder(args) {
         $("#rickshaw_y-axes_right").height(args.height);
         $("#rickshaw_chart").height(args.height);
         $("#rickshaw_addons").width(args.width - 70);
-        $("#rickshaw_addons").find("ul").width(args.width - 70);
+        $("#rickshaw_addons ul").width(args.width - 70);
         $("#rickshaw_timeline").width(args.width - 60);
-        $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
-        $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
-        $("#rickshaw_x-axis").width(args.width);
+        $("#rickshaw_slider").width(args.width- 70);
+        $("#rickshaw_range_slider_preview_container").width(args.width - 70);
+        $("#rickshaw_range_slider_preview").width(args.width - 70);
+        $("#rickshaw_x-axis").width(args.width - 60);
         $(".x_axis_d3").attr("width", args.width);
-        $(".graph").width(eval(parseInt(args.width) + 25));
+        $(".graph").width(args.width + 60);
 
         self.graph.configure({
             width: widthOfChartSvg,
@@ -429,6 +435,15 @@ function RickshawGraphBuilder(args) {
         };
         series.numberOfMeasurandGroups = measurandGroups.length;
         return series;
+    }
+
+    this.initializeEventListeners = function() {
+        $(window).resize(function() {
+            self.updateSize({
+                width: 'auto',
+                height: 'auto'
+            });
+        });
     }
 
     this.initialize(args);

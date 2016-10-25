@@ -22,7 +22,7 @@
   background-color: white;
   margin-left: auto;
   margin-right: auto;
-  width: 1135px;
+  overflow: auto;
 }
 .graphDuplicate {
   background-color: white;
