@@ -16,9 +16,7 @@
 <body>
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
-<div>
-    <g:form>
-        <div class="controlribbon">
+        <g:form>
             <g:if test="${!measurementsEnabled}">
                 <div class="alert alert-warning">
                     <h4><g:message code="de.iteratec.osm.measurement.schedule.gui.warningdisabled.header"
@@ -59,7 +57,7 @@
                     </div>
                 </div>
             </g:if>
-            <label><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" class="control-label"/></label>
+            <legend><g:message code="de.iteratec.sri.wptrd.jobs.filter.heading" default="Jobs filtern" class="control-label"/></legend>
             <div class="row">
                 <div class="col-md-3">
                     <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()" id="filterByLabel"
@@ -95,7 +93,7 @@
                            placeholder="<g:message code="Job.list.filterBySkript" default="Nach Skriptname filtern"/>"
                            name="filters.filterBySkript" value="${filters?.filterBySkript}"/>
                 </div>
-                <div class="col-md-3 offset-md-3">
+                <div class="col-md-3 col-md-offset-3">
                     <input class="form-control" type="text" onkeyup="filterJobList()" oninput="filterJobList()"
                            id="filterByBrowser"
                            placeholder="<g:message code="Job.list.filterByBrowser" default="Browser filtern"/>"
@@ -129,96 +127,95 @@
                     </div>
                 </div>
             </div>
-
-            <div>
-                <g:checkBox onchange="filterJobList()"
-                            id="filterCheckedJobs" class="checkbox-inline"
-                            name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/><label
-                    for="filterCheckedJobs"><g:message
-                        code="job.filter.filterCheckedJobs"/></label>
-                <g:checkBox
-                        onchange="filterJobList()" id="filterHighlightedJobs" class="checkbox-inline"
-                        name="filters.filterHighlightedJobs" value="${filters?.filterHighlightedJobs}"/><label
-                    for="filterHighlightedJobs"><g:message
-                        code="job.filter.filterHighlightedJobs"/></label>
-                <g:checkBox
-                        onchange="filterJobList()" id="filterRunningJobs" class="checkbox-inline"
-                        name="filters.filterRunningJobs" value="${filters?.filterRunningJobs}"/><label
-                    for="filterRunningJobs"><g:message
-                        code="job.filter.filterRunningJobs"/></label>
-                <g:checkBox
-                        onchange="filterJobList()" id="filterInactiveJobs" class="checkbox-inline"
-                        name="filters.filterInactiveJobs" value="${filters?.filterInactiveJobs}"/><label
-                    for="filterInactiveJobs"><g:message
-                        code="job.filter.filterInactiveJobs"/></label>
+            <div class="section-xl">
+                <div class="checkbox-inline">
+                    <g:checkBox onchange="filterJobList()" id="filterCheckedJobs" class="checkbox-inline"
+                                name="filters.filterCheckedJobs" value="${filters?.filterCheckedJobs}"/>
+                    <label for="filterCheckedJobs"><g:message code="job.filter.filterCheckedJobs"/></label>
+                </div>
+                <div class="checkbox-inline">
+                    <g:checkBox onchange="filterJobList()" id="filterHighlightedJobs" class="checkbox-inline"
+                                name="filters.filterHighlightedJobs" value="${filters?.filterHighlightedJobs}"/>
+                    <label for="filterHighlightedJobs"><g:message code="job.filter.filterHighlightedJobs"/></label>
+                </div>
+                <div class="checkbox-inline">
+                    <g:checkBox onchange="filterJobList()" id="filterRunningJobs" class="checkbox-inline"
+                                name="filters.filterRunningJobs" value="${filters?.filterRunningJobs}"/>
+                    <label for="filterRunningJobs"><g:message code="job.filter.filterRunningJobs"/></label>
+                </div>
+                <div class="checkbox-inline">
+                    <g:checkBox onchange="filterJobList()" id="filterInactiveJobs" class="checkbox-inline"
+                                name="filters.filterInactiveJobs" value="${filters?.filterInactiveJobs}"/>
+                    <label for="filterInactiveJobs"><g:message code="job.filter.filterInactiveJobs"/></label>
+                </div>
             </div>
-        </div>
-
-        <div class="controlribbon" style="border: 1px solid green width: 100%;vertical-align: middle;">
-
-            <i class="fa fa-arrow-down"></i>
-            <g:message code="de.iteratec.isj.job.selected"
-                       default="Markierte Jobs"/>:&nbsp;
-            <g:actionSubmit action="activate" class="btn btn-default"
-                            value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
-
-
-            <g:actionSubmit action="deactivate" class="btn btn-default"
-                            value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
-            <g:actionSubmit class="btn btn-info" action="execute"
-                            value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
-
-            <span style="margin-left: 50px; vertical-align: middle;">
-                <g:field type="text" name="jobSetName" style="vertical-align: middle;margin-top: 10px;"
-                         placeholder="${message(code: 'de.iteratec.osm.job.savePlaceholder', default: 'placeholder')}"/>
-                <g:actionSubmit action="saveJobSet" class="btn btn-default"
-                                value="${message(code: 'de.iteratec.osm.job.jobSetSaveButton', default: 'save jobSet')}"/>
-            </span>
-
-            <span style="margin-left:50px;">
-                <a href="<g:createLink action="create"/>" class="btn btn-primary">
-                    <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
-                </a>
-            </span>
-            <span style="float:right;margin-top: 12px;">
-                <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon" rel="popover"
-                   data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"
-                   style="text-decoration:none;color: #3a87ad;"></a>
-            </span>
-        </div>
+            <div class="row section-sm">
+                <div class="col-md-6">
+                    <i class="fa fa-arrow-down"></i>
+                    <g:message code="de.iteratec.isj.job.selected"
+                               default="Markierte Jobs"/>:&nbsp;
+                    <div class="btn-group">
+                        <g:actionSubmit action="activate" class="btn btn-default"
+                                        value="${message(code: 'de.iteratec.isj.job.activate', default: 'Aktivieren')}"/>
 
 
-        <div class="alert alert-warning" id="serverdown">
-            <a class="close" data-dismiss="alert">×</a>
-            <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
-        </div>
-        <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-        <table class="table-striped table-fixed-header" id="jobtable">
-            <thead class="header">
-            <tr>
-                <th><input type="checkbox" id="checkAll"/></th>
-                <g:set var="titleHeader"><g:message code="de.iteratec.isj.job" default="Job"/><br/>
-                    <span style="font-weight: normal"><g:message
-                            code="de.iteratec.iss.script" default="Skript"/>
-                    </span>
-                </g:set>
-                <g:set var="executionScheduleLabel"><g:message code="job.executionSchedule.label" default="Execution Schedule"/>
-                </g:set>
-                <g:sortableColumn property="label" title="${titleHeader}"/>
-                <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>
-                <g:sortableColumn property="location.uniqueIdentifierForServer" titleKey="job.location.label"/>
-                <g:sortableColumn property="location.browser.name" titleKey="browser.label"/>
-                <g:sortableColumn property="lastRun" titleKey="job.lastRun.label" title="Zuletzt ausgeführt"/>
-                <g:sortableColumn property="nextExecutionTime" titleKey="job.nextRun.label"/>
-                <g:sortableColumn property="executionSchedule" title="${executionScheduleLabel}"/>
-                <g:sortableColumn property="runs" titleKey="job.runs.label" title="Runs"/>
-                <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
-            </tr>
-            </thead>
-            <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
-        </table>
-    </g:form>
-</div>
+                        <g:actionSubmit action="deactivate" class="btn btn-default"
+                                        value="${message(code: 'de.iteratec.isj.job.deactivate', default: 'Deaktivieren')}"/>
+                        <g:actionSubmit class="btn btn-info" action="execute"
+                                        value="${message(code: 'de.iteratec.isj.job.runonce', default: 'Run now')}"/>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <g:field type="text" name="jobSetName" class="form-control"
+                                 placeholder="${message(code: 'de.iteratec.osm.job.savePlaceholder', default: 'placeholder')}"/>
+                        <span class="input-group-btn">
+                            <g:actionSubmit action="saveJobSet" class="btn btn-default"
+                                            value="${message(code: 'de.iteratec.osm.job.jobSetSaveButton', default: 'save jobSet')}"/>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <a href="<g:createLink action="create"/>" class="btn btn-primary">
+                        <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
+                    </a>
+                    <a href="#" id="updateHints" class="fa fa-question-circle fa-lg clickable-icon pull-right" rel="popover"
+                       data-placement="bottom" data-content="${render(template: "updateHints")}" data-html="true"></a>
+                </div>
+            </div>
+
+
+            <div class="alert alert-warning" id="serverdown">
+                <a class="close" data-dismiss="alert">×</a>
+                <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
+            </div>
+            <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
+            <table class="table-striped table-fixed-header" id="jobtable">
+                <thead class="header">
+                <tr>
+                    <th><input type="checkbox" id="checkAll"/></th>
+                    <g:set var="titleHeader"><g:message code="de.iteratec.isj.job" default="Job"/><br/>
+                        <span style="font-weight: normal"><g:message
+                                code="de.iteratec.iss.script" default="Skript"/>
+                        </span>
+                    </g:set>
+                    <g:set var="executionScheduleLabel"><g:message code="job.executionSchedule.label" default="Execution Schedule"/>
+                    </g:set>
+                    <g:sortableColumn property="label" title="${titleHeader}"/>
+                    <g:sortableColumn property="jobGroup.name" titleKey="job.jobGroup.label"/>
+                    <g:sortableColumn property="location.uniqueIdentifierForServer" titleKey="job.location.label"/>
+                    <g:sortableColumn property="location.browser.name" titleKey="browser.label"/>
+                    <g:sortableColumn property="lastRun" titleKey="job.lastRun.label" title="Zuletzt ausgeführt"/>
+                    <g:sortableColumn property="nextExecutionTime" titleKey="job.nextRun.label"/>
+                    <g:sortableColumn property="executionSchedule" title="${executionScheduleLabel}"/>
+                    <g:sortableColumn property="runs" titleKey="job.runs.label" title="Runs"/>
+                    <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
+                </tr>
+                </thead>
+                <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
+            </table>
+        </g:form>
 <content tag="include.bottom">
     <asset:javascript src="prettycron/prettycronManifest.js"/>
     <asset:javascript src="job/jobList.js"/>

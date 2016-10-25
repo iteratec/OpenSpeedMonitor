@@ -54,10 +54,6 @@ display: block;
    background: #ddd;
 }
 
-.controlribbon, .controlribbon .row {
-	margin-bottom: 15px;
-}
-
 .chosen-container {
 	width: 100%;
 	border-radius: 4px;
@@ -78,4 +74,9 @@ display: block;
 .running {
     background: center left no-repeat url(../../images/loading_indicator.gif);
     padding-left: 20px;
+}
+
+#updateHints {
+	line-height: 21px;
+	padding: 6px;
 }
