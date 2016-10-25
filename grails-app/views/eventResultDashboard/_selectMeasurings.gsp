@@ -21,8 +21,8 @@ GSP-Template Mappings:
 * selectedAllLocations
  --%>
 <div class="col-md-3" id="filter-navtab-jobGroup">
-    <g:render template="selectJobGroup" model="['folders': folders, 'selectedFolder': selectedFolder,
-                                                'tagToJobGroupNameMap': tagToJobGroupNameMap]" />
+    <g:render template="/eventResultDashboard/selectJobGroup"
+              model="['folders': folders, 'selectedFolder': selectedFolder, 'tagToJobGroupNameMap': tagToJobGroupNameMap]"/>
 </div>
 
 %{--the rest----------------------------------------------------------------------------------------------}%
@@ -44,5 +44,5 @@ GSP-Template Mappings:
                       'connectivityProfiles'            : connectivityProfiles,
                       'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
                       'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                      'showExtendedConnectivitySettings': false]"/>
+                      'showExtendedConnectivitySettings': true]"/>
 </div>
