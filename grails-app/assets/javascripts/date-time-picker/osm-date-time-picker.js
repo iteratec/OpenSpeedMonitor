@@ -179,18 +179,12 @@ var addLeadingZeroIfNecessary = function(date) {
 	return date;
 };
 var disOrEnableFieldsetsOfManualDateTimeSelection = function(preSelection){
-	var manualSelection = !preSelection
-	//dis-/enable hole fieldset of manual date/time selection 
-	$('#fromHourTimepicker').attr("disabled", preSelection);
-	$('#toHourTimepicker').attr("disabled", preSelection);
-	//disable fieldsets for manual time selection if parent fieldset of date/time selection
-	//is enabled and checkbox for manual time selection isn't checked (default)
-	if(manualSelection && !$('#setFromHour').is(':checked')){
-		$('#fromHourTimepicker').attr("disabled", true);
-	}
-	if(manualSelection && !$('#setToHour').is(':checked')){
-		$('#toHourTimepicker').attr("disabled", true);
-	}
+	//dis-/enable hole fieldset of manual date/time selection
+	$('#fldset-startdate').attr("disabled", preSelection);
+	$('#fldset-enddate').attr("disabled", preSelection);
+	//disable input for manual time selection if there is a preSelection or the checkbox isn't checked
+	$('#fromHourTimepicker').attr("disabled", preSelection || !$('#setFromHour').is(':checked'));
+	$('#toHourTimepicker').attr("disabled", preSelection || !$('#setToHour').is(':checked'));
 };
 
 var setDateAndTimeRespectivePreselection = function() {
@@ -232,12 +226,12 @@ var setFromHour = function(fromHourToSet){
 var setManualFromHourCheckbox = function(lastManualFromHourSelection){
     var stringUtils = OpenSpeedMonitor.stringUtils();
 	$('#setFromHour').attr('checked', stringUtils.stringToBoolean(lastManualFromHourSelection));
-	$('#fldset-startdate-hour :input').attr("disabled", !stringUtils.stringToBoolean(lastManualFromHourSelection));
+	$('#setFromHourTimepicker').attr("disabled", !stringUtils.stringToBoolean(lastManualFromHourSelection));
 };
 var setManualToHourCheckbox = function(lastManualToHourSelection){
     var stringUtils = OpenSpeedMonitor.stringUtils();
 	$('#setToHour').attr('checked', stringUtils.stringToBoolean(lastManualToHourSelection));
-	$('#fldset-enddate-hour :input').attr("disabled", !stringUtils.stringToBoolean(lastManualToHourSelection));
+	$('#setToHourTimepicker').attr("disabled", !stringUtils.stringToBoolean(lastManualToHourSelection));
 };
 
 function updateDateTimePicker(from, to, fromHour, toHour, timeFrameInterval) {

@@ -25,7 +25,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 					default="Start" />:
 		</label>
 		<div class="col-md-4">
-			<input class="form-control" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" disabled/>
+			<input class="form-control" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" />
 		</div>
 		<div class="col-md-4">
 			<fieldset id="fldset-startdate-hour">
@@ -34,7 +34,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 						<g:checkBox name="setFromHour" id="setFromHour" checked="${setFromHour}"/>
 					</span>
 					<input id="fromHourTimepicker" type="text" class="form-control"
-						   value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled>
+						   value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled/>
 					<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 				</div>
 			</fieldset>
@@ -53,7 +53,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 					default="End" />:
 		</label>
 		<div class="col-md-4">
-			<input class="form-control" type="text" id="toDatepicker" placeholder="end ..." value="${to}" disabled/>
+			<input class="form-control" type="text" id="toDatepicker" placeholder="end ..." value="${to}" />
 		</div>
 		<div class="col-md-4">
 			<fieldset id="fldset-enddate-hour">
@@ -62,7 +62,7 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 						<g:checkBox name="setToHour" id="setToHour" checked="${setToHour}"/>
 					</span>
 					<input id="toHourTimepicker" type="text" class="form-control"
-						   value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled>
+						   value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled/>
 					<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 				</div>
 			</fieldset>
