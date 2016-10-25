@@ -137,109 +137,92 @@
             </g:if>
 
 
-            <div class="row">
-                <div class="col-md-6">
-                    <fieldset>
-                        <legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading"
-                                           default="Aggregator"/></legend>
+            <div class="row card-well">
+                <div class="col-md-4">
+                    <div class="card">
+                        <fieldset>
+                            <legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading"
+                                               default="Aggregator"/></legend>
 
-                        <div>
-                            <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
-                                          values="${aggrGroupValues}"
-                                          value="${aggrGroupAndInterval}">
-                                <p>${it.radio} <g:message code="${it.label}"/></p>
-                            </g:radioGroup>
-                        </div>
-                    </fieldset>
-                </div>
-
-                <div class="col-md-6">
-                    <g:render template="/dateSelection/startAndEnddateSelection"
-                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'fromHour': fromHour, 'to': to, 'toHour': toHour, 'includeInterval': includeInterval]}"/>
-
-                    <fieldset id="includeInterval">
-                        <div class="col-md-3">
-                            <label class="checkbox-inline">
-                                <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
-                                &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
-                                                 default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
-                            </label>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <legend>
-                        <g:message code="de.iteratec.isocsi.csi.filter.heading" default="Filter"/>
-                    </legend>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4" id="filter-navtab-csiSystem">
-                    <div style="padding-top: 60px;"></div>
-                    <label for="folderSelectCsiSystem">
-                        <strong>
-                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>:
-                        </strong>
-                    </label>
-                    <g:select id="folderSelectCsiSystem"
-                              name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
-                              optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
-                </div>
-            </div>
-            <g:render template="/eventResultDashboard/selectMeasurings"
-                      model="[
-                              'locationsOfBrowsers'             : locationsOfBrowsers,
-                              'eventsOfPages'                   : eventsOfPages,
-                              'folders'                         : folders,
-                              'selectedFolder'                  : selectedFolder,
-                              'pages'                           : pages,
-                              'selectedPages'                   : selectedPages,
-                              'measuredEvents'                  : measuredEvents,
-                              'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                              'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                              'browsers'                        : browsers,
-                              'selectedBrowsers'                : selectedBrowsers,
-                              'selectedAllBrowsers'             : selectedAllBrowsers,
-                              'locations'                       : locations,
-                              'selectedLocations'               : selectedLocations,
-                              'selectedAllLocations'            : selectedAllLocations,
-                              'connectivityProfiles'            : connectivityProfiles,
-                              'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                              'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                              'showExtendedConnectivitySettings': false]"/>
-            <div style="clear:both;"></div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <legend>
-                        <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
-                    </legend>
-
-                    <div class="col-md-12">
-                        <div class="form-group">
                             <div>
-                                <label class="checkbox" for="csiTypeDocComplete">
-                                    <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
-                                            test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
-                                        checked
-                                    </g:if>/>
-                                    &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
+                                <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
+                                              values="${aggrGroupValues}"
+                                              value="${aggrGroupAndInterval}">
+                                    <p>${it.radio} <g:message code="${it.label}"/></p>
+                                </g:radioGroup>
+                            </div>
+                        </fieldset>
+                        <div class="form-horizontal">
+                            <g:render template="/dateSelection/startAndEnddateSelection"
+                                      model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
+                                                'fromHour': fromHour, 'to': to, 'toHour': toHour,
+                                                'includeInterval': includeInterval]}"/>
+                        </div>
+                        <fieldset id="includeInterval">
+                                <label class="checkbox-inline">
+                                    <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
+                                    &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
+                                                     default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
                                 </label>
-                                <label class="checkbox" for="csiTypeVisuallyComplete">
-                                    <input type="checkbox" name="csiTypeVisuallyComplete"
-                                           id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
-                                        checked
-                                    </g:if>/>
-                                    &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
-                                </label>
+                        </fieldset>
+                    </div>
+                        <div class="card">
+                            <legend>
+                                <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
+                            </legend>
+                            <div class="form-group">
+                                <div>
+                                    <label class="checkbox" for="csiTypeDocComplete">
+                                        <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
+                                                test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
+                                            checked
+                                        </g:if>/>
+                                        &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
+                                    </label>
+                                    <label class="checkbox" for="csiTypeVisuallyComplete">
+                                        <input type="checkbox" name="csiTypeVisuallyComplete"
+                                               id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
+                                            checked
+                                        </g:if>/>
+                                        &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
+                                    </label>
+                                </div>
                             </div>
                         </div>
+                </div>
+                <div class="col-md-3" id="filter-navtab-csiSystem">
+                    <div class="card">
+                        <legend>
+                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>
+                        </legend>
+                        <g:select id="folderSelectCsiSystem" class="form-control"
+                                  name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
+                                  optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
                     </div>
                 </div>
+                <g:render template="/eventResultDashboard/selectMeasurings"
+                          model="[
+                                  'locationsOfBrowsers'             : locationsOfBrowsers,
+                                  'eventsOfPages'                   : eventsOfPages,
+                                  'folders'                         : folders,
+                                  'selectedFolder'                  : selectedFolder,
+                                  'pages'                           : pages,
+                                  'selectedPages'                   : selectedPages,
+                                  'measuredEvents'                  : measuredEvents,
+                                  'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
+                                  'selectedMeasuredEvents'          : selectedMeasuredEvents,
+                                  'browsers'                        : browsers,
+                                  'selectedBrowsers'                : selectedBrowsers,
+                                  'selectedAllBrowsers'             : selectedAllBrowsers,
+                                  'locations'                       : locations,
+                                  'selectedLocations'               : selectedLocations,
+                                  'selectedAllLocations'            : selectedAllLocations,
+                                  'connectivityProfiles'            : connectivityProfiles,
+                                  'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
+                                  'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
+                                  'showExtendedConnectivitySettings': false]"/>
+
+            </div>
 
                 <p>
                     <g:actionSubmit id="chart-submit"
