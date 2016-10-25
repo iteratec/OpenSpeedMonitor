@@ -24,11 +24,11 @@
     min-height: 18em;
 }
 
-#select-jobgroup, #select-page-location {
+#filter-navtab-jobGroup, #select-page-location {
     min-height: 23em;
 }
 
-#select-jobgroup select {
+#filter-navtab-jobGroup select {
     height: 13em;
     min-height: 13em;
 }

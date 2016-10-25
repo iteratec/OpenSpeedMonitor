@@ -26,7 +26,7 @@ GSP-Template Mappings:
 </div>
 
 %{--the rest----------------------------------------------------------------------------------------------}%
-<div id="filter-complete-tabbable" class="col-md-5 tabbable">
+<div id="filter-complete-tabbable" class="col-md-5">
     <g:render template="/eventResultDashboard/selectPageLocation"
               model="['locationsOfBrowsers'             : locationsOfBrowsers,
                       'eventsOfPages'                   : eventsOfPages,

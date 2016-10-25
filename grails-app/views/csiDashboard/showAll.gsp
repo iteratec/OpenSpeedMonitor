@@ -141,9 +141,12 @@
                 <div class="col-md-4">
                     <div class="card">
                         <fieldset>
-                            <legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading"
-                                               default="Aggregator"/></legend>
-
+                            <legend>
+                                <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
+                                               default="Aggregator"/>
+                                &amp;
+                                <g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />
+                            </legend>
                             <div>
                                 <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
                                               values="${aggrGroupValues}"
@@ -152,46 +155,28 @@
                                 </g:radioGroup>
                             </div>
                         </fieldset>
+                        <hr />
                         <div class="form-horizontal">
                             <g:render template="/dateSelection/startAndEnddateSelection"
                                       model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
                                                 'fromHour': fromHour, 'to': to, 'toHour': toHour,
                                                 'includeInterval': includeInterval]}"/>
                         </div>
-                        <fieldset id="includeInterval">
-                                <label class="checkbox-inline">
-                                    <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
-                                    &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
-                                                     default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
-                                </label>
-                        </fieldset>
-                    </div>
-                        <div class="card">
-                            <legend>
-                                <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
-                            </legend>
-                            <div class="form-group">
-                                <div>
-                                    <label class="checkbox" for="csiTypeDocComplete">
-                                        <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
-                                                test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
-                                            checked
-                                        </g:if>/>
-                                        &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
+                        <div class="row">
+                            <div class="col-md-offset-4 col-md-8">
+                                <fieldset id="includeInterval">
+                                    <label class="checkbox-inline">
+                                        <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
+                                        &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
+                                                         default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
                                     </label>
-                                    <label class="checkbox" for="csiTypeVisuallyComplete">
-                                        <input type="checkbox" name="csiTypeVisuallyComplete"
-                                               id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
-                                            checked
-                                        </g:if>/>
-                                        &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
-                                    </label>
-                                </div>
+                                </fieldset>
                             </div>
                         </div>
+                    </div>
                 </div>
-                <div class="col-md-3" id="filter-navtab-csiSystem">
-                    <div class="card">
+                <div class="col-md-3">
+                    <div class="card" id="filter-navtab-csiSystem">
                         <legend>
                             <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>
                         </legend>
@@ -199,29 +184,56 @@
                                   name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
                                   optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
                     </div>
+                    <div id="filter-navtab-jobGroup">
+                        <g:render template="/eventResultDashboard/selectJobGroup"
+                                  model="['folders': folders, 'selectedFolder': selectedFolder,
+                                          'tagToJobGroupNameMap': tagToJobGroupNameMap]" />
+                    </div>
+                    <div class="card">
+                        <legend>
+                            <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
+                        </legend>
+                        <div class="checkbox">
+                            <label for="csiTypeDocComplete">
+                                <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
+                                        test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
+                                    checked
+                                </g:if>/>
+                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label for="csiTypeVisuallyComplete">
+                                <input type="checkbox" name="csiTypeVisuallyComplete"
+                                       id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
+                                    checked
+                                </g:if>/>
+                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <g:render template="/eventResultDashboard/selectMeasurings"
-                          model="[
-                                  'locationsOfBrowsers'             : locationsOfBrowsers,
-                                  'eventsOfPages'                   : eventsOfPages,
-                                  'folders'                         : folders,
-                                  'selectedFolder'                  : selectedFolder,
-                                  'pages'                           : pages,
-                                  'selectedPages'                   : selectedPages,
-                                  'measuredEvents'                  : measuredEvents,
-                                  'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                                  'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                                  'browsers'                        : browsers,
-                                  'selectedBrowsers'                : selectedBrowsers,
-                                  'selectedAllBrowsers'             : selectedAllBrowsers,
-                                  'locations'                       : locations,
-                                  'selectedLocations'               : selectedLocations,
-                                  'selectedAllLocations'            : selectedAllLocations,
-                                  'connectivityProfiles'            : connectivityProfiles,
-                                  'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                  'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                  'showExtendedConnectivitySettings': false]"/>
-
+                %{--the rest----------------------------------------------------------------------------------------------}%
+                <div id="filter-complete-tabbable" class="col-md-5">
+                    <g:render template="/eventResultDashboard/selectPageLocation"
+                              model="['locationsOfBrowsers'             : locationsOfBrowsers,
+                                      'eventsOfPages'                   : eventsOfPages,
+                                      'pages'                           : pages,
+                                      'selectedPages'                   : selectedPages,
+                                      'measuredEvents'                  : measuredEvents,
+                                      'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
+                                      'selectedMeasuredEvents'          : selectedMeasuredEvents,
+                                      'browsers'                        : browsers,
+                                      'selectedBrowsers'                : selectedBrowsers,
+                                      'selectedAllBrowsers'             : selectedAllBrowsers,
+                                      'locations'                       : locations,
+                                      'selectedLocations'               : selectedLocations,
+                                      'selectedAllLocations'            : selectedAllLocations,
+                                      'connectivityProfiles'            : connectivityProfiles,
+                                      'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
+                                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
+                                      'showExtendedConnectivitySettings': false]"/>
+                </div>
             </div>
 
                 <p>
