@@ -149,7 +149,7 @@
                     <label for="filterInactiveJobs"><g:message code="job.filter.filterInactiveJobs"/></label>
                 </div>
             </div>
-            <div class="row section-sm">
+            <div class="row table-filter">
                 <div class="col-md-6">
                     <i class="fa fa-arrow-down"></i>
                     <g:message code="de.iteratec.isj.job.selected"

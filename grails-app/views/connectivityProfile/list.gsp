@@ -11,9 +11,12 @@
 
         <g:render template="/layouts/mainMenu" />
 
-        <a href="<g:createLink action="create" />" class="btn btn-primary" style="margin-bottom: 1em;">
+
+        <div class="table-filter">
+            <a href="<g:createLink action="create" />" class="btn btn-primary pull-right">
                 <i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
             </a>
+        </div>
         <section id="list-connectivityProfile" class="first">
 
             <table class="table table-bordered">
