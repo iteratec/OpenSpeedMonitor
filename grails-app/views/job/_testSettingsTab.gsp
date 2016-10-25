@@ -120,13 +120,10 @@
     <span class="required-indicator">*</span>
     </label>
     <div class="col-md-8">
-        <g:select id="connectivityProfile"
-                  class="iteratec-element-select chosen"
-                  data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
-                  name="connectivityProfile.id"
-                  from="${ connectivites }"
-                  optionKey="id"
-                  value="${job.connectivityProfile?job.connectivityProfile.id:null}" />
+        <g:select id="connectivityProfile" class="chosen"
+				  data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Please chose an option')}"
+                  name="connectivityProfile.id" from="${connectivites }" optionKey="id"
+				  value="${job.connectivityProfile?job.connectivityProfile.id:null}" />
     </div>
 </div>
 <div id="connectivityProfileDetails">

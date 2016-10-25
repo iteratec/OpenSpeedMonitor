@@ -185,10 +185,9 @@
                             <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>:
                         </strong>
                     </label>
-                    <g:select id="folderSelectCsiSystem" class="iteratec-element-select"
+                    <g:select id="folderSelectCsiSystem"
                               name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
-                              optionValue="label" value="${selectedCsiSystems}"
-                              multiple="true"/>
+                              optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
                 </div>
             </div>
             <g:render template="/eventResultDashboard/selectMeasurings"

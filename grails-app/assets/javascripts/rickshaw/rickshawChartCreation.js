@@ -1711,8 +1711,6 @@ function scrollToChartbox(chartBoxTopOffset) {
     var offset = navbarOffset + chartBoxTopOffset;
     if ($("#chartbox").length > 0) {
         $('html,body').animate({scrollTop: ($("#chartbox").offset().top + offset)}, {duration: 'fast'});
-    } else {
-        $('html,body').animate({scrollTop: 0}, {duration: 'fast'});
     }
 }
 

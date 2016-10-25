@@ -126,7 +126,7 @@ GSP-Template Mappings:
                             </strong>
                         </label>
                         <g:select id="selectedLocationsHtmlId"
-                                  class="iteratec-element-select chosen" style="height: 150px; width:90%"
+                                  class="chosen"
                                   data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Bitte ausw&auml;hlen')}"
                                   name="selectedLocations" from="${locations}" optionKey="id"
                                   optionValue="${it}"
