@@ -136,9 +136,10 @@
         <g:if test="${startedBatchActivity == null}"> %{--User tried to load assets--}%
             <g:if test="${request.queryString}">
                 <g:if test="${!warnAboutLongProcessingTime}">
-                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
-                        <strong><g:message
-                                code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
+                    <div class="col-md-12">
+                        <div class="alert alert-info text-center">
+                            <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
+                        </div>
                     </div>
                 </g:if>
             </g:if>

@@ -204,11 +204,8 @@
 <g:else>
     <g:if test="${request.queryString}">
         <g:if test="${!warnAboutLongProcessingTime}">
-            <div class="row">
-                <div class="col-md-12" id="noDataForCurrentSelectionWarning">
-                    <strong><g:message
-                            code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
-                </div>
+            <div class="alert alert-info text-center">
+                <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
             </div>
         </g:if>
     </g:if>
