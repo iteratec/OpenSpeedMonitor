@@ -1,0 +1,39 @@
+.ui-timepicker-div .ui-widget-header {
+    margin-bottom: 8px;
+}
+
+.ui-timepicker-div dl {
+    text-align: left;
+}
+
+.ui-timepicker-div dl dt {
+    height: 25px;
+    margin-bottom: -25px;
+}
+
+.ui-timepicker-div dl dd {
+    margin: 0 10px 10px 65px;
+}
+
+.ui-timepicker-div td {
+    font-size: 90%;
+}
+
+#select-timeframe {
+    min-width: 26em;
+    min-height: 18em;
+}
+
+#select-jobgroup, #select-page-location {
+    min-height: 23em;
+}
+
+#select-jobgroup select {
+    height: 13em;
+    min-height: 13em;
+}
+
+#select-page-location select {
+    min-height: 10em;
+    height: 10em;
+}

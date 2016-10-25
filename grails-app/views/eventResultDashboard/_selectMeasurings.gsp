@@ -21,7 +21,7 @@ GSP-Template Mappings:
 * selectedAllLocations
  --%>
 <div class="col-md-3" id="filter-navtab-jobGroup">
-    <div class="card">
+    <div class="card" id="select-jobgroup">
     %{--JobGroups----------------------------------------------------------------------------------------------}%
         <legend>
                 <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>
@@ -51,7 +51,7 @@ GSP-Template Mappings:
 
 %{--the rest----------------------------------------------------------------------------------------------}%
 <div id="filter-complete-tabbable" class="col-md-5 tabbable">
-    <div class="card">
+    <div class="card" id="select-page-location">
         <ul class="nav nav-tabs">
             <li class="active" id="filter-navtab-page">
                 <a href="#tab1" data-toggle="tab">
