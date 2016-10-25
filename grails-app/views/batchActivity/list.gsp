@@ -43,7 +43,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div align="center" class="pagination"><ul id="elementPager"></ul></div>
+            <div align="center"><ul id="elementPager" class="pagination"></ul></div>
         </div>
         <div class="col-md-3">
             <div align="right" class="form-group">

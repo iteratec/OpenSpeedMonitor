@@ -53,7 +53,7 @@ class BootstrapTagLib {
 		def disabledPrev = (currentstep > firststep) ? "" : "disabled"
 		//		linkTagAttrs.class = 'prevLink'
 		//		linkParams.offset = offset - max
-		writer << "<ul>"
+		writer << "<ul class='pagination'>"
 		writer << "<li class='prev ${disabledPrev}'>"
 		writer << link(linkTagAttrs.clone()) {
 			(attrs.prev ?: messageSource.getMessage('paginate.prev', null, messageSource.getMessage('default.paginate.prev', null, 'Previous', locale), locale))

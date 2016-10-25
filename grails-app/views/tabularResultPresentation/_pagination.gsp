@@ -5,8 +5,8 @@
       model: An instance of PaginationListing, not null. 
 --%>
 <g:if test="${model != null && !model.isEmpty()}">
-	<div class="pagination pagination-centered">
-		 <ul>
+	<div>
+		 <ul class="pagination pagination-centered">
 		 	<g:if test="${model.isNotFirst()}">
 		 		<li><a href="${model.getPrevLink()}"><g:message code="de.iteratec.isr.pagination.prev" /></a></li>
 		 	</g:if>

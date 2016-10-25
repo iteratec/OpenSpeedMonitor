@@ -53,7 +53,7 @@
                 </g:each>
                 </tbody>
             </table>
-            <div class="pagination">
+            <div>
                 <bs:paginate total="${connectivityProfileInstanceTotal}" />
             </div>
         </section>
