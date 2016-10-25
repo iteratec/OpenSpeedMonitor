@@ -1707,8 +1707,10 @@ function ChartExporter(args) {
 }
 
 function scrollToChartbox(chartBoxTopOffset) {
+    var navbarOffset = -$("#Navbar").height();
+    var offset = navbarOffset + chartBoxTopOffset;
     if ($("#chartbox").length > 0) {
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top + chartBoxTopOffset)}, {duration: 'fast'});
+        $('html,body').animate({scrollTop: ($("#chartbox").offset().top + offset)}, {duration: 'fast'});
     } else {
         $('html,body').animate({scrollTop: 0}, {duration: 'fast'});
     }

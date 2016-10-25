@@ -42,7 +42,7 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
         createGraph();
     }
 
-    scrollToChartbox(200);
+    scrollToChartbox(0);
 
 }
 
