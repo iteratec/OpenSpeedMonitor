@@ -258,7 +258,7 @@ class CsiDashboardController {
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1;
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
 
         cmd.copyRequestDataToViewModelMap(modelToRender)

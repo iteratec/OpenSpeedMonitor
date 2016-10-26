@@ -92,7 +92,7 @@ class RickshawHtmlCreater {
                     title: "${title}",
                     data : ${data},
                     height: ${height},
-                    width: 'auto',
+                    width: ${width},
                     top: "${yAxisMax}",
                     bottom: "${yAxisMin}",
                     dataLabelsActivated : ${dataLabelsActivated},

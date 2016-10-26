@@ -97,6 +97,10 @@
                             <g:checkBox id="to-enable-marker" name="toEnableMarker" checked="${markerShouldBeEnabled}"/>
                             <g:message code="de.iteratec.isocsi.csi.show.datamarkers" default="Datenpunkte anzeigen"/>
                         </label>
+                        <label class="checkbox-inline">
+                            <g:checkBox id="to-enable-autoresize" name="toEnableAutoResize" checked="${initialChartWidth < 0}"/>
+                            <g:message code="de.iteratec.isocsi.csi.autoresize" default="Fit graph width to window"/>
+                        </label>
                     </div>
                 </div>
             </div>

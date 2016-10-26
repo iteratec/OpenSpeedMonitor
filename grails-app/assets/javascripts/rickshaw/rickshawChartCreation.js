@@ -36,6 +36,7 @@ function RickshawGraphBuilder(args) {
             this.dataLabelsActivated = true;
         }
 
+        self.autoResize = args.width < 0 || args.width == "auto";
         self.divId = args.divId;
         args.series = self.composeSeries(args.data);
 
@@ -137,7 +138,7 @@ function RickshawGraphBuilder(args) {
             args.height = parseInt(args.height);
         }
 
-        if (args.width == "auto") {
+        if (args.width == "auto" || args.width == -1) {
             args.width = $(window).width() - 90;
         } else {
             args.width = parseInt(args.width);
@@ -443,6 +444,9 @@ function RickshawGraphBuilder(args) {
 
     this.initializeEventListeners = function() {
         $(window).resize(function() {
+            if (!self.autoResize) {
+                return;
+            }
             self.updateSize({
                 width: 'auto',
                 height: 'auto'
@@ -1102,6 +1106,7 @@ function ChartAdjuster(args) {
         self.addFunctionalityShowDataMarker();
         self.addFunctionalityShowDataLabels();
         self.addFunctionalityToggleWideScreenExport();
+        self.addFunctionalityAutoresize();
     }
 
     this.addFunctionalityAdjustingChartSize = function () {
@@ -1114,15 +1119,16 @@ function ChartAdjuster(args) {
                     var maxWidth = 5000
                     var minWidth = 540
                     var maxHeight = 3000
-                    if ($.isNumeric(diaWidth) && $.isNumeric(diaHeight)
-                        && parseInt(diaWidth) > 0
-                        && parseInt(diaWidth) <= maxWidth
-                        && parseInt(diaWidth) >= minWidth
-                        && parseInt(diaHeight) > 0
-                        && parseInt(diaHeight) <= maxHeight) {
-                        rickshawGraphBuilder.updateSize({
-                            width: $('#dia-width').val(),
-                            height: $('#dia-height').val()
+                    var widthNumeric = $.isNumeric(diaWidth) &&
+                        parseInt(diaWidth) <= maxWidth &&
+                        parseInt(diaWidth) >= minWidth;
+                    var autoWidth = diaWidth < 0 || diaWidth == "auto";
+                    var heightNumeric = $.isNumeric(diaHeight) && parseInt(diaHeight) <= maxHeight;
+                    $("#to-enable-autoresize").prop('checked', autoWidth);
+                    if ((widthNumeric || autoWidth) && (heightNumeric || diaHeight == "auto")) {
+                        window.rickshawGraphBuilder.updateSize({
+                            width: diaWidth,
+                            height: diaHeight
                         });
                         if (parseInt(diaWidth) < 1070) {
                             $("#rickshaw_legend > ul").css({
@@ -1137,12 +1143,6 @@ function ChartAdjuster(args) {
                                 "column-count": 2 + ""
                             });
                         }
-                        //center legend
-//            var leftDistance = Math.floor(((diaWidth - $("#rickshaw_legend").outerWidth()) / 2) - 60);
-//            document.getElementById('rickshaw_legend').style.cssText = "margin-left:" + leftDistance + "px !important";
-//            $(".rickshaw_legend").css({
-//              "margin-left" : "" + leftDistance + "px"
-//            });
                     } else {
                         window
                             .alert("Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels.");
@@ -1257,6 +1257,20 @@ function ChartAdjuster(args) {
         $('#to-enable-marker').bind('change', function () {
             var toEnableMarkers = $(this).is(':checked');
             rickshawGraphBuilder.updateDrawPointMarkers(toEnableMarkers);
+        });
+    }
+
+    this.addFunctionalityAutoresize = function () {
+        $('#to-enable-autoresize').bind('change', function () {
+            var enabled = $(this).is(':checked');
+            window.rickshawGraphBuilder.autoResize = enabled;
+            if (enabled) {
+                $('#dia-width').val("auto");
+            }
+            window.rickshawGraphBuilder.updateSize({
+                width: $('#dia-width').val(),
+                height: $('#dia-height').val()
+            });
         });
     }
 

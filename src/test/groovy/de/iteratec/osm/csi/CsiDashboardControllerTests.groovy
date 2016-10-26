@@ -111,7 +111,6 @@ class CsiDashboardControllerTests {
 
         def configMock = new MockFor(ConfigService, true)
         configMock.demand.getInitialChartHeightInPixels(0..100000) { -> return 400 }
-        configMock.demand.getInitialChartWidthInPixels(0..100000) { -> return 1000 }
         configServiceMock = configMock.proxyInstance()
         controllerUnderTest.configService = this.configServiceMock
 

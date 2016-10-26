@@ -157,7 +157,7 @@ class EventResultDashboardController {
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1;
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
@@ -837,7 +837,7 @@ class EventResultDashboardController {
                 Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
                 cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
                 cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-                cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+                cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1
 
                 cmd.copyRequestDataToViewModelMap(modelToRender);
                 modelToRender.put('command', cmd)
@@ -855,7 +855,7 @@ class EventResultDashboardController {
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1
 
         cmd.copyRequestDataToViewModelMap(modelToRender);
 
