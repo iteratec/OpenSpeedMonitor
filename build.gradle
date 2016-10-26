@@ -190,6 +190,17 @@ task bowerSyncJavascript(type: Sync) {
     include 'jquery-ui/ui/minified/jquery-ui.min.js'
     include 'bootstrap/docs/assets/js/bootstrap.min.js'
     include 'clipboard/dist/clipboard.min.js'
+    include 'chosen/chosen.jquery.js'
+    include 'd3/d3.min.js'
+    include 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'
+    include 'later/later.min.js'
+    include 'moment/min/moment.min.js'
+    include 'prettycron/prettycron.js'
+    include 'spin.js/spin.js'
+    include 'tagit/js/tag-it.min.js'
+    include 'codemirror/lib/codemirror.js'
+    include 'codemirror/addon/hint/show-hint.js'
+
     dependsOn bowerInstall
 }
 
@@ -200,8 +211,18 @@ task bowerSyncStylesheets(type: Sync) {
     include 'bootstrap/less/*.less'
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
+    include 'chosen/chosen.css'
+    include 'chosen/chosen-sprite.png'
+    include 'chosen/chosen-sprite@2x.png'
+    include 'bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css'
+    include 'codemirror/lib/codemirror.css'
+    include 'codemirror/addon/hint/show-hint.css'
+    include 'tagit/css/jquery.tagit.css'
+    include 'jquery-ui/themes/smoothness/jquery-ui.min.css'
+    include 'jquery-ui/themes/smoothness/images/'
     dependsOn bowerInstall
 }
+
 
 task bowerPackages() {
     dependsOn bowerSyncJavascript, bowerSyncStylesheets
@@ -236,4 +257,8 @@ sourceSets {
 }
 'dbmChangelogSync' {
     jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
+}
+bootRun {
+    addResources = false // We can set it to true if we would like to reload src/main/resources
+    jvmArgs = ["-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"]
 }

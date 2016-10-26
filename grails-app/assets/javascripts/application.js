@@ -16,12 +16,13 @@
 */
 //= require_tree bower_components/jquery
 //= require_tree bower_components/jquery-ui
-//= require_tree bower_components
+//= require_tree bower_components/bootstrap
+//= require_tree bower_components/bootstrap-datepicker
+//= require_tree bower_components/chosen
+//= require_tree bower_components/clipboard
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
-//= require date-time-picker/bootstrap-datepicker.min
 //= require postload/PostLoader
-//= require chosen/chosen.jquery.min
 //= require_self
 
 /**

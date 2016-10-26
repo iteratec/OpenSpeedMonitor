@@ -2,9 +2,9 @@
 *= require_tree bower_components/bootstrap/docs
 *= require_tree bower_components/components-font-awesome
 *= require_tree bower_components/dcjs
+*= require_tree bower_components/chosen
 *= require bootstrap-custom
-*= require date-time-picker/bootstrap-datepicker.min.css
-*= require chosen/chosen.css
+*= require bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css
 *= require_self
 */
 .form-group.error label, .fieldcontain.error label {
