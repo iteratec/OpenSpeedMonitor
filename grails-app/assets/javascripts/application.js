@@ -22,6 +22,7 @@
 //= require date-time-picker/bootstrap-datepicker.min
 //= require postload/PostLoader
 //= require chosen/chosen.jquery.min
+//= require chartContextUtilities.js
 //= require_self
 
 /**

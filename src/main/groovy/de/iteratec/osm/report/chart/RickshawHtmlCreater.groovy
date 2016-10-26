@@ -19,6 +19,7 @@ package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.DefaultTimeToCsMapping
 import de.iteratec.osm.csi.RickshawTransformableCsMapping
+import de.iteratec.osm.result.CachedView
 
 class RickshawHtmlCreater {
 
@@ -167,8 +168,27 @@ class RickshawHtmlCreater {
 				url = eachPoint.sourceURL.toString();
             }
 
+            // the enum is declared in the wrong order
+            def cached = eachPoint.chartPointWptInfo.cachedView.isCached()
+
+            // json object containing all relevant infos to create a url to jump to wpt
+            def pointInfo = eachPoint.chartPointWptInfo
+            def wptResultInfo =  """{
+                wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}",
+                testId: "${pointInfo.testId.toString()}",
+                numberOfWptRun: ${pointInfo.numberOfWptRun.toString()},
+                oneBaseStepIndexInJourney: "${pointInfo.oneBaseStepIndexInJourney.toString()}",
+                wptVersion: "${pointInfo.wptVersion.toString()}",
+                cachedView: ${cached}
+            }""";
+
             testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
-			sw << prefix +""" { x: ${eachPoint.time / 1000}, y: ${csiAggregation}, url: "${url}" ${testingAgent}}"""
+            sw << prefix +""" {
+                x: ${eachPoint.time / 1000},
+                y: ${csiAggregation},
+                url: "${url}" ${testingAgent},
+                wptResultInfo: ${wptResultInfo}
+            }"""
             prefix = ","
         }
         sw << """ ]"""

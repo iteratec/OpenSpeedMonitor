@@ -30,6 +30,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
+import de.iteratec.osm.report.chart.dao.WptEventResultInfo
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -259,11 +260,33 @@ public class EventResultDashboardService {
 
                 URL testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
 
+                // Get WPT event result info to build the WPT url dynamically
+                String serverBaseUrl = eventResult.jobResult.wptServerBaseurl
+                String testId = eventResult.jobResult.testId
+                Integer numberOfWptRun = eventResult.numberOfWptRun
+                CachedView cachedView = eventResult.cachedView
+                Integer oneBaseStepIndexInJourney = eventResult.oneBasedStepIndexInJourney
+                WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
+                        serverBaseUrl: serverBaseUrl,
+                        testId: testId,
+                        numberOfWptRun: numberOfWptRun,
+                        cachedView: cachedView,
+                        wptVersion: WptXmlResultVersion.MULTISTEP,
+                        oneBaseStepIndexInJourney: oneBaseStepIndexInJourney
+                )
+
                 if (isCachedViewEqualToAggregatorTypesView(eventResult, aggregatorTypeCachedView)) {
                     Double value = resultCsiAggregationService.getEventResultPropertyForCalculation(aggregator, eventResult)
                     if (value != null && isInBounds(eventResult, aggregator, gtBoundary,ltBoundary)) {
                         String graphLabel = "${aggregator.name}${UNIQUE_STRING_DELIMITTER}${eventResult.tag}${UNIQUE_STRING_DELIMITTER}${connectivity}"
-                        OsmChartPoint chartPoint = new OsmChartPoint(time: eventResult.getJobResultDate().getTime(), csiAggregation: value, countOfAggregatedResults: 1, sourceURL: testsDetailsURL, testingAgent: eventResult.testAgent)
+                        OsmChartPoint chartPoint = new OsmChartPoint(
+                                time: eventResult.getJobResultDate().getTime(),
+                                csiAggregation: value,
+                                countOfAggregatedResults: 1,
+                                sourceURL: testsDetailsURL,
+                                testingAgent: eventResult.testAgent,
+                                chartPointWptInfo: chartPointWptInfo
+                        )
                         if (chartPoint.isValid())
                             highchartPointsForEachGraph[graphLabel].add(chartPoint)
                     }

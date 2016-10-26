@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.report.chart
 
+import de.iteratec.osm.report.chart.dao.WptEventResultInfo
 import groovy.transform.EqualsAndHashCode
 import org.joda.time.DateTime
 
@@ -104,6 +105,9 @@ class OsmChartPoint{
 	 * Measuring machine name (can contain ip adress) 
 	 */
 	String testingAgent
+
+
+	WptEventResultInfo chartPointWptInfo
 
 	/**
 	 * <p>
