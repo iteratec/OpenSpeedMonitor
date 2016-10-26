@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.report.chart.dao
+package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.result.CachedView
 import groovy.transform.EqualsAndHashCode

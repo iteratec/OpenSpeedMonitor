@@ -132,8 +132,6 @@ function buildWptUrl(wptView = null, nearestPoint = null) {
         var cachedView = nearestPoint.value.wptResultInfo.cachedView;
         var cached = null;
         var oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney.toString();
-        // TODO: If the wpt version is persisted adapt this dynamic url building to all versions
-        var wptVersion = nearestPoint.value.wptResultInfo.wptVersion.toString();
 
         // build the url
         if (wptView == "compare") {

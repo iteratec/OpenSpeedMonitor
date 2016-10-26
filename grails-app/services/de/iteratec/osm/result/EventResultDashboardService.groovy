@@ -30,7 +30,7 @@ import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.report.chart.dao.WptEventResultInfo
+import de.iteratec.osm.report.chart.WptEventResultInfo
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -271,7 +271,6 @@ public class EventResultDashboardService {
                         testId: testId,
                         numberOfWptRun: numberOfWptRun,
                         cachedView: cachedView,
-                        wptVersion: WptXmlResultVersion.MULTISTEP,
                         oneBaseStepIndexInJourney: oneBaseStepIndexInJourney
                 )
 
