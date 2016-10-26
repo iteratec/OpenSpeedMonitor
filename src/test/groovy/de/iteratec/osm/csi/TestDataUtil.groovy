@@ -66,61 +66,6 @@ import static org.junit.Assert.assertNotNull
 class TestDataUtil implements OsmTestLogin {
     /**
      * <p>
-     * Creates a map of {@link CsiAggregation}s referenced by a key consists
-     * of {@link JobGroup}- and {@link Page}-ID.
-     * </p>
-     *
-     * <p>
-     * The key-format is: {@code group.ident ( ) +':::'+page.ident()}, for example:
-     * {@code 1:::2}. For all existing keys the referenced {@link List} is
-     * not <code>null</code> but possibly empty.
-     * </p>
-
-     * @todo TODO mze-2013-08-15: Use {@link Collection} instead of List
-     *       because the values are not sorted!
-     *
-     * @param hourlyCsiAggregations The hourly measured value to insert in the
-     *         maps collections; not <code>null</code>.
-     * @param csiAggregationTagService
-     *         The service to use for tag generation, not <code>null</code>.
-     *
-     * @return A map as described above, never <code>null</code>.
-     *
-     * @throws IllegalArgumentException
-     *         if at least one of the measured values is not an hourly measured value.
-     *
-     * @since IT-43
-     */
-    public static Map<String, List<CsiAggregation>> createHourlyCsiAggregationByGroupAndPageIdMap(
-            List<CsiAggregation> hourlyCsiAggregations,
-            CsiAggregationTagService csiAggregationTagService
-    ) throws IllegalArgumentException {
-
-        Map<String, List<CsiAggregation>> result = [:];
-
-        for (CsiAggregation hCsiAggregation : hourlyCsiAggregations) {
-            Page page = csiAggregationTagService.findPageOfHourlyEventTag(hCsiAggregation.tag);
-            assertNotNull("You must create a page for the measured value with id " + hCsiAggregation.ident() + "first", page);
-
-            JobGroup group = csiAggregationTagService.findJobGroupOfHourlyEventTag(hCsiAggregation.tag);
-            assertNotNull("You must create a group for the measured value with id " + hCsiAggregation.ident() + "first", group);
-
-            String key = group.ident() + ':::' + page.ident();
-            Collection valuesForPageAndGroup = result[key];
-
-            if (valuesForPageAndGroup == null) {
-                valuesForPageAndGroup = [];
-                result[key] = valuesForPageAndGroup;
-            }
-
-            valuesForPageAndGroup.add(hCsiAggregation);
-        }
-
-        return result;
-    }
-
-    /**
-     * <p>
      * Removes all entries from the database.  The hole action is one hibernate-transaction which gets flushed afterwards.
      * </p>
      *
@@ -461,7 +406,7 @@ class TestDataUtil implements OsmTestLogin {
      * @param jobGroup
      *         The group to use, not <code>null</code>.
      * @param pageName
-     *         The name of the page to calculate data for,
+     *         The name of the pageAggregator to calculate data for,
      *         not <code>null</code>.
      * @param end
      *         The last date to calculate for,
@@ -489,7 +434,6 @@ class TestDataUtil implements OsmTestLogin {
             DateTime end, DateTime currentDate,
             CsiAggregationInterval hourlyInterval,
             EventCsiAggregationService eventCsiAggregationService,
-            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
@@ -502,7 +446,6 @@ class TestDataUtil implements OsmTestLogin {
             createdHmvs.addAll(calculateMvsOfOneHour(
                     currentDate, hourlyInterval, jobGroup, pageName,
                     eventCsiAggregationService,
-                    csiAggregationTagService,
                     eventResultService,
                     weightingService,
                     meanCalcService,
@@ -533,7 +476,6 @@ class TestDataUtil implements OsmTestLogin {
             JobGroup jobGroup,
             String pageName,
             EventCsiAggregationService eventCsiAggregationService,
-            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
@@ -543,40 +485,32 @@ class TestDataUtil implements OsmTestLogin {
 
         Page page = Page.findByName(pageName)
 
-        assertNotNull('Please use an existing page! The page with name ' + pageName + ' does not exisits.', page)
+        assertNotNull('Please use an existing pageAggregator! The pageAggregator with name ' + pageName + ' does not exisits.', page)
 
-        MeasuredEvent event = findMeasuredEvent(jobGroup, page)
-
-        // FF
-        String tagFF = csiAggregationTagService.createHourlyEventTag(
-                jobGroup,
-                event,
-                page,
-                Browser.findByName('FF'),
-                Location.findByLocation('ffLocationLocation'));
+        MeasuredEvent measuredEvent = findMeasuredEvent(jobGroup, page)
 
         createdHmvs.add(
-                ensurePresenceAndCalculation(dateTimeToCalculateMvFor, hourly, tagFF,
+                ensurePresenceAndCalculation(dateTimeToCalculateMvFor, hourly,
+                        jobGroup,
+                        measuredEvent,
+                        page,
+                        Browser.findByName('FF'),
+                        Location.findByLocation('ffLocationLocation'),
                         eventCsiAggregationService,
-                        csiAggregationTagService,
                         eventResultService,
                         weightingService,
                         meanCalcService,
                         csiAggregationUpdateEventDaoService)
         )
 
-        // IE
-        String tagIE = csiAggregationTagService.createHourlyEventTag(
-                jobGroup,
-                event,
-                page,
-                Browser.findByName('IE'),
-                Location.findByLocation('ieLocationLocation'));
-
         createdHmvs.add(
-                ensurePresenceAndCalculation(dateTimeToCalculateMvFor, hourly, tagIE,
+                ensurePresenceAndCalculation(dateTimeToCalculateMvFor, hourly,
+                        jobGroup,
+                        measuredEvent,
+                        page,
+                        Browser.findByName('IE'),
+                        Location.findByLocation('ieLocationLocation'),
                         eventCsiAggregationService,
-                        csiAggregationTagService,
                         eventResultService,
                         weightingService,
                         meanCalcService,
@@ -597,9 +531,12 @@ class TestDataUtil implements OsmTestLogin {
     public static CsiAggregation ensurePresenceAndCalculation(
             DateTime startDate,
             CsiAggregationInterval interval,
-            String tag,
+            JobGroup jobGroup,
+            MeasuredEvent measuredEvent,
+            Page page,
+            Browser browser,
+            Location location,
             EventCsiAggregationService eventCsiAggregationService,
-            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
@@ -608,10 +545,13 @@ class TestDataUtil implements OsmTestLogin {
         return ensurePresenceAndCalculation(
                 startDate,
                 interval,
-                tag,
                 AggregatorType.findByName(AggregatorType.MEASURED_EVENT),
+                jobGroup,
+                measuredEvent,
+                page,
+                browser,
+                location,
                 eventCsiAggregationService,
-                csiAggregationTagService,
                 eventResultService,
                 weightingService,
                 meanCalcService,
@@ -622,19 +562,21 @@ class TestDataUtil implements OsmTestLogin {
     public static CsiAggregation ensurePresenceAndCalculation(
             DateTime startDate,
             CsiAggregationInterval interval,
-            String tag,
             AggregatorType eventAggregator,
+            JobGroup jobGroup,
+            MeasuredEvent measuredEvent,
+            Page page,
+            Browser browser,
+            Location location,
             EventCsiAggregationService eventCsiAggregationService,
-            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     ) {
-        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, tag, eventAggregator, false, ConnectivityProfile.findAll())
+        CsiAggregation toCreateAndOrCalculate = eventCsiAggregationService.ensurePresence(startDate, interval, jobGroup, measuredEvent, page, browser, location, eventAggregator, false, ConnectivityProfile.findAll())
         return calcMv(
                 toCreateAndOrCalculate,
-                csiAggregationTagService,
                 eventResultService,
                 weightingService,
                 meanCalcService,
@@ -650,7 +592,6 @@ class TestDataUtil implements OsmTestLogin {
      */
     public static CsiAggregation calcMv(
             CsiAggregation toBeCalculated,
-            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
@@ -663,7 +604,7 @@ class TestDataUtil implements OsmTestLogin {
 
             if (!toBeCalculated.isCalculated()) {
                 reCalc(toBeCalculated, fromDate, toDate,
-                        csiAggregationTagService, eventResultService, weightingService, meanCalcService, csiAggregationUpdateEventDaoService)
+                        eventResultService, weightingService, meanCalcService, csiAggregationUpdateEventDaoService)
             }
             return toBeCalculated
         }
@@ -674,22 +615,21 @@ class TestDataUtil implements OsmTestLogin {
             CsiAggregation toBeCalculated,
             Date fromDate,
             Date toDate,
-            CsiAggregationTagService csiAggregationTagService,
             EventResultService eventResultService,
             WeightingService weightingService,
             MeanCalcService meanCalcService,
             CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     ) {
 
-        MeasuredEvent measuredEvent = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(toBeCalculated.tag)
-        JobGroup jobGroup = csiAggregationTagService.findJobGroupOfHourlyEventTag(toBeCalculated.tag)
-        Location location = csiAggregationTagService.findLocationOfHourlyEventTag(toBeCalculated.tag)
+        MeasuredEvent measuredEventAggr = toBeCalculated.measuredEventAggr
+        JobGroup jobGroup = toBeCalculated.jobGroup
+        Location location = toBeCalculated.location
 
-        if (!measuredEvent || !jobGroup || !jobGroup.hasCsiConfiguration() || !location) {
+        if (!measuredEventAggr || !jobGroup || !jobGroup.hasCsiConfiguration() || !location) {
             return toBeCalculated
         }
         List<EventResult> results = []
-        results.addAll(eventResultService.findByMeasuredEventBetweenDate(jobGroup, measuredEvent, location, fromDate, toDate))
+        results.addAll(eventResultService.findByMeasuredEventBetweenDate(jobGroup, measuredEventAggr, location, fromDate, toDate))
 
 
         List<WeightedCsiValue> weightedCsiValues = []
@@ -728,48 +668,6 @@ class TestDataUtil implements OsmTestLogin {
         createBrowsersAndAliases()
         createLocations()
         decodeCSVTestDataLine(csvFile.readLines(), pagesToGenerateDataFor)
-    }
-
-    /**
-     * <p>
-     * Loads test-data from customers CSV file and creates missing elements.
-     * </p>
-     *
-     * @param csvFile
-     *         The CSV file with customer data,
-     *         not <code>null</code>.
-     * @param pagesToGenerateDataFor
-     *         The names of the pages to process (see {@link Page}),
-     *         not <code>null</code>,
-     *         not {@linkplain Collection#isEmpty() empty}.
-     * @param csiAggregationTagService
-     * 		   The {@link CsiAggregationTagService} for generating the tag of {@link EventResult}
-     */
-    public
-    static void loadTestDataFromCustomerCSV(File csvFile, List<String> pagesToGenerateDataFor, List<String> allPages, CsiAggregationTagService csiAggregationTagService) {
-        List<Browser> browserList = createBrowsersAndAliases()
-        List<Page> pages = createPages(allPages)
-        createServer()
-        createLocations()
-        ConnectivityProfile profile = createConnectivityProfile("conn-profile-for-testing-purposes")
-        createJobGroups().each {
-            CsiConfiguration csiConfiguration = it.csiConfiguration
-            browserList.each { browser ->
-                csiConfiguration.addToBrowserConnectivityWeights(new BrowserConnectivityWeight(browser: browser, connectivity: profile, weight: 50))
-            }
-            pages.each { page ->
-                csiConfiguration.pageWeights.add(new PageWeight(page: page, weight: 7))
-            }
-        }
-        def i = 0
-        csvFile.eachLine { String csvLine ->
-            if (!isHeaderLine(csvLine) && !isEmptyLine(csvLine)) {
-                //				System.out.println('Processing line: ' + csvLine);
-                decodeCSVTestDataLine(csvLine, pagesToGenerateDataFor, csiAggregationTagService, profile)
-                println(i)
-                i += 1
-            }
-        }
     }
 
     static List<Location> createLocations() {
@@ -938,15 +836,15 @@ class TestDataUtil implements OsmTestLogin {
 
     /**
      * <p>
-     * Checks if data for the page is relevant for the test.
+     * Checks if data for the pageAggregator is relevant for the test.
      * </p>
      *
      * @param page
-     *         The page that relevance is to check, not <code>null</code>.
+     *         The pageAggregator that relevance is to check, not <code>null</code>.
      * @param pagesToGenerateDataFor
      *         The relevant pages by name, not <code>null</code>; an empty
      *         collection would cause nothing to be relevant.
-     * @return <code>true</code> if page is relevant, <code>false</code> else.
+     * @return <code>true</code> if pageAggregator is relevant, <code>false</code> else.
      */
     private static boolean isResultForPageRequired(Page page, List<String> pagesToGenerateDataFor) {
         return pagesToGenerateDataFor.contains(page.name)
@@ -972,11 +870,11 @@ class TestDataUtil implements OsmTestLogin {
 
     /**
      * <p>
-     * Gets or create an {@link MeasuredEvent} for the specified page and job combination.
+     * Gets or create an {@link MeasuredEvent} for the specified pageAggregator and job combination.
      * </p>
      *
      * @param job The job an event is to get for, not <code>null</code>.
-     * @param page The page an event is to get for, not <code>null</code>.
+     * @param page The pageAggregator an event is to get for, not <code>null</code>.
      *
      * @return not <code>null</code>.
      */
@@ -1075,8 +973,7 @@ class TestDataUtil implements OsmTestLogin {
             int docCompleteTimeInMillisecs,
             double customerSatisfactionInPercent,
             MeasuredEvent event,
-            ConnectivityProfile connectivityProfile) {
-        CsiAggregationTagService csiAggregationTagService = new CsiAggregationTagService()
+            ConnectivityProfile connectivityProfile = null) {
         Browser dummyBrowser = createBrowser("bro", 0)
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
@@ -1088,132 +985,19 @@ class TestDataUtil implements OsmTestLogin {
                 jobResult: jobResult,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: jobResult.job.ident(),
-                measuredEvent: event,
+                measuredEventAggr: event,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
                 noTrafficShapingAtAll: false,
-                tag: csiAggregationTagService.createEventResultTag(job.jobGroup, event, event.testedPage, dummyBrowser, job.location)
+                jobGroup: job.jobGroup,
+                measuredEvent: event,
+                page: event.testedPage,
+                browser: dummyBrowser,
+                location: job.location
         ).save(failOnError: true)
 
         return eventResult
-    }
-
-    /**
-     * <p>
-     * Creates an event result and assigns it to the specified
-     * {@link JobResult}.
-     * </p>
-     *
-     * <p>
-     * None of the arguments may be <code>null</code>.
-     * </p>
-     *
-     * @param job
-     *         The parent job.
-     * @param jobResult
-     *         The job result the event result should be assigned to.
-     * @param docCompleteTimeInMillisecs
-     *         The doc-complete-time in milliseconds.
-     * @param customerSatisfactionInPercent
-     *         The customer-satisfaction-index in percent.
-     * @param csiAggregationTagService
-     * 		   The {@link CsiAggregationTagService} for generating the tag of {@link EventResult}
-     */
-    static EventResult createEventResult(
-            Job job,
-            JobResult jobResult,
-            int docCompleteTimeInMillisecs,
-            double customerSatisfactionInPercent,
-            MeasuredEvent event,
-            CsiAggregationTagService csiAggregationTagService,
-            boolean withConnectivityProfile = true
-    ) {
-
-        JobGroup jobGroup = job.jobGroup
-        Page page = event.testedPage
-        Location location = job.location
-        Browser browser = location.browser
-
-        String resultTag = csiAggregationTagService.createEventResultTag(jobGroup, event, page, browser, location)
-        EventResult eventResult = new EventResult(
-                numberOfWptRun: 1,
-                cachedView: CachedView.UNCACHED,
-                medianValue: true,
-                wptStatus: 200,
-                docCompleteTimeInMillisecs: docCompleteTimeInMillisecs,
-                csByWptDocCompleteInPercent: customerSatisfactionInPercent,
-                jobResult: jobResult,
-                jobResultDate: jobResult.date,
-                jobResultJobConfigId: jobResult.job.ident(),
-                measuredEvent: event,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: resultTag,
-                noTrafficShapingAtAll: job.noTrafficShapingAtAll,
-                connectivityProfile: withConnectivityProfile ? createConnectivityProfile('conn-profile-for-testing-purposes') : null
-        ).save(failOnError: true)
-
-        return eventResult.save(failOnError: true)
-
-    }
-
-    /**
-     * <p>
-     * Creates an event result and assigns it to the specified
-     * {@link JobResult}.
-     * </p>
-     *
-     * <p>
-     * None of the arguments may be <code>null</code>.
-     * </p>
-     *
-     * @param job
-     *         The parent job.
-     * @param jobResult
-     *         The job result the event result should be assigned to.
-     * @param docCompleteTimeInMillisecs
-     *         The doc-complete-time in milliseconds.
-     * @param customerSatisfactionInPercent
-     *         The customer-satisfaction-index in percent.
-     * @param csiAggregationTagService
-     * 		   The {@link CsiAggregationTagService} for generating the tag of {@link EventResult}
-     */
-    static EventResult createEventResultWithConnectivity(
-            Job job,
-            JobResult jobResult,
-            int docCompleteTimeInMillisecs,
-            double customerSatisfactionInPercent,
-            MeasuredEvent event,
-            CsiAggregationTagService csiAggregationTagService,
-            ConnectivityProfile connectivityProfile
-    ) {
-
-        JobGroup jobGroup = job.jobGroup
-        Page page = event.testedPage
-        Location location = job.location
-        Browser browser = location.browser
-
-        String resultTag = csiAggregationTagService.createEventResultTag(jobGroup, event, page, browser, location)
-        EventResult eventResult = new EventResult(
-                numberOfWptRun: 1,
-                cachedView: CachedView.UNCACHED,
-                medianValue: true,
-                wptStatus: 200,
-                docCompleteTimeInMillisecs: docCompleteTimeInMillisecs,
-                csByWptDocCompleteInPercent: customerSatisfactionInPercent,
-                jobResult: jobResult,
-                jobResultDate: jobResult.date,
-                jobResultJobConfigId: jobResult.job.ident(),
-                measuredEvent: event,
-                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: resultTag,
-                noTrafficShapingAtAll: false,
-                customConnectivityName: null,
-                connectivityProfile: connectivityProfile
-        ).save(failOnError: true)
-
-        return eventResult
-
     }
 
     /**
@@ -1303,67 +1087,6 @@ class TestDataUtil implements OsmTestLogin {
 
     }
 
-    /**
-     * Decodes one line of test data CSV.
-     *
-     * @param csvLine
-     */
-    private
-    static void decodeCSVTestDataLine(String csvLine, List<String> pagesToGenerateDataFor, CsiAggregationTagService csiAggregationTagService, ConnectivityProfile profile) {
-        String[] columns = csvLine.split(';');
-
-        String jobName = columns[0]
-
-        Page page = getPageFromCSVJobName(jobName);
-
-        assertNotNull('Page for job-name ' + jobName + ' may not be null.', page)
-
-        if (!isResultForPageRequired(page, pagesToGenerateDataFor)) {
-            // If the result is not needed for this test, just return and
-            // do nothing more...
-            return;
-        }
-
-        JobGroup defaultJobGroup = JobGroup.findByName('CSI');
-        JobGroup jobGroup1 = JobGroup.findByName('csiGroup1');
-        JobGroup jobGroup2 = JobGroup.findByName('csiGroup2');
-
-        Location location = getLocationCSVJobName(jobName);
-        Date dateOfJobRun = new Date(columns[2] + " " + columns[3]);
-
-
-        assertNotNull(defaultJobGroup)
-        assertNotNull(jobGroup1)
-        assertNotNull(jobGroup2)
-        assertNotNull(location)
-        assertNotNull(dateOfJobRun)
-
-        // Create the job:
-        JobGroup groupOfJob
-        switch (jobName.split('_')[0]) {
-            case 'csiGroup1':
-                groupOfJob = jobGroup1
-                break;
-            case 'csiGroup2':
-                groupOfJob = jobGroup2
-                break;
-            default:
-                groupOfJob = defaultJobGroup
-        }
-        Job job = getJobOfCSVJobName(jobName, groupOfJob, location);
-        assertNotNull(job)
-
-        MeasuredEvent eventOfPage = getMeasuredEvent(groupOfJob, page);
-        assertNotNull(eventOfPage)
-
-        JobResult jobResult = createJobResult(columns[6], dateOfJobRun, job, location)
-
-        assertNotNull(jobResult)
-
-        if (columns.length > 8 && !columns[8].isEmpty()) {
-            createEventResultWithConnectivity(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, csiAggregationTagService, profile);
-        }
-    }
 
     /**
      * <p>
@@ -1373,7 +1096,7 @@ class TestDataUtil implements OsmTestLogin {
      * </p>
      *
      * @param csvJobColumn CSV Job-column contents.
-     * @return An assigned page, null if not interpretable.
+     * @return An assigned pageAggregator, null if not interpretable.
      */
     private static Page getPageFromCSVJobName(String csvJobColumn) {
         switch (csvJobColumn.toLowerCase()) {
@@ -1459,16 +1182,16 @@ class TestDataUtil implements OsmTestLogin {
 
     /**
      * <p>
-     * Gets the previously created {@link MeasuredEvent}s for the specified page and jobgroup.
+     * Gets the previously created {@link MeasuredEvent}s for the specified pageAggregator and jobgroup.
      * </p>
      *
      * @param jobgroup The jobgroup an event is to get for, not <code>null</code>.
-     * @param page The page an event is to get for, not <code>null</code>.
+     * @param page The pageAggregator an event is to get for, not <code>null</code>.
      *
      * @return not <code>null</code>.
      */
     public static MeasuredEvent findMeasuredEvent(JobGroup jobgroup, Page page) {
-//		List<MeasuredEvent> event = MeasuredEvent.findAllByTestedPage(page)
+//		List<MeasuredEvent> event = MeasuredEvent.findAllByTestedPage(pageAggregator)
         String eventName = 'TestEvent-' + page + "-" + jobgroup.name;
 
         MeasuredEvent event = MeasuredEvent.findByName(eventName);
@@ -1479,7 +1202,7 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     /**
-     * Writes new {@link CsiAggregation} to db.
+     * Writes new {@link CsiAggregation} to db without validating it.
      * @param date
      * @param csiAggregationInterval
      * @param aggregator
@@ -1489,18 +1212,51 @@ class TestDataUtil implements OsmTestLogin {
      * @param closed
      */
     public
-    static CsiAggregation createCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, String tag, Double value, String resultIdsAsString, boolean closed, ConnectivityProfile profile = null) {
+    static CsiAggregation createSimpleCsiAggregation(Date date, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, boolean closed) {
+        JobGroup group = JobGroup.list()[0]
+        Page page
+        if (aggregator.name == AggregatorType.PAGE) {
+            page = Page.list()[0]
+        }
         return new CsiAggregation(
                 started: date,
                 interval: csiAggregationInterval,
+                underlyingEventResultsByWptDocComplete: "",
+                underlyingEventResultsByVisuallyComplete: "",
                 aggregator: aggregator,
-                tag: tag,
-                csByWptDocCompleteInPercent: value,
-                underlyingEventResultsByWptDocComplete: resultIdsAsString,
+                csByWptDocCompleteInPercent: 0.0d,
                 closedAndCalculated: closed,
-                connectivityProfile: profile
+                jobGroup: group,
+                page: page
+        ).save(validate: false)
+    }
+
+    /**
+     * * Writes new {@link CsiAggregation} to db.
+     * @param started
+     * @param csiAggregationInterval
+     * @param aggregator
+     * @param jobGroup
+     * @param page
+     * @param csByWptDocCompleteInPercent
+     * @param resultIds
+     * @param closed
+     * @return
+     */
+    public
+    static CsiAggregation createCsiAggregation(Date started, CsiAggregationInterval csiAggregationInterval, AggregatorType aggregator, JobGroup jobGroup, Page page, Double csByWptDocCompleteInPercent, String resultIds, boolean closed) {
+        return new CsiAggregation(
+                started: started,
+                interval: csiAggregationInterval,
+                aggregator: aggregator,
+                jobGroup: jobGroup,
+                page: page,
+                underlyingEventResultsByWptDocComplete: resultIds,
+                csByWptDocCompleteInPercent: csByWptDocCompleteInPercent,
+                closedAndCalculated: closed,
         ).save(failOnError: true)
     }
+
     /**
      * Writes a new {@link CsiAggregationUpdateEvent} with dateOfUpdate = NOW.
      * @param csiAggregationId

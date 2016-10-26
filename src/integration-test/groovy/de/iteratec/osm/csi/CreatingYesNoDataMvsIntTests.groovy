@@ -17,24 +17,20 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
+import de.iteratec.osm.result.MeasuredEvent
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import org.joda.time.DateTime
 
 /**
  * Contains tests which test the creation of {@link de.iteratec.osm.report.chart.CsiAggregation}s without the existence of corresponding {@link EventResult}s.<br>
@@ -106,14 +102,13 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         Integer countWeeks = 2
         Integer countPages = 7
         when:
-        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
-        Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
+        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
         then:
         wsmvs.size() == countWeeks
         wsmvs.each {
             it.isCalculated()
         }
-        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)).size() == countWeeks * countPages
+        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list(), Page.list()).size() == countWeeks * countPages
 
     }
 

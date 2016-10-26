@@ -25,17 +25,13 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
 import org.junit.Test
-
-import java.util.regex.Pattern
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
@@ -66,7 +62,6 @@ class ShopCsiAggregationServiceTests {
     def doWithSpring = {
         pageCsiAggregationService(PageCsiAggregationService)
         csiAggregationDaoService(CsiAggregationDaoService)
-        csiAggregationTagService(CsiAggregationTagService)
         csiAggregationUtilService(CsiAggregationUtilService)
         meanCalcService(MeanCalcService)
         performanceLoggingService(PerformanceLoggingService)
@@ -92,11 +87,11 @@ class ShopCsiAggregationServiceTests {
         browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
 
         //with existing JobGroup:
-        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '1', started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '2', started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '3', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, jobGroup: jobGroup1, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, jobGroup: jobGroup2, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, jobGroup: jobGroup3, started: startDate.toDate()).save(validate: false)
         //not with existing JobGroup:
-        new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '4', started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: shop, jobGroup: null, started: startDate.toDate()).save(validate: false)
 
         serviceUnderTest = service
         //mocks common for all tests
@@ -131,22 +126,18 @@ class ShopCsiAggregationServiceTests {
         Integer with_group2 = 1
 
         List<JobGroup> groups = [group1, group2, group3]
-        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group1to3
         groups = [group2, group3]
-        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group2to3
         groups = [group1, group3]
-        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group1or3
         groups = [group2]
-        mockCsiAggregationTagService(groups)
         assert service.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groups).size() == with_group2
     }
 
     /**
-     * Tests calculation of daily-shop{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test one single page-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-shop-{@link CsiAggregation}.
+     * Tests calculation of daily-shopAggregator{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test one single pageAggregator-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-shopAggregator-{@link CsiAggregation}.
      */
     @Test
     void testCalculation_DailyInterval_SingleDailyMv() {
@@ -159,7 +150,6 @@ class ShopCsiAggregationServiceTests {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
 
         //mocking inner services
-        mockCsiAggregationTagService([jobGroup1, jobGroup2, jobGroup3])
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
         mockPageCsiAggregationService()
 
@@ -182,8 +172,8 @@ class ShopCsiAggregationServiceTests {
     }
 
     /**
-     * Tests calculation of daily-shop-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test page-{@link CsiAggregation}s with different weights exist.
+     * Tests calculation of daily-shopAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test pageAggregator-{@link CsiAggregation}s with different weights exist.
      */
     @Test
     void testCalculation_DailyInterval_MultipleDailyMv() {
@@ -197,7 +187,6 @@ class ShopCsiAggregationServiceTests {
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 13d, weight: 1d), underlyingEventResultIds: [5, 6])]
 
         //mocking inner services
-        mockCsiAggregationTagService([jobGroup1, jobGroup2, jobGroup3])
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
         mockPageCsiAggregationService()
 
@@ -233,15 +222,14 @@ class ShopCsiAggregationServiceTests {
     }
 
     /**
-     * Tests calculation of daily-shop-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test no page-{@link CsiAggregation}s exist, which are database of the calculation of daily-shop-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
+     * Tests calculation of daily-shopAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
+     * In this test no pageAggregator-{@link CsiAggregation}s exist, which are database of the calculation of daily-shopAggregator-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
      */
     @Test
     void testCalculation_DailyInterval_MultipleHourlyMv_YesCalculatedNoData() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //mocking inner services
-        mockCsiAggregationTagService([jobGroup1, jobGroup2, jobGroup3])
         mockWeightingService([], [])
         mockPageCsiAggregationService()
 
@@ -285,49 +273,6 @@ class ShopCsiAggregationServiceTests {
         serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationDaoService = original
     }
 
-    private void mockCsiAggregationTagService(List<JobGroup> csiGroups) {
-        Pattern patternToReturn = ~/(${csiGroups*.ident().join('||')})/
-        def csiAggregationTagServiceMocked = grailsApplication.mainContext.getBean('csiAggregationTagService')
-        csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyShopCasWithJobGroups = {
-            List<JobGroup> theCsiGroups ->
-                return patternToReturn
-        }
-        String aggregatorTagToReturn = jobGroup1.ident().toString();
-        csiAggregationTagServiceMocked.metaClass.createShopAggregatorTag = {
-            EventResult newResult ->
-                return aggregatorTagToReturn
-        }
-        Pattern hourlyPattern = ~/(${csiGroups*.ident().join('|')});[^;];[^;];[^;];[^;]/
-        csiAggregationTagServiceMocked.metaClass.getTagPatternForHourlyCsiAggregations = { MvQueryParams thePages ->
-            return hourlyPattern;
-        }
-        csiAggregationTagServiceMocked.metaClass.findJobGroupOfWeeklyShopTag = { String tag ->
-            return jobGroup1;
-        }
-        csiAggregationTagServiceMocked.metaClass.getTagPatternForWeeklyPageCasWithJobGroupsAndPages = { List<JobGroup> groups, List<Page> pages ->
-            Pattern weeklyPattern = ~/(${groups*.ident().join('||')});(${pages*.ident().join('||')})/
-            return weeklyPattern
-        }
-        csiAggregationTagServiceMocked.metaClass.findBrowserOfHourlyEventTag = { String tag ->
-            return browser;
-        }
-        csiAggregationTagServiceMocked.metaClass.findJobGroupOfHourlyEventTag = { String tag ->
-            return jobGroup1;
-        }
-        csiAggregationTagServiceMocked.metaClass.findPageByPageTag = { String tag ->
-            return page1;
-        }
-        csiAggregationTagServiceMocked.metaClass.findPageOfHourlyEventTag = { String tag ->
-            return page1;
-        }
-        csiAggregationTagServiceMocked.metaClass.createPageAggregatorTag = { JobGroup group, Page page ->
-            return group.ident() + ";" + page.ident();
-        }
-        CsiAggregationTagService mVTS = csiAggregationTagServiceMocked
-        serviceUnderTest.csiAggregationTagService = mVTS
-        serviceUnderTest.pageCsiAggregationService.csiAggregationTagService = mVTS
-        serviceUnderTest.pageCsiAggregationService.eventCsiAggregationService.csiAggregationTagService = mVTS
-    }
 
     /**
      * Mocks methods of {@link WeightingService}.

@@ -21,27 +21,22 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
-import grails.test.mixin.TestMixin
 import grails.test.mixin.integration.Integration
-import grails.test.mixin.integration.IntegrationTestMixin
 import grails.transaction.Rollback
 import org.joda.time.DateTime
-import org.junit.Test
 import spock.lang.Ignore
-import spock.lang.Shared
 import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.*
+
 @Integration
 @Rollback
 @ConfineMetaClassChanges([JobResultDaoService])
 class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 	/** injected by grails */
-	CsiAggregationTagService csiAggregationTagService
 	PageCsiAggregationService pageCsiAggregationService
 	CsiAggregationUpdateService csiAggregationUpdateService
 
@@ -75,7 +70,7 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 
 			System.out.println('Loading CSV-data...');
 			TestDataUtil.
-					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages, csiAggregationTagService);
+					loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToGenerateDataFor, allPages);
 			System.out.println('Loading CSV-data... DONE');
 
 			System.out.println('Create some common test-data... DONE');

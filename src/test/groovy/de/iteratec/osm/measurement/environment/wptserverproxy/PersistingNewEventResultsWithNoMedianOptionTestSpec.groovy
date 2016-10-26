@@ -30,7 +30,10 @@ import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -38,6 +41,7 @@ import org.junit.Before
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
+
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
@@ -59,7 +63,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         timeToCsMappingService(TimeToCsMappingService)
         pageService(PageService)
         csiAggregationUpdateService(CsiAggregationUpdateService)
-        csiAggregationTagService(CsiAggregationTagService)
     }
 
     @Before
@@ -109,8 +112,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        
+
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -158,8 +160,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        
+
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -200,8 +201,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        
+
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -243,8 +243,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
         mockCsiAggregationUpdateService()
         mockTimeToCsMappingService()
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        
+
 
         // Mock Location needed!
         mockLocation(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server);
@@ -333,23 +332,6 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec {
                     stepName
         }
         serviceUnderTest.pageService = pageServiceMocked
-    }
-
-    private void mockCsiAggregationTagService(String tagToReturn) {
-        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
-        csiAggregationTagService.metaClass.createEventResultTag = {
-            JobGroup jobGroup,
-            MeasuredEvent measuredEvent,
-            Page page,
-            Browser browser,
-            Location location ->
-                return tagToReturn
-        }
-        csiAggregationTagService.metaClass.findJobGroupOfEventResultTag = {
-            String tag ->
-                return undefinedJobGroup
-        }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
 
     private void mockMetricReportingService() {

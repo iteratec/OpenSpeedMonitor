@@ -370,8 +370,6 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
 
         measuredEvent = TestDataUtil.createMeasuredEvent('Test event', homepage)
 
-        String eventResultTag = "$jobGroup.id;$measuredEvent.id;$homepage.id;$fireFoxBrowser.id;$ffAgent1.id";
-
         /* Create TestData */
         runDate = new DateTime(2013, 5, 29, 0, 0, 0, DateTimeZone.UTC)
 
@@ -379,28 +377,27 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         JobResult jobRunWithNativeConnectivity = TestDataUtil.createJobResult('2', runDate.toDate(), jobWithNativeConnectivity, jobWithNativeConnectivity.location)
         JobResult jobRunWithCustomConnectivity = TestDataUtil.createJobResult('3', runDate.toDate(), jobWithCustomConnectivity, jobWithCustomConnectivity.location)
 
-        CsiAggregationTagService tagService = new CsiAggregationTagService()
-        withPredefinedProfile1 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent, tagService)
+        withPredefinedProfile1 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent)
         withPredefinedProfile1.connectivityProfile = predefinedProfile1
         withPredefinedProfile1.customConnectivityName = null
         withPredefinedProfile1.save(failOnError: true)
 
-        withPredefinedProfile2 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent, tagService)
+        withPredefinedProfile2 = TestDataUtil.createEventResult(jobWithPredefinedConnectivity, jobRunWithPredefinedConnectivity, 123I, 456.5D, measuredEvent)
         withPredefinedProfile2.connectivityProfile = predefinedProfile2
         withPredefinedProfile1.customConnectivityName = null
         withPredefinedProfile2.save(failOnError: true)
 
-        withNativeConnectivity = TestDataUtil.createEventResult(jobWithNativeConnectivity, jobRunWithNativeConnectivity, 123I, 456.5D, measuredEvent, tagService, false)
+        withNativeConnectivity = TestDataUtil.createEventResult(jobWithNativeConnectivity, jobRunWithNativeConnectivity, 123I, 456.5D, measuredEvent, false)
         withNativeConnectivity.connectivityProfile = null
         withNativeConnectivity.customConnectivityName = null
         withNativeConnectivity.save(failOnError: true)
 
-        withCustomConnectivityMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, tagService)
+        withCustomConnectivityMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent)
         withCustomConnectivityMatchingRegex.connectivityProfile = null
         withCustomConnectivityMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_SHOULD_MATCH
         withCustomConnectivityMatchingRegex.save(failOnError: true)
 
-        withCustomConnectivityNotMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent, tagService)
+        withCustomConnectivityNotMatchingRegex = TestDataUtil.createEventResult(jobWithCustomConnectivity, jobRunWithCustomConnectivity, 123I, 456.5D, measuredEvent)
         withCustomConnectivityNotMatchingRegex.connectivityProfile = null
         withCustomConnectivityNotMatchingRegex.customConnectivityName = CUSTOM_CONN_NAME_SHOULD_NOT_MATCH
         withCustomConnectivityNotMatchingRegex.save(failOnError: true)

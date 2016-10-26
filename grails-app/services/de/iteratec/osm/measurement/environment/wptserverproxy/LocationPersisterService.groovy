@@ -22,7 +22,6 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.Transactional
@@ -39,7 +38,6 @@ class LocationPersisterService implements iLocationListener {
     BrowserService browserService
     TimeToCsMappingService timeToCsMappingService
     PageService pageService
-    CsiAggregationTagService csiAggregationTagService
     PerformanceLoggingService performanceLoggingService
     LinkGenerator grailsLinkGenerator
 

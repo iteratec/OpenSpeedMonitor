@@ -1,17 +1,7 @@
 package geb.de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.BrowserConnectivityWeight
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.CsiSystem
-import de.iteratec.osm.csi.JobGroupWeight
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageWeight
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -23,7 +13,6 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
@@ -48,7 +37,6 @@ import spock.lang.Stepwise
 @Rollback
 @Stepwise
 class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
-    CsiAggregationTagService csiAggregationTagService
     @Shared
     String script1Name = "TestScript1-564892#Afef1"
     @Shared
@@ -68,7 +56,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
     @Shared
     String csiConfigurationName = "CsiConfiguration1-564892#Afef1"
 
-    void cleanupSpec(){
+    void cleanupSpec() {
         cleanUpData()
     }
 
@@ -87,24 +75,31 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
 
     }
-    void "No selection leads to error message"(){
+
+    void "No selection leads to error message"() {
         given: "User is on CsiDashboardPage"
         to CsiDashboardPage
         when: "User clicks on \"Show\" button"
 
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         sleep(100)
         showButton.click()
 
         then: "Error message is displayed"
-        waitFor{at CsiDashboardPage}
-        waitFor{$("div", class: "alert alert-error")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")} //check that the error box appears
-        waitFor{$("div", class: "alert alert-error")[0].find("li")[0].attr("innerHTML").contains("Please select at least one folder.")} //check that the correct error message is displayed
-        waitFor{$("div", class: "alert alert-error")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page.")} //check that the correct error message is displayed
+        waitFor { at CsiDashboardPage }
+        waitFor {
+            $("div", class: "alert alert-error")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
+        } //check that the error box appears
+        waitFor {
+            $("div", class: "alert alert-error")[0].find("li")[0].attr("innerHTML").contains("Please select at least one folder.")
+        } //check that the correct error message is displayed
+        waitFor {
+            $("div", class: "alert alert-error")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page.")
+        } //check that the correct error message is displayed
 
     }
 
-    void "Graph for \"Hourly mean per measured step\""(){
+    void "Graph for \"Hourly mean per measured step\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         timeFrameSelect.click()
         selectDateInDatepicker(fromDatepicker, "01.06.2016")
@@ -114,59 +109,62 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         basedOnVisuallyCompleteButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "NotUsedBrowser leads to no data"(){
+    void "NotUsedBrowser leads to no data"() {
         given: "User selects NotUsedBrowser"
-        waitFor {browserTab.click()}
+        waitFor { browserTab.click() }
         selectAllBrowserButton.click()
         selectBrowsersList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {
+            $("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")
+        }
     }
-    void "Graph is shown for correct Browser"(){
+
+    void "Graph is shown for correct Browser"() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
         selectBrowsersList[1].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "Graph is shown for \"Select all Browsers\""(){
+    void "Graph is shown for \"Select all Browsers\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
         selectAllBrowserButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "NotUsedLocation leads to no data"(){
+    void "NotUsedLocation leads to no data"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
         selectAllLocationsButton.click()
@@ -174,169 +172,173 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         selectLocationList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {
+            $("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")
+        }
     }
 
-    void "Graph is shown for correct Location"(){
+    void "Graph is shown for correct Location"() {
         given: "User selects NotUsedLocation"
         browserTab.click()
         selectLocationField.click()
         selectLocationList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "Graph is shown for \"Select all Locations\""(){
+    void "Graph is shown for \"Select all Locations\""() {
         given: "User selects NotUsedBrowser"
         browserTab.click()
         selectAllLocationsButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "NotUsedConnectivity leads to no data"(){
+    void "NotUsedConnectivity leads to no data"() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
         selectAllConnectivityButton.click()
         selectConnectivityProfilesList[1].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
+        waitFor {
+            $("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")
+        }
     }
 
-    void "Graph is shown for correct Connectivity Profile"(){
+    void "Graph is shown for correct Connectivity Profile"() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
         selectConnectivityProfilesList[0].click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "Graph is shown for \"Select all Connectivity Profiles\""(){
+    void "Graph is shown for \"Select all Connectivity Profiles\""() {
         given: "User selects NotUsedBrowser"
         connectivityTab.click()
         selectAllConnectivityButton.click()
 
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,348.84437596302L168.33333333333331,319.8404785643071L336.66666666666663,279.96011964107674L505,240.07976071784645L673.3333333333333,200.19940179461614L841.6666666666667,160.31904287138582L1010,134.94063264751202'
         graphLine2 == 'M0,200.19940179461614L168.33333333333331,189.3229402700988L336.66666666666663,153.06806852170757L505,105.93673524879904L673.3333333333333,80.55832502492518L841.6666666666667,225.57781201848996L1010,80.55832502492518'
     }
 
-    void "Graph for \"Daily mean per Page\""(){
+    void "Graph for \"Daily mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         aggregationRadioButtons.aggrGroupAndInterval = "daily_page"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,73.307350675247L1010,73.307350675247'
         graphLine2 == 'M420.83333333333337,348.84437596302L505,319.8404785643071L589.1666666666667,279.96011964107674L673.3333333333333,240.07976071784645L757.5,200.19940179461614L841.6666666666667,160.31904287138582L925.8333333333334,134.94063264751202'
         graphLine3 == 'M420.83333333333337,200.19940179461614L505,189.3229402700988L589.1666666666667,153.06806852170757L673.3333333333333,105.93673524879904L757.5,80.55832502492518L841.6666666666667,225.57781201848996L925.8333333333334,80.55832502492518'
     }
 
-    void "Graph for \"Weekly mean per Page\""(){
+    void "Graph for \"Weekly mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "weekly_page"
+        aggregationRadioButtons.aggrGroupAndInterval = "weekly_page"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,73.307350675247L1010,73.307350675247'
         graphLine2 == 'M505,277.7848273361733L946.875,158.25251518172757'
         graphLine3 == 'M505,145.81709417202933L946.875,135.44820085198944'
     }
 
-    void "Graph for \"Daily mean per Job Group\""(){
+    void "Graph for \"Daily mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "daily_shop"
+        aggregationRadioButtons.aggrGroupAndInterval = "daily_shop"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,73.307350675247L1010,73.307350675247'
         graphLine2 == 'M432.8571428571429,348.84437596302L505,319.8404785643071L577.1428571428572,279.96011964107674L649.2857142857143,240.07976071784645L721.4285714285714,200.19940179461614L793.5714285714286,160.31904287138582L865.7142857142858,134.94063264751202'
         graphLine3 == 'M432.8571428571429,200.19940179461614L505,189.3229402700988L577.1428571428572,153.06806852170757L649.2857142857143,105.93673524879904L721.4285714285714,80.55832502492518L793.5714285714286,225.57781201848996L865.7142857142858,80.55832502492518'
     }
 
-    void "Graph for \"Weekly mean per Job Group\""(){
+    void "Graph for \"Weekly mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "weekly_shop"
+        aggregationRadioButtons.aggrGroupAndInterval = "weekly_shop"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,73.307350675247L1010,73.307350675247'
         graphLine2 == 'M505,277.7848273361733L897.7777777777778,158.25251518172757'
         graphLine3 == 'M505,145.81709417202933L897.7777777777778,135.44820085198944'
     }
 
-    void "Graph for \"Daily mean per CSI System\""(){
+    void "Graph for \"Daily mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        waitFor {aggregationRadioButtons.displayed}
-        aggregationRadioButtons.aggrGroupAndInterval= "daily_system"
+        waitFor { aggregationRadioButtons.displayed }
+        aggregationRadioButtons.aggrGroupAndInterval = "daily_system"
         csiSystem[0].click()
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,73.307350675247L1010,73.307350675247'
         graphLine2 == 'M432.8571428571429,348.84437596302L505,319.8404785643071L577.1428571428572,279.96011964107674L649.2857142857143,240.07976071784645L721.4285714285714,200.19940179461614L793.5714285714286,160.31904287138582L865.7142857142858,134.94063264751202'
         graphLine3 == 'M432.8571428571429,200.19940179461614L505,189.3229402700988L577.1428571428572,153.06806852170757L649.2857142857143,105.93673524879904L721.4285714285714,80.55832502492518L793.5714285714286,225.57781201848996L865.7142857142858,80.55832502492518'
     }
 
-    void "Graph for \"Weekly mean per CSI System\""(){
+    void "Graph for \"Weekly mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "weekly_system"
+        aggregationRadioButtons.aggrGroupAndInterval = "weekly_system"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLineDiv.displayed}
+        waitFor { graphLineDiv.displayed }
         graphLine1 == 'M0,73.307350675247L1010,73.307350675247'
         graphLine2 == 'M505,277.7848273361733L897.7777777777778,158.25251518172757'
         graphLine3 == 'M505,145.81709417202933L897.7777777777778,135.44820085198944'
@@ -377,8 +379,6 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         waitFor { graphLine2 == "M270,416.67724100425994L480.00000000000006,237.37877277259133" }
         waitFor { graphLine3 == "M270,218.725641258044L480.00000000000006,203.17230127798416" }
     }
-
-
 
 
     void "Adjust Chart Section"() {
@@ -467,8 +467,8 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
     }
 
 
-    private void createData(){
-        Job.withNewTransaction{
+    private void createData() {
+        Job.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
             initChartData()
@@ -478,51 +478,52 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     }
 
-    private void createTestSpecificData(){
+    private void createTestSpecificData() {
 
 
-        Script script1 = TestDataUtil.createScript(script1Name,"This is for test purposes","stuff")
-        Browser browser = TestDataUtil.createBrowser("TestFireFox",1d)
-        ConnectivityProfile connectivityProfile =TestDataUtil.createConnectivityProfile(connectivityProfileName)
+        Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
+        Browser browser = TestDataUtil.createBrowser("TestFireFox", 1d)
+        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
         BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
-        Page page1 =TestDataUtil.createPage(page1Name,1.0)
-        PageWeight pageWeight = TestDataUtil.createPageWeight(page1,3)
+        Page page1 = TestDataUtil.createPage(page1Name, 1.0)
+        PageWeight pageWeight = TestDataUtil.createPageWeight(page1, 3)
         TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
-        CsiDay csiDay = TestDataUtil.createCsiDay([0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:11,13:10,14:9,15:8,16:7,17:6,18:5,19:4,20:3,21:2,22:1,23:0])
-        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName,"TestDescription",csiDay,[browserConnectivityWeight],[pageWeight], [timeToCsMapping])
-        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(),TestDataUtil.createCsTargetValue())
-        JobGroup jobGroup1 = new JobGroup([csiConfiguration:csiConfiguration, name: jobGroup1Name]).save()
-        JobGroup jobGroup2 = new JobGroup([csiConfiguration:csiConfiguration, name: jobGroup2Name]).save()
-        WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1","TestIdentifier",true,"http://internet.de")
-        Location location1 = TestDataUtil.createLocation(wpt,location1Name,browser,true)
-        Job job1=TestDataUtil.createJob(job1Name,script1,location1,jobGroup1,"This is the first test job",1,false,12)
-        CsiSystem csiSystem =  new CsiSystem([label:"TestCsiSystem"])
+        CsiDay csiDay = TestDataUtil.createCsiDay([0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 11, 13: 10, 14: 9, 15: 8, 16: 7, 17: 6, 18: 5, 19: 4, 20: 3, 21: 2, 22: 1, 23: 0])
+        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName, "TestDescription", csiDay, [browserConnectivityWeight], [pageWeight], [timeToCsMapping])
+        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(), TestDataUtil.createCsTargetValue())
+        JobGroup jobGroup1 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup1Name]).save()
+        JobGroup jobGroup2 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup2Name]).save()
+        WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
+        Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
+        Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
+        CsiSystem csiSystem = new CsiSystem([label: "TestCsiSystem"])
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 60))
-        csiSystem.save(failOnError:true)
-        JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016,06,22,5,13).toDate(),job1,location1)
+        csiSystem.save(failOnError: true)
+        JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 5, 13).toDate(), job1, location1)
         MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
         CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        new CsiAggregation([started:new DateTime(2016,6,5 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:14,csByWptVisuallyCompleteInPercent:55,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,6 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:22,csByWptVisuallyCompleteInPercent:58,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,7 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:33,csByWptVisuallyCompleteInPercent:68,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,8 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:44,csByWptVisuallyCompleteInPercent:81,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,9 ,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:55,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,10,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:66,csByWptVisuallyCompleteInPercent:48,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,11,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:73,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,12,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:24,csByWptVisuallyCompleteInPercent:98,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,13,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:39,csByWptVisuallyCompleteInPercent:65,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,14,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:77,csByWptVisuallyCompleteInPercent:61,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,15,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:88,csByWptVisuallyCompleteInPercent:72,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,16,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:99,csByWptVisuallyCompleteInPercent:78,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,17,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent: 1,csByWptVisuallyCompleteInPercent:84,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,18,9,10).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:31,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser",0)
+        new CsiAggregation([started: new DateTime(2016, 6, 5, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 14, csByWptVisuallyCompleteInPercent: 55, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 6, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 22, csByWptVisuallyCompleteInPercent: 58, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 7, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 33, csByWptVisuallyCompleteInPercent: 68, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 8, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 44, csByWptVisuallyCompleteInPercent: 81, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 9, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 55, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 10, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 66, csByWptVisuallyCompleteInPercent: 48, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 11, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 73, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 12, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 24, csByWptVisuallyCompleteInPercent: 98, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 13, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 39, csByWptVisuallyCompleteInPercent: 65, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 14, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 77, csByWptVisuallyCompleteInPercent: 61, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 15, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 88, csByWptVisuallyCompleteInPercent: 72, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 16, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 99, csByWptVisuallyCompleteInPercent: 78, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 17, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 1, csByWptVisuallyCompleteInPercent: 84, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 18, 9, 10).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup:  jobGroup1, measuredEvent:  measuredEvent1, page:  page1, browser:  browser, location:  location1, csByWptDocCompleteInPercent: 31, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser", 0)
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
-        TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
+        TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
     }
+
     private void selectDateInDatepicker(def datePicker, String date) {
         datePicker.click()
         datePicker << Keys.chord(Keys.CONTROL, "a")
@@ -617,7 +618,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         ).save(failOnError: true)
 
         String labelTargetCsi_EN = 'Target-CSI'
-        String descriptionTargetCsi_EN =  'Customer satisfaction index defined as target.'
+        String descriptionTargetCsi_EN = 'Customer satisfaction index defined as target.'
         CsTargetGraph.findByLabel(labelTargetCsi_EN) ?: new CsTargetGraph(
                 label: labelTargetCsi_EN,
                 description: descriptionTargetCsi_EN,
@@ -628,7 +629,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
 
 
-        if(CsiConfiguration.count <= 0) {
+        if (CsiConfiguration.count <= 0) {
             CsiConfiguration initCsiConfiguration = new CsiConfiguration()
             initCsiConfiguration.with {
                 label = "initial csi configuration"

@@ -20,29 +20,24 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResultDaoService
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
- * Provides methods for calculating and retrieving {@link CsiAggregation}s with {@link AggregatorType#getName()}=={@link AggregatorType#JOB}.
+ * Provides methods for calculating and retrieving {@link CsiAggregation}s with {@link AggregatorType#getName()}=={@link AggregatorType}.
  * @author nkuhn
  *
  */
-@Transactional
 class CsiSystemCsiAggregationService {
 
     ShopCsiAggregationService shopCsiAggregationService
     MeanCalcService meanCalcService
-    CsiAggregationTagService csiAggregationTagService
     PerformanceLoggingService performanceLoggingService
     JobService jobService
     JobResultDaoService jobResultDaoService
@@ -59,15 +54,13 @@ class CsiSystemCsiAggregationService {
      * @return
      */
     List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval) {
-        List<CsiAggregation> result = []
         def query = CsiAggregation.where {
             started >= fromDate
             started <= toDate
             interval == targetInterval
             aggregator == AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
         }
-        result = query.list()
-        return result
+        return query.list()
     }
     /**
      * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
@@ -112,13 +105,12 @@ class CsiSystemCsiAggregationService {
     }
 
     /**
-     * Provides all shop-{@link CsiAggregation}s of given csi-{@link JobGroup}s between toDate and fromDate.
-     * Non-existent {@link CsiAggregation}s will be created.
-     * All {@link CsiAggregation}s with @{link CsiAggregation.Calculated.Not} will be calculated and persisted with @{link CsiAggregation.Calculated.Yes}* or @{link CsiAggregation.Calculated.YesNoData}.
+     * Returns calculated CsiSystemCsiAggregations
      * @param fromDate
      * @param toDate
-     * @param csiSystems
-     * @return
+     * @param interval the {@link CsiAggregationInterval}
+     * @param csiSystems the {@link CsiSystem}s to calculate the csiAggregations for
+     * @return a list of calculated csiSystemCsiAggregations
      */
     List<CsiAggregation> getOrCalculateCsiSystemCsiAggregations(Date fromDate, Date toDate, CsiAggregationInterval interval, List<CsiSystem> csiSystems) {
         if (fromDate > toDate) {
@@ -127,137 +119,118 @@ class CsiSystemCsiAggregationService {
         DateTime toDateTime = new DateTime(toDate)
         DateTime fromDateTime = new DateTime(fromDate)
 
-        Integer numberOfIntervals = csiAggregationUtilService.getNumberOfIntervals(fromDateTime, toDateTime, interval)
+        DateTime currentDateTime = fromDateTime
+        List<Long> allCsiAggregationIds = []
 
-        List<CsiAggregation> existingCsiAggregations = findAll(fromDateTime.toDate(), toDateTime.toDate(), interval, csiSystems)
+        CsiAggregation.withNewSession { session ->
 
-        List<CsiAggregation> openCsiAggregations = existingCsiAggregations.findAll { !it.closedAndCalculated }
-        Boolean allCsiAggregationsExist = existingCsiAggregations.size() == numberOfIntervals * csiSystems.size()
-        if (allCsiAggregationsExist && openCsiAggregations.size() == 0) {
-            return existingCsiAggregations
-        }
-
-        List<CsiAggregationUpdateEvent> updateEvents = []
-        if (openCsiAggregations.size() > 0) updateEvents.addAll(csiAggregationDaoService.getUpdateEvents(openCsiAggregations*.ident()))
-        List<CsiAggregation> csiAggregationsToBeCalculated = openCsiAggregations.findAll {
-            it.hasToBeCalculatedAccordingEvents(updateEvents)
-        }
-
-        if (allCsiAggregationsExist && csiAggregationsToBeCalculated.size() == 0) {
-
-            return existingCsiAggregations
-
-        } else {
-
-            List<CsiAggregation> calculatedCsiAggregations = []
-            DateTime currentDateTime = fromDateTime
             while (!currentDateTime.isAfter(toDateTime)) {
-                performanceLoggingService.logExecutionTime(LogLevel.INFO, " get/create/calculate ${interval.name} shop-CsiAggregation for: ${currentDateTime}", IndentationDepth.TWO) {
-                    List<CsiAggregation> existingMvsOfCurrentTime = existingCsiAggregations.findAll {
-                        new DateTime(it.started) == currentDateTime
-                    }
-                    List<CsiAggregation> mvsToBeCalculatedOfCurrentTime = csiAggregationsToBeCalculated.findAll {
-                        new DateTime(it.started) == currentDateTime
-                    }
-                    if (existingMvsOfCurrentTime.size() == csiSystems.size() && mvsToBeCalculatedOfCurrentTime.size() == 0) {
+                List<Long> csiSystemCsiAggregationIds = ensurePresence(currentDateTime, interval, csiSystems)
+                List<Long> csiSystemCsiAggregationIdsToCalculate = filterCsiAggregationsToCalculate(csiSystemCsiAggregationIds)
+                if (csiSystemCsiAggregationIdsToCalculate)
+                    calcCsiAggregations(csiSystemCsiAggregationIdsToCalculate)
 
-                        calculatedCsiAggregations.addAll(existingMvsOfCurrentTime)
+                allCsiAggregationIds.addAll(csiSystemCsiAggregationIds)
 
-                    } else {
-
-                        calculatedCsiAggregations.addAll(getOrCalculateCsiSystemCas(currentDateTime, interval, csiSystems, updateEvents))
-
-                    }
-                }
                 currentDateTime = csiAggregationUtilService.addOneInterval(currentDateTime, interval.intervalInMinutes)
-            }
-            return calculatedCsiAggregations
-        }
-    }
 
-    private List<CsiAggregation> getOrCalculateCsiSystemCas(DateTime toGetMvsFor, CsiAggregationInterval interval, List<CsiSystem> csiSystems, List<CsiAggregationUpdateEvent> updateEvents) {
-        List<CsiAggregation> smvs = []
-        csiSystems.each { csiSystem ->
-            smvs.addAll(ensurePresenceAndCalculation(toGetMvsFor, interval, csiSystem, updateEvents))
+                session.flush()
+                session.clear()
+            }
         }
-        return smvs
+
+
+        return CsiAggregation.getAll(allCsiAggregationIds)
     }
 
     /**
-     * Creates respective {@link CsiAggregation} if it doesn't exist and calculates it.
-     * After calculation status is {@link CsiAggregation.Calculated.Yes} or {@link CsiAggregation.Calculated.YesNoData}.
+     * Returns the id for each csiAggregation with the startDate and given csiSystem.
+     * If a csiAggregation does not exist it gets created.
      * @param startDate
      * @param interval
-     * @param csiSystem
-     * @return
+     * @param csiSystems
+     * @return a list of all csiAggregationIds for the csiAggregations with given startDate and csiSystem
      */
-    CsiAggregation ensurePresenceAndCalculation(DateTime startDate, CsiAggregationInterval interval, CsiSystem csiSystem, List<CsiAggregationUpdateEvent> updateEvents) {
-        CsiAggregation toCreateAndOrCalculate
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence", IndentationDepth.THREE) {
-            toCreateAndOrCalculate = ensurePresence(startDate, interval, csiSystem)
-        }
-        if (toCreateAndOrCalculate.hasToBeCalculatedAccordingEvents(updateEvents)) {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "calculateCustomerSatisfactionCsiAggregation (interval=${interval.intervalInMinutes}; aggregator=csiSystem)", IndentationDepth.THREE) {
-                toCreateAndOrCalculate = calcCa(toCreateAndOrCalculate, csiSystem)
-            }
-        }
-        return toCreateAndOrCalculate
-    }
-
-    private CsiAggregation ensurePresence(DateTime startDate, CsiAggregationInterval interval, CsiSystem csiSystem) {
-        CsiAggregation toCreateAndOrCalculate
+    private List<Long> ensurePresence(DateTime startDate, CsiAggregationInterval interval, List<CsiSystem> csiSystems) {
+        List<Long> result = []
         AggregatorType csiSystemAggregator = AggregatorType.findByName(AggregatorType.CSI_SYSTEM)
-        String tag = csiAggregationTagService.getTagPatternForWeeklyShopCasWithJobGroups(csiSystem.getAffectedJobGroups())
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.findByStarted", IndentationDepth.FOUR) {
-            toCreateAndOrCalculate = CsiAggregation.findByStartedAndIntervalAndAggregatorAndTagAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, tag, csiSystem)
-            log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem delivered ${toCreateAndOrCalculate ? 'a' : 'no'} result")
-        }
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ensurePresence.createNewMV", IndentationDepth.FOUR) {
-            if (!toCreateAndOrCalculate) {
-                toCreateAndOrCalculate = new CsiAggregation(
+
+        csiSystems.each { currentCsiSystem ->
+            CsiAggregation csiAggregation
+
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "CsiSystemCsiAggregationService: ensurePresence.findByStarted", IndentationDepth.FOUR) {
+                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, currentCsiSystem)
+                log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem delivered ${csiAggregation ? 'a' : 'no'} result")
+            }
+            if (!csiAggregation) {
+                csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),
                         interval: interval,
                         aggregator: csiSystemAggregator,
-                        tag: tag,
-                        csiSystem: csiSystem,
+                        csiSystem: currentCsiSystem,
                         csByWptDocCompleteInPercent: null,
                         underlyingEventResultsByWptDocComplete: ''
-                ).save(failOnError: true)
+                ).save(failOnError: true, flush: true)
             }
+
+            result << csiAggregation.id
         }
-        return toCreateAndOrCalculate
+
+        return result
     }
 
     /**
-     * Calculates the given {@link CsiAggregation} toBeCalculated.
-     * @param toBeCalculated
-     * 		The {@link CsiAggregation} to be calculated.
-     * @return The calculated {@link CsiAggregation}.
+     * Filters given list of csiAggregationIds for csiAggregations that have to be calculated
+     * @param allCsiAggregationIds
+     * @return a new list of csiAggregationIds containing only ids for csiAggregations that have to be calculated
      */
-    CsiAggregation calcCa(CsiAggregation toBeCalculated, CsiSystem csiSystem) {
+    private List<Long> filterCsiAggregationsToCalculate(List<Long> allCsiAggregationIds) {
+        List<Long> result = []
 
-        Contract.requiresArgumentNotNull("toBeCalculated", toBeCalculated);
-
-        List<JobGroup> groupsOfMv = csiSystem.getAffectedJobGroups()
-        List<CsiAggregation> shopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(
-                toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), groupsOfMv)
-
-        List<WeightedCsiValue> weightedCsiValues = []
-        List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
-
-        if (shopCsiAggregations.size() > 0) {
-            weightedCsiValues = weightingService.getWeightedCsiValues(shopCsiAggregations, csiSystem)
-            weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(shopCsiAggregations, csiSystem)
+        List<CsiAggregation> openCsiAggregations = CsiAggregation.findAll {
+            id in allCsiAggregationIds && closedAndCalculated == false
+        }
+        openCsiAggregations.each {
+            if (it.hasToBeCalculated()) {
+                result << it.id
+            }
         }
 
-        if (weightedCsiValues.size() > 0) {
-            toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+        return result
+    }
+
+    /**
+     * calculates all csiAggregations with given ids
+     * @param csiAggregationIdsToCalc a list of csiAggregationIds to calculate
+     */
+    public void calcCsiAggregations(List<Long> csiAggregationIdsToCalc) {
+        Contract.requiresArgumentNotNull("toBeCalculated", csiAggregationIdsToCalc);
+
+        List<CsiAggregation> csiAggregationsToCalculate = CsiAggregation.getAll(csiAggregationIdsToCalc)
+
+        csiAggregationsToCalculate.each { toBeCalculated ->
+            CsiSystem csiSystem = toBeCalculated.csiSystem
+            List<JobGroup> groupsOfMv = csiSystem.getAffectedJobGroups()
+
+            List<CsiAggregation> shopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(
+                    toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), groupsOfMv)
+
+            List<WeightedCsiValue> weightedCsiValues = []
+            List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
+
+            if (shopCsiAggregations.size() > 0) {
+                weightedCsiValues = weightingService.getWeightedCsiValues(shopCsiAggregations, csiSystem)
+                weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(shopCsiAggregations, csiSystem)
+            }
+
+            if (weightedCsiValues.size() > 0) {
+                toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)
+            }
+            if (weightedCsiValuesVisuallyComplete.size() > 0) {
+                toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
+            }
+            csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+            toBeCalculated.save(failOnError: true, flush: true)
         }
-        if (weightedCsiValuesVisuallyComplete.size() > 0) {
-            toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
-        }
-        csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-        toBeCalculated.save(failOnError: true)
-        return toBeCalculated
     }
 }

@@ -109,7 +109,6 @@ class PersistScreenshotDependentWptMetricsSpec {
         mocker.mockProxyService(serviceUnderTest)
         mocker.mockMetricReportingService(serviceUnderTest)
         serviceUnderTest.pageService = grailsApplication.mainContext.getBean('pageService')
-        mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }

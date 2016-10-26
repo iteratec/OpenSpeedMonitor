@@ -132,7 +132,7 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
                 mvWeeklyShop.isCalculated()
                 1 == wpmvsOfOneGroupPageCombination.size()
                 wpmvsOfOneGroupPageCombination.each { mvWeeklyPage ->
-                    assert csiGroup.ident().toString() == mvWeeklyPage.tag
+                    assert csiGroup.id == mvWeeklyPage.jobGroupId
                     assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
                 }
             }

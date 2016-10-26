@@ -17,14 +17,13 @@
 
 package de.iteratec.osm.csi
 
-import grails.transaction.Transactional
-import org.joda.time.DateTime
-
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultDaoService
+import grails.transaction.Transactional
+import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Propagation
 
 /**

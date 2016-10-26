@@ -17,7 +17,9 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult;
 
 /**
@@ -43,12 +45,6 @@ public interface CsiValue {
     public Date retrieveDate()
 
     /**
-     * Delivers csi-tag.
-     * @see CsiAggregationTagService
-     */
-    public String retrieveTag()
-
-    /**
      * Delivers connectivity Profile
      */
     public ConnectivityProfile retrieveConnectivityProfile()
@@ -64,4 +60,22 @@ public interface CsiValue {
      * @return
      */
     public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete()
+
+    /**
+     * Delivers the {@link JobGroup} for this csiValue. Can be null.
+     * @return
+     */
+    public JobGroup retrieveJobGroup()
+
+    /**
+     * Delivers the {@link Page} for this csiValue. Can be null.
+     * @return
+     */
+    public Page retrievePage()
+
+    /**
+     * Delivers the {@link Browser} for this csiValue. Can be null.
+     * @return
+     */
+    public Browser retrieveBrowser()
 }

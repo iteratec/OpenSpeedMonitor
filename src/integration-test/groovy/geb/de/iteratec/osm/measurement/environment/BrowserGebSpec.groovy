@@ -7,11 +7,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserAliasCreatePage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserCreatePage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserEditPage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserIndexPage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserShowPage
+import geb.pages.de.iteratec.osm.measurement.environment.*
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.openqa.selenium.Keys
@@ -20,7 +16,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 /**
- * Tests the CRUD View of @link{de.iteratec.osm.measurement.environment.Browser}*/
+ * Tests the CRUD View of {@link Browser}*/
 @Integration
 @Rollback
 @Stepwise

@@ -21,11 +21,11 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
-import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.result.CsiAggregationTagService
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
+import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
 import grails.gorm.DetachedCriteria
-import grails.transaction.Transactional
 
 /**
  * Contains the logic to ...
@@ -36,14 +36,13 @@ import grails.transaction.Transactional
  * @author nkuhn
  */
 class CsiAggregationUpdateEventCleanupService {
+    public static final int BATCH_SIZE = 500
     CsiAggregationDaoService csiAggregationDaoService
     PageCsiAggregationService pageCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService
-    CsiAggregationTagService csiAggregationTagService
     InMemoryConfigService inMemoryConfigService
     BatchActivityService batchActivityService
     CsiSystemCsiAggregationService csiSystemCsiAggregationService
-    CachingContainerService cachingContainerService
 
     /**
      * <p>
@@ -70,104 +69,91 @@ class CsiAggregationUpdateEventCleanupService {
             return
         }
 
-        List<CsiAggregation> csiAggregationsOpenAndExpired = csiAggregationDaoService.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(minutes)
+        List<Long> csiAggregationsOpenAndExpiredIds = csiAggregationDaoService.getOpenCsiAggregationsWhosIntervalExpiredForAtLeast(minutes)*.id
 
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${CsiAggregationUpdateEvent.count()} update events in db before cleanup.")
 
-        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${csiAggregationsOpenAndExpired.size()} CsiAggregations identified as open and expired.")
+        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${csiAggregationsOpenAndExpiredIds.size()} CsiAggregations identified as open and expired.")
 
-        BatchActivityUpdater activityUpdater = batchActivityService.getActiveBatchActivity(this.class, Activity.UPDATE, "Close and Calculate CsiAggregations", 2, createBatchActivity)
-        activityUpdater.beginNewStage("closing and calculating CsiAggregations", csiAggregationsOpenAndExpired.size())
+        BatchActivityUpdater activityUpdater = batchActivityService.getActiveBatchActivity(this.class, Activity.UPDATE, "Close and Calculate CsiAggregations", 4, createBatchActivity, 200)
+        activityUpdater.beginNewStage("closing and calculating CsiAggregations", csiAggregationsOpenAndExpiredIds.size())
 
-        csiAggregationsOpenAndExpired.each { csiAggregationToCalcAndClose ->
+        List<Long> calculatedCsiAggregationIds = []
 
-            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Calculating and closing open and expired csi aggregations...")
-            activityUpdater.addProgressToStage()
+        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Calculating and closing open and expired csi aggregations...")
+        csiAggregationsOpenAndExpiredIds.each { csiAggregationToCalcAndCloseId ->
+
 
             try {
-                closeAndCalculateIfNecessary(csiAggregationToCalcAndClose)
+                calculateIfNecessary(csiAggregationToCalcAndCloseId)
+                calculatedCsiAggregationIds << csiAggregationToCalcAndCloseId
             } catch (Exception e) {
-                log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation: \n" +
+                log.error("Quartz controlled cleanup of CsiAggregationUpdateEvents: An error occured during closeAndCalculate csiAggregation with id \'${csiAggregationToCalcAndCloseId}\': \n" +
                         e.getMessage() +
                         "\n Processing with the next csiAggregations")
                 activityUpdater.addFailures(e.getMessage())
             }
 
-            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Done calculating and closing open and expired csi aggregations.")
+            activityUpdater.addProgressToStage()
+
         }
+
+        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: Done calculating and closing open and expired csi aggregations.")
+        closeAllCsiAggregations(calculatedCsiAggregationIds, activityUpdater)
 
         deleteUpdateEventsForClosedAndCalculatedMvs(activityUpdater)
+        deleteUpdateEventsForNotExistingCsiAggregations(activityUpdater)
+
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${CsiAggregationUpdateEvent.count()} update events in db after cleanup.")
-
-        activityUpdater.done()
     }
 
-    @Transactional
-    void closeAndCalculateIfNecessary(CsiAggregation csiAggregationOpenAndExpired) {
-        CsiAggregationUpdateEvent latestUpdateEvent = csiAggregationDaoService.getLatestUpdateEvent(csiAggregationOpenAndExpired.ident())
-        def latestUpdateEventList = latestUpdateEvent ? [latestUpdateEvent] : []
+    public void closeAllCsiAggregations(List<Long> csiAggregationIds, BatchActivityUpdater activityUpdater) {
+        activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: closing calculated csiAggregations", csiAggregationIds.size())
+        CsiAggregation.withNewSession { session ->
+            csiAggregationIds.collate(BATCH_SIZE).each {
+                if (it) {
 
-        if (csiAggregationOpenAndExpired.hasToBeCalculatedAccordingEvents(latestUpdateEventList)) {
-            calculateAndCloseCsiAggregation(csiAggregationOpenAndExpired)
-        }
+                    List<CsiAggregation> csiAggregationsToClose = CsiAggregation.getAll(it)
+                    csiAggregationsToClose.each {
+                        it.closedAndCalculated = true
+                        it.save(failOnError: true)
+                    }
 
-        csiAggregationOpenAndExpired.closedAndCalculated = true
-    }
+                    activityUpdater.addProgressToStage(it.size())
 
-    void calculateAndCloseCsiAggregation(CsiAggregation csiAggregation) {
-        switch (csiAggregation.aggregator.name) {
-            case AggregatorType.PAGE:
-                calculatePageMvs(csiAggregation)
-                break
-
-            case AggregatorType.SHOP:
-                calculateShopMvs(csiAggregation)
-                break
-
-            case AggregatorType.CSI_SYSTEM:
-                calculateCsiSystemCsiAggregation(csiAggregation)
-                break
+                    session.flush()
+                    session.clear()
+                }
+            }
         }
     }
 
-    private void calculateCsiSystemCsiAggregation(CsiAggregation csiAggregationToCalculate) {
-        csiSystemCsiAggregationService.calcCa(csiAggregationToCalculate, csiAggregationToCalculate.csiSystem)
-    }
-
-    void calculatePageMvs(CsiAggregation pageMvsToCalculateAndClose) {
-        Map<String, Map<String, List<CsiAggregation>>> hourlyCsiAggregationsForDailyPageMvs
-        Map<String, Map<String, List<CsiAggregation>>> hourlyCsiAggregationsForWeeklyPageMvs
-
-        Map<Long, Page> allPages = csiAggregationTagService.getAllPagesFromWeeklyOrDailyPageTags([pageMvsToCalculateAndClose.tag])
-        Map<Long, JobGroup> allJobGroups = csiAggregationTagService.getAllJobGroupsFromWeeklyOrDailyPageTags([pageMvsToCalculateAndClose.tag])
-
-        CsiAggregationCachingContainer csiAggregationCachingContainer
-
-        if (pageMvsToCalculateAndClose.interval.intervalInMinutes == CsiAggregationInterval.DAILY) {
-
-            Map<String, List<JobGroup>> dailyJobGroupsByStartDate = cachingContainerService.getDailyJobGroupsByStartDate([pageMvsToCalculateAndClose], allJobGroups)
-            Map<String, List<Page>> dailyPagesByStartDate = cachingContainerService.getDailyPagesByStartDate([pageMvsToCalculateAndClose], allPages)
-            hourlyCsiAggregationsForDailyPageMvs = cachingContainerService.getDailyHeCsiAggregationMapByStartDate([pageMvsToCalculateAndClose], dailyJobGroupsByStartDate, dailyPagesByStartDate)
-            csiAggregationCachingContainer = cachingContainerService.createContainerFor(pageMvsToCalculateAndClose, allJobGroups, allPages, hourlyCsiAggregationsForDailyPageMvs[pageMvsToCalculateAndClose.started.toString()])
-
-        } else if (pageMvsToCalculateAndClose.interval.intervalInMinutes == CsiAggregationInterval.WEEKLY) {
-
-            Map<String, List<JobGroup>> weeklyJobGroupsByStartDate = cachingContainerService.getWeeklyJobGroupsByStartDate([pageMvsToCalculateAndClose], allJobGroups)
-            Map<String, List<Page>> weeklyPagesByStartDate = cachingContainerService.getWeeklyPagesByStartDate([pageMvsToCalculateAndClose], allPages)
-            hourlyCsiAggregationsForWeeklyPageMvs = cachingContainerService.getWeeklyHeCsiAggregationMapByStartDate([pageMvsToCalculateAndClose], weeklyJobGroupsByStartDate, weeklyPagesByStartDate)
-            csiAggregationCachingContainer = cachingContainerService.createContainerFor(pageMvsToCalculateAndClose, allJobGroups, allPages, hourlyCsiAggregationsForWeeklyPageMvs[pageMvsToCalculateAndClose.started.toString()])
-
-        } else {
-            throw new IllegalArgumentException("Page CsiAggregations can only have interval DAILY or WEEKLY! This CsiAggregation caused this Exception: ${pageMvsToCalculateAndClose}")
+    void calculateIfNecessary(Long csiAggregationOpenAndExpiredId) {
+        CsiAggregation csiAggregationOpenAndExpired = CsiAggregation.get(csiAggregationOpenAndExpiredId)
+        if (csiAggregationOpenAndExpired.hasToBeCalculated()) {
+            calculateCsiAggregation(csiAggregationOpenAndExpired)
         }
-
-        pageCsiAggregationService.calcMv(pageMvsToCalculateAndClose, csiAggregationCachingContainer)
-
     }
 
+    void calculateCsiAggregation(CsiAggregation csiAggregation) {
+        CsiAggregation.withNewSession { session ->
+            switch (csiAggregation.aggregator.name) {
+                case AggregatorType.PAGE:
+                    pageCsiAggregationService.calcCsiAggregations([csiAggregation.id])
+                    break
 
-    void calculateShopMvs(CsiAggregation shopCsiAggregationToCalculate) {
-        shopCsiAggregationService.calcCa(shopCsiAggregationToCalculate)
+                case AggregatorType.SHOP:
+                    shopCsiAggregationService.calcCsiAggregations([csiAggregation.id])
+                    break
+
+                case AggregatorType.CSI_SYSTEM:
+                    csiSystemCsiAggregationService.calcCsiAggregations([csiAggregation.id])
+                    break
+            }
+
+            session.flush()
+            session.clear()
+        }
     }
 
     void deleteUpdateEventsForClosedAndCalculatedMvs(BatchActivityUpdater activityUpdater) {
@@ -180,25 +166,44 @@ class CsiAggregationUpdateEventCleanupService {
             eq("closedAndCalculated", true)
         }
 
+        int total = 0
+        CsiAggregation.withNewSession { session ->
+            activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting update events for closedAndCalculated csiAggregations", closedAndCalculatedCsiAggregationIds.size())
+            if (closedAndCalculatedCsiAggregationIds.size() > 0) {
+                def lists = closedAndCalculatedCsiAggregationIds.collate(BATCH_SIZE)
+                lists.each { currentIds ->
+                    if (currentIds) {
+                        def updateEventsToBeDeletedCriteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
+                            'in' 'csiAggregationId', currentIds
+                        }
 
-        int batchSize = 100
-        activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting update events for closedAndCalculated csiAggregations", closedAndCalculatedCsiAggregationIds.size())
+                        total += updateEventsToBeDeletedCriteria.deleteAll()
 
-        if (closedAndCalculatedCsiAggregationIds.size() > 0) {
-            def lists = closedAndCalculatedCsiAggregationIds.collate(batchSize)
-            int total = 0
-            lists.each { l ->
-                def updateEventsToBeDeletedCriteria = new DetachedCriteria(CsiAggregationUpdateEvent).build {
-                    'in' 'csiAggregationId', l
+                        activityUpdater.addProgressToStage(currentIds.size())
+
+                        session.flush()
+                        session.clear()
+                    }
                 }
-
-                total += updateEventsToBeDeletedCriteria.deleteAll()
-
-                activityUpdater.addProgressToStage(l.size())
             }
-            log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${total} updateEvents deleted")
+
         }
+        log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: ${total} updateEvents deleted")
 
         log.info("Quartz controlled cleanup of CsiAggregationUpdateEvents: done deleting csiAggregationUpdateEvents for closedAndCalculated CsiAggregations")
     }
+
+    private void deleteUpdateEventsForNotExistingCsiAggregations(BatchActivityUpdater batchActivityUpdater) {
+        CsiAggregationUpdateEvent.withNewSession { session ->
+            batchActivityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: deleting update events for non-existing csiAggregations", 1)
+
+            CsiAggregationUpdateEvent.executeUpdate("delete from CsiAggregationUpdateEvent where csi_aggregation_id not in (select id from CsiAggregation)")
+
+            batchActivityUpdater.addProgressToStage(1)
+            batchActivityUpdater.done()
+            session.flush()
+            session.clear()
+        }
+    }
+
 }

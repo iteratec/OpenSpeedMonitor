@@ -21,13 +21,10 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserverproxy.ResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -121,20 +118,20 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
                     started: startDate,
                     interval: weekly,
                     aggregator: pageAggregatorShop,
-                    tag: csiGroup.ident().toString(),
+                    jobGroup: csiGroup,
                     csByWptDocCompleteInPercent: null,
                     underlyingEventResultsByWptDocComplete: ''
             ).save(failOnError: true)
         }
 
         when:
-        shopCsiAggregationService.calcCa(mvWeeklyShop)
+        shopCsiAggregationService.calcCsiAggregations([mvWeeklyShop.id])
 
         then:
         startDate == mvWeeklyShop.started
         weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
         pageAggregatorShop.name == mvWeeklyShop.aggregator.name
-        csiGroup.ident().toString() == mvWeeklyShop.tag
+        csiGroup.id == mvWeeklyShop.jobGroupId
         mvWeeklyShop.isCalculated()
         0 == mvWeeklyShop.countUnderlyingEventResultsByWptDocComplete()
         mvWeeklyShop.csByWptDocCompleteInPercent == null
@@ -163,7 +160,7 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
                     started: startDate,
                     interval: weekly,
                     aggregator: pageAggregatorShop,
-                    tag: csiGroup.ident().toString(),
+                    jobGroup: csiGroup,
                     csByWptDocCompleteInPercent: null,
                     underlyingEventResultsByWptDocComplete: ''
             ).save(failOnError: true, flush: true)
@@ -171,17 +168,19 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         }
 
         CsiAggregationInterval.findAll()
-        CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
 
         when:
-        shopCsiAggregationService.calcCa(mvWeeklyShop)
+        CsiAggregation.withNewSession {
+            shopCsiAggregationService.calcCsiAggregations([csiAggregationId])
+        }
+        CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
 
         then:
-//		Math.abs(results.size() - targetResultCount) < 30
+		Math.abs(results.size() - targetResultCount) < 30
         startDate == mvWeeklyShop.started
         weekly.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
         pageAggregatorShop.name == mvWeeklyShop.aggregator.name
-        csiGroup.ident().toString() == mvWeeklyShop.tag
+        csiGroup == mvWeeklyShop.jobGroup
         mvWeeklyShop.isCalculated()
         mvWeeklyShop.csByWptDocCompleteInPercent != null
         Double calculated = mvWeeklyShop.csByWptDocCompleteInPercent * 100

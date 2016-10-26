@@ -26,4 +26,12 @@ databaseChangeLog = {
     include file: '2016-09-08-SCHEME-v352.groovy'
     include file: '2016-09-08-DATA-v352.groovy'
     include file: '2016-09-30-SCHEME-v354.groovy'
+
+    include file: 'eventResultScheme.groovy'
+    include file: 'eventResultData.groovy'
+    include file: 'csiAggregationScheme.groovy'
+    include file: 'csiAggregationData.groovy'
+    include file: 'afterAll.groovy'
+    include file: 'deleteCsiAggregationUpdateEvents.groovy'
+
 }

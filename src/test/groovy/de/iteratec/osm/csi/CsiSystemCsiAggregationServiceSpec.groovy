@@ -68,7 +68,6 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     Page page1
     Browser browser
 
-    static final double DELTA = 1e-15
     DateTime startDate = new DateTime(2013, 5, 16, 0, 0, 0)
     String jobGroupName1 = 'myJobGroup1'
     String jobGroupName2 = 'myJobGroup2'
@@ -137,7 +136,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     /**
      * Tests calculation of daily-CsiSystem{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test one single shop-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-csiSystem-{@link CsiAggregation}.
+     * In this test one single shopAggregator-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-csiSystem-{@link CsiAggregation}.
      */
     @Test
     void "don't calc daily-Mv if only findAll()"() {
@@ -183,7 +182,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     /**
      * Tests calculation of daily-csiSystem-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test shop-{@link CsiAggregation}s with different weights exist.
+     * In this test shopAggregator-{@link CsiAggregation}s with different weights exist.
      */
     @Test
     void "calc multiple daily-Mv"() {
@@ -222,7 +221,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     /**
      * Tests calculation of daily-csiSystem-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test no shop-{@link CsiAggregation}s exist, which are database of the calculation of daily-csiSystem-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
+     * In this test no shopAggregator-{@link CsiAggregation}s exist, which are database of the calculation of daily-csiSystem-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
      */
     @Test
     void "calc multiple daily-Mv, but no value calculated"() {
@@ -313,7 +312,6 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         serviceUnderTest.csiAggregationDaoService = grailsApplication.mainContext.getBean('csiAggregationDaoService')
 
         Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
-        SERVICE_MOCKER.mockCsiAggregationTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
 
         SERVICE_MOCKER.mockShopCsiAggregationService(serviceUnderTest, [new CsiAggregation()])
 
@@ -360,10 +358,10 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     private void createCsiAggregations() {
         //with existing JobGroup:
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
         //not with existing CsiSystem:
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', csiSystem: null, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, csiSystem: null, started: startDate.toDate()).save(validate: false)
     }
 
     private void createEventResult() {
@@ -431,7 +429,11 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 jobResult: jobResult1,
                 jobResultDate: startDate.toDate(),
                 jobResultJobConfigId: jobResult1.job.ident(),
+                jobGroup: jobGroup1,
                 measuredEvent: measuredEvent,
+                page: page1,
+                browser: browser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: conn1,
                 customConnectivityName: null,

@@ -47,10 +47,10 @@ class OsmChartProcessingServiceSpec extends Specification{
     public static final String LOCATION_2_UNIQUE_IDENTIFIER = 'unique-identifier-location2'
     public static final String LOCATION_3_UNIQUE_IDENTIFIER = 'unique-identifier-location3'
     public static final String LOCATION_4_UNIQUE_IDENTIFIER = 'unique-identifier-location4'
-    public static final String PAGE_1_NAME = 'page 1 name'
-    public static final String PAGE_2_NAME = 'page 2 name'
-    public static final String PAGE_3_NAME = 'page 3 name'
-    public static final String PAGE_4_NAME = 'page 4 name'
+    public static final String PAGE_1_NAME = 'pageAggregator 1 name'
+    public static final String PAGE_2_NAME = 'pageAggregator 2 name'
+    public static final String PAGE_3_NAME = 'pageAggregator 3 name'
+    public static final String PAGE_4_NAME = 'pageAggregator 4 name'
     public static final String MEASURAND_1_NAME = 'measuren 1 name'
     public static final String MEASURAND_2_NAME = 'measuren 2 name'
     public static final String MEASURAND_3_NAME = 'measuren 3 name'
@@ -155,7 +155,7 @@ class OsmChartProcessingServiceSpec extends Specification{
         chart.osmChartGraphsCommonLabel == ''
     }
 
-    // page csiAggregations ////////////////////////////////////////////////////////////////////////////
+    // pageAggregator csiAggregations ////////////////////////////////////////////////////////////////////////////
 
     void "page csiAggregations, every legend part in every graph different -> no summarization"(){
         setup:

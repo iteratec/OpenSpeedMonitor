@@ -83,10 +83,8 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Outdated daily page CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
         CsiAggregation.withNewTransaction {
-
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
+            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "They are closed programmatically"
@@ -108,9 +106,8 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Outdated weekly page CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
+            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
@@ -147,9 +144,8 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Outdated daily JobGroup CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
         CsiAggregation.withSession {
-            String tag = "${JobGroup.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
         }
 
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
@@ -186,11 +182,10 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     void "Closing daily JobGroup CsiAggregations twice leads to closed and calculated page CsiAggregations"() {
         setup: "Create two outdated JobGroup CsiAggregations and no EventResults"
-        String tag = "${JobGroup.list()[0].ident()}"
         int numberOfJobGroupCsiAggregations = 2
         CsiAggregation.withNewTransaction {
-            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
         }
 
         when: "The JobGroup CsiAggregations are closed programmatically once"
@@ -225,9 +220,8 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Outdated weekly JobGroup CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
         }
 
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
@@ -267,9 +261,8 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         setup: "Create two outdated JobGroup CsiAggregations and no EventResults"
         int numberOfJobGroupCsiAggregations = 2
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
         }
 
         when: "The JobGroup CsiAggregations are closed programmatically once"
@@ -305,8 +298,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Daily page CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create daily page CsiAggregation younger expire time"
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
@@ -327,8 +319,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Weekly page CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create weekly page CsiAggregation younger expire time"
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
@@ -349,8 +340,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Daily JobGroup CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create daily JobGroup CsiAggregation younger expire time"
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
@@ -371,8 +361,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Weekly JobGroup CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create weekly JobGroup CsiAggregation younger expire time"
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
@@ -390,13 +379,14 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         CsiAggregationUpdateEvent.list().size() == 1
     }
 
-    private void createCsiAggregationsWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, String tag) {
+    private void createCsiAggregationsWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, JobGroup jobGroup, Page page) {
         String resultIdsIrrelevantInTheseTests = '1,2,3'
         CsiAggregation mv = TestDataUtil.createCsiAggregation(
                 started,
                 interval,
                 aggregator,
-                tag,
+                jobGroup,
+                page,
                 null,
                 resultIdsIrrelevantInTheseTests,
                 closed
