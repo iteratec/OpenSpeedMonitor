@@ -41,9 +41,6 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
     if($("#chartbox").length > 0){
         createGraph();
     }
-
-    scrollToChartbox(0);
-
 }
 
 function addAccordionHandlers() {

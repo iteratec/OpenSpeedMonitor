@@ -1722,14 +1722,6 @@ function ChartExporter(args) {
     this.initialize(args);
 }
 
-function scrollToChartbox(chartBoxTopOffset) {
-    var navbarOffset = -$("#Navbar").height();
-    var offset = navbarOffset + chartBoxTopOffset;
-    if ($("#chartbox").length > 0) {
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top + offset)}, {duration: 'fast'});
-    }
-}
-
 // escapes special characters
 //
 function makeValidSelector(identifier) {
