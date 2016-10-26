@@ -258,7 +258,3 @@ sourceSets {
 'dbmChangelogSync' {
     jvmArgs = ["-XX:MaxPermSize=512m", "-Xms1G", "-Xmx2G"]
 }
-bootRun {
-    addResources = false // We can set it to true if we would like to reload src/main/resources
-    jvmArgs = ["-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"]
-}
