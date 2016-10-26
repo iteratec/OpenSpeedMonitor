@@ -9,7 +9,7 @@
  * id : the id of the barChart on this page (unique)
  *
  */
-//= require d3/d3.v3.js
+//= require bower_components/d3/d3.min.js
 //= require d3/clocks.js
 
 function createBarChart(altWidth, altHeight, data, img, id) {
