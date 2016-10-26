@@ -28,9 +28,9 @@ class EventResultDashboardPage extends Page {
         chartWidthInputField { $("#dia-width") }
         chartheightInputField { $("#dia-height") }
         diaChangeChartsizeButton { $("#dia-change-chartsize") }
-        diaYAxisMinInputField { $("#dia-y-axis-min") }
-        diaYAxisMaxInputField { $("#dia-y-axis-max") }
-        diaChangeYAxisButton { $("#dia-change-yaxis") }
+        diaYAxisMinInputField { $(".dia-y-axis-min") }
+        diaYAxisMaxInputField { $(".dia-y-axis-max") }
+        diaChangeYAxisButton { $(".dia-change-yaxis") }
         showDataMarkersCheckBox { $("#to-enable-marker") }
         showDataLabelsCheckBox { $("#to-enable-label") }
         optimizeForWideScreenCheckBox { $("#wide-screen-diagram-montage") }

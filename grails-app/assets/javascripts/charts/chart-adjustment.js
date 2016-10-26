@@ -17,18 +17,19 @@
 
 function addAlias() {
     var clone = $("#graphAlias_clone").clone();
-    var selectedValue = clone.find("#graphName").val();
+    var graphNameSelect = clone.find("#graphName");
+    var selectedValue = graphNameSelect.val();
     var htmlId = 'graphAlias_' + selectedValue;
 
     clone.attr('id', htmlId);
 
     $("#graphAliasChildlist").append(clone);
     clone.show();
-
-    clone.find("#graphName").change(function () {
+    graphNameSelect.change(function () {
         var selectedValue = $(this).val();
         $(this).closest(".graphAlias-div").attr('id', 'graphAlias_' + selectedValue);
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");
+        initColorPicker($(this).parent().parent().find("#color"), selectedValue);
     });
     clone.find("#alias").on('input', function () {
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");
@@ -37,17 +38,22 @@ function addAlias() {
         $(this).closest(".graphAlias-div").remove();
         $("#graphAliasChildlist").trigger("graphAliasChildsChanged");
     });
-    clone.find("#color").change(function () {
+    var colorPicker = clone.find("#color");
+    initColorPicker(colorPicker, selectedValue);
+    colorPicker.change(function () {
         var currentColor = $(this).val();
-        $(this).css('background-color', currentColor);
         var name = $(this).closest(".graphAlias-div").find("#graphName").val();
         var argument = {};
         argument[name] = currentColor;
         $("#graphAliasChildlist").trigger("graphAliasColorChanged", argument);
     });
+}
 
-    // initial coloring
-    clone.find("#color").css('background-color', clone.find("#color").val());
+function initColorPicker(colorPicker, selectedValue) {
+    var selectedSeries = window.rickshawGraphBuilder.graph.series.find(function(el) { return el.name == selectedValue });
+    if (selectedSeries) {
+        colorPicker.val(selectedSeries.color);
+    }
 }
 
 function initGraphNameAliases(graphNameAliases) {

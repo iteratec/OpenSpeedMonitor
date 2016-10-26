@@ -133,10 +133,14 @@ function RickshawGraphBuilder(args) {
 
         if (args.height == "auto") {
             args.height = self.htmlProvider.HEIGHT_OF_CHART;
+        } else {
+            args.height = parseInt(args.height);
         }
 
         if (args.width == "auto") {
             args.width = $(window).width() - 90;
+        } else {
+            args.width = parseInt(args.width);
         }
 
         $("#rickshaw_main").width(args.width);
@@ -1164,25 +1168,25 @@ function ChartAdjuster(args) {
 
     this.createYAxisAdjuster = function (args) {
         var measurandGroups = args.graph.measurandGroupsManager.measurandGroups;
-        var parentContainer = $("#collapseAdjustment > .accordion-inner > .span11");
-        var blankYAxisAdjuster = $("[id=adjust_chart_y_axis]");
+        var blankYAxisAdjuster = $("div.adjust_chart_y_axis");
+        var parentContainer = $("#adjust_chart_y_axis_container");
         measurandGroups.forEach(function (mg) {
             var unit = mg.label.match(/\[.*]/);
             if (unit != null && unit[0] != null) unit = unit[0].replace("\[", "").replace("]", "");
             var yAxisAdjuster = blankYAxisAdjuster.clone();
             parentContainer.append(yAxisAdjuster);
             var button = yAxisAdjuster.find("button");
-            var yAxisAdjusterLabel = yAxisAdjuster.find(".span2.text-right");
+            var yAxisAdjusterLabel = yAxisAdjuster.find("label");
             yAxisAdjusterLabel.html(yAxisAdjusterLabel.html() + ": " + mg.label.replace("[" + unit + "]", ""));
             button[0].measurandGroup = mg.name;
 
-            var inputMin = button.parent().find("#dia-y-axis-min");
-            yAxisAdjuster.find("#minimumUnit").html(unit);
-            yAxisAdjuster.find("#maximumUnit").html(unit);
+            var inputMin = yAxisAdjuster.find(".dia-y-axis-min");
+            yAxisAdjuster.find(".minimumUnit").html(unit);
+            yAxisAdjuster.find(".maximumUnit").html(unit);
 
-            var inputMax = button.parent().find("#dia-y-axis-max");
+            var inputMax = yAxisAdjuster.find(".dia-y-axis-max");
             // TODO: werte dynamisch ermitteln
-            inputMin.val(0);
+            inputMin.val("0");
             inputMax.val("auto");
 
             self.addFunctionalityAdjustYAxis(button);
@@ -1196,10 +1200,8 @@ function ChartAdjuster(args) {
             .bind(
                 'click',
                 function () {
-                    var diaYAxisMin = $(this).parent().find(
-                        '#dia-y-axis-min').val();
-                    var diaYAxisMax = $(this).parent().find(
-                        '#dia-y-axis-max').val();
+                    var diaYAxisMin = $(this).parent().parent().find('.dia-y-axis-min').val();
+                    var diaYAxisMax = $(this).parent().parent().find('.dia-y-axis-max').val();
 
                     var valide = true;
                     if (diaYAxisMin != "auto"
