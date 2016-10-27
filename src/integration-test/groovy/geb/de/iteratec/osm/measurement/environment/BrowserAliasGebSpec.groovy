@@ -204,7 +204,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
         to BrowserAliasIndexPage
 
         then: "only one hundred browserAliases are shown"
-        browserAliasTableRows.size() == 100
+        waitFor {browserAliasTableRows.size() == 100}
 
         and: "there is pagination"
         def pageCount = (int) (250 / 100) + 1

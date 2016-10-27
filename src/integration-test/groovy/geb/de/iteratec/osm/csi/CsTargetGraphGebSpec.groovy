@@ -200,7 +200,7 @@ class CsTargetGraphGebSpec extends CustomUrlGebReportingSpec {
         to CsTargetGraphIndexPage
 
         then: "only one hundred csTargetGraphs are shown"
-        csTargetGraphTableRows.size() == 100
+        waitFor {csTargetGraphTableRows.size() == 100}
 
         and: "there is pagination"
         def csTargetGraphCount = (int) (250 / 100) + 1

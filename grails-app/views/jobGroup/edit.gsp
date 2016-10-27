@@ -40,7 +40,7 @@
 </section>
 
 <content tag="include.bottom">
-    <asset:javascript src="tagit/tagit.js"/>
+    <asset:javascript src="bower_components/tagit/js/tag-it.min.js"/>
     <asset:script type="text/javascript">
         $(document).ready(function() {
 

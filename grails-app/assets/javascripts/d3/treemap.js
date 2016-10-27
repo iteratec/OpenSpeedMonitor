@@ -1,4 +1,4 @@
-//= require d3/d3.v3.js
+//= require bower_components/d3/d3.min.js
 //= require d3/treeMapDesigner.js
 
 /**

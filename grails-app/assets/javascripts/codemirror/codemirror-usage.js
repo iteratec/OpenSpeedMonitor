@@ -54,7 +54,6 @@ function CodemirrorEditor(data) {
         // Create a Javascript array with all MeasuredEvents for auto complete
         CodeMirror.measuredEvents = []
         for (index = 0; index < this.measuredEvents.length; ++index) {
-            console.log(this.measuredEvents[index]);
             CodeMirror.measuredEvents.push({
                 text: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name,
                 displayText: this.measuredEvents[index].testedPage.name + ":::" + this.measuredEvents[index].name

@@ -1,7 +1,7 @@
-//= require d3/d3.v3.js
+//= require bower_components/d3/d3.min.js
 /**
  * JS Class for Creating ScheduleCharts with de.iteratec.osm.d3Data.ScheduleChartData as JSON objects
- * Class uses d3.v3.js
+ * Class uses d3.min.js
  *
  *
  * @author Marcus Meier
