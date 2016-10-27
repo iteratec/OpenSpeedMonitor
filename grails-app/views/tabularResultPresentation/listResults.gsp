@@ -27,14 +27,9 @@
         <form method="get" action="">
             <div class="row card-well">
                 <div class="col-md-4">
-                    <div class="card form-horizontal" id="select-timeframe">
-                        <legend>
-                            <g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />
-                        </legend>
-                        <g:render template="/dateSelection/startAndEnddateSelection"
-                            model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from,
-                                      'fromHour':fromHour, 'to':to, 'toHour':toHour]}"/>
-                    </div>
+                    <g:render template="/dateSelection/startAndEnddateSelection"
+                        model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from,
+                                  'fromHour':fromHour, 'to':to, 'toHour':toHour]}"/>
                 </div>
                 <g:if test="${showSpecificJob}">
                     <g:render template="filterJob" model="${['job': job]}" />

@@ -216,8 +216,6 @@
                             <legend>
                                 <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
                                                default="Aggregator"/>
-                                &amp;
-                                <g:message code="de.iteratec.isocsi.csi.timeframe.heading" default="Zeitraum" />
                             </legend>
                             <div>
                                 <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
@@ -227,25 +225,11 @@
                                 </g:radioGroup>
                             </div>
                         </fieldset>
-                        <hr />
-                        <div class="form-horizontal">
-                            <g:render template="/dateSelection/startAndEnddateSelection"
-                                      model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
-                                                'fromHour': fromHour, 'to': to, 'toHour': toHour,
-                                                'includeInterval': includeInterval]}"/>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-offset-4 col-md-8">
-                                <fieldset id="includeInterval">
-                                    <label class="checkbox-inline">
-                                        <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
-                                        &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
-                                                         default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
-                                    </label>
-                                </fieldset>
-                            </div>
-                        </div>
                     </div>
+                    <g:render template="/dateSelection/startAndEnddateSelection"
+                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
+                                        'fromHour': fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': true,
+                                        'includeInterval': includeInterval]}"/>
                 </div>
                 <div class="col-md-3">
                     <div class="card" id="filter-navtab-csiSystem">
