@@ -178,7 +178,6 @@ class RickshawHtmlCreater {
                 testId: "${pointInfo.testId.toString()}",
                 numberOfWptRun: ${pointInfo.numberOfWptRun.toString()},
                 oneBaseStepIndexInJourney: "${pointInfo.oneBaseStepIndexInJourney.toString()}",
-                wptVersion: "${pointInfo.wptVersion.toString()}",
                 cachedView: ${cached}
             }""";
 
