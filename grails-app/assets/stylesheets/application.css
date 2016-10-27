@@ -6,10 +6,6 @@
 *= require chosen/chosen.css
 *= require_self
 */
-.form-group.error label, .fieldcontain.error label {
-	color: #b94a48;
-	font-weight: bold;
-}
 .renderInvisible {
  display:none;
 }
