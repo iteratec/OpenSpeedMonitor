@@ -159,7 +159,7 @@ npmInstall {
     outputs.files file('node_modules')
 }
 
-task jasmineRun(type: NodeTask, dependsOn: ['npmInstall']) {
+task jasmineRun(type: NodeTask, dependsOn: ['bowerPackages']) {
     script = karmaExec
     args = ['start', karmaConfig, '--single-run']
 }
