@@ -419,8 +419,6 @@ class TestDataUtil implements OsmTestLogin {
      *         calculation, should be an
      * {@link CsiAggregationInterval#HOURLY} one;
      *         not <code>null</code>.
-     * @param csiAggregationTagService
-     *         The service to use for tag generation, not <code>null</code>.
      * @param eventCsiAggregationService
      *         The service to use for calcualtion, not <code>null</code>.
      *

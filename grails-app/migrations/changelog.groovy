@@ -32,6 +32,4 @@ databaseChangeLog = {
     include file: 'csiAggregationScheme.groovy'
     include file: 'csiAggregationData.groovy'
     include file: 'afterAll.groovy'
-    include file: 'deleteCsiAggregationUpdateEvents.groovy'
-
 }
