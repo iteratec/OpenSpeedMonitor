@@ -189,12 +189,25 @@ label.sub {
   display: block;
 }
 
+#main-navbar {
+  margin-left: 150px;
+}
+
+body {
+  // required as the fixed navbar is not considered in normal page flow
+  padding-top: 66px;
+}
+
 @media (min-width: 768px) {
   #main-navbar .navbar-right {
     position: absolute;
     bottom: 0;
     right: 0;
   }
+}
+
+#main-navbar .flag {
+  vertical-align: inherit;
 }
 
 

@@ -31,14 +31,6 @@
         <!-----------------------------------------------------main navigation-->
         <g:render template="/_menu/navbar"/>
 
-        <!-----------------------------------------------------header (default or page specific)-->
-        <g:if test="${ pageProperty(name:'page.header') }">
-            <g:pageProperty name="page.header" />
-        </g:if>
-        <g:else>
-            <g:render template="/layouts/header"/>
-        </g:else>
-
         <!-----------------------------------------------------body-->
         <g:render template="/layouts/content_osm"/>
 
