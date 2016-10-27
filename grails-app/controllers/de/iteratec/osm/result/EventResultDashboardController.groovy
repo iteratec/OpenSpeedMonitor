@@ -188,6 +188,7 @@ class EventResultDashboardController {
                 }
             }
         }
+        modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableEventResultDashboards())
 
         log.info("from=${modelToRender['from']}")
         log.info("to=${modelToRender['to']}")

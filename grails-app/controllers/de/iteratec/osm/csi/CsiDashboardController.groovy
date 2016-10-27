@@ -297,6 +297,7 @@ class CsiDashboardController {
                 }
             }
         }
+        modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableCsiDashboards())
 
         return modelToRender
     }

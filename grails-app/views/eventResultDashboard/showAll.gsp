@@ -15,38 +15,7 @@
 <body>
 
 <%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
-
-<%-- userspecific dashboards --%>
-<div class="row">
-    <div class="col-md-12">
-                <a class="btn btn-primary btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
-                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                               default="Dashboard-Ansicht ausw&auml;hlen"/>
-                    <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" id="customDashBoardSelection">
-                    <g:set var="availableDashboards"
-                           value="${userspecificDashboardService.getListOfAvailableEventResultDashboards()}"/>
-                    <g:if test="${availableDashboards.size() > 0}">
-                        <g:each in="${availableDashboards}" var="availableDashboard">
-                            <li><g:link action="showAll"
-                                        params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
-                        </g:each>
-                    </g:if>
-                    <g:else>
-                        <g:set var="anchorDashboardCreation" value="#"/>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                            <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                        </sec:ifAnyGranted>
-                        <li><a href="${anchorDashboardCreation}"><g:message
-                                code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                                default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
-                    </g:else>
-                </ul>
-    </div>
-</div>
-<br/>
+<g:render template="/layouts/mainMenu" model="${['availableDashboards': availableDashboards]}"/>
 
 <div class="row">
     <div class="col-md-12">
