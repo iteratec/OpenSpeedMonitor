@@ -116,6 +116,25 @@ $(function () {
 });
 
 
+// select/deselect points on the graph with meta-key+click
+$(function () {
+    $('#rickshaw_main').on('click', '.chart-context-menu', function (event) {
+        if (event.metaKey) {
+            var nearestPoint = rickshawGraphBuilder.graph.nearestPoint;
+
+            if (isNotSelected(nearestPoint)) {
+                selectPoint(nearestPoint);
+            } else {
+                deselectPoint(nearestPoint)
+            }
+
+            event.preventDefault();
+            return false;
+        }
+    });
+});
+
+
 function buildWptUrl(wptView = null, nearestPoint = null) {
     var url = null;
     if (!nearestPoint || !wptView) {
