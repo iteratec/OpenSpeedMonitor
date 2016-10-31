@@ -95,8 +95,15 @@ $(function () {
             "compare": {
                 name: chartContextMenuI18N.compareFilmstrips,
                 icon: "fa-columns",
-                // show only if at least one point is already selected
+                // show only if at least one point is already selected and
+                // also only if comparison is not only with itself
                 visible: function () {
+                    var nearestDotId = rickshawGraphBuilder.graph.nearestPoint.value.wptResultInfo.testId;
+
+                    if (rickshawGraphBuilder.graph.selectedPoints.length == 1 &&
+                        rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.testId == nearestDotId) {
+                        return false;
+                    }
                     return rickshawGraphBuilder.graph.selectedPoints.length > 0;
                 },
                 callback: function (itemKey) {
