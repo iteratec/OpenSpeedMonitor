@@ -68,11 +68,11 @@ function updateSelectionConstraints() {
 function showSummaryRow(row, text) {
     row = $(row);
     row.find('td').html(text);
-    row.show();
+    row.css("display", "table-row");
 }
 
 function hideSummaryRow(row) {
-    $(row).hide();
+    $(row).css("display", "none");
 }
 
 function updateSelectionConstraintBrowser() {

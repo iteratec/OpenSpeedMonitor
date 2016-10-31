@@ -79,7 +79,7 @@
     <g:if test="${eventResultValues}">
         <div class="col-md-12">
             <a name="chart-table"></a>
-            <div id="chartbox">
+            <div id="chartbox" class="section">
                 <g:render template="/highchart/chart"
                           model="[
                                   chartData                    : eventResultValues,

@@ -92,17 +92,6 @@ label.sub {
   float: left;
 }
 
-#rickshaw_slider {
-  margin-top: 3px;
-}
-
-#rickshaw_label_summary_box {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-left: 60px;
-  margin-right: 40px;
-}
-
 //bootstrap component-animation
 .collapse {
   position: relative;
@@ -319,7 +308,16 @@ body {
 // Dashboard selection summary
 
 #selectionSummary {
-  font-size: 1rem;
+  font-size: 12px;
+}
+
+#selectionSummary table {
+  float: right;
+  margin-right: 60px; // to align with chart
+}
+
+#selectionSummary table tr {
+  display: none; // hide by default
 }
 
 #selectionSummary th {

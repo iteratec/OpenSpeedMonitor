@@ -45,7 +45,7 @@
 		annotations="${annotations}"/>
 </g:else>
 <div class="row">
-	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
+	<g:render template="/highchart/adjustChartModal" model="${model}" />
 </div>
 <div class="row">
 	<div class="col-md-12">
