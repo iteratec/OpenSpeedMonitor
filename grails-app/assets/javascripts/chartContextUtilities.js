@@ -21,10 +21,38 @@
 
 //= require bower_components/jQuery-contextMenu/dist/jquery.contextMenu.min.js
 
+
 // context menu on all dots of all graphs
 $(function () {
     $.contextMenu({
         selector: '.chart-context-menu',
+
+        appendTo: '#chartbox',
+
+        events: {
+            show: function () {
+                // don't loose the dot on which the context menu was called
+
+                // get the current dot, clone it and mark the clone as visible while context menu is active
+                var activeDot = $('.dot.active')[0];
+                var dotOfContextMenu = $(activeDot).clone();
+                $(dotOfContextMenu).attr('id', 'visibleWhileActiveContextMenu');
+
+                // create the new dot and copy the styles of the active dot
+                // get the distance to the left side
+                var detailElement = $('.detail')[0];
+                var left = $(detailElement).css("left");
+                $(dotOfContextMenu).css("left", left);
+
+                // display the new saved dot in the chart
+                var chart = $('#rickshaw_chart');
+                $(chart).append(dotOfContextMenu);
+            },
+            hide: function () {
+                // loose the dot on which the context menu was called when it will be hidden
+                $('#visibleWhileActiveContextMenu')[0].remove();
+            }
+        },
 
         callback: function (key) {
             // rickshawGraphBuilder is in the global namespace and
@@ -87,6 +115,8 @@ $(function () {
 $(function () {
     $.contextMenu({
         selector: '#rickshaw_chart',
+
+        appendTo: '#chartbox',
 
         items: {
             "comparePoints": {
@@ -246,8 +276,9 @@ function selectPoint(nearestPoint) {
     // set an id for the ability to delete it individually
     $(activeDot).attr('id', html_id);
 
-    // create the new dot and copy the styles of the active dot
+    // create the new dot and copy the styles of the active dot but without the active context menu class property
     var newSavedDot = $(activeDot).clone();
+    newSavedDot.removeClass('context-menu-active');
     // get the distance to the left side
     var detailElement = $('.detail')[0];
     var left = $(detailElement).css("left");
@@ -287,8 +318,7 @@ function deselectPoint(point) {
     rickshawGraphBuilder.graph.selectedPoints.splice(itemToRemove, 1);
 
     // remove the dot from the DOM
-    var dot = document.getElementById(itemToRemove.html_id);
-    dot.parentNode.removeChild(dot);
+    $('#' + itemToRemove.html_id)[0].remove();
 }
 
 
