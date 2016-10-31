@@ -44,7 +44,7 @@
                     </label>
                     <div class="input-group">
                         <input name="trimAboveLoadTimes" id="appendedInputAboveLoadTimes"
-                               value="${trimAboveLoadTimes}" class="form-control" type="text"
+                               value="${trimAboveLoadTimes}" class="form-control trim-selection" type="text"
                                placeholder="...">
                         <span class="input-group-addon">ms</span>
                     </div>
@@ -55,7 +55,7 @@
                     </label>
                     <div class="input-group">
                         <input name="trimBelowLoadTimes" id="appendedInputBelowLoadTimes"
-                               value="${trimBelowLoadTimes}" class="form-control" type="text"
+                               value="${trimBelowLoadTimes}" class="form-control trim-selection" type="text"
                                placeholder="...">
                         <span class="input-group-addon">ms</span>
                     </div>
@@ -71,7 +71,7 @@
                     </label>
                     <div class="input-group form-group">
                         <input name="trimAboveRequestCounts" id="appendedInputAboveRequestCounts"
-                               value="${trimAboveRequestCounts}" class="form-control" type="text"
+                               value="${trimAboveRequestCounts}" class="form-control trim-selection" type="text"
                                placeholder="...">
                         <span class="input-group-addon">REQ</span>
                     </div>
@@ -82,7 +82,7 @@
                     </label>
                     <div class="input-group">
                         <input name="trimBelowRequestCounts" id="appendedInputBelowRequestCounts"
-                               value="${trimBelowRequestCounts}" class="form-control" type="text"
+                               value="${trimBelowRequestCounts}" class="form-control trim-selection" type="text"
                                placeholder="...">
                         <span class="input-group-addon">REQ</span>
                     </div>
@@ -100,7 +100,7 @@
                     </label>
                     <div class="input-group">
                         <input name="trimAboveRequestSizes" id="appendedInputAboveRequestSizes"
-                               value="${trimAboveRequestSizes}" class="form-control" type="text"
+                               value="${trimAboveRequestSizes}" class="form-control trim-selection" type="text"
                                placeholder="...">
                         <span class="input-group-addon">KB</span>
                     </div>
@@ -112,7 +112,7 @@
                     </label>
                     <div class="input-group">
                         <input name="trimBelowRequestSizes" id="appendedInputBelowRequestSizes"
-                               value="${trimBelowRequestSizes}" class="form-control" type="text"
+                               value="${trimBelowRequestSizes}" class="form-control trim-selection" type="text"
                                placeholder="...">
                         <span class="input-group-addon">KB</span>
                     </div>

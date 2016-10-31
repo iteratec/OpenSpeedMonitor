@@ -94,7 +94,42 @@
             </g:elseif>
         </ul>
     </div>
-    <div class="col-md-4">
-
+    <div class="col-md-4" id="selectionSummary">
+        <g:if test="${controllerName == 'eventResultDashboard'}">
+            <table>
+                <tr id="selectionConstraintBrowser">
+                    <th>
+                        <g:message code="browser.label" default="Browser"/>
+                        &nbsp;|&nbsp;
+                        <g:message code="job.location.label" default="Location"/>:
+                    </th>
+                    <td></td>
+                </tr>
+                <tr id="selectionConstraintConnectivity">
+                    <th>
+                        <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>:
+                    </th>
+                    <td></td>
+                </tr>
+                <tr id="selectionConstraintFirstView">
+                    <th>
+                        <g:message code="job.firstView.label" default="First View"/>:
+                    </th>
+                    <td></td>
+                </tr>
+                <tr id="selectionConstraintRepeatView">
+                    <th>
+                        <g:message code="job.repeatedView.label" default="Repeated View"/>:
+                    </th>
+                    <td></td>
+                </tr>
+                <tr id="selectionConstraintTrim">
+                    <th>
+                        <g:message code="de.iteratec.isr.wptrd.labels.trim" default="Trim"/>:
+                    </th>
+                    <td></td>
+                </tr>
+            </table>
+        </g:if>
     </div>
 </div>

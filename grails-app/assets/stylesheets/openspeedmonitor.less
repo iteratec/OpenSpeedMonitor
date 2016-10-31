@@ -8,27 +8,6 @@
   min-height: 1em;
 }
 
-.accordion-info {
-  .text-info;
-  line-height: normal;
-  font-size: 80%;
-  padding: 8px 8px;
-}
-
-.accordion-link {
-  display: block;
-  width: 100%;
-  padding: 0;
-  line-height: 40px;
-  color: #333333;
-  border: 0;
-}
-
-.accordion-custom-heading {
-  background-color: #EEEEEE;
-  font-size: 1.2em;
-}
-
 .content-box {
   box-sizing: content-box;
   -moz-box-sizing: content-box;
@@ -335,4 +314,21 @@ body {
 .card-well.tab-content {
   border-top-color: transparent;
   border-radius: 0 0 4px 4px;
+}
+
+// Dashboard selection summary
+
+#selectionSummary {
+  font-size: 1rem;
+}
+
+#selectionSummary th {
+  text-align: right;
+  color: @link-color;
+  padding-right: 1rem;
+  vertical-align: top;
+}
+
+#selectionSummary td .unit {
+  font-weight: bold;
 }

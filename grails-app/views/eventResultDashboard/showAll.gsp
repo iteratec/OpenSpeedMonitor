@@ -116,35 +116,6 @@
     </g:else>
 </div>
 
-<div class="row" id="selectionSummary">
-    <div class="col-md-2 accordion-info text-right">
-        <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
-                   default="Aggregation"/>:<br>
-        <g:message code="de.iteratec.isocsi.csi.timeframe.heading"
-                   default="Timeframe"/>:
-    </div>
-    <div class="col-md-2 accordion-info" id="accordion-info-date"></div>
-    <div class="col-md-2 accordion-info text-right">
-        <g:message code="de.iteratec.isr.wptrd.labels.filterFolder"
-                   default="Job Group"/>:<br>
-        <g:message code="de.iteratec.osm.result.page.label"
-                   default="Page"/>&nbsp;|&nbsp;<g:message
-                code="de.iteratec.osm.result.measured-event.label"
-                default="Measured step"/>:<br>
-        <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message
-                code="job.location.label" default="Location"/>:<br>
-        <g:message code="de.iteratec.osm.result.connectivity.label"
-                   default="Connectivity"/>:<br>
-    </div>
-    <div class="col-md-2 accordion-info" id="accordion-info-jobs"></div>
-    <div class="col-md-2 accordion-info text-right">
-        <g:message code="job.firstView.label" default="First View"/>:<br>
-        <g:message code="job.repeatedView.label" default="Repeated View"/>:<br>
-    </div>
-
-    <div class="col-md-2 accordion-info" id="accordion-info-measurements"></div>
-</div>
-
 <div class="row">
     <div class="col-md-12">
         <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv">
