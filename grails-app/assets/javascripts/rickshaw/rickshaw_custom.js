@@ -2629,7 +2629,7 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 			var url = info.wptServerBaseurl.toString() + "result/" + info.testId.toString() + "/#run"
 				+ info.numberOfWptRun.toString() + "_step" + info.oneBaseStepIndexInJourney.toString();
 
-            var link = $("<a href='"+ url  + "'></a>");
+            var link = $("<a href='"+ url + "'></a>");
             link.append($(dot));
             $(this.element).append(link);
         }.bind(this));

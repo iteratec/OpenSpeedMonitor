@@ -495,6 +495,7 @@
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
     <asset:javascript src="iteratecChartRickshaw.js"/>
+    <asset:javascript src="chartContextUtilities.js"/>
     <asset:script type="text/javascript">
 
         var pagesToEvents = [];
