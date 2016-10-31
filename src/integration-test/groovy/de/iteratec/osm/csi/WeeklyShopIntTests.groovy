@@ -170,8 +170,9 @@ class WeeklyShopIntTests extends NonTransactionalIntegrationSpec {
         CsiAggregationInterval.findAll()
 
         when:
-        CsiAggregation.withNewSession {
+        CsiAggregation.withNewSession { session ->
             shopCsiAggregationService.calcCsiAggregations([csiAggregationId])
+            session.flush()
         }
         CsiAggregation mvWeeklyShop = CsiAggregation.get(csiAggregationId)
 

@@ -20,11 +20,6 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
 
     CsiAggregationUpdateEventCleanupService csiAggregationUpdateEventCleanupService
 
-    private static final String irrelevant_PageTag = '1;1'
-    private static final String irrelevant_ShopTag = '1'
-    private static final Double irrelevant_Value = 42d
-    private static final String irrelevant_ResultIds = '1,2,3'
-
     CsiAggregationInterval daily
     CsiAggregationInterval weekly
     AggregatorType page
@@ -45,7 +40,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
         when:
         assert CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 1
         assert CsiAggregation.get(idDailyPageMvInitiallyOpenAndCalculated).closedAndCalculated == false
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
 
         then:
         CsiAggregationUpdateEvent.findAllByCsiAggregationId(idDailyPageMvInitiallyOpenAndCalculated).size() == 0
@@ -106,7 +101,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
 
     void "already calculated daily shop mvs get closed"() {
         setup:
-        CsiAggregation mvDailyShopCalculated = TestDataUtil.createCsiAggregation(new Date(100), daily, shop, false)
+        CsiAggregation mvDailyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, shop, false)
         Serializable idDailyShopMvInitiallyOpenAndCalculated = mvDailyShopCalculated.ident()
         TestDataUtil.createUpdateEvent(idDailyShopMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
@@ -123,7 +118,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
 
     void "outdated daily shop mvs get calculated and closed"() {
         setup:
-        CsiAggregation mvDailyShopOutdated = TestDataUtil.createCsiAggregation(new Date(100), daily, shop, false)
+        CsiAggregation mvDailyShopOutdated = TestDataUtil.createSimpleCsiAggregation(new Date(100), daily, shop, false)
         Serializable idDailyShopMvInitiallyOpenAndOutdated = mvDailyShopOutdated.ident()
         TestDataUtil.createUpdateEvent(idDailyShopMvInitiallyOpenAndOutdated, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
 
@@ -140,7 +135,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
 
     void "already calculated weekly shop mvs get closed"() {
         setup:
-        CsiAggregation mvWeeklyShopCalculated = TestDataUtil.createCsiAggregation(new Date(100), weekly, shop, false)
+        CsiAggregation mvWeeklyShopCalculated = TestDataUtil.createSimpleCsiAggregation(new Date(100), weekly, shop, false)
         Serializable idWeeklyShopMvInitiallyOpenAndCalculated = mvWeeklyShopCalculated.ident()
         TestDataUtil.createUpdateEvent(idWeeklyShopMvInitiallyOpenAndCalculated, CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 

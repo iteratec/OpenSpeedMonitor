@@ -161,10 +161,7 @@ class ShopCsiAggregationService {
 
         jobGroups.each { currentJobGroup ->
             CsiAggregation csiAggregation
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "ShopCsiAggregationService: ensurePresence.findByStarted", IndentationDepth.FOUR) {
-                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroup(startDate.toDate(), interval, shopAggregator, currentJobGroup)
-                log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndPage delivered ${csiAggregation ? 'a' : 'no'} result")
-            }
+            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroup(startDate.toDate(), interval, shopAggregator, currentJobGroup)
             if (!csiAggregation) {
                 csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),
@@ -209,28 +206,28 @@ class ShopCsiAggregationService {
     public void calcCsiAggregations(List<Long> csiAggregationIds) {
         Contract.requiresArgumentNotNull("toBeCalculated", csiAggregationIds);
 
-            List<CsiAggregation> csiAggregationsToCalculate = CsiAggregation.getAll(csiAggregationIds)
+        List<CsiAggregation> csiAggregationsToCalculate = CsiAggregation.getAll(csiAggregationIds)
 
-            csiAggregationsToCalculate.each { toBeCalculated ->
-                JobGroup jobGroupOfCsiAggregation = toBeCalculated.jobGroup
-                List<CsiAggregation> pageCsiAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), [jobGroupOfCsiAggregation])
+        csiAggregationsToCalculate.each { toBeCalculated ->
+            JobGroup jobGroupOfCsiAggregation = toBeCalculated.jobGroup
+            List<CsiAggregation> pageCsiAggregations = pageCsiAggregationService.getOrCalculatePageCsiAggregations(toBeCalculated.started, toBeCalculated.started, toBeCalculated.getInterval(), [jobGroupOfCsiAggregation])
 
 
-                List<WeightedCsiValue> weightedCsiValuesDocComplete = []
-                List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
+            List<WeightedCsiValue> weightedCsiValuesDocComplete = []
+            List<WeightedCsiValue> weightedCsiValuesVisuallyComplete = []
 
-                if (pageCsiAggregations.size() > 0) {
-                    weightedCsiValuesDocComplete = weightingService.getWeightedCsiValues(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
-                    weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
-                }
-                if (weightedCsiValuesDocComplete.size() > 0) {
-                    toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesDocComplete*.weightedValue)
-                }
-                if (weightedCsiValuesVisuallyComplete.size() > 0) {
-                    toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
-                }
-                csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
-                toBeCalculated.save(failOnError: true)
+            if (pageCsiAggregations.size() > 0) {
+                weightedCsiValuesDocComplete = weightingService.getWeightedCsiValues(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
+                weightedCsiValuesVisuallyComplete = weightingService.getWeightedCsiValuesByVisuallyComplete(pageCsiAggregations, [WeightFactor.PAGE] as Set, jobGroupOfCsiAggregation.csiConfiguration)
             }
+            if (weightedCsiValuesDocComplete.size() > 0) {
+                toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesDocComplete*.weightedValue)
+            }
+            if (weightedCsiValuesVisuallyComplete.size() > 0) {
+                toBeCalculated.csByWptVisuallyCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesVisuallyComplete*.weightedValue)
+            }
+            csiAggregationUpdateEventDaoService.createUpdateEvent(toBeCalculated.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
+            toBeCalculated.save(failOnError: true)
+        }
     }
 }

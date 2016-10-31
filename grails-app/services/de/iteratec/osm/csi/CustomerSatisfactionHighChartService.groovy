@@ -167,32 +167,34 @@ class CustomerSatisfactionHighChartService {
 
         List<OsmChartGraph> graphs = new ArrayList<OsmChartGraph>();
 
-        for (CsiAggregation currentCsiAggregation : csiValues) {
+        // start a new session for better performance
+        CsiAggregation.withNewSession {
 
-            if (getValue(currentCsiAggregation)) {
+            for (CsiAggregation currentCsiAggregation : csiValues) {
+                if (getValue(currentCsiAggregation)) {
 
-                String valueTagToGraph = getCsiAggregationIdentifierForChart(currentCsiAggregation)
+                    String valueTagToGraph = getCsiAggregationIdentifierForChart(currentCsiAggregation)
 
-                if (!tagToGraph.containsKey(valueTagToGraph)) {
-                    OsmChartGraph graph = new OsmChartGraph();
-                    graph.setLabel(getMapLabel(currentCsiAggregation, csiType));
-                    tagToGraph.put(valueTagToGraph, graph);
-                    graphs.add(graph);
+                    if (!tagToGraph.containsKey(valueTagToGraph)) {
+                        OsmChartGraph graph = new OsmChartGraph();
+                        graph.setLabel(getMapLabel(currentCsiAggregation, csiType));
+                        tagToGraph.put(valueTagToGraph, graph);
+                        graphs.add(graph);
+                    }
+
+                    OsmChartPoint chartPoint = new OsmChartPoint(
+                            time: getHighchartCompatibleTimestampFrom(currentCsiAggregation.started),
+                            csiAggregation: formatPercentage(getValue(currentCsiAggregation)),
+                            countOfAggregatedResults: currentCsiAggregation.countUnderlyingEventResultsByWptDocComplete(),
+                            sourceURL: getLinkFor(currentCsiAggregation, csiType),
+                            testingAgent: null
+                    )
+                    if (chartPoint.isValid())
+                        tagToGraph[valueTagToGraph].getPoints().add(chartPoint)
                 }
-
-                OsmChartPoint chartPoint = new OsmChartPoint(
-                        time: getHighchartCompatibleTimestampFrom(currentCsiAggregation.started),
-                        csiAggregation: formatPercentage(getValue(currentCsiAggregation)),
-                        countOfAggregatedResults: currentCsiAggregation.countUnderlyingEventResultsByWptDocComplete(),
-                        sourceURL: getLinkFor(currentCsiAggregation, csiType),
-                        testingAgent: null
-                )
-                if (chartPoint.isValid())
-                    tagToGraph[valueTagToGraph].getPoints().add(chartPoint)
             }
+
         }
-
-
 
         return graphs;
     }
@@ -259,22 +261,24 @@ class CustomerSatisfactionHighChartService {
     private URL getLinkFor(CsiAggregation csiValue, CsiType csiType) {
         URL linkForPoint
 
-        if (csiValue.aggregator.name.equals(AggregatorType.PAGE) ||
-                csiValue.aggregator.name.equals(AggregatorType.SHOP) ||
-                csiValue.aggregator.name.equals(AggregatorType.CSI_SYSTEM)
-        ) {
-            Map paramsToSend = getParamsForLink(csiValue)
-            paramsToSend[CsiDashboardShowAllCommand.receiveControlnameFor(csiType)] = 'on'
-            String testsDetailURLAsString = grailsLinkGenerator.link([
-                    'controller': 'csiDashboard',
-                    'action'    : 'showAll',
-                    'absolute'  : true,
-                    'params'    : paramsToSend
-            ]);
-            linkForPoint = testsDetailURLAsString ? new URL(testsDetailURLAsString) : null;
-        } else if (csiValue.aggregator.name.equals(AggregatorType.MEASURED_EVENT)) {
-            linkForPoint = this.eventResultDashboardService.tryToBuildTestsDetailsURL(csiValue)
-        }
+            String aggregatorName = csiValue.aggregator.name
+
+            if (aggregatorName.equals(AggregatorType.PAGE) ||
+                    aggregatorName.equals(AggregatorType.SHOP) ||
+                    aggregatorName.equals(AggregatorType.CSI_SYSTEM)
+            ) {
+                Map paramsToSend = getParamsForLink(csiValue)
+                paramsToSend[CsiDashboardShowAllCommand.receiveControlnameFor(csiType)] = 'on'
+                String testsDetailURLAsString = grailsLinkGenerator.link([
+                        'controller': 'csiDashboard',
+                        'action'    : 'showAll',
+                        'absolute'  : true,
+                        'params'    : paramsToSend
+                ]);
+                linkForPoint = testsDetailURLAsString ? new URL(testsDetailURLAsString) : null;
+            } else if (aggregatorName.equals(AggregatorType.MEASURED_EVENT)) {
+                linkForPoint = this.eventResultDashboardService.tryToBuildTestsDetailsURL(csiValue)
+            }
         return linkForPoint
     }
 

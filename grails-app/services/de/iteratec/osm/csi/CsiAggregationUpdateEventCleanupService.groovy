@@ -108,22 +108,24 @@ class CsiAggregationUpdateEventCleanupService {
     }
 
     public void closeAllCsiAggregations(List<Long> csiAggregationIds, BatchActivityUpdater activityUpdater) {
-        activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: closing calculated csiAggregations", csiAggregationIds.size())
         CsiAggregation.withNewSession { session ->
-            csiAggregationIds.collate(BATCH_SIZE).each {
-                if (it) {
+            csiAggregationIds.collate(BATCH_SIZE).each { sublist ->
+                activityUpdater.beginNewStage("Quartz controlled cleanup of CsiAggregationUpdateEvents: closing calculated csiAggregations", csiAggregationIds.size())
 
-                    List<CsiAggregation> csiAggregationsToClose = CsiAggregation.getAll(it)
-                    csiAggregationsToClose.each {
-                        it.closedAndCalculated = true
-                        it.save(failOnError: true)
+                // sublist can be an empty list, if csiAggregationIds is an empty list
+                if (sublist) {
+
+                    List<CsiAggregation> csiAggregationsToClose = CsiAggregation.getAll(sublist)
+                    csiAggregationsToClose.each { CsiAggregation toClose ->
+                        toClose.closedAndCalculated = true
+                        toClose.save(failOnError: true)
                     }
 
-                    activityUpdater.addProgressToStage(it.size())
-
-                    session.flush()
-                    session.clear()
+                    activityUpdater.addProgressToStage(sublist.size())
                 }
+
+                session.flush()
+                session.clear()
             }
         }
     }

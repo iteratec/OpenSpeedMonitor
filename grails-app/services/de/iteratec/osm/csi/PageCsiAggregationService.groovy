@@ -163,10 +163,7 @@ class PageCsiAggregationService {
         jobGroups.each { currentJobGroup ->
             pages.each { currentPage ->
                 CsiAggregation csiAggregation
-                performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "PageCsiAggregationService: ensurePresence.findByStarted", IndentationDepth.FOUR) {
-                    csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndPage(startDate.toDate(), interval, pageAggregator, currentJobGroup, currentPage)
-                    log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndPage delivered ${csiAggregation ? 'a' : 'no'} result")
-                }
+                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndJobGroupAndPage(startDate.toDate(), interval, pageAggregator, currentJobGroup, currentPage)
                 if (!csiAggregation) {
                     csiAggregation = new CsiAggregation(
                             started: startDate.toDate(),
