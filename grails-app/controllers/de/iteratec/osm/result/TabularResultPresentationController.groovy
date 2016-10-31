@@ -26,6 +26,8 @@ import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
 import de.iteratec.osm.persistence.OsmDataSourceService
+import de.iteratec.osm.report.UserspecificCsiDashboardController
+import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.ui.EventResultListing
 import de.iteratec.osm.report.ui.EventResultListingRow
 import de.iteratec.osm.report.ui.PaginationListing
@@ -63,6 +65,7 @@ class TabularResultPresentationController {
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
     EventResultDashboardService eventResultDashboardService
+    UserspecificDashboardService userspecificDashboardService
 
     private Map<String, Object> listResultsByCommand(TabularResultEventResultsCommandBase cmd) {
 
@@ -117,6 +120,8 @@ class TabularResultPresentationController {
         }
         modelToRender.put('eventResultsListing', eventResultsListing);
         modelToRender.put('paginationListing', paginationListing)
+        modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableEventResultDashboards())
+
         return modelToRender;
     }
 

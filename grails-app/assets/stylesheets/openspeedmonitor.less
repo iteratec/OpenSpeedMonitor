@@ -220,6 +220,35 @@ body {
   padding: 8px 12px;
 }
 
+// nav pills with button group for split dropdown button
+
+#main-menu .nav-pills li .btn-group .btn {
+  border: 0;
+  color: @link-color
+}
+
+#main-menu .nav-pills li .btn-group .btn .caret {
+  margin: 0;
+  border-top-color: @link-color;
+  border-bottom-color: @link-color;
+}
+
+#main-menu .nav-pills li.active .btn-group .btn .caret {
+  margin: 0;
+  border-top-color: @body-bg;
+  border-bottom-color: @body-bg;
+}
+
+#main-menu .nav-pills li.active .btn-group .btn {
+  color: @body-bg;
+  background: @link-color;
+}
+
+#main-menu .nav-pills li.active .btn-group .btn + .btn {
+  border-left: 1px #2e6da4 solid;
+  margin-left: 0;
+}
+
 //bootstrap variables
 @navbar-default-bg: #AB0C0C; /*ffffff;*/
 

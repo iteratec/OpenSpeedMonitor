@@ -66,8 +66,10 @@
 
             <g:elseif test="${mainTab.equals('results')}">
                 <li class="controller ${(controllerName.equals('eventResultDashboard') || controllerName.equals('detailAnalysis')) ? 'active' : ''}">
-                    <g:link controller="eventResultDashboard" action="showAll"><i class="fa fa-signal"></i>
-                        <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard"/></g:link>
+                    <g:render template="/layouts/dashboardButton" model="${[
+                            'availableDashboards': availableDashboards,
+                            'affectedController': 'eventResultDashboard'
+                    ]}"/>
                 </li>
                 <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}">
                     <g:link controller="tabularResultPresentation" action="listResults"><i
@@ -80,8 +82,10 @@
 
             <g:elseif test="${mainTab.equals('csi')}">
                 <li class="controller ${actionName.equals('showAll') ? 'active' : ''}">
-                    <g:link controller="csiDashboard" action="showAll"><i class="fa fa-signal"></i> <g:message
-                            code="de.iteratec.isocsi.csiDashboard" default="Dashboard"/></g:link>
+                    <g:render template="/layouts/dashboardButton" model="${[
+                            'availableDashboards': availableDashboards,
+                            'affectedController': 'csiDashboard'
+                    ]}"/>
                 </li>
                 <li class="controller ${actionName.equals('configurations') ? 'active' : ''}">
                     <g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
@@ -90,35 +94,7 @@
             </g:elseif>
         </ul>
     </div>
-    <g:if test="${availableDashboards != null}">
-        <div class="col-md-4">
-            <ul class="nav nav-pills pull-right">
-                <li role="presentation" class="dropdown active">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
-                       aria-haspopup="true" aria-expanded="false">
-                        <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                                   default="Dashboard-Ansicht ausw&auml;hlen"/>
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-right" id="customDashBoardSelection">
-                        <g:if test="${availableDashboards.size() > 0}">
-                            <g:each in="${availableDashboards}" var="availableDashboard">
-                                <li><g:link action="showAll"
-                                            params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
-                            </g:each>
-                        </g:if>
-                        <g:else>
-                            <g:set var="anchorDashboardCreation" value="#"/>
-                            <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                                <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                            </sec:ifAnyGranted>
-                            <li><a href="${anchorDashboardCreation}"><g:message
-                                    code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                                    default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
-                        </g:else>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </g:if>
+    <div class="col-md-4">
+
+    </div>
 </div>
