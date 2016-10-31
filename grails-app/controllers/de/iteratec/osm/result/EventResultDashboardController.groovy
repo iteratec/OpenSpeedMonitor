@@ -193,6 +193,9 @@ class EventResultDashboardController {
         log.info("to=${modelToRender['to']}")
         log.info("fromHour=${modelToRender['fromHour']}")
         log.info("toHour=${modelToRender['toHour']}")
+
+        fillWithI18N(modelToRender)
+
         return modelToRender
     }
 
@@ -490,6 +493,27 @@ class EventResultDashboardController {
         AnnotationUtil.fillWithAnnotations(modelToRender, timeFrame, selectedFolder, eventService)
 
     }
+
+
+    // fill the context menu with i18n
+    private void fillWithI18N(Map<String, Object> modelToRender) {
+        Map<String, String> i18n = [:]
+
+        i18n.put("summary", message(code: 'de.iteratec.chart.contextMenu.summary', default: 'Summary'))
+        i18n.put("waterfall", message(code: 'de.iteratec.chart.contextMenu.waterfall', default: 'Waterfall'))
+        i18n.put("performanceReview", message(code: 'de.iteratec.chart.contextMenu.performanceReview', default: 'Performance Review'))
+        i18n.put("contentBreakdown", message(code: 'de.iteratec.chart.contextMenu.contentBreakdown', default: 'Content Breakdown'))
+        i18n.put("domains", message(code: 'de.iteratec.chart.contextMenu.domains', default: 'Domains'))
+        i18n.put("screenshot", message(code: 'de.iteratec.chart.contextMenu.screenshot', default: 'Screenshot'))
+        i18n.put("filmstrip", message(code: 'de.iteratec.chart.contextMenu.filmstrip', default: 'Filmstrip'))
+        i18n.put("compareFilmstrips", message(code: 'de.iteratec.chart.contextMenu.compareFilmstrips', default: 'Compare Filmstrips'))
+        i18n.put("selectPoint", message(code: 'de.iteratec.chart.contextMenu.selectPoint', default: 'Select Point'))
+        i18n.put("deselectPoint", message(code: 'de.iteratec.chart.contextMenu.deselectPoint', default: 'Deselect Point'))
+        i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
+
+        modelToRender.put('i18n', i18n as JSON)
+    }
+
 
     /**
      * <p>

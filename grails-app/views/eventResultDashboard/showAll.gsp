@@ -512,6 +512,8 @@
         </g:if>
         </g:each>
 
+        var chartContextMenuI18N = ${i18n};
+
         function setAdjustments() {
             var chartTitle = "${chartTitle}";
             var chartWidth = "${chartWidth}";

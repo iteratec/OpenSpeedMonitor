@@ -64,15 +64,37 @@ $(function () {
         },
 
         items: {
-            "summary": {name: "Summary", icon: "fa-file-text-o"},
-            "waterfallView": {name: "Waterfall", icon: "fa-bars"},
-            "performanceReview": {name: "Performance Review", icon: "fa-check"},
-            "contentBreakdown": {name: "Content Breakdown", icon: "fa-pie-chart"},
-            "domains": {name: "Domains", icon: "fa-list"},
-            "screenshot": {name: "Screen Shot", icon: "fa-picture-o"},
-            "filmstrip": {name: "Filmstrip", icon: "fa-film"},
+            "summary": {
+                name: chartContextMenuI18N.summary,
+                icon: "fa-file-text-o"
+            },
+            "waterfallView": {
+                name: chartContextMenuI18N.waterfall,
+                icon: "fa-bars"
+            },
+            "performanceReview": {
+                name: chartContextMenuI18N.performanceReview,
+                icon: "fa-check"
+            },
+            "contentBreakdown": {
+                name: chartContextMenuI18N.contentBreakdown,
+                icon: "fa-pie-chart"
+            },
+            "domains": {
+                name: chartContextMenuI18N.domains,
+                icon: "fa-list"
+            },
+            "screenshot": {
+                name: chartContextMenuI18N.screenshot,
+                icon: "fa-picture-o"
+            },
+            "filmstrip": {
+                name: chartContextMenuI18N.filmstrip,
+                icon: "fa-film"
+            },
             "compare": {
-                name: "Compare Filmstrips", icon: "fa-columns",
+                name: chartContextMenuI18N.compareFilmstrips,
+                icon: "fa-columns",
                 // show only if at least one point is already selected
                 visible: function () {
                     return rickshawGraphBuilder.graph.selectedPoints.length > 0;
@@ -87,7 +109,8 @@ $(function () {
             },
             separator: "-----",
             "selectPoint": {
-                name: "Select Point", icon: "fa-dot-circle-o",
+                name: chartContextMenuI18N.selectPoint,
+                icon: "fa-dot-circle-o",
                 // show only if point is not selected yet
                 visible: function () {
                     return isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
@@ -97,7 +120,8 @@ $(function () {
                 }
             },
             "deselectPoint": {
-                name: "Deselect Point", icon: "fa-trash-o",
+                name: chartContextMenuI18N.deselectPoint,
+                icon: "fa-trash-o",
                 // show only if point is already selected
                 visible: function () {
                     return !isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
@@ -120,7 +144,7 @@ $(function () {
 
         items: {
             "comparePoints": {
-                name: "Compare Filmstrips",
+                name: chartContextMenuI18N.compareFilmstrips,
                 icon: "fa-columns",
                 // show only if at least one point is already saved
                 visible: function () {
@@ -131,7 +155,7 @@ $(function () {
                 }
             },
             "deselectAllPoints": {
-                name: "Deselect all Points",
+                name: chartContextMenuI18N.deselectAllPoints,
                 icon: "fa-trash-o",
                 // show only if at least one point is already saved
                 visible: function () {
