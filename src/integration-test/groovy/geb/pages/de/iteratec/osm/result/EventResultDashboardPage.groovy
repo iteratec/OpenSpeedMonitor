@@ -70,6 +70,8 @@ class EventResultDashboardPage extends Page {
         includeNativeConnectivityButton{$("#includeNativeConnectivity")}
         includeCustomConnectivityButton{$("#includeCustomConnectivity")}
 
+        tabJobSelection{$("#tabJobSelectionElement")}
+        tabVariableSelection{$("#tabVariableSelectionElement")}
 
 
     }

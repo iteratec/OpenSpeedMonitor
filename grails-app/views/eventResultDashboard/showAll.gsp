@@ -102,10 +102,10 @@
     </g:if>
     <g:else>
 
-        <g:if test="${startedBatchActivity == null}"> %{--User tried to load assets--}%
+        <g:if test="${startedBatchActivity == null}"> %{--User didnt try to load assets--}%
             <g:if test="${request.queryString}">
                 <g:if test="${!warnAboutLongProcessingTime}">
-                    <div class="col-md-12">
+                    <div class="col-md-12" id="noDataForCurrentSelectionWarning">
                         <div class="alert alert-info text-center">
                             <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
                         </div>
@@ -203,8 +203,8 @@
             </div>
             <!-- Actual tabs -->
             <ul class="nav nav-tabs card-well-tabs">
-                <li class="active">
-                    <a data-toggle="tab" href="#tabJobSelection">
+                <li class="active" >
+                    <a data-toggle="tab" href="#tabJobSelection" id="tabJobSelectionElement" >
                         <g:message code="de.iteratec.sri.wptrd.time.filter.heading"
                                    default="Zeitraum ausw&auml;hlen"/>
                         &amp;
@@ -213,7 +213,7 @@
                     </a>
                 </li>
                 <li>
-                    <a data-toggle="tab" href="#tabVariableSelection">
+                    <a data-toggle="tab"  href="#tabVariableSelection" id="tabVariableSelectionElement">
                         <g:message code="de.iteratec.sri.wptrd.measurement.filter.heading"
                                    default="Messwerte auw&auml;hlen"/>
                     </a>
