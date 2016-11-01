@@ -134,10 +134,10 @@ class RickshawHtmlCreater {
                 }
             }
 
-            sw << prefix1 + """ { measurandGroup: "${graph.measurandGroup}",  """
-            sw << """ yAxisLabel: "${label}","""
-            sw << """ name: "${graph.label}", """
-            sw << """ data: """ + generateDataPoints(graph) + """ }"""
+            sw << prefix1 + """ { measurandGroup: "${graph.measurandGroup}", """
+            sw << """yAxisLabel: "${label}", """
+            sw << """name: "${graph.label}", """
+            sw << """data: """ + generateDataPoints(graph) + """ }"""
             prefix1 = ", "
         }
 
@@ -168,27 +168,20 @@ class RickshawHtmlCreater {
 				url = eachPoint.sourceURL.toString();
             }
 
-            // the enum is declared in the wrong order
-            def cached = eachPoint.chartPointWptInfo.cachedView.isCached()
+            def wptResultInfo = null
+            if (eachPoint.chartPointWptInfo) {
+                // the enum is declared in the wrong order
+                def cached = eachPoint.chartPointWptInfo.cachedView.isCached()
 
-            // json object containing all relevant infos to create a url to jump to wpt
-            def pointInfo = eachPoint.chartPointWptInfo
-            def wptResultInfo =  """{
-                wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}",
-                testId: "${pointInfo.testId.toString()}",
-                numberOfWptRun: ${pointInfo.numberOfWptRun.toString()},
-                oneBaseStepIndexInJourney: "${pointInfo.oneBaseStepIndexInJourney.toString()}",
-                cachedView: ${cached}
-            }""";
+                // json object containing all relevant infos to create a url to jump to wpt
+                def pointInfo = eachPoint.chartPointWptInfo
+                wptResultInfo =  """{ wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}", testId: "${pointInfo.testId.toString()}", numberOfWptRun: ${pointInfo.numberOfWptRun.toString()}, oneBaseStepIndexInJourney: ${pointInfo.oneBaseStepIndexInJourney.toString()}, cachedView: ${cached} }""";
+            }
+
 
             testingAgent = eachPoint.testingAgent !=null ? ',testAgent:\'' + eachPoint.testingAgent + '\'' : ''
-            sw << prefix +""" {
-                x: ${eachPoint.time / 1000},
-                y: ${csiAggregation},
-                url: "${url}" ${testingAgent},
-                wptResultInfo: ${wptResultInfo}
-            }"""
-            prefix = ","
+            sw << prefix +"""{ x: ${eachPoint.time / 1000}, y: ${csiAggregation}, url: "${url}" ${testingAgent}, wptResultInfo: ${wptResultInfo} }"""
+            prefix = ", "
         }
         sw << """ ]"""
     }
