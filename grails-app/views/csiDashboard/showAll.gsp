@@ -207,8 +207,47 @@
                     </p>
                 </div>
             </g:if>
+            <div class="action-row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <g:actionSubmit id="chart-submit"
+                                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
+                                        action="showAll" class="btn btn-primary" />
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <g:actionSubmit action="csiValuesCsv"
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}" />
+                            </li>
 
-
+                            <sec:ifLoggedIn>
+                                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                                    <li class="separator"></li>
+                                    <li>
+                                        <a href="#CreateUserspecifiedDashboardModal" role="button" data-toggle="modal">
+                                            ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
+                                        </a>
+                                    </li>
+                                </sec:ifAnyGranted>
+                            </sec:ifLoggedIn>
+                            <g:if test="${params.dashboardID}">
+                                <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                                    <li>
+                                        <a href="#" role="button" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
+                                            ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
+                                        </a>
+                                        <g:render template="/_common/modals/deleteCustomDashboard"/>
+                                    </li>
+                                </g:if>
+                            </g:if>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div class="row card-well">
                 <div class="col-md-4">
                     <div class="card">
@@ -289,29 +328,6 @@
                                       'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
                                       'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
                                       'showExtendedConnectivitySettings': false]"/>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <g:actionSubmit id="chart-submit"
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                                    action="showAll" class="btn btn-primary" />
-                    <g:actionSubmit
-                            value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
-                            action="csiValuesCsv" class="btn btn-primary" />
-                    <sec:ifLoggedIn>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                            <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
-                               data-toggle="modal">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-                        </sec:ifAnyGranted>
-                    </sec:ifLoggedIn>
-                    <g:if test="${params.dashboardID}">
-                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
-                            <a href="#" role="button" class="btn btn-primary"
-                               onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
-                            <g:render template="/_common/modals/deleteCustomDashboard"/>
-                        </g:if>
-                    </g:if>
                 </div>
             </div>
             <g:if test="${exceedsTimeframeBoundary}">
