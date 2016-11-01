@@ -172,7 +172,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         to PageIndexPage
 
         then: "only one hundred pages are shown"
-        pageTableRows.size() == 100
+        waitFor {pageTableRows.size() == 100}
 
         and: "there is pagination"
         def pageCount = (int) (250 / 100) + 1

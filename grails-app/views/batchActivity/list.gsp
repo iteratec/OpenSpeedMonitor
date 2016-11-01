@@ -96,7 +96,7 @@
     <asset:javascript src="batchactivity/batchActivityList.js"/>
     <asset:script type="text/javascript">
         $(document).ready(
-            initBatch( '${createLink(action: 'updateTable', absolute: true)}',
+            OpenSpeedMonitor.batchActivity.init( '${createLink(action: 'updateTable', absolute: true)}',
                     '${createLink(action: 'checkForUpdate', absolute: true)}',
                     '${createLink(action: 'getUpdate', absolute: true)}',
                     '${batchActivityCount}',

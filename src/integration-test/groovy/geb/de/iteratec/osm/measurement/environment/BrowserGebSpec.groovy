@@ -190,7 +190,7 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         to BrowserIndexPage
 
         then: "only one hundred browsers are shown"
-        browserTableRows.size() == 100
+        waitFor {browserTableRows.size() == 100}
 
         and: "there is pagination"
         def pageCount = (int) (250 / 100) + 1

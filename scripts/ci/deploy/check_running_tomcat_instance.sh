@@ -17,10 +17,10 @@ fi
 
 # detect port to undeploy (tomcat with actual osm version) and to deploy (tomcat without osm)
 ports=()
-if(curl -u "${bamboo_tomcat_TOMCAT_ADMIN_USERNAME}:${bamboo_tomcat_TOMCAT_ADMIN_PASSWORD}" "http://${bamboo_tomcat_HOST_TO_DEPLOY_TO}:${bamboo_tomcat_TOMCAT_PORT1}/manager/text/list" | grep OpenSpeedMonitor);
+if(curl -I "http://${bamboo_tomcat_HOST_TO_DEPLOY_TO}:${bamboo_tomcat_TOMCAT_PORT1}/about" | grep "HTTP/1.1 200 OK");
     then ports[${#ports[*]}]=$bamboo_tomcat_TOMCAT_PORT1
 fi
-if(curl -u "${bamboo_tomcat_TOMCAT_ADMIN_USERNAME}:${bamboo_tomcat_TOMCAT_ADMIN_PASSWORD}" "http://${bamboo_tomcat_HOST_TO_DEPLOY_TO}:${bamboo_tomcat_TOMCAT_PORT2}/manager/text/list" | grep OpenSpeedMonitor);
+if(curl -I "http://${bamboo_tomcat_HOST_TO_DEPLOY_TO}:${bamboo_tomcat_TOMCAT_PORT2}/about" | grep "HTTP/1.1 200 OK");
     then ports[${#ports[*]}]=$bamboo_tomcat_TOMCAT_PORT2
 fi
 if [ ${#ports[*]} -eq 0 ];

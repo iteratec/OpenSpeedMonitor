@@ -1,5 +1,5 @@
 /*
-*= require codemirror/codemirror.css
+*= require bower_components/codemirror/lib/codemirror.css
 *= require codemirror/warnings.css
-*= require hint/show-hint.css
+*= require bower_components/codemirror/addon/hint/show-hint.css
 */

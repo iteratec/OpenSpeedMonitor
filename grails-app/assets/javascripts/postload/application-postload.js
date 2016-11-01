@@ -24,7 +24,7 @@
  * @param dataFromGsp This contains all init data and is filled in _common/_postloadInitializedJS.gsp
  * @constructor
  */
-//= require spin/spin.min.js
+//= require bower_components/spin.js/spin.js
 //= require_self
 function PostLoaded(dataFromGsp){
 
