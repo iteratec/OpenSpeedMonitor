@@ -25,6 +25,13 @@
             </g:hasErrors>
         </g:if>
         <form method="get" action="">
+            <div class="action-row">
+                <div class="col-md-12">
+                    <g:actionSubmit class="btn btn-primary pull-right"
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
+                                    action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" />
+                </div>
+            </div>
             <div class="row card-well">
                 <div class="col-md-4">
                     <g:render template="/dateSelection/startAndEnddateSelection"
@@ -58,13 +65,6 @@
                                     'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles,
                                     'showExtendedConnectivitySettings'  : true]}"/>
                 </g:else>
-            </div>
-            <div class="row section">
-                <div class="col-md-12">
-                    <g:actionSubmit
-                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default':'Show')}"
-                        action="${ showSpecificJob ? 'listResultsForJob' : 'listResults'}" class="btn btn-primary" />
-                </div>
             </div>
         </form>
 
