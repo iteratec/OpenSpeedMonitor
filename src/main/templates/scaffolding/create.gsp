@@ -18,7 +18,7 @@
             </ul>
             </g:hasErrors>
             <g:form action="save" class="form-horizontal">
-                <fieldset class="form">
+                <fieldset class="form-horizontal">
                     <f:all bean="${propertyName}"/>
                 </fieldset>
                 <div>

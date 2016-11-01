@@ -19,7 +19,7 @@
             </g:hasErrors>
             <g:form resource="\${${propertyName}}" method="PUT" class="form-horizontal">
                 <g:hiddenField name="version" value="\${${propertyName}?.version}" />
-                <fieldset class="form">
+                <fieldset class="form-horizontal">
                     <f:all bean="${propertyName}"/>
                 </fieldset>
                 <div>

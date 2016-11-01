@@ -22,7 +22,7 @@ class BrowserAliasCreatePage extends I18nGebPage {
     }
 
     def selectBrowserByID(String browserID) {
-        $(".controls").$("select").click()
-        $(".controls").$("select").find("option").find{ it.value() == browserID }.click()
+        $("form").$("select").click()
+        $("form").$("select").find("option").find{ it.value() == browserID }.click()
     }
 }
