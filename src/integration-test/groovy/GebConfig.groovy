@@ -25,12 +25,20 @@ environments {
 
     // ./gradlew -Dgeb.env=chrome integrationTest
     chrome {
-        driver = { new ChromeDriver() }
+        driver = {
+            def driverInstance = new ChromeDriver()
+            driverInstance.manage().window().maximize()
+            driverInstance
+        }
     }
 
     // ./gradlew -Dgeb.env=firefox integrationTest
     firefox {
-        driver = { new FirefoxDriver() }
+        driver = {
+            def driverInstance = new FirefoxDriver()
+            driverInstance.manage().window().maximize()
+            driverInstance
+        }
     }
 
 }
