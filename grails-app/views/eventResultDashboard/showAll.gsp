@@ -491,6 +491,7 @@
     </g:else>
 </div>
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
+<g:render template="/_common/modals/chartContextMenuErrorDialog" />
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>

@@ -290,7 +290,7 @@ function selectPoint(nearestPoint) {
         var server = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl;
 
         if (server != nearestPoint.value.wptResultInfo.wptServerBaseurl) {
-            alert("Multiple selection is only possible for measurements on the same server.");
+            $("#ContextMenuErrorModal").modal();
             return;
         }
     }
