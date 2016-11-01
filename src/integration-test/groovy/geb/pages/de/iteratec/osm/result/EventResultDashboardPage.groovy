@@ -27,7 +27,6 @@ class EventResultDashboardPage extends Page {
         chartTitle { $("#rickshaw_chart_title").attr("innerHTML") }
         chartWidthInputField { $("#dia-width") }
         chartheightInputField { $("#dia-height") }
-        diaChangeChartsizeButton { $("#dia-change-chartsize") }
         diaYAxisMinInputField { $(".dia-y-axis-min") }
         diaYAxisMaxInputField { $(".dia-y-axis-max") }
         diaChangeYAxisButton { $(".dia-change-yaxis") }
@@ -73,6 +72,8 @@ class EventResultDashboardPage extends Page {
         tabJobSelection{$("#tabJobSelectionElement")}
         tabVariableSelection{$("#tabVariableSelectionElement")}
 
+        adjustChartButton{$("#rickshaw_adjust_chart_link")}
+        adjustChartApply{$("#adjustChartApply")}
 
     }
 
@@ -112,12 +113,12 @@ class EventResultDashboardPage extends Page {
     public void clickSaveAsDashboardButton() {
         // Scroll object into view so it becomes clickable
         sleep(100)
-        String jqueryString = "jQuery(\'#bottomCommitButtons\')[0].scrollIntoView();"
+        String jqueryString = "jQuery(\'#graphButtonHtmlId\')[0].scrollIntoView();"
         js.exec(jqueryString)
         sleep(100)
         js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
         sleep(100)
-        $("a",href:'#CreateUserspecifiedDashboardModal').click()
+        $('#graphButtonHtmlId').click()
 
     }
 }
