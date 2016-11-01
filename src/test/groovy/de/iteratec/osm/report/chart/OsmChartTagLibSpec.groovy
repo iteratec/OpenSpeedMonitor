@@ -20,8 +20,10 @@ package de.iteratec.osm.report.chart
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.TestDataUtil
+import de.iteratec.osm.result.CachedView
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
+import groovy.json.JsonSlurper
 import groovy.util.slurpersupport.NodeChild
 import spock.lang.Specification
 import static org.junit.Assert.assertTrue
@@ -60,11 +62,38 @@ class OsmChartTagLibSpec extends Specification {
 		Date oneHourAfterNow = new Date(1373635396000L);
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
-		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), csiAggregation: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
-				"https://www.example.com/now"), testingAgent: null);
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), csiAggregation: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), csiAggregation: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
-				"https://www.example.com/twoHoursAfterNow"), testingAgent: null);
+        WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
+				serverBaseUrl: "http://www.example.com/",
+				testId: "161006_8A_YX",
+				numberOfWptRun: 1,
+                cachedView: CachedView.UNCACHED,
+				oneBaseStepIndexInJourney: 4
+		);
+
+		OsmChartPoint nowPoint = new OsmChartPoint(
+                time: now.getTime(),
+                csiAggregation: 1.5d,
+                countOfAggregatedResults: 1,
+                sourceURL: new URL("https://www.example.com/now"),
+                testingAgent: null,
+                chartPointWptInfo: chartPointWptInfo
+        );
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(
+                time: oneHourAfterNow.getTime(),
+                csiAggregation: 3d,
+                countOfAggregatedResults: 1,
+                sourceURL: null,
+                testingAgent: null,
+                chartPointWptInfo: chartPointWptInfo
+        );
+		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(
+                time: twoHoursAfterNow.getTime(),
+                csiAggregation: 2.3d,
+                countOfAggregatedResults: 1,
+                sourceURL: new URL("https://www.example.com/twoHoursAfterNow"),
+                testingAgent: null,
+                chartPointWptInfo: chartPointWptInfo
+        );
 
 		OsmChartGraph graph=new OsmChartGraph();
 		graph.setLabel("job1");
@@ -135,10 +164,54 @@ class OsmChartTagLibSpec extends Specification {
         String javascript = javascriptRickshawNode.text();
         List<String> javascriptLines = javascript.tokenize("\n")*.trim()
 
+//        def jsonSlurper = new JsonSlurper()
+//        def javascriptLinesAsJSON = jsonSlurper.parseText('"' + javascriptLines[6] + '"')
+//        def expected = jsonSlurper.parseText("""
+//            data : [ { " +
+//                "measurandGroup: \"PERCENTAGES\"," +
+//                "yAxisLabel: \"Antwortzeit [ms]\"," +
+//                "name: \"job1\"," +
+//                "data: [ {" +
+//                        "x: 1373631796," +
+//                        "y: 1.5," +
+//                        "url: \"https://www.example.com/now\"," +
+//                        "wptResultInfo: {" +
+//                            "wptServerBaseurl: \"http://www.example.com/\"," +
+//                            "testId: \"161006_8A_YX\"," +
+//                            "numberOfWptRun: 1," +
+//                            "cachedView: false," +
+//                            "oneBaseStepIndexInJourney: 4"+
+//                        "}" +
+//                    "}, { " +
+//                        "x: 1373635396," +
+//                        "y: 3.0," +
+//                        "url: \"undefined\"," +
+//                        "wptResultInfo: {" +
+//                            "wptServerBaseurl: \"http://www.example.com/\"," +
+//                            "testId: \"161006_8A_YX\"," +
+//                            "numberOfWptRun: 1," +
+//                            "cachedView: false," +
+//                            "oneBaseStepIndexInJourney: 4"+
+//                        "}" +
+//                    " }, {" +
+//                        "x: 1373638996," +
+//                        "y: 2.3," +
+//                        "url: \"https://www.example.com/twoHoursAfterNow\"," +
+//                        "wptResultInfo: {" +
+//                            "wptServerBaseurl: \"http://www.example.com/\"," +
+//                            "testId: \"161006_8A_YX\"," +
+//                            "numberOfWptRun: 1," +
+//                            "cachedView: false," +
+//                            "oneBaseStepIndexInJourney: 4"+
+//                        "}" +
+//                "} ] " +
+//            "} ]
+//        """)
+
         javascriptLines[0] == 'var CHARTLIB="RICKSHAW";'
         javascriptLines[1] == 'var rickshawGraphBuilder;'
         javascriptLines[4] == "divId: \"myDivId\","
-        javascriptLines[6] == "data : [ { measurandGroup: \"PERCENTAGES\",   yAxisLabel: \"Antwortzeit [ms]\", name: \"job1\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] } ],"
+        javascriptLines[6] == "data : [ { measurandGroup: \"PERCENTAGES\", yAxisLabel: \"Antwortzeit [ms]\", name: \"job1\", data: [ { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } }, { x: 1373635396, y: 3.0, url: \"undefined\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } } ] } ],"
         javascriptLines[7] == "height: 400,"
 
 	}
@@ -158,11 +231,38 @@ class OsmChartTagLibSpec extends Specification {
 		Date oneHourAfterNow = new Date(1373635396000L);
 		Date twoHoursAfterNow = new Date(1373638996000L);
 
-		OsmChartPoint nowPoint = new OsmChartPoint(time: now.getTime(), csiAggregation: 1.5d, countOfAggregatedResults: 1, sourceURL: new URL(
-				"https://www.example.com/now"), testingAgent: null);
-		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(time: oneHourAfterNow.getTime(), csiAggregation: 3d, countOfAggregatedResults: 1, sourceURL: null, testingAgent: null);
-		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(time: twoHoursAfterNow.getTime(), csiAggregation: 2.3d, countOfAggregatedResults: 1, sourceURL: new URL(
-				"https://www.example.com/twoHoursAfterNow"), testingAgent: null);
+        WptEventResultInfo chartPointWptInfo = new WptEventResultInfo(
+                serverBaseUrl: "http://www.example.com/",
+                testId: "161006_8A_YX",
+                numberOfWptRun: 1,
+                cachedView: CachedView.UNCACHED,
+                oneBaseStepIndexInJourney: 4
+        );
+
+		OsmChartPoint nowPoint = new OsmChartPoint(
+                time: now.getTime(),
+                csiAggregation: 1.5d,
+                countOfAggregatedResults: 1,
+                sourceURL: new URL("https://www.example.com/now"),
+                testingAgent: null,
+                chartPointWptInfo: chartPointWptInfo
+        );
+		OsmChartPoint oneHourAfterNowPoint_withoutURL = new OsmChartPoint(
+                time: oneHourAfterNow.getTime(),
+                csiAggregation: 3d,
+                countOfAggregatedResults: 1,
+                sourceURL: null,
+                testingAgent: null,
+                chartPointWptInfo: chartPointWptInfo
+        );
+		OsmChartPoint twoHoursAfterNowPoint = new OsmChartPoint(
+                time: twoHoursAfterNow.getTime(),
+                csiAggregation: 2.3d,
+                countOfAggregatedResults: 1,
+                sourceURL: new URL("https://www.example.com/twoHoursAfterNow"),
+                testingAgent: null,
+                chartPointWptInfo: chartPointWptInfo
+        );
 
 		OsmChartGraph graph1=new OsmChartGraph();
 		graph1.setMeasurandGroup(MeasurandGroup.LOAD_TIMES)
@@ -250,7 +350,7 @@ class OsmChartTagLibSpec extends Specification {
         javascriptLines[0] == 'var CHARTLIB="RICKSHAW";'
         javascriptLines[1] == 'var rickshawGraphBuilder;'
         javascriptLines[4] == "divId: \"myDivId\","
-        javascriptLines[6] == "data : [ { measurandGroup: \"LOAD_TIMES\",   yAxisLabel: \"Load Times\", name: \"job1\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] },  { measurandGroup: \"PERCENTAGES\",   yAxisLabel: \"Percentages\", name: \"job2\",  data: [  { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" }, { x: 1373635396, y: 3.0, url: \"undefined\" }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" } ] } ],"
+        javascriptLines[6] == "data : [ { measurandGroup: \"LOAD_TIMES\", yAxisLabel: \"Load Times\", name: \"job1\", data: [ { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } }, { x: 1373635396, y: 3.0, url: \"undefined\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } } ] },  { measurandGroup: \"PERCENTAGES\", yAxisLabel: \"Percentages\", name: \"job2\", data: [ { x: 1373631796, y: 1.5, url: \"https://www.example.com/now\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } }, { x: 1373635396, y: 3.0, url: \"undefined\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } }, { x: 1373638996, y: 2.3, url: \"https://www.example.com/twoHoursAfterNow\" , wptResultInfo: { wptServerBaseurl: \"http://www.example.com/\", testId: \"161006_8A_YX\", numberOfWptRun: 1, oneBaseStepIndexInJourney: 4, cachedView: false } } ] } ],"
         javascriptLines[7] == "height: 600,"
 
 	}
