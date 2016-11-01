@@ -331,3 +331,26 @@ body {
 #selectionSummary td .unit {
   font-weight: bold;
 }
+
+.dropdown-menu > li > input[type="submit"] {
+  display: block;
+  border: 0;
+  padding: 3px 20px;
+  width: 100%;
+  text-align: left;
+  clear: both;
+  background: transparent;
+  font-weight: normal;
+  line-height: @line-height-base;
+  color: @dropdown-link-color;
+  white-space: nowrap;
+}
+
+.dropdown-menu > li > input[type="submit"] {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: @dropdown-link-hover-color;
+    background-color: @dropdown-link-hover-bg;
+  }
+}

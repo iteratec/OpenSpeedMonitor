@@ -143,111 +143,127 @@
 <div class="row">
     <div class="col-md-12">
         <form method="get" action="" id="dashBoardParamsForm">
-        <ul class="nav nav-tabs card-well-tabs">
-            <li class="active">
-                <a data-toggle="tab" href="#tabJobSelection">
-                    <g:message code="de.iteratec.sri.wptrd.time.filter.heading"
-                               default="Zeitraum ausw&auml;hlen"/>
-                    &amp;
-                    <g:message code="de.iteratec.sri.wptrd.jobs.filter.heading"
-                               default="Jobs filtern"/>
-                </a>
-            </li>
-            <li>
-                <a data-toggle="tab" href="#tabVariableSelection">
-                    <g:message code="de.iteratec.sri.wptrd.measurement.filter.heading"
-                               default="Messwerte auw&auml;hlen"/>
-                </a>
-            </li>
-        </ul>
-        <div class="tab-content card-well">
-            <div class="tab-pane in active" id="tabJobSelection">
-                <g:render template="selectMeasuringsAndTimeFrame"
-                          model="${['selectedTimeFrameInterval'       : selectedTimeFrameInterval,
-                                    'from'                            : from,
-                                    'fromHour'                        : fromHour,
-                                    'to'                              : to,
-                                    'toHour'                          : toHour,
-                                    'selectedInterval'                : selectedInterval,
-                                    'csiAggregationIntervals'         : csiAggregationIntervals,
-                                    'locationsOfBrowsers'             : locationsOfBrowsers,
-                                    'eventsOfPages'                   : eventsOfPages,
-                                    'folders'                         : folders,
-                                    'selectedFolder'                  : selectedFolder,
-                                    'pages'                           : pages,
-                                    'selectedPage'                    : selectedPage,
-                                    'measuredEvents'                  : measuredEvents,
-                                    'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                                    'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                                    'browsers'                        : browsers,
-                                    'selectedBrowsers'                : selectedBrowsers,
-                                    'selectedAllBrowsers'             : selectedAllBrowsers,
-                                    'locations'                       : locations,
-                                    'selectedLocations'               : selectedLocations,
-                                    'selectedAllLocations'            : selectedAllLocations,
-                                    'connectivityProfiles'            : connectivityProfiles,
-                                    'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                    'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                    'showExtendedConnectivitySettings': true]}"/>
-            </div>
-            <div class="tab-pane" id="tabVariableSelection">
-                <g:render template="selectMeasuredVariables"
-                          model="${['selectedAggrGroupValuesUnCached' : selectedAggrGroupValuesUnCached,
-                                    'docCompleteTimeInMillisecsUncached': docCompleteTimeInMillisecsUncached,
-                                    'aggrGroupValuesUnCached': aggrGroupValuesUnCached,
-                                    'aggrGroupValuesCached': aggrGroupValuesCached,
-                                    'selectedAggrGroupValuesCached': selectedAggrGroupValuesCached,
-                                    'trimBelowLoadTimes': trimBelowLoadTimes,
-                                    'trimAboveLoadTimes': trimAboveLoadTimes,
-                                    'trimBelowRequestCounts': trimBelowRequestCounts,
-                                    'trimAboveRequestCounts': trimAboveRequestCounts,
-                                    'trimBelowRequestSizes': trimBelowRequestSizes,
-                                    'trimAboveRequestSizes': trimAboveRequestSizes]}"/>
-            </div>
-        </div>
-
-        <div id="bottomCommitButtons" class="row">
-            <div class="col-md-12">
-                <g:actionSubmit
-                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                        action="showAll"
-                        id="graphButtonHtmlId" class="btn btn-primary"/>
-                <g:actionSubmit
-                        value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
-                        action="downloadCsv"
-                        role="button" class="btn btn-primary"/>
-                <g:if test="${persistenceOfAssetRequestsEnabled}">
-                    <g:actionSubmit
-                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
-                        action="showDetailData"  role="button" class="btn btn-primary"/>
-                </g:if>
-                <sec:ifLoggedIn>
-                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                        <a href="#CreateUserspecifiedDashboardModal" role="button"
-                           class="btn btn-primary" data-toggle="modal">
-                            ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
-                        </a>
-                    </sec:ifAnyGranted>
-                </sec:ifLoggedIn>
-                <g:if test="${params.dashboardID}">
-                    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
-                        <a href="#" role="button" class="btn btn-primary"
-                           onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
-                        <g:render template="/_common/modals/deleteCustomDashboard"/>
+            <!-- Split button to show/download/detail analysis, etc -->
+            <div class="btn-group pull-right">
+                <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
+                                action="showAll" id="graphButtonHtmlId" class="btn btn-primary"/>
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <g:if test="${eventResultValues}">
+                        <li>
+                            <a href="#" id="dia-save-chart-as-png" style="vertical-align: top;">
+                                <g:message code="de.iteratec.ism.ui.button.save.name"/>
+                            </a>
+                        </li>
                     </g:if>
-                </g:if>
-                <sec:ifLoggedIn>
+                    <li>
+                        <g:actionSubmit
+                                value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Download CSV')}"
+                                action="downloadCsv" role="button"/>
+                    </li>
+                    <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                        <li role="separator" class="divider"></li>
+                        <li>
+                            <a href="#CreateUserspecifiedDashboardModal" data-toggle="modal" role="button">
+                                ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
+                            </a>
+                        </li>
+                    </sec:ifAnyGranted>
+                    <g:if test="${params.dashboardID}">
+                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                            <li>
+                                <a href="#" role="button"
+                                   onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
+                                <g:render template="/_common/modals/deleteCustomDashboard"/>
+                            </li>
+                        </g:if>
+                    </g:if>
+                    <li role="separator" class="divider"></li>
+                    <g:if test="${persistenceOfAssetRequestsEnabled}">
+                        <li>
+                            <g:actionSubmit
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.detailData', 'default': 'Detail Data')}"
+                                    action="showDetailData" />
+                        </li>
+                    </g:if>
                     <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                         <g:if test="${persistenceOfAssetRequestsEnabled}">
-                            <g:actionSubmit
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
-                                    action="sendFetchAssetsAsBatchCommand"
-                                    class="btn btn-primary" />
+                            <li>
+                                <g:actionSubmit
+                                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.loadAssets', 'default': 'Load Assets')}"
+                                        action="sendFetchAssetsAsBatchCommand" />
+                            </li>
                         </g:if>
                     </sec:ifAnyGranted>
-                </sec:ifLoggedIn>
+                </ul>
             </div>
-        </div>
+            <!-- Actual tabs -->
+            <ul class="nav nav-tabs card-well-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#tabJobSelection">
+                        <g:message code="de.iteratec.sri.wptrd.time.filter.heading"
+                                   default="Zeitraum ausw&auml;hlen"/>
+                        &amp;
+                        <g:message code="de.iteratec.sri.wptrd.jobs.filter.heading"
+                                   default="Jobs filtern"/>
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#tabVariableSelection">
+                        <g:message code="de.iteratec.sri.wptrd.measurement.filter.heading"
+                                   default="Messwerte auw&auml;hlen"/>
+                    </a>
+                </li>
+            </ul>
+            <div class="tab-content card-well">
+                <div class="tab-pane in active" id="tabJobSelection">
+                    <g:render template="selectMeasuringsAndTimeFrame"
+                              model="${['selectedTimeFrameInterval'       : selectedTimeFrameInterval,
+                                        'from'                            : from,
+                                        'fromHour'                        : fromHour,
+                                        'to'                              : to,
+                                        'toHour'                          : toHour,
+                                        'selectedInterval'                : selectedInterval,
+                                        'csiAggregationIntervals'         : csiAggregationIntervals,
+                                        'locationsOfBrowsers'             : locationsOfBrowsers,
+                                        'eventsOfPages'                   : eventsOfPages,
+                                        'folders'                         : folders,
+                                        'selectedFolder'                  : selectedFolder,
+                                        'pages'                           : pages,
+                                        'selectedPage'                    : selectedPage,
+                                        'measuredEvents'                  : measuredEvents,
+                                        'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
+                                        'selectedMeasuredEvents'          : selectedMeasuredEvents,
+                                        'browsers'                        : browsers,
+                                        'selectedBrowsers'                : selectedBrowsers,
+                                        'selectedAllBrowsers'             : selectedAllBrowsers,
+                                        'locations'                       : locations,
+                                        'selectedLocations'               : selectedLocations,
+                                        'selectedAllLocations'            : selectedAllLocations,
+                                        'connectivityProfiles'            : connectivityProfiles,
+                                        'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
+                                        'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
+                                        'showExtendedConnectivitySettings': true]}"/>
+                </div>
+                <div class="tab-pane" id="tabVariableSelection">
+                    <g:render template="selectMeasuredVariables"
+                              model="${['selectedAggrGroupValuesUnCached' : selectedAggrGroupValuesUnCached,
+                                        'docCompleteTimeInMillisecsUncached': docCompleteTimeInMillisecsUncached,
+                                        'aggrGroupValuesUnCached': aggrGroupValuesUnCached,
+                                        'aggrGroupValuesCached': aggrGroupValuesCached,
+                                        'selectedAggrGroupValuesCached': selectedAggrGroupValuesCached,
+                                        'trimBelowLoadTimes': trimBelowLoadTimes,
+                                        'trimAboveLoadTimes': trimAboveLoadTimes,
+                                        'trimBelowRequestCounts': trimBelowRequestCounts,
+                                        'trimAboveRequestCounts': trimAboveRequestCounts,
+                                        'trimBelowRequestSizes': trimBelowRequestSizes,
+                                        'trimAboveRequestSizes': trimAboveRequestSizes]}"/>
+                </div>
+            </div>
         </form>
     </div>
 </div>
