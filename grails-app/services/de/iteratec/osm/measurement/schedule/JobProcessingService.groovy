@@ -21,7 +21,7 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserverproxy.ProxyService
-import de.iteratec.osm.measurement.schedule.quartzjobs.CronDispatcherQuartzJob
+import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.transaction.NotTransactional
@@ -51,7 +51,9 @@ class JobExecutionException extends Exception {
 }
 
 enum TriggerGroup {
-    QUARTZ_TRIGGER_GROUP('OSMJobCycles'), QUARTZ_SUBTRIGGER_GROUP('OSMJobCyclePolls'), QUARTZ_TIMEOUTTRIGGER_GROUP('OSMTimeoutTriggers')
+    JOB_TRIGGER_LAUNCH('OSMJobCycles'),
+    JOB_TRIGGER_POLL('OSMJobCyclePolls'),
+    JOB_TRIGGER_TIMEOUT('OSMTimeoutTriggers')
 
     private final String value
 
@@ -265,7 +267,7 @@ class JobProcessingService {
      */
     private Trigger buildSubTrigger(Job job, String testId, Date endDate) {
         TriggerBuilder subTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
+                .withIdentity(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                 .withIntervalInSeconds(pollDelaySeconds)
                 .repeatForever()
@@ -282,7 +284,7 @@ class JobProcessingService {
      */
     private Trigger buildTimeoutTrigger(Job job, String testId, Date timeoutDate) {
         TriggerBuilder timeoutTrigger = TriggerBuilder.newTrigger()
-                .withIdentity(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value())
+                .withIdentity(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
         // timeout handling is executed immediately after the scheduler discovers a misfire situation
                 .withMisfireHandlingInstructionFireNow())
@@ -331,13 +333,13 @@ class JobProcessingService {
                 // build and schedule subtrigger for polling every pollDelaySeconds seconds.
                 // Polling is stopped by pollJobRun() when the running test is finished or on endDate at the latest
                 log.debug("Building subtrigger for polling for job ${job.label} and test-id ${params.testId} (enddate ${endDate})")
-                CronDispatcherQuartzJob.schedule(buildSubTrigger(job, params.testId, endDate), jobDataMap)
+                JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(job, params.testId, endDate), jobDataMap)
                 // schedule a timeout trigger which will fire once after endDate + a delay of
                 // declareTimeoutAfterMaxDownloadTimePlusSeconds seconds and perform cleaning operations.
                 // This will also set this job run's status to 504 Timeout.
                 Date timeoutDate = endDate + declareTimeoutAfterMaxDownloadTimePlusSeconds.seconds
                 log.debug("Building timeout trigger for job ${job.label} and test-id ${params.testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
-                CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(job, params.testId, timeoutDate), jobDataMap)
+                JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, params.testId, timeoutDate), jobDataMap)
             }
 
             return true
@@ -389,8 +391,9 @@ class JobProcessingService {
             persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
         } finally {
             if (statusCode >= 200) {
-                CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
-                CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value())
+                JobProcessingQuartzHandlerJob.removePollingLock(job, testId)
+                JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
+                JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
             }
         }
         return statusCode
@@ -417,10 +420,11 @@ class JobProcessingService {
      * also terminate it. Otherwise it will be left running on the server but polling is stopped.
      */
     public void cancelJobRun(Job job, String testId) {
-//		if (quartzScheduler.getTrigger(new TriggerKey(getSubtriggerId(job, testId)), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value()))
+//		if (quartzScheduler.getTrigger(new TriggerKey(getSubtriggerId(job, testId)), TriggerGroup.JOB_TRIGGER_POLL.value()))
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId}")
-        CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
-        CronDispatcherQuartzJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.QUARTZ_TIMEOUTTRIGGER_GROUP.value())
+        JobProcessingQuartzHandlerJob.removePollingLock(job, testId)
+        JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
+        JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
         JobResult result = JobResult.findByJobConfigLabelAndTestIdAndHttpStatusCodeLessThan(job.label, testId, 200)
         if (result) {
@@ -442,7 +446,7 @@ class JobProcessingService {
             return
         }
         TriggerBuilder builder = TriggerBuilder.newTrigger()
-                .withIdentity(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value())
+                .withIdentity(job.id.toString(), TriggerGroup.JOB_TRIGGER_LAUNCH.value())
                 .withSchedule(
                 CronScheduleBuilder.cronSchedule(job.executionSchedule)
                 // Immediately executes first misfired execution and discards other (i.e. all misfired executions are merged together).
@@ -451,17 +455,17 @@ class JobProcessingService {
         )
         Trigger cronTrigger = builder.build()
         // job is already scheduled:
-        if (quartzScheduler.getTrigger(new TriggerKey(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value()))) {
+        if (quartzScheduler.getTrigger(new TriggerKey(job.id.toString(), TriggerGroup.JOB_TRIGGER_LAUNCH.value()))) {
             if (rescheduleIfAlreadyScheduled) {
                 if (log.infoEnabled) log.info("Rescheduling Job ${job.label} (${job.executionSchedule})")
-                CronDispatcherQuartzJob.reschedule(cronTrigger, [jobId: job.id])
+                JobProcessingQuartzHandlerJob.reschedule(cronTrigger, [jobId: job.id])
             } else {
                 log.info("Ignoring Job ${job.label} as it is already scheduled.")
             }
         } else {
             try {
                 log.info("Scheduling Job ${job.label} (${job.executionSchedule})")
-                CronDispatcherQuartzJob.schedule(cronTrigger, [jobId: job.id])
+                JobProcessingQuartzHandlerJob.schedule(cronTrigger, [jobId: job.id])
             } catch (SchedulerException se) {
                 log.info("Job ${job.label} with schedule ${job.executionSchedule} can't be scheduled: ${se.message}", se)
             }
@@ -482,7 +486,7 @@ class JobProcessingService {
     @NotTransactional
     public void unscheduleJob(Job job) {
         if (log.infoEnabled) log.info("Unscheduling Job ${job.label}")
-        CronDispatcherQuartzJob.unschedule(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value())
+        JobProcessingQuartzHandlerJob.unschedule(job.id.toString(), TriggerGroup.JOB_TRIGGER_LAUNCH.value())
     }
 
     public Map<String, Integer> handleOldJobResults() {
@@ -512,15 +516,15 @@ class JobProcessingService {
                 Date timeoutDate = new DateTime(endDate).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate()
                 if (new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate() > new Date()) {
                     try {
-                        CronDispatcherQuartzJob.schedule(buildSubTrigger(jobResult.job, jobResult.testId, endDate), jobDataMap)
-                        CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, timeoutDate), jobDataMap)
+                        JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(jobResult.job, jobResult.testId, endDate), jobDataMap)
+                        JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, timeoutDate), jobDataMap)
                     } catch (Exception e) {
                         log.error("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}" + e)
                     }
                 } else {
 
                     try {
-                        CronDispatcherQuartzJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(1).toDate()), jobDataMap)
+                        JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(1).toDate()), jobDataMap)
                     } catch (Exception e) {
                         log.error("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}" + e)
                     }
