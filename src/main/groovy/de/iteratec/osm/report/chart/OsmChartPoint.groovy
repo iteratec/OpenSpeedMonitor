@@ -105,6 +105,9 @@ class OsmChartPoint{
 	 */
 	String testingAgent
 
+
+	WptEventResultInfo chartPointWptInfo
+
 	/**
 	 * <p>
 	 * Has this point a source {@link URL} with more details about its value?

@@ -1,6 +1,7 @@
 /*
 *= require_tree bower_components/components-font-awesome
 *= require_tree bower_components/dcjs
+*= require_tree bower_components/jQuery-contextMenu
 *= require_tree bower_components/chosen
 *= require bootstrap-custom
 *= require bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css

@@ -2419,6 +2419,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 	initialize: function(args) {
 
 		var graph = this.graph = args.graph;
+        this.graph.nearestPoint = null;
+        this.graph.selectedPoints = [];
 
 		this.xFormatter = args.xFormatter || function(x) {
 			 return new Date( x * 1000 ).toUTCString();
@@ -2527,10 +2529,14 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		}, this );
 
-		if (!nearestPoint)
+		if (!nearestPoint) {
+			this.graph.nearestPoint = null;
 			return;
+		}
 
 		nearestPoint.active = true;
+
+		this.graph.nearestPoint = nearestPoint;
 
 		var domainX = nearestPoint.value.x;
 		var formattedXValue = nearestPoint.formattedXValue;
@@ -2570,19 +2576,19 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
 		var graph = this.graph;
 		var points = args.points;
-		var point = points.filter( function(p) { return p.active } ).shift();
-        var pointsAtSameTimepoint = points.filter( function(p) { return p.value.x == point.value.x } );
+		var activePoint = points.filter( function(p) { return p.active } ).shift();
+        var pointsAtSameTimepoint = points.filter( function(p) { return p.value.x == activePoint.value.x } );
 
-		if (point.value.y === null) return;
+		if (activePoint.value.y === null) return;
 
-		var formattedXValue = point.formattedXValue;
+		var formattedXValue = activePoint.formattedXValue;
 
-		if (point.value.y < 0 || point.value.y > 1) {
+		if (activePoint.value.y < 0 || activePoint.value.y > 1) {
 			return;
 		}
 		
 		this.element.innerHTML = '';
-		this.element.style.left = graph.x(point.value.x) + 'px';
+		this.element.style.left = graph.x(activePoint.value.x) + 'px';
 
 		var xLabel = document.createElement('div');
 
@@ -2600,8 +2606,8 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
             return pxTopA - pxTopB;
         }.bind(this));
 
-		item.innerHTML = this.formatter(point, pointsAtSameTimepoint, formattedXValue, point.testAgent);
-		item.style.top = this.graph.y(point.value.y0 + point.value.y) + 'px';
+		item.innerHTML = this.formatter(activePoint, pointsAtSameTimepoint, formattedXValue, activePoint.testAgent);
+		item.style.top = this.graph.y(activePoint.value.y0 + activePoint.value.y) + 'px';
 
 		this.element.appendChild(item);
 
@@ -2613,9 +2619,17 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
             dot.style.borderColor = point.series.color;
 
             item.classList.add('active');
-            dot.classList.add('active');
 
-            var link = $("<a href='"+ point.url  + "'></a>");
+            var activityStatus = (activePoint==point) ? 'active' : 'inactive';
+            dot.classList.add(activityStatus);
+
+            dot.classList.add('chart-context-menu');
+
+			var info = point.value.wptResultInfo;
+			var url = info.wptServerBaseurl.toString() + "result/" + info.testId.toString() + "/#run"
+				+ info.numberOfWptRun.toString() + "_step" + info.oneBaseStepIndexInJourney.toString();
+
+            var link = $("<a href='"+ url + "'></a>");
             link.append($(dot));
             $(this.element).append(link);
         }.bind(this));

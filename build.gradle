@@ -190,6 +190,7 @@ task bowerSyncJavascript(type: Sync) {
     include 'jquery-ui/ui/minified/jquery-ui.min.js'
     include 'bootstrap/dist/js/bootstrap.min.js'
     include 'clipboard/dist/clipboard.min.js'
+    include 'jQuery-contextMenu/dist/jquery.contextMenu.min.js'
     include 'chosen/chosen.jquery.js'
     include 'd3/d3.min.js'
     include 'bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js'
@@ -200,7 +201,6 @@ task bowerSyncJavascript(type: Sync) {
     include 'tagit/js/tag-it.min.js'
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
-
     dependsOn bowerInstall
 }
 
@@ -212,6 +212,7 @@ task bowerSyncStylesheets(type: Sync) {
     include 'bootstrap/less/mixins/*.less'
     include 'components-font-awesome/css/font-awesome.min.css'
     include 'components-font-awesome/fonts/*'
+    include 'jQuery-contextMenu/dist/jquery.contextMenu.min.css'
     include 'chosen/chosen.css'
     include 'chosen/chosen-sprite.png'
     include 'chosen/chosen-sprite@2x.png'

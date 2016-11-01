@@ -269,10 +269,12 @@
 </div>
 
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
+<g:render template="/_common/modals/chartContextMenuErrorDialog" />
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
     <asset:javascript src="iteratecChartRickshaw.js"/>
+    <asset:javascript src="chartContextUtilities.js"/>
     <asset:script type="text/javascript">
 
         var pagesToEvents = [];
@@ -289,6 +291,8 @@
                                                            in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
         </g:if>
         </g:each>
+
+        var chartContextMenuI18N = ${i18n};
 
         function setAdjustments() {
             var chartTitle = "${chartTitle}";
