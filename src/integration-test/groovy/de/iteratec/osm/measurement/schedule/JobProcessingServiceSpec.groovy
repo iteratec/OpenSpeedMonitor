@@ -36,7 +36,6 @@ import org.apache.http.message.BasicHttpResponse
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
-import spock.lang.Specification
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
@@ -230,7 +229,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
 
         Job.withNewTransaction {
             // ensure launchJobRun created a Quartz trigger (called subtrigger) to repeatedly execute JobProcessingService.pollJubRun()
-             subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.QUARTZ_SUBTRIGGER_GROUP.value())
+             subtriggerKey = new TriggerKey(jobProcessingService.getSubtriggerId(job, HttpRequestServiceMock.testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         }
         Trigger subtrigger
         // no Job in  JobStore, because no Triger was created --> returns null
@@ -352,6 +351,6 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
     }
 
     private TriggerKey getTriggerKeyOf(Job job) {
-        return new TriggerKey(job.id.toString(), TriggerGroup.QUARTZ_TRIGGER_GROUP.value())
+        return new TriggerKey(job.id.toString(), TriggerGroup.JOB_TRIGGER_LAUNCH.value())
     }
 }

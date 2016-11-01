@@ -79,6 +79,7 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     logger("grails.app.filters.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("grails.app.conf.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("grails.app.taglib.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
+    logger("grails.app.jobs.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     // other packages
     logger("liquibase", ALL,["asyncOsmAppenderDetails"], false)
     logger("grails.app", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
@@ -163,6 +164,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
     logger("grails.app.filters.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("grails.app.conf.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("grails.app.taglib.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
+    logger("grails.app.jobs.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     // other packages
     logger("liquibase", ALL,["asyncOsmAppenderDetails"], false)
     logger("grails.app", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)

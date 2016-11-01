@@ -124,6 +124,8 @@ class ProxyService {
         return addedLocations
     }
 
+
+
     /**
      * Gets result from given wptserver via REST-call.
      * @param wptserverOfResult
