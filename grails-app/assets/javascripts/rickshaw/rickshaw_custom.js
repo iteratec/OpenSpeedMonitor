@@ -2626,8 +2626,13 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
             dot.classList.add('chart-context-menu');
 
 			var info = point.value.wptResultInfo;
-			var url = info.wptServerBaseurl.toString() + "result/" + info.testId.toString() + "/#run"
-				+ info.numberOfWptRun.toString() + "_step" + info.oneBaseStepIndexInJourney.toString();
+            var oneBaseStepIndexInJourney = "";
+			if (info.oneBaseStepIndexInJourney) {
+				oneBaseStepIndexInJourney = info.oneBaseStepIndexInJourney.toString();
+			}
+
+            var url = info.wptServerBaseurl.toString() + "result/" + info.testId.toString() + "/"
+			    + info.numberOfWptRun.toString() + "/details/#waterfall_view_step" + oneBaseStepIndexInJourney;
 
             var link = $("<a href='"+ url + "'></a>");
             link.append($(dot));

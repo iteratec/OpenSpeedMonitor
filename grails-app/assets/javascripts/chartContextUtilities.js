@@ -211,7 +211,10 @@ function buildWptUrl(wptView = null, nearestPoint = null) {
         var numberOfWptRun = nearestPoint.value.wptResultInfo.numberOfWptRun.toString();
         var cachedView = nearestPoint.value.wptResultInfo.cachedView;
         var cached = null;
-        var oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney.toString();
+        var oneBaseStepIndexInJourney = "";
+        if (nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney) {
+            oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney.toString();
+        }
 
         // build the url
         if (wptView == "compare") {
