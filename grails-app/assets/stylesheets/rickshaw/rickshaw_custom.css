@@ -561,6 +561,13 @@
 	margin-top: 3px;
 }
 
+#rickshaw_chart_label_summary {
+	text-align: center;
+	margin-top: -10px;
+	margin-bottom: 10px;
+	color: #555555;
+}
+
 #rickshaw_label_summary_box {
 	margin-left: 60px;
 	margin-right: 40px;
