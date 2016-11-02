@@ -305,7 +305,7 @@ class RestApiController {
         try {
             queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
         } catch (NoResultException nre) {
-            sendSimpleResponseAsStream(response, 404, 'Some of the request arguments could not be found: ' + nre.getMessage())
+            sendSimpleResponseAsStream(response, 404, 'Some of the requests arguments caused an error: ' + nre.getMessage())
             return
         }
 
@@ -862,6 +862,18 @@ public class ResultsRequestCommand {
 
     /**
      * <p>
+     * The id of the page for that results should be delivered. If <code>null</code>
+     * or {@linkplain String#isEmpty() empty} results for all pages will be
+     * delivered.
+     * </p>
+     *
+     * @see Page
+     * @see Page#ident()
+     */
+    String pageId;
+
+    /**
+     * <p>
      * The step (measured event) for that results should be delivered.
      * If <code>null</code> or {@linkplain String#isEmpty() empty}
      * results for all steps will be delivered.
@@ -871,6 +883,18 @@ public class ResultsRequestCommand {
      * @see MeasuredEvent#getName()
      */
     String step;
+
+    /**
+     * <p>
+     * The id of the step (measured event) for that results should be delivered.
+     * If <code>null</code> or {@linkplain String#isEmpty() empty}
+     * results for all steps will be delivered.
+     * </p>
+     *
+     * @see MeasuredEvent
+     * @see MeasuredEvent#ident()
+     */
+    String stepId;
 
     /**
      * <p>
@@ -886,6 +910,18 @@ public class ResultsRequestCommand {
 
     /**
      * <p>
+     * The id of the browser for that results should be delivered.
+     * If <code>null</code> or {@linkplain String#isEmpty() empty}
+     * results for all browser will be delivered.
+     * </p>
+     *
+     * @see Browser
+     * @see Browser#getName()
+     */
+    String browserId;
+
+    /**
+     * <p>
      * The location for that results should be delivered.
      * If <code>null</code> or {@linkplain String#isEmpty() empty}
      * results for all locations will be delivered.
@@ -895,6 +931,18 @@ public class ResultsRequestCommand {
      * @see Location#getLocation()
      */
     String location;
+
+    /**
+     * <p>
+     * The id of the location for that results should be delivered.
+     * If <code>null</code> or {@linkplain String#isEmpty() empty}
+     * results for all locations will be delivered.
+     * </p>
+     *
+     * @see Location
+     * @see Location#getLocation()
+     */
+    String locationId;
 
     /**
      * Whether or not to pretty-print the json-response.
@@ -914,9 +962,13 @@ public class ResultsRequestCommand {
         timestampTo(nullable: false, blank: false)
         system(nullable: false, blank: false)
         page(nullable: true, blank: true)
+        pageId(nullable: true, blank: true)
         step(nullable: true, blank: true)
+        stepId(nullable: true, blank: true)
         browser(nullable: true, blank: true)
+        browserId(nullable: true, blank: true)
         location(nullable: true, blank: true)
+        locationId(nullable: true, blank: true)
         pretty(nullable: true, blank: true)
         cachedView(nullable: true, blank: true)
     }
@@ -948,46 +1000,114 @@ public class ResultsRequestCommand {
         MvQueryParams result = new MvQueryParams();
 
         // system
+        addJobGroupQueryData(result)
+
+        addPageQueryData(result)
+
+        addStepQueryData(measuredEventDaoService, result)
+
+        addBrowserQueryData(browserDaoService, result)
+
+        addLocationQueryData(result)
+
+        return result;
+    }
+
+    private void addJobGroupQueryData(MvQueryParams result) {
         JobGroup theSystem = JobGroup.findByName(system)
         if (theSystem == null) {
             throw new NoResultException("Can not find CSI system named: " + system);
         }
         result.jobGroupIds.add(theSystem.getId());
+    }
 
-        // page
-        if (page) {
-            Page thePage = Page.findByName(page)
-            if (thePage == null) {
-                throw new NoResultException("Can not find Page named: " + page);
+    private addPageQueryData(MvQueryParams result){
+        if (pageId) {
+            pageId.tokenize(",").each {singlePageId->
+                if (!singlePageId.isLong()){
+                    throw new NoResultException("Parameter pageId must be an Integer.");
+                }
+                Page thePage = Page.get(singlePageId)
+                if (thePage == null) {
+                    throw new NoResultException("Can not find Page with ID: " + singlePageId);
+                }
+                result.pageIds.add(thePage.getId());
             }
-            result.pageIds.add(thePage.getId());
+        }else if (page) {
+            page.tokenize(",").each { singlePageName ->
+                Page thePage = Page.findByName(singlePageName)
+                if (thePage == null) {
+                    throw new NoResultException("Can not find Page named: " + singlePageName);
+                }
+                result.pageIds.add(thePage.getId());
+            }
         }
 
-        if (step) {
-            MeasuredEvent theStep = measuredEventDaoService.tryToFindByName(step);
-            if (theStep == null) {
-                throw new NoResultException("Can not find step named: " + step);
-            }
-            result.measuredEventIds.add(theStep.getId());
-        }
+    }
 
-        if (browser) {
+    private addStepQueryData(MeasuredEventDaoService measuredEventDaoService, MvQueryParams result){
+        if (stepId) {
+            stepId.tokenize(",").each { singleStepId ->
+                if (!singleStepId.isLong()){
+                    throw new NoResultException("Parameter stepId must be an Integer.");
+                }
+                MeasuredEvent theStep = MeasuredEvent.get(singleStepId);
+                if (theStep == null) {
+                    throw new NoResultException("Can not find step with ID: " + singleStepId);
+                }
+                result.measuredEventIds.add(theStep.getId());
+            }
+        }else if (step) {
+            step.tokenize(",").each { singleStepName ->
+                MeasuredEvent theStep = measuredEventDaoService.tryToFindByName(singleStepName);
+                if (theStep == null) {
+                    throw new NoResultException("Can not find step named: " + singleStepName);
+                }
+                result.measuredEventIds.add(theStep.getId());
+            }
+        }
+    }
+
+    private addBrowserQueryData(BrowserDaoService browserDaoService, MvQueryParams result){
+        if (browserId) {
+            browserId.tokenize(",").each { singlebrowserId ->
+                if (!singlebrowserId.isLong()){
+                    throw new NoResultException("Parameter browserId must be an Integer.");
+                }
+                Browser theBrowser = Browser.get(singlebrowserId);
+                if (theBrowser == null) {
+                    throw new NoResultException("Can not find browser with ID: " + singlebrowserId);
+                }
+                result.browserIds.add(theBrowser.getId());
+            }
+        }else if (browser) {
             Browser theBrowser = browserDaoService.tryToFindByNameOrAlias(browser);
             if (theBrowser == null) {
                 throw new NoResultException("Can not find browser named: " + browser);
             }
             result.browserIds.add(theBrowser.getId());
         }
+    }
 
-        if (location) {
+    private addLocationQueryData(MvQueryParams result){
+        if (locationId) {
+            locationId.tokenize(",").each { singlelocationId ->
+                if (!singlelocationId.isLong()){
+                    throw new NoResultException("Parameter locationId must be an Integer.");
+                }
+                Location theLocation = Location.get(singlelocationId);
+                if (theLocation == null) {
+                    throw new NoResultException("Can not find location with ID: " + singlelocationId);
+                }
+                result.locationIds.add(theLocation.getId());
+            }
+        }else if (location) {
             List<Location> locations = Location.findAllByUniqueIdentifierForServer(location)
             if (locations.size() == 0) {
                 throw new NoResultException("Can not find location with unique identifier \"" + location + "\"");
             }
             result.locationIds.addAll(locations*.ident())
         }
-
-        return result;
     }
 
     /**

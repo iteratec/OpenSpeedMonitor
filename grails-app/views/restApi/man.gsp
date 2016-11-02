@@ -70,11 +70,18 @@
 					   <dl>
 					   <dt>page</dt>
 						<dd>
-                            OPTIONAL<br>The name of a page. If specified only results belonging to this page are returned.
+                            OPTIONAL<br>The name of a page. If specified only results belonging to this page are returned. If parameter page and pageId are both provided pageId is used.
 							<br/>
 							You can obtain a list of all pages by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allPages</code>.
 							As result a JSON list of pages is returned.
 						</dd>
+                       <dt>pageId</dt>
+                       <dd>
+                           OPTIONAL<br>The ID of a page. If specified only results belonging to the page of this ID are returned. If parameter page and pageId are both provided pageId is used.
+                           <br/>
+                           You can obtain a list of all pages by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allPages</code>.
+                           As result a JSON list of pages is returned.
+                       </dd>
 						<dt>step</dt>
 						<dd>
                             OPTIONAL<br>The name of a (measured) step. If specified only results belonging to this step are returned.
@@ -82,6 +89,13 @@
 							You can obtain a list of all steps by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSteps</code>.
 							As result a JSON list of steps is returned.
 						</dd>
+                        <dt>stepId</dt>
+                        <dd>
+                            OPTIONAL<br>The ID of a (measured) step. If specified only results belonging to the step of this ID are returned. If parameter step and stepId are both provided stepId is used.
+                            <br/>
+                            You can obtain a list of all steps by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allSteps</code>.
+                            As result a JSON list of steps is returned.
+                        </dd>
 						<dt>browser</dt>
 						<dd>
                             OPTIONAL<br>The name of a browser. If specified only results belonging to this browser are returned.
@@ -89,6 +103,13 @@
 							You can obtain a list of all browsers by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allBrowsers</code>.
 							As result a JSON list of browsers is returned.
 						</dd>
+                        <dt>browserId</dt>
+                        <dd>
+                           OPTIONAL<br>The ID of a browser. If specified only results belonging to the browser of this ID are returned. If parameter browser and browserId are both provided browserId is used.
+                           <br/>
+                           You can obtain a list of all browsers by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allBrowsers</code>.
+                        As result a JSON list of browsers is returned.
+                        </dd>
 						<dt>location</dt>
 						<dd>
                             OPTIONAL<br>The location-address of a location. If specified only results belonging to this location are returned.
@@ -96,6 +117,13 @@
 							You can obtain a list of all location-addresses by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allLocations</code>.
 							As result a JSON list of locations is returned.
 						</dd>
+                        <dt>locationId</dt>
+                        <dd>
+                           OPTIONAL<br>The ID of a location. If specified only results belonging to the location of this ID are returned. If parameter location and locationId are both provided locationId is used.
+                           <br/>
+                           You can obtain a list of all location-addresses by sending a request to <code><abbr title="[application path]/rest">[REST-base-path]</abbr>/allLocations</code>.
+                        As result a JSON list of locations is returned.
+                        </dd>
 					   	<dt>cachedView</dt>
 					   	<dd>
                             OPTIONAL<br>The cached view. If specified only results of this cached view are returned.
@@ -177,7 +205,7 @@
 
 				<div id="system-csi">
 
-					<h2>GET Method:&nbsp;<span class="text-info">CSI</span></h2>
+					<h2>GET Method:&nbsp;<span class="text-info">JobGroup CSI</span></h2>
 
 					<h3>Request signature</h3>
 					<p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/[system]/csi/[timestampFrom]/[timestampTo]</code></p>
@@ -239,7 +267,7 @@
 
                 <div id="page-csi">
 
-                    <h2>GET Method:&nbsp;<span class="text-info">CSI</span></h2>
+                    <h2>GET Method:&nbsp;<span class="text-info">Page CSI</span></h2>
 
                     <h3>Request signature</h3>
                     <p><code><abbr title="[application path]/rest">[REST-base-path]</abbr>/[system]/[page]/csi/[timestampFrom]/[timestampTo]</code></p>
