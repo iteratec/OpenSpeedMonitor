@@ -2625,18 +2625,34 @@ Rickshaw.Graph.HoverDetail = Rickshaw.Class.create({
 
             dot.classList.add('chart-context-menu');
 
-			var info = point.value.wptResultInfo;
-            var oneBaseStepIndexInJourney = "";
-			if (info.oneBaseStepIndexInJourney) {
-				oneBaseStepIndexInJourney = info.oneBaseStepIndexInJourney.toString();
-			}
+            // check if current view is eventResultDashboard or csiDashboard and
+            // build dot links accordingly
+            var info = point.value.wptResultInfo;
+            var link = null;
+            if (info) {
+                // build wpt link dynamically
+                var oneBaseStepIndexInJourney = "";
+                if (info.oneBaseStepIndexInJourney) {
+                    oneBaseStepIndexInJourney = info.oneBaseStepIndexInJourney.toString();
+                }
 
-            var url = info.wptServerBaseurl.toString() + "result/" + info.testId.toString() + "/"
-			    + info.numberOfWptRun.toString() + "/details/#waterfall_view_step" + oneBaseStepIndexInJourney;
+                var url = info.wptServerBaseurl.toString() + "result/" + info.testId.toString() + "/"
+                    + info.numberOfWptRun.toString() + "/details/#waterfall_view_step" + oneBaseStepIndexInJourney;
 
-            var link = $("<a href='"+ url + "'></a>");
-            link.append($(dot));
-            $(this.element).append(link);
+                link = $("<a target='_blank' href='"+ url + "'></a>");
+                link.append($(dot));
+                $(this.element).append(link);
+            } else {
+                // check if url is not properly set and if not don't append a link
+                if (activePoint.url != "undefined") {
+                    link = $("<a href='"+ activePoint.url + "'></a>");
+                    link.append($(dot));
+                    $(this.element).append(link);
+                } else {
+                    $(this.element).append($(dot));
+                }
+            }
+
         }.bind(this));
 
         // Assume left alignment until the element has been displayed and
