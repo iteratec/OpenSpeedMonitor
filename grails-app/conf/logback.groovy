@@ -165,6 +165,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
     logger("grails.app.taglib.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     // other packages
     logger("liquibase", ALL,["asyncOsmAppenderDetails"], false)
+    logger("com.p6spy", ALL,["asyncOsmAppenderDetails"], false)
     logger("grails.app", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.grails.commons", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.grails.web.mapping", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
