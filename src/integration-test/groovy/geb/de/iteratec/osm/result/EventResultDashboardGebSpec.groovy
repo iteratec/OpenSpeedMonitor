@@ -424,7 +424,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Trimm maximal requests"() {
         given: "User defines maximal request count"
-        
+
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
         appendedInputAboveRequestCountsTextField << "5"
 
@@ -532,7 +532,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Time to first byte graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        
+
         firstViewList[1].click()
 
         when: "User wants to see a graph"
@@ -558,7 +558,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Start render time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        
+
         firstViewList[2].click()
 
         when: "User wants to see a graph"
@@ -808,6 +808,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         waitFor { chartTitleInputField.displayed }
         sleep(100)
         chartTitleInputField << "CustomTitle"
+        sleep(100)
         adjustChartApply.click()
 
         then: "Chart title is changed"
@@ -903,7 +904,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Chart changed"
         waitFor { graphLineDiv.displayed }
-        println(graphLine)
         waitFor { graphLine == "M0,-9.272183449651061L216,484.247258225324L540,35.59322033898296" }
     }
 
@@ -914,9 +914,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         when: "User clicks \"Show data-marker\""
         waitFor { showDataMarkersCheckBox.displayed }
+        sleep(200)
         showDataMarkersCheckBox.click()
+        sleep(200)
         waitFor { adjustChartApply.displayed }
+        sleep(200)
         adjustChartApply.click()
+        sleep(200)
 
         then: "Data-markers show on the graph"
         waitFor { dataMarker }
@@ -924,10 +928,19 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     }
 
     void "Enable Data-Labels"() {
+        given: "User clicked adjust chart"
+        waitFor {adjustChartButton.click()}
+        sleep(200)
+
 
         when: "User clicks \"Show data-marker\""
         waitFor { showDataLabelsCheckBox.displayed }
         showDataLabelsCheckBox.click()
+        waitFor { adjustChartApply.displayed }
+        sleep(200)
+        adjustChartApply.click()
+        sleep(200)
+
 
         then: "Data-markers show on the graph"
         waitFor { dataLabel }
@@ -939,6 +952,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Save custom dashboard"() {
         given: "User clicked on \"Save as dashboard\"-button"
+        clickSaveAsDashboardButton()
 
         when: "User enters new name for the dashboard"
         waitFor { dashboardNameFromModalTextField.displayed }
@@ -950,10 +964,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { saveDashboardSuccessMessage.displayed }
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651038L216,484.247258225324L540,35.593220338982974" }
+        waitFor { graphLine == "M0,-9.272183449651061L216,484.247258225324L540,35.59322033898296" }
     }
 
-    @Ignore
     void "Load custom dashboard"() {
         given: "User visits the EventResultDashboardPage"
         to EventResultDashboardPage
@@ -964,7 +977,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "The old dashboard is loaded again"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651038L216,484.247258225324L540,35.593220338982974" }
+        waitFor { graphLine == "M0,4.1384044587548185L216,327.7577104751319L540,33.558341369334556" }
         waitFor { dataLabel }
         waitFor {
             dataLabel.attr("style").contains('top: 479px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default; fill: rgb(179, 179, 179);')

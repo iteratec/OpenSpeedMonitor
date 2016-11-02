@@ -47,7 +47,7 @@ class EventResultDashboardPage extends Page {
         dashboardNameFromModalTextField(required: false) { $("#dashboardNameFromModal") }
         saveDashboardButtonButton { $("#saveDashboardButton") }
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
-        customDashboardSelectionDropdown { $("#customDashBoardSelection").parent() }
+        customDashboardSelectionDropdown { $(".dropdown-toggle.btn.btn-default") }
         customDashboardSelectionList { $("#customDashBoardSelection") }
         appendedInputBelowLoadTimesTextField { $("#appendedInputBelowLoadTimes") }
         appendedInputAboveLoadTimesTextField { $("#appendedInputAboveLoadTimes") }
@@ -77,38 +77,7 @@ class EventResultDashboardPage extends Page {
 
     }
 
-    public void clickChooseMeasuredVariablesAccordion() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[2].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;')// scroll a little more cause of the sticky header
-        sleep(100)
-        $('.accordion-toggle')[2].click()
-    }
 
-    public void clickFilterJobAccordion() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[1].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;')// scroll a little more cause of the sticky header
-        sleep(100)
-        $('.accordion-toggle')[1].click()
-    }
-
-    public void clickAdjustChartAccordion() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[3].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
-        sleep(100)
-        $('.accordion-toggle')[3].click()
-    }
 
     public void clickSaveAsDashboardButton() {
         // Scroll object into view so it becomes clickable
@@ -118,7 +87,8 @@ class EventResultDashboardPage extends Page {
         sleep(100)
         js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
         sleep(100)
-        $('#graphButtonHtmlId').click()
+        $('.btn.btn-primary.dropdown-toggle').click()
+        $('#createUserspecificDashboardButton').click()
 
     }
 }

@@ -168,7 +168,7 @@
                     <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
                         <li role="separator" class="divider"></li>
                         <li>
-                            <a href="#CreateUserspecifiedDashboardModal" data-toggle="modal" role="button">
+                            <a id="createUserspecificDashboardButton" href="#CreateUserspecifiedDashboardModal" data-toggle="modal" role="button">
                                 ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
                             </a>
                         </li>
