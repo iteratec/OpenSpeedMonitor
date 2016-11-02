@@ -3,7 +3,7 @@
     <g:link controller="${affectedController}" action="showAll" class="btn btn-default"><i class="fa fa-signal"></i>
         <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard"/></g:link>
     <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
-       aria-haspopup="true" aria-expanded="false">
+       aria-haspopup="true" aria-expanded="false" id="customDashboardDropdownButton">
         <span class="caret"></span>
     </a>
     <ul class="dropdown-menu" id="customDashBoardSelection">

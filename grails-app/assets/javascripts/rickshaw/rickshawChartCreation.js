@@ -1099,7 +1099,6 @@ function ChartAdjuster(graphBuilder, args) {
         self.createYAxisAdjuster(args);
         self.addFunctionalityShowDataMarker();
         self.addFunctionalityShowDataLabels();
-        self.addFunctionalityAutoresize();
     }
 
     this.registerEventHandlers = function () {
@@ -1127,8 +1126,8 @@ function ChartAdjuster(graphBuilder, args) {
             parseInt(diaWidth) >= minWidth;
         var autoWidth = diaWidth < 0 || diaWidth == "auto";
         var heightNumeric = $.isNumeric(diaHeight) && parseInt(diaHeight) <= maxHeight;
-        $("#to-enable-autoresize").prop('checked', autoWidth);
         if ((widthNumeric || autoWidth) && (heightNumeric || diaHeight == "auto")) {
+            self.graphBuilder.autoResize = autoWidth;
             self.graphBuilder.updateSize({
                 width: diaWidth,
                 height: diaHeight
@@ -1213,20 +1212,6 @@ function ChartAdjuster(graphBuilder, args) {
         $('#to-enable-marker').bind('change', function () {
             var toEnableMarkers = $(this).is(':checked');
             self.graphBuilder.updateDrawPointMarkers(toEnableMarkers);
-        });
-    }
-
-    this.addFunctionalityAutoresize = function () {
-        $('#to-enable-autoresize').bind('change', function () {
-            var enabled = $(this).is(':checked');
-            self.graphBuilder.autoResize = enabled;
-            if (enabled) {
-                $('#dia-width').val("auto");
-            }
-            self.graphBuilder.updateSize({
-                width: $('#dia-width').val(),
-                height: $('#dia-height').val()
-            });
         });
     }
 
