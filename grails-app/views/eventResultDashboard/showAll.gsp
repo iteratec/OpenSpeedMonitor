@@ -178,7 +178,9 @@
                             <li>
                                 <a href="#" role="button"
                                    onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
-                                <g:render template="/_common/modals/deleteCustomDashboard"/>
+                                <a href="#DeleteModal" role="button" data-toggle="modal">
+                                    ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.delete', default: 'Delete')}
+                                </a>
                             </li>
                         </g:if>
                     </g:if>
@@ -270,6 +272,11 @@
 
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 <g:render template="/_common/modals/chartContextMenuErrorDialog" />
+<g:if test="${params.dashboardID}">
+    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+        <g:render template="/_common/modals/deleteDialog" model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
+    </g:if>
+</g:if>
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>

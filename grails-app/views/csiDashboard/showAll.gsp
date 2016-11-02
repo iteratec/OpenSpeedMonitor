@@ -179,6 +179,11 @@
 </g:else>
 
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
+<g:if test="${params.dashboardID}">
+    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+        <g:render template="/_common/modals/deleteDialog" model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
+    </g:if>
+</g:if>
 
 <div class="row">
     <div class="col-md-12">
@@ -240,7 +245,9 @@
                                         <a href="#" role="button" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
                                             ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
                                         </a>
-                                        <g:render template="/_common/modals/deleteCustomDashboard"/>
+                                        <a href="#DeleteModal" role="button" data-toggle="modal">
+                                            ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.delete', default: 'Delete')}
+                                        </a>
                                     </li>
                                 </g:if>
                             </g:if>
@@ -391,10 +398,10 @@
             var graphNameAliases = ${graphNameAliases};
             var graphColors = ${graphColors};
             $("#dia-title").val(chartTitle);
-            $("#dia-width").val(chartWidth);
-            $("#dia-height").val(chartHeight);
-            $("#dia-y-axis-max").val(loadTimeMaximum);
-            $("#dia-y-axis-min").val(loadTimeMinimum);
+            $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
+            $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
+            $(".dia-y-axis-max").val(loadTimeMaximum);
+            $(".dia-y-axis-min").val(loadTimeMinimum);
             if (eval(showDataMarkers)) {
                 $("#to-enable-marker").click();
             }

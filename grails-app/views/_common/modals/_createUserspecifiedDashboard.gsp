@@ -168,8 +168,8 @@
             objectData["chartTitle"] = $("#dia-title").val();
             objectData["chartWidth"] = $("#dia-width").val();
             objectData["chartHeight"] = $("#dia-height").val();
-            objectData["loadTimeMaximum"] = $("#dia-y-axis-max").val();
-            objectData["loadTimeMinimum"] = $("#dia-y-axis-min").val();
+            objectData["loadTimeMaximum"] = $(".dia-y-axis-max").val();
+            objectData["loadTimeMinimum"] = $(".dia-y-axis-min").val();
             objectData["showDataMarkers"] = $("#to-enable-marker").is(':checked');
             objectData["showDataLabels"] = $("#to-enable-label").is(':checked');
             objectData["csiTypeDocComplete"] = $("#csiTypeDocComplete").is(':checked');
