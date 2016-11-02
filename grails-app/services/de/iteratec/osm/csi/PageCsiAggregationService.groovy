@@ -270,9 +270,8 @@ class PageCsiAggregationService {
      */
     List<CsiAggregation> getHmvsByCsiGroupAndPage(List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime) {
         List<CsiAggregation> hourlyCsiAggregations
-        List<MeasuredEvent> measuredEvents = measuredEventDaoService.getEventsFor(csiPages)
         performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getHmvs: getting", IndentationDepth.FOUR) {
-            hourlyCsiAggregations = eventCsiAggregationService.getHourlyCsiAggregations(startDateTime.toDate(), endDateTime.toDate(), csiGroups, csiPages, measuredEvents)
+            hourlyCsiAggregations = eventCsiAggregationService.getHourlyCsiAggregations(startDateTime.toDate(), endDateTime.toDate(), csiGroups, csiPages)
         }
         return hourlyCsiAggregations
     }

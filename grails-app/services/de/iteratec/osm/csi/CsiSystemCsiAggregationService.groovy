@@ -39,7 +39,6 @@ class CsiSystemCsiAggregationService {
     ShopCsiAggregationService shopCsiAggregationService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
-    JobService jobService
     JobResultDaoService jobResultDaoService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
@@ -92,13 +91,13 @@ class CsiSystemCsiAggregationService {
         JobGroup jobGroupOfResult = newResult.jobResult.job.jobGroup
 
         List<JobGroupWeight> affectedJobGroupWeights = JobGroupWeight.findAllByJobGroup(jobGroupOfResult)
-        List<CsiSystem> affectedCsiSystems = affectedJobGroupWeights*.csiSystem
+        List<CsiSystem> affectedCsiSystems = affectedJobGroupWeights*.csiSystem.unique(false)
 
         if (affectedCsiSystems && jobGroupOfResult.csiConfiguration != null) {
-            affectedCsiSystems.each {
-                CsiAggregation csiSystemMv = ensurePresence(start, interval, it)
+            List<Long> outdatedCsiAggregationIds = ensurePresence(start, interval, affectedCsiSystems)
+            outdatedCsiAggregationIds.each {
                 csiAggregationUpdateEventDaoService.
-                        createUpdateEvent(csiSystemMv.ident(), CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
+                        createUpdateEvent(it, CsiAggregationUpdateEvent.UpdateCause.OUTDATED)
             }
         }
 
@@ -158,10 +157,7 @@ class CsiSystemCsiAggregationService {
         csiSystems.each { currentCsiSystem ->
             CsiAggregation csiAggregation
 
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "CsiSystemCsiAggregationService: ensurePresence.findByStarted", IndentationDepth.FOUR) {
-                csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, currentCsiSystem)
-                log.debug("CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem delivered ${csiAggregation ? 'a' : 'no'} result")
-            }
+            csiAggregation = CsiAggregation.findByStartedAndIntervalAndAggregatorAndCsiSystem(startDate.toDate(), interval, csiSystemAggregator, currentCsiSystem)
             if (!csiAggregation) {
                 csiAggregation = new CsiAggregation(
                         started: startDate.toDate(),

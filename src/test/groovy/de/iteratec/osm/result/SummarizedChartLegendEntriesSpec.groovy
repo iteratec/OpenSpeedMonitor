@@ -653,6 +653,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 DOC_COMPLETE_TIME,
                 CUSTOMER_SATISFACTION,
                 MeasuredEvent.findByName(EVENT_1_NAME),
+                Browser.findByName("FF"),
                 connProfile
         )
         result.jobGroup = jobGroup

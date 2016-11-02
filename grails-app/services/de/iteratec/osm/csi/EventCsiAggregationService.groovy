@@ -226,10 +226,9 @@ class EventCsiAggregationService {
      * @param toDate the end date
      * @param jobGroup the jobGroup
      * @param page the page
-     * @param measuredEvents a list of measuredEvents
      * @return a list of csiAggregations or an empty list
      */
-    List<CsiAggregation> getHourlyCsiAggregations(Date fromDate, Date toDate, List<JobGroup> jobGroups, List<Page> pages, List<MeasuredEvent> measuredEvents) {
+    List<CsiAggregation> getHourlyCsiAggregations(Date fromDate, Date toDate, List<JobGroup> jobGroups, List<Page> pages) {
         if (fromDate > toDate) {
             throw new IllegalArgumentException("toDate must not be later than fromDate: fromDate=${fromDate}; toDate=${toDate}")
         }
@@ -237,8 +236,8 @@ class EventCsiAggregationService {
         CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
 
-        return CsiAggregation.findAllByAggregatorAndIntervalAndJobGroupInListAndPageInListAndMeasuredEventInList(
-                aggregatorType, interval, jobGroups, pages, measuredEvents
+        return CsiAggregation.findAllByAggregatorAndIntervalAndJobGroupInListAndPageInList(
+                aggregatorType, interval, jobGroups, pages
         )
     }
 
