@@ -214,7 +214,7 @@
                                         value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
                                         action="showAll" class="btn btn-primary" />
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
-                                aria-haspopup="true" aria-expanded="false">
+                                aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
                             <span class="caret"></span>
                             <span class="sr-only">Toggle Dropdown</span>
                         </button>

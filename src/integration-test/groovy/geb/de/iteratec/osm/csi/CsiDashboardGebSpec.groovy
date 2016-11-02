@@ -345,14 +345,15 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
-        clickAdjustChartAccordion()
+        adjustChartButton.click()
 
         when: "User edits title"
         waitFor { chartTitleInputField.displayed }
         sleep(100)
-        chartTitleInputField << Keys.chord(Keys.CONTROL, "a")
-        chartTitleInputField << Keys.chord(Keys.DELETE)
+        chartTitleInputField.firstElement().clear()
         chartTitleInputField << "CustomTitle"
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
 
         then: "Chart title is changed"
         waitFor { chartTitle == "CustomTitle" }
@@ -361,22 +362,23 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     void "Adjust Chart Size"() {
         given: "User edits chart size"
-        chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
-        chartWidthInputField << Keys.chord(Keys.DELETE)
+        adjustChartButton.click()
+        waitFor { chartWidthInputField.displayed }
+        chartWidthInputField.firstElement().clear()
         chartWidthInputField << "600"
-        chartheightInputField << Keys.chord(Keys.CONTROL, "a")
-        chartheightInputField << Keys.chord(Keys.DELETE)
+        chartheightInputField.firstElement().clear()
         chartheightInputField << "600"
+        sleep(100)
 
         when: "User clicks \"apply\""
-        waitFor { diaChangeChartsizeButton.displayed }
-        diaChangeChartsizeButton.click()
+        waitFor { adjustChartApplyButton.displayed }
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
 
         then: "Chart changed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine1 == "M0,109.96102601287049L540,109.96102601287049" }
-        waitFor { graphLine2 == "M270,416.67724100425994L480.00000000000006,237.37877277259133" }
-        waitFor { graphLine3 == "M270,218.725641258044L480.00000000000006,203.17230127798416" }
+        waitFor { graphLine1 == "M0,109.9610260128704L540,109.9610260128704" }
+        waitFor { graphLine2 == "M270,416.67724100425994L480,237.37877277259128" }
+        waitFor { graphLine3 == "M270,218.725641258044L480,203.1723012779842" }
     }
 
 
@@ -384,28 +386,32 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     void "Adjust Chart Section"() {
         given: "User edits chart size"
-        diaYAxisMinInputField << Keys.chord(Keys.CONTROL, "a")
-        diaYAxisMinInputField << Keys.chord(Keys.DELETE)
+        adjustChartButton.click()
+        waitFor { diaYAxisMinInputField.displayed }
+        diaYAxisMinInputField.firstElement().clear()
         diaYAxisMinInputField << "70"
-        diaYAxisMaxInputField << Keys.chord(Keys.CONTROL, "a")
-        diaYAxisMaxInputField << Keys.chord(Keys.DELETE)
+        diaYAxisMaxInputField.firstElement().clear()
         diaYAxisMaxInputField << "80"
 
         when: "User clicks \"apply\""
-        waitFor { diaChangeYAxisButton.displayed }
-        diaChangeYAxisButton.click()
+        waitFor { adjustChartApplyButton.displayed }
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
 
         then: "Chart changed"
         waitFor { graphLineDiv[2].displayed }
-        waitFor { graphLine2 == "M270,2776.8693918245267L480.00000000000006,804.5862412761719" }
+        waitFor { graphLine2 == "M270,2776.8693918245267L480,804.5862412761719" }
     }
 
     void "Enable Data-Markers"() {
 
         when: "User clicks \"Show data-marker\""
+        adjustChartButton.click()
         waitFor { showDataMarkersCheckBox.displayed }
         showDataMarkersCheckBox.click()
         showDataMarkersCheckBox.click()
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
 
         then: "Data-markers show on the graph"
         waitFor { dataMarker }
@@ -415,8 +421,11 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
     void "Enable Data-Labels"() {
 
         when: "User clicks \"Show data-marker\""
+        adjustChartButton.click()
         waitFor { showDataLabelsCheckBox.displayed }
         showDataLabelsCheckBox.click()
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
 
         then: "Data-markers show on the graph"
         waitFor { dataLabel }
@@ -441,7 +450,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         at CsiDashboardPage
         waitFor { saveDashboardSuccessMessage.displayed }
         waitFor { graphLineDiv[2].displayed }
-        waitFor { graphLine2 == "M270,2776.8693918245267L480.00000000000006,804.5862412761719" }
+        waitFor { graphLine2 == "M270,2776.8693918245267L480,804.5862412761719" }
 
     }
 
@@ -457,7 +466,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         then: "The old dashboard is loaded again"
         at CsiDashboardPage
         waitFor { graphLineDiv[2].displayed }
-        waitFor { graphLine2 == "M270,2776.8693918245267L480.00000000000006,804.5862412761719" }
+        waitFor { graphLine2 == "M270,2776.8693918245267L480,804.5862412761719" }
         waitFor { dataLabel }
         waitFor {
             dataLabel.attr("style").contains('top: 595px; left: 261px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default;')

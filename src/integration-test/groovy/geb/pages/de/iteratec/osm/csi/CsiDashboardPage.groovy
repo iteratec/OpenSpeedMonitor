@@ -12,6 +12,7 @@ class CsiDashboardPage extends Page{
 
     static content = {
         adjustChartButton{$("#rickshaw_adjust_chart_link")}
+        adjustChartApplyButton{$('#adjustChartApply')}
         timeFrameSelect{$("#timeframeSelect").find("option").contextElements[0]}
         showButton (to: CsiDashboardPage) {$("#chart-submit")}
         fromDatepicker{$("#fromDatepicker")}
@@ -37,10 +38,8 @@ class CsiDashboardPage extends Page{
         chartTitle { $("#rickshaw_chart_title").attr("innerHTML") }
         chartWidthInputField { $("#dia-width") }
         chartheightInputField { $("#dia-height") }
-        diaChangeChartsizeButton { $("#dia-change-chartsize") }
-        diaYAxisMinInputField { $("#dia-y-axis-min") }
-        diaYAxisMaxInputField { $("#dia-y-axis-max") }
-        diaChangeYAxisButton { $("#dia-change-yaxis") }
+        diaYAxisMinInputField { $(".dia-y-axis-min") }
+        diaYAxisMaxInputField { $(".dia-y-axis-max") }
         showDataMarkersCheckBox { $("#to-enable-marker") }
         showDataLabelsCheckBox { $("#to-enable-label") }
         optimizeForWideScreenCheckBox { $("#wide-screen-diagram-montage") }
@@ -59,26 +58,9 @@ class CsiDashboardPage extends Page{
         connectivityTab{$("a",href:"#tab3")}
     }
 
-    public void clickAdjustChart() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[0].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
-        sleep(100)
-        $('#rickshaw_adjust_chart_link')[0].click()
-    }
-
     public void clickSaveAsDashboardButton() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'#chart-submit\')[0].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
-        sleep(100)
+        $("#chart-action-dropdown").click()
+        sleep(200)
         $("a",href:'#CreateUserspecifiedDashboardModal').click()
-
     }
 }
