@@ -47,7 +47,7 @@ class EventResultDashboardPage extends Page {
         dashboardNameFromModalTextField(required: false) { $("#dashboardNameFromModal") }
         saveDashboardButtonButton { $("#saveDashboardButton") }
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
-        customDashboardSelectionDropdown { $(".dropdown-toggle.btn.btn-default") }
+        customDashboardSelectionDropdown { $("#customDashboardDropdownButton") }
         customDashboardSelectionList { $("#customDashBoardSelection") }
         appendedInputBelowLoadTimesTextField { $("#appendedInputBelowLoadTimes") }
         appendedInputAboveLoadTimesTextField { $("#appendedInputAboveLoadTimes") }

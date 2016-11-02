@@ -51,8 +51,8 @@ class CsiDashboardPage extends Page{
         dashboardNameFromModalTextField(required: false) { $("#dashboardNameFromModal") }
         saveDashboardButtonButton { $("#saveDashboardButton") }
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
-        customDashboardSelectionDropdown { $("a",href:"/csiDashboard/showAll?dashboardID=1").parent().parent().parent() }
-        customDashboardSelectionList { $("a",href:"/csiDashboard/showAll?dashboardID=1") }
+        customDashboardSelectionDropdown { $("#customDashboardDropdownButton") }
+        customDashboardSelectionList { $("#customDashBoardSelection") }
         pageTab{$("a",href:"#tab1")}
         browserTab{$("a",href:"#tab2")}
         connectivityTab{$("a",href:"#tab3")}

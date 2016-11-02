@@ -454,17 +454,16 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
     }
 
-    @Ignore
     void "Load custom dashboard"() {
-        given: "User visits the EventResultDashboardPage"
+        given: "User visits the CsiDashboardPage"
         to CsiDashboardPage
-
         when: "User loads CustomDashboard"
         customDashboardSelectionDropdown.click()
         waitFor { customDashboardSelectionList.displayed }
-        customDashboardSelectionList.click()
+        customDashboardSelectionList.find("a").click()
         then: "The old dashboard is loaded again"
         at CsiDashboardPage
+
         waitFor { graphLineDiv[2].displayed }
         waitFor { graphLine2 == "M270,2776.8693918245267L480,804.5862412761719" }
         waitFor { dataLabel }
