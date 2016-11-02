@@ -23,7 +23,7 @@
                 <g:hiddenField name="id" value="${connectivityProfileInstance?.id}"/>
                 <g:hiddenField name="version" value="${connectivityProfileInstance?.version}"/>
 
-                <fieldset class="form">
+                <fieldset class="form-horizontal">
                     <g:render template="form"/>
                 </fieldset>
 

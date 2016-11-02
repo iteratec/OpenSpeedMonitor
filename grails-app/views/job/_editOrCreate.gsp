@@ -8,16 +8,6 @@
 
         <asset:stylesheet src="job/edit.css"/>
 
-        <style type="text/css">
-            .control-label {
-                width: 250px !important;
-                margin-right: 1em !important;
-            }
-            .form-group {
-                margin-bottom: 0.4em !important;
-            }
-        </style>
-
     </head>
 
     <body>
