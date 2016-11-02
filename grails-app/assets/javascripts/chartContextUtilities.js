@@ -27,8 +27,6 @@ $(function () {
     $.contextMenu({
         selector: '.chart-context-menu',
 
-        appendTo: '#chartbox',
-
         events: {
             show: function () {
                 // don't loose the dot on which the context menu was called
@@ -147,8 +145,6 @@ $(function () {
     $.contextMenu({
         selector: '#rickshaw_chart',
 
-        appendTo: '#chartbox',
-
         items: {
             "comparePoints": {
                 name: chartContextMenuI18N.compareFilmstrips,
@@ -180,7 +176,7 @@ $(function () {
 // select/deselect points on the graph with meta-key+click
 $(function () {
     $('#rickshaw_main').on('click', '.chart-context-menu', function (event) {
-        if (event.metaKey) {
+        if (event.metaKey || event.ctrlKey) {
             var nearestPoint = rickshawGraphBuilder.graph.nearestPoint;
 
             if (isNotSelected(nearestPoint)) {
