@@ -17,45 +17,33 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.weighting.WeightFactor
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.persistence.OsmDataSourceService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.dao.DefaultMeasuredEventDaoService
-import de.iteratec.osm.util.PerformanceLoggingService
-import grails.test.mixin.Mock
-import grails.test.mixin.TestFor
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
 import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.After
-import org.junit.Assert
-import org.junit.Before
-import org.junit.Test
 
 import static org.junit.Assert.*
 
 /**
  * Test-suite of {@link PageCsiAggregationService}.
  */
-@TestFor(PageCsiAggregationService)
-@Mock([CsiAggregation, CsiAggregationInterval, AggregatorType, JobGroup, Page, MeasuredEvent, Browser, Location,
-        EventResult, CsiAggregationDaoService, DefaultMeasuredEventDaoService, EventCsiAggregationService,
-        CustomerSatisfactionWeightService, CsiDay, MeanCalcService, CsiAggregationUpdateEvent, ConnectivityProfile,
-        ConnectivityProfileService, CsiConfiguration, ConfigService, OsmDataSourceService, EventCsiAggregationService,
-        PerformanceLoggingService, CsiAggregationUtilService])
 
-class PageCsiAggregationServiceTests {
+@Integration
+@Rollback
+class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-15
 
@@ -76,36 +64,16 @@ class PageCsiAggregationServiceTests {
     String pageName2 = 'myPageName2'
     String pageName3 = 'myPageName3'
 
-    PageCsiAggregationService serviceUnderTest
+    PageCsiAggregationService pageCsiAggregationService
 
-    def doWithSpring = {
-        defaultMeasuredEventDaoService(DefaultMeasuredEventDaoService)
-    }
-
-
-    @Before
-    void setUp() {
-        serviceUnderTest = service
-
-        //mocks common for all tests
-        serviceUnderTest.measuredEventDaoService = grailsApplication.mainContext.getBean('defaultMeasuredEventDaoService')
-        mockCsiAggregationUpdateEventDaoService()
-
-        //test-data common for all tests
+    def setup() {
         createTestDataForAllTests()
-    }
-
-    @After
-    void tearDown() {
-        deleteTestData()
     }
 
     //tests////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Test
-    void testFindAllByJobGroupsAndPages() {
-        //getting test-specific data
-
+    void "test findAllByJobGroupsAndPages"() {
+        when:
         JobGroup group1 = JobGroup.findByName(jobGroupName1)
         JobGroup group2 = JobGroup.findByName(jobGroupName2)
         JobGroup group3 = JobGroup.findByName(jobGroupName3)
@@ -124,95 +92,85 @@ class PageCsiAggregationServiceTests {
         Integer with_group1to2_page1 = 1
         Integer with_group3_page1or3 = 2
 
-        //test execution, mocking inner services and assertions
+        List<JobGroup> group1To3 = [group1, group2, group3]
+        List<JobGroup> group1To2 = [group1, group2]
+        List<Page> page1To3 = [page1, page2, page3]
+        List<Page> page1Or3 = [page1, page3]
 
-        Map<String, JobGroup> groups = ['1': group1, '2': group2, '3': group3]
-        Map<String, Page> pages = ['1': page1, '2': page2, '3': page3]
-        List<JobGroup> groupsAsList = groups.values().toList()
-        List<Page> pagesAsList = pages.values().toList()
-        Assert.assertEquals(with_group1to3_page1to3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group1_page1to3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group2_page1to3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group3_page1to3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group1to3_page1, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group1to3_page2, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group1to3_page3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group1to2_page3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group1to2_page1, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
-        Assert.assertEquals(with_group3_page1or3, findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, groupsAsList, pagesAsList).size())
+        then:
+        with_group1to3_page1to3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, group1To3, page1To3).size()
+        with_group1_page1to3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [group1], page1To3).size()
+        with_group2_page1to3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [group2], page1To3).size()
+        with_group3_page1to3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [group3], page1To3).size()
+        with_group1to3_page1 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, group1To3, [page1]).size()
+        with_group1to3_page2 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, group1To3, [page2]).size()
+        with_group1to3_page3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, group1To3, [page3]).size()
+        with_group1to2_page3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, group1To2, [page3]).size()
+        with_group1to2_page1 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, group1To2, [page2]).size()
+        with_group3_page1or3 == pageCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, [group3], page1Or3).size()
     }
 
     /**
      * Tests the marking of dependent (weekly-pageAggregator-){@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * {@link de.iteratec.osm.report.chart.CsiAggregationUpdateEvent}s with {@link CsiAggregationUpdateEvent#UpdateCause} OUTDATED should be written to db.
      */
-    @Test
-    void testMarkingWeeklyPageMvsAsOutdated() {
-
-        //getting test-specific data
-
-        EventResult eventResult = new EventResult(jobGroup: jobGroup1, page: page1).save(validate: false)
+    void "test markingWeeklyPageMvsAsOutdated"() {
+        given:
+        EventResult eventResult = TestDataUtil.createEventResult(jobGroup1, measuredEvent1, page1, browser, location1)
         DateTime startTimeOfWeek = new DateTime(2013, 8, 5, 0, 0, 0, DateTimeZone.UTC)
 
-        //precondition
-
-        List<CsiAggregation> wpmvs = findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval)
+        List<CsiAggregation> wpmvs = pageCsiAggregationService.findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval, JobGroup.list(), Page.list())
         assertEquals(0, wpmvs.size())
 
-        //test execution
-        serviceUnderTest.markMvAsOutdated(startTimeOfWeek, eventResult, weeklyInterval)
-
-        //assertions
-
-        wpmvs = findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval)
-        assertEquals(1, wpmvs.size())
+        when:
+        pageCsiAggregationService.markMvAsOutdated(startTimeOfWeek, eventResult, weeklyInterval)
+        wpmvs = pageCsiAggregationService.findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval, JobGroup.list(), Page.list())
         CsiAggregation wpmvMarked = wpmvs[0]
-        assertFalse(wpmvMarked.isCalculated())
-        assertTrue(wpmvMarked.hasToBeCalculated())
 
-        //second mark of the same weekly-pageAggregator-mv
-        serviceUnderTest.markMvAsOutdated(startTimeOfWeek, eventResult, weeklyInterval)
-        wpmvs = findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval)
+        then:
         assertEquals(1, wpmvs.size())
-        wpmvMarked = wpmvs[0]
         assertFalse(wpmvMarked.isCalculated())
         assertTrue(wpmvMarked.hasToBeCalculated())
 
+        when: "second mark of the same weekly-pageAggregator-mv"
+        pageCsiAggregationService.markMvAsOutdated(startTimeOfWeek, eventResult, weeklyInterval)
+        wpmvs = pageCsiAggregationService.findAll(startTimeOfWeek.toDate(), startTimeOfWeek.toDate(), weeklyInterval, JobGroup.list(), Page.list())
+        wpmvMarked = wpmvs[0]
+
+        then:
+        assertEquals(1, wpmvs.size())
+        assertFalse(wpmvMarked.isCalculated())
+        assertTrue(wpmvMarked.hasToBeCalculated())
     }
 
     /**
      * Tests the marking of dependent (weekly-pageAggregator-){@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      * {@link de.iteratec.osm.report.chart.CsiAggregationUpdateEvent}s with {@link CsiAggregationUpdateEvent#UpdateCause} OUTDATED should be written to db.
      */
-    @Test
-    void testMarkingDailyPageMvsAsOutdated() {
-
-        //getting test-specific data
-
-        EventResult eventResult = new EventResult(jobGroup: jobGroup1, page: page1).save(validate: false)
+    void "test markingDailyPageMvsAsOutdated"() {
+        given:
+        EventResult eventResult = TestDataUtil.createEventResult(jobGroup1, measuredEvent1, page1, browser, location1)
         DateTime startTime = new DateTime(2013, 8, 5, 0, 0, 0, DateTimeZone.UTC)
 
-        //precondition
-
-        List<CsiAggregation> mvs = findAll(startTime.toDate(), startTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startTime.toDate(), startTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         assertEquals(0, mvs.size())
 
-        //test execution
-        serviceUnderTest.markMvAsOutdated(startTime, eventResult, dailyInterval)
-
-        //assertions
-
-        mvs = findAll(startTime.toDate(), startTime.toDate(), dailyInterval)
-        assertEquals(1, mvs.size())
+        when:
+        pageCsiAggregationService.markMvAsOutdated(startTime, eventResult, dailyInterval)
+        mvs = pageCsiAggregationService.findAll(startTime.toDate(), startTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         CsiAggregation wpmvMarked = mvs[0]
+
+        then:
+        assertEquals(1, mvs.size())
         assertFalse(wpmvMarked.isCalculated())
         assertTrue(wpmvMarked.hasToBeCalculated())
 
-        //second mark of the same weekly-pageAggregator-mv
-        serviceUnderTest.markMvAsOutdated(startTime, eventResult, dailyInterval)
-        mvs = findAll(startTime.toDate(), startTime.toDate(), dailyInterval)
-        assertEquals(1, mvs.size())
+        when: "second mark of the same weekly-pageAggregator-mv"
+        pageCsiAggregationService.markMvAsOutdated(startTime, eventResult, dailyInterval)
+        mvs = pageCsiAggregationService.findAll(startTime.toDate(), startTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         wpmvMarked = mvs[0]
+        then:
+        assertEquals(1, mvs.size())
         assertFalse(wpmvMarked.isCalculated())
         assertTrue(wpmvMarked.hasToBeCalculated())
 
@@ -221,20 +179,17 @@ class PageCsiAggregationServiceTests {
     /**
      * Tests calculation of daily-pageAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
-    @Test
-    void testCalculation_DailyInterval_SingleHourlyMv() {
+    void "test calculation_DailyInterval_SingleHourlyMv"() {
+        given:
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
-        MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page1, name: "measuredEventAggregator")
-        Location location = new Location(uniqueIdentifierForServer: "unusedLocation").save(validate: false)
+        MeasuredEvent measuredEvent = new MeasuredEvent(testedPage: page1, name: "measuredEvent").save(failOnError: true)
 
-        CsiAggregation hpmv = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, measuredEvent: measuredEvent, page: page1, browser: browser, location: location, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
+        AggregatorType measuredEventAggregator = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
+        CsiAggregation hpmv = new CsiAggregation(interval: hourlyInterval, aggregator: measuredEventAggregator, jobGroup: jobGroup1, measuredEvent: measuredEvent, page: page1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(hpmv.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
-        CsiDay testDay = new CsiDay()
-        (0..23).each {
-            testDay.setHourWeight(it, 1)
-        }
-        testDay.save(failOnError: true)
+        List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
+        assertEquals(0, mvs.size())
 
         List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [])]
@@ -243,31 +198,23 @@ class PageCsiAggregationServiceTests {
 
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
-        //precondition
+        when:
+        List<CsiAggregation> calculatedMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
 
-        List<CsiAggregation> mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
-        assertEquals(0, mvs.size())
-
-        //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
-
-        //assertions
-
+        then:
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
         assertEquals(12d, calculatedMvs[0].csByWptDocCompleteInPercent, DELTA)
-
-        mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
     }
 
     /**
      * Tests calculation of daily-pageAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
-    @Test
-    void testCalculation_DailyInterval_MultipleHourlyMv() {
+    void "test calculation_DailyInterval_MultipleHourlyMv"() {
+        given:
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
-
         CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 12d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv1.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
         CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusHours(2).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 10d, connectivityProfile: connectivityProfile).save(failOnError: true);
@@ -281,38 +228,28 @@ class PageCsiAggregationServiceTests {
         CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv5.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
-        CsiDay testDay = new CsiDay()
-        (0..23).each {
-            testDay.setHourWeight(it, 1)
-        }
-        testDay.save(failOnError: true)
-
+        //mocking inner services
         List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: []),
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 10d, weight: 1d), underlyingEventResultIds: []),
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 11d, weight: 1d), underlyingEventResultIds: [])]
-
-        //mocking inner services
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
 
-        List<CsiAggregation> mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         assertEquals(0, mvs.size())
 
-        //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        when:
+        List<CsiAggregation> calculatedMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
+        CsiAggregation wpmvMarked = mvs[0]
 
-        //assertions
-
+        then:
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
         assertEquals(11d, calculatedMvs[0].csByWptDocCompleteInPercent, DELTA)
-
-        mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
-
-        CsiAggregation wpmvMarked = mvs[0]
         assertTrue(wpmvMarked.isCalculated())
 
     }
@@ -320,11 +257,9 @@ class PageCsiAggregationServiceTests {
     /**
      * Tests calculation of daily-pageAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
-    @Test
-    void testCalculation_DailyInterval_MultipleHourlyMv_differentWeights() {
+    void "test calculation_DailyInterval_MultipleHourlyMv_differentWeights"() {
 
-        //test-specific data
-
+        given:
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         CsiAggregation mv1 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1d, connectivityProfile: connectivityProfile).save(failOnError: true)
@@ -340,34 +275,17 @@ class PageCsiAggregationServiceTests {
         CsiAggregation mv5 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true)
         TestDataUtil.createUpdateEvent(mv5.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
-        CsiDay testDay = new CsiDay()
-        (0..23).each {
-            testDay.setHourWeight(it, 1)
-        }
-        testDay.setHourWeight(12, 10)
-        testDay.save(failOnError: true)
-
+        //mocking inner services
         List<WeightedCsiValue> weightedCsiValuesToReturnInMock = [
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 1d, weight: 10d), underlyingEventResultIds: []),
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 10d, weight: 1d), underlyingEventResultIds: []),
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 11d, weight: 1d), underlyingEventResultIds: [])]
-
-        //mocking inner services
-
         mockWeightingService(weightedCsiValuesToReturnInMock, [])
 
         //precondition
-
-        List<CsiAggregation> mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         assertEquals(0, mvs.size())
 
-        //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
-
-        //assertions
-
-        assertEquals(1, calculatedMvs.size())
-        assertTrue(calculatedMvs[0].isCalculated())
         double browserWeightAllMvs = 1d
         double valueFirstMv = 1d
         double hourofdayWeightFirstMv = 10d
@@ -376,16 +294,22 @@ class PageCsiAggregationServiceTests {
         double valueThirdMv = 11d
         double hourofdayWeightThirdMv = 1d
         double sumOfAllWeights = 12d
+
+        when:
+        List<CsiAggregation> calculatedMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
+        CsiAggregation wpmvMarked = mvs[0]
+
+        then:
+        assertEquals(1, calculatedMvs.size())
+        assertTrue(calculatedMvs[0].isCalculated())
         assertEquals(
                 ((valueFirstMv * hourofdayWeightFirstMv * browserWeightAllMvs) + (valueSecondMv * hourofdayWeightSecondMv * browserWeightAllMvs) + (valueThirdMv * hourofdayWeightThirdMv * browserWeightAllMvs)) / sumOfAllWeights,
                 calculatedMvs[0].csByWptDocCompleteInPercent,
                 DELTA
         );
 
-        mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
-
-        CsiAggregation wpmvMarked = mvs[0]
         assertTrue(wpmvMarked.isCalculated())
 
     }
@@ -393,8 +317,7 @@ class PageCsiAggregationServiceTests {
     /**
      * Tests calculation of daily-pageAggregator-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
      */
-    @Test
-    void testCalculation_DailyInterval_MultipleHourlyMv_YesCalculatedNoData() {
+    void "test calculation_DailyInterval_MultipleHourlyMv_YesCalculatedNoData"() {
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
 
         //MVs outside of Interval
@@ -403,31 +326,21 @@ class PageCsiAggregationServiceTests {
         CsiAggregation mv2 = new CsiAggregation(interval: hourlyInterval, aggregator: AggregatorType.findByName(AggregatorType.MEASURED_EVENT), jobGroup: jobGroup1, page: page1, measuredEvent: measuredEvent1, browser: browser, location: location1, started: startedTime.plusMinutes(CsiAggregationInterval.DAILY + 1).toDate(), underlyingEventResultsByWptDocComplete: "1", csByWptDocCompleteInPercent: 1000d, connectivityProfile: connectivityProfile).save(failOnError: true);
         TestDataUtil.createUpdateEvent(mv2.ident(), CsiAggregationUpdateEvent.UpdateCause.CALCULATED)
 
-        CsiDay testDay = new CsiDay()
-        (0..23).each {
-            testDay.setHourWeight(it, 1)
-        }
-        testDay.save(failOnError: true)
-
         //precondition
 
-        List<CsiAggregation> mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
+        List<CsiAggregation> mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
         assertEquals(0, mvs.size())
 
-        //test execution
-        List<CsiAggregation> calculatedMvs = serviceUnderTest.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        when:
+        List<CsiAggregation> calculatedMvs = pageCsiAggregationService.getOrCalculatePageCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1], [page1])
+        mvs = pageCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list(), Page.list())
 
-        //assertions
-
+        then:
         assertEquals(1, calculatedMvs.size())
         assertTrue(calculatedMvs[0].isCalculated())
         assertNull(calculatedMvs[0].csByWptDocCompleteInPercent)
-
-        mvs = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval)
         assertEquals(1, mvs.size())
     }
-
-    //mocking inner services////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Mocks methods of {@link WeightingService}.
@@ -442,25 +355,7 @@ class PageCsiAggregationServiceTests {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        serviceUnderTest.weightingService = weightingService.proxyInstance()
-    }
-
-    /**
-     * Mocks methods of {@link CsiAggregationUpdateEventDaoService}.
-     */
-    private void mockCsiAggregationUpdateEventDaoService() {
-        def csiAggregationUpdateEventDaoService = new MockFor(CsiAggregationUpdateEventDaoService, true)
-        csiAggregationUpdateEventDaoService.demand.createUpdateEvent(1..10000) {
-            Long csiAggregationId, CsiAggregationUpdateEvent.UpdateCause cause ->
-
-                new CsiAggregationUpdateEvent(
-                        dateOfUpdate: new Date(),
-                        csiAggregationId: csiAggregationId,
-                        updateCause: cause
-                ).save(failOnError: true)
-
-        }
-        serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
+        pageCsiAggregationService.weightingService = weightingService.proxyInstance()
     }
 
     //testdata////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -489,30 +384,25 @@ class PageCsiAggregationServiceTests {
         jobGroup3 = new JobGroup(name: jobGroupName3, csiConfiguration: csiConfiguration).save(failOnError: true)
 
         measuredEvent1 = new MeasuredEvent(testedPage: page1, name: "measuredEventAggregator").save(failOnError: true)
-        location1 = new Location(uniqueIdentifierForServer: "unusedLocation").save(validate: false)
+        WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer("unusedLabel", "unusedProxyIdentifier", false, "http://example.com")
+        location1 = TestDataUtil.createLocation(wptServer, "unusedIdentifier", browser, false)
 
         //with existing JobGroup and Page:
-        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, jobGroup: jobGroup1, page: page1, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, jobGroup: jobGroup1, page: page2, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, jobGroup: jobGroup3, page: page1, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, jobGroup: jobGroup3, page: page2, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: pageAggregator, jobGroup: jobGroup3, page: page3, started: startDate.toDate()).save(validate: false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup1, page1, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup1, page2, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup3, page1, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup3, page2, null, "", false)
+        TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, pageAggregator, jobGroup3, page3, null, "", false)
 
-        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, jobGroup: jobGroup1, page: page1, started: startDate.toDate(), csByWptDocCompleteInPercent: 12, connectivityProfile: connectivityProfile).save(validate: true)
-        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, jobGroup: jobGroup1, page: page2, started: startDate.toDate(), csByWptDocCompleteInPercent: 10, connectivityProfile: connectivityProfile).save(validate: false)
-        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, jobGroup: jobGroup3, page: page1, started: startDate.toDate(), csByWptDocCompleteInPercent: 12, connectivityProfile: connectivityProfile).save(validate: false)
-        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, jobGroup: jobGroup3, page: page2, started: startDate.toDate(), csByWptDocCompleteInPercent: 12, connectivityProfile: connectivityProfile).save(validate: false)
-        new CsiAggregation(interval: hourlyInterval, aggregator: pageAggregator, jobGroup: jobGroup3, page: page3, started: startDate.toDate(), csByWptDocCompleteInPercent: 10, connectivityProfile: connectivityProfile).save(validate: false)
-    }
-
-    private void deleteTestData() {
-        Page.list()*.delete(flush: true)
-        CsiAggregation.list()*.delete(flush: true)
-        JobGroup.list()*.delete(flush: true)
-    }
-
-    private List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval) {
-        AggregatorType aggregator = AggregatorType.findByName(AggregatorType.PAGE)
-        return CsiAggregation.findAllByStartedBetweenAndIntervalAndAggregator(fromDate, toDate, targetInterval, aggregator)
+        List<CsiAggregation> csiAggregationsWithConnectivityProfile = []
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup1, page1, 12, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup1, page2, 10, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup3, page1, 12, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup3, page2, 12, "", false)
+        csiAggregationsWithConnectivityProfile << TestDataUtil.createCsiAggregation(startDate.toDate(), hourlyInterval, pageAggregator, jobGroup3, page3, 10, "", false)
+        csiAggregationsWithConnectivityProfile.each {
+            it.connectivityProfile = connectivityProfile
+            it.save(failOnError: true)
+        }
     }
 }

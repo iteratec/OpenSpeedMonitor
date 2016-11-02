@@ -47,23 +47,7 @@ class ShopCsiAggregationService {
     CsiAggregationUtilService csiAggregationUtilService
     WeightingService weightingService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-
-    /**
-     * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
-     * @param fromDate
-     * @param toDate
-     * @param targetInterval
-     * @return
-     */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval) {
-        def query = CsiAggregation.where {
-            started >= fromDate
-            started <= toDate
-            interval == targetInterval
-            aggregator == AggregatorType.findByName(AggregatorType.SHOP)
-        }
-        return query.list()
-    }
+    
     /**
      * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
      * @param fromDate

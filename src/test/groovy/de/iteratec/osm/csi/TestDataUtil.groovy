@@ -971,8 +971,8 @@ class TestDataUtil implements OsmTestLogin {
             int docCompleteTimeInMillisecs,
             double customerSatisfactionInPercent,
             MeasuredEvent event,
+            Browser browser,
             ConnectivityProfile connectivityProfile = null) {
-        Browser dummyBrowser = createBrowser("bro", 0)
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -987,12 +987,60 @@ class TestDataUtil implements OsmTestLogin {
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
-                noTrafficShapingAtAll: false,
+                noTrafficShapingAtAll: (connectivityProfile ? false : true),
                 jobGroup: job.jobGroup,
                 measuredEvent: event,
                 page: event.testedPage,
-                browser: dummyBrowser,
+                browser: browser,
                 location: job.location
+        ).save(failOnError: true)
+
+        return eventResult
+    }
+
+    /**
+     * <p>
+     * Creates an event result and assigns it to the specified
+     * {@link JobResult}.
+     * </p>
+     *
+     * <p>
+     * None of the arguments may be <code>null</code>.
+     * </p>
+     *
+     * @param job
+     *         The parent job.
+     * @param jobResult
+     *         The job result the event result should be assigned to.
+     * @param docCompleteTimeInMillisecs
+     *         The doc-complete-time in milliseconds.
+     * @param customerSatisfactionInPercent
+     *         The customer-satisfaction-index in percent.
+     */
+    static EventResult createEventResult(
+            JobGroup jobGroup, MeasuredEvent measuredEvent, Page page, Browser browser, Location location,
+            ConnectivityProfile connectivityProfile = null) {
+        Job job = createJob("jobLabel", createScript(), location, jobGroup, "description", 1, false, 200)
+        JobResult jobResult = createJobResult("123", new Date(), job, location)
+        EventResult eventResult = new EventResult(
+                numberOfWptRun: 1,
+                cachedView: CachedView.UNCACHED,
+                medianValue: true,
+                wptStatus: 200,
+                docCompleteTimeInMillisecs: null,
+                csByWptDocCompleteInPercent: null,
+                jobResult: jobResult,
+                jobResultDate: jobResult.date,
+                jobResultJobConfigId: jobResult.job.ident(),
+                speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
+                connectivityProfile: connectivityProfile,
+                customConnectivityName: null,
+                noTrafficShapingAtAll: true,
+                jobGroup: jobGroup,
+                measuredEvent: measuredEvent,
+                page: page,
+                browser: browser,
+                location: location
         ).save(failOnError: true)
 
         return eventResult
@@ -1078,13 +1126,13 @@ class TestDataUtil implements OsmTestLogin {
                 assertNotNull(jobResult)
 
                 if (columns.length > 8 && !columns[8].isEmpty()) {
-                    createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, connectivityProfile);
+                    Browser dummyBrowser = createBrowser("bro", 0)
+                    createEventResult(job, jobResult, Integer.valueOf(columns[7]), Double.valueOf(columns[8]), eventOfPage, dummyBrowser, connectivityProfile);
                 }
             }
         }
 
     }
-
 
     /**
      * <p>

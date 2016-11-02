@@ -88,9 +88,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         }
 
         when: "They are closed programmatically"
-        CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
-        }
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
 
         then: "OUTDATED update events get deleted and csi aggregations got closed and calculated"
         CsiAggregationUpdateEvent.list().size() == 0
@@ -121,7 +119,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
         when: "They are closed programmatically"
         CsiAggregation.withTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         updateEvents = csiAggregationDaoService.getUpdateEvents(csiAggregations*.ident())
         csiAggregations = CsiAggregation.list()
@@ -161,7 +159,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         int updateEventCountBefore = updateEventsOfJobGroupCsiAggregations.size()
 
         when: "They are closed programmatically"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         jobGroupCsiAggregations = csiAggregations.findAll { it.aggregator.name.equals(AggregatorType.SHOP) }
         updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
 
@@ -189,7 +187,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         }
 
         when: "The JobGroup CsiAggregations are closed programmatically once"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         List<CsiAggregation> pageCsiAggregations = CsiAggregation.list().findAll {
             it.aggregator.name.equals(AggregatorType.PAGE)
         }
@@ -201,7 +199,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         int updateEventCountBefore = updateEventsOfPageCsiAggregations.size()
 
         and: "Then a second time"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         pageCsiAggregations = CsiAggregation.list().findAll { it.aggregator.name.equals(AggregatorType.PAGE) }
         updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
 
@@ -237,7 +235,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         int updateEventCountBefore = updateEventsOfJobGroupCsiAggregations.size()
 
         when: "They are closed programmatically"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         csiAggregations = CsiAggregation.list()
         jobGroupCsiAggregations = csiAggregations.findAll { it.aggregator.name.equals(AggregatorType.SHOP) }
         updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
@@ -266,7 +264,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         }
 
         when: "The JobGroup CsiAggregations are closed programmatically once"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         List<CsiAggregation> pageCsiAggregations = CsiAggregation.list().findAll {
             it.aggregator.name.equals(AggregatorType.PAGE)
         }
@@ -278,7 +276,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         int updateEventCountBefore = updateEventsOfPageCsiAggregations.size()
 
         and: "Then a second time"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         pageCsiAggregations = CsiAggregation.list().findAll { it.aggregator.name.equals(AggregatorType.PAGE) }
         updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
 
@@ -303,7 +301,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
         CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -324,7 +322,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
         CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -345,7 +343,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
         CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -366,7 +364,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
         CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 

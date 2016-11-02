@@ -96,7 +96,9 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 
         shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
         weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-        wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
+        CsiAggregation.withNewSession {
+            wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
+        }
 
         targetValues = [
                 csiGroup1: 0.391,
