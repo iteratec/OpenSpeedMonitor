@@ -859,9 +859,12 @@ class CsiDashboardController {
                 graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
-        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
-        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
-        if (dashboardValues.chartWidth) cmd.chartWidth = dashboardValues.chartWidth.toInteger()
+        if (dashboardValues.chartHeight) {
+            cmd.chartHeight = dashboardValues.chartHeight == "auto" ? -1 : dashboardValues.chartHeight.toInteger()
+        }
+        if (dashboardValues.chartWidth) {
+            cmd.chartWidth = dashboardValues.chartWidth == "auto" ? -1 : dashboardValues.chartWidth.toInteger()
+        }
 
         if (!cmd.validate()) {
             //send errors

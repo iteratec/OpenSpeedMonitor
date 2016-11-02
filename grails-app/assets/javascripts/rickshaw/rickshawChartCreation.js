@@ -1104,9 +1104,10 @@ function ChartAdjuster(graphBuilder, args) {
     this.registerEventHandlers = function () {
         $('#adjustChartApply').bind('click', function () {
             self.graphBuilder.updateTitle($('#dia-title').val());
-            self.updateAllYAxis();
-            self.updateSize();
-            $('#adjustChartModal').modal('hide');
+            var success = self.updateAllYAxis();
+            if (self.updateSize() && success) {
+                $('#adjustChartModal').modal('hide');
+            }
         });
         var aliasChildList = $("#graphAliasChildlist");
         aliasChildList.bind("graphAliasChildsChanged", self.graphBuilder.updateAliases);
@@ -1145,9 +1146,11 @@ function ChartAdjuster(graphBuilder, args) {
                     "column-count": 2 + ""
                 });
             }
+            return true
         } else {
             window
                 .alert("Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels.");
+            return false
         }
     }
 
@@ -1177,10 +1180,14 @@ function ChartAdjuster(graphBuilder, args) {
     }
 
     this.updateAllYAxis = function () {
-        $("div.adjust_chart_y_axis").each(self.updateOneYAxis);
+        var success = true;
+        $("div.adjust_chart_y_axis").each(function(i, el) {
+            success = self.updateOneYAxis(el) && success
+        });
+        return success;
     }
 
-    this.updateOneYAxis = function(_, container) {
+    this.updateOneYAxis = function(container) {
         container = $(container);
         var diaYAxisMin = container.find('.dia-y-axis-min').val();
         var diaYAxisMax = container.find('.dia-y-axis-max').val();
@@ -1206,6 +1213,7 @@ function ChartAdjuster(graphBuilder, args) {
         } else {
             window.alert("Minimum and maximum of Y-Axis has to be \"auto\" or numeric values and maximum must be greater than minimum!");
         }
+        return valid;
     }
 
     this.addFunctionalityShowDataMarker = function () {

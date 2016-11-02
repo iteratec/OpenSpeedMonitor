@@ -310,12 +310,11 @@
             var showDataMarkers = "${showDataMarkers}";
             var showDataLabels = "${showDataLabels}";
             var optimizeForWideScreen = "${showDataLabels}"
-            var graphNameAliases =
-            ${graphNameAliases}
+            var graphNameAliases = ${graphNameAliases};
             var graphColors = ${graphColors}
-                    $("#dia-title").val(chartTitle);
-            $("#dia-width").val(chartWidth);
-            $("#dia-height").val(chartHeight);
+            $("#dia-title").val(chartTitle);
+            $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
+            $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
             $("#dia-y-axis-max").val(loadTimeMaximum);
             $("#dia-y-axis-min").val(loadTimeMinimum);
             initGraphNameAliases(graphNameAliases);
@@ -341,7 +340,6 @@
 
             <g:if test="${dashboardName}">
                 updateDateTimePicker(${from.getTime()}, ${to.getTime()}, '${fromHour}', '${toHour}', ${selectedTimeFrameInterval});
-                updateSelectedInterval(${selectedInterval});
             </g:if>
 
             if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {

@@ -274,12 +274,12 @@ class EventResultDashboardController {
             overwriteWarningAboutLongProcessingTime = dashboard.overwriteWarningAboutLongProcessingTime
             debug = dashboard.debug
 
-            trimBelowLoadTimes = dashboard.trimBelowLoadTimes ? Integer.parseInt(dashboard.trimBelowLoadTimes) : null
-            trimAboveLoadTimes = dashboard.trimAboveLoadTimes ? Integer.parseInt(dashboard.trimAboveLoadTimes) : null
-            trimBelowRequestCounts = dashboard.trimBelowRequestCounts ? Integer.parseInt(dashboard.trimBelowRequestCounts) : null
-            trimAboveRequestCounts = dashboard.trimAboveRequestCounts ? Integer.parseInt(dashboard.trimAboveRequestCounts) : null
-            trimBelowRequestSizes = dashboard.trimBelowRequestSizes ? Integer.parseInt(dashboard.trimBelowRequestSizes) : null
-            trimAboveRequestSizes = dashboard.trimAboveRequestSizes ? Integer.parseInt(dashboard.trimAboveRequestSizes) : null
+            trimBelowLoadTimes = dashboard.trimBelowLoadTimes
+            trimAboveLoadTimes = dashboard.trimAboveLoadTimes
+            trimBelowRequestCounts = dashboard.trimBelowRequestCounts
+            trimAboveRequestCounts = dashboard.trimAboveRequestCounts
+            trimBelowRequestSizes = dashboard.trimBelowRequestSizes
+            trimAboveRequestSizes = dashboard.trimAboveRequestSizes
 
             includeNativeConnectivity = dashboard.includeNativeConnectivity
             customConnectivityName = dashboard.customConnectivityName
@@ -401,9 +401,12 @@ class EventResultDashboardController {
         if (dashboardValues.trimAboveLoadTimes) cmd.trimAboveLoadTimes = dashboardValues.trimAboveLoadTimes.toInteger()
         if (dashboardValues.trimBelowLoadTimes) cmd.trimBelowLoadTimes = dashboardValues.trimBelowLoadTimes.toInteger()
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
-        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
-        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
-        if (dashboardValues.chartWidth) cmd.chartWidth = dashboardValues.chartWidth.toInteger()
+        if (dashboardValues.chartHeight) {
+            cmd.chartHeight = dashboardValues.chartHeight == "auto" ? -1 : dashboardValues.chartHeight.toInteger()
+        }
+        if (dashboardValues.chartWidth) {
+            cmd.chartWidth = dashboardValues.chartWidth == "auto" ? -1 : dashboardValues.chartWidth.toInteger()
+        }
         // Check validation and send errors if needed
         if (!cmd.validate()) {
             //send errors
