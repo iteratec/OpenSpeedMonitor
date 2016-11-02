@@ -171,7 +171,7 @@
 <g:else>
     <g:if test="${request.queryString}">
         <g:if test="${!warnAboutLongProcessingTime}">
-            <div class="alert alert-info text-center">
+            <div class="alert alert-info text-center" id="noDataForCurrentSelectionWarning">
                 <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
             </div>
         </g:if>
@@ -256,7 +256,7 @@
                                 <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
                                                default="Aggregator"/>
                             </legend>
-                            <div>
+                            <div id="aggregationRadioButtons">
                                 <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
                                               values="${aggrGroupValues}"
                                               value="${aggrGroupAndInterval}">

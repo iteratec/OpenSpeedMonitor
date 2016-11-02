@@ -11,11 +11,12 @@ class CsiDashboardPage extends Page{
     static at = { title == "Dashboard" }
 
     static content = {
+        adjustChartButton{$("#rickshaw_adjust_chart_link")}
         timeFrameSelect{$("#timeframeSelect").find("option").contextElements[0]}
         showButton (to: CsiDashboardPage) {$("#chart-submit")}
         fromDatepicker{$("#fromDatepicker")}
         toDatepicker{$("#toDatepicker")}
-        aggregationRadioButtons{$(".span6")} //possible values measured_event, daily_page, weekly_page, daily_shop, weekly_shop, daily_system, weekly_system
+        aggregationRadioButtons{$("#aggregationRadioButtons")} //possible values measured_event, daily_page, weekly_page, daily_shop, weekly_shop, daily_system, weekly_system
         basedOnVisuallyCompleteButton{$("#csiTypeVisuallyComplete")}
         saveAsDashboardButton(required: false) { $("a", href: "#CreateUserspecifiedDashboardModal") }
         jobGroupList { $("#folderSelectHtmlId").find("option").contextElements }
@@ -58,7 +59,7 @@ class CsiDashboardPage extends Page{
         connectivityTab{$("a",href:"#tab3")}
     }
 
-    public void clickAdjustChartAccordion() {
+    public void clickAdjustChart() {
         // Scroll object into view so it becomes clickable
         sleep(100)
         String jqueryString = "jQuery(\'.accordion-toggle\')[0].scrollIntoView();"
@@ -66,7 +67,7 @@ class CsiDashboardPage extends Page{
         sleep(100)
         js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
         sleep(100)
-        $('.accordion-toggle')[0].click()
+        $('#rickshaw_adjust_chart_link')[0].click()
     }
 
     public void clickSaveAsDashboardButton() {
