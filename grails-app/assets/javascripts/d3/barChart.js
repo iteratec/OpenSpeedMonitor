@@ -16,7 +16,8 @@ function createBarChart(altWidth, altHeight, data, img, id) {
     var rawWidth, rawHeight;
 
     if (!d3.select('#barChartSpan').empty()) {
-        var barChartSpanWidth = parseInt(d3.select('#barChartSpan').style('width'), 10);
+        // var barChartSpanWidth = parseInt(d3.select('#barChartSpan').style('width'), 10);
+        var barChartSpanWidth = $(window).innerWidth() * 0.5;
         rawWidth = barChartSpanWidth;
         rawHeight = 2 / 3 * rawWidth;
     } else {

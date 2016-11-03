@@ -68,7 +68,7 @@
                 <li class="controller ${(controllerName.equals('eventResultDashboard') || controllerName.equals('detailAnalysis')) ? 'active' : ''}">
                     <g:render template="/layouts/dashboardButton" model="${[
                             'availableDashboards': availableDashboards,
-                            'affectedController': 'eventResultDashboard'
+                            'affectedController' : 'eventResultDashboard'
                     ]}"/>
                 </li>
                 <li class="controller ${controllerName.equals('tabularResultPresentation') ? 'active' : ''}">
@@ -84,16 +84,21 @@
                 <li class="controller ${actionName.equals('showAll') ? 'active' : ''}">
                     <g:render template="/layouts/dashboardButton" model="${[
                             'availableDashboards': availableDashboards,
-                            'affectedController': 'csiDashboard'
+                            'affectedController' : 'csiDashboard'
                     ]}"/>
                 </li>
                 <li class="controller ${actionName.equals('configurations') ? 'active' : ''}">
-                    <g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
-                            code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>
+                    <g:render template="/layouts/csiConfigurationButton" model="${[
+                            'availableCsiConfigurations': csiConfigurations,
+                            'affectedController'     : 'csiConfiguration'
+                    ]}"/>
+                    %{--<g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
+                            code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>--}%
                 </li>
             </g:elseif>
         </ul>
     </div>
+
     <div class="col-md-4" id="selectionSummary">
         <g:if test="${controllerName == 'eventResultDashboard'}">
             <table>
@@ -131,5 +136,19 @@
                 </tr>
             </table>
         </g:if>
+        <g:elseif test="${controllerName == 'csiConfiguration'}">
+            <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
+                <div class="pull-right">
+                    <button class="btn btn-primary"
+                            onclick="prepareConfigurationListAndCopy()">
+                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        ${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Save')}
+                    </button>
+                    <a href="#" onclick="return validatedDeletion()" id="deleteCsiConfigurationHref" class="btn btn-danger">
+                        <i class="fa fa-trash-o" aria-hidden="true"></i> ${message(code: 'de.iteratec.osm.csiConfiguration.deleteCsiConfiguration', default: 'Delete')}
+                    </a>
+                </div>
+            </sec:ifAnyGranted>
+        </g:elseif>
     </div>
 </div>

@@ -53,7 +53,7 @@ class D3HtmlCreator {
     def generateBarChartHtml = {chartIdentifier ->
         StringWriter writer = new StringWriter()
             return writer << """<div class="row">
-                                    <div class="col-md-8" id="barChartSpan">
+                                    <div class="col-md-12" id="barChartSpan">
                                         <svg class="chart" id="${chartIdentifier}"></svg>
                                     </div>
                                 </div>"""
@@ -65,7 +65,7 @@ class D3HtmlCreator {
     def generateMatrixViewHtml = {chartIdentifier ->
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
-                                <div class="col-md-8" id="${chartIdentifier}"></div>
+                                <div class="col-md-12" id="${chartIdentifier}"></div>
                                     <div id="tooltipMatrixView" class="hidden">
                                     <p><strong id="columnName"></strong></p>
                                     <p><strong id="rowName"></strong></p>
@@ -82,14 +82,13 @@ class D3HtmlCreator {
     def generateTreemapHtml = {chartIdentifier ->
         StringWriter writer = new StringWriter()
         return writer << """<div class="row">
-                                <div class="col-md-8" id="treemapSpan">
+                                <div class="col-md-12" id="treemapSpan">
                                     <div class="treemap" id= ${chartIdentifier}></div>
-                                    <div id="tooltip" class="hidden">
+                                    <div id="tooltipTreemap" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
                                     </div>
-                                </div>
-                                <div class="col-md-3" id="zeroWeightSpan">
+                                    <div id="zeroWeightSpan"></div>
                                 </div>
                             </div>"""
     }

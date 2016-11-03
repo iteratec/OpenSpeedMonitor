@@ -8,10 +8,11 @@ function createMatrixView(data, chartDivIdentifier) {
 
     //pick div and set width
     var div = d3.select("#" + chartDivIdentifier);
-    var divWidth = parseInt(div.style("width"), 10);
+    // var divWidth = parseInt(div.style("width"), 10);
+    var divWidth = $(window).innerWidth() * 0.5;
 
     // Define margins, width and height
-    var margin = {top: 150, right: 100, bottom: 50, left: 100},
+    var margin = {top: 150, right: 100, bottom: 50, left: 150},
         width = divWidth - margin.right,
         tileSize = width / data.columnNames.length,
         tilePadding = 3,
@@ -47,6 +48,7 @@ function createMatrixView(data, chartDivIdentifier) {
 
     // Create SVG Container
     var svg = div.append("svg")
+        .attr("class", "chart")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")

@@ -5,6 +5,10 @@
     <meta name="layout" content="kickstart_osm"/>
     <title>CSI CheckDashboard</title>
     <style>
+    .chart {
+        display: block;
+        margin: 0 auto;
+    }
     %{--Styles for MatrixView--}%
     .xAxisMatrix path,
     .xAxisMatrix line,
@@ -84,7 +88,8 @@
     }
 
     #tooltipMatrixView,
-    #tooltip {
+    #tooltipTreemap,
+    #tooltip{
         position: absolute;
         width: auto;
         height: auto;
@@ -100,6 +105,7 @@
     }
 
     #tooltipMatrixView.hidden,
+    #tooltipTreemap.hidden,
     #tooltip.hidden {
         display: none;
     }
@@ -147,46 +153,20 @@
 <%-- main menu ---------------------------------------------------------------------------%>
 <g:render template="/layouts/mainMenu"/>
 
-%{--container for errors --}%
-<div class="alert alert-danger" id="errorDeletingCsiConfiguration" style="display: none">
-    <strong>
-        <g:message code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/>
-    </strong>
 
-    <p id="deletingCsiConfiguratioinErrors"></p>
-</div>
-
+%{-- dropdown button --}%%{--
 <div class="row">
-
-    %{--Name and description of actual config----------------------------------------------}%
-    <div class="col-md-8">
-        <blockquote>
-            <p class="text-info">
-                <strong id="headerCsiConfLabel">${selectedCsiConfiguration.label}</strong>
-                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                    <a href="#updateCsiConfModal" class="fa fa-edit"
-                       style="text-decoration:none;color: #3a87ad;" data-toggle="modal"></a>
-                </sec:ifAnyGranted>
-            </p>
-            <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
-        </blockquote>
-    </div>
-
-    <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner-25"></div>
-    %{--dropdown button----------------------------------------------}%
-    <div class="col-md-2 col-md-offset-1">
-
+    <div class="col-md-2">
         <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
-
             <div class="btn btn-group pull-left">
                 <button class="btn btn-sm btn-info dropdown-toggle text-right" data-toggle="dropdown">
                     <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration"
-                               default="This Configuration..."></g:message>
+                               default="This Configuration..."/>
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
 
-                %{--features for actual configuration----------------------------}%
+                --}%%{--features for actual configuration----------------------------}%%{--
                     <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
                         <li>
                             <a href="#"
@@ -202,7 +182,7 @@
                         </li>
                     </sec:ifAnyGranted>
 
-                %{--submenu to show other configurations----------------------------}%
+                --}%%{--submenu to show other configurations----------------------------}%%{--
                     <li class="dropdown-submenu" id="otherConfigsSubmenu">
                         <a tabindex="-1" href="#">
                             <i class="fa fa-share-square-o"></i>&nbsp;<g:message
@@ -213,13 +193,96 @@
                     </li>
                 </ul>
             </div>
+        </g:if>
+    </div>
+</div>--}%
 
+
+%{-- container for errors --}%
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-danger" id="errorDeletingCsiConfiguration" style="display: none">
+            <strong>
+                <g:message code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/>
+            </strong>
+
+            <p id="deletingCsiConfiguratioinErrors"></p>
+        </div>
+
+        <g:if test="${!readOnly}">
+            <div class="alert alert-warning" id="warnAboutOverwritingBox">
+                <strong>
+                    <g:message code="de.iteratec.osm.defaults.confirmationMessage"/>
+                </strong>
+                <p id="warningsOverwriting"></p>
+            </div>
+
+            <div class="alert alert-danger" id="errorBoxDefaultMappingCsv">
+                <strong>
+                    <g:message code="de.iteratec.osm.csi.csvErrors.title"/>
+                </strong>
+                <p id="defaultMappingCsvErrors"></p>
+            </div>
         </g:if>
 
+        <g:if test="${!readOnly}">
+            <g:if test="${errorMessagesCsi}">
+                <ul>
+                    <g:each var="errMessage" in="${errorMessagesCsi ?}">
+                        <li class="text-danger">${errMessage}</li>
+                    </g:each>
+                </ul>
+            </g:if>
+        </g:if>
     </div>
 </div>
 
-%{--mapping and weights details----------------------------------------------}%
+
+%{-- name and description of actual config --}%
+<div class="row">
+    <div class="col-md-12">
+        <blockquote>
+            <p class="text-info">
+                <strong id="headerCsiConfLabel">${selectedCsiConfiguration.label}</strong>
+                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                    <a href="#updateCsiConfModal" class="fa fa-edit"
+                       style="text-decoration:none;color: #3a87ad;" data-toggle="modal"></a>
+                </sec:ifAnyGranted>
+            </p>
+            <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
+        </blockquote>
+
+        <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner-25"></div>
+    </div>
+</div>
+
+
+%{-- nav tabs for the mapping and the weights --}%
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" href="#csiMappingDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#csiConnectivityWeightDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.connectivityWeights" default="Connectivity Weights"/>
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#csiPageWeightDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.pageWeights" default="Page Weights"/>
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#csiTimeWeightDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.timeWeights" default="Time Weights"/>
+        </a>
+    </li>
+</ul>
+
+
+%{-- mapping and weights details --}%
 <g:render template="confDetails" model="[readOnly                : false,
                                          showDefaultMappings     : true,
                                          errorMessagesCsi        : errorMessagesCsi,
@@ -227,7 +290,8 @@
                                          selectedCsiConfiguration: selectedCsiConfiguration,
                                          pageMappingsExist       : pageMappingsExist]"/>
 
-%{--initially invisible modal dialog to update csi configuratuion via ajax---------------}%
+
+%{-- initially invisible modal dialog to update csi configuratuion via ajax --}%
 <g:render template="/_common/modals/csi/updateCsiConfiguration"/>
 
 <%-- include bottom ---------------------------------------------------------------------------%>
@@ -243,14 +307,14 @@
 
             registerEventHandlersForFileUploadControls();
 
-            $("#btn-csi-mapping").click(function () {
-                $('#csi-mapping').show();
-                $('#csi-weights').hide();
-            });
-            $("#btn-csi-weights").click(function () {
-                $('#csi-mapping').hide();
-                $('#csi-weights').show();
-            });
+            %{--$("#btn-csi-mapping").click(function () {--}%
+                %{--$('#csi-mapping').show();--}%
+                %{--$('#csi-weights').hide();--}%
+            %{--});--}%
+            %{--$("#btn-csi-weights").click(function () {--}%
+                %{--$('#csi-mapping').hide();--}%
+                %{--$('#csi-weights').show();--}%
+            %{--});--}%
 
             $('#updateCsiConfModal').on('shown', function () {
                 $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
@@ -309,7 +373,7 @@
         var actualCsiConfigurationLabel = '${selectedCsiConfiguration.label}';
         var allCsiConfigurations = ${csiConfigurations as grails.converters.JSON};
 
-        function refreshCsiConfigurationSwitchMenu() {
+%{--        function refreshCsiConfigurationSwitchMenu() {
 
             if(allCsiConfigurations.length <= 1){
                 $('#otherConfigsSubmenu').hide();
@@ -331,7 +395,7 @@
                 $('#otherConfigsSubmenu').show();
             }
 
-        }
+        }--}%
 
         $(document).ready(function () {
 
@@ -342,7 +406,7 @@
             registerEventHandlers();
 
             initializeSomeControls();
-            refreshCsiConfigurationSwitchMenu();
+            %{--refreshCsiConfigurationSwitchMenu();--}%
 
         });
         $( window ).load(function() {

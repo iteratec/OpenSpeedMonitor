@@ -27,7 +27,8 @@ function createTreemap(altWidth, altHeight, data, design, id) {
 
     // set sizes if divs are found
     if (!d3.select('#treemapSpan').empty() && !d3.select('#zeroWeightSpan').empty()) {
-        var treemapSpanWidth = parseInt(d3.select('#treemapSpan').style('width'), 10);
+        // var treemapSpanWidth = parseInt(d3.select('#treemapSpan').style('width'), 10);
+        var treemapSpanWidth = $(window).innerWidth() * 0.5;
         var zeroWeigthSpanWidth = parseInt(d3.select('#zeroWeightSpan').style('width'), 10);
         rawWidth = treemapSpanWidth;
         rawHeight = 2 / 3 * rawWidth;
@@ -44,17 +45,20 @@ function createTreemap(altWidth, altHeight, data, design, id) {
     var selector = "[id=" + id + "]";
     var container = d3.select(selector);
     // Defines the margins and the size of the treemap
-    var margin = {top: 10, right: 0, bottom: 10, left: 50},
+    var margin = {top: 10, right: 0, bottom: 10, left: 0},
         width = rawWidth - margin.left - margin.right,
         height = rawHeight - margin.top - margin.bottom;
 
+    $('#treemapSpan')
+        .css("display", "flex")
+        .css("justify-content", "center");
 
     // Set attributes of the treemap container
     container
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .style("display", "flex")
-        .style("float", "left");
+        .style("width", width + margin.left + margin.right + "px")
+        .style("height", height + margin.top + margin.bottom + "px")
+        // .style("display", "flex")
+        // .style("float", "left");
 
 
     // does tooltip at mouse position
@@ -62,18 +66,23 @@ function createTreemap(altWidth, altHeight, data, design, id) {
         var xPosition = d3.event.pageX + 10;
         var yPosition = d3.event.pageY + 10;
 
-        d3.select("#tooltip")
-            .style("left", xPosition + "px")
-            .style("top", yPosition + "px");
-        d3.select("#tooltip #heading")
+        var treemapSpanTop = $('#treemapSpan').offset().top;
+        var treemapSpanLeft = $('#treemapSpan').offset().left;
+
+        var tooltip = d3.select("#tooltipTreemap");
+        tooltip
+            .style("left", xPosition - treemapSpanLeft + "px")
+            .style("top", yPosition - treemapSpanTop + "px")
+            .style("z-index", 3);
+        d3.select("#tooltipTreemap #heading")
             .text(data.dataName + ": " + d.name);
-        d3.select("#tooltip #info")
+        d3.select("#tooltipTreemap #info")
             .text(data.weightName + ": " + d.weight);
-        d3.select("#tooltip").classed("hidden", false);
+        d3.select("#tooltipTreemap").classed("hidden", false);
     };
 
     var mouseout = function () {
-        d3.select("#tooltip").classed("hidden", true);
+        d3.select("#tooltipTreemap").classed("hidden", true);
     };
 
     var treemap = d3.layout.treemap()
@@ -117,9 +126,10 @@ function createTreemap(altWidth, altHeight, data, design, id) {
 
     function addFilterBox() {
         var filterBox = d3.select('#zeroWeightSpan');
+        filterBox.style("padding-left", "20px");
 
         filterBox.append("text")
-            .html("<h4>" + data.zeroWeightLabel + ": </h4>");
+            .html("<strong>" + data.zeroWeightLabel + ": </strong>");
 
         var listGroup = filterBox.append("ul")
             .attr("class", "list-group");

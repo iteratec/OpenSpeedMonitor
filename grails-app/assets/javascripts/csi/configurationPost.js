@@ -53,7 +53,7 @@ function copyCsiConfiguration(csiConfigurations) {
                 $('#uploadPageWeightsCsiConfigurationId').val(actualCsiConfigurationId);
                 $('#uploadHourOfDayWeightsCsiConfigurationId').val(actualCsiConfigurationId);
 
-                refreshCsiConfigurationSwitchMenu();
+                // refreshCsiConfigurationSwitchMenu();
                 runningSpinner.stop();
 
             }

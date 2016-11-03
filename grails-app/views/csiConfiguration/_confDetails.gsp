@@ -1,6 +1,8 @@
 <%@ page import="grails.converters.JSON" %>
 <%@ defaultCodec="none" %>
-<div class="row">
+
+%{-- navigation buttons (deprecated) --}%
+%{--<div class="row">
     <div class="col-md-12">
         <div class="btn-group" data-toggle="buttons">
             <button type="button" class="btn btn-sm btn-info" id="btn-csi-mapping"
@@ -13,336 +15,376 @@
                                                           default="Mapping CSI"/></button>
         </div>
     </div>
-</div>
-
-<%-- csi weights ---------------------------------------------------------------------------%>
-
-<div id="csi-weights">
-
-    <g:if test="${!readOnly}">
-
-        <g:if test="${errorMessagesCsi}">
-            <ul>
-                <g:each var="errMessage" in="${errorMessagesCsi ?}"><li class="text-danger">${errMessage}</li></g:each>
-            </ul>
-        </g:if>
-
-        <br/>
-    </g:if>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>
-                <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
-                <g:message code="de.iteratec.isocsi.browser_connectivity_weight" default="BrowserConnectivity"/>
-            </h3>
-        </div>
-    </div>
-    <g:if test="${!readOnly}">
-        <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadBrowserConnectivityWeights', absolute: true)}')">
-            <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-        </button>
-
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:uploadForm controller="csiConfigIO" action="uploadBrowserConnectivityWeights">
-                <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv"
-                       style="display:none">
-                <input id="uploadBrowserConnectivityWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
-                       value="${selectedCsiConfiguration.ident()}"
-                       style="display:none">
-
-                <div class="input-group">
-                    <label><g:message code="de.iteratec.ism.label.upload_new_browser_connectivity_weights"
-                                      default="Neue Browser-Verbindung-Gewichtung hochladen (csv)"/>
-                    </label>
-                    <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text">
-                    <a class="btn btn-default" onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
-                        <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
-                    </a>
-                    <button type="submit" class="btn btn-default">
-                        <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
-                    </button>
-                </div>
-            </g:uploadForm>
-        </sec:ifAllGranted>
-
-    </g:if>
-    <iteratec:matrixView
-            chartIdentifier="browserConnectivityMatrixView"/>
-
-    <hr/>
-
-    <h3>
-        <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
-        <g:message code="de.iteratec.isocsi.page_weight" default="Page"/>
-    </h3>
-    <g:if test="${!readOnly}">
-        <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadPageWeights', absolute: true)}')">
-            <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-        </button>
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:uploadForm controller="csiConfigIO" action="uploadPageWeights">
-                <input id="thePageCsvFile" type="file" name="pageCsv" style="display:none">
-                <input id="uploadPageWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
-                       value="${selectedCsiConfiguration.ident()}"
-                       style="display:none">
-
-                <div class="input-group">
-                    <label>
-                        <g:message code="de.iteratec.ism.label.upload_new_page_weights"
-                                   default="Neue Page-Gewichtung hochladen (csv)"/>
-                    </label>
-                    <input id="thePageCsvFileTwitter" class="form-control" type="text">
-                    <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
-                        <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
-                    </a>
-                    <button type="submit" class="btn btn-default">
-                        <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
-                    </button>
-                </div>
-            </g:uploadForm>
-        </sec:ifAllGranted>
-
-    </g:if>
-    <iteratec:treemap
-            chartIdentifier="pageWeightTreemap"/>
-
-    <hr/>
-
-    <h3>
-        <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
-        <g:message code="de.iteratec.isocsi.hour_weight" default="Tageszeit"/>
-    </h3>
-    <g:if test="${!readOnly}">
-        <button class="btn btn-link" onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadHourOfDayWeights', absolute: true)}')">
-            <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-        </button>
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:uploadForm controller="csiConfigIO" action="uploadHourOfDayWeights">
-                <input id="theHourOfDayCsvFile" type="file" name="hourOfDayCsv" style="display:none">
-                <input id="uploadHourOfDayWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId" value="${selectedCsiConfiguration.ident()}"
-                       value="${selectedCsiConfiguration.ident()}"
-                       style="display:none">
-
-                <div class="input-group">
-                    <label>
-                        <g:message code="de.iteratec.ism.label.upload_default_mappings"
-                                   default="Neue Default-Mappings hochladen (CSV)"/>
-                    </label>
-                    <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text">
-                    <a class="btn btn-default" onclick="$('input[id=theHourOfDayCsvFile]').click();">
-                        <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
-                    </a>
-                    <button type="submit" class="btn btn-default">
-                        <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
-                    </button>
-                </div>
-            </g:uploadForm>
-        </sec:ifAllGranted>
-    </g:if>
-    <iteratec:barChart
-            chartIdentifier="hoursOfDayBarchart"/>
-
-    <br/>
-</div>
-<%-- csi mapping ---------------------------------------------------------------------------%>
-
-<div id="csi-mapping">
-
-    <g:if test="${!readOnly}">
-
-        <div id="csi-mapping"></div>
-
-        <div class="alert alert-warning" id="warnAboutOverwritingBox">
-            <strong><g:message
-                    code="de.iteratec.osm.defaults.confirmationMessage"/></strong>
-
-            <p id="warningsOverwriting">
-            </p>
-
-        </div>
-
-        <div class="alert alert-danger" id="errorBoxDefaultMappingCsv">
-            <strong><g:message
-                    code="de.iteratec.osm.csi.csvErrors.title"/></strong>
-
-            <p id="defaultMappingCsvErrors">
-            </p>
-
-        </div>
-        <br/>
-    </g:if>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>
-                <span class="text-muted"><g:message code="de.iteratec.osm.csi.mapping.label"
-                                               default="Mapping"/>:&nbsp;</span>
-                <g:message code="de.iteratec.osm.csi.configuration.mapping.heading"
-                           default="Mapping Load time&nbsp;&rArr;&nbsp;Customer satisfaction"/>
-            </h3>
-        </div>
-    </div>
+</div>--}%
 
 
-    %{--Page Mappings--}%
-    <div class="row">
-        <div class="col-md-12">
-            <span class="inline">
-                <span class="text-info">
-                    <strong><g:message code="de.iteratec.osm.csiConfiguration.pageMappingsHeadline"
-                                       default="PageMappings"/></strong>
-                </span>
-                &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.pageMappingsExplanation"
-                                        default="These Mappings are assigned to pages"/>
-            </span>
-        </div>
-    </div>
-    <g:if test="${pageMappingsExist}">
+<div class="tab-content">
+    <div id="csiMappingDetailsTabContent" class="tab-pane active">
+        <h3 class="section">
+            <span class="text-muted"><g:message code="de.iteratec.osm.csi.mapping.label"
+                                                default="Mapping"/>:&nbsp;</span>
+            <g:message code="de.iteratec.osm.csi.configuration.mapping.heading"
+                       default="Mapping Load time&nbsp;&rArr;&nbsp;Customer satisfaction"/>
+        </h3>
+
         <div class="row">
-            <div class="col-md-12">
-                <g:render template="/chart/csi-mappings"
-                          model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
-                                    'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                                    'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+            <div class="col-md-2">
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active">
+                        <a data-toggle="tab" href="#csiAssignedMappingTabContent">
+                            Assigned Mappings
+                        </a>
+                    </li>
+                    <li>
+                        <a data-toggle="tab" href="#csiAvailableMappingTabContent">
+                            Available Mappings
+                        </a>
+                    </li>
+                </ul>
             </div>
-        </div>
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <button href="#" type="button" class="btn btn-primary" style="display: none;"
-                                    id="removePageMapping"
-                                    onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping', absolute: true)}',
-                                            actualCsiConfigurationId);">
-                                <g:message code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
-                                           default="Remove Mapping"/>
-                            </button>
-                        </div>
 
-                        <div class="col-md-10" id="page-mapping-deletions"></div>
+            <div class="col-md-10">
+                <div class="tab-content">
+                    %{-- Assigned Mappings --}%
+                    <div id="csiAssignedMappingTabContent" class="tab-pane active">
+                        <g:if test="${pageMappingsExist}">
+                            <div class="row section">
+                                <div class="col-md-12">
+                                    <span class="inline">
+                                        <span class="text-info">
+                                            <strong><g:message
+                                                    code="de.iteratec.osm.csiConfiguration.pageMappingsHeadline"
+                                                    default="PageMappings"/></strong>
+                                        </span>
+                                        &nbsp;-&nbsp;
+                                        <g:message code="de.iteratec.osm.csi.mapping.defaults.pageMappingsExplanation"
+                                                   default="These Mappings are assigned to pages"/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                %{-- this chart is rendered in a class="col-md-8". see D3HtmlCreator.groovy --}%
+                                <g:render template="/chart/csi-mappings"
+                                              model="${['chartData'        : pageTimeToCsMappings, 'chartIdentifier': 'page_csi_mappings',
+                                                        'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                                                        'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+                                <div class="col-md-4">
+                                    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                                        <button href="#" type="button" class="btn btn-primary"
+                                                style="display: none;"
+                                                id="removePageMapping"
+                                                onclick="removeSelectedPageMapping('${createLink(controller: 'csiConfiguration', action: 'removePageMapping', absolute: true)}',
+                                                        actualCsiConfigurationId);">
+                                            <g:message
+                                                    code="de.iteratec.osm.csi.configuration.pagemapping.remove.label"
+                                                    default="Remove Mapping"/>
+                                        </button>
+                                        <div id="page-mapping-deletions"></div>
+                                    </sec:ifAllGranted>
+                                </div>
+                            </div>
+                            <asset:script type="text/javascript">
+                                var legendEntryClickCallback = function(nameOfClickedLegendEntry){
+                                    var btnRemovePageMapping = $('#removePageMapping');
+                                    if (nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
+                                        btnRemovePageMapping.show();
+                                    } else if (btnRemovePageMapping){
+                                        btnRemovePageMapping.hide();
+                                    }
+                                };
+                                var graphData = ${pageTimeToCsMappings};
+                                var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
+                            </asset:script>
+                        </g:if>
+                        <g:else>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings"
+                                                   default="Keine Mappings vorhanden."/></h5>
+                                </div>
+                            </div>
+                        </g:else>
+                    </div>
+                    %{-- Default Mappings --}%
+                    <div id="csiAvailableMappingTabContent" class="tab-pane">
+                        <g:if test="${showDefaultMappings}">
+                            <div class="row section">
+                                <div class="col-md-12">
+                                    <span class="inline">
+                                        <span class="text-info">
+                                            <strong><g:message code="de.iteratec.osm.default.heading"
+                                                               default="Defaults"/></strong>
+                                        </span>
+                                        &nbsp;-&nbsp;
+                                        <g:message code="de.iteratec.osm.csi.mapping.defaults.explanation"
+                                                   default="These Mappings can be assigned to pages"/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <g:set var="defaultIdentifier" value='default_csi_mappings'/>
+
+                            <div class="row">
+                                %{-- this chart is rendered in a class="col-md-8". see D3HtmlCreator.groovy --}%
+                                <g:render template="/chart/csi-mappings"
+                                          model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
+                                                    'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
+                                                    'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
+                                <asset:script type="text/javascript">
+                                    defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}", true, null, null);
+                                </asset:script>
+                                <div class="col-md-4">
+                                    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                                        <g:uploadForm controller="csiConfigIO"
+                                                      action="uploadDefaultTimeToCsMappings">
+                                            <input id="defaultTimeToCsMappingCsvFile" type="file"
+                                                   name="defaultTimeToCsMappingCsv"
+                                                   style="display:none">
+
+                                            <label for="defaultTimeToCsMappingCsvFileVisible">
+                                                <g:message
+                                                        code="de.iteratec.ism.label.upload_default_mappings"
+                                                        default="Neue Default-Mappings hochladen (CSV)"/>
+                                            </label>
+                                            <div class="input-group">
+                                                <span class="input-group-btn">
+                                                    <a class="btn btn-default"
+                                                       onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
+                                                        <i class="fa fa-folder-open-o"
+                                                           aria-hidden="true"></i>
+                                                    </a>
+                                                </span>
+                                                <input id="defaultTimeToCsMappingCsvFileVisible"
+                                                       class="form-control" type="text">
+                                                <span class="input-group-btn">
+                                                    <button type="submit" class="btn btn-default"
+                                                            id="defaultMappingUploadButton"
+                                                            onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);">
+                                                        <g:message code="de.iteratec.isocsi.upload_file"
+                                                                   default="Upload"/>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </g:uploadForm>
+                                    </sec:ifAllGranted>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <g:if test="${!readOnly}">
+                                    <button class="btn btn-primary"
+                                            onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadDefaultTimeToCsMappings', absolute: true)}')">
+                                        <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
+                                    </button>
+                                </g:if>
+                                <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                                    <g:set var="customDefaultCsiMappingDeletePrefix" value='DeleteDefaultCsiMapping'/>
+                                    <g:if test="${!readOnly}">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal"
+                                                href="#CsiMappingModal"
+                                                disabled="true"
+                                                id="btn-apply-mapping" onclick="showMappingDialog()">
+                                            <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
+                                                       default="Apply Mapping"/></button>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal"
+                                                href="#DeleteModal${customDefaultCsiMappingDeletePrefix}"
+                                                disabled="true"
+                                                id="btn-delete-default">
+                                            <g:message
+                                                    code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
+                                                    default="Delete Default Mapping"/></button>
+                                        <asset:script type="text/javascript">
+                                            $(document).ready(function(){
+                                                    $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
+                                            });
+                                            function defaultSelectChange(){
+                                                var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
+                                                $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
+                                                $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
+                                                changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
+                                            }
+                                            function showMappingDialog(){
+                                                var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
+                                                showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
+                                            }
+                                        </asset:script>
+                                    </g:if>
+                                    <g:render template="/_common/modals/deleteDialogCustomAction"
+                                              model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
+                                    <g:if test="${!readOnly}">
+                                        <g:render template="/_common/modals/chooseCsiMapping"
+                                                  model="[defaultMultiLineChart: defaultTimeToCsMappings, pages: pages, pageData: pageTimeToCsMappings ?: '[]']"/>
+                                    </g:if>
+                                </sec:ifAllGranted>
+                            </div>
+                        </g:if>
                     </div>
                 </div>
             </div>
-        </sec:ifAllGranted>
-        <asset:script type="text/javascript">
-            var legendEntryClickCallback = function(nameOfClickedLegendEntry){
-                var btnRemovePageMapping = $('#removePageMapping');
-                if(nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
-                    btnRemovePageMapping.show();
-                }else if(btnRemovePageMapping){
-                    btnRemovePageMapping.hide();
-                }
-            };
-            var graphData = ${pageTimeToCsMappings};
-            var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
-        </asset:script>
-    </g:if>
-    <g:else>
-        <div class="row">
-            <div class="col-md-12">
-                <h5><g:message code="de.iteratec.osm.csiConfiguration.noPageMappings"
-                               default="Keine Mappings vorhanden."/></h5>
-            </div>
         </div>
-    </g:else>
+    </div>
 
-%{--Default Mappings--}%
-    <g:if test="${showDefaultMappings}">
-
-        <div class="row">
-            <div class="col-md-12">
-                <hr>
-                <span class="inline">
-                    <span class="text-info">
-                        <strong><g:message code="de.iteratec.osm.default.heading" default="Defaults"/></strong>
-                    </span>
-                    &nbsp;-&nbsp;<g:message code="de.iteratec.osm.csi.mapping.defaults.explanation"
-                                            default="These Mappings can be assigned to pages"/>
-                </span>
-            </div>
-        </div>
-        <g:set var="defaultIdentifier" value='default_csi_mappings'/>
-        <g:render template="/chart/csi-mappings"
-                  model="${['chartData'        : defaultTimeToCsMappings, 'chartIdentifier': defaultIdentifier,
-                            'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
-                            'yAxisTopOffset'   : 8, 'bottomOffsetLegend': 220, 'modal': false]}"/>
-        <asset:script type="text/javascript">
-            defaultGraphObject = createMultiLineGraph(${defaultTimeToCsMappings}, "${defaultIdentifier}", true, null, null);
-        </asset:script>
-
-        <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-            <g:set var="customDefaultCsiMappingDeletePrefix" value='DeleteDefaultCsiMapping'/>
-            <div class="col-md-6" id="defaultMultilineGraphButtonLine">
-                <g:if test="${!readOnly}">
-                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" href="#CsiMappingModal"
-                            disabled="true"
-                            id="btn-apply-mapping" onclick="showMappingDialog()">
-                        <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
-                                   default="Delete Default Mapping"/></button>
-                    <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
-                            href="#DeleteModal${customDefaultCsiMappingDeletePrefix}" disabled="true"
-                            id="btn-delete-default">
-                        <g:message code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
-                                   default="Delete Default Mapping"/></button>
-                    <asset:script type="text/javascript">
-                        $(document).ready(function(){
-                                $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
-                    });
-                    function defaultSelectChange(){
-                        var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
-                        $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
-                        $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
-                        changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
-                    }
-                    function showMappingDialog(){
-                        var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
-                        showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
-                    }
-                    </asset:script>
-                </g:if>
-            </div>
-            <style>
-            #select-default {
-                margin-top: 10px;
-            }
-            </style>
-            <g:render template="/_common/modals/deleteDialogCustomAction"
-                      model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
-            <g:if test="${!readOnly}">
-                <g:render template="/_common/modals/chooseCsiMapping"
-                          model="[defaultMultiLineChart: defaultTimeToCsMappings, pages: pages, pageData: pageTimeToCsMappings ?: '[]']"/>
-            </g:if>
-        </sec:ifAllGranted>
+    <div id="csiConnectivityWeightDetailsTabContent" class="tab-pane">
+        <h3 class="section">
+            <span class="text-muted"><g:message code="de.iteratec.isocsi.weight"
+                                                default="Weight"/>:&nbsp;</span>
+            <g:message code="de.iteratec.isocsi.browser_connectivity_weight"
+                       default="BrowserConnectivity"/>
+        </h3>
 
         <g:if test="${!readOnly}">
-            <div class="row">
-                <div class="col-md-12">
-                    <g:link controller="csiConfigIO" action="downloadDefaultTimeToCsMappings">
-                        <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
-                    </g:link>
-                    <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
-                        <g:uploadForm controller="csiConfigIO" action="uploadDefaultTimeToCsMappings">
-                            <input id="defaultTimeToCsMappingCsvFile" type="file" name="defaultTimeToCsMappingCsv"
+            <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                <div class="row section">
+                    <div class="col-md-4">
+                        <g:uploadForm controller="csiConfigIO" action="uploadBrowserConnectivityWeights">
+                            <input id="theBrowserConnectivityCsvFile" type="file" name="browserConnectivityCsv"
+                                   style="display:none">
+                            <input id="uploadBrowserConnectivityWeightsCsiConfigurationId" type="text"
+                                   name="selectedCsiConfigurationId"
+                                   value="${selectedCsiConfiguration.ident()}"
+                                   value="${selectedCsiConfiguration.ident()}"
                                    style="display:none">
 
+
+                            <label for="theBrowserConnectivityCsvFileTwitter">
+                                <g:message code="de.iteratec.ism.label.upload_new_browser_connectivity_weights"
+                                           default="Upload new browser connectivity weights (CSV):"/>
+                            </label>
+
                             <div class="input-group">
-                                <label>
-                                    <g:message code="de.iteratec.ism.label.upload_default_mappings"
-                                               default="Neue Default-Mappings hochladen (CSV)"/>
-                                </label>
-                                <input id="defaultTimeToCsMappingCsvFileVisible" class="form-control" type="text">
-                                <a class="btn btn-default" onclick="$('input[id=defaultTimeToCsMappingCsvFile]').click();">
-                                    <g:message code="de.iteratec.ism.browse_file_system" default="Durchsuchen"/>
-                                </a>
-                                <button type="submit" class="btn btn-default" id="defaultMappingUploadButton"
-                                        onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);">
-                                    <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
-                                </button>
+                                <span class="input-group-btn">
+                                    <a class="btn btn-default"
+                                       onclick="$('input[id=theBrowserConnectivityCsvFile]').click();">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-default">
+                                        <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
+                                    </button>
+                                </span>
                             </div>
                         </g:uploadForm>
-                    </sec:ifAllGranted>
+                    </div>
                 </div>
-            </div>
+            </sec:ifAllGranted>
         </g:if>
-    </g:if>
+
+        <iteratec:matrixView chartIdentifier="browserConnectivityMatrixView"/>
+
+        <g:if test="${!readOnly}">
+            <button class="btn btn-primary"
+                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadBrowserConnectivityWeights', absolute: true)}')">
+                <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
+            </button>
+        </g:if>
+    </div>
+
+    <div id="csiPageWeightDetailsTabContent" class="tab-pane">
+        <h3 class="section">
+            <span class="text-muted"><g:message code="de.iteratec.isocsi.weight"
+                                                default="Weight"/>:&nbsp;</span>
+            <g:message code="de.iteratec.isocsi.page_weight" default="Page"/>
+        </h3>
+
+        <g:if test="${!readOnly}">
+            <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                <g:uploadForm controller="csiConfigIO" action="uploadPageWeights">
+                    <input id="thePageCsvFile" type="file" name="pageCsv" style="display:none">
+                    <input id="uploadPageWeightsCsiConfigurationId" type="text"
+                           name="selectedCsiConfigurationId"
+                           value="${selectedCsiConfiguration.ident()}"
+                           value="${selectedCsiConfiguration.ident()}"
+                           style="display:none">
+
+                    <div class="row">
+                        <div class="col-md-4 section">
+                            <label for="thePageCsvFileTwitter">
+                                <g:message code="de.iteratec.ism.label.upload_new_page_weights"
+                                           default="Upload new page weights (CSV):"/>
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <a class="btn btn-default" onclick="$('input[id=thePageCsvFile]').click();">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                <input id="thePageCsvFileTwitter" class="form-control" type="text">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-default">
+                                        <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </g:uploadForm>
+            </sec:ifAllGranted>
+        </g:if>
+
+        <iteratec:treemap chartIdentifier="pageWeightTreemap"/>
+
+        <g:if test="${!readOnly}">
+            <button class="btn btn-primary"
+                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadPageWeights', absolute: true)}')">
+                <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
+            </button>
+        </g:if>
+
+    </div>
+
+    <div id="csiTimeWeightDetailsTabContent" class="tab-pane">
+        <h3 class="section">
+            <span class="text-muted"><g:message code="de.iteratec.isocsi.weight" default="Weight"/>:&nbsp;</span>
+            <g:message code="de.iteratec.isocsi.hour_weight" default="Hour of day"/>
+        </h3>
+
+        <g:if test="${!readOnly}">
+            <sec:ifAllGranted roles="ROLE_SUPER_ADMIN">
+                <g:uploadForm controller="csiConfigIO" action="uploadHourOfDayWeights">
+                    <input id="theHourOfDayCsvFile" type="file" name="hourOfDayCsv" style="display:none">
+                    <input id="uploadHourOfDayWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId"
+                           value="${selectedCsiConfiguration.ident()}"
+                           value="${selectedCsiConfiguration.ident()}"
+                           style="display:none">
+
+                    <div class="row">
+                        <div class="col-md-4 section">
+                            <label for="theHourOfDayCsvFileTwitter">
+                                <g:message code="de.iteratec.ism.label.upload_default_mappings"
+                                           default="Neue Default-Mappings hochladen (CSV)"/>
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-btn">
+                                    <a class="btn btn-default"
+                                       onclick="$('input[id=theHourOfDayCsvFile]').click();">
+                                        <i class="fa fa-folder-open-o" aria-hidden="true"></i>
+                                    </a>
+                                </span>
+                                <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text">
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-default">
+                                        <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </g:uploadForm>
+            </sec:ifAllGranted>
+        </g:if>
+
+        <iteratec:barChart chartIdentifier="hoursOfDayBarchart"/>
+
+        <g:if test="${!readOnly}">
+            <button class="btn btn-primary"
+                    onclick="callControllerActionWithId('${createLink(controller: 'csiConfigIO', action: 'downloadHourOfDayWeights', absolute: true)}')">
+                <g:message code="de.iteratec.isocsi.csi.csvdownload" default="CSV-Download"/>
+            </button>
+        </g:if>
+    </div>
 </div>

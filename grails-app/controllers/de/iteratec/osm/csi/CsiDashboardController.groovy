@@ -299,6 +299,10 @@ class CsiDashboardController {
         }
         modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableCsiDashboards())
 
+        List csi_configurations = []
+        CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
+        modelToRender.put("csiConfigurations", csi_configurations)
+
         return modelToRender
     }
 
