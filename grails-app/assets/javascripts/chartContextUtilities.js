@@ -192,9 +192,9 @@ $(function () {
 });
 
 
-function buildWptUrl(wptView = null, nearestPoint = null) {
+function buildWptUrl(wptView, nearestPoint) {
     var url = null;
-    if (!nearestPoint || !wptView) {
+    if (typeof nearestPoint == 'undefined' || typeof wptView == 'undefined') {
         // build url for the comparison view launched from the chart context menu
         url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl.toString() +
             "video/compare.php?tests=" + comparingPartOfFilmstripsURL();
