@@ -135,7 +135,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
+        waitFor { graphLine == "M0,1.7471395337795848L338,286.60684612828186L845,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
     void "NotUsedBrowser leads to no data"(){

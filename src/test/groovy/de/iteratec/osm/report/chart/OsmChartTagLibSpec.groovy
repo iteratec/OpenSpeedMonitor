@@ -144,7 +144,7 @@ class OsmChartTagLibSpec extends Specification {
         def chartTitleNode = actualHtmlAsNode.childNodes().getAt(0)
         chartTitleNode.attributes['id'] == 'rickshaw_chart_title'
         chartTitleNode.attributes['class'] == 'rickshaw_chart_title'
-        chartTitleNode.text() == 'Title'
+        chartTitleNode.text() == ''
 
         def rickshawLableSummaryBoxNode = actualHtmlAsNode.childNodes().getAt(1)
         rickshawLableSummaryBoxNode.attributes['id'] == 'rickshaw_label_summary_box'
@@ -325,7 +325,7 @@ class OsmChartTagLibSpec extends Specification {
         def chartTitleNode = actualHtmlAsNode.childNodes().getAt(0)
         chartTitleNode.attributes['id'] == 'rickshaw_chart_title'
         chartTitleNode.attributes['class'] == 'rickshaw_chart_title'
-        chartTitleNode.text() == 'Title'
+        chartTitleNode.text() == ''
 
         def rickshawLableSummaryBoxNode = actualHtmlAsNode.childNodes().getAt(1)
         rickshawLableSummaryBoxNode.attributes['id'] == 'rickshaw_label_summary_box'

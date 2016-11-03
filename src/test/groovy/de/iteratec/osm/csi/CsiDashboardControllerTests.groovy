@@ -27,6 +27,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.MeasuredEvent
@@ -71,6 +72,7 @@ class CsiDashboardControllerTests {
     BrowserDaoService browserDaoServiceMock
     LocationDaoService locationDaoServiceMock
     ConfigService configServiceMock
+    UserspecificDashboardService userspecificDashboardServiceMock
 
     def doWithSpring ={
         csiAggregationUtilService(CsiAggregationUtilService)
@@ -108,6 +110,11 @@ class CsiDashboardControllerTests {
 
         this.locationDaoServiceMock = Mockito.mock(LocationDaoService.class);
         controllerUnderTest.locationDaoService = this.locationDaoServiceMock;
+
+        def dashboardServiceMock = new MockFor(UserspecificDashboardService);
+        dashboardServiceMock.demand.getListOfAvailableCsiDashboards() {-> return [] }
+        this.userspecificDashboardServiceMock = dashboardServiceMock.proxyInstance()
+        controllerUnderTest.userspecificDashboardService = this.userspecificDashboardServiceMock;
 
         def configMock = new MockFor(ConfigService, true)
         configMock.demand.getInitialChartHeightInPixels(0..100000) { -> return 400 }
