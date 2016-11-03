@@ -89,7 +89,7 @@ class D3HtmlCreator {
                                         <p><span id="info"></span></p>
                                     </div>
                                 </div>
-                                <div class="col-md-3git" id="zeroWeightSpan">
+                                <div class="col-md-3" id="zeroWeightSpan">
                                 </div>
                             </div>"""
     }
