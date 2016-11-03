@@ -34,8 +34,10 @@
             });
         });
 
-        var loader = new PostLoader();
-        loader.loadJavascript('<g:assetPath src="postload/application-postload.js" absolute="true"/>');
+        OpenSpeedMonitor.postLoader.loadJavascript(
+            '<g:assetPath src="postload/application-postload.js" absolute="true"/>',
+            true
+        )
 
     });
 </script>

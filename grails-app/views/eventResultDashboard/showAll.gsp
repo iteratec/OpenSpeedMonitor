@@ -281,7 +281,6 @@
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
     <asset:javascript src="iteratecChartRickshaw.js"/>
-    <asset:javascript src="chartContextUtilities.js"/>
     <asset:script type="text/javascript">
 
         var pagesToEvents = [];
@@ -350,6 +349,9 @@
             code="de.iteratec.ism.ui.button.save.disabled.tooltip"/>");
             }
             setAdjustments();
+        });
+        $(window).load(function() {
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js" absolute="true"/>')
         });
 
     </asset:script>

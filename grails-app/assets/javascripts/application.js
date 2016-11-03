@@ -22,7 +22,6 @@
 //= require_tree bower_components/clipboard
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
-//= require postload/PostLoader
 // = require_self
 
 /**
@@ -37,6 +36,36 @@ OpenSpeedMonitor.postLoadUrls = OpenSpeedMonitor.postLoadUrls || [];
 OpenSpeedMonitor.postLoadUrls.forEach( function (scriptUrl) {
    $.getScript(scriptUrl);
 });
+
+OpenSpeedMonitor.postLoader = (function (){
+
+  var head = document.getElementsByTagName("head")[0];
+
+  var loadJavascript = function(url, async){
+    async = async || true;
+    var script = document.createElement("script");
+    script.setAttribute("src",url);
+    script.setAttribute("type","text/javascript");
+    script.setAttribute("async",async);
+    //script.setAttribute("charset","ISO-8859-1");
+    head.appendChild(script);
+  }
+  var loadStylesheet = function(url){
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.type = "text/css";
+    link.href = url;
+    link.media = "all";
+    head.appendChild(link);
+  }
+
+  return {
+    loadJavascript: loadJavascript,
+    loadStylesheet: loadStylesheet
+  }
+
+})();
+
 /**
  * Global string utilities module.
  * @returns {{
