@@ -59,6 +59,7 @@ repositories {
     mavenLocal()
     maven { url "https://repo.grails.org/grails/core" }
     maven { url "http://dl.bintray.com/iteratec/grails-plugins" }
+    maven { url "http://dl.bintray.com/ishults/plugins" }
     maven { url "https://dl.bintray.com/longwa/plugins" }
 }
 
@@ -81,6 +82,7 @@ dependencies {
     compile "org.grails.plugins:cache"
     compile "org.grails.plugins:scaffolding"
     compile "org.grails.plugins:hibernate4"
+    compile 'org.grails.plugins:log-hibernate-stats:1.0.20'
     compile "org.hibernate:hibernate-ehcache"
     runtime "com.h2database:h2"
     console "org.grails:grails-console"
