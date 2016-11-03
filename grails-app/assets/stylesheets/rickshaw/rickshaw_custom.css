@@ -3,7 +3,6 @@
 
 #rickshaw_main{
 	position: relative;
-	top: 20px;
 	width: 1110px;
 }
 .rickshaw_y-axis_left {
@@ -22,7 +21,6 @@
   background-color: white;
   margin-left: auto;
   margin-right: auto;
-  width: 1135px;
 }
 .graphDuplicate {
   background-color: white;
@@ -55,11 +53,10 @@
   padding-bottom: 10px;
   margin-left: 60px;
   width: 1104px;
-  z-index: 1976;
+  z-index: 1001;
 }
 #rickshaw_addons {
   margin-top: 10px;
-  padding-bottom: 10px;
   margin-left: 60px;
   width: 1104px;
 }
@@ -67,6 +64,7 @@
 	text-align: center;	
 	font-size: 25px;
 	line-height: 40px;
+	margin-bottom: 15px;
 }
 .rickshaw_legend {
 	display: table !important;
@@ -502,6 +500,7 @@
 	display: inline-block;
 	margin-right: 3px;
 	border-radius: 2px;
+	margin-top: 2px;
 }
 
 .rickshaw_legend .label {
@@ -555,4 +554,39 @@
 .rickshaw_legend li:active {
 	background: rgba(255, 255, 255, 0.2);
 	border-radius: 3px;
+}
+
+
+#rickshaw_slider {
+	margin-top: 3px;
+}
+
+#rickshaw_chart_label_summary {
+	text-align: center;
+	margin-top: -10px;
+	margin-bottom: 10px;
+	color: #555555;
+}
+
+#rickshaw_label_summary_box {
+	margin-left: 60px;
+	margin-right: 40px;
+}
+
+#rickshaw_adjust_chart_link {
+	color: #333333;
+	opacity: 0.5;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	border-radius: 4px;
+	z-index: 500;
+	font-size: 25px;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+#rickshaw_adjust_chart_link:hover,
+#rickshaw_adjust_chart_link:focus {
+	background: #eeeeee;
 }

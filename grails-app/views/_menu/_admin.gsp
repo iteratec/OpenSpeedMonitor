@@ -1,12 +1,11 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<ul class="nav pull-right">
     <li class="dropdown">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="fa fa-wrench"></i>
             <g:message code="default.admin.label" locale="${lang}"/><b class="caret"></b>
         </a>
         <ul class="dropdown-menu">
-            <li class="">
+            <li>
                 %{--All modal dialogs are located in /grails-app/views/_modals/--}%
                 <a href="#modal-p13n" data-toggle="modal">
                     <i class="fa fa-star-o"></i>
@@ -14,19 +13,19 @@
                 </a>
             </li>
             <sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
-                <li class="">
+                <li>
                     <a href="<g:createLink controller="osmConfiguration" action="show" id="1" />">
                         <i class="fa fa-tasks"></i>
                         <g:message code="de.iteratec.osm.configuration.show.label" locale="${lang}"/>
                     </a>
                 </li>
-                <li class="">
+                <li>
                     <a href="${createLink(controller: 'batchActivity')}">
                         <i class="fa fa-tasks"></i>
                         <g:message code="de.iteratec.osm.batch.batchactivity.list.heading" locale="${lang}"/>
                     </a>
                 </li>
-                <li class="">
+                <li>
                     <a href="${createLink(uri: '/systeminfo')}">
                         <i class="fa fa-info-circle	"></i>
                         <g:message code="default.systeminfo.label" locale="${lang}"/>
@@ -69,7 +68,7 @@
                 </li>
             </sec:ifAnyGranted>
             <g:if env="development">
-                <li class="">
+                <li>
                     <a href="${createLink(uri: '/admin/dbconsole')}" target="_blank">
                         <i class="fa fa-tachometer"></i>
                         <g:message code="de.iteratec.osm.persistence.dbconsole.label" locale="${lang}"/>
@@ -78,4 +77,3 @@
             </g:if>
         </ul>
     </li>
-</ul>

@@ -26,7 +26,7 @@ This menu is used to show function that can be triggered on the content (an obje
 			<li class="${ params.action == "edit" ? 'active' : '' }">
 				<g:link action="edit" id="${params.id}"><i class="fa fa-pencil"></i> <g:message code="default.edit.label"  args="[entityName]"/></g:link>
 			</li>
-			<li class="">
+			<li>
 				<g:render template="/_common/modals/deleteTextLink"/>
 			</li>
 		</g:if>

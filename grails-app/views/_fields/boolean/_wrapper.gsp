@@ -1,6 +1,6 @@
-<div class="control-group fieldcontain">
+<div class="form-group fieldcontain">
     <g:render template="/_fields/labelTemplate"/>
-    <div class="controls">
+    <div>
         <bs:checkBox name="${property}" value="${value}" />
     </div>
 </div>

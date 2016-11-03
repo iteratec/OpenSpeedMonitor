@@ -8,128 +8,23 @@
   min-height: 1em;
 }
 
-.iteratec-grid-border-left {
-  margin-left: ((@gridGutterWidth - 4) / 2) !important;
-  padding-left: ((@gridGutterWidth - 4) / 2) !important;
-  border-left: 2px solid #cdcdcd;
-
-  height: 250px !important;
-}
-
-.iteratec-element-select {
-  height: 150px !important;
-  min-width: 100% !important;
-}
-
-.iteratec-element-select.default-not-visible {
-  .iteratec-element-select;
-  display: none;
-}
-
-.iteratec-element-select-higher {
-  height: 250px !important;
-  width: 95% !important;
-}
-
-.iteratec-default-not-visible {
-  display: none;
-}
-
-.accordion-info {
-  .text-info;
-  line-height: normal;
-  font-size: 80%;
-  padding: 8px 0px;
-}
-
-.accordion-link {
-  display: block;
-  width: 100%;
-  padding: 0;
-  line-height: 40px;
-  color: #333333;
-  border: 0;
-}
-
-.accordion-custom-heading {
-  background-color: #EEEEEE;
-  font-size: 1.2em;
-}
-
-.input-medium-height30 {
-  .input-medium;
-  height: 24px !important;
-  padding: 2px 6px !important;
-}
-
 .content-box {
   box-sizing: content-box;
   -moz-box-sizing: content-box;
 }
 
 .chart-tiptext {
-  color: @white;
+  color: @gray-lighter;
   font-size: 10pt;
   white-space: nowrap;
-}
-
-#highcharts-0 {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .radio.inline, .checkbox.inline {
   margin-right: 5px;
 }
 
-textarea,
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
-.uneditable-input {
-  // height: 25px !important;
-  height: 24px;
-  padding: 2px 6px !important;
-  line-height: 24px !important;
-}
-
-select {
-  width: auto !important;
-  height: 30px;
-  padding: 4px 6px !important;
-  line-height: 20px !important;
-}
-
 .width_31em {
   width: 31em !important;
-}
-
-.noIdent {
-  margin-left: 0 !important;
-}
-
-.input-append .add-on, .input-prepend .add-on {
-  height: 20px !important;
-  line-height: 20px !important;
-}
-
-.btn {
-  line-height: 25px !important;
-}
-
-select[multiple], select[size] {
-  //height: auto !important;
 }
 
 .dropdown-menu .scrollable {
@@ -147,13 +42,46 @@ i.clickable-icon {
   .text-info
 }
 
+input[type="text"].form-control {
+  min-width: 4em;
+}
+
 textarea {
   height: auto;
 }
 
-input.ui-autocomplete-input {
-  height: 20px !important;
-  padding: 2px 6px !important;
+select[multiple] {
+  min-height: 15em;
+}
+
+select.chosen-select {
+  min-height: 0;
+  height: 34px;
+}
+
+select.long-select {
+  min-height: 25em;
+}
+
+label.sub {
+  font-weight: normal;
+}
+
+.table-filter {
+  .clearfix();
+  margin-bottom: 10px;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.section-xl {
+  margin-bottom: 30px;
+}
+
+.filter-buttons {
+  margin-top: 10px;
 }
 
 .dataLabel {
@@ -164,23 +92,12 @@ input.ui-autocomplete-input {
   float: left;
 }
 
-#rickshaw_slider {
-  margin-top: 3px;
-}
-
-#rickshaw_label_summary_box {
-  padding-top: 10px;
-  padding-bottom: 10px;
-  margin-left: 60px;
-  margin-right: 40px;
-}
-
 //bootstrap component-animation
 .collapse {
   position: relative;
   height: 0;
   overflow: auto;
-  .transition(height .35s ease);
+  transition: height .35s ease;
   &.in {
     height: auto;
   }
@@ -191,19 +108,18 @@ input.ui-autocomplete-input {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: @zindexPopover;
+  z-index: @zindex-popover;
   display: none;
   max-width: 800px;
   padding: 1px;
   text-align: left; // Reset given new insertion method
-  background-color: @popoverBackground;
+  background-color: @popover-bg;
   -webkit-background-clip: padding-box;
   -moz-background-clip: padding;
   background-clip: padding-box;
-  border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, .2);
-  .border-radius(6px);
-  .box-shadow(0 5px 10px rgba(0, 0, 0, .2));
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
 
   // Overrides for proper insertion
   white-space: normal;
@@ -226,29 +142,83 @@ input.ui-autocomplete-input {
 //bootstrap navbar
 // Brand: website or project name
 // -------------------------
-.navbar .brand {
-  float: left;
-  display: block;
-  // Vertically center the text given @navbarHeight
-  padding: ((@navbarHeight - @baseLineHeight) / 2) 20px 6px !important;
-  margin-left: -20px; // negative indent to left-align the text down the page
-  font-size: 20px;
-  font-weight: 200;
-  color: @navbarBrandColor;
-  text-shadow: 0 1px 0 @navbarBackgroundHighlight;
-  &:hover,
-  &:focus {
-    text-decoration: none;
-  }
+
+// so "fork me on github" doesn't overlap navigation
+.navbar .container-fluid {
+  padding-right: 135px;
+}
+
+.navbar-brand {
+  padding: 0 20px;
 }
 
 .navbar img.logo {
-  max-height: 39px !important;
-  margin-top: -3px;
+  margin-top: 7px;
+  display: block;
+}
+
+#main-navbar {
+  margin-left: 150px;
+}
+
+body {
+  // required as the fixed navbar is not considered in normal page flow
+  padding-top: 66px;
+}
+
+@media (min-width: 768px) {
+  #main-navbar .navbar-right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+}
+
+#main-navbar .flag {
+  vertical-align: inherit;
+}
+
+
+// second navigation (pills)
+#main-menu .nav {
+  margin-bottom: 20px;
+}
+
+#main-menu .nav li a {
+  padding: 8px 12px;
+}
+
+// nav pills with button group for split dropdown button
+
+#main-menu .nav-pills li .btn-group .btn {
+  border: 0;
+  color: @link-color
+}
+
+#main-menu .nav-pills li .btn-group .btn .caret {
+  margin: 0;
+  border-top-color: @link-color;
+  border-bottom-color: @link-color;
+}
+
+#main-menu .nav-pills li.active .btn-group .btn .caret {
+  margin: 0;
+  border-top-color: @body-bg;
+  border-bottom-color: @body-bg;
+}
+
+#main-menu .nav-pills li.active .btn-group .btn {
+  color: @body-bg;
+  background: @link-color;
+}
+
+#main-menu .nav-pills li.active .btn-group .btn + .btn {
+  border-left: 1px #2e6da4 solid;
+  margin-left: 0;
 }
 
 //bootstrap variables
-@navbarBackgroundHighlight: #AB0C0C; /*ffffff;*/
+@navbar-default-bg: #AB0C0C; /*ffffff;*/
 
 //bootstrap responsive-utilities
 // Required for Windows 8 Metro split-screen snapping with IE10
@@ -258,9 +228,7 @@ input.ui-autocomplete-input {
 }
 
 //bootstrap dropdown
-//was deleted with IT-508, removed body to remove behavior TODO maybe there is a better way
-.dropdown-submenu:hover > .dropdown-menu {
-}
+
 
 .spinner-content-spinner {
   padding-top: 20px;
@@ -289,4 +257,113 @@ input.ui-autocomplete-input {
 }
 .iteratec-tab-content > .active {
   display: block;
+}
+
+// card style
+
+.card-well {
+  color: #333;
+  background-color: #f5f5f5;
+  border: 1px #ddd solid;
+  border-radius: 4px;
+  padding: 0 7.5px 15px 7.5px;
+  margin-bottom: 20px;
+}
+
+.card-well .row, .card-well.row  {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.card {
+  box-shadow: 0 2px 4px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
+  padding: 15px;
+  background: white;
+  margin: 15px -7.5px 0 -7.5px;
+}
+
+.card > .nav {
+  margin-bottom: 20px;
+}
+
+.card > .nav li a {
+  margin-top: -1px;
+  padding: 5px 12px;
+}
+
+.card-well-tabs li.active a,
+.card-well-tabs li.active a:hover,
+.card-well-tabs li.active a:focus{
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+  border-bottom-color: transparent;
+}
+
+.card-well.tab-content {
+  border-top-color: transparent;
+  border-radius: 0 0 4px 4px;
+}
+
+// Dashboard selection summary
+
+#selectionSummary {
+  font-size: 12px;
+}
+
+#selectionSummary table {
+  float: right;
+  margin-right: 60px; // to align with chart
+}
+
+#selectionSummary table tr {
+  display: none; // hide by default
+}
+
+#selectionSummary th {
+  text-align: right;
+  color: @link-color;
+  padding-right: 1rem;
+  vertical-align: top;
+  min-width: 5em;
+}
+
+#selectionSummary td .unit {
+  font-weight: bold;
+}
+
+.dropdown-menu > li > input[type="submit"] {
+  display: block;
+  border: 0;
+  padding: 3px 20px;
+  width: 100%;
+  text-align: left;
+  clear: both;
+  background: transparent;
+  font-weight: normal;
+  line-height: @line-height-base;
+  color: @dropdown-link-color;
+  white-space: nowrap;
+}
+
+.dropdown-menu > li > input[type="submit"] {
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: @dropdown-link-hover-color;
+    background-color: @dropdown-link-hover-bg;
+  }
+}
+
+.action-row {
+  .make-row();
+  margin-bottom: 6px;
+}
+
+.chosen-container {
+  font-size: inherit !important;
+}
+
+.form-horizontal .chosen-container {
+  margin-top: 7px;
 }

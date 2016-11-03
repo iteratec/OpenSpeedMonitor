@@ -19,6 +19,6 @@ class BrowserAliasEditPage extends I18nGebPage{
         errorMessageBox { $("div", class: "alert alert-danger") }
         errorMessageBoxText { errorMessageBox.attr("innerHTML") }
 
-        browserDropdown { $(".controls").$("select") }
+        browserDropdown { $("form").$("select") }
     }
 }

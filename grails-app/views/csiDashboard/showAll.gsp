@@ -52,46 +52,11 @@
 
 <body>
 <%-- main menu --%>
-<g:render template="/layouts/mainMenu"/>
-<%-- user specific dashboards --%>
-<div class="row">
-    <div class="span12">
-        <div class="btn-group">
-            <a class="btn btn-primary btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.select.label"
-                           default="Dashboard-Ansicht ausw&auml;hlen"/>
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-
-                <g:set var="availableDashboards"
-                       value="${userspecificDashboardService.getListOfAvailableCsiDashboards()}"/>
-
-                <g:if test="${availableDashboards.size() > 0}">
-                    <g:each in="${availableDashboards}" var="availableDashboard">
-                        <li><g:link action="showAll"
-                                    params="[dashboardID: availableDashboard.dashboardID]">${availableDashboard.dashboardName}</g:link></li>
-                    </g:each>
-                </g:if>
-                <g:else>
-                    <g:set var="anchorDashboardCreation" value="#"/>
-                    <sec:ifLoggedIn>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                            <g:set var="anchorDashboardCreation" value="#bottomCommitButtons"/>
-                        </sec:ifAnyGranted>
-                    </sec:ifLoggedIn>
-                    <li><a href="${anchorDashboardCreation}"><g:message
-                            code="de.iteratec.isocsi.dashBoardControllers.custom.select.error.noneAvailable"
-                            default="Es sind keine verf&uuml;gbar - bitte legen Sie eine an!"/></a></li>
-                </g:else>
-            </ul>
-        </div>
-    </div>
-</div>
+<g:render template="/layouts/mainMenu" model="${['availableDashboards': availableDashboards]}"/>
 
 <%-- Überschrift --%>
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <h3><g:message code="de.iteratec.isocsi.csi.heading" default="Kundenzufriedenheit (CSI)"/></h3>
 
         <p>
@@ -101,7 +66,7 @@
 
         <g:if test="${command}">
             <g:hasErrors bean="${command}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
                     <ul>
                         <g:eachError var="eachError" bean="${command}">
@@ -111,201 +76,20 @@
                 </div>
             </g:hasErrors>
         </g:if>
-
-        <form method="get" action="" id="dashBoardParamsForm">
-            <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message
-                    code="de.iteratec.ism.ui.labels.save.success"
-                    default="Successfully saved these settings as custom dashboard."/></div>
-
-            <div class="alert alert-error renderInvisible" id="saveDashboardErrorDiv"></div>
-            <g:if test="${warnAboutLongProcessingTime}">
-                <div class="alert">
-                    <strong><g:message
-                            code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
-
-                    <p>
-                        <g:message
-                                code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.message"/>
-                    </p>
-
-                    <p>
-                        <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
-                                    style="display:none;"/>
-                        <g:actionSubmit id="override-long-processing-time"
-                                        value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
-                                        action="showAll" class="btn btn-warning"/>
-                    </p>
-                </div>
-            </g:if>
-
-
-            <div class="row">
-                <div class="span6">
-                    <fieldset>
-                        <legend><g:message code="de.iteratec.isocsi.csi.aggreator.heading"
-                                           default="Aggregator"/></legend>
-
-                        <div>
-                            <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
-                                          values="${aggrGroupValues}"
-                                          value="${aggrGroupAndInterval}">
-                                <p>${it.radio} <g:message code="${it.label}"/></p>
-                            </g:radioGroup>
-                        </div>
-                    </fieldset>
-                </div>
-
-                <div class="span6">
-                    <g:render template="/dateSelection/startAndEnddateSelection"
-                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'fromHour': fromHour, 'to': to, 'toHour': toHour, 'includeInterval': includeInterval]}"/>
-
-                    <fieldset id="includeInterval">
-                        <div class="span3">
-                            <label class="checkbox inline">
-                                <g:checkBox name="includeInterval" id="includeInterval" checked="${includeInterval}"/>
-                                &nbsp;<g:message code="de.iteratec.isocsi.csi.includeInterval.label"
-                                                 default="auch&nbsp;aktuelles&nbsp;Intervall&nbsp;anzeigen"/>
-                            </label>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="span12">
-                    <legend>
-                        <g:message code="de.iteratec.isocsi.csi.filter.heading" default="Filter"/>
-                    </legend>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="span4" id="filter-navtab-csiSystem">
-                    <div style="padding-top: 60px;"></div>
-                    <label for="folderSelectCsiSystem">
-                        <strong>
-                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>:
-                        </strong>
-                    </label>
-                    <g:select id="folderSelectCsiSystem" class="iteratec-element-select"
-                              name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
-                              optionValue="label" value="${selectedCsiSystems}"
-                              multiple="true"/>
-                </div>
-            </div>
-            <g:render template="/eventResultDashboard/selectMeasurings"
-                      model="[
-                              'locationsOfBrowsers'             : locationsOfBrowsers,
-                              'eventsOfPages'                   : eventsOfPages,
-                              'folders'                         : folders,
-                              'selectedFolder'                  : selectedFolder,
-                              'pages'                           : pages,
-                              'selectedPages'                   : selectedPages,
-                              'measuredEvents'                  : measuredEvents,
-                              'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
-                              'selectedMeasuredEvents'          : selectedMeasuredEvents,
-                              'browsers'                        : browsers,
-                              'selectedBrowsers'                : selectedBrowsers,
-                              'selectedAllBrowsers'             : selectedAllBrowsers,
-                              'locations'                       : locations,
-                              'selectedLocations'               : selectedLocations,
-                              'selectedAllLocations'            : selectedAllLocations,
-                              'connectivityProfiles'            : connectivityProfiles,
-                              'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                              'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                              'showExtendedConnectivitySettings': false]"/>
-            <div style="clear:both;"></div>
-
-            <div class="row">
-                <div class="span12">
-                    <legend>
-                        <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
-                    </legend>
-
-                    <div class="span12">
-                        <div class="control-group">
-                            <div class="controls">
-                                <label class="checkbox" for="csiTypeDocComplete">
-                                    <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
-                                            test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
-                                        checked
-                                    </g:if>/>
-                                    &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
-                                </label>
-                                <label class="checkbox" for="csiTypeVisuallyComplete">
-                                    <input type="checkbox" name="csiTypeVisuallyComplete"
-                                           id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
-                                        checked
-                                    </g:if>/>
-                                    &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <p>
-                    <g:actionSubmit id="chart-submit"
-                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
-                                    action="showAll" class="btn btn-primary" style="margin-top: 16px;"/>
-                    <g:actionSubmit
-                            value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}"
-                            action="csiValuesCsv" class="btn btn-primary" style="margin-top: 16px;"/>
-                    <sec:ifLoggedIn>
-                        <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
-                            <a href="#CreateUserspecifiedDashboardModal" role="button" class="btn btn-primary"
-                               data-toggle="modal"
-                               style="margin-top: 16px;">${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}</a>
-                        </sec:ifAnyGranted>
-                    </sec:ifLoggedIn>
-                    <g:if test="${params.dashboardID}">
-                        <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
-                            <a href="#" role="button" class="btn btn-primary"
-                               style="margin-top: 16px;"
-                               onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}</a>
-                            <g:render template="/_common/modals/deleteCustomDashboard"/>
-                        </g:if>
-                    </g:if>
-                </p>
-                <g:if test="${exceedsTimeframeBoundary}">
-                    <g:if test="${selectedInterval.intervalInMinutes == 60}">
-                        <p class="text-error"><g:message
-                                code="de.iteratec.isocsi.csi.timeframe.boundary.hourly.exceeded"
-                                default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                    </g:if>
-                    <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
-                        <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
-                                                         default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                    </g:elseif>
-                    <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
-                        <p class="text-error"><g:message
-                                code="de.iteratec.isocsi.csi.timeframe.boundary.weekly.exceeded"
-                                default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                    </g:elseif>
-                    <g:else>
-                        <p class="text-error"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
-                                                         default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
-                    </g:else>
-                </g:if>
-        </form>
     </div>
 </div>
 
 <g:if test="${wptCustomerSatisfactionValues}">
-    <hr>
-
     <div class="row">
-        <div class="span1">
-            <div id="chart-table-toggle" class="btn-group" data-toggle="buttons-radio" id="job-filter-toggle">
-                <button type="button" class="btn btn-small active" id="chart-toggle"><g:message
+        <div class="col-md-12">
+            <div id="chart-table-toggle" class="btn-group" data-toggle="buttons" id="job-filter-toggle">
+                <button type="button" class="btn btn-sm btn-default active" id="chart-toggle"><g:message
                         code="de.iteratec.isocsi.csi.button.graphView" default="Kurvendarstellung"/></button>
-                <button type="button" class="btn btn-small" id="table-toggle"><g:message
+                <button type="button" class="btn btn-sm btn-default" id="table-toggle"><g:message
                         code="de.iteratec.isocsi..csi.button.tableView" default="Tabellendarstellung"/></button>
             </div>
         </div>
     </div>
-
-    <br>
 
     <a name="chart-table"></a>
 
@@ -339,8 +123,8 @@
                        value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.chart.csiSystem.title')}"/>
             </g:elseif>
         </g:if>
-        <div id="chartbox">
-            <div class="span12 well">
+        <div class="col-md-12 section">
+            <div id="chartbox">
                 <g:render template="/highchart/chart"
                           model="[
                                   singleYAxis                  : 'false',
@@ -364,9 +148,9 @@
             </div>
         </div>
         <%-- table --%>
-        <div id="csi-table" class="span12" style="display: none;">
+        <div id="csi-table" class="col-md-12" style="display: none;">
             <g:if test="${flash.tableDataError}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <g:message error="${flash.tableDataError}"/>
                 </div>
             </g:if>
@@ -387,17 +171,195 @@
 <g:else>
     <g:if test="${request.queryString}">
         <g:if test="${!warnAboutLongProcessingTime}">
-            <div class="row">
-                <div class="span12" id="noDataForCurrentSelectionWarning">
-                    <strong><g:message
-                            code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/></strong>
-                </div>
+            <div class="alert alert-info text-center" id="noDataForCurrentSelectionWarning">
+                <g:message code="de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection"/>
             </div>
         </g:if>
     </g:if>
 </g:else>
 
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
+<g:if test="${params.dashboardID}">
+    <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+        <g:render template="/_common/modals/deleteDialog" model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
+    </g:if>
+</g:if>
+
+<div class="row">
+    <div class="col-md-12">
+        <form method="get" action="" id="dashBoardParamsForm">
+            <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv"><g:message
+                    code="de.iteratec.ism.ui.labels.save.success"
+                    default="Successfully saved these settings as custom dashboard."/></div>
+
+            <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
+            <g:if test="${warnAboutLongProcessingTime}">
+                <div class="alert alert-warning">
+                    <strong><g:message
+                            code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
+
+                    <p>
+                        <g:message
+                                code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.message"/>
+                    </p>
+
+                    <p>
+                        <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
+                                    style="display:none;"/>
+                        <g:actionSubmit id="override-long-processing-time"
+                                        value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
+                                        action="showAll" class="btn btn-warning"/>
+                    </p>
+                </div>
+            </g:if>
+            <div class="action-row">
+                <div class="col-md-12">
+                    <div class="btn-group pull-right">
+                        <g:actionSubmit id="chart-submit"
+                                        value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
+                                        action="showAll" class="btn btn-primary" />
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false" id="chart-action-dropdown">
+                            <span class="caret"></span>
+                            <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <g:actionSubmit action="csiValuesCsv"
+                                    value="${g.message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'As CSV')}" />
+                            </li>
+
+                            <sec:ifLoggedIn>
+                                <sec:ifAnyGranted roles="ROLE_ADMIN, ROLE_SUPER_ADMIN">
+                                    <li class="separator"></li>
+                                    <li>
+                                        <a href="#CreateUserspecifiedDashboardModal" role="button" data-toggle="modal">
+                                            ${message(code: 'de.iteratec.ism.ui.labels.save.custom.dashboard', default: 'Save these settings as custom dashboard')}
+                                        </a>
+                                    </li>
+                                </sec:ifAnyGranted>
+                            </sec:ifLoggedIn>
+                            <g:if test="${params.dashboardID}">
+                                <g:if test="${userspecificDashboardService.isCurrentUserDashboardOwner(params.dashboardID)}">
+                                    <li>
+                                        <a href="#" role="button" onclick="updateCustomDashboard('${dashboardName}', '${publiclyVisible}')">
+                                            ${message(code: 'de.iteratec.ism.ui.labels.update.custom.dashboard', default: 'Update custom dashboard')}
+                                        </a>
+                                        <a href="#DeleteModal" role="button" data-toggle="modal">
+                                            ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.delete', default: 'Delete')}
+                                        </a>
+                                    </li>
+                                </g:if>
+                            </g:if>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row card-well">
+                <div class="col-md-4">
+                    <div class="card">
+                        <fieldset>
+                            <legend>
+                                <g:message code="de.iteratec.isocsi.csi.aggreator.heading"
+                                               default="Aggregator"/>
+                            </legend>
+                            <div id="aggregationRadioButtons">
+                                <g:radioGroup name="aggrGroupAndInterval" labels="${aggrGroupLabels}"
+                                              values="${aggrGroupValues}"
+                                              value="${aggrGroupAndInterval}">
+                                    <p>${it.radio} <g:message code="${it.label}"/></p>
+                                </g:radioGroup>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <g:render template="/dateSelection/startAndEnddateSelection"
+                              model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
+                                        'fromHour': fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': true,
+                                        'includeInterval': includeInterval]}"/>
+                </div>
+                <div class="col-md-3">
+                    <div class="card" id="filter-navtab-csiSystem">
+                        <legend>
+                            <g:message code="de.iteratec.isr.wptrd.labels.filterCsiSystem" default="CSI System"/>
+                        </legend>
+                        <g:select id="folderSelectCsiSystem" class="form-control"
+                                  name="selectedCsiSystems" from="${csiSystems}" optionKey="id"
+                                  optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
+                    </div>
+                    <div id="filter-navtab-jobGroup">
+                        <g:render template="/eventResultDashboard/selectJobGroup"
+                                  model="['folders': folders, 'selectedFolder': selectedFolder,
+                                          'tagToJobGroupNameMap': tagToJobGroupNameMap]" />
+                    </div>
+                    <div class="card">
+                        <legend>
+                            <g:message code="de.iteratec.osm.csi.type.heading" default="CSI Type"/>
+                        </legend>
+                        <div class="checkbox">
+                            <label for="csiTypeDocComplete">
+                                <input type="checkbox" name="csiTypeDocComplete" id="csiTypeDocComplete" <g:if
+                                        test="${csiTypeDocComplete || (!csiTypeDocComplete && !csiTypeVisuallyComplete)}">
+                                    checked
+                                </g:if>/>
+                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byDocComplete.label", default: "Doc Complete")}
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label for="csiTypeVisuallyComplete">
+                                <input type="checkbox" name="csiTypeVisuallyComplete"
+                                       id="csiTypeVisuallyComplete" <g:if test="${csiTypeVisuallyComplete}">
+                                    checked
+                                </g:if>/>
+                                &nbsp;${message(code: "de.iteratec.osm.csi.type.byVisuallyComplete.label", default: "Visually Complete")}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                %{--the rest----------------------------------------------------------------------------------------------}%
+                <div id="filter-complete-tabbable" class="col-md-5">
+                    <g:render template="/eventResultDashboard/selectPageLocation"
+                              model="['locationsOfBrowsers'             : locationsOfBrowsers,
+                                      'eventsOfPages'                   : eventsOfPages,
+                                      'pages'                           : pages,
+                                      'selectedPages'                   : selectedPages,
+                                      'measuredEvents'                  : measuredEvents,
+                                      'selectedAllMeasuredEvents'       : selectedAllMeasuredEvents,
+                                      'selectedMeasuredEvents'          : selectedMeasuredEvents,
+                                      'browsers'                        : browsers,
+                                      'selectedBrowsers'                : selectedBrowsers,
+                                      'selectedAllBrowsers'             : selectedAllBrowsers,
+                                      'locations'                       : locations,
+                                      'selectedLocations'               : selectedLocations,
+                                      'selectedAllLocations'            : selectedAllLocations,
+                                      'connectivityProfiles'            : connectivityProfiles,
+                                      'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
+                                      'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
+                                      'showExtendedConnectivitySettings': false]"/>
+                </div>
+            </div>
+            <g:if test="${exceedsTimeframeBoundary}">
+                <g:if test="${selectedInterval.intervalInMinutes == 60}">
+                    <p class="text-danger"><g:message
+                            code="de.iteratec.isocsi.csi.timeframe.boundary.hourly.exceeded"
+                            default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                </g:if>
+                <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24}">
+                    <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.daily.exceeded"
+                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                </g:elseif>
+                <g:elseif test="${selectedInterval.intervalInMinutes == 60 * 24 * 7}">
+                    <p class="text-danger"><g:message
+                            code="de.iteratec.isocsi.csi.timeframe.boundary.weekly.exceeded"
+                            default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                </g:elseif>
+                <g:else>
+                    <p class="text-danger"><g:message code="de.iteratec.isocsi.csi.timeframe.boundary.exceeded"
+                                                     default="Gew&auml;hlter Zeitraum zu gro&szlig;"/></p>
+                </g:else>
+            </g:if>
+        </form>
+    </div>
+</div>
 
 <content tag="include.bottom">
     <asset:javascript src="csidashboard/csiDashboard.js"/>
@@ -436,10 +398,10 @@
             var graphNameAliases = ${graphNameAliases};
             var graphColors = ${graphColors};
             $("#dia-title").val(chartTitle);
-            $("#dia-width").val(chartWidth);
-            $("#dia-height").val(chartHeight);
-            $("#dia-y-axis-max").val(loadTimeMaximum);
-            $("#dia-y-axis-min").val(loadTimeMinimum);
+            $("#dia-width").val(chartWidth < 0 ? "auto" : chartWidth);
+            $("#dia-height").val(chartHeight < 0 ? "auto" : chartHeight);
+            $(".dia-y-axis-max").val(loadTimeMaximum);
+            $(".dia-y-axis-min").val(loadTimeMinimum);
             if (eval(showDataMarkers)) {
                 $("#to-enable-marker").click();
             }

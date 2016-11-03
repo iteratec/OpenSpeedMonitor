@@ -12,7 +12,7 @@
             </g:if>
             <f:table collection="${userList}" properties='["username","enabled","accountExpired","accountLocked","passwordExpired"]'/>
 
-            <div class="pagination">
+            <div>
                 <bs:paginate total="${userCount ?: 0}" />
             </div>
         </div>

@@ -88,13 +88,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "The system shows him a helpful error message"
         waitFor { at EventResultDashboardPage }
         waitFor {
-            $("div", class: "alert alert-error")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
+            $("div", class: "alert alert-danger")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
         } //check that the error box appears
         waitFor {
-            $("div", class: "alert alert-error")[0].find("li")[0].attr("innerHTML").contains("Please select at least one system")
+            $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one system")
         } //check that the correct error message is displayed
         waitFor {
-            $("div", class: "alert alert-error")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page")
+            $("div", class: "alert alert-danger")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page")
         } //check that the correct error message is displayed
     }
 
@@ -135,13 +135,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
     void "NotUsedBrowser leads to no data"(){
         given: "User selects NotUsedBrowser"
 
-        clickFilterJobAccordion()
         browserTab.click()
         waitFor {selectAllBrowserButton.click()}
         waitFor {selectBrowsersList.displayed}
@@ -158,7 +157,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     }
     void "Graph is shown for correct Browser"(){
         given: "User selects NotUsedBrowser"
-        clickFilterJobAccordion()
         browserTab.click()
         waitFor {selectBrowsersList.displayed}
         selectBrowsersList[1].click()
@@ -171,13 +169,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
 
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
 
     void "Graph is shown for \"Select all Browsers\""(){
         given: "User selects NotUsedBrowser"
-        clickFilterJobAccordion()
         browserTab.click()
         waitFor {selectAllBrowserButton.displayed}
         selectAllBrowserButton.click()
@@ -190,13 +187,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
 
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
 
     void "NotUsedLocation leads to no data"(){
         given: "User selects NotUsedLocation"
-        clickFilterJobAccordion()
         browserTab.click()
         waitFor {selectAllLocationsButton.displayed}
         selectAllLocationsButton.click()
@@ -216,7 +212,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Graph is shown for correct Location"(){
         given: "User selects NotUsedLocation"
-        clickFilterJobAccordion()
         browserTab.click()
         waitFor {selectLocationField.displayed}
         selectLocationField.click()
@@ -230,13 +225,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Graphs are displayed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
 
     void "Graph is shown for \"Select all Locations\""(){
         given: "User selects NotUsedBrowser"
-        clickFilterJobAccordion()
         browserTab.click()
         waitFor {selectAllLocationsButton.displayed}
         selectAllLocationsButton.click()
@@ -249,13 +243,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "Graphs are displayed"
 
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
 
     void "NotUsedConnectivity leads to no data"(){
         given: "User selects NotUsedBrowser"
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {selectAllConnectivityButton.displayed}
         selectAllConnectivityButton.click()
@@ -273,7 +266,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Graph is shown for correct Connectivity Profile"(){
         given: "User selects NotUsedBrowser"
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {selectConnectivityProfilesList.displayed}
         selectConnectivityProfilesList[0].click()
@@ -285,12 +277,11 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Graphs are displayed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
     void "Graph is shown for native connectivity"(){
         given: "User selects native connectivity"
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {includeNativeConnectivityButton.displayed}
         includeNativeConnectivityButton.click()
@@ -302,21 +293,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Graphs are displayed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
-        waitFor { graphLine2 == "M404,324.5881403408821L1010,277.11152257513174" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
+        waitFor { graphLine2 == "M332,324.5881403408821L830,277.11152257513174" }
 
         cleanup:
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {includeNativeConnectivityButton.displayed}
         includeNativeConnectivityButton.click()
         pageTab.click()
-        clickFilterJobAccordion()
     }
 
     void "Graph is shown for custom connectivity"(){
         given: "User selects custom connectivity"
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {includeCustomConnectivityButton.displayed}
         includeCustomConnectivityButton.click()
@@ -328,21 +316,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Graphs are displayed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
-        waitFor { graphLine2 == "M404,182.15828704363096L1010,134.6816692778806" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
+        waitFor { graphLine2 == "M332,182.158287043631L830,134.68166927788064" }
 
         cleanup:
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {includeCustomConnectivityButton.displayed}
         includeCustomConnectivityButton.click()
         pageTab.click()
-        clickFilterJobAccordion()
     }
 
     void "Graph is shown for \"Select all Connectivity Profiles\""(){
         given: "User selects NotUsedBrowser"
-        clickFilterJobAccordion()
         connectivityTab.click()
         waitFor {selectAllConnectivityButton.displayed}
         selectAllConnectivityButton.click()
@@ -354,15 +339,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "Graphs are displayed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,286.60684612828175L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
         waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
     }
 
     void "Trimm minimal time"() {
         given: "User defines minimal load time"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
-        waitFor { appendedInputBelowLoadTimesTextField.displayed }
+
+        tabVariableSelection.click()
         appendedInputBelowLoadTimesTextField << "250"
 
         when: "User wants to see a graph"
@@ -373,14 +357,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L1010,96.70037506528024" }
+        waitFor { graphLine == "M0,1.7471395337795848L830,96.70037506528031" }
         waitFor {
             graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         waitFor { appendedInputBelowLoadTimesTextField.displayed }
         appendedInputBelowLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputBelowLoadTimesTextField << Keys.chord(Keys.DELETE)
@@ -389,9 +372,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Trimm maximal time"() {
         given: "User defines maximal load time"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
-        waitFor { appendedInputAboveLoadTimesTextField.displayed }
         appendedInputAboveLoadTimesTextField << "830"
 
         when: "User wants to see a graph"
@@ -402,14 +382,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,251.29611166500496L1010,2.0438683948154335" }
+        waitFor { graphLine == "M0,251.29611166500493L830,2.04386839481554" }
         waitFor {
             graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         waitFor { appendedInputAboveLoadTimesTextField.displayed }
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputAboveLoadTimesTextField << Keys.chord(Keys.DELETE)
@@ -430,14 +409,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.55832502492513L1010,0.7976071784646024" }
+        waitFor { graphLine == "M0,80.5583250249252L830,0.7976071784645988" }
+
         waitFor {
             graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         waitFor { appendedInputBelowRequestCountsTextField.displayed }
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputBelowRequestCountsTextField << Keys.chord(Keys.DELETE)
@@ -445,8 +424,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Trimm maximal requests"() {
         given: "User defines maximal request count"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
+
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
         appendedInputAboveRequestCountsTextField << "5"
 
@@ -458,14 +436,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.55832502492513L1010,160.3190428713858" }
+        waitFor { graphLine == "M0,80.5583250249252L830,160.31904287138582" }
+
         waitFor {
             graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         waitFor { appendedInputAboveRequestCountsTextField.displayed }
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputAboveRequestCountsTextField << Keys.chord(Keys.DELETE)
@@ -486,14 +464,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,3.5839149219008846L1010,16.877367896310943" }
+        waitFor { graphLine == "M0,3.5839149219009325L830,16.877367896311046" }
+
         waitFor {
             graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         waitFor { appendedInputBelowRequestSizesTimesTextField.displayed }
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputBelowRequestSizesTimesTextField << Keys.chord(Keys.DELETE)
@@ -512,14 +490,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,282.7464273845131L1010,16.877367896310943" }
+        waitFor { graphLine == "M0,282.7464273845131L830,16.877367896311046" }
+
         waitFor {
             graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         waitFor { appendedInputAboveRequestSizesTextField.displayed }
         appendedInputAboveRequestSizesTextField << Keys.chord(Keys.CONTROL, "a")
         appendedInputAboveRequestSizesTextField << Keys.chord(Keys.DELETE)
@@ -541,22 +519,20 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337794888L404,273.3133931538717L1010,225.8367753881213" }
+        waitFor { graphLine == "M0,1.7471395337795848L332,273.3133931538717L830,225.83677538812134" }
         waitFor {
             graphName == 'fv load time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[0].click()
     }
 
 
     void "Time to first byte graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
+
         firstViewList[1].click()
 
         when: "User wants to see a graph"
@@ -568,22 +544,21 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,0.7976071784646024L404,275.268312708932L1010,40.677966101694835" }
+        waitFor { graphLine == "M0,0.7976071784645988L332,275.268312708932L830,40.67796610169485" }
+
         waitFor {
             graphName == 'fv ttfb | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[1].click()
 
     }
 
     void "Start render time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
+
         firstViewList[2].click()
 
         when: "User wants to see a graph"
@@ -595,22 +570,19 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,130.93351524374242L404,0.7976071784646024L1010,140.72869111962353" }
+        waitFor { graphLine == "M0,130.93351524374245L332,0.7976071784645988L830,140.72869111962353" }
         waitFor {
             graphName == 'fv start render | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[2].click()
     }
 
     void "Visually complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
 
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[4].click()
 
         when: "User wants to see a graph"
@@ -621,21 +593,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,106.69460544918911L404,339.66800164478315L1010,1.698858227577091" }
+        waitFor { graphLine == "M0,106.69460544918911L332,339.66800164478315L830,1.6988582275771158" }
         waitFor {
             graphName == 'fv visually complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[4].click()
     }
 
     void "Dom time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[5].click()
 
         when: "User wants to see a graph"
@@ -646,21 +615,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,133.7321369225656L404,266.66666666666663L1010,0.7976071784646024" }
+        waitFor { graphLine == "M0,133.73213692256562L332,266.66666666666663L830,0.7976071784645988" }
         waitFor {
             graphName == 'fv dom time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[5].click()
     }
 
     void "Fully loaded time graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[6].click()
 
         when: "User wants to see a graph"
@@ -671,22 +637,19 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.264955134596164L404,243.03963110667993L1010,87.25697906281152" }
+        waitFor { graphLine == "M0,1.2649551345961907L332,243.03963110667993L830,87.25697906281154" }
         waitFor {
             graphName == 'fv fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[6].click()
 
     }
 
     void "Count of request to doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[7].click()
 
         when: "User wants to see a graph"
@@ -697,21 +660,19 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.55832502492513L404,160.3190428713858L1010,0.7976071784646024" }
+        waitFor { graphLine == "M0,80.5583250249252L332,160.31904287138582L830,0.7976071784645988" }
+        println(graphLine)
         waitFor {
             graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[7].click()
     }
 
     void "Count of requestion to fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[8].click()
 
         when: "User wants to see a graph"
@@ -722,21 +683,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,16.749750747756707L404,192.22333000997006L1010,112.46261216350945" }
+        waitFor { graphLine == "M0,16.749750747756707L332,192.22333000997006L830,112.46261216350946" }
         waitFor {
             graphName == 'fv requests fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[8].click()
     }
 
     void "Bytes until doc complete graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[9].click()
 
         when: "User wants to see a graph"
@@ -747,21 +705,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,3.5839149219008846L404,282.7464273845131L1010,16.877367896310943" }
+        waitFor { graphLine == "M0,3.5839149219009325L332,282.7464273845131L830,16.877367896311046" }
         waitFor {
             graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[9].click()
     }
 
     void "Bytes until fully loaded graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[10].click()
 
         when: "User wants to see a graph"
@@ -772,21 +727,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.9616825200074572L404,349.24415941365095L1010,112.11770095120033" }
+        waitFor { graphLine == "M0,1.9616825200074572L332,349.24415941365095L830,112.11770095120039" }
         waitFor {
             graphName == 'fv fullyLoadedIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[10].click()
     }
 
     void "Customer satisfaction (visually complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[11].click()
 
         when: "User wants to see a graph"
@@ -797,21 +749,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.55832502492518L404,316.21499138946797L1010,171.19550439590316" }
+        waitFor { graphLine == "M0,80.5583250249252L332,316.2149913894679L830,171.19550439590316" }
         waitFor {
             graphName == 'fv customer satisfaction (visually complete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[11].click()
     }
 
     void "Customer satisfaction (doc complete) graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[12].click()
 
         when: "User wants to see a graph"
@@ -822,21 +771,18 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,38.44575364814642L404,313.9827789359195L1010,132.7084201939635" }
+        waitFor { graphLine == "M0,38.44575364814644L332,313.9827789359195L830,132.7084201939635" }
         waitFor {
             graphName == 'fv customer satisfaction (docComplete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
 
         cleanup:
-        clickChooseMeasuredVariablesAccordion()
+        tabVariableSelection.click()
         firstViewList[12].click()
     }
 
     void "Speed index graph is shown"() {
         given: "User selects valid timeframe, page and jobgroup"
-        waitFor { chooseMeasuredVariablesAccordionContent.displayed }
-        clickChooseMeasuredVariablesAccordion()
         firstViewList[13].click()
 
         when: "User wants to see a graph"
@@ -847,7 +793,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "A graph with a line is shown"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,2.758936305836528L404,218.50514031675462L1010,22.372227579556352" }
+        waitFor { graphLine == "M0,2.7589363058365457L332,218.50514031675462L830,22.37222757955637" }
         waitFor {
             graphName == 'fv speed index | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
         }
@@ -855,12 +801,15 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Adjust Chart Title"() {
         given: "User opens Adjust Chart"
-        clickAdjustChartAccordion()
+
+        adjustChartButton.click()
 
         when: "User edits title"
         waitFor { chartTitleInputField.displayed }
         sleep(100)
         chartTitleInputField << "CustomTitle"
+        sleep(100)
+        adjustChartApply.click()
 
         then: "Chart title is changed"
         waitFor { chartTitle == "CustomTitle" }
@@ -868,6 +817,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Adjust Chart Size to illigal values"() {
         given: "User edits chart size"
+        waitFor {adjustChartButton.click()}
+        sleep(200)
         chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
         chartWidthInputField << Keys.chord(Keys.DELETE)
         chartWidthInputField << "0"
@@ -877,7 +828,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         when: "User clicks \"apply\""
         sleep(100)
-        def result = withAlert{diaChangeChartsizeButton.click()}
+        def result = withAlert{adjustChartApply.click()}
 
         then: "Error message is shown"
         result== "Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels."
@@ -885,6 +836,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Adjust Chart Size"() {
         given: "User edits chart size"
+        waitFor {adjustChartButton.click()}
+        sleep(200)
         chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
         chartWidthInputField << Keys.chord(Keys.DELETE)
         chartWidthInputField << "600"
@@ -893,12 +846,12 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         chartheightInputField << "600"
 
         when: "User clicks \"apply\""
-        waitFor { diaChangeChartsizeButton.displayed }
-        diaChangeChartsizeButton.click()
+        waitFor { adjustChartApply.displayed }
+        adjustChartApply.click()
 
         then: "Chart changed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,4.138404458754849L216,327.75771047513194L540,33.558341369334585" }
+        waitFor { graphLine == "M0,4.1384044587548185L216,327.7577104751319L540,33.558341369334556" }
     }
 
     //TODO:
@@ -936,6 +889,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
     void "Adjust Chart Section"() {
         given: "User edits chart size"
+        waitFor {adjustChartButton.click()}
+        sleep(200)
         diaYAxisMinInputField << Keys.chord(Keys.CONTROL, "a")
         diaYAxisMinInputField << Keys.chord(Keys.DELETE)
         diaYAxisMinInputField << "200"
@@ -944,19 +899,28 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         diaYAxisMaxInputField << "600"
 
         when: "User clicks \"apply\""
-        waitFor { diaChangeYAxisButton.displayed }
-        diaChangeYAxisButton.click()
+        waitFor { adjustChartApply.displayed }
+        adjustChartApply.click()
 
         then: "Chart changed"
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651038L216,484.247258225324L540,35.593220338982974" }
+        waitFor { graphLine == "M0,-9.272183449651061L216,484.247258225324L540,35.59322033898296" }
     }
 
     void "Enable Data-Markers"() {
+        given: "User clicked adjust chart"
+        waitFor {adjustChartButton.click()}
+        sleep(200)
 
         when: "User clicks \"Show data-marker\""
         waitFor { showDataMarkersCheckBox.displayed }
+        sleep(200)
         showDataMarkersCheckBox.click()
+        sleep(200)
+        waitFor { adjustChartApply.displayed }
+        sleep(200)
+        adjustChartApply.click()
+        sleep(200)
 
         then: "Data-markers show on the graph"
         waitFor { dataMarker }
@@ -964,10 +928,19 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
     }
 
     void "Enable Data-Labels"() {
+        given: "User clicked adjust chart"
+        waitFor {adjustChartButton.click()}
+        sleep(200)
+
 
         when: "User clicks \"Show data-marker\""
         waitFor { showDataLabelsCheckBox.displayed }
         showDataLabelsCheckBox.click()
+        waitFor { adjustChartApply.displayed }
+        sleep(200)
+        adjustChartApply.click()
+        sleep(200)
+
 
         then: "Data-markers show on the graph"
         waitFor { dataLabel }
@@ -991,10 +964,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         at EventResultDashboardPage
         waitFor { saveDashboardSuccessMessage.displayed }
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651038L216,484.247258225324L540,35.593220338982974" }
+        waitFor { graphLine == "M0,-9.272183449651061L216,484.247258225324L540,35.59322033898296" }
     }
 
-    @Ignore
     void "Load custom dashboard"() {
         given: "User visits the EventResultDashboardPage"
         to EventResultDashboardPage
@@ -1005,7 +977,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         then: "The old dashboard is loaded again"
         at EventResultDashboardPage
         waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651038L216,484.247258225324L540,35.593220338982974" }
+        waitFor { graphLine == "M0,4.1384044587548185L216,327.7577104751319L540,33.558341369334556" }
         waitFor { dataLabel }
         waitFor {
             dataLabel.attr("style").contains('top: 479px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default; fill: rgb(179, 179, 179);')

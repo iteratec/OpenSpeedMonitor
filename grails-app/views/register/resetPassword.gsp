@@ -7,10 +7,10 @@
 <body>
 <g:form class="form-horizontal" role="main">
 	<div class="row">
-		<div class="span12">
+		<div class="col-md-12">
 			<g:if test="${resetPasswordCommand}">
 				<g:hasErrors bean="${resetPasswordCommand}">
-					<div class="alert alert-error">
+					<div class="alert alert-danger">
 						<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 						<ul>
 							<g:eachError var="eachError" bean="${resetPasswordCommand}">
@@ -27,20 +27,20 @@
 	<label class="control-label">
 		<g:message code="security.password.label" default="Username" />
 	</label>
-	<div class="control-group">
-		<div class="controls">
+	<div class="form-group">
+		<div>
 			<g:passwordField  name='password' value="" />
 		</div>
 	</div>
 	<label class="control-label">
 		<g:message code="security.password2.label" default="Username" />
 	</label>
-	<div class="control-group">
-		<div class="controls">
+	<div class="form-group">
+		<div>
 			<g:passwordField name='password2' value="" />
 		</div>
 	</div>
-	<div class="form-actions">
+	<div>
 		<g:actionSubmit class="btn btn-primary" action="resetPassword" value="${message(code: 'spring.security.ui.resetPassword.submit', default: 'Reset password')}" />
 	</div>
 </g:form>

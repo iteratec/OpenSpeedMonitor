@@ -27,3 +27,25 @@
 	background: #fff;
 	cursor: default;
 }
+
+input[type="text"], textarea {
+	width: 35em !important;
+	box-sizing: border-box;
+}
+
+#tags {
+	width: 32em;
+}
+
+#tags input {
+	width: 31em !important;
+}
+
+
+#placeholderCandidates {
+	padding-top: 7px;
+}
+
+.checkbox input[type="checkbox"] {
+	margin-left: 0;
+}

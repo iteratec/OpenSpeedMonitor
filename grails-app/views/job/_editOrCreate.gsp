@@ -8,16 +8,6 @@
 
         <asset:stylesheet src="job/edit.css"/>
 
-        <style type="text/css">
-            .control-label {
-                width: 250px !important;
-                margin-right: 1em !important;
-            }
-            .form-group {
-                margin-bottom: 0.4em !important;
-            }
-        </style>
-
     </head>
 
     <body>
@@ -37,7 +27,7 @@
                     <g:render template="form"/>
                 </fieldset>
 
-                <div class="form-actions">
+                <div>
                     <g:if test="${mode == 'edit'}">
                         <g:actionSubmit class="btn btn-primary" action="update"
                                         value="${message(code: 'default.button.save.label', default: 'Speichern')}"/>

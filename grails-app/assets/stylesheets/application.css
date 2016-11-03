@@ -1,5 +1,4 @@
 /*
-*= require_tree bower_components/bootstrap/docs
 *= require_tree bower_components/components-font-awesome
 *= require_tree bower_components/dcjs
 *= require_tree bower_components/jQuery-contextMenu
@@ -8,10 +7,6 @@
 *= require bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css
 *= require_self
 */
-.form-group.error label, .fieldcontain.error label {
-	color: #b94a48;
-	font-weight: bold;
-}
 .renderInvisible {
  display:none;
 }
@@ -24,6 +19,6 @@
   border-top-color: #ffffff;
   border-bottom-color: #ffffff;
 }
-.btn-group > .btn-small {
+.btn-group > .btn-sm {
     font-size: 14px;
 }

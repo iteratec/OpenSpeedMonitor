@@ -1,51 +1,54 @@
-<div id="CreateUserspecifiedDashboardModal" class="modal hide fade" tabindex="-1" role="dialog"
+<div id="CreateUserspecifiedDashboardModal" class="modal fade" tabindex="-1" role="dialog"
      aria-labelledby="CreateUserspecifiedDashboardModalLabel">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>
-        <h4 id="CreateUserspecifiedDashboardModalLabel">
-            <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.title"
-                       default="To save as custom dashboard, please enter additional information!"/>
-        </h4>
-    </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="CreateUserspecifiedDashboardModalLabel">
+                    <g:message code="de.iteratec.isocsi.dashBoardControllers.custom.title"
+                               default="To save as custom dashboard, please enter additional information!"/>
+                </h4>
+            </div>
 
-    <div class="modal-body">
-        <div class="alert alert-error renderInvisible" id="validateDashboardNameErrorDiv"></div>
-
-        <div class="control-group">
-            <label class="control-label"
-                   for="dashboardNameFromModal">${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}</label>
-
-            <div class="controls">
+            <div class="modal-body form-horizontal">
+                <div class="alert alert-danger renderInvisible" id="validateDashboardNameErrorDiv"></div>
                 <div id="spinner-position"></div>
-                <input type="text" class="span3" name="dashboardNameFromModal" id="dashboardNameFromModal"
-                       placeholder="${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}">
+                <div class="form-group">
+                    <label class="control-label col-md-3" for="dashboardNameFromModal">
+                        ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}:
+                    </label>
+
+                    <div class="col-md-7">
+                        <input type="text" class="form-control" name="dashboardNameFromModal" id="dashboardNameFromModal"
+                               placeholder="${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox col-md-10 col-md-offset-3">
+                        <label for="publiclyVisibleFromModal">
+                            <input type="checkbox" name="publiclyVisibleFromModal" id="publiclyVisibleFromModal">
+                            ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.publiclyVisible.label', default: 'Everybody is entitled to view this custom dashboard.')}
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <g:form>
+                    <g:hiddenField name="id" value="${item ? item.id : params.id}"/>
+                    <g:hiddenField name="_method" value="POST"/>
+                    <button class="btn btn-default" data-dismiss="modal"><g:message code="default.button.cancel.label"
+                                                                        default="Cancel"/></button>
+                    <a id="saveDashboardButton" href="#" class="btn btn-primary"
+                       onclick="checkDashboardAlreadyExists()"><g:message
+                            code="de.iteratec.ism.ui.labels.save" default="Save"/></a>
+                    <a id="overwriteDashboardButton" href="#" class="btn btn-primary" style="display: none"
+                       onclick="saveCustomDashboard()"><g:message
+                            code="de.iteratec.ism.ui.labels.overwrite" default="Overwrite"/></a>
+                </g:form>
+
             </div>
         </div>
-
-        <div class="control-group">
-            <div class="controls">
-                <label class="checkbox" for="publiclyVisibleFromModal">
-                    <input type="checkbox" name="publiclyVisibleFromModal" id="publiclyVisibleFromModal">
-                    ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.publiclyVisible.label', default: 'Everybody is entitled to view this custom dashboard.')}
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-footer">
-        <g:form>
-            <g:hiddenField name="id" value="${item ? item.id : params.id}"/>
-            <g:hiddenField name="_method" value="POST"/>
-            <button class="btn" data-dismiss="modal"><g:message code="default.button.cancel.label"
-                                                                default="Cancel"/></button>
-            <a id="saveDashboardButton" href="#" class="btn btn-primary"
-               onclick="checkDashboardAlreadyExists()"><g:message
-                    code="de.iteratec.ism.ui.labels.save" default="Save"/></a>
-            <a id="overwriteDashboardButton" href="#" class="btn btn-primary" style="display: none"
-               onclick="saveCustomDashboard()"><g:message
-                    code="de.iteratec.ism.ui.labels.overwrite" default="Overwrite"/></a>
-        </g:form>
-
     </div>
 </div>
 <asset:script type="text/javascript">
@@ -55,7 +58,7 @@
             lines: 15, // The number of lines to draw
             length: 20, // The length of each line
             width: 10, // The line thickness
-            radius: 30, // The radius of the inner circle
+            radius: 10, // The radius of the inner circle
             corners: 1, // Corner roundness (0..1)
             rotate: 0, // The rotation offset
             direction: 1, // 1: clockwise, -1: counterclockwise
@@ -66,8 +69,8 @@
             hwaccel: false, // Whether to use hardware acceleration
             className: 'spinner', // The CSS class to assign to the spinner
             zIndex: 2e9, // The z-index (defaults to 2000000000)
-            top: '50%', // Top position relative to parent in px
-            left: '50%' // Left position relative to parent in px
+            top: '0', // Top position relative to parent in px
+            left: '0' // Left position relative to parent in px
         };
         return new Spinner(opts).spin(spinnerElement);
     }
@@ -165,8 +168,8 @@
             objectData["chartTitle"] = $("#dia-title").val();
             objectData["chartWidth"] = $("#dia-width").val();
             objectData["chartHeight"] = $("#dia-height").val();
-            objectData["loadTimeMaximum"] = $("#dia-y-axis-max").val();
-            objectData["loadTimeMinimum"] = $("#dia-y-axis-min").val();
+            objectData["loadTimeMaximum"] = $(".dia-y-axis-max").val();
+            objectData["loadTimeMinimum"] = $(".dia-y-axis-min").val();
             objectData["showDataMarkers"] = $("#to-enable-marker").is(':checked');
             objectData["showDataLabels"] = $("#to-enable-label").is(':checked');
             objectData["csiTypeDocComplete"] = $("#csiTypeDocComplete").is(':checked');

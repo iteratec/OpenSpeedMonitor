@@ -11,9 +11,9 @@
 <%-- main menu --%>
 <g:render template="/layouts/mainMenu"/>
 <div class="row">
-    <div class="span12">
+    <div class="col-md-12">
         <g:if test="${errorList && !errorList.empty}">
-            <div class="alert alert-error">
+            <div class="alert alert-danger">
                 <strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
                 <ul>
                     <g:each in="${errorList}">

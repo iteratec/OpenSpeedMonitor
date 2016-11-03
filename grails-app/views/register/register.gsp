@@ -11,10 +11,10 @@
 		<div class="message" role="status">${flash.message}</div>
 	</g:if>
 	<div class="row">
-		<div class="span12">
+		<div class="col-md-12">
 			<g:if test="${registerCommand}">
 				<g:hasErrors bean="${registerCommand}">
-					<div class="alert alert-error">
+					<div class="alert alert-danger">
 						<strong><g:message code="de.iteratec.isocsi.CsiDashboardController.selectionErrors.title"/></strong>
 						<ul>
 							<g:eachError var="eachError" bean="${registerCommand}">
@@ -35,36 +35,36 @@
 		<label class="control-label">
 			<g:message code="security.user.label" default="Username" />
 		</label>
-		<div class="control-group">
-			<div class="controls">
+		<div class="form-group">
+			<div>
 				<g:textField  name="username" value="" />
 			</div>
 		</div>
 		<label class="control-label">
 			<g:message code="security.email.label" default="E-mail" />
 		</label>
-		<div class="control-group">
-			<div class="controls">
+		<div class="form-group">
+			<div>
 				<g:textField  name="email" value="" />
 			</div>
 		</div>
 		<label class="control-label">
 			<g:message code="security.password.label" default="Password" />
 		</label>
-		<div class="control-group">
-			<div class="controls">
+		<div class="form-group">
+			<div>
 				<g:passwordField  name="password" value="" />
 			</div>
 		</div>
 		<label class="control-label">
 			<g:message code="security.password2.label" default="Password (again)" />
 		</label>
-		<div class="control-group">
-			<div class="controls">
+		<div class="form-group">
+			<div>
 				<g:passwordField  name="password2" value="" />
 			</div>
 		</div>
-		<div class="form-actions">
+		<div>
 			<g:actionSubmit class="btn btn-primary" action="register" value="${message(code: 'spring.security.ui.register.submit', default: 'Create your account')}" />
 		</div>
 	</g:else>

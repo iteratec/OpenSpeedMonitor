@@ -28,17 +28,17 @@ function removeSelectedPageMapping(removePageMappingLink, csiConfId){
         btnRemovePageMapping.prop("disabled",true);
 
         var rowDiv = document.createElement("div");
-        rowDiv.classList.add("row-fluid");
+        rowDiv.classList.add("row");
         var spanDiv = document.createElement("div");
-        spanDiv.classList.add("span10");
+        spanDiv.classList.add("col-md-10");
 
         var spinnerDiv = document.createElement("div");
-        spinnerDiv.classList.add("span1");
+        spinnerDiv.classList.add("col-md-1");
         spinnerDiv.id = "spinner-position";
         spinnerDiv.classList.add("spinner-content-spinner");
 
         var messageDiv = document.createElement("div");
-        messageDiv.classList.add("span11");
+        messageDiv.classList.add("col-md-11");
         messageDiv.classList.add("spinner-content-message");
         messageDiv.classList.add("text-info");
         messageDiv.classList.add("text-left");

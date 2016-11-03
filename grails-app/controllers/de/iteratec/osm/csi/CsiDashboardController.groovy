@@ -258,7 +258,7 @@ class CsiDashboardController {
 
         cmd.loadTimeMaximum = cmd.loadTimeMaximum ?: "auto"
         cmd.chartHeight = cmd.chartHeight > 0 ? cmd.chartHeight : configService.getInitialChartHeightInPixels()
-        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : configService.getInitialChartWidthInPixels()
+        cmd.chartWidth = cmd.chartWidth > 0 ? cmd.chartWidth : -1;
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll()
 
         cmd.copyRequestDataToViewModelMap(modelToRender)
@@ -297,6 +297,7 @@ class CsiDashboardController {
                 }
             }
         }
+        modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableCsiDashboards())
 
         return modelToRender
     }
@@ -858,9 +859,12 @@ class CsiDashboardController {
                 graphNameAliases: dashboardValues.graphAliases, graphColors: dashboardValues.graphColors)
 
         if (dashboardValues.loadTimeMinimum) cmd.loadTimeMinimum = dashboardValues.loadTimeMinimum.toInteger()
-        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
-        if (dashboardValues.chartHeight) cmd.chartHeight = dashboardValues.chartHeight.toInteger()
-        if (dashboardValues.chartWidth) cmd.chartWidth = dashboardValues.chartWidth.toInteger()
+        if (dashboardValues.chartHeight) {
+            cmd.chartHeight = dashboardValues.chartHeight == "auto" ? -1 : dashboardValues.chartHeight.toInteger()
+        }
+        if (dashboardValues.chartWidth) {
+            cmd.chartWidth = dashboardValues.chartWidth == "auto" ? -1 : dashboardValues.chartWidth.toInteger()
+        }
 
         if (!cmd.validate()) {
             //send errors

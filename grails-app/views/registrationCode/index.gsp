@@ -29,7 +29,7 @@
                     </g:each>
                 </tbody>
             </table>
-            <div class="pagination">
+            <div>
                 <bs:paginate total="${registrationCodeCount ?: 0}" />
             </div>
         </div>

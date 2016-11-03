@@ -1,20 +1,20 @@
 <%@ page import="de.iteratec.osm.csi.CsiSystem" %>
 
 
-<div class="control-group fieldcontain ${hasErrors(bean: csiSystem, field: 'label', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: csiSystem, field: 'label', 'error')} ">
     <label for="label" class="control-label"><g:message code="csiSystem.label.label" default="Label"/></label>
 
-    <div class="controls">
+    <div>
         <g:textField name="label" value="${csiSystem?.label}"/>
     </div>
 </div>
 
 
-<div class="control-group fieldcontain ${hasErrors(bean: csiSystem, field: 'jobGroupWeights', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: csiSystem, field: 'jobGroupWeights', 'error')} ">
     <label for="jobGroupWeights" class="control-label"><g:message code="csiSystem.jobGroupWeights.label"
                                                                   default="Job Group Weights"/></label>
 
-    <div class="controls">
+    <div>
 
         <g:render template="jobGroupWeights" model="['csiSystem': csiSystem]"/>
 

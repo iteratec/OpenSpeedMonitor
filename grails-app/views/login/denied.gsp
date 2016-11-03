@@ -13,18 +13,18 @@
 		<!-- Empty Header -->
 	</content>
 
-  	<section id="Error" class="">
+  	<section id="Error">
 		<div class="big-message">
 			<div class="container">
 				<h1><g:message code="springSecurity.denied.title" locale="${lang}"/>!</h1>
 		    	<h2><g:message code="springSecurity.denied.message" locale="${lang}"/></h2> 
 				
 				<div class="actions margin-top-large">
-					<a href="${createLink(uri: '/')}" class="btn btn-large btn-primary">
+					<a href="${createLink(uri: '/')}" class="btn btn-lg btn-primary">
 						<i class="fa fa-chevron-left"></i>
 						<g:message code="error.button.backToHome" locale="${lang}"/>
 					</a>
-					<a href="${createLink(uri: '/login')}" class="btn btn-large btn-success">
+					<a href="${createLink(uri: '/login')}" class="btn btn-lg btn-success">
 						<i class="fa fa-user"></i>
 						<g:message code="error.button.login" locale="${lang}"/>
 					</a>					

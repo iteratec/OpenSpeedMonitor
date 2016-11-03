@@ -14,7 +14,7 @@
 <section id="create-page" class="first">
 
 	<g:hasErrors bean="${pageInstance}">
-	<div class="alert alert-error">
+	<div class="alert alert-danger">
 		<g:renderErrors bean="${pageInstance}" as="list" />
 	</div>
 	</g:hasErrors>
@@ -23,9 +23,9 @@
 		<fieldset class="form">
 			<g:render template="form"/>
 		</fieldset>
-		<div class="form-actions">
+		<div>
 			<g:submitButton name="create" class="btn btn-primary" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-            <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+            <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
 		</div>
 	</g:form>
 	

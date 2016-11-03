@@ -27,15 +27,14 @@ class EventResultDashboardPage extends Page {
         chartTitle { $("#rickshaw_chart_title").attr("innerHTML") }
         chartWidthInputField { $("#dia-width") }
         chartheightInputField { $("#dia-height") }
-        diaChangeChartsizeButton { $("#dia-change-chartsize") }
-        diaYAxisMinInputField { $("#dia-y-axis-min") }
-        diaYAxisMaxInputField { $("#dia-y-axis-max") }
-        diaChangeYAxisButton { $("#dia-change-yaxis") }
+        diaYAxisMinInputField { $(".dia-y-axis-min") }
+        diaYAxisMaxInputField { $(".dia-y-axis-max") }
+        diaChangeYAxisButton { $(".dia-change-yaxis") }
         showDataMarkersCheckBox { $("#to-enable-marker") }
         showDataLabelsCheckBox { $("#to-enable-label") }
         optimizeForWideScreenCheckBox { $("#wide-screen-diagram-montage") }
         addAliasButton { $("#addAliasButton") }
-        aliasInputField { $(".input-xxlarge")[2] }
+        aliasInputField { $(".input-alias")[0] }
         graphName { $("span.label").attr("innerHTML") }
         colorPicker { $("#color") }
         graphColorField { $(".swatch").attr("style") }
@@ -48,7 +47,7 @@ class EventResultDashboardPage extends Page {
         dashboardNameFromModalTextField(required: false) { $("#dashboardNameFromModal") }
         saveDashboardButtonButton { $("#saveDashboardButton") }
         saveDashboardSuccessMessage(required: false) { $("#saveDashboardSuccessDiv") }
-        customDashboardSelectionDropdown { $("#customDashBoardSelection").parent() }
+        customDashboardSelectionDropdown { $("#customDashboardDropdownButton") }
         customDashboardSelectionList { $("#customDashBoardSelection") }
         appendedInputBelowLoadTimesTextField { $("#appendedInputBelowLoadTimes") }
         appendedInputAboveLoadTimesTextField { $("#appendedInputAboveLoadTimes") }
@@ -70,52 +69,26 @@ class EventResultDashboardPage extends Page {
         includeNativeConnectivityButton{$("#includeNativeConnectivity")}
         includeCustomConnectivityButton{$("#includeCustomConnectivity")}
 
+        tabJobSelection{$("#tabJobSelectionElement")}
+        tabVariableSelection{$("#tabVariableSelectionElement")}
 
+        adjustChartButton{$("#rickshaw_adjust_chart_link")}
+        adjustChartApply{$("#adjustChartApply")}
 
     }
 
-    public void clickChooseMeasuredVariablesAccordion() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[2].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;')// scroll a little more cause of the sticky header
-        sleep(100)
-        $('.accordion-toggle')[2].click()
-    }
 
-    public void clickFilterJobAccordion() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[1].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;')// scroll a little more cause of the sticky header
-        sleep(100)
-        $('.accordion-toggle')[1].click()
-    }
-
-    public void clickAdjustChartAccordion() {
-        // Scroll object into view so it becomes clickable
-        sleep(100)
-        String jqueryString = "jQuery(\'.accordion-toggle\')[3].scrollIntoView();"
-        js.exec(jqueryString)
-        sleep(100)
-        js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
-        sleep(100)
-        $('.accordion-toggle')[3].click()
-    }
 
     public void clickSaveAsDashboardButton() {
         // Scroll object into view so it becomes clickable
         sleep(100)
-        String jqueryString = "jQuery(\'#bottomCommitButtons\')[0].scrollIntoView();"
+        String jqueryString = "jQuery(\'#graphButtonHtmlId\')[0].scrollIntoView();"
         js.exec(jqueryString)
         sleep(100)
         js.exec('document.body.scrollTop -= 70;') // scroll a little more cause of the sticky header
         sleep(100)
-        $("a",href:'#CreateUserspecifiedDashboardModal').click()
+        $('.btn.btn-primary.dropdown-toggle').click()
+        $('#createUserspecificDashboardButton').click()
 
     }
 }

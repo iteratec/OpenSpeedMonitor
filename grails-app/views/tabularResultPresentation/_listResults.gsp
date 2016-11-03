@@ -6,7 +6,7 @@
              If empty an aproximate message is shown.
 --%>
 <g:if test="${model.isEmpty()}">
-<p>
+<p class="text-center">
     <g:message code="de.iteratec.isr.ui.EventResultListing.isEmpty.message" />
 </p>
 </g:if>

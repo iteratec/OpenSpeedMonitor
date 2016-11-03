@@ -15,15 +15,18 @@
 	<%-- main menu --%>
 	<g:render template="/layouts/mainMenu"/>
 
-	<div class="controlribbon">
-		<h5><g:message code="script.list.label.filter" default="Skripte filtern" /></h5>
-		<input type="text" id="filterByLabel" onkeyup="filterScriptList()" oninput="filterScriptList()" placeholder="<g:message code="script.list.filter.name" default="Nach Skript-Namen" />" />
+	<div class="row table-filter">
+		<div class="col-md-8">
+			<input type="text" id="filterByLabel" onkeyup="filterScriptList()" class="form-control"
+				   oninput="filterScriptList()" placeholder="<g:message code="script.list.filter.name"
+																		default="Filter by script name" />" />
+		</div>
+		<div class="col-md-4">
+			<a href="<g:createLink action="create" />" class="btn btn-primary pull-right">
+				<i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
+			</a>
+		</div>
 	</div>
-	<div class="controlribbon">
-		<a href="<g:createLink action="create" />" class="btn btn-primary">
-			<i class="fa fa-plus"></i> <g:message code="default.create.label" args="[entityName]" />
-		</a>
-	</div><br>
     <g:if test="${scripts.isEmpty()}">
 	<p>
 	    <g:message code="de.iteratec.isr.ui.EventResultListing.isEmpty.message" />

@@ -12,7 +12,7 @@
             </g:if>
             <f:table collection="${roleList}" />
 
-            <div class="pagination">
+            <div>
                 <bs:paginate total="${roleCount ?: 0}" />
             </div>
         </div>

@@ -1,6 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<ul class="nav pull-right">
-	<li class="dropdown dropdown-btn">
+	<li class="dropdown">
 		
 		<a class="dropdown-toggle" data-toggle="dropdown" href="#">
     		<i class="fa fa-info-circle"></i>
@@ -21,7 +20,7 @@
                     <g:message code="de.iteratec.osm.api.manual.label" locale="${lang}"/>
                 </a>
             </li>
-            <li class="">
+            <li>
                 <a href="${createLink(uri: '/about')}" target="_blank">
                     <i class="fa fa-info-circle"></i>
                     <g:message code="de.iteratec.osm.about.label" locale="${lang}"/>
@@ -36,4 +35,3 @@
 
 		</ul>
 	</li>
-</ul>

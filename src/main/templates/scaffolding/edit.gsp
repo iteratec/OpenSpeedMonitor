@@ -19,13 +19,13 @@
             </g:hasErrors>
             <g:form resource="\${${propertyName}}" method="PUT" class="form-horizontal">
                 <g:hiddenField name="version" value="\${${propertyName}?.version}" />
-                <fieldset class="form">
+                <fieldset class="form-horizontal">
                     <f:all bean="${propertyName}"/>
                 </fieldset>
-                <div class="form-actions">
+                <div>
                     <g:actionSubmit class="btn btn-primary" action="update" value="\${message(code: 'default.button.update.label', default: 'Update')}" />
                     <g:render template="/_common/modals/deleteSymbolLink"/>
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
         </div>

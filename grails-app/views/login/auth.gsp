@@ -11,35 +11,41 @@
 <body>
 
 <section id="login" class="first">
+<h3 class="text-center"> <g:message code="springSecurity.login.header" locale="${lang}"/> </h3>
 <div class="row">
-	<div class="span3"></div>
-	<div class="span6">
-		<h3> <g:message code="springSecurity.login.header" locale="${lang}"/> </h3>
+	<div class="col-md-4 col-md-offset-4">
 		<form id='loginForm' class='form-horizontal' action='${postUrl}' method='POST' autocomplete='off'>
-			<fieldset class="form">
-				<div class="control-group fieldcontain">
-					<label for='username' class="control-label"><g:message code="springSecurity.login.username.label" locale="${lang}"/>:</label>
-					<div class="controls">
-						<input type='text' class='span4' name='username' id='username'/>
+			<fieldset>
+				<div class="form-group">
+					<label for='username' class="col-md-6 control-label">
+						<g:message code="springSecurity.login.username.label" locale="${lang}"/>:
+					</label>
+					<div class='col-md-6'>
+						<input type='text' class='form-control' name='username' id='username'/>
 					</div>
 				</div>
 	
-				<div class="control-group fieldcontain">
-					<label for='password' class="control-label"><g:message code="springSecurity.login.password.label" locale="${lang}"/>:</label>
-					<div class="controls">
-						<input type='password' class='span4' name='password' id='password'/>
+				<div class="form-group">
+					<label for='password' class="control-label col-md-6">
+						<g:message code="springSecurity.login.password.label" locale="${lang}"/>:
+					</label>
+					<div class='col-md-6'>
+						<input type='password' class='form-control' name='password' id='password'/>
 					</div>
 				</div>
 				
-				<div id="remember_me_holder" class="control-group fieldcontain">
-					<label for='remember_me' class="control-label"><g:message code="springSecurity.login.remember.me.label" locale="${lang}"/></label>
-					<div class="controls">
-						<bs:checkBox class="span4" name="${rememberMeParameter}" value="${hasCookie}" />
+				<div id="remember_me_holder" class="form-group">
+					<label for='remember_me' class="control-label col-md-6">
+						<g:message code="springSecurity.login.remember.me.label" locale="${lang}"/>
+					</label>
+					<div class="col-md-6 checkbox">
+						<bs:checkBox name="${rememberMeParameter}" value="${hasCookie}" id="remember_me" />
 					</div>
 				</div>
 			</fieldset>
-			<div class="controls">
-				<input type='submit' id="submit" class="btn btn-success" value='${message([code:'springSecurity.login.button', locale:lang])}'/>
+			<div>
+				<input type='submit' id="submit" class="btn btn-success pull-right"
+					   value='${message([code:'springSecurity.login.button', locale:lang])}'/>
 				<g:if test="${grailsApplication.config.getProperty('grails.mail.disabled')?.toLowerCase() == "false"}">
 					<span class="forgot-link">
 						<g:link controller='register' action='forgotPassword'><g:message code='spring.security.ui.login.forgotPassword'/></g:link>
@@ -48,7 +54,6 @@
 			</div>
 		</form>
 	</div>
-	<div class="span3"></div>
 </div>
 </section>
 

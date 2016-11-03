@@ -50,8 +50,9 @@ function createScheduleChart(rawdata, id, htmlIdOfDurationToShowDiv, htmlIdOfSho
     var jobNamesTrimmed = trimJobNames(jobNamesAndDescriptions);
 
     // Define margins, width and height
-    var margin = {top: 20, right: 50, bottom: 20, left: 200},
-        width = divWidth - margin.left - margin.right,
+    var padding = {left: 15, right: 15},
+        margin = {top: 20, right: 50, bottom: 20, left: 200},
+        width = divWidth - margin.left - margin.right - padding.left - padding.right,
         height = jobCount * jobHeight;
 
     // Scale for x-Axis (Time)

@@ -44,17 +44,18 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects) {
     $("#chart-toggle").click(function () {
         $("#csi-table").hide();
         $("#chartbox").fadeIn();
+        $(this).addClass("active").siblings().removeClass("active");
     });
     $("#table-toggle").click(function () {
         $("#chartbox").hide();
         $("#csi-table").fadeIn();
+        $(this).addClass("active").siblings().removeClass("active")
     });
 
     if ($("#chartbox").length > 0) {
         createGraph();
     }
 
-    scrollToChartbox(-120);
 }
 /**
  * show or hide filter-elements, depending on aggregator type

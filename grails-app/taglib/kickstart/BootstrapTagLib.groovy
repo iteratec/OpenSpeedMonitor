@@ -53,7 +53,7 @@ class BootstrapTagLib {
 		def disabledPrev = (currentstep > firststep) ? "" : "disabled"
 		//		linkTagAttrs.class = 'prevLink'
 		//		linkParams.offset = offset - max
-		writer << "<ul>"
+		writer << "<ul class='pagination'>"
 		writer << "<li class='prev ${disabledPrev}'>"
 		writer << link(linkTagAttrs.clone()) {
 			(attrs.prev ?: messageSource.getMessage('paginate.prev', null, messageSource.getMessage('default.paginate.prev', null, 'Previous', locale), locale))
@@ -309,7 +309,7 @@ class BootstrapTagLib {
 //				${messageSource.getMessage(name + '.label', null, '', locale)}
 //			</label>
 //
-//			<div class="">
+//			<div>
 //"""
 
 		out << "				<input type=\"hidden\" name=\"_${name}\"";
@@ -342,9 +342,9 @@ class BootstrapTagLib {
 		out << ' />'
 
 		out << """
-				<div id="btngroup" class="btn-group radiocheckbox" data-toggle="buttons-radio">
-					<div class="btn btn-small on   ${value ? 'active btn-primary' : ''}">${messageSource.getMessage(onLabel, null, onLabel, locale)}</div>
-					<div class="btn btn-small off ${!value ? 'active btn-primary' : ''}">${messageSource.getMessage(offLabel, null, offLabel, locale)}</div>
+				<div id="btngroup" class="btn-group radiocheckbox" data-toggle="buttons">
+					<div class="btn btn-sm on   ${value ? 'active btn-primary' : 'btn-default'}">${messageSource.getMessage(onLabel, null, onLabel, locale)}</div>
+					<div class="btn btn-sm off ${!value ? 'active btn-primary' : 'btn-default'}">${messageSource.getMessage(offLabel, null, offLabel, locale)}</div>
 				</div>
 		"""
 	}

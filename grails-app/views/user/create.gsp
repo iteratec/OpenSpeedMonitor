@@ -32,9 +32,9 @@
                     <div id="roleMenu" class="tab-pane fade">
                         <g:each var='entry' in='${authorityList}'>
                             <g:set var='roleName' value='${uiPropertiesStrategy.getProperty(entry, 'authority')}'/>
-                            <div class="control-group">
+                            <div class="form-group">
                                 <g:link class="control-label" controller='role' action='edit' id='${entry.id}'>${roleName}</g:link>
-                                <div class="controls">
+                                <div>
                                     <bs:checkBox name="${roleName}" />
                                 </div>
                             </div>
@@ -44,9 +44,9 @@
                     </div>
 
                 </div>
-                <div class="form-actions">
+                <div>
                     <g:submitButton name="create" class="btn btn-primary" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
         </div>

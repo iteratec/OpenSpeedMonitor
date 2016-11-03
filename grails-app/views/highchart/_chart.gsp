@@ -44,7 +44,4 @@
 		width="${initialChartWidth}"
 		annotations="${annotations}"/>
 </g:else>
-<div class="row">
-	<g:render template="/highchart/adjustChartAccordion" model="${model}" />
-    <button class="span btn btn-primary" id="dia-save-chart-as-png" style="vertical-align: top;"><g:message code="de.iteratec.ism.ui.button.save.name"/></button>
-</div>
+<g:render template="/highchart/adjustChartModal" model="${model}" />

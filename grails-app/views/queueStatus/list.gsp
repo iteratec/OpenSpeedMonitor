@@ -21,7 +21,7 @@
         <%-- main menu --%>
         <g:render template="/layouts/mainMenu" />
 
-        <div class="alert" id="serverdown">
+        <div class="alert alert-warning" id="serverdown">
           <a class="close" data-dismiss="alert">×</a>
           <g:message code="queue.noconnection.label"/>
         </div>
@@ -76,16 +76,16 @@
                       });
                                 $(nextRow).attr('status', status);
 
-                                $('.arrow').toggleClass('icon-chevron-down', false);
-                                $('.arrow').toggleClass('icon-chevron-up', true);
+                                $('.arrow').toggleClass('glyphicon-chevron-down', false);
+                                $('.arrow').toggleClass('glyphicon-chevron-up', true);
 
-                                $('.arrow', this).toggleClass('icon-chevron-down', true);
-                                $('.arrow', this).toggleClass('icon-chevron-up', false);
+                                $('.arrow', this).toggleClass('glyphicon-chevron-down', true);
+                                $('.arrow', this).toggleClass('glyphicon-chevron-up', false);
                                 $(nextRow).toggle(true);
                             } else {
                                 // hide row
-                                $('.arrow', this).toggleClass('icon-chevron-down', false);
-                                $('.arrow', this).toggleClass('icon-chevron-up', true);
+                                $('.arrow', this).toggleClass('glyphicon-chevron-down', false);
+                                $('.arrow', this).toggleClass('glyphicon-chevron-up', true);
                                 $(nextRow).toggle(false);
                             }
                         }
@@ -95,8 +95,8 @@
                     $(document).on('click', 'tr.queueRow', function () {
                         var thisRow = this;
                         if ($(this).next().hasClass('jobsRow')) {
-                            $('.arrow', thisRow).removeClass('icon-chevron-down');
-                            $('.arrow', thisRow).addClass('icon-chevron-up');
+                            $('.arrow', thisRow).removeClass('glyphicon-chevron-down');
+                            $('.arrow', thisRow).addClass('glyphicon-chevron-up');
                             $(this).next().hide();
                         }
                     });

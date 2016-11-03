@@ -148,7 +148,7 @@
 <g:render template="/layouts/mainMenu"/>
 
 %{--container for errors --}%
-<div class="alert alert-error" id="errorDeletingCsiConfiguration" style="display: none">
+<div class="alert alert-danger" id="errorDeletingCsiConfiguration" style="display: none">
     <strong>
         <g:message code="de.iteratec.osm.csiConfiguration.deleteErrorTitle"/>
     </strong>
@@ -159,7 +159,7 @@
 <div class="row">
 
     %{--Name and description of actual config----------------------------------------------}%
-    <div class="span8">
+    <div class="col-md-8">
         <blockquote>
             <p class="text-info">
                 <strong id="headerCsiConfLabel">${selectedCsiConfiguration.label}</strong>
@@ -174,12 +174,12 @@
 
     <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner-25"></div>
     %{--dropdown button----------------------------------------------}%
-    <div class="span2 offset1">
+    <div class="col-md-2 col-md-offset-1">
 
         <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
 
-            <div class="btn-group pull-left">
-                <button class="btn btn-small btn-info dropdown-toggle text-right" data-toggle="dropdown">
+            <div class="btn btn-group pull-left">
+                <button class="btn btn-sm btn-info dropdown-toggle text-right" data-toggle="dropdown">
                     <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration"
                                default="This Configuration..."></g:message>
                     <span class="caret"></span>

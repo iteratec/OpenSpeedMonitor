@@ -14,7 +14,7 @@
         <section id="edit-connectivityProfile" class="first">
 
             <g:hasErrors bean="${connectivityProfileInstance}">
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <g:renderErrors bean="${connectivityProfileInstance}" as="list"/>
                 </div>
             </g:hasErrors>
@@ -23,11 +23,11 @@
                 <g:hiddenField name="id" value="${connectivityProfileInstance?.id}"/>
                 <g:hiddenField name="version" value="${connectivityProfileInstance?.version}"/>
 
-                <fieldset class="form">
+                <fieldset class="form-horizontal">
                     <g:render template="form"/>
                 </fieldset>
 
-                <div class="form-actions">
+                <div>
                     <%-- Save as copy--%>
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.save.label', default: 'Save')}"/>
 
@@ -41,7 +41,7 @@
                     </a>
 
                     <%-- Reset --%>
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
 
                     <%--			<g:actionSubmit class="btn btn-danger" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />  --%>
                 </div>

@@ -36,6 +36,7 @@ function RickshawGraphBuilder(args) {
             this.dataLabelsActivated = true;
         }
 
+        self.autoResize = args.width < 0 || args.width == "auto";
         self.divId = args.divId;
         args.series = self.composeSeries(args.data);
 
@@ -58,13 +59,14 @@ function RickshawGraphBuilder(args) {
         self.updateTitle(args.title);
         self.addDataLabels();
 
-        new ChartAdjuster(args);
+        new ChartAdjuster(self, args);
         new ChartExporter(args);
         self.updateBorders({
                 measurandGroupName: this.measurandGroup,
                 bottom: args.bottom,
                 top: args.top
             });
+        self.initializeEventListeners();
     }
 
     this.addDataLabels = function () {
@@ -132,6 +134,14 @@ function RickshawGraphBuilder(args) {
 
         if (args.height == "auto") {
             args.height = self.htmlProvider.HEIGHT_OF_CHART;
+        } else {
+            args.height = parseInt(args.height);
+        }
+
+        if (args.width == "auto" || args.width == -1) {
+            args.width = $(window).width() - 95;
+        } else {
+            args.width = parseInt(args.width);
         }
 
         $("#rickshaw_main").width(args.width);
@@ -144,13 +154,14 @@ function RickshawGraphBuilder(args) {
         $("#rickshaw_y-axes_right").height(args.height);
         $("#rickshaw_chart").height(args.height);
         $("#rickshaw_addons").width(args.width - 70);
-        $("#rickshaw_addons").find("ul").width(args.width - 70);
+        $("#rickshaw_addons ul").width(args.width - 70);
         $("#rickshaw_timeline").width(args.width - 60);
-        $("#rickshaw_slider").width(eval(parseInt(args.width) + 10));
-        $("#rickshaw_range_slider_preview_container").width(eval(parseInt(args.width) + 10));
-        $("#rickshaw_x-axis").width(args.width);
+        $("#rickshaw_slider").width(args.width- 70);
+        $("#rickshaw_range_slider_preview_container").width(args.width - 70);
+        $("#rickshaw_range_slider_preview").width(args.width - 70);
+        $("#rickshaw_x-axis").width(args.width - 60);
         $(".x_axis_d3").attr("width", args.width);
-        $(".graph").width(eval(parseInt(args.width) + 25));
+        $(".graph").width(args.width + 60);
 
         self.graph.configure({
             width: widthOfChartSvg,
@@ -429,6 +440,18 @@ function RickshawGraphBuilder(args) {
         };
         series.numberOfMeasurandGroups = measurandGroups.length;
         return series;
+    }
+
+    this.initializeEventListeners = function() {
+        $(window).resize(function() {
+            if (!self.autoResize) {
+                return;
+            }
+            self.updateSize({
+                width: 'auto',
+                height: 'auto'
+            });
+        });
     }
 
     this.initialize(args);
@@ -1067,179 +1090,136 @@ function HtmlProvider(args) {
     this.initialize(args);
 }
 
-function ChartAdjuster(args) {
+function ChartAdjuster(graphBuilder, args) {
     var self = this;
 
-    this.initialize = function (args) {
-        $("#collapseAdjustment").collapse('hide');
-
-        self.addFunctionalityAdjustingChartSize();
-        self.addFunctionalityCustomizeTitle();
-        self.addFunctionalityCustomizeAliases();
+    this.initialize = function(graphBuilder, args) {
+        self.graphBuilder = graphBuilder;
+        self.registerEventHandlers();
         self.createYAxisAdjuster(args);
-        self.replaceDataMarkerCheckbox();
-        self.replaceDataLabelsCheckbox();
-        self.replaceWideScreenDiagramMontageCheckbox();
         self.addFunctionalityShowDataMarker();
         self.addFunctionalityShowDataLabels();
-        self.addFunctionalityToggleWideScreenExport();
     }
 
-    this.addFunctionalityAdjustingChartSize = function () {
-        $('#dia-change-chartsize')
-            .bind(
-                'click',
-                function () {
-                    var diaWidth = $('#dia-width').val()
-                    var diaHeight = $('#dia-height').val()
-                    var maxWidth = 5000
-                    var minWidth = 540
-                    var maxHeight = 3000
-                    if ($.isNumeric(diaWidth) && $.isNumeric(diaHeight)
-                        && parseInt(diaWidth) > 0
-                        && parseInt(diaWidth) <= maxWidth
-                        && parseInt(diaWidth) >= minWidth
-                        && parseInt(diaHeight) > 0
-                        && parseInt(diaHeight) <= maxHeight) {
-                        rickshawGraphBuilder.updateSize({
-                            width: $('#dia-width').val(),
-                            height: $('#dia-height').val()
-                        });
-                        if (parseInt(diaWidth) < 1070) {
-                            $("#rickshaw_legend > ul").css({
-                                "-moz-column-count": 1 + "",
-                                "-webkit-column-count": 1 + "",
-                                "column-count": 1 + ""
-                            });
-                        } else {
-                            $("#rickshaw_legend > ul").css({
-                                "-moz-column-count": 2 + "",
-                                "-webkit-column-count": 2 + "",
-                                "column-count": 2 + ""
-                            });
-                        }
-                        //center legend
-//            var leftDistance = Math.floor(((diaWidth - $("#rickshaw_legend").outerWidth()) / 2) - 60);
-//            document.getElementById('rickshaw_legend').style.cssText = "margin-left:" + leftDistance + "px !important";
-//            $(".rickshaw_legend").css({
-//              "margin-left" : "" + leftDistance + "px"
-//            });
-                    } else {
-                        window
-                            .alert("Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels.");
-                    }
+    this.registerEventHandlers = function () {
+        $('#adjustChartApply').bind('click', function () {
+            self.graphBuilder.updateTitle($('#dia-title').val());
+            var success = self.updateAllYAxis();
+            if (self.updateSize() && success) {
+                $('#adjustChartModal').modal('hide');
+            }
+        });
+        var aliasChildList = $("#graphAliasChildlist");
+        aliasChildList.bind("graphAliasChildsChanged", self.graphBuilder.updateAliases);
+        aliasChildList.bind("graphAliasColorChanged", function (event, nameAndColor) {
+            self.graphBuilder.updateColorsOfSeries(nameAndColor);
+        });
+    }
+
+    this.updateSize = function () {
+        var diaWidth = $('#dia-width').val()
+        var diaHeight = $('#dia-height').val()
+        var maxWidth = 5000
+        var minWidth = 540
+        var maxHeight = 3000
+        var widthNumeric = $.isNumeric(diaWidth) &&
+            parseInt(diaWidth) <= maxWidth &&
+            parseInt(diaWidth) >= minWidth;
+        var autoWidth = diaWidth < 0 || diaWidth == "auto";
+        var heightNumeric = $.isNumeric(diaHeight) && parseInt(diaHeight) <= maxHeight;
+        if ((widthNumeric || autoWidth) && (heightNumeric || diaHeight == "auto")) {
+            self.graphBuilder.autoResize = autoWidth;
+            self.graphBuilder.updateSize({
+                width: diaWidth,
+                height: diaHeight
+            });
+            if (parseInt(diaWidth) < 1070) {
+                $("#rickshaw_legend > ul").css({
+                    "-moz-column-count": 1 + "",
+                    "-webkit-column-count": 1 + "",
+                    "column-count": 1 + ""
                 });
-
+            } else {
+                $("#rickshaw_legend > ul").css({
+                    "-moz-column-count": 2 + "",
+                    "-webkit-column-count": 2 + "",
+                    "column-count": 2 + ""
+                });
+            }
+            return true
+        } else {
+            window
+                .alert("Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels.");
+            return false
+        }
     }
-
-    this.addFunctionalityCustomizeTitle = function () {
-        $('#dia-title').bind('input', function () {
-            rickshawGraphBuilder.updateTitle($(this).val());
-        });
-    };
-
-    this.addFunctionalityCustomizeAliases = function () {
-        $("#graphAliasChildlist").bind("graphAliasChildsChanged", function () {
-            rickshawGraphBuilder.updateAliases();
-        });
-        $("#graphAliasChildlist").bind("graphAliasColorChanged", function (event, nameAndColor) {
-            rickshawGraphBuilder.updateColorsOfSeries(nameAndColor)
-        });
-    };
 
     this.createYAxisAdjuster = function (args) {
         var measurandGroups = args.graph.measurandGroupsManager.measurandGroups;
-        var parentContainer = $("#collapseAdjustment > .accordion-inner > .span11");
-        var blankYAxisAdjuster = $("[id=adjust_chart_y_axis]");
+        var blankYAxisAdjuster = $("div.adjust_chart_y_axis");
+        var parentContainer = $("#adjust_chart_y_axis_container");
         measurandGroups.forEach(function (mg) {
             var unit = mg.label.match(/\[.*]/);
             if (unit != null && unit[0] != null) unit = unit[0].replace("\[", "").replace("]", "");
             var yAxisAdjuster = blankYAxisAdjuster.clone();
             parentContainer.append(yAxisAdjuster);
-            var button = yAxisAdjuster.find("button");
-            var yAxisAdjusterLabel = yAxisAdjuster.find(".span2.text-right");
+            var yAxisAdjusterLabel = yAxisAdjuster.find("label");
             yAxisAdjusterLabel.html(yAxisAdjusterLabel.html() + ": " + mg.label.replace("[" + unit + "]", ""));
-            button[0].measurandGroup = mg.name;
 
-            var inputMin = button.parent().find("#dia-y-axis-min");
-            yAxisAdjuster.find("#minimumUnit").html(unit);
-            yAxisAdjuster.find("#maximumUnit").html(unit);
+            yAxisAdjuster.find(".dia-y-axis-name").val(mg.name);
 
-            var inputMax = button.parent().find("#dia-y-axis-max");
-            // TODO: werte dynamisch ermitteln
-            inputMin.val(0);
+            var inputMin = yAxisAdjuster.find(".dia-y-axis-min");
+            yAxisAdjuster.find(".minimumUnit").html(unit);
+            yAxisAdjuster.find(".maximumUnit").html(unit);
+
+            var inputMax = yAxisAdjuster.find(".dia-y-axis-max");
+            inputMin.val("0");
             inputMax.val("auto");
-
-            self.addFunctionalityAdjustYAxis(button);
-
         });
         blankYAxisAdjuster.remove();
     }
 
-    this.addFunctionalityAdjustYAxis = function (button) {
-        button
-            .bind(
-                'click',
-                function () {
-                    var diaYAxisMin = $(this).parent().find(
-                        '#dia-y-axis-min').val();
-                    var diaYAxisMax = $(this).parent().find(
-                        '#dia-y-axis-max').val();
-
-                    var valide = true;
-                    if (diaYAxisMin != "auto"
-                        && !($.isNumeric(diaYAxisMin))
-                        && diaYAxisMax != "auto"
-                        && !($.isNumeric(diaYAxisMax))) {
-                        valide = false;
-                    }
-                    if (valide) {
-                        if (diaYAxisMax != "auto"
-                            && diaYAxisMin != "auto") {
-                            if (!(parseFloat(diaYAxisMax) > parseFloat(diaYAxisMin))) {
-                                valide = false;
-                            }
-                        }
-                    }
-                    if (valide) {
-                        rickshawGraphBuilder
-                            .updateBorders({
-                                measurandGroupName: this.measurandGroup,
-                                bottom: diaYAxisMin,
-                                top: diaYAxisMax
-                            });
-                    } else {
-                        window
-                            .alert("Minimum and maximum of Y-Axis has to be \"auto\" or numeric values and maximum must be greater than minimum!");
-                    }
-                });
+    this.updateAllYAxis = function () {
+        var success = true;
+        $("div.adjust_chart_y_axis").each(function(i, el) {
+            success = self.updateOneYAxis(el) && success
+        });
+        return success;
     }
 
-    this.replaceDataMarkerCheckbox = function () {
-        var checkbox = $("#to-enable-marker").parent().parent();
-        var parentContainer = checkbox.parent();
-        checkbox.detach();
-        parentContainer.append(checkbox);
-    }
+    this.updateOneYAxis = function(container) {
+        container = $(container);
+        var diaYAxisMin = container.find('.dia-y-axis-min').val();
+        var diaYAxisMax = container.find('.dia-y-axis-max').val();
 
-    this.replaceDataLabelsCheckbox = function () {
-        var checkbox = $("#to-enable-label").parent().parent();
-        var parentContainer = checkbox.parent();
-        checkbox.detach();
-        parentContainer.append(checkbox);
-    }
-
-    this.replaceWideScreenDiagramMontageCheckbox = function () {
-        var checkbox = $("#wide-screen-diagram-montage").parent().parent();
-        var parentContainer = checkbox.parent();
-        checkbox.detach();
-        parentContainer.append(checkbox);
+        var valid = true;
+        if (diaYAxisMin != "auto" && !($.isNumeric(diaYAxisMin))
+            && diaYAxisMax != "auto" && !($.isNumeric(diaYAxisMax))) {
+            valid = false;
+        }
+        if (valid) {
+            if (diaYAxisMax != "auto" && diaYAxisMin != "auto") {
+                if (!(parseFloat(diaYAxisMax) > parseFloat(diaYAxisMin))) {
+                    valid = false;
+                }
+            }
+        }
+        if (valid) {
+            self.graphBuilder.updateBorders({
+                measurandGroupName: container.find('.dia-y-axis-name').val(),
+                bottom: diaYAxisMin,
+                top: diaYAxisMax
+            });
+        } else {
+            window.alert("Minimum and maximum of Y-Axis has to be \"auto\" or numeric values and maximum must be greater than minimum!");
+        }
+        return valid;
     }
 
     this.addFunctionalityShowDataMarker = function () {
         $('#to-enable-marker').bind('change', function () {
             var toEnableMarkers = $(this).is(':checked');
-            rickshawGraphBuilder.updateDrawPointMarkers(toEnableMarkers);
+            self.graphBuilder.updateDrawPointMarkers(toEnableMarkers);
         });
     }
 
@@ -1250,23 +1230,12 @@ function ChartAdjuster(args) {
                 window.alert("Too many datapoints to show and label them!");
                 $(this).prop('checked', false);
             } else {
-                rickshawGraphBuilder.updateDrawPointLabels(toEnableLabels);
-            }
-        });
-    }
-    this.addFunctionalityToggleWideScreenExport = function () {
-        $('#wide-screen-diagram-montage').bind('change', function () {
-            if ($(this).is(':checked')) {
-                window.history.pushState('', document.title, (document.location.href + '&wideScreenDiagramMontage=on'));
-            } else {
-                var url = document.location.href
-                url = url.replace(/&wideScreenDiagramMontage=on/, '');
-                window.history.pushState('', document.title, url);
+                self.graphBuilder.updateDrawPointLabels(toEnableLabels);
             }
         });
     }
 
-    this.initialize(args);
+    this.initialize(graphBuilder, args);
 }
 
 
@@ -1689,14 +1658,6 @@ function ChartExporter(args) {
     }
 
     this.initialize(args);
-}
-
-function scrollToChartbox(chartBoxTopOffset) {
-    if ($("#chartbox").length > 0) {
-        $('html,body').animate({scrollTop: ($("#chartbox").offset().top + chartBoxTopOffset)}, {duration: 'fast'});
-    } else {
-        $('html,body').animate({scrollTop: 0}, {duration: 'fast'});
-    }
 }
 
 // escapes special characters

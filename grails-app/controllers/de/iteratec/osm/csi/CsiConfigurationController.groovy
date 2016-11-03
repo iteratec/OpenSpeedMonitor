@@ -23,6 +23,7 @@ import de.iteratec.osm.d3Data.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.converters.JSON
@@ -37,6 +38,7 @@ class CsiConfigurationController {
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
     PerformanceLoggingService performanceLoggingService
+    UserspecificDashboardService userspecificDashboardService
 
     def configurations() {
         CsiConfiguration config
@@ -123,7 +125,8 @@ class CsiConfigurationController {
          defaultTimeToCsMappings : defaultTimeToCsMappingsChart as JSON,
          pageTimeToCsMappings    : pageTimeToCsMappingsChart as JSON,
          pages                   : Page.list(),
-         pageMappingsExist       : pageMappingsExist]
+         pageMappingsExist       : pageMappingsExist,
+         availableDashboards     : userspecificDashboardService.getListOfAvailableCsiDashboards()]
     }
 
     /**

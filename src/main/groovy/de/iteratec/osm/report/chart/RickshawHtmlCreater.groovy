@@ -66,11 +66,14 @@ class RickshawHtmlCreater {
 
         sw <<"""
 		<div id="${divId}" class="graph">
-			<div id="rickshaw_chart_title" class="rickshaw_chart_title">Title</div>
+			<div id="rickshaw_chart_title" class="rickshaw_chart_title"></div>
 			<div id="rickshaw_label_summary_box">
-                <div id="rickshaw_chart_label_summary" class="rickshaw_legend">${labelSummary}</div>
+                <div id="rickshaw_chart_label_summary">${labelSummary}</div>
             </div>
-			<div id="rickshaw_main">
+			<div id="rickshaw_main" style="height: ${height}">
+                <a href="#adjustChartModal" id="rickshaw_adjust_chart_link" data-toggle="modal" data-target="#adjustChartModal">
+                    <i class="fa fa-sliders"></i>
+                </a>
 				<div id="rickshaw_yAxis_0" class="rickshaw_y-axis_left"></div>
 				<div id="rickshaw_y-axes_right"></div>
 				<div id="rickshaw_chart"></div>

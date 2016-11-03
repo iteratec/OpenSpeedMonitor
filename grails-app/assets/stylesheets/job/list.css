@@ -26,9 +26,6 @@ table#jobtable tr.failure td {
 	
 }
 
-.controlribbon {
-	padding: 0.5em;
-}
 
 label {
 	display: inline !important;
@@ -58,14 +55,18 @@ display: block;
 }
 
 .chosen-container {
-	width: 400px !important;
-	margin-bottom: 10px;
-	border-radius: 4px !important;
-	border: 1px solid #cccccc !important;
+	width: 100%;
+	border-radius: 4px;
+	border: 1px solid #cccccc;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 14px;
-	color: #555555 !important;
+	color: #555555;
 }
+
+.chosen-container .search-field {
+	height: 32px;
+}
+
 
 .inactiveJob {
 	font-weight: normal;
@@ -73,4 +74,9 @@ display: block;
 .running {
     background: center left no-repeat url(../../images/loading_indicator.gif);
     padding-left: 20px;
+}
+
+#updateHints {
+	line-height: 21px;
+	padding: 6px;
 }

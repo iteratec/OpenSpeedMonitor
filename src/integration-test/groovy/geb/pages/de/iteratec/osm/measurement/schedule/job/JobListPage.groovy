@@ -10,7 +10,7 @@ class JobListPage extends I18nGebPage {
     static at = {
         title == "Jobs"
         $("li", class:"controller active").text() == getI18nMessage("de.iteratec.isr.managementDashboard")
-        $("h5").text() == getI18nMessage("de.iteratec.sri.wptrd.jobs.filter.heading")
+        $("legend").text() == getI18nMessage("de.iteratec.sri.wptrd.jobs.filter.heading")
     }
 
 

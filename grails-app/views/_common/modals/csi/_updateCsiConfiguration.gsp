@@ -1,46 +1,52 @@
 %{--
     Modal dialog to update CsiConfiguration in view via ajax.
 --}%
-<div id="updateCsiConfModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="updateCsiConfModalLabel" >
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>
-        <h3 id="updateCsiConfModalLabel"><g:message code="de.iteratec.osm.csi.configuration.update.heading" default="Update CSI configuration"/></h3>
-    </div>
-    <div class="modal-body">
-        %{--container for errors --}%
-        <div class="alert alert-error" id="errorUpdatingCsiConfiguration" style="display: none">
-            <strong>
-                <g:message code="de.iteratec.osm.csiConfiguration.updateErrorTitle"/>
-            </strong>
-            <p id="updatingCsiConfigurationErrors"></p>
+<div id="updateCsiConfModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="updateCsiConfModalLabel" >
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>
+                <h4 class="modal-title" id="updateCsiConfModalLabel">
+                    <g:message code="de.iteratec.osm.csi.configuration.update.heading" default="Update CSI configuration"/>
+                </h4>
+            </div>
+            <div class="modal-body">
+                %{--container for errors --}%
+                <div class="alert alert-danger" id="errorUpdatingCsiConfiguration" style="display: none">
+                    <strong>
+                        <g:message code="de.iteratec.osm.csiConfiguration.updateErrorTitle"/>
+                    </strong>
+                    <p id="updatingCsiConfigurationErrors"></p>
+                </div>
+                %{--controls for attributes to update--}%
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div id="spinner-position"></div>
+                        <label class="control-label col-md-3" for="confLabelFromModal">
+                            ${message(code: 'de.iteratec.osm.gui.label.notation', default: 'Label')}:
+                        </label>
+                        <div class="col-md-9">
+                            <g:textField name="confLabelFromModal" id="confLabelFromModal" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-md-3" for="confDescriptionFromModal">
+                            ${message(code: 'de.iteratec.osm.gui.description.notation', default: 'Description')}:
+                        </label>
+                        <div class="col-md-9">
+                            <g:textArea class="form-control" rows="3" name="confDescriptionFromModal" id="confDescriptionFromModal"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                %{--buttons--}%
+                <button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><g:message code="default.button.cancel.label" default="Cancel"/></button>
+                <a href="#" class="btn btn-primary" onclick="updateCsiConfiguration()">
+                    <g:message code="de.iteratec.ism.ui.labels.save" default="Save"/>
+                </a>
+            </div>
         </div>
-        %{--controls for attributes to update--}%
-        <form class="form-horizontal">
-            <div class="control-group">
-                <label class="control-label" for="confLabelFromModal">
-                    ${message(code: 'de.iteratec.osm.gui.label.notation', default: 'Label')}
-                </label>
-                <div class="controls">
-                    <div id="spinner-position"></div>
-                    <g:textField name="confLabelFromModal" id="confLabelFromModal"></g:textField>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="confDescriptionFromModal">
-                    ${message(code: 'de.iteratec.osm.gui.description.notation', default: 'Description')}
-                </label>
-                <div class="controls">
-                    <g:textArea name="confDescriptionFromModal" id="confDescriptionFromModal"></g:textArea>
-                </div>
-            </div>
-        </form>
-    </div>
-    <div class="modal-footer">
-        %{--buttons--}%
-        <button class="btn" data-dismiss="modal" aria-hidden="true"><g:message code="default.button.cancel.label" default="Cancel"/></button>
-        <a href="#" class="btn btn-primary" onclick="updateCsiConfiguration()">
-            <g:message code="de.iteratec.ism.ui.labels.save" default="Save"/>
-        </a>
     </div>
 </div>
 

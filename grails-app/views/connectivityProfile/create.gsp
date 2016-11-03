@@ -14,18 +14,18 @@
         <section id="create-connectivityProfile" class="first">
 
             <g:hasErrors bean="${connectivityProfileInstance}">
-            <div class="alert alert-error">
+            <div class="alert alert-danger">
                 <g:renderErrors bean="${connectivityProfileInstance}" as="list" />
             </div>
             </g:hasErrors>
 
             <g:form action="save" class="form-horizontal" >
-                <fieldset class="form">
+                <fieldset class="form-horizontal">
                     <g:render template="form"/>
                 </fieldset>
-                <div class="form-actions">
+                <div>
                     <g:submitButton name="create" class="btn btn-primary" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
 
