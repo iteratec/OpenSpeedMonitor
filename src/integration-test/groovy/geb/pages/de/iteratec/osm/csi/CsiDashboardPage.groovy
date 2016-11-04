@@ -30,10 +30,10 @@ class CsiDashboardPage extends Page{
         selectLocationList{$(".active-result")}
         selectAllLocationsButton{$("#selectedAllLocations")}
         csiSystem { $("#folderSelectCsiSystem").find("option").contextElements}
-        graphLineDiv { $(".path") }
-        graphLine1 { $(".path")[0].attr("d") }
-        graphLine2 { $(".path")[1].attr("d") }
-        graphLine3 { $(".path")[2].attr("d") }
+        chartContainer { $("#rickshaw_main") }
+        graphYGridFirstTick { $("#rickshaw_chart .y_grid .tick")[0].attr("data-y-value") }
+        graphYGridLastTick { $("#rickshaw_chart .y_grid .tick")[-1].attr("data-y-value") }
+        graphLines { $("#rickshaw_chart .path") }
         chartTitleInputField { $("#dia-title") }
         chartTitle { $("#rickshaw_chart_title").attr("innerHTML") }
         chartWidthInputField { $("#dia-width") }

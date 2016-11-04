@@ -1,17 +1,7 @@
 package geb.de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
-import de.iteratec.osm.csi.BrowserConnectivityWeight
-import de.iteratec.osm.csi.CsTargetGraph
-import de.iteratec.osm.csi.CsTargetValue
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.CsiSystem
-import de.iteratec.osm.csi.JobGroupWeight
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageWeight
-import de.iteratec.osm.csi.TestDataUtil
-import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -36,18 +26,17 @@ import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import org.openqa.selenium.Keys
-import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
 
 /**
- * Created by marko on 07.07.16.
+ * Created by sburnicki on 04.11.16.
  */
 
 @Integration
 @Rollback
 @Stepwise
-class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
+class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
     CsiAggregationTagService csiAggregationTagService
     @Shared
     String script1Name = "TestScript1-564892#Afef1"
@@ -72,32 +61,32 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         cleanUpData()
     }
 
-    void "No selection leads to error message"(){
-        given: "User is on CsiDashboardPage"
+    void "Login makes \"Save as Dashboard\"-Button visible"() {
+        when: "User is not logged in"
         createData()
         to CsiDashboardPage
-        when: "User clicks on \"Show\" button"
+        then: "The button is invisible"
+        !saveAsDashboardButton.present
 
-        waitFor{showButton.displayed}
-        sleep(100)
-        showButton.click()
+        when: "User is logged in"
+        doLogin()
+        then: "Button is visible"
+        at CsiDashboardPage
+        saveAsDashboardButton.present
 
-        then: "Error message is displayed"
-        waitFor{at CsiDashboardPage}
-        waitFor{$("div", class: "alert alert-danger")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")} //check that the error box appears
-        waitFor{$("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one folder.")} //check that the correct error message is displayed
-        waitFor{$("div", class: "alert alert-danger")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page.")} //check that the correct error message is displayed
 
     }
 
-    void "Graph for \"Hourly mean per measured step\""(){
+    void "Graph for \"Daily mean per Page\""(){
         given: "User selects appropriate timeframe, aggregation type, job group and page"
+        to CsiDashboardPage
         timeFrameSelect.click()
         selectDateInDatepicker(fromDatepicker, "01.06.2016")
         selectDateInDatepicker(toDatepicker, "11.06.2016")
         jobGroupList[0].click()
         pageList[0].click()
         basedOnVisuallyCompleteButton.click()
+        aggregationRadioButtons.aggrGroupAndInterval = "daily_page"
 
         when: "User clicks on \"Show\" button"
         js.exec("window.scrollTo(0,0);") // otherwise the fixed navbar overlaps the button
@@ -106,212 +95,276 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
         then: "Graphs are displayed"
         waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x: 1464645600, y:90], [x:1465682400, y:90]]
         graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
+                [x:1465077600, y:14], [x:1465164000, y:22], [x:1465250400, y:33], [x:1465336800, y:44],
+                [x:1465423200, y:55], [x:1465509600, y:66], [x:1465596000, y:73]
         ]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
+                [x:1465077600, y:55], [x:1465164000, y:58], [x:1465250400, y:68], [x:1465336800, y:81],
+                [x:1465423200, y:88], [x:1465509600, y:48], [x:1465596000, y:88]
+        ]
+
     }
 
-    void "NotUsedBrowser leads to no data"(){
-        given: "User selects NotUsedBrowser"
-        waitFor {browserTab.click()}
-        selectAllBrowserButton.click()
-        selectBrowsersList[0].click()
-
-        when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        showButton.click()
-
-        then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
-    }
-    void "Graph is shown for correct Browser"(){
-        given: "User selects NotUsedBrowser"
-        browserTab.click()
-        selectBrowsersList[1].click()
-
+    void "Graph for \"Weekly mean per Page\""(){
+        given: "User selects appropriate timeframe, aggregation type, job group and page"
+        aggregationRadioButtons.aggrGroupAndInterval= "weekly_page"
         when: "User clicks on \"Show\" button"
         waitFor{showButton.displayed}
         showButton.click()
 
         then: "Graphs are displayed"
         waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464213600, y:90],   [x:1465596000, y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70],   [x:1465509600, y:72.86]]
     }
 
-    void "Graph is shown for \"Select all Browsers\""(){
-        given: "User selects NotUsedBrowser"
-        browserTab.click()
-        selectAllBrowserButton.click()
-
+    void "Graph for \"Daily mean per Job Group\""(){
+        given: "User selects appropriate timeframe, aggregation type, job group and page"
+        aggregationRadioButtons.aggrGroupAndInterval= "daily_shop"
         when: "User clicks on \"Show\" button"
         waitFor{showButton.displayed}
         showButton.click()
 
         then: "Graphs are displayed"
         waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464559200, y:90], [x:1465768800, y:90]]
         graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
+                [x:1465077600, y:14], [x:1465164000, y:22], [x:1465250400, y:33], [x:1465336800, y:44],
+                [x:1465423200, y:55], [x:1465509600, y:66], [x:1465596000, y:73]
+        ]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
+                [x:1465077600, y:55], [x:1465164000, y:58], [x: 1465250400, y: 68], [x: 1465336800, y: 81],
+                [x: 1465423200, y:88], [x:1465509600, y:48], [x:1465596000, y:88]
         ]
     }
 
-    void "NotUsedLocation leads to no data"(){
-        given: "User selects NotUsedLocation"
-        browserTab.click()
-        selectAllLocationsButton.click()
-        selectLocationField.click()
-        selectLocationList[0].click()
-
-        when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        showButton.click()
-
-        then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
-    }
-
-    void "Graph is shown for correct Location"(){
-        given: "User selects NotUsedLocation"
-        browserTab.click()
-        selectLocationField.click()
-        selectLocationList[0].click()
-
+    void "Graph for \"Weekly mean per Job Group\""(){
+        given: "User selects appropriate timeframe, aggregation type, job group and page"
+        aggregationRadioButtons.aggrGroupAndInterval= "weekly_shop"
         when: "User clicks on \"Show\" button"
         waitFor{showButton.displayed}
         showButton.click()
 
         then: "Graphs are displayed"
         waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
     }
 
-    void "Graph is shown for \"Select all Locations\""(){
-        given: "User selects NotUsedBrowser"
-        browserTab.click()
-        selectAllLocationsButton.click()
-
+    void "Graph for \"Daily mean per CSI System\""(){
+        given: "User selects appropriate timeframe, aggregation type, job group and page"
+        waitFor {aggregationRadioButtons.displayed}
+        aggregationRadioButtons.aggrGroupAndInterval= "daily_system"
+        csiSystem[0].click()
         when: "User clicks on \"Show\" button"
         waitFor{showButton.displayed}
         showButton.click()
 
         then: "Graphs are displayed"
         waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464559200, y:90], [x:1465768800, y:90]]
         graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
+                [x:1465077600, y:14], [x:1465164000, y:22], [x:1465250400, y:33], [x:1465336800, y:44],
+                [x:1465423200, y:55], [x:1465509600, y:66], [x:1465596000, y:73]
+        ]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
+                [x:1465077600, y:55], [x:1465164000, y:58], [x:1465250400, y:68], [x:1465336800, y:81],
+                [x:1465423200, y:88], [x:1465509600, y:48], [x:1465596000, y:88]
         ]
     }
 
-    void "NotUsedConnectivity leads to no data"(){
-        given: "User selects NotUsedBrowser"
-        connectivityTab.click()
-        selectAllConnectivityButton.click()
-        selectConnectivityProfilesList[1].click()
-
-        when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        showButton.click()
-
-        then: "No Data Warning is displayed"
-        waitFor {$("#noDataForCurrentSelectionWarning").attr("innerHTML").contains("No data available for your selection.")}
-    }
-
-    void "Graph is shown for correct Connectivity Profile"(){
-        given: "User selects NotUsedBrowser"
-        connectivityTab.click()
-        selectConnectivityProfilesList[0].click()
-
+    void "Graph for \"Weekly mean per CSI System\""(){
+        given: "User selects appropriate timeframe, aggregation type, job group and page"
+        aggregationRadioButtons.aggrGroupAndInterval= "weekly_system"
         when: "User clicks on \"Show\" button"
         waitFor{showButton.displayed}
         showButton.click()
 
         then: "Graphs are displayed"
         waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
     }
 
-    void "Graph is shown for \"Select all Connectivity Profiles\""(){
-        given: "User selects NotUsedBrowser"
-        connectivityTab.click()
-        selectAllConnectivityButton.click()
+    void "Adjust Chart Title"() {
+        given: "User opens Adjust Chart"
+        adjustChartButton.click()
 
-        when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
-        showButton.click()
+        when: "User edits title"
+        waitFor { chartTitleInputField.displayed }
+        sleep(100)
+        chartTitleInputField.firstElement().clear()
+        chartTitleInputField << "CustomTitle"
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
 
-        then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
-        graphLines.size() == 2
+        then: "Chart title is changed"
+        waitFor { chartTitle == "CustomTitle" }
+    }
+
+
+    void "Adjust Chart Size"() {
+        given: "User edits chart size"
+        adjustChartButton.click()
+        waitFor { chartWidthInputField.displayed }
+        chartWidthInputField.firstElement().clear()
+        chartWidthInputField << "600"
+        chartheightInputField.firstElement().clear()
+        chartheightInputField << "600"
+        sleep(100)
+
+        when: "User clicks \"apply\""
+        waitFor { adjustChartApplyButton.displayed }
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
+
+        then: "Chart changed"
+        graphLines.size() == 3
+        chartContainer.width == 600
+        graphYGridFirstTick == "0"
+        graphYGridLastTick == "110"
+
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
-
-        graphSeries.size() == 2
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:14], [x:1465197000, y:22], [x:1465283400, y:33], [x:1465369800, y:44],
-                [x:1465456200, y:55], [x:1465542600, y:66], [x:1465629000, y:73]
-        ]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465110600, y:55], [x:1465197000, y:58], [x:1465283400, y:68], [x:1465369800, y:81],
-                [x:1465456200, y:88], [x:1465542600, y:48], [x:1465629000, y:88]
-        ]
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
     }
+
+
+
+
+    void "Adjust Chart Section"() {
+        given: "User edits chart size"
+        adjustChartButton.click()
+        waitFor { diaYAxisMinInputField.displayed }
+        diaYAxisMinInputField.firstElement().clear()
+        diaYAxisMinInputField << "70"
+        diaYAxisMaxInputField.firstElement().clear()
+        diaYAxisMaxInputField << "80"
+
+        when: "User clicks \"apply\""
+        waitFor { adjustChartApplyButton.displayed }
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
+
+        then: "Chart changed"
+        graphYGridFirstTick == "70"
+        graphYGridLastTick == "80"
+    }
+
+    void "Enable Data-Markers"() {
+
+        when: "User clicks \"Show data-marker\""
+        adjustChartButton.click()
+        waitFor { showDataMarkersCheckBox.displayed }
+        showDataMarkersCheckBox.click()
+        sleep(100)
+        showDataMarkersCheckBox.click()
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
+
+        then: "Data-markers show on the graph"
+        waitFor { dataMarker }
+        waitFor { dataMarker.attr("style").contains("top: 600px; left: 270px;") }
+    }
+
+    void "Enable Data-Labels"() {
+
+        when: "User clicks \"Show data-marker\""
+        adjustChartButton.click()
+        waitFor { showDataLabelsCheckBox.displayed }
+        sleep(100)
+        showDataLabelsCheckBox.click()
+        adjustChartApplyButton.click()
+        sleep(500) // fade-out
+
+        then: "Data-markers show on the graph"
+        waitFor { dataLabel }
+        waitFor {
+            dataLabel.attr("style").contains('top: 595px; left: 261px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default;')
+        }
+    }
+
+
+    void "Save custom dashboard"() {
+        given: "User clicked on \"Save as dashboard\"-button"
+        clickSaveAsDashboardButton()
+
+        when: "User enters new name for the dashboard"
+        waitFor { dashboardNameFromModalTextField.displayed }
+        dashboardNameFromModalTextField << "CustomDashboard"
+        waitFor { saveDashboardButtonButton.displayed }
+        sleep(100)
+        saveDashboardButtonButton.click()
+
+        then: "Success Message is displayed"
+        at CsiDashboardPage
+        waitFor { saveDashboardSuccessMessage.displayed }
+
+    }
+
+    void "Load custom dashboard"() {
+        given: "User visits the CsiDashboardPage"
+        to CsiDashboardPage
+        when: "User loads CustomDashboard"
+        customDashboardSelectionDropdown.click()
+        waitFor { customDashboardSelectionList.displayed }
+        customDashboardSelectionList.find("a").click()
+        then: "The old dashboard is loaded again"
+        at CsiDashboardPage
+
+        waitFor { graphLines.size() == 3 }
+
+        waitFor { dataLabel }
+        waitFor {
+            dataLabel.attr("style").contains('top: 595px; left: 261px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default;')
+        }
+
+        waitFor { dataMarker }
+        waitFor { dataMarker.attr("style").contains("top: 600px; left: 270px;") }
+
+        chartTitle == "CustomTitle"
+        chartContainer.width == 600
+        graphYGridFirstTick == "70"
+        graphYGridLastTick == "80"
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 3
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
+    }
+
 
     private void createData(){
         Job.withNewTransaction{
