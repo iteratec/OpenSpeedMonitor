@@ -61,23 +61,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         cleanUpData()
     }
 
-    void "Login makes \"Save as Dashboard\"-Button visible"() {
-        when: "User is not logged in"
-        createData()
-        to EventResultDashboardPage
-        then: "The button is invisible"
-        !saveAsDashboardButton.present
-
-        when: "User is logged in"
-        doLogin()
-        then: "Button is visible"
-        at EventResultDashboardPage
-        saveAsDashboardButton.present
-
-    }
-
     void "Nothing selected causes error-message"() {
         given: "Data is available but neither page nor jobgroup is selected"
+        createData()
         to EventResultDashboardPage
 
         when: "User wants to see a graph"
@@ -134,9 +120,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L338,286.60684612828186L845,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
     void "NotUsedBrowser leads to no data"(){
         given: "User selects NotUsedBrowser"
@@ -167,10 +157,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+
     }
 
     void "Graph is shown for \"Select all Browsers\""(){
@@ -185,10 +179,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
     void "NotUsedLocation leads to no data"(){
@@ -224,9 +221,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
     void "Graph is shown for \"Select all Locations\""(){
@@ -241,10 +242,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
     void "NotUsedConnectivity leads to no data"(){
@@ -276,9 +280,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
     void "Graph is shown for native connectivity"(){
         given: "User selects native connectivity"
@@ -292,9 +300,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphLine2 == "M332,324.5881403408821L830,277.11152257513174" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 2
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 2
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:158], [x:1466565480, y:258]]
 
         cleanup:
         connectivityTab.click()
@@ -315,9 +327,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphLine2 == "M332,182.158287043631L830,134.68166927788064" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 2
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 2
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:458], [x:1466565480, y:558]]
 
         cleanup:
         connectivityTab.click()
@@ -338,9 +354,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,286.60684612828186L830,96.70037506528031" }
-        waitFor { graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1' }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
     }
 
     void "Trimm minimal time"() {
@@ -356,11 +376,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L830,96.70037506528031" }
-        waitFor {
-            graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565480, y:638]]
 
         cleanup:
         tabVariableSelection.click()
@@ -381,11 +403,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,251.29611166500493L830,2.04386839481554" }
-        waitFor {
-            graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:238], [x:1466565480, y:638]]
 
         cleanup:
         tabVariableSelection.click()
@@ -408,12 +432,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.5583250249252L830,0.7976071784645988" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor {
-            graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:4], [x:1466565480, y:5]]
 
         cleanup:
         tabVariableSelection.click()
@@ -435,12 +460,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.5583250249252L830,160.31904287138582" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor {
-            graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:4], [x:1466565300, y:3]]
 
         cleanup:
         tabVariableSelection.click()
@@ -463,12 +489,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,3.5839149219009325L830,16.877367896311046" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor {
-            graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565480, y:71.976]]
 
         cleanup:
         tabVariableSelection.click()
@@ -489,12 +516,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,282.7464273845131L830,16.877367896311046" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor {
-            graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565300, y:21.976], [x:1466565480, y:71.976]]
 
         cleanup:
         tabVariableSelection.click()
@@ -518,11 +546,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.7471395337795848L332,273.3133931538717L830,225.83677538812134" }
-        waitFor {
-            graphName == 'fv load time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv load time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:266], [x:1466565480, y:366]]
 
         cleanup:
         tabVariableSelection.click()
@@ -543,12 +573,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,0.7976071784645988L332,275.268312708932L830,40.67796610169485" }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv ttfb | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
 
-        waitFor {
-            graphName == 'fv ttfb | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:170], [x:1466565300, y:53], [x:1466565480, y:153]]
 
         cleanup:
         tabVariableSelection.click()
@@ -569,11 +600,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,130.93351524374245L332,0.7976071784645988L830,140.72869111962353" }
-        waitFor {
-            graphName == 'fv start render | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv start render | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:192], [x:1466565300, y:285], [x:1466565480, y:185]]
 
         cleanup:
         tabVariableSelection.click()
@@ -592,11 +625,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,106.69460544918911L332,339.66800164478315L830,1.6988582275771158" }
-        waitFor {
-            graphName == 'fv visually complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv visually complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:1300], [x:1466565300, y:266], [x:1466565480, y:1766]]
 
         cleanup:
         tabVariableSelection.click()
@@ -614,11 +649,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,133.73213692256562L332,266.66666666666663L830,0.7976071784645988" }
-        waitFor {
-            graphName == 'fv dom time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv dom time | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:500], [x:1466565300, y:250], [x:1466565480, y:750]]
 
         cleanup:
         tabVariableSelection.click()
@@ -636,11 +673,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.2649551345961907L332,243.03963110667993L830,87.25697906281154" }
-        waitFor {
-            graphName == 'fv fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:2557], [x:1466565300, y:1005], [x:1466565480, y:2005]]
 
         cleanup:
         tabVariableSelection.click()
@@ -659,12 +698,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.5583250249252L332,160.31904287138582L830,0.7976071784645988" }
-        println(graphLine)
-        waitFor {
-            graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv requests doc complete | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:4], [x:1466565300, y:3], [x:1466565480, y:5]]
 
         cleanup:
         tabVariableSelection.click()
@@ -682,11 +722,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,16.749750747756707L332,192.22333000997006L830,112.46261216350946" }
-        waitFor {
-            graphName == 'fv requests fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv requests fully loaded | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:48], [x:1466565300, y:26], [x:1466565480, y:36]]
 
         cleanup:
         tabVariableSelection.click()
@@ -704,11 +746,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,3.5839149219009325L332,282.7464273845131L830,16.877367896311046" }
-        waitFor {
-            graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv docCompleteIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:74.476], [x:1466565300, y:21.976], [x:1466565480, y:71.976]]
 
         cleanup:
         tabVariableSelection.click()
@@ -726,11 +770,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,1.9616825200074572L332,349.24415941365095L830,112.11770095120039" }
-        waitFor {
-            graphName == 'fv fullyLoadedIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv fullyLoadedIncomingBytesUncached | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:184.46], [x:1466565300, y:23.36], [x:1466565480, y:133.36]]
 
         cleanup:
         tabVariableSelection.click()
@@ -748,11 +794,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,80.5583250249252L332,316.2149913894679L830,171.19550439590316" }
-        waitFor {
-            graphName == 'fv customer satisfaction (visually complete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv customer satisfaction (visually complete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:88], [x:1466565300, y:23], [x:1466565480, y:63]]
 
         cleanup:
         tabVariableSelection.click()
@@ -770,11 +818,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,38.44575364814644L332,313.9827789359195L830,132.7084201939635" }
-        waitFor {
-            graphName == 'fv customer satisfaction (docComplete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv customer satisfaction (docComplete) | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:99.6157], [x:1466565300, y:23.6157], [x:1466565480, y:73.6157]]
 
         cleanup:
         tabVariableSelection.click()
@@ -792,201 +842,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
 
         then: "A graph with a line is shown"
         at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,2.7589363058365457L332,218.50514031675462L830,22.37222757955637" }
-        waitFor {
-            graphName == 'fv speed index | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
-        }
+        waitFor { graphLines.displayed }
+        graphLines.size() == 1
+        graphName == 'fv speed index | TestJobGroup1-564892#Afef1 | MeasureEvent1-564892#Afef1 | TestLocation1-564892#Afef1 | ConnectivityProfile-564892#Afef1'
+
+        def graphSeries = js."window.rickshawGraphBuilder.graph.series"
+        graphSeries.size() == 1
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:607], [x:1466565300, y:277], [x:1466565480, y:577]]
     }
-
-    void "Adjust Chart Title"() {
-        given: "User opens Adjust Chart"
-
-        adjustChartButton.click()
-
-        when: "User edits title"
-        waitFor { chartTitleInputField.displayed }
-        sleep(100)
-        chartTitleInputField << "CustomTitle"
-        sleep(100)
-        adjustChartApply.click()
-
-        then: "Chart title is changed"
-        waitFor { chartTitle == "CustomTitle" }
-    }
-
-    void "Adjust Chart Size to illigal values"() {
-        given: "User edits chart size"
-        waitFor {adjustChartButton.click()}
-        sleep(200)
-        chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
-        chartWidthInputField << Keys.chord(Keys.DELETE)
-        chartWidthInputField << "0"
-        chartheightInputField << Keys.chord(Keys.CONTROL, "a")
-        chartheightInputField << Keys.chord(Keys.DELETE)
-        chartheightInputField << "9999999"
-
-        when: "User clicks \"apply\""
-        sleep(100)
-        def result = withAlert{adjustChartApply.click()}
-
-        then: "Error message is shown"
-        result== "Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels."
-    }
-
-    void "Adjust Chart Size"() {
-        given: "User edits chart size"
-        waitFor {adjustChartButton.click()}
-        sleep(200)
-        chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
-        chartWidthInputField << Keys.chord(Keys.DELETE)
-        chartWidthInputField << "600"
-        chartheightInputField << Keys.chord(Keys.CONTROL, "a")
-        chartheightInputField << Keys.chord(Keys.DELETE)
-        chartheightInputField << "600"
-
-        when: "User clicks \"apply\""
-        waitFor { adjustChartApply.displayed }
-        adjustChartApply.click()
-
-        then: "Chart changed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,4.1384044587548185L216,327.7577104751319L540,33.558341369334556" }
-    }
-
-    //TODO:
-    @Ignore("Not yet sure how to trigger the js part")
-    void "Add graph alias"() {
-        given: "User clicks on the add graph aliases button"
-        waitFor { addAliasButton.click() }
-
-        when: "User provides graph alias"
-        sleep(500)
-        waitFor { aliasInputField.displayed }
-        aliasInputField << "CustomAlias"
-        sleep(500)
-
-        then: "Graph is renamed"
-        waitFor { graphName == "CustomAlias" }
-    }
-
-    //TODO:
-    @Ignore("Not yet sure how to trigger the js part")
-    void "Change Graph color"() {
-        when: "User changes graph color"
-        sleep(500)
-//        colorPicker << '#AAAAAA'
-//        $(".span2").find("input", type:"color")[0].jquery.attr("style", "width: 50%; background-color: rgb(170,170, 170);")
-        $(".span2").find("input", type: "color")[0].jquery.attr("value", "#aaaaaa")
-        sleep(500)
-
-        then: "Graph is recolored"
-        true
-
-        waitFor { graphColorField == 'background-color: rgb(170, 170, 170);' }
-    }
-
-
-    void "Adjust Chart Section"() {
-        given: "User edits chart size"
-        waitFor {adjustChartButton.click()}
-        sleep(200)
-        diaYAxisMinInputField << Keys.chord(Keys.CONTROL, "a")
-        diaYAxisMinInputField << Keys.chord(Keys.DELETE)
-        diaYAxisMinInputField << "200"
-        diaYAxisMaxInputField << Keys.chord(Keys.CONTROL, "a")
-        diaYAxisMaxInputField << Keys.chord(Keys.DELETE)
-        diaYAxisMaxInputField << "600"
-
-        when: "User clicks \"apply\""
-        waitFor { adjustChartApply.displayed }
-        adjustChartApply.click()
-
-        then: "Chart changed"
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651061L216,484.247258225324L540,35.59322033898296" }
-    }
-
-    void "Enable Data-Markers"() {
-        given: "User clicked adjust chart"
-        waitFor {adjustChartButton.click()}
-        sleep(200)
-
-        when: "User clicks \"Show data-marker\""
-        waitFor { showDataMarkersCheckBox.displayed }
-        sleep(200)
-        showDataMarkersCheckBox.click()
-        sleep(200)
-        waitFor { adjustChartApply.displayed }
-        sleep(200)
-        adjustChartApply.click()
-        sleep(200)
-
-        then: "Data-markers show on the graph"
-        waitFor { dataMarker }
-        waitFor { dataMarker.attr("style").contains("top: 484.5px; left: 216px;") }
-    }
-
-    void "Enable Data-Labels"() {
-        given: "User clicked adjust chart"
-        waitFor {adjustChartButton.click()}
-        sleep(200)
-
-
-        when: "User clicks \"Show data-marker\""
-        waitFor { showDataLabelsCheckBox.displayed }
-        showDataLabelsCheckBox.click()
-        waitFor { adjustChartApply.displayed }
-        sleep(200)
-        adjustChartApply.click()
-        sleep(200)
-
-
-        then: "Data-markers show on the graph"
-        waitFor { dataLabel }
-        waitFor {
-            dataLabel.attr("style").contains('top: 479px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default')
-        }
-    }
-
-
-    void "Save custom dashboard"() {
-        given: "User clicked on \"Save as dashboard\"-button"
-        clickSaveAsDashboardButton()
-
-        when: "User enters new name for the dashboard"
-        waitFor { dashboardNameFromModalTextField.displayed }
-        dashboardNameFromModalTextField << "CustomDashboard"
-        waitFor { saveDashboardButtonButton.displayed }
-        saveDashboardButtonButton.click()
-
-        then: "Success Message is displayed"
-        at EventResultDashboardPage
-        waitFor { saveDashboardSuccessMessage.displayed }
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,-9.272183449651061L216,484.247258225324L540,35.59322033898296" }
-    }
-
-    void "Load custom dashboard"() {
-        given: "User visits the EventResultDashboardPage"
-        to EventResultDashboardPage
-        when: "User loads CustomDashboard"
-        customDashboardSelectionDropdown.click()
-        waitFor { customDashboardSelectionList.displayed }
-        customDashboardSelectionList.find("a").click()
-        then: "The old dashboard is loaded again"
-        at EventResultDashboardPage
-        waitFor { graphLineDiv.displayed }
-        waitFor { graphLine == "M0,4.1384044587548185L216,327.7577104751319L540,33.558341369334556" }
-        waitFor { dataLabel }
-        waitFor {
-            dataLabel.attr("style").contains('top: 479px; left: 207px; height: 100px; width: 100px; font-size: 13pt; font-weight: bold; color: rgb(179, 179, 179); cursor: default; fill: rgb(179, 179, 179);')
-        }
-        waitFor { dataMarker }
-        waitFor { dataMarker.attr("style").contains("top: 484.5px; left: 216px;") }
-        chartTitle == "CustomTitle"
-    }
-
 
     private cleanUpData() {
         doLogout()

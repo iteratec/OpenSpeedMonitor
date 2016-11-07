@@ -38,9 +38,10 @@ class EventResultDashboardPage extends Page {
         graphName { $("span.label").attr("innerHTML") }
         colorPicker { $("#color") }
         graphColorField { $(".swatch").attr("style") }
-        graphLineDiv { $(".path") }
-        graphLine { $(".path").attr("d") }
-        graphLine2{ $(".path")[1].attr("d")}
+        chartContainer { $("#rickshaw_main") }
+        graphYGridFirstTick { $("#rickshaw_chart .y_grid .tick")[0].attr("data-y-value") }
+        graphYGridLastTick { $("#rickshaw_chart .y_grid .tick")[-1].attr("data-y-value") }
+        graphLines { $("#rickshaw_chart .path") }
         dataMarker { $(".pointMarker") }
         dataLabel { $(".dataLabel") }
         saveAsDashboardButton(required: false) { $("a", href: "#CreateUserspecifiedDashboardModal") }
