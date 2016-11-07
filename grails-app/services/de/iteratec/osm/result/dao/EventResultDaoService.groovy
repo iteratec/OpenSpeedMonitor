@@ -334,11 +334,11 @@ public class EventResultDaoService {
     private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
 
         if (queryParams.connectivityProfileIds.size() > 0){
+            boolean predefinedAndCustom = queryParams.includeCustomConnectivity
+            boolean predefinedAndNative = queryParams.includeNativeConnectivity
+            boolean justPredefined = !predefinedAndCustom && !predefinedAndNative
+            boolean predefinedAndCustomAndNative = predefinedAndCustom && predefinedAndNative
 
-            boolean justPredefined = queryParams.includeCustomConnectivity == false && queryParams.includeNativeConnectivity == false
-            boolean predefinedAndCustomAndNative = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
-            boolean predefinedAndCustom = queryParams.includeCustomConnectivity == true
-            boolean predefinedAndNative = queryParams.includeNativeConnectivity == true
 
             if (justPredefined){
                 eventResults = eventResults.findAll {
@@ -362,10 +362,9 @@ public class EventResultDaoService {
                 }
             }
         }else{
-
-            boolean nativeAndCustom = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
-            boolean justCustom = queryParams.includeCustomConnectivity == true
-            boolean justNative = queryParams.includeNativeConnectivity == true
+            boolean justCustom = queryParams.includeCustomConnectivity
+            boolean justNative = queryParams.includeNativeConnectivity
+            boolean nativeAndCustom = justCustom && justNative
 
             if (nativeAndCustom){
                 eventResults = eventResults.findAll {
