@@ -132,16 +132,9 @@ class CsiAggregation implements CsiValue {
     static mapping = {
         underlyingEventResultsByWptDocComplete(type: 'text')
         closedAndCalculated(defaultValue: false, index: 'closedAndCalculated_and_started_idx')
-        started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx,started_aggregator_interval_jobGroup_page,started_aggregator_interval_jobGroup,started_interval_aggregator_csiSystem,started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile,aggregator_interval_jobGroup_page_measuredEvent')
-        interval(index: 'started_and_iVal_and_aggr_idx,started_aggregator_interval_jobGroup_page,started_aggregator_interval_jobGroup,started_interval_aggregator_csiSystem,started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile,aggregator_interval_jobGroup_page_measuredEvent')
-        aggregator(index: 'started_and_iVal_and_aggr_idx,started_aggregator_interval_jobGroup_page,started_aggregator_interval_jobGroup,started_interval_aggregator_csiSystem,started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile')
-        jobGroup(index: 'started_aggregator_interval_jobGroup_page,started_aggregator_interval_jobGroup,started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile,aggregator_interval_jobGroup_page_measuredEvent')
-        page(index: 'started_aggregator_interval_jobGroup_page,started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile,aggregator_interval_jobGroup_page_measuredEvent')
-        csiSystem(index: 'started_interval_aggregator_csiSystem')
-        measuredEvent(index: 'started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile,aggregator_interval_jobGroup_page_measuredEvent')
-        browser(index: 'started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile')
-        location(index: 'started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile')
-        connectivityProfile(index: 'started_interval_aggregator_jobGroup_measuredEvent_page_browser_location_connectivityProfile')
+        started(index: 'started_and_iVal_and_aggr_idx,closedAndCalculated_and_started_idx')
+        interval(index: 'started_and_iVal_and_aggr_idx')
+        aggregator(index: 'started_and_iVal_and_aggr_idx')
     }
 
     /**
