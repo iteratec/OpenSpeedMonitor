@@ -542,7 +542,6 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
     private cleanUpData() {
         doLogout()
         Job.withNewTransaction {
-
             CsiAggregation.list().each {
                 it.delete()
             }
@@ -610,6 +609,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
                 it.delete()
             }
             OsmConfiguration.list().each {
+                it.delete()
+            }
+            CsiSystem.list().each {
                 it.delete()
             }
         }

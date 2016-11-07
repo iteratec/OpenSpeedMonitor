@@ -559,6 +559,9 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
             OsmConfiguration.list().each {
                 it.delete()
             }
+            CsiSystem.list().each {
+                it.delete()
+            }
         }
     }
 }
