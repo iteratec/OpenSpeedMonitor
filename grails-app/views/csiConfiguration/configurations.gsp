@@ -346,8 +346,10 @@
 
         });
         $( window ).load(function() {
-            var loader = new PostLoader();
-            loader.loadJavascript('<g:assetPath src="csi/configurationPost.js" absolute="true"/>');
+            OpenSpeedMonitor.postLoader.loadJavascript(
+                '<g:assetPath src="csi/configurationPost.js" absolute="true"/>',
+                true
+            )
         });
 
     </asset:script>

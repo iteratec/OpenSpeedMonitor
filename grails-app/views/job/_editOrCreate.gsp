@@ -125,9 +125,14 @@
                         });
                         $('#script').change();
                     });
-                    var loader = new PostLoader();
-                    loader.loadJavascript('<g:assetPath src="codemirror/codemirrorManifest.js" absolute="true"/>');
-                    loader.loadStylesheet('<g:assetPath src="codemirror/codemirrorManifest.css" absolute="true"/>');
+                    OpenSpeedMonitor.postLoader.loadJavascript(
+                        '<g:assetPath src="codemirror/codemirrorManifest.js" absolute="true"/>',
+                        true
+                    )
+                   OpenSpeedMonitor.postLoader.loadStylesheet(
+                        '<g:assetPath src="codemirror/codemirrorManifest.css" absolute="true"/>',
+                        true
+                    )
 
                 });
             </asset:script>
