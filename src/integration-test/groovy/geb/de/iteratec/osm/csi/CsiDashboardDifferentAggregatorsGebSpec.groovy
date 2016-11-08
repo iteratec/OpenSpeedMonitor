@@ -100,14 +100,15 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x: 1464645600, y:90], [x:1465682400, y:90]]
+
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x: timestampOfDate(2016, 5, 31), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
         graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465077600, y:14], [x:1465164000, y:22], [x:1465250400, y:33], [x:1465336800, y:44],
-                [x:1465423200, y:55], [x:1465509600, y:66], [x:1465596000, y:73]
+                [x:timestampOfDate(2016, 6, 5), y:14], [x:timestampOfDate(2016, 6, 6), y:22], [x:timestampOfDate(2016, 6, 7), y:33], [x:timestampOfDate(2016, 6, 8), y:44],
+                [x:timestampOfDate(2016, 6, 9), y:55], [x:timestampOfDate(2016, 6, 10), y:66], [x:timestampOfDate(2016, 6, 11), y:73]
         ]
         graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465077600, y:55], [x:1465164000, y:58], [x:1465250400, y:68], [x:1465336800, y:81],
-                [x:1465423200, y:88], [x:1465509600, y:48], [x:1465596000, y:88]
+                [x:timestampOfDate(2016, 6, 5), y:55], [x:timestampOfDate(2016, 6, 6), y:58], [x:timestampOfDate(2016, 6, 7), y:68], [x:timestampOfDate(2016, 6, 8), y:81],
+                [x:timestampOfDate(2016, 6, 9), y:88], [x:timestampOfDate(2016, 6, 10), y:48], [x:timestampOfDate(2016, 6, 11), y:88]
         ]
 
     }
@@ -125,9 +126,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464213600, y:90],   [x:1465596000, y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70],   [x:1465509600, y:72.86]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 26), y:90],   [x:timestampOfDate(2016, 6, 11), y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70],   [x:timestampOfDate(2016, 6, 10), y:72.86]]
     }
 
     void "Graph for \"Daily mean per Job Group\""(){
@@ -143,14 +144,14 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464559200, y:90], [x:1465768800, y:90]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 30), y:90], [x:timestampOfDate(2016, 6, 13), y:90]]
         graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465077600, y:14], [x:1465164000, y:22], [x:1465250400, y:33], [x:1465336800, y:44],
-                [x:1465423200, y:55], [x:1465509600, y:66], [x:1465596000, y:73]
+                [x:timestampOfDate(2016, 6, 5), y:14], [x:timestampOfDate(2016, 6, 6), y:22], [x:timestampOfDate(2016, 6, 7), y:33], [x:timestampOfDate(2016, 6, 8), y:44],
+                [x:timestampOfDate(2016, 6, 9), y:55], [x:timestampOfDate(2016, 6, 10), y:66], [x:timestampOfDate(2016, 6, 11), y:73]
         ]
         graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465077600, y:55], [x:1465164000, y:58], [x: 1465250400, y: 68], [x: 1465336800, y: 81],
-                [x: 1465423200, y:88], [x:1465509600, y:48], [x:1465596000, y:88]
+                [x:timestampOfDate(2016, 6, 5), y:55], [x:timestampOfDate(2016, 6, 6), y:58], [x: timestampOfDate(2016, 6, 7), y: 68], [x: timestampOfDate(2016, 6, 8), y: 81],
+                [x: timestampOfDate(2016, 6, 9), y:88], [x:timestampOfDate(2016, 6, 10), y:48], [x:timestampOfDate(2016, 6, 11), y:88]
         ]
     }
 
@@ -167,9 +168,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
     }
 
     void "Graph for \"Daily mean per CSI System\""(){
@@ -187,14 +188,14 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464559200, y:90], [x:1465768800, y:90]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 30), y:90], [x:timestampOfDate(2016, 6, 13), y:90]]
         graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465077600, y:14], [x:1465164000, y:22], [x:1465250400, y:33], [x:1465336800, y:44],
-                [x:1465423200, y:55], [x:1465509600, y:66], [x:1465596000, y:73]
+                [x:timestampOfDate(2016, 6, 5), y:14], [x:timestampOfDate(2016, 6, 6), y:22], [x:timestampOfDate(2016, 6, 7), y:33], [x:timestampOfDate(2016, 6, 8), y:44],
+                [x:timestampOfDate(2016, 6, 9), y:55], [x:timestampOfDate(2016, 6, 10), y:66], [x:timestampOfDate(2016, 6, 11), y:73]
         ]
         graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
-                [x:1465077600, y:55], [x:1465164000, y:58], [x:1465250400, y:68], [x:1465336800, y:81],
-                [x:1465423200, y:88], [x:1465509600, y:48], [x:1465596000, y:88]
+                [x:timestampOfDate(2016, 6, 5), y:55], [x:timestampOfDate(2016, 6, 6), y:58], [x:timestampOfDate(2016, 6, 7), y:68], [x:timestampOfDate(2016, 6, 8), y:81],
+                [x:timestampOfDate(2016, 6, 9), y:88], [x:timestampOfDate(2016, 6, 10), y:48], [x:timestampOfDate(2016, 6, 11), y:88]
         ]
     }
 
@@ -211,9 +212,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
     }
 
     void "Adjust Chart Title"() {
@@ -256,9 +257,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
     }
 
 
@@ -361,9 +362,9 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1464127200, y:90], [x:1465682400, y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:33.6], [x:1465509600, y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:1464904800, y:70], [x:1465509600, y:72.86]]
+        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
+        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
+        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
     }
 
 
@@ -398,7 +399,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         Job job1=TestDataUtil.createJob(job1Name,script1,location1,jobGroup1,"This is the first test job",1,false,12)
         CsiSystem csiSystem =  new CsiSystem([label:"TestCsiSystem"])
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))
-        csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 60))
+        csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight : 60))
         csiSystem.save(failOnError:true)
         JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016,06,22,3,13, DateTimeZone.UTC).toDate(),job1,location1)
         MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
@@ -616,5 +617,17 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
                 it.delete()
             }
         }
+    }
+
+    /**
+     * Returns a timestamp in seconds since UNIX epoch for midnight at the specified date in the servers default
+     * time zone. This way tests work no matter what time zone the server runs on
+     * @param year The year
+     * @param month The month (1-12)
+     * @param day The day (1-31)
+     * @return timestamp in seconds since UNIX epoch
+     */
+    private int timestampOfDate(int year, int month, int day) {
+        return new DateTime(year, month, day, 0, 0).getMillis() / 1000;
     }
 }
