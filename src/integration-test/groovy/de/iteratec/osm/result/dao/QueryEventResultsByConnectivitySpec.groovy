@@ -48,35 +48,42 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     private ConnectivityProfile predefinedProfile2
 
     def setupTest() {
-        createTestDataCommonToAllTests();
+        EventResult.withNewSession { session ->
+            createTestDataCommonToAllTests();
+            session.flush()
+        }
     }
 
     // selection by one type of selector: predefined profile(s), custom conn or native conn ///////////////////////////////////////////
     void "select by single predefined profile"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams()
-        queryParams.includeCustomConnectivity = false
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(measuredEvent.testedPage.id)
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
-        queryParams.connectivityProfileIds.add(predefinedProfile1.ident())
+        EventResult.withNewSession {
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.includeCustomConnectivity = false
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
+            queryParams.measuredEventIds.add(measuredEvent.id)
+            queryParams.pageIds.add(measuredEvent.testedPage.id)
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
+            queryParams.connectivityProfileIds.add(predefinedProfile1.ident())
+
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 1
@@ -87,28 +94,31 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select by a list of predefined profiles"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams()
-        queryParams.includeCustomConnectivity = false
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
-        queryParams.measuredEventIds.add(measuredEvent.id)
-        queryParams.pageIds.add(measuredEvent.testedPage.id)
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
-        queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident(), predefinedProfile2.ident()])
+        EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams()
+            queryParams.includeCustomConnectivity = false
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id)
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id)
+            queryParams.measuredEventIds.add(measuredEvent.id)
+            queryParams.pageIds.add(measuredEvent.testedPage.id)
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
+            queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident(), predefinedProfile2.ident()])
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 2
@@ -122,6 +132,7 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select by custom conn name regex: not matching all"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
         MvQueryParams queryParams = new ErQueryParams();
@@ -133,7 +144,7 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id)
         queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
+        results = eventResultDaoService.getLimitedMedianEventResultsBy(
                 runDate.toDate(),
                 runDate.plusHours(1).toDate(),
                 [
@@ -154,28 +165,31 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select by custom conn name regex: matching all"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = true
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-        queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
+        EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams();
+            queryParams.includeCustomConnectivity = true
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
+            queryParams.measuredEventIds.add(measuredEvent.id);
+            queryParams.pageIds.add(measuredEvent.testedPage.id);
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
+            queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 2
@@ -189,28 +203,31 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select only native conn"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = false
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-        queryParams.includeNativeConnectivity = true
+        EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams();
+            queryParams.includeCustomConnectivity = false
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
+            queryParams.measuredEventIds.add(measuredEvent.id);
+            queryParams.pageIds.add(measuredEvent.testedPage.id);
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
+            queryParams.includeNativeConnectivity = true
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 1
@@ -221,29 +238,32 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select by custom conn name regex AND native conn"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = true
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-        queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
-        queryParams.includeNativeConnectivity = true
+        EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams();
+            queryParams.includeCustomConnectivity = true
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
+            queryParams.measuredEventIds.add(measuredEvent.id);
+            queryParams.pageIds.add(measuredEvent.testedPage.id);
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
+            queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
+            queryParams.includeNativeConnectivity = true
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 2
@@ -254,29 +274,32 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select by custom conn name regex AND predefined conn"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = true
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-        queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
-        queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident()])
+        EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams();
+            queryParams.includeCustomConnectivity = true
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
+            queryParams.measuredEventIds.add(measuredEvent.id);
+            queryParams.pageIds.add(measuredEvent.testedPage.id);
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
+            queryParams.customConnectivityNameRegex = REGEX_MATCHING_ALL_CUSTOM_CONNS
+            queryParams.connectivityProfileIds.addAll([predefinedProfile1.ident()])
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 3
@@ -288,29 +311,32 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
     void "select by native conn AND predefined conn"() {
         setup:
         setupTest()
+        Collection<EventResult> results
 
         when:
-        MvQueryParams queryParams = new ErQueryParams();
-        queryParams.includeCustomConnectivity = false
-        queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
-        queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
-        queryParams.measuredEventIds.add(measuredEvent.id);
-        queryParams.pageIds.add(measuredEvent.testedPage.id);
-        queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
-        queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
-        queryParams.includeNativeConnectivity = true
+        EventResult.withNewSession {
+            MvQueryParams queryParams = new ErQueryParams();
+            queryParams.includeCustomConnectivity = false
+            queryParams.browserIds.add(jobWithPredefinedConnectivity.location.browser.id);
+            queryParams.jobGroupIds.add(jobWithPredefinedConnectivity.jobGroup.id);
+            queryParams.measuredEventIds.add(measuredEvent.id);
+            queryParams.pageIds.add(measuredEvent.testedPage.id);
+            queryParams.locationIds.add(jobWithPredefinedConnectivity.location.id);
+            queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
+            queryParams.includeNativeConnectivity = true
 
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 2
@@ -330,19 +356,22 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
         queryParams.connectivityProfileIds.addAll([predefinedProfile2.ident()])
         queryParams.includeNativeConnectivity = true
         queryParams.customConnectivityNameRegex = REGEX_NOT_MATCHING_ALL_CUSTOM_CONNS
+        Collection<EventResult> results
 
         when:
-        Collection<EventResult> results = eventResultDaoService.getLimitedMedianEventResultsBy(
-                runDate.toDate(),
-                runDate.plusHours(1).toDate(),
-                [
-                        CachedView.CACHED,
-                        CachedView.UNCACHED
-                ] as Set,
-                queryParams,
-                [:],
-                new CriteriaSorting(sortingActive: false)
-        )
+        EventResult.withNewSession {
+            results = eventResultDaoService.getLimitedMedianEventResultsBy(
+                    runDate.toDate(),
+                    runDate.plusHours(1).toDate(),
+                    [
+                            CachedView.CACHED,
+                            CachedView.UNCACHED
+                    ] as Set,
+                    queryParams,
+                    [:],
+                    new CriteriaSorting(sortingActive: false)
+            )
+        }
 
         then:
         results.size() == 3

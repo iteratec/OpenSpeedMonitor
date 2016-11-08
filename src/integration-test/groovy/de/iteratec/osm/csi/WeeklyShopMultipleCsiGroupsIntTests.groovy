@@ -26,16 +26,16 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
 import org.joda.time.DateTime
+import org.springframework.test.annotation.Rollback
 
 @Integration
 @Rollback
 class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    static ShopCsiAggregationService shopCsiAggregationService
-    static ResultPersisterService resultPersisterService
+    ShopCsiAggregationService shopCsiAggregationService
+    ResultPersisterService resultPersisterService
 
     Map<String, Double> targetValues
     List<Page> pageObjectsToTest
@@ -43,7 +43,6 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
     static CsiAggregationInterval weeklyInterval
     static AggregatorType shopAggregatorType
     static List<JobGroup> csiGroups
-    static List<CsiAggregation> wsmvs
     static final List<String> pagesToTest = [
             'HP',
             'MES',
@@ -59,21 +58,15 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 
     static final Integer countWeeklyShopMvsToBeCreated = 2
 
-    def setup() {
+    def setupData() {
         System.out.println('Create some common test-data...');
         TestDataUtil.createOsmConfig()
-        CsiAggregationInterval.withNewTransaction {
-            TestDataUtil.createCsiAggregationIntervals()
-        }
-        AggregatorType.withNewTransaction {
-            TestDataUtil.createAggregatorTypes()
-        }
+        TestDataUtil.createCsiAggregationIntervals()
+        TestDataUtil.createAggregatorTypes()
         System.out.println('Create some common test-data... DONE');
 
         System.out.println('Loading CSV-data...');
-        EventResult.withNewTransaction {
-            TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
-        }
+        TestDataUtil.loadTestDataFromCustomerCSV(new File("test/resources/CsiData/${csvName}"), pagesToTest, pagesToTest);
         System.out.println('Loading CSV-data... DONE');
         csiGroups = [
                 JobGroup.findByName(csiGroup1Name),
@@ -96,9 +89,6 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
 
         shopAggregatorType = AggregatorType.findByName(AggregatorType.SHOP)
         weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-        CsiAggregation.withNewSession {
-            wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfWeek.toDate(), startOfWeek.toDate(), weeklyInterval, csiGroups)
-        }
 
         targetValues = [
                 csiGroup1: 0.391,
@@ -115,28 +105,31 @@ class WeeklyShopMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpe
      */
     void testCreationAndCalculationOfWeeklyShopValues() {
         setup:
+        EventResult.withNewSession { session ->
+            setupData()
+            session.flush()
+        }
         Date startDate = startOfWeek.toDate()
-        List<CsiAggregation> wpmvsOfOneGroupPageCombination
+        List<CsiAggregation> weeklyShopCsiAggregations
         when:
-        List<EventResult> results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
-        then:
-        wsmvs.each { mvWeeklyShop ->
-            csiGroups.each { csiGroup ->
+        List<EventResult> results
+        EventResult.withNewSession {
+            results = EventResult.findAllByJobResultDateBetween(startDate, new DateTime(startDate).plusWeeks(1).toDate())
+            CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
+            weeklyShopCsiAggregations = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, csiGroups)
+        }
 
-                CsiAggregationInterval weeklyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)
-                wpmvsOfOneGroupPageCombination = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startDate, startDate, weeklyInterval, [csiGroup])
-                24 == results.size()
-                wsmvs != null
-                countWeeklyShopMvsToBeCreated == wsmvs.size()
-                startDate == mvWeeklyShop.started
-                weeklyInterval.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
-                shopAggregatorType.name == mvWeeklyShop.aggregator.name
-                mvWeeklyShop.isCalculated()
-                1 == wpmvsOfOneGroupPageCombination.size()
-                wpmvsOfOneGroupPageCombination.each { mvWeeklyPage ->
-                    assert csiGroup.id == mvWeeklyPage.jobGroupId
-                    assert Double.compare(targetValues["${csiGroup.name}"], mvWeeklyPage.csByWptDocCompleteInPercent.round(2)) < 0.01
-                }
+        then:
+        24 == results.size()
+        countWeeklyShopMvsToBeCreated == weeklyShopCsiAggregations.size()
+        CsiAggregation.withNewSession {
+            weeklyShopCsiAggregations*.id.each { mvWeeklyShopId ->
+                CsiAggregation mvWeeklyShop = CsiAggregation.get(mvWeeklyShopId)
+                assert shopAggregatorType.name == mvWeeklyShop.aggregator.name
+                assert startDate == mvWeeklyShop.started
+                assert weeklyInterval.intervalInMinutes == mvWeeklyShop.interval.intervalInMinutes
+                assert mvWeeklyShop.isCalculated()
+                assert Double.compare(targetValues["${mvWeeklyShop.jobGroup.name}"], mvWeeklyShop.csByWptDocCompleteInPercent.round(2)) < 0.01
             }
         }
     }

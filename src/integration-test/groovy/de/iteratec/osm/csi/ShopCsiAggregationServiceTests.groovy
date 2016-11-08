@@ -23,12 +23,14 @@ import de.iteratec.osm.csi.weighting.WeightedValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
-import org.junit.Test
+import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
@@ -38,6 +40,7 @@ import static org.junit.Assert.assertTrue
  */
 @Integration
 @Rollback
+@ConfineMetaClassChanges([WeightingService])
 class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     JobGroup jobGroup1, jobGroup2, jobGroup3
@@ -76,13 +79,11 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
         TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, shopAggregator, jobGroup1, null, null, "", false)
         TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, shopAggregator, jobGroup2, null, null, "", false)
         TestDataUtil.createCsiAggregation(startDate.toDate(), weeklyInterval, shopAggregator, jobGroup3, null, null, "", false)
+    }
 
-        //mocks common for all tests
-//        shopCsiAggregationService.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
-//        shopCsiAggregationService.pageCsiAggregationService.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
-//        shopCsiAggregationService.pageCsiAggregationService.meanCalcService = grailsApplication.mainContext.getBean('meanCalcService')
-//        shopCsiAggregationService.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
-//        mockCsiAggregationUpdateEventDaoService()
+    def cleanup() {
+        // undo mocked service
+        shopCsiAggregationService.weightingService = grailsApplication.mainContext.getBean('weightingService')
     }
 
     void "test findAll"() {
@@ -211,7 +212,7 @@ class ShopCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
      */
 
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = grailsApplication.mainContext.getBean('weightingService')
+        def weightingService = new WeightingService()
         weightingService.metaClass.getWeightedCsiValues = {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues

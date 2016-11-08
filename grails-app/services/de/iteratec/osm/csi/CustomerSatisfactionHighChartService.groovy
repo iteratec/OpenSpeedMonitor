@@ -24,7 +24,6 @@ import de.iteratec.osm.result.EventResultDashboardService
 import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.util.PerformanceLoggingService
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -33,7 +32,6 @@ import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 
 import static de.iteratec.osm.util.Constants.HIGHCHART_LEGEND_DELIMITTER
-
 
 /**
  * Provides methods to get {@link CsiAggregation}s from db and transform them into a chart processable format.
@@ -61,7 +59,6 @@ class CustomerSatisfactionHighChartService {
     CsiAggregationUtilService csiAggregationUtilService
     OsmChartProcessingService osmChartProcessingService
     CsiSystemCsiAggregationService csiSystemCsiAggregationService
-    PerformanceLoggingService performanceLoggingService
 
     /**
      * The Grails engine to generate links.

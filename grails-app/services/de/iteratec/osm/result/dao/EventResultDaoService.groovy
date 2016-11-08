@@ -193,7 +193,13 @@ public class EventResultDaoService {
                 fromDate, toDate, cachedViews, queryParams, sorting
         )
 
-        return eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap);
+        List<EventResult> eventResults = eventResultQueryAggregator.runQuery("list", listCriteriaRestrictionMap)
+        if (osmDataSourceService.getRLikeSupport()) {
+            return eventResults
+        } else {
+            //FIXME: rlike isn't supported in H2-db used in unit-tests. The following Environment-switch should be replaced with metaclass-method-replacement in tests.
+            return applyConnectivityQueryParamsToCriteriaWithoutRlike(eventResults, queryParams)
+        }
 
     }
 
@@ -248,7 +254,7 @@ public class EventResultDaoService {
             }
         }
 
-        if (queryParams instanceof ErQueryParams) {
+        if (queryParams instanceof ErQueryParams && osmDataSourceService.getRLikeSupport()) {
             addConnectivityRelatedCriteria((ErQueryParams) queryParams, eventResultQueryAggregator)
         }
 
@@ -342,6 +348,60 @@ public class EventResultDaoService {
                 eq('noTrafficShapingAtAll', true)
             }
         }
+    }
+
+    private List<EventResult> applyConnectivityQueryParamsToCriteriaWithoutRlike(List<EventResult> eventResults, ErQueryParams queryParams){
+
+        if (queryParams.connectivityProfileIds.size() > 0){
+
+            boolean justPredefined = queryParams.includeCustomConnectivity == false && queryParams.includeNativeConnectivity == false
+            boolean predefinedAndCustomAndNative = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
+            boolean predefinedAndCustom = queryParams.includeCustomConnectivity == true
+            boolean predefinedAndNative = queryParams.includeNativeConnectivity == true
+
+            if (justPredefined){
+                eventResults = eventResults.findAll {
+                    it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())
+                }
+            }else if (predefinedAndCustomAndNative){
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                            (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
+                            (it.noTrafficShapingAtAll == true)
+                }
+            } else if (predefinedAndCustom){
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                            (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
+                }
+            } else if (predefinedAndNative){
+                eventResults = eventResults.findAll {
+                    (it.connectivityProfile != null && queryParams.connectivityProfileIds.contains(it.connectivityProfile.ident())) ||
+                            (it.noTrafficShapingAtAll == true)
+                }
+            }
+        }else{
+
+            boolean nativeAndCustom = queryParams.includeCustomConnectivity == true && queryParams.includeNativeConnectivity == true
+            boolean justCustom = queryParams.includeCustomConnectivity == true
+            boolean justNative = queryParams.includeNativeConnectivity == true
+
+            if (nativeAndCustom){
+                eventResults = eventResults.findAll {
+                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/) ||
+                            (it.noTrafficShapingAtAll == true)
+                }
+            }else if (justCustom){
+                eventResults = eventResults.findAll {
+                    (it.customConnectivityName != null && it.customConnectivityName ==~ ~/${queryParams.customConnectivityNameRegex}/)
+                }
+            }else if (justNative){
+                eventResults = eventResults.findAll {
+                    (it.noTrafficShapingAtAll == true)
+                }
+            }
+        }
+        return eventResults
     }
 
     /**

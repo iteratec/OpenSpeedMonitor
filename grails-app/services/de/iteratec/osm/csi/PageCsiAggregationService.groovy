@@ -24,7 +24,6 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -217,7 +216,7 @@ class PageCsiAggregationService {
         DateTime latestDate = new DateTime(csiAggregationsToCalculate*.started.max())
         int longestInterval = csiAggregationsToCalculate*.interval*.getIntervalInMinutes().max()
         List<JobGroup> allJobGroups = csiAggregationsToCalculate*.jobGroup.unique()
-        List<JobGroup> allpages = csiAggregationsToCalculate*.page.unique()
+        List<Page> allpages = csiAggregationsToCalculate*.page.unique()
         List<CsiAggregation> allHourlyCsiAggregations = getHmvsByCsiGroupAndPage(allJobGroups, allpages, earliestDate, latestDate.plusMinutes(longestInterval))
 
 
@@ -233,7 +232,7 @@ class PageCsiAggregationService {
                 return
             }
             List<CsiAggregation> hourlyCsiAggregationsForCsiAggregationToCalculate = allHourlyCsiAggregations.findAll {
-                it.jobGroup == targetCsiGroup && it.page == targetPage && it.started >= started.toDate() && it.started <= started.plusMinutes(interval.getIntervalInMinutes()).toDate()
+                it.jobGroup == targetCsiGroup && it.page == targetPage && it.started >= started.toDate() && it.started < started.plusMinutes(interval.getIntervalInMinutes()).toDate()
             }
 
             List<WeightedCsiValue> weightedCsiValuesByDocComplete = []

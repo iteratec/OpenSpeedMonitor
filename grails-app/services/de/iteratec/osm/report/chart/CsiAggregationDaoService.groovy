@@ -64,35 +64,7 @@ class CsiAggregationDaoService {
     }
 
     /**
-     * Gets all {@link CsiAggregation}s from db respective given arguments. tag-attribute is queried via rlike.
-     *
-     * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
-     * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
-     * @param fromDate
-     * @param toDate
-     * @param rlikePattern
-     * @param interval
-     * @param aggregator
-     * @return
-     */
-    List<CsiAggregation> getMvs(
-            Date fromDate,
-            Date toDate,
-            String rlikePattern,
-            CsiAggregationInterval interval,
-            AggregatorType aggregator
-    ) {
-        def criteria = CsiAggregation.createCriteria()
-        return criteria.list {
-            between("started", fromDate, toDate)
-            eq("interval", interval)
-            eq("aggregator", aggregator)
-            rlike("tag", rlikePattern)
-        }
-    }
-
-    /**
-     * Gets all {@link CsiAggregation}s from db respective given arguments. tag-attribute is queried via rlike.
+     * Gets all {@link CsiAggregation}s from db respective given arguments.
      *
      * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
      * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
@@ -118,45 +90,6 @@ class CsiAggregationDaoService {
         List<CsiAggregation> result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate, toDate, toDate, interval, aggregator)
         result.findAll {
             csiSystems.contains(it.csiSystem)
-        }
-    }
-
-    /**
-     * Gets all {@link CsiAggregation}s from db respective given arguments. tag-attribute is queried via rlike.
-     *
-     * <strong>Important:</strong> This method uses custom regex filtering when executed in a test environment
-     * as H2+GORM/Hibernate used in test environments does not reliably support rlike statements.
-     * @param fromDate
-     * @param toDate
-     * @param rlikePattern
-     * @param interval
-     * @param aggregator
-     * @param connectivityProfiles
-     * @return
-     */
-    List<CsiAggregation> getMvs(
-            Date fromDate,
-            Date toDate,
-            String rlikePattern,
-            CsiAggregationInterval interval,
-            AggregatorType aggregator,
-            List<ConnectivityProfile> connectivityProfiles
-    ) {
-        List<CsiAggregation> result
-        toDate = fromDate == toDate ? toDate + interval.intervalInMinutes : toDate
-
-        //TODO: optimize query to something like:
-        //findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndConnectivityProfileInListAndTagRlike
-        //... which works in running App, but NOT in unit-tests!
-        if (osmDataSourceService.getRLikeSupport()) {
-            result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregatorAndTagRlike(fromDate, toDate, toDate, interval, aggregator, rlikePattern)
-        } else {
-            result = CsiAggregation.findAllByStartedBetweenAndStartedLessThanAndIntervalAndAggregator(fromDate, toDate, toDate, interval, aggregator)
-            result = result.grep { it.tag ==~ rlikePattern }
-        }
-
-        result.findAll {
-            connectivityProfiles.contains(it.connectivityProfile)
         }
     }
 

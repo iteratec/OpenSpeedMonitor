@@ -31,9 +31,9 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MeasuredEvent
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
-import groovy.mock.interceptor.MockFor
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.*
 
@@ -43,6 +43,7 @@ import static org.junit.Assert.*
 
 @Integration
 @Rollback
+@ConfineMetaClassChanges([WeightingService])
 class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
 
     static final double DELTA = 1e-15
@@ -68,6 +69,11 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
 
     def setup() {
         createTestDataForAllTests()
+    }
+
+    def cleanup() {
+        // undo mocked service
+        pageCsiAggregationService.weightingService = grailsApplication.mainContext.getBean('weightingService')
     }
 
     //tests////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -346,16 +352,16 @@ class PageCsiAggregationServiceTests extends NonTransactionalIntegrationSpec {
      * Mocks methods of {@link WeightingService}.
      */
     private void mockWeightingService(List<WeightedCsiValue> toReturnFromGetWeightedCsiValues, List<WeightedCsiValue> toReturnFromGetWeightedCsiValuesByVisuallyComplete) {
-        def weightingService = new MockFor(WeightingService, true)
-        weightingService.demand.getWeightedCsiValues(1..10000) {
+        def weightingService = new WeightingService()
+        weightingService.metaClass.getWeightedCsiValues = {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValues
         }
-        weightingService.demand.getWeightedCsiValuesByVisuallyComplete(1..10000) {
+        weightingService.metaClass.getWeightedCsiValuesByVisuallyComplete = {
             List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration ->
                 return toReturnFromGetWeightedCsiValuesByVisuallyComplete
         }
-        pageCsiAggregationService.weightingService = weightingService.proxyInstance()
+        pageCsiAggregationService.weightingService = weightingService
     }
 
     //testdata////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

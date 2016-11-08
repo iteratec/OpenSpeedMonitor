@@ -17,14 +17,11 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEventDaoService
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.EventResultService
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -32,18 +29,12 @@ import org.joda.time.DateTime
 import static org.junit.Assert.*
 import static spock.util.matcher.HamcrestMatchers.closeTo
 
-//@TestMixin(IntegrationTestMixin)
 @Integration
 @Rollback
 class WeeklyPageMultipleCsiGroupsIntTests extends NonTransactionalIntegrationSpec {
 
     /** injected by grails */
-    EventCsiAggregationService eventCsiAggregationService
     PageCsiAggregationService pageCsiAggregationService
-    EventResultService eventResultService
-    WeightingService weightingService
-    MeanCalcService meanCalcService
-    CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
     CsiAggregationUpdateService csiAggregationUpdateService
 
     CsiAggregationInterval hourly

@@ -62,8 +62,9 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     CsiSystem csiSystem
 
     def setup() {
-        CsiAggregation.withNewTransaction {
+        CsiAggregation.withNewSession {session ->
             createCommonTestData()
+            session.flush()
         }
     }
 
