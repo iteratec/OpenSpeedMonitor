@@ -178,7 +178,7 @@ class RickshawHtmlCreater {
 
                 // json object containing all relevant infos to create a url to jump to wpt
                 def pointInfo = eachPoint.chartPointWptInfo
-                wptResultInfo =  """{ wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}", testId: "${pointInfo.testId.toString()}", numberOfWptRun: ${pointInfo.numberOfWptRun.toString()}, oneBaseStepIndexInJourney: ${pointInfo.oneBaseStepIndexInJourney.toString()}, cachedView: ${cached} }""";
+                wptResultInfo =  """{ wptServerBaseurl: "${pointInfo.serverBaseUrl.toString()}", testId: "${pointInfo.testId.toString()}", numberOfWptRun: "${pointInfo.numberOfWptRun.toString()}", oneBaseStepIndexInJourney: "${pointInfo.oneBaseStepIndexInJourney.toString()}", cachedView: ${cached} }""";
             }
 
 

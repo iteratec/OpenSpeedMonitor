@@ -17,6 +17,8 @@
 
 /*
  * Contains functionality used to display a context menu in the chart in eventResultDashboard/showAll
+ * to link to the defined WPT detail pages and
+ * select/deselect datapoints for comparison in the filmstrip view of the WPT
  */
 
 //= require bower_components/jQuery-contextMenu/dist/jquery.contextMenu.min.js
@@ -24,6 +26,8 @@
 // context menu on all dots of all graphs
 $.contextMenu({
     selector: '.chart-context-menu',
+
+    zindex: 4,
 
     events: {
         show: function () {
@@ -141,6 +145,8 @@ $.contextMenu({
 $.contextMenu({
     selector: '#rickshaw_chart',
 
+    zindex: 4,
+
     items: {
         "comparePoints": {
             name: chartContextMenuI18N.compareFilmstrips,
@@ -167,7 +173,8 @@ $.contextMenu({
     }
 });
 
-// select/deselect points on the graph with meta-key+click
+
+// select/deselect points on the graph with meta-key+click or ctrl-key+click
 $('#rickshaw_main').on('click', '.chart-context-menu', function (event) {
     if (event.metaKey || event.ctrlKey) {
         var nearestPoint = rickshawGraphBuilder.graph.nearestPoint;
@@ -193,21 +200,18 @@ OpenSpeedMonitor.chartContextUtil = (function(){
     var url = null;
     if (typeof nearestPoint == 'undefined' || typeof wptView == 'undefined') {
       // build url for the comparison view launched from the chart context menu
-      url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl.toString() +
+      url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl +
         "video/compare.php?tests=" + comparingPartOfFilmstripsURL();
     } else {
-      // build url for the comparison view launched from a aspecific point
+      // build url for the comparison view launched from a a specific point
 
       // get the wpt infos of the corresponding data point
-      var wptServerBaseurl = nearestPoint.value.wptResultInfo.wptServerBaseurl.toString();
-      var testId = nearestPoint.value.wptResultInfo.testId.toString();
-      var numberOfWptRun = nearestPoint.value.wptResultInfo.numberOfWptRun.toString();
+      var wptServerBaseurl = nearestPoint.value.wptResultInfo.wptServerBaseurl;
+      var testId = nearestPoint.value.wptResultInfo.testId;
+      var numberOfWptRun = nearestPoint.value.wptResultInfo.numberOfWptRun;
       var cachedView = nearestPoint.value.wptResultInfo.cachedView;
       var cached = null;
-      var oneBaseStepIndexInJourney = "";
-      if (nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney) {
-        oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney.toString();
-      }
+      var oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney;
 
       // build the url
       if (wptView == "compare") {
@@ -263,10 +267,10 @@ OpenSpeedMonitor.chartContextUtil = (function(){
   function comparingPartOfFilmstripsURL() {
     var urlPart = "";
     rickshawGraphBuilder.graph.selectedPoints.forEach(function (point) {
-      var testId = point.value.wptResultInfo.testId.toString();
-      var numberOfWptRun = point.value.wptResultInfo.numberOfWptRun.toString();
+      var testId = point.value.wptResultInfo.testId;
+      var numberOfWptRun = point.value.wptResultInfo.numberOfWptRun;
       var cached = point.value.wptResultInfo.cachedView ? "1" : "0";
-      var oneBaseStepIndexInJourney = point.value.wptResultInfo.oneBaseStepIndexInJourney.toString();
+      var oneBaseStepIndexInJourney = point.value.wptResultInfo.oneBaseStepIndexInJourney;
 
       urlPart += testId +
         "-r:" + numberOfWptRun +
