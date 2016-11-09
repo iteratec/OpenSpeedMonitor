@@ -33,13 +33,19 @@ function copyCsiConfiguration(csiConfigurations) {
     var linkToCopyCsiConfig = promptForNewName(
         POSTLOADED.link_CsiConfigurationSaveCopy, POSTLOADED.i18n_nameAlreadyExistMsg, csiConfigurations);
 
+    var spinnerParent = document.getElementById('copyCsiConfigurationSpinner');
+    var spinnerBackground = document.createElement('div');
+
     if(linkToCopyCsiConfig) {
         var runningSpinner;
         $.ajax({
             url: linkToCopyCsiConfig,
             beforeSend: function() {
-                var spinnerParent = document.getElementById('copyCsiConfigurationSpinner');
+                spinnerBackground.classList.add('spinnerBackground');
+                spinnerParent.appendChild(spinnerBackground);
+
                 runningSpinner = POSTLOADED.getLargeSpinner('#000', '50%', '50%');
+                runningSpinner.el.style.position = 'fixed';
                 spinnerParent.appendChild(runningSpinner.el);
             },
             complete: function(xhr, textStatus) {
@@ -54,6 +60,7 @@ function copyCsiConfiguration(csiConfigurations) {
                 $('#uploadHourOfDayWeightsCsiConfigurationId').val(actualCsiConfigurationId);
 
                 // refreshCsiConfigurationSwitchMenu();
+                spinnerParent.removeChild(spinnerBackground);
                 runningSpinner.stop();
 
             }

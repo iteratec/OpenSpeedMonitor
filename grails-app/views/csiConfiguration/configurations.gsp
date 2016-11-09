@@ -154,8 +154,12 @@
 <g:render template="/layouts/mainMenu"/>
 
 
-%{-- dropdown button --}%%{--
-<div class="row">
+<div id="copyCsiConfigurationSpinner"></div>
+
+
+
+%{-- dropdown button --}%
+%{--<div class="row">
     <div class="col-md-2">
         <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
             <div class="btn btn-group pull-left">
@@ -251,8 +255,6 @@
             </p>
             <span id="headerCsiConfDescription">${selectedCsiConfiguration.description}</span>
         </blockquote>
-
-        <div id="copyCsiConfigurationSpinner" class="spinner-large-content-spinner-25"></div>
     </div>
 </div>
 
