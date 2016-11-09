@@ -50,11 +50,8 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 						code="de.iteratec.isr.wptrd.labels.timeframes.start"
 						default="Start" />:
 			</label>
-			<div class="col-md-4">
-				<input class="form-control" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" />
-			</div>
-			<div class="col-md-4">
-				<fieldset id="fldset-startdate-hour">
+			<div class="col-md-8">
+				<fieldset id="fldset-startdate-hour" class="time-control">
 					<div class="input-group bootstrap-timepicker">
 						<span class="input-group-addon">
 							<g:checkBox name="setFromHour" id="setFromHour" checked="${setFromHour}"/>
@@ -64,6 +61,9 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</fieldset>
+				<div class="date-control">
+					<input class="form-control" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" />
+				</div>
 			</div>
 		</div>
 		<input type="hidden" name="from" id="from" value="${from}">
@@ -78,11 +78,8 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 						code="de.iteratec.isr.wptrd.labels.timeframes.end"
 						default="End" />:
 			</label>
-			<div class="col-md-4">
-				<input class="form-control" type="text" id="toDatepicker" placeholder="end ..." value="${to}" />
-			</div>
-			<div class="col-md-4">
-				<fieldset id="fldset-enddate-hour">
+			<div class="col-md-8">
+				<fieldset id="fldset-enddate-hour" class="time-control">
 					<div class="input-group bootstrap-timepicker">
 						<span class="input-group-addon">
 							<g:checkBox name="setToHour" id="setToHour" checked="${setToHour}"/>
@@ -92,6 +89,9 @@ These two can either be set manually or via pre-selections like 'last hour', 'la
 						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
 					</div>
 				</fieldset>
+				<div class="date-control">
+					<input class="form-control" type="text" id="toDatepicker" placeholder="end ..." value="${to}" />
+				</div>
 			</div>
 		</div>
 		<input type="hidden" name="to" value="${to}" id="to">
