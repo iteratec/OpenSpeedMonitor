@@ -26,7 +26,7 @@
     </g:else>
 
     <g:form action="save" class="form-horizontal">
-        <fieldset class="form">
+        <fieldset class="form-horizontal">
             <g:render template="form"/>
         </fieldset>
 

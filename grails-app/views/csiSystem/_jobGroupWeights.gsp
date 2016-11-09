@@ -86,4 +86,4 @@
         </asset:script>
     </g:each>
 </div>
-<input type="button" value="Add jobGroupWeight" onclick="addJobGroupWeight();"/>
+<input type="button" value="Add jobGroupWeight" onclick="addJobGroupWeight();" class="btn btn-default" />

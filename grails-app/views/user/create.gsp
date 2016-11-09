@@ -18,7 +18,7 @@
             </ul>
             </g:hasErrors>
             <g:form action="save" class="form-horizontal">
-                <ul class="nav nav-tabs">
+                <ul class="nav nav-tabs section">
                     <li class="active"><a data-toggle="pill" href="#userMenu">User</a></li>
                     <li><a data-toggle="tab" href="#roleMenu">Role</a></li>
                 </ul>
@@ -29,12 +29,14 @@
                             <f:all bean="user"/>
                         </fieldset>
                     </div>
-                    <div id="roleMenu" class="tab-pane fade">
+                    <div id="roleMenu" class="tab-pane fade form-horizontal">
                         <g:each var='entry' in='${authorityList}'>
                             <g:set var='roleName' value='${uiPropertiesStrategy.getProperty(entry, 'authority')}'/>
                             <div class="form-group">
-                                <g:link class="control-label" controller='role' action='edit' id='${entry.id}'>${roleName}</g:link>
-                                <div>
+                                <label class="col-md-3">
+                                    <g:link class="control-label" controller='role' action='edit' id='${entry.id}'>${roleName}</g:link>
+                                </label>
+                                <div class="col-md-6">
                                     <bs:checkBox name="${roleName}" />
                                 </div>
                             </div>

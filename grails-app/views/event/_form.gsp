@@ -1,22 +1,22 @@
 <%@ page import="de.iteratec.osm.report.chart.Event" %>
 
 <div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'eventDate', 'error')} required">
-    <label for="eventDate" class="control-label"><g:message code="event.date.label" default="Date"/><span
+    <label for="eventDate" class="control-label col-md-3"><g:message code="event.date.label" default="Date"/><span
             class="required-indicator">*</span></label>
 
-    <div>
-        <bs:datePicker name="eventDate" required="" precision="day" value="${eventInstance?.eventDate}"/>
+    <div class="col-md-6">
+        <bs:datePicker name="eventDate" required="" precision="day" value="${eventInstance?.eventDate}" class="form-control" />
     </div>
 </div>
 
-<div class="form-group fieldcontain  required">
-    <label class="control-label"><g:message code="event.time.label" default="Uhrzeit"/><span
+<div class="form-group fieldcontain required">
+    <label class="control-label col-md-3"><g:message code="event.time.label" default="Uhrzeit"/><span
             class="required-indicator">*</span></label>
 
 
-    <div>
-        <div class="input-group bootstrap-timepicker" }>
-            <input id="fromHourTimepicker" name="time" type="text" class="form-control content-box"
+    <div class="col-md-6">
+        <div class="input-group bootstrap-timepicker" >
+            <input id="fromHourTimepicker" name="time" type="text" class="form-control"
                    value="<g:if
                            test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
                        ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
@@ -28,38 +28,38 @@
 </div>
 
 <div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'shortName', 'error')} ">
-    <label for="shortName" class="control-label"><g:message code="event.shortName.label" default="Short Name"/></label>
+    <label for="shortName" class="control-label col-md-3"><g:message code="event.shortName.label" default="Short Name"/></label>
 
-    <div>
-        <g:textArea name="shortName" cols="40" rows="5" maxlength="255" value="${eventInstance?.shortName}"/>
+    <div class="col-md-6">
+        <g:textArea name="shortName" cols="40" rows="5" maxlength="255" value="${eventInstance?.shortName}" class="form-control"/>
     </div>
 </div>
 
 <div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'description', 'error')} ">
-    <label for="description" class="control-label"><g:message code="event.description.label"
+    <label for="description" class="control-label col-md-3"><g:message code="event.description.label"
                                                               default="Html Description"/></label>
 
-    <div>
-        <g:textArea name="description" cols="40" rows="5" maxlength="255"
+    <div class="col-md-6">
+        <g:textArea name="description" cols="40" rows="5" maxlength="255" class="form-control"
                     value="${eventInstance?.description}"/>
     </div>
 </div>
 
 <div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'globallyVisible', 'error')} ">
-    <label for="globallyVisible" class="control-label"><g:message code="event.globallyVisible.label"
+    <label for="globallyVisible" class="control-label col-md-3"><g:message code="event.globallyVisible.label"
                                                                   default="Globally Visible"/></label>
 
-    <div>
+    <div class="col-md-6">
         %{--<input type="checkBox" name="globallyVisible" value="${eventInstance?.globallyVisible}"/>--}%
         <g:checkBox name="globallyVisible" value="${eventInstance?.globallyVisible}"/>
     </div>
 </div>
 
 <div class="form-group fieldcontain ${hasErrors(bean: eventInstance, field: 'jobGroups', 'error')} ">
-    <label for="jobGroups" class="control-label"><g:message code="event.jobGroup.label" default="Job Group"/></label>
+    <label for="jobGroups" class="control-label col-md-3"><g:message code="event.jobGroup.label" default="Job Group"/></label>
 
-    <div>
+    <div class="col-md-6">
         <g:select name="jobGroups" from="${de.iteratec.osm.measurement.schedule.JobGroup.list()}" multiple="multiple"
-                  optionKey="id" size="5" value="${eventInstance?.jobGroups*.id}" class="many-to-many"/>
+                  optionKey="id" size="5" value="${eventInstance?.jobGroups*.id}" class="many-to-many form-control"/>
     </div>
 </div>

@@ -18,21 +18,21 @@
             </ul>
             </g:hasErrors>
             <g:form resource="${user}" method="PUT" class="form-horizontal">
-                <ul class="nav nav-tabs">
+                <ul class="nav nav-tabs section">
                     <li class="active"><a data-toggle="pill" href="#userMenu">User</a></li>
                     <li><a data-toggle="tab" href="#roleMenu">Role</a></li>
                 </ul>
                 <div class="tab-content">
                     <div id="userMenu" class="tab-pane fade in active">
                         <g:hiddenField name="version" value="${user?.version}" />
-                        <fieldset class="form">
+                        <fieldset class="form-horizontal">
                             <f:field bean="user" property="username"/>
-                            <div class="control-group fieldcontain required">
-                                <lable for="password" class="control-label">Password
+                            <div class="form-group fieldcontain required">
+                                <label for="password" class="control-label col-md-3">Password
                                 <span class="required-indicator">*</span>
-                                </lable>
-                                <div class="controls">
-                                    <input type="password" name="password" value="*****" id="password" data-cip-id="password">
+                                </label>
+                                <div class="controls col-md-6">
+                                    <input type="password" name="password" value="*****" id="password" data-cip-id="password" class="form-control" />
                                 </div>
                             </div>
                             <f:with bean="user">
@@ -44,12 +44,14 @@
                             </f:with>
                         </fieldset>
                     </div>
-                    <div id="roleMenu" class="tab-pane fade">
+                    <div id="roleMenu" class="tab-pane fade form-horizontal">
                         <g:each var='entry' in='${roleMap}'>
                             <g:set var='roleName' value='${uiPropertiesStrategy.getProperty(entry.key, 'authority')}'/>
                             <div class="form-group">
+                                <label class="col-md-3">
                                 <g:link class="control-label" controller='role' action='edit' id='${entry.key.id}'>${roleName}</g:link>
-                                <div>
+                                </label>
+                                <div class="col-md-6">
                                     <bs:checkBox name="${roleName}" value="${entry.value}" />
                                 </div>
                             </div>

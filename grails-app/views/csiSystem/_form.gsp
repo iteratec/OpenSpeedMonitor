@@ -2,22 +2,19 @@
 
 
 <div class="form-group fieldcontain ${hasErrors(bean: csiSystem, field: 'label', 'error')} ">
-    <label for="label" class="control-label"><g:message code="csiSystem.label.label" default="Label"/></label>
+    <label for="label" class="control-label col-md-3"><g:message code="csiSystem.label.label" default="Label"/></label>
 
-    <div>
-        <g:textField name="label" value="${csiSystem?.label}"/>
+    <div class="col-md-6">
+        <g:textField name="label" value="${csiSystem?.label}" class="form-control" />
     </div>
 </div>
 
 
 <div class="form-group fieldcontain ${hasErrors(bean: csiSystem, field: 'jobGroupWeights', 'error')} ">
-    <label for="jobGroupWeights" class="control-label"><g:message code="csiSystem.jobGroupWeights.label"
-                                                                  default="Job Group Weights"/></label>
-
-    <div>
-
+    <label for="jobGroupWeights" class="control-label col-md-3">
+        <g:message code="csiSystem.jobGroupWeights.label" default="Job Group Weights"/></label>
+    <div class="col-md-6">
         <g:render template="jobGroupWeights" model="['csiSystem': csiSystem]"/>
-
     </div>
 </div>
 
