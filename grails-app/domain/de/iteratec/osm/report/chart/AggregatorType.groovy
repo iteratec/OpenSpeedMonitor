@@ -128,7 +128,7 @@ class AggregatorType {
 		measurandGroup(nullable: false)
 	}	
 	static mapping = {
-		cache usage: 'nonstrict-read-write'
+		cache usage: 'read-only'
 	}
 	
 	static transients = ['cached', 'cachedCriteriaApplicable'];
