@@ -329,10 +329,10 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
 
 
         Script script1 = TestDataUtil.createScript(script1Name,"This is for test purposes","stuff")
-        Browser browser = TestDataUtil.createBrowser("TestFireFox",1d)
+        Browser browser = TestDataUtil.createBrowser("TestFireFox")
         ConnectivityProfile connectivityProfile =TestDataUtil.createConnectivityProfile(connectivityProfileName)
         BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
-        Page page1 =TestDataUtil.createPage(page1Name,1.0)
+        Page page1 =TestDataUtil.createPage(page1Name)
         PageWeight pageWeight = TestDataUtil.createPageWeight(page1,3)
         TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
         CsiDay csiDay = TestDataUtil.createCsiDay([0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:11,13:10,14:9,15:8,16:7,17:6,18:5,19:4,20:3,21:2,22:1,23:0])
@@ -365,7 +365,7 @@ class CsiDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLo
         new CsiAggregation([started:new DateTime(2016,6,16,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:99,csByWptVisuallyCompleteInPercent:78,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
         new CsiAggregation([started:new DateTime(2016,6,17,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent: 1,csByWptVisuallyCompleteInPercent:84,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
         new CsiAggregation([started:new DateTime(2016,6,18,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:31,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser",0)
+        Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
         TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
 

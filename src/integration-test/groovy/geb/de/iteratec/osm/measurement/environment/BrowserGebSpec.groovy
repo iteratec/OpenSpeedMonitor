@@ -205,7 +205,7 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         given: "a browser"
         Browser browser
         Browser.withNewTransaction {
-            browser = TestDataUtil.createBrowser("a geb test browser foreign key", 2.0)
+            browser = TestDataUtil.createBrowser("a geb test browser foreign key")
         }
 
         and: "a browserConnectivityWeight using this browser"
@@ -249,7 +249,7 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
 
         Browser.withNewTransaction {
             count.times {
-                browserIDs << TestDataUtil.createBrowser("gebBrowser" + it, it).id
+                browserIDs << TestDataUtil.createBrowser("gebBrowser" + it).id
             }
         }
 

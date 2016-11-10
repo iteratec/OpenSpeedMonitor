@@ -35,7 +35,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
 
     def setupData() {
         Browser.withNewTransaction {
-            existingBrowser = TestDataUtil.createBrowser("a geb test browserAlias", 2.0)
+            existingBrowser = TestDataUtil.createBrowser("a geb test browserAlias")
         }
     }
 

@@ -187,7 +187,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         given: "a page"
         Page testPage
         Page.withNewTransaction {
-            testPage = TestDataUtil.createPage("a geb test page foreign key", 2.0)
+            testPage = TestDataUtil.createPage("a geb test page foreign key")
         }
 
         and: "a pageWeight using this page"
@@ -228,7 +228,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
 
         Page.withNewTransaction {
             count.times {
-                pageIDs << TestDataUtil.createPage("gebPage" + it, it).id
+                pageIDs << TestDataUtil.createPage("gebPage" + it).id
             }
         }
 
