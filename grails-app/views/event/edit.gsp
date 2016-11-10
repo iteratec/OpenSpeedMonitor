@@ -36,9 +36,6 @@
 
     <content tag="include.bottom">
         <asset:javascript src="event/event.js" />
-        <asset:script type="text/javascript">
-            $(document).ready(doOnDomReady());
-        </asset:script>
     </content>
 
 </body>

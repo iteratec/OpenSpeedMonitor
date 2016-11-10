@@ -16,12 +16,10 @@
 
     <div class="col-md-6">
         <div class="input-group bootstrap-timepicker" >
-            <input id="fromHourTimepicker" name="time" type="text" class="form-control"
-                   value="<g:if
-                           test="${(eventInstance?.eventDate?.getHours() as String) != null && (eventInstance?.eventDate?.getHours() as String).isEmpty()}">
-                       ${(eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")}
-                   </g:if>
-                   <g:else>00:00</g:else>">
+            <input id="hourTimepicker" name="time" type="text" class="form-control"
+                   value="<g:if test="${(eventInstance?.eventDate?.getHours() as String)}">${
+                       (eventInstance?.eventDate?.getHours() as String).padLeft(2, "0") + ":" + (eventInstance?.eventDate?.minutes as String).padLeft(2, "0")
+                   }</g:if><g:else>00:00</g:else>">
             <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
         </div>
     </div>
