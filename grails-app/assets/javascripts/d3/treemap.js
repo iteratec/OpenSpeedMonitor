@@ -27,7 +27,6 @@ function createTreemap(altWidth, altHeight, data, design, id) {
 
     // set sizes if divs are found
     if (!d3.select('#treemapSpan').empty() && !d3.select('#zeroWeightSpan').empty()) {
-        // var treemapSpanWidth = parseInt(d3.select('#treemapSpan').style('width'), 10);
         var treemapSpanWidth = $(window).innerWidth() * 0.5;
         var zeroWeigthSpanWidth = parseInt(d3.select('#zeroWeightSpan').style('width'), 10);
         rawWidth = treemapSpanWidth;

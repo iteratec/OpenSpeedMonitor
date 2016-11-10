@@ -92,8 +92,6 @@
                             'availableCsiConfigurations': csiConfigurations,
                             'affectedController'     : 'csiConfiguration'
                     ]}"/>
-                    %{--<g:link controller="csiConfiguration" action="configurations"><i class="fa fa-gears"></i> <g:message
-                            code="de.iteratec.osm.configuration.heading" default="Configuration"/></g:link>--}%
                 </li>
             </g:elseif>
         </ul>

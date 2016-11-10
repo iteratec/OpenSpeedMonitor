@@ -47,7 +47,6 @@ function createMultiLineGraph(
     function createGraph(){
         //pick div and set width
         var div = d3.select("#" + graphObject.identifier);
-        // var divWidth = parseInt(div.style("width"), 10);
         var divWidth = $(window).innerWidth() * 0.5;
 
         // Get Lines from data

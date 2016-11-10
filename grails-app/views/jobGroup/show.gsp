@@ -172,15 +172,7 @@
             <tr class="prop">
                 <td valign="top" class="name"><g:message code="jobGroup.csiConfiguration.label"
                                                          default="Csi Configuration"/></td>
-                <td>${selectedCsiConfiguration.label} <br/><br/>
-                    %{--<g:if test="${jobGroup.csiConfiguration}">
-                        <g:set var="renderCsiConfiguration" value="true"></g:set>
-                        <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
-                                                                                   showDefaultMappings    : false,
-                                                                                   defaultTimeToCsMappings: defaultTimeToCsMappings,
-                                                                                   pageMappingsExist      : pageMappingsExist]"/>
-                    </g:if>--}%
-                </td>
+                <td>${selectedCsiConfiguration.label}</td>
             </tr>
         </g:if>
         </tbody>
@@ -199,16 +191,6 @@
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
-    <asset:script type="text/javascript">
-        %{--$(document).ready(function () {
-
-            if (${renderCsiConfiguration ?: false}) {
-                createMatrixView(${matrixViewData ?: "null"}, "browserConnectivityMatrixView");
-                createTreemap(1200, 750, ${treemapData ?: "null"}, "rect", "pageWeightTreemap");
-                createBarChart(1000, 750, ${barchartData ?: "null"}, "clocks", "hoursOfDayBarchart");
-            }
-        });--}%
-    </asset:script>
 </content>
 
 </body>

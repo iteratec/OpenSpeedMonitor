@@ -156,51 +156,6 @@
 <div id="copyCsiConfigurationSpinner"></div>
 
 
-
-%{-- dropdown button --}%
-%{--<div class="row">
-    <div class="col-md-2">
-        <g:if test="${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") || csiConfigurations.size() > 1}">
-            <div class="btn btn-group pull-left">
-                <button class="btn btn-sm btn-info dropdown-toggle text-right" data-toggle="dropdown">
-                    <g:message code="de.iteratec.osm.csi.configuration.messages.actual-configuration"
-                               default="This Configuration..."/>
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-
-                --}%%{--features for actual configuration----------------------------}%%{--
-                    <sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_SUPER_ADMIN">
-                        <li>
-                            <a href="#"
-                               onclick="prepareConfigurationListAndCopy();">
-                                <i class="fa fa-copy"></i>&nbsp;${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Copy')}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#"
-                               onclick="return validatedDeletion()" id="deleteCsiConfigurationHref">
-                                <i class="fa fa-remove"></i>&nbsp;${message(code: 'de.iteratec.osm.csi.ui.delete.label', default: 'delete')}
-                            </a>
-                        </li>
-                    </sec:ifAnyGranted>
-
-                --}%%{--submenu to show other configurations----------------------------}%%{--
-                    <li class="dropdown-submenu" id="otherConfigsSubmenu">
-                        <a tabindex="-1" href="#">
-                            <i class="fa fa-share-square-o"></i>&nbsp;<g:message
-                                code="de.iteratec.osm.csi.configuration.messages.select-different"
-                                default="Switch to..."/>
-                        </a>
-                        <ul class="dropdown-menu" id="csiConfigurationSwitchMenu"></ul>
-                    </li>
-                </ul>
-            </div>
-        </g:if>
-    </div>
-</div>--}%
-
-
 %{-- container for errors --}%
 <div class="row">
     <div class="col-md-12">
@@ -258,31 +213,6 @@
 </div>
 
 
-%{-- nav tabs for the mapping and the weights --}%
-%{--<ul class="nav nav-tabs">--}%
-    %{--<li class="active">--}%
-        %{--<a data-toggle="tab" href="#csiMappingDetailsTabContent">--}%
-            %{--<g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>--}%
-        %{--</a>--}%
-    %{--</li>--}%
-    %{--<li>--}%
-        %{--<a data-toggle="tab" href="#csiConnectivityWeightDetailsTabContent">--}%
-            %{--<g:message code="de.iteratec.osm.csi.navTab.connectivityWeights" default="Connectivity Weights"/>--}%
-        %{--</a>--}%
-    %{--</li>--}%
-    %{--<li>--}%
-        %{--<a data-toggle="tab" href="#csiPageWeightDetailsTabContent">--}%
-            %{--<g:message code="de.iteratec.osm.csi.navTab.pageWeights" default="Page Weights"/>--}%
-        %{--</a>--}%
-    %{--</li>--}%
-    %{--<li>--}%
-        %{--<a data-toggle="tab" href="#csiTimeWeightDetailsTabContent">--}%
-            %{--<g:message code="de.iteratec.osm.csi.navTab.timeWeights" default="Time Weights"/>--}%
-        %{--</a>--}%
-    %{--</li>--}%
-%{--</ul>--}%
-
-
 %{-- mapping and weights details --}%
 <g:render template="confDetails" model="[readOnly                : false,
                                          showDefaultMappings     : true,
@@ -292,14 +222,14 @@
                                          pageMappingsExist       : pageMappingsExist,
                                          matrixViewData          : matrixViewData,
                                          treemapData             : treemapData,
-                                         barchartData            : barchartData]"/>
+                                         barchartData            : barchartData,
+                                         pageTimeToCsMappings    : pageTimeToCsMappings]"/>
 
 
 %{-- initially invisible modal dialog to update csi configuratuion via ajax --}%
 <g:render template="/_common/modals/csi/updateCsiConfiguration"/>
 
-<%-- include bottom ---------------------------------------------------------------------------%>
-
+%{-- include bottom ---------------------------------------------------------------------------}%
 <content tag="include.bottom">
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
@@ -310,15 +240,6 @@
         var registerEventHandlers = function () {
 
             registerEventHandlersForFileUploadControls();
-
-            %{--$("#btn-csi-mapping").click(function () {--}%
-                %{--$('#csi-mapping').show();--}%
-                %{--$('#csi-weights').hide();--}%
-            %{--});--}%
-            %{--$("#btn-csi-weights").click(function () {--}%
-                %{--$('#csi-mapping').hide();--}%
-                %{--$('#csi-weights').show();--}%
-            %{--});--}%
 
             $('#updateCsiConfModal').on('shown', function () {
                 $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
@@ -359,11 +280,6 @@
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
-            %{--if (${showCsiWeights}) {
-                $("#btn-csi-weights").click();
-            } else {
-                $("#btn-csi-mapping").click();
-            }--}%
         };
 
         var prepareConfigurationListAndCopy = function(){
@@ -377,41 +293,9 @@
         var actualCsiConfigurationLabel = '${selectedCsiConfiguration.label}';
         var allCsiConfigurations = ${csiConfigurations as grails.converters.JSON};
 
-%{--        function refreshCsiConfigurationSwitchMenu() {
-
-            if(allCsiConfigurations.length <= 1){
-                $('#otherConfigsSubmenu').hide();
-            }else {
-                var listOfOtherCsiConfigurations = document.getElementById('csiConfigurationSwitchMenu');
-                listOfOtherCsiConfigurations.innerHTML = "";
-                allCsiConfigurations.forEach(function(csiConfig){
-                    if(csiConfig.id != actualCsiConfigurationId){
-                        var anchor = document.createElement('a');
-                        anchor.addEventListener("click", function() {
-                            changeCsiConfiguration(csiConfig.id);
-                        });
-                        anchor.innerHTML = csiConfig.label;
-                        var li = document.createElement('li');
-                        li.appendChild(anchor);
-                        listOfOtherCsiConfigurations.appendChild(li);
-                    }
-                });
-                $('#otherConfigsSubmenu').show();
-            }
-
-        }--}%
-
         $(document).ready(function () {
 
-            %{--createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");--}%
-            %{--createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");--}%
-            %{--createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");--}%
-
-            %{--registerEventHandlers();--}%
-
             initializeSomeControls();
-            %{--refreshCsiConfigurationSwitchMenu();--}%
-
         });
 
         $( window ).load(function() {

@@ -1,22 +1,6 @@
 <%@ page import="grails.converters.JSON" %>
 <%@ defaultCodec="none" %>
 
-%{-- navigation buttons (deprecated) --}%
-%{--<div class="row">
-    <div class="col-md-12">
-        <div class="btn-group" data-toggle="buttons">
-            <button type="button" class="btn btn-sm btn-info" id="btn-csi-mapping"
-                    onclick="$('#csi-mapping').show();
-                    $('#csi-weights').hide();"><g:message code="de.iteratec.osm.csi.weights.mappingCSIButton"
-                                                          default="Weights CSI"/></button>
-            <button type="button" class="btn btn-sm btn-info" id="btn-csi-weights"
-                    onclick="$('#csi-mapping').hide();
-                    $('#csi-weights').show();"><g:message code="de.iteratec.osm.csi.weights.weightCSIButton"
-                                                          default="Mapping CSI"/></button>
-        </div>
-    </div>
-</div>--}%
-
 
 %{-- nav tabs for the mapping and the weights --}%
 <ul class="nav nav-tabs">
@@ -111,18 +95,6 @@
                                     </sec:ifAllGranted>
                                 </div>
                             </div>
-                            <asset:script type="text/javascript">
-                                var legendEntryClickCallback = function(nameOfClickedLegendEntry){
-                                    var btnRemovePageMapping = $('#removePageMapping');
-                                    if (nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
-                                        btnRemovePageMapping.show();
-                                    } else if (btnRemovePageMapping){
-                                        btnRemovePageMapping.hide();
-                                    }
-                                };
-                                var graphData = ${pageTimeToCsMappings};
-                                var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
-                            </asset:script>
                         </g:if>
                         <g:else>
                             <div class="row">
@@ -221,21 +193,6 @@
                                             <g:message
                                                     code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
                                                     default="Delete Default Mapping"/></button>
-                                        <asset:script type="text/javascript">
-                                            $(document).ready(function(){
-                                                    $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
-                                            });
-                                            function defaultSelectChange(){
-                                                var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
-                                                $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
-                                                $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
-                                                changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
-                                            }
-                                            function showMappingDialog(){
-                                                var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
-                                                showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
-                                            }
-                                        </asset:script>
                                     </g:if>
                                     <g:render template="/_common/modals/deleteDialogCustomAction"
                                               model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
@@ -269,7 +226,6 @@
                                    style="display:none">
                             <input id="uploadBrowserConnectivityWeightsCsiConfigurationId" type="text"
                                    name="selectedCsiConfigurationId"
-                                   value="${selectedCsiConfiguration.ident()}"
                                    value="${selectedCsiConfiguration.ident()}"
                                    style="display:none">
 
@@ -323,7 +279,6 @@
                     <input id="uploadPageWeightsCsiConfigurationId" type="text"
                            name="selectedCsiConfigurationId"
                            value="${selectedCsiConfiguration.ident()}"
-                           value="${selectedCsiConfiguration.ident()}"
                            style="display:none">
 
                     <div class="row">
@@ -375,7 +330,6 @@
                     <input id="theHourOfDayCsvFile" type="file" name="hourOfDayCsv" style="display:none">
                     <input id="uploadHourOfDayWeightsCsiConfigurationId" type="text" name="selectedCsiConfigurationId"
                            value="${selectedCsiConfiguration.ident()}"
-                           value="${selectedCsiConfiguration.ident()}"
                            style="display:none">
 
                     <div class="row">
@@ -418,11 +372,36 @@
 
 <content tag="include.bottom">
     <asset:script type="text/javascript">
+        var legendEntryClickCallback = function(nameOfClickedLegendEntry){
+            var btnRemovePageMapping = $('#removePageMapping');
+            if (nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
+                btnRemovePageMapping.show();
+            } else if (btnRemovePageMapping){
+                btnRemovePageMapping.hide();
+            }
+        };
+        var graphData = ${pageTimeToCsMappings};
+        var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
+
+        function defaultSelectChange(){
+                var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
+                $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
+                $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
+                changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
+        }
+
+        function showMappingDialog(){
+            var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
+            showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
+        }
+
         $(document).ready(function () {
 
             createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
             createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
             createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
+
+            $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
         });
     </asset:script>
 </content>

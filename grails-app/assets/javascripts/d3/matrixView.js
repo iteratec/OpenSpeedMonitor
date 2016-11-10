@@ -8,7 +8,6 @@ function createMatrixView(data, chartDivIdentifier) {
 
     //pick div and set width
     var div = d3.select("#" + chartDivIdentifier);
-    // var divWidth = parseInt(div.style("width"), 10);
     var divWidth = $(window).innerWidth() * 0.5;
 
     // Define margins, width and height

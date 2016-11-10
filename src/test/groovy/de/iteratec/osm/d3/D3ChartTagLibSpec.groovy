@@ -80,7 +80,7 @@ class D3ChartTagLibSpec extends Specification {
         chartSVGContainerNode.attributes['id'] == identifier
     }
 
-    def "HTML provided by taglib iteratec:treemap returns two containers with correct identifiers"() {
+    def "HTML provided by taglib iteratec:treemap returns three containers with correct identifiers"() {
         given:
         String identifier = "ChartIdentifier"
 
@@ -89,10 +89,14 @@ class D3ChartTagLibSpec extends Specification {
 
         then:
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
-        testHtmlAsNode.childNodes().size() == 2
+        testHtmlAsNode.childNodes().size() == 1
         def chartContainerNode = testHtmlAsNode.childNodes().getAt(0)
-        chartContainerNode.childNodes().getAt(0).attributes['id'] == identifier
-        def zeroWeigthSpan = testHtmlAsNode.childNodes().getAt(1)
+        chartContainerNode.childNodes().size() == 3
+        def treeMap = chartContainerNode.childNodes().getAt(0)
+        def tooltipTreemap = chartContainerNode.childNodes().getAt(1)
+        def zeroWeigthSpan = chartContainerNode.childNodes().getAt(2)
+        treeMap.attributes['id'] == identifier
+        tooltipTreemap.attributes['id'] == "tooltipTreemap"
         zeroWeigthSpan.attributes['id'] == "zeroWeightSpan"
     }
 
