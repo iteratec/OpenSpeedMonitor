@@ -78,23 +78,6 @@ class BrowserController {
         }
     }
 
-    def delete(Browser browser) {
-
-        if (browser == null) {
-            notFound()
-            return
-        }
-
-        try {
-            browser.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'browser.label', default: 'Browser'), params.id])
-            redirect(action: "index")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'browser.label', default: 'Browser'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
     def updateTable(){
         params.order = params.order ? params.order : "desc"
         params.sort = params.sort ? params.sort : "name"

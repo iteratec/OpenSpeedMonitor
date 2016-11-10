@@ -147,36 +147,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         }
     }
 
-    void "test delete browser"() {
-        given: "user is at detail page of browser"
-        go "/browser/show/" + browserId
-        at BrowserShowPage
-
-        when: "user clicks delete button"
-        deleteButton.click()
-        waitFor(5.0) {
-            deleteConfirmationDialog.isDisplayed()
-        }
-
-        then: "a modal confirmation dialog is show"
-        deleteConfirmationDialog.isDisplayed()
-
-        when: "user confirms"
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-        waitFor(10.0) {
-            at BrowserIndexPage
-        }
-
-        then: "user gets to index page"
-        successDiv.isDisplayed()
-        successDivText.contains(browserId.toString())
-    }
-
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 browsers"
@@ -195,51 +165,7 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         cleanup:
         deleteBrowsers(browserIDs)
     }
-
-    @IgnoreIf(IgnoreGebLiveTest)
-    void "test deleting browser impossible caused by foreignKey constraint"() {
-        given: "a browser"
-        Browser browser
-        Browser.withNewTransaction {
-            browser = TestDataUtil.createBrowser("a geb test browser foreign key", 2.0)
-        }
-
-        and: "a browserConnectivityWeight using this browser"
-        ConnectivityProfile connectivityProfile
-        BrowserConnectivityWeight browserConnectivityWeight
-        ConnectivityProfile.withNewTransaction {
-            connectivityProfile = TestDataUtil.createConnectivityProfile("connectivity profile")
-            browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2.0)
-        }
-
-        when: "user tries to delete browser"
-        go "/browser/show/" + browser.id
-        at BrowserShowPage
-        deleteButton.click()
-        waitFor {
-            deleteConfirmationDialog.isDisplayed()
-        }
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-
-        then: "an error message is shown"
-        waitFor {
-            alertDivText.contains("could not be deleted")
-        }
-
-        cleanup:
-        Browser.withNewTransaction {
-            browserConnectivityWeight.delete(flush: true, failOnError: true)
-            connectivityProfile.delete(flush: true, failOnError: true)
-            browser.delete(flush: true, failOnError: true)
-        }
-
-    }
-
+    
     private List<Long> createManyBrowsers(int count) {
         List<Long> browserIDs = []
 

@@ -80,24 +80,6 @@ class MeasuredEventController {
         }
     }
 
-    def delete(MeasuredEvent measuredEvent) {
-
-        if (measuredEvent == null) {
-            notFound()
-            return
-        }
-
-        try {
-            measuredEvent.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'measuredEvent.label', default: 'MeasuredEvent'), params.id])
-            redirect(action: "index")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'measuredEvent.label', default: 'MeasuredEvent'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
-
     def updateTable(){
         params.order = params.order ? params.order : "desc"
         params.sort = params.sort ? params.sort : "name"

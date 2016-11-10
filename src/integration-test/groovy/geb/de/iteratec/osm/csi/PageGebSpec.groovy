@@ -135,34 +135,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         name == newPageName
     }
 
-    void "test delete page"() {
-        given: "user is at detail page of page"
-        go "/page/show/" + pageId
-        waitFor {at PageShowPage}
-
-        when: "user clicks delete button"
-        deleteButton.click()
-        waitFor(5.0) {
-            deleteConfirmationDialog.isDisplayed()
-        }
-
-        then: "a modal confirmation dialog is show"
-        deleteConfirmationDialog.isDisplayed()
-
-        when: "user confirms"
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-
-        then: "user gets to index page"
-        waitFor {
-            at PageIndexPage
-        }
-    }
-
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 pages"
@@ -181,48 +153,7 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         cleanup:
         deletePages(pageIDs)
     }
-
-    @IgnoreIf(IgnoreGebLiveTest)
-    void "test deleting page impossible caused by foreignKey constraint"() {
-        given: "a page"
-        Page testPage
-        Page.withNewTransaction {
-            testPage = TestDataUtil.createPage("a geb test page foreign key", 2.0)
-        }
-
-        and: "a pageWeight using this page"
-        PageWeight pageWeight
-        PageWeight.withNewTransaction {
-            pageWeight = TestDataUtil.createPageWeight(testPage, 2.0)
-        }
-
-        when: "user tries to delete page"
-        go "/page/show/" + testPage.id
-        at PageShowPage
-        deleteButton.click()
-        waitFor {
-            deleteConfirmationDialog.isDisplayed()
-        }
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-
-        then: "an error message is shown"
-        waitFor {
-            alertDivText.contains("could not be deleted")
-        }
-
-        cleanup:
-        Page.withNewTransaction {
-            pageWeight.delete(flush: true, failOnError: true)
-            testPage.delete(flush: true, failOnError: true)
-        }
-
-    }
-
+    
     private List<Long> createManyPages(int count) {
         List<Long> pageIDs = []
 

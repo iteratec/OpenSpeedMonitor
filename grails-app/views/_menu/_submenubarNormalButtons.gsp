@@ -2,7 +2,7 @@
        value="${message(code: params.controller + '.label', default: params.controller.substring(0, 1).toUpperCase() + params.controller.substring(1).toLowerCase())}"/>
 
 <li class="${params.action == "list" ? 'active' : ''}">
-    <g:link action="list"><i class="fa fa-th-list"></i> <g:message code="default.list.label"
+    <g:link action="index"><i class="fa fa-th-list"></i> <g:message code="default.list.label"
                                                                    args="[entityName]"/></g:link>
 </li>
 <li class="${params.action == "create" ? 'active' : ''}">

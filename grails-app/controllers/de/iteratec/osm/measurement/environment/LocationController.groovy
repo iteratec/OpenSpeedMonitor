@@ -77,24 +77,6 @@ class LocationController {
         }
     }
 
-    def delete(Location location) {
-
-        if (location == null) {
-            notFound()
-            return
-        }
-
-        try {
-            location.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
-            redirect(action: "index")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
-
     def updateTable(){
         params.order = params.order ? params.order : "desc"
         params.sort = params.sort ? params.sort : "label"

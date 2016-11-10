@@ -151,23 +151,4 @@ class PageController {
         response.getOutputStream().flush()
 
     }
-    
-    def delete() {
-        def pageInstance = Page.get(params.id)
-        if (!pageInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'page.label', default: 'Page'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            pageInstance.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'page.label', default: 'Page'), params.id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'page.label', default: 'Page'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
 }
