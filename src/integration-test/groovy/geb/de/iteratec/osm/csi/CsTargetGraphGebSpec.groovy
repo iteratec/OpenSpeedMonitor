@@ -18,7 +18,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 /**
- * Tests the CRUD View of @link{de.iteratec.osm.csi.CsTargetGraph}* Most TestCases can't be run agains liveInstance beacause there have to be some CsTargetValues
+ * Tests the CRUD View of {@link de.iteratec.osm.csi.CsTargetGraph}* Most TestCases can't be run agains liveInstance beacause there have to be some CsTargetValues
  */
 @Integration
 @Rollback

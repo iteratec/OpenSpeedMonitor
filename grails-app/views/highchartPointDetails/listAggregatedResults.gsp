@@ -55,7 +55,11 @@
 			<g:form method="GET">
 				<g:hiddenField name="from" value="${params.from}" />
 				<g:hiddenField name="to" value="${params.to}" />
-				<g:hiddenField name="tag" value="${params.tag}" />
+				<g:hiddenField name="jobGroup" value="${params.jobGroup}" />
+				<g:hiddenField name="measuredEvent" value="${params.measuredEvent}" />
+				<g:hiddenField name="page" value="${params.page}" />
+				<g:hiddenField name="browser" value="${params.browser}" />
+				<g:hiddenField name="location" value="${params.location}" />
 				<g:hiddenField name="aggregatorTypeName"
 					value="${params.aggregatorTypeName}" />
 				<g:hiddenField name="lastKnownCountOfAggregatedResultsOrNull"

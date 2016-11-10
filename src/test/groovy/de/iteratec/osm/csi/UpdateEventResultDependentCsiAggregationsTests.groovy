@@ -29,14 +29,9 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.ConnectivityProfileService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.*
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.CsiValueService
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -90,7 +85,7 @@ class UpdateEventResultDependentCsiAggregationsTests {
     }
 
     void setUp() {
-        Job.metaClass.static.performQuartzScheduling << {Boolean active ->
+        Job.metaClass.static.performQuartzScheduling << { Boolean active ->
 
         }
 
@@ -102,21 +97,7 @@ class UpdateEventResultDependentCsiAggregationsTests {
         mockGenerator.mockOsmConfigCacheService(serviceUnderTest)
         mockGenerator.mockEventResultService(serviceUnderTest)
         mockGenerator.mockJobResultDaoService(serviceUnderTest)
-        mockGenerator.mockBrowserService(serviceUnderTest)
         mockGenerator.mockCsiAggregationUpdateEventDaoService(serviceUnderTest)
-        Map idAsStringToJobGroupMap_irrelevantCauseNotUsedInTheseTests = [:]
-        Map idAsStringToMeasuredEventMap_irrelevantCauseNotUsedInTheseTests = [:]
-        Map idAsStringToPageMap_irrelevantCauseNotUsedInTheseTests = [:]
-        Map idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests = [:]
-        Map idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests = [:]
-        mockGenerator.mockCsiAggregationTagService(
-                serviceUnderTest,
-                idAsStringToJobGroupMap_irrelevantCauseNotUsedInTheseTests,
-                idAsStringToMeasuredEventMap_irrelevantCauseNotUsedInTheseTests,
-                idAsStringToPageMap_irrelevantCauseNotUsedInTheseTests,
-                idAsStringToBrowserMap_irrelevantCauseNotUsedInTheseTests,
-                idAsStringToLocationMap_irrelevantCauseNotUsedInTheseTests
-        )
         serviceUnderTest.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
         serviceUnderTest.csiValueService.osmConfigCacheService = grailsApplication.mainContext.getBean('osmConfigCacheService')
         serviceUnderTest.csiValueService.osmConfigCacheService.configService = grailsApplication.mainContext.getBean('configService')
@@ -139,11 +120,11 @@ class UpdateEventResultDependentCsiAggregationsTests {
 
         //create test-specific data
         JobResult run = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
-        EventResult result1 = createNewResult(run, 50, null, '1;1;1;1;1')
-        EventResult result2 = createNewResult(run, 60, 60, '1;1;1;1;1')
-        EventResult result3 = createNewResult(run, 70, 70, '1;1;1;1;1')
-        EventResult result4 = createNewResult(run, 80, 80, '1;1;1;1;1')
-        EventResult result5 = createNewResult(run, 90, 90, '1;1;1;1;1')
+        EventResult result1 = createNewResult(run, 50, null, JobGroup.findByName(group1Name))
+        EventResult result2 = createNewResult(run, 60, 60, JobGroup.findByName(group1Name))
+        EventResult result3 = createNewResult(run, 70, 70, JobGroup.findByName(group1Name))
+        EventResult result4 = createNewResult(run, 80, 80, JobGroup.findByName(group1Name))
+        EventResult result5 = createNewResult(run, 90, 90, JobGroup.findByName(group1Name))
 
         mockGenerator.mockOsmConfigCacheService(result1)
         mockGenerator.mockOsmConfigCacheService(result2)
@@ -191,11 +172,11 @@ class UpdateEventResultDependentCsiAggregationsTests {
         JobGroup group2 = JobGroup.findByName(group2Name)
         Long jobGroup1Id = group1.ident()
         Long jobGroup2Id = group2.ident()
-        EventResult result1OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 80, null, "${jobGroup1Id};1;1;1;1")
-        EventResult result2OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 90, 90, "${jobGroup1Id};1;1;1;1")
-        EventResult result1OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 10, 10, "${jobGroup2Id};1;1;1;1")
-        EventResult result2OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 20, 20, "${jobGroup2Id};1;1;1;1")
-        EventResult result3OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 30, 30, "${jobGroup2Id};1;1;1;1")
+        EventResult result1OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 80, null, group1)
+        EventResult result2OfCsiGroup1 = createNewResult(runOfJobOfCsiGroup1, 90, 90, group1)
+        EventResult result1OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 10, 10, group2)
+        EventResult result2OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 20, 20, group2)
+        EventResult result3OfCsiGroup2 = createNewResult(runOfJobOfCsiGroup2, 30, 30, group2)
 
         //execute test
         serviceUnderTest.createOrUpdateHourlyValue(resultsExecutionTime, result1OfCsiGroup1)
@@ -210,11 +191,11 @@ class UpdateEventResultDependentCsiAggregationsTests {
         Integer countEvents = 2
         assertEquals(countEvents, hourlyMvs.size())
 
-        List<CsiAggregation> hourlyMvsOfGroup1 = hourlyMvs.findAll { it.tag ==~ /${jobGroup1Id};\d+;\d+;\d+;\d+/ }
+        List<CsiAggregation> hourlyMvsOfGroup1 = hourlyMvs.findAll { it.jobGroupId == jobGroup1Id }
         assertEquals(1, hourlyMvsOfGroup1.size())
         proofHourlyCsiAggregation(hourlyMvsOfGroup1[0], true, 2, 85, 45)
 
-        List<CsiAggregation> hourlyMvsOfGroup2 = hourlyMvs.findAll { it.tag ==~ /${jobGroup2Id};\d+;\d+;\d+;\d+/ }
+        List<CsiAggregation> hourlyMvsOfGroup2 = hourlyMvs.findAll { it.jobGroupId == jobGroup2Id }
         assertEquals(1, hourlyMvsOfGroup2.size())
         proofHourlyCsiAggregation(hourlyMvsOfGroup2[0], true, 3, 20, 20)
 
@@ -258,8 +239,9 @@ class UpdateEventResultDependentCsiAggregationsTests {
      * @param csByDocComplete
      * @return
      */
-    private EventResult createNewResult(JobResult jobResult, Integer csByDocComplete, Integer csByVisuallyComplete, String resultTag) {
+    private EventResult createNewResult(JobResult jobResult, Integer csByDocComplete, Integer csByVisuallyComplete, JobGroup jobGroup) {
         MeasuredEvent event = MeasuredEvent.findByName(measuredEventName)
+        Browser browser = Browser.findByName(browserName)
         EventResult returnValue = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -284,12 +266,15 @@ class UpdateEventResultDependentCsiAggregationsTests {
                 jobResult: jobResult,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: jobResult.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: event,
+                page: event.testedPage,
+                browser: browser,
+                location: jobResult.job.location,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: connectivityProfile,
                 customConnectivityName: null,
-                noTrafficShapingAtAll: false,
-                tag: resultTag).save(failOnError: true)
+                noTrafficShapingAtAll: false).save(failOnError: true)
 
         jobResult.save(failOnError: true)
         mockGenerator.mockOsmConfigCacheService(returnValue)

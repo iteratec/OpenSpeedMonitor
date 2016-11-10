@@ -142,7 +142,6 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
         browserService(BrowserService)
         csiAggregationUpdateService(CsiAggregationUpdateService)
         pageService(PageService)
-        csiAggregationTagService(CsiAggregationTagService)
         csiValueService(CsiValueService)
         jobDaoService(JobDaoService)
     }
@@ -218,8 +217,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        mockProxyService(xmlResult.responseNode.data.location.toString())
+                mockProxyService(xmlResult.responseNode.data.location.toString())
 
         deleteAllRelevantDomains() // No Locations left!
 
@@ -245,8 +243,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
+                deleteAllRelevantDomains()
 
         //test execution
 
@@ -275,8 +272,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-        deleteAllRelevantDomains()
+                deleteAllRelevantDomains()
 
         //test execution
 
@@ -413,8 +409,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
-    }
+       }
 
     private void createLocationIfNotExistent(String locationIdentifier, Browser browser, WebPageTestServer server) {
         Location alreadyExistent = Location.findByWptServerAndUniqueIdentifierForServer(server, locationIdentifier)
@@ -466,23 +461,6 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
                     stepName
         }
         serviceUnderTest.pageService = pageServiceMocked
-    }
-
-    private void mockCsiAggregationTagService(String tagToReturn) {
-        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
-        csiAggregationTagService.metaClass.createEventResultTag = {
-            JobGroup jobGroup,
-            MeasuredEvent measuredEvent,
-            Page page,
-            Browser browser,
-            Location location ->
-                return tagToReturn
-        }
-        csiAggregationTagService.metaClass.findJobGroupOfEventResultTag = {
-            String tag ->
-                return undefinedJobGroup
-        }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
 
     private void mockMetricReportingService() {

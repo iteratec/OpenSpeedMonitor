@@ -112,8 +112,6 @@ if (Environment.isDevelopmentMode() && targetDir) {
     }
     appenders << "CONSOLE"
 
-
-
     appender("osmAppender", RollingFileAppender) {
         file = "logs/OpenSpeedMonitor.log"
         append = true
@@ -131,6 +129,21 @@ if (Environment.isDevelopmentMode() && targetDir) {
     }
     appenders << "osmAppender"
 
+    appender("osmHibernateStatsAppender", RollingFileAppender) {
+        file = "logs/OpenSpeedMonitorHibernateStats.log"
+        append = true
+        rollingPolicy(TimeBasedRollingPolicy) {
+            FileNamePattern = "logs/OpenSpeedMonitorHibernateStats-%d{yyyy-MM-dd}.zip"
+        }
+        encoder(PatternLayoutEncoder) {
+            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
+        }
+        filter(ThresholdFilter) {
+            level = DEBUG
+        }
+
+    }
+    appenders << "osmHibernateStatsAppender"
 
     appender("osmAppenderDetails", RollingFileAppender) {
         file = "logs/OpenSpeedMonitorDetails.log"
@@ -168,6 +181,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
     logger("grails.app.jobs.de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
     // other packages
     logger("liquibase", ALL,["asyncOsmAppenderDetails"], false)
+    logger("com.p6spy", ALL,["asyncOsmAppenderDetails"], false)
     logger("grails.app", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.grails.commons", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.grails.web.mapping", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
@@ -184,8 +198,11 @@ if (Environment.isDevelopmentMode() && targetDir) {
     logger("org.grails.orm.hibernate", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.hibernate.SQL", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.hibernate.transaction", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    root(DEBUG, appenders)
 
+    logger('grails.app.controllers.org.grails.plugins.LogHibernateStatsInterceptor', DEBUG, ['osmHibernateStatsAppender'], false)
+    logger('org.hibernate.stat', DEBUG, ['osmHibernateStatsAppender'], false)
+
+    root(DEBUG, appenders)
 }
 if (Environment.getCurrent() == Environment.TEST && targetDir) {
     appender('CONSOLE', ConsoleAppender) {

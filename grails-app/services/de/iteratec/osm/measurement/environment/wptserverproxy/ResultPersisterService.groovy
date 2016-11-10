@@ -21,7 +21,6 @@ import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
@@ -51,11 +50,9 @@ class ResultPersisterService implements iResultListener {
 
     private boolean callListenerAsync = false
 
-    BrowserService browserService
     CsiAggregationUpdateService csiAggregationUpdateService
     TimeToCsMappingService timeToCsMappingService
     PageService pageService
-    CsiAggregationTagService csiAggregationTagService
     ProxyService proxyService
     MetricReportingService metricReportingService
     PerformanceLoggingService performanceLoggingService
@@ -367,7 +364,13 @@ class ResultPersisterService implements iResultListener {
         result.jobResult = jobRun
         result.jobResultDate = jobRun.date
         result.jobResultJobConfigId = jobRun.job.ident()
-        setSpeedIndex(jobRun, step, result, viewTag)
+        JobGroup csiGroup = jobRun.job.jobGroup ?: JobGroup.findByName(JobGroup.UNDEFINED_CSI)
+        result.jobGroup = csiGroup
+        result.measuredEvent = step
+        result.page = step.testedPage
+        result.browser = jobRun.job.location.browser
+        result.location = jobRun.job.location
+        setSpeedIndex(result, viewTag)
         setVisuallyCompleteTime(viewTag, result)
         setWaterfallUrl(result, jobRun, waterfallAnchor)
         setCustomerSatisfaction(step, result, docCompleteTime)
@@ -426,9 +429,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    private void setSpeedIndex(JobResult jobRun, MeasuredEvent step, EventResult result, GPathResult viewTag) {
-        JobGroup csiGroup = jobRun.job.jobGroup ?: JobGroup.findByName(JobGroup.UNDEFINED_CSI)
-        result.tag = csiAggregationTagService.createEventResultTag(csiGroup, step, step.testedPage, jobRun.job.location.browser, jobRun.job.location)
+    private void setSpeedIndex(EventResult result, GPathResult viewTag) {
         if (!viewTag.SpeedIndex.isEmpty() && viewTag.SpeedIndex.toString().isInteger() && viewTag.SpeedIndex.toInteger() > 0) {
             result.speedIndex = viewTag.SpeedIndex.toInteger()
         } else {

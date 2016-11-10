@@ -17,14 +17,14 @@
 
 package de.iteratec.osm.result
 
+import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
+import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.result.dao.EventResultDaoService
-import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
 import de.iteratec.osm.util.I18nService
+import de.iteratec.osm.util.PerformanceLoggingService
 
 /**
  * Calculates {@link de.iteratec.osm.report.chart.CsiAggregation}s for EventResults.
@@ -37,7 +37,6 @@ class ResultCsiAggregationService {
     JobResultDaoService jobResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
     BrowserDaoService browserDaoService
-    CsiAggregationTagService csiAggregationTagService
     CsiAggregationDaoService csiAggregationDaoService
     EventResultDaoService eventResultDaoService
     PerformanceLoggingService performanceLoggingService

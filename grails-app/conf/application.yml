@@ -5,6 +5,7 @@ hibernate:
         use_second_level_cache: true
         use_query_cache: false
         region.factory_class: 'org.hibernate.cache.ehcache.EhCacheRegionFactory'
+    generate_statistics: true
 
 dataSource:
     pooled: true
@@ -33,6 +34,8 @@ environments:
                 bundle: true
         dataSource:
             url: jdbc:h2:mem:devaDb;MVCC=TRUE;LOCK_TIMEOUT=10000
+        logHibernateStats:
+            enabled: 'ALWAYS' # From ALWAYS, ALLOWED, NEVER
     test:
         grails:
             logging:
@@ -314,11 +317,20 @@ grails:
         locales:
             - en
             - de
-
+    cache:
+        enabled: true
+        config:
+            defaultCache:
+                maxElementsInMemory: 10000
+                eternal: false
+                timeToIdleSeconds: 120
+                timeToLiveSeconds: 120
+                overflowToDisk: true
+                maxElementsOnDisk: 10000000
+                diskPersistent: false
+                diskExpiryThreadIntervalSeconds: 120
+                memoryStoreEvictionPolicy: 'LRU'
 
 endpoints:
     jmx:
         unique-names: true
-beans:
-    cacheManager:
-        shared: true

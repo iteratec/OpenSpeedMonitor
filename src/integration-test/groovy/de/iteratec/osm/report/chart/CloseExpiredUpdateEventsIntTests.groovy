@@ -73,7 +73,7 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     def setup() {
 
-        CsiAggregation.withNewTransaction {
+        CsiAggregation.withNewSession {
             mocksCommonToAllTests()
 
             createTestdataCommonToAllTests()
@@ -83,167 +83,197 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Outdated daily page CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
         CsiAggregation.withNewTransaction {
-
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
+            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
+            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "They are closed programmatically"
         CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
 
         then: "OUTDATED update events get deleted and csi aggregations got closed and calculated"
-        CsiAggregationUpdateEvent.list().size() == 0
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
-        csiAggregations.size() == 2
-        csiAggregations.every {
-            it.closedAndCalculated &&
-                    it.isCalculatedWithoutData()
+        CsiAggregation.withNewTransaction {
+            List<CsiAggregation> csiAggregations = CsiAggregation.list()
+            CsiAggregationUpdateEvent.list().size() == 0
+            csiAggregations.size() == 2
+            csiAggregations.every {
+                it.closedAndCalculated &&
+                        it.isCalculatedWithoutData()
+            }
         }
-
     }
 
     void "Outdated weekly page CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
+        int csiAggregationCountBefore
+        boolean everyCsiAggClosedAndCalculatedBefore
+        int updateEventCountBefore
+        List<CsiAggregation> csiAggregations
+        List<CsiAggregationUpdateEvent> updateEvents
         CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
-        }
+            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
+            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
 
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
-        List<CsiAggregationUpdateEvent> updateEvents = csiAggregationDaoService.getUpdateEvents(csiAggregations*.ident())
-        int csiAggregationCountBefore = csiAggregations.size()
-        boolean everyCsiAggClosedAndCalculatedBefore = csiAggregations.every {
-            it.closedAndCalculated &&
-                    it.isCalculated()
+            csiAggregations = CsiAggregation.list()
+            updateEvents = csiAggregationDaoService.getUpdateEvents(csiAggregations*.ident())
+            csiAggregationCountBefore = csiAggregations.size()
+            everyCsiAggClosedAndCalculatedBefore = csiAggregations.every {
+                it.closedAndCalculated &&
+                        it.isCalculated()
+            }
+            updateEventCountBefore = updateEvents.size()
         }
-        int updateEventCountBefore = updateEvents.size()
-
         when: "They are closed programmatically"
-        CsiAggregation.withTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewTransaction {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+            updateEvents = csiAggregationDaoService.getUpdateEvents(csiAggregations*.ident())
         }
-        updateEvents = csiAggregationDaoService.getUpdateEvents(csiAggregations*.ident())
-        csiAggregations = CsiAggregation.list()
 
         then: "OUTDATED update events get deleted and csi aggregations got closed and calculated"
-        updateEventCountBefore == 2
-        updateEvents.size() == 0
+        CsiAggregation.withNewTransaction {
+            csiAggregations = CsiAggregation.list()
+            updateEventCountBefore == 2
+            updateEvents.size() == 0
 
-        csiAggregationCountBefore == 2
-        csiAggregations.size() == 2
+            csiAggregationCountBefore == 2
+            csiAggregations.size() == 2
 
-        everyCsiAggClosedAndCalculatedBefore == false
-        csiAggregations.every {
-            it.closedAndCalculated &&
-                    it.isCalculated() &&
-                    it.isCalculatedWithoutData()
+            everyCsiAggClosedAndCalculatedBefore == false
+            csiAggregations.every {
+                it.closedAndCalculated &&
+                        it.isCalculated() &&
+                        it.isCalculatedWithoutData()
+            }
         }
     }
 
     void "Outdated daily JobGroup CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
-        CsiAggregation.withSession {
-            String tag = "${JobGroup.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
-        }
+        List<CsiAggregation> jobGroupCsiAggregations
+        List<CsiAggregation> csiAggregations
+        List<CsiAggregationUpdateEvent> updateEventsOfJobGroupCsiAggregations
+        int updateEventCountBefore
+        int csiAggregationCountBefore
+        boolean everyCsiAggClosedAndCalculatedBefore
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
 
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
-        List<CsiAggregation> jobGroupCsiAggregations = csiAggregations.findAll {
-            it.aggregator.name.equals(AggregatorType.SHOP)
+            csiAggregations = CsiAggregation.list()
+            jobGroupCsiAggregations = csiAggregations.findAll {
+                it.aggregator.name.equals(AggregatorType.SHOP)
+            }
+            csiAggregationCountBefore = jobGroupCsiAggregations.size()
+            everyCsiAggClosedAndCalculatedBefore = jobGroupCsiAggregations.every {
+                it.closedAndCalculated &&
+                        it.isCalculated()
+            }
+            updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
+            updateEventCountBefore = updateEventsOfJobGroupCsiAggregations.size()
         }
-        int csiAggregationCountBefore = jobGroupCsiAggregations.size()
-        boolean everyCsiAggClosedAndCalculatedBefore = jobGroupCsiAggregations.every {
-            it.closedAndCalculated &&
-                    it.isCalculated()
-        }
-        List<CsiAggregationUpdateEvent> updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
-        int updateEventCountBefore = updateEventsOfJobGroupCsiAggregations.size()
 
         when: "They are closed programmatically"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+        }
+        csiAggregations = CsiAggregation.list()
         jobGroupCsiAggregations = csiAggregations.findAll { it.aggregator.name.equals(AggregatorType.SHOP) }
         updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
 
         then: "OUTDATED update events get deleted and csi aggregations got closed and calculated"
         updateEventCountBefore == 2
         updateEventsOfJobGroupCsiAggregations.size() == 0
-
         csiAggregationCountBefore == 2
         jobGroupCsiAggregations.size() == 2
-
         everyCsiAggClosedAndCalculatedBefore == false
-        jobGroupCsiAggregations.every {
-            it.closedAndCalculated &&
-                    it.isCalculated() &&
-                    it.isCalculatedWithoutData()
+
+        CsiAggregation.withNewSession {
+            jobGroupCsiAggregations.every {
+                it.closedAndCalculated &&
+                        it.isCalculated() &&
+                        it.isCalculatedWithoutData()
+            }
         }
     }
 
     void "Closing daily JobGroup CsiAggregations twice leads to closed and calculated page CsiAggregations"() {
         setup: "Create two outdated JobGroup CsiAggregations and no EventResults"
-        String tag = "${JobGroup.list()[0].ident()}"
         int numberOfJobGroupCsiAggregations = 2
-        CsiAggregation.withNewTransaction {
-            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
+        int updateEventCountBefore
+        int pageCsiAggregationCountBefore
+        boolean everyPageCsiAggClosedAndCalculatedBefore
+        List<CsiAggregation> pageCsiAggregations
+        List<CsiAggregationUpdateEvent> updateEventsOfPageCsiAggregations
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(lastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], null)
         }
 
         when: "The JobGroup CsiAggregations are closed programmatically once"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
-        List<CsiAggregation> pageCsiAggregations = CsiAggregation.list().findAll {
-            it.aggregator.name.equals(AggregatorType.PAGE)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+            pageCsiAggregations = CsiAggregation.list().findAll {
+                it.aggregator.name.equals(AggregatorType.PAGE)
+            }
+            pageCsiAggregationCountBefore = pageCsiAggregations.size()
+            everyPageCsiAggClosedAndCalculatedBefore = pageCsiAggregations.every {
+                it.closedAndCalculated
+            }
+            updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
+            updateEventCountBefore = updateEventsOfPageCsiAggregations.size()
         }
-        int pageCsiAggregationCountBefore = pageCsiAggregations.size()
-        boolean everyPageCsiAggClosedAndCalculatedBefore = pageCsiAggregations.every {
-            it.closedAndCalculated
-        }
-        List<CsiAggregationUpdateEvent> updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
-        int updateEventCountBefore = updateEventsOfPageCsiAggregations.size()
 
         and: "Then a second time"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
-        pageCsiAggregations = CsiAggregation.list().findAll { it.aggregator.name.equals(AggregatorType.PAGE) }
-        updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+        }
 
         then: "Page csi aggregations created while closing JobGroup aggregations for the first time are closed and calculated, too."
-        pageCsiAggregationCountBefore == NUMBER_OF_PAGES * numberOfJobGroupCsiAggregations
-        updateEventCountBefore == NUMBER_OF_PAGES * numberOfJobGroupCsiAggregations
-        everyPageCsiAggClosedAndCalculatedBefore == false
+        CsiAggregation.withNewSession {
+            pageCsiAggregations = CsiAggregation.list().findAll { it.aggregator.name.equals(AggregatorType.PAGE) }
+            updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
+            pageCsiAggregationCountBefore == NUMBER_OF_PAGES * numberOfJobGroupCsiAggregations
+            updateEventCountBefore == NUMBER_OF_PAGES * numberOfJobGroupCsiAggregations
+            everyPageCsiAggClosedAndCalculatedBefore == false
 
-        pageCsiAggregations.size() == NUMBER_OF_PAGES * numberOfJobGroupCsiAggregations
-        updateEventsOfPageCsiAggregations.size() == 0
-        pageCsiAggregations.every {
-            it.closedAndCalculated
+            pageCsiAggregations.size() == NUMBER_OF_PAGES * numberOfJobGroupCsiAggregations
+            updateEventsOfPageCsiAggregations.size() == 0
+            pageCsiAggregations.every {
+                it.closedAndCalculated
+            }
         }
     }
 
     void "Outdated weekly JobGroup CsiAggregations get closed and calculated correctly"() {
         setup: "Create two outdated CsiAggregations and no EventResults"
-        CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
-        }
+        int csiAggregationCountBefore
+        int updateEventCountBefore
+        boolean everyCsiAggClosedAndCalculatedBefore
+        List<CsiAggregation> csiAggregations
+        List<CsiAggregation> jobGroupCsiAggregations
+        List<CsiAggregationUpdateEvent> updateEventsOfJobGroupCsiAggregations
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
 
-        List<CsiAggregation> csiAggregations = CsiAggregation.list()
-        List<CsiAggregation> jobGroupCsiAggregations = csiAggregations.findAll {
-            it.aggregator.name.equals(AggregatorType.SHOP)
+            csiAggregations = CsiAggregation.list()
+            jobGroupCsiAggregations = csiAggregations.findAll {
+                it.aggregator.name.equals(AggregatorType.SHOP)
+            }
+            csiAggregationCountBefore = jobGroupCsiAggregations.size()
+            everyCsiAggClosedAndCalculatedBefore = jobGroupCsiAggregations.every {
+                it.closedAndCalculated &&
+                        it.isCalculated()
+            }
+            updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
+            updateEventCountBefore = updateEventsOfJobGroupCsiAggregations.size()
         }
-        int csiAggregationCountBefore = jobGroupCsiAggregations.size()
-        boolean everyCsiAggClosedAndCalculatedBefore = jobGroupCsiAggregations.every {
-            it.closedAndCalculated &&
-                    it.isCalculated()
-        }
-        List<CsiAggregationUpdateEvent> updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
-        int updateEventCountBefore = updateEventsOfJobGroupCsiAggregations.size()
 
         when: "They are closed programmatically"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+        }
         csiAggregations = CsiAggregation.list()
         jobGroupCsiAggregations = csiAggregations.findAll { it.aggregator.name.equals(AggregatorType.SHOP) }
         updateEventsOfJobGroupCsiAggregations = csiAggregationDaoService.getUpdateEvents(jobGroupCsiAggregations*.ident())
@@ -266,26 +296,35 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
     void "Closing weekly JobGroup CsiAggregations twice leads to closed and calculated page CsiAggregations"() {
         setup: "Create two outdated JobGroup CsiAggregations and no EventResults"
         int numberOfJobGroupCsiAggregations = 2
-        CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
-            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
+        boolean everyPageCsiAggClosedAndCalculatedBefore
+        int pageCsiAggregationCountBefore
+        int updateEventCountBefore
+        List<CsiAggregation> pageCsiAggregations
+        List<CsiAggregationUpdateEvent> updateEventsOfPageCsiAggregations
+
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(lastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
+            createCsiAggregationsWithUpdateEventOutdated(secondLastWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], null)
         }
 
         when: "The JobGroup CsiAggregations are closed programmatically once"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
-        List<CsiAggregation> pageCsiAggregations = CsiAggregation.list().findAll {
-            it.aggregator.name.equals(AggregatorType.PAGE)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+            pageCsiAggregations = CsiAggregation.list().findAll {
+                it.aggregator.name.equals(AggregatorType.PAGE)
+            }
+            pageCsiAggregationCountBefore = pageCsiAggregations.size()
+            everyPageCsiAggClosedAndCalculatedBefore = pageCsiAggregations.every {
+                it.closedAndCalculated
+            }
+            updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
+            updateEventCountBefore = updateEventsOfPageCsiAggregations.size()
         }
-        int pageCsiAggregationCountBefore = pageCsiAggregations.size()
-        boolean everyPageCsiAggClosedAndCalculatedBefore = pageCsiAggregations.every {
-            it.closedAndCalculated
-        }
-        List<CsiAggregationUpdateEvent> updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
-        int updateEventCountBefore = updateEventsOfPageCsiAggregations.size()
 
         and: "Then a second time"
-        csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
+        }
         pageCsiAggregations = CsiAggregation.list().findAll { it.aggregator.name.equals(AggregatorType.PAGE) }
         updateEventsOfPageCsiAggregations = csiAggregationDaoService.getUpdateEvents(pageCsiAggregations*.ident())
 
@@ -304,14 +343,13 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     void "Daily page CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create daily page CsiAggregation younger expire time"
-        CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, pageAggregator, false, tag)
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
-        CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -326,14 +364,13 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     void "Weekly page CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create weekly page CsiAggregation younger expire time"
-        CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, pageAggregator, false, tag)
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, pageAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
-        CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -348,14 +385,13 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     void "Daily JobGroup CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create daily JobGroup CsiAggregation younger expire time"
-        CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, shopAggregator, false, tag)
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(actualDayStart.toDate(), dailyInterval, shopAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
-        CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -370,14 +406,13 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
 
     void "Weekly JobGroup CsiAggregation younger expire time shouldn't be closed"() {
         setup: "Create weekly JobGroup CsiAggregation younger expire time"
-        CsiAggregation.withNewTransaction {
-            String tag = "${JobGroup.list()[0].ident()};${Page.list()[0].ident()}"
-            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, shopAggregator, false, tag)
+        CsiAggregation.withNewSession {
+            createCsiAggregationsWithUpdateEventOutdated(actualWeekStart.toDate(), weeklyInterval, shopAggregator, false, JobGroup.list()[0], Page.list()[0])
         }
 
         when: "CsiAggregations get closed with expire time > date of created CsiAggregation"
-        CsiAggregation.withNewTransaction {
-            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300)
+        CsiAggregation.withNewSession {
+            csiAggregationUpdateEventCleanupService.closeCsiAggregationsExpiredForAtLeast(300, false)
         }
         List<CsiAggregation> csiAggregations = CsiAggregation.list()
 
@@ -390,13 +425,14 @@ class CloseExpiredUpdateEventsIntTests extends NonTransactionalIntegrationSpec {
         CsiAggregationUpdateEvent.list().size() == 1
     }
 
-    private void createCsiAggregationsWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, String tag) {
+    private void createCsiAggregationsWithUpdateEventOutdated(Date started, CsiAggregationInterval interval, AggregatorType aggregator, boolean closed, JobGroup jobGroup, Page page) {
         String resultIdsIrrelevantInTheseTests = '1,2,3'
         CsiAggregation mv = TestDataUtil.createCsiAggregation(
                 started,
                 interval,
                 aggregator,
-                tag,
+                jobGroup,
+                page,
                 null,
                 resultIdsIrrelevantInTheseTests,
                 closed

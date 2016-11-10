@@ -20,7 +20,6 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.CsiAggregationTagService
 import grails.transaction.Transactional
 import org.joda.time.DateTime
 
@@ -30,19 +29,18 @@ import org.joda.time.DateTime
  */
 @Transactional
 class CachingContainerService {
-    CsiAggregationTagService csiAggregationTagService
     PageCsiAggregationService pageCsiAggregationService
 
     CsiAggregationCachingContainer createContainerFor(CsiAggregation mv, Map<Long, JobGroup> cachedJobGroups, Map<Long, Page> cachedPages, Map<String, List<CsiAggregation>> hemvs) {
         return new CsiAggregationCachingContainer(
-                csiGroupToCalcCsiAggregationFor: cachedJobGroups[csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyPageTag(mv.tag)],
-                pageToCalcCsiAggregationFor: cachedPages[csiAggregationTagService.getPageIdFromWeeklyOrDailyPageTag(mv.tag)],
+                csiGroupToCalcCsiAggregationFor: cachedJobGroups[mv.jobGroup.ident()],
+                pageToCalcCsiAggregationFor: cachedPages[mv.page.ident()],
                 hCsiAggregationsByCsiGroupPageCombination: hemvs)
     }
 
     Map<String, Map<String, List<CsiAggregation>>> getDailyHeCsiAggregationMapByStartDate(List<CsiAggregation> dailyPageCsiAggregationsToCalculate,
                                                                                           Map<String, List<JobGroup>> dailyJobGroupsByStartDate, Map<String, List<Page>> dailyPagesByStartDate) {
-        Map<String, Map<String, List<CsiAggregation>>> result = [:].withDefault {[:]}
+        Map<String, Map<String, List<CsiAggregation>>> result = [:].withDefault { [:] }
 
         dailyPageCsiAggregationsToCalculate*.started.unique().each { Date uniqueStartDate ->
 
@@ -65,7 +63,7 @@ class CachingContainerService {
         Map<String, List<JobGroup>> result = [:].withDefault { key -> [] }
 
         dailyPageMvsToCalculate.each { dpmv ->
-            Long jobGroupID = csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyPageTag(dpmv.tag)
+            Long jobGroupID = dpmv.jobGroup.ident()
 
             JobGroup jobGroup = cachedJobGroups[jobGroupID]
 
@@ -79,7 +77,7 @@ class CachingContainerService {
         Map<String, List<Page>> result = [:].withDefault { key -> [] }
 
         dailyPageMvsToCalculate.each { dpmv ->
-            Long pageID = csiAggregationTagService.getPageIdFromWeeklyOrDailyPageTag(dpmv.tag)
+            Long pageID = dpmv.page.ident()
 
             Page page = cachedPages[pageID]
 
@@ -93,7 +91,7 @@ class CachingContainerService {
         Map<String, List<JobGroup>> result = [:].withDefault { key -> [] }
         weeklyPageMvsToCalculate.each { wpmv ->
 
-            JobGroup jobGroup = cachedJobGroups[csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyPageTag(wpmv.tag)]
+            JobGroup jobGroup = cachedJobGroups[wpmv.jobGroup.ident()]
 
             result[wpmv.started.toString()].add(jobGroup)
         }
@@ -104,8 +102,7 @@ class CachingContainerService {
     Map<String, List<Page>> getWeeklyPagesByStartDate(List<CsiAggregation> weeklyPageMvsToCalculate, Map<Long, Page> cachedPages) {
         Map<String, List<Page>> result = [:].withDefault { key -> [] }
         weeklyPageMvsToCalculate.each { wpmv ->
-            Page page = cachedPages[csiAggregationTagService.getPageIdFromWeeklyOrDailyPageTag(wpmv.tag)]
-
+            Page page = cachedPages[wpmv.page.ident()]
             result[wpmv.started.toString()].add(page)
         }
         return result

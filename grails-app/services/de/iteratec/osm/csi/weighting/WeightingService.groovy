@@ -22,10 +22,8 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.Contract
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.transaction.Transactional
 import org.joda.time.DateTime
 
 /**
@@ -35,8 +33,6 @@ import org.joda.time.DateTime
  */
 class WeightingService {
 
-
-    CsiAggregationTagService csiAggregationTagService
     CustomerSatisfactionWeightService customerSatisfactionWeightService
     PerformanceLoggingService performanceLoggingService
     CsiValueService csiValueService
@@ -51,7 +47,7 @@ class WeightingService {
     public List<WeightedCsiValue> getWeightedCsiValues(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
         List<CsiValue> csiRelevantValues = csiValues.findAll { csiValueService.isCsiRelevant(it) }
 
-        return getWeightedAndFlattenedCsiValues(csiRelevantValues, weightFactors, csiConfiguration, {CsiValue value -> value.retrieveCsByWptDocCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete()})
+        return getWeightedAndFlattenedCsiValues(csiRelevantValues, weightFactors, csiConfiguration, { CsiValue value -> value.retrieveCsByWptDocCompleteInPercent() }, { CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete() })
     }
 
     /**
@@ -63,7 +59,7 @@ class WeightingService {
     public List<WeightedCsiValue> getWeightedCsiValues(List<CsiValue> csiValues, CsiSystem csiSystem) {
         List<CsiValue> csiRelevantValues = csiValues.findAll { csiValueService.isCsiRelevant(it) }
 
-        return getWeightedAndFlattenedCsiValuesForCsiSystem(csiRelevantValues, csiSystem, {CsiValue value -> value.retrieveCsByWptDocCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete()})
+        return getWeightedAndFlattenedCsiValuesForCsiSystem(csiRelevantValues, csiSystem, { CsiValue value -> value.retrieveCsByWptDocCompleteInPercent() }, { CsiValue value -> value.retrieveUnderlyingEventResultsByDocComplete() })
     }
 
     /**
@@ -77,7 +73,7 @@ class WeightingService {
             it.retrieveCsByWptVisuallyCompleteInPercent() != null && csiValueService.isCsiRelevant(it)
         }
 
-        return getWeightedAndFlattenedCsiValuesForCsiSystem(mvsWithVisuallyCompleteValue, csiSystem, {CsiValue value -> value.retrieveCsByWptVisuallyCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByVisuallyComplete()})
+        return getWeightedAndFlattenedCsiValuesForCsiSystem(mvsWithVisuallyCompleteValue, csiSystem, { CsiValue value -> value.retrieveCsByWptVisuallyCompleteInPercent() }, { CsiValue value -> value.retrieveUnderlyingEventResultsByVisuallyComplete() })
     }
 
     /**
@@ -92,7 +88,7 @@ class WeightingService {
             it.retrieveCsByWptVisuallyCompleteInPercent() != null && csiValueService.isCsiRelevant(it)
         }
 
-        return getWeightedAndFlattenedCsiValues(mvsWithVisuallyCompleteValue, weightFactors, csiConfiguration, {CsiValue value -> value.retrieveCsByWptVisuallyCompleteInPercent()}, {CsiValue value -> value.retrieveUnderlyingEventResultsByVisuallyComplete()})
+        return getWeightedAndFlattenedCsiValues(mvsWithVisuallyCompleteValue, weightFactors, csiConfiguration, { CsiValue value -> value.retrieveCsByWptVisuallyCompleteInPercent() }, { CsiValue value -> value.retrieveUnderlyingEventResultsByVisuallyComplete() })
     }
 
     /**
@@ -100,9 +96,7 @@ class WeightingService {
      * @param csiValues the csiValues
      * @param weightFactors the weightFactors to use
      * @param csiConfiguration the csiConfiguration to use
-     * @param getCsiValueClosure a closure to get the value for a csiValue (ex. {value -> value.retrieveCsiValue()}
-     * @param getUnderlyingEventResultsClosure a closure to get the underlyings event results for a csiValue (ex. {value -> value.retrieveUnderlyingEventResults()}
-     * @return a list of weightedCsiValues
+     * @param getCsiValueClosure a closure to get the value for a csiValue (ex. {value -> value.retrieveCsiValue()}* @param getUnderlyingEventResultsClosure a closure to get the underlyings event results for a csiValue (ex. {value -> value.retrieveUnderlyingEventResults()}* @return a list of weightedCsiValues
      */
     private List<WeightedCsiValue> getWeightedAndFlattenedCsiValues(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration, Closure getCsiValueClosure, Closure getUnderlyingEventResultsClosure) {
         List<WeightedCsiValue> weightedCsiValues = []
@@ -137,9 +131,7 @@ class WeightingService {
      * @param csiValues the csiValues
      * @param weightFactors the weightFactors to use
      * @param csiConfiguration the csiConfiguration to use
-     * @param getCsiValueClosure a closure to get the value for a csiValue (ex. {value -> value.retrieveCsiValue()}
-     * @param getUnderlyingEventResultsClosure a closure to get the underlyings event results for a csiValue (ex. {value -> value.retrieveUnderlyingEventResults()}
-     * @return a list of weightedCsiValues
+     * @param getCsiValueClosure a closure to get the value for a csiValue (ex. {value -> value.retrieveCsiValue()}* @param getUnderlyingEventResultsClosure a closure to get the underlyings event results for a csiValue (ex. {value -> value.retrieveUnderlyingEventResults()}* @return a list of weightedCsiValues
      */
     private List<CsiValue> getWeightedAndFlattenedCsiValuesForCsiSystem(List<CsiValue> csiValues, CsiSystem csiSystem, Closure getCsiValueClosure, Closure getUnderlyingEventresultsClosure) {
         List<WeightedCsiValue> weightedCsiValues = []
@@ -150,7 +142,7 @@ class WeightingService {
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.TWO) {
             csiValues.each { CsiValue csiValue ->
                 value = getCsiValueClosure(csiValue)
-                JobGroup jobGroupOfCsiValue = JobGroup.findById(csiAggregationTagService.getJobGroupIdFromWeeklyOrDailyShopTag(csiValue.retrieveTag()))
+                JobGroup jobGroupOfCsiValue = csiValue.retrieveJobGroup()
                 JobGroupWeight jobGroupWeightOfCsiValue = csiSystem.jobGroupWeights.find {
                     it.jobGroup.id == jobGroupOfCsiValue.id
                 }
@@ -261,13 +253,11 @@ class WeightingService {
 
     private double getPageWeightFrom(CsiValue csiValue, List<PageWeight> pageWeights) {
 
-        Page page = csiValue.retrieveTag().split(';').size() == 5 ?
-                csiAggregationTagService.findPageOfHourlyEventTag(csiValue.retrieveTag()) :
-                csiAggregationTagService.findPageByPageTag(csiValue.retrieveTag())
-        if (page == null || pageWeights.empty) {
+        Page pageOfCsiValue = csiValue.retrievePage()
+        if (pageOfCsiValue == null || pageWeights.empty) {
             return 0
         } else {
-            PageWeight pageWeight = pageWeights.find { it.page == page }
+            PageWeight pageWeight = pageWeights.find { it.page == pageOfCsiValue }
             return pageWeight.weight
         }
 
@@ -286,7 +276,7 @@ class WeightingService {
 
         Browser browser
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.FOUR) {
-            browser = csiAggregationTagService.findBrowserOfHourlyEventTag(csiValue.retrieveTag())
+            browser = csiValue.retrieveBrowser()
         }
         ConnectivityProfile connectivityProfile
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.TRACE, '[getWeight] BCC - get connectivity profile', PerformanceLoggingService.IndentationDepth.FOUR) {
@@ -310,8 +300,7 @@ class WeightingService {
     }
 
     public double getHourOfDayWeight(CsiValue csiValue) {
-        Serializable jobGroupID = csiAggregationTagService.findJobGroupIdOfHourlyEventTag(csiValue.retrieveTag())
-        JobGroup jobGroup = JobGroup.get(jobGroupID)
+        JobGroup jobGroup = csiValue.retrieveJobGroup()
         CsiDay dayForCsiValue = jobGroup.csiConfiguration.csiDay
         int hour = new DateTime(csiValue.retrieveDate()).getHourOfDay()
         Double hourofdayWeight = dayForCsiValue.getHourWeight(hour)

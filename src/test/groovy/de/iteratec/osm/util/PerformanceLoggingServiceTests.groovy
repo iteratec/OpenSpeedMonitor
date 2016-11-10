@@ -35,85 +35,168 @@ import spock.lang.Specification
 @TestFor(PerformanceLoggingService)
 class PerformanceLoggingServiceTests extends Specification {
 
-	Logger serviceLogger
-	PerformanceLoggingService serviceUnderTest
+    Logger serviceLogger
+    PerformanceLoggingService serviceUnderTest
 
-	void setup() {
-		serviceUnderTest = service
-		serviceLogger = (Logger) LoggerFactory.getLogger("grails.app.services.de.iteratec.osm.util.PerformanceLoggingService");
-	}
-
-	/**
-	 * Tests whether {@link PerformanceLoggingService} logs to rootLogger with log-level {@link Level.ERROR}.
-	 */
-    void testLoggingOfExecutionTime() {
-		given: "We get access to the log output"
-		String message
-		Appender appender = addAppender {String m -> message = m}
-		String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
-
-		when: "We set the log level to Info and execute a operation which logs on Fatal"
-		serviceLogger.setLevel(Level.INFO)
-		serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, IndentationDepth.NULL){
-			Thread.sleep(1100)
-		}
-
-		then: "We should receive a log entry"
-		message.contains("Elapsed Sec")
-		message.indexOf(descriptionOfClosureToMeasure) > -1
-		String elapsedInSecondsAsString = message.tokenize().pop()
-		elapsedInSecondsAsString.isDouble()
-		Double.valueOf(elapsedInSecondsAsString)>1
-
-		cleanup: "Remove the Appender"
-		serviceLogger.detachAppender(appender)
+    void setup() {
+        serviceUnderTest = service
+        serviceLogger = (Logger) LoggerFactory.getLogger("grails.app.services.de.iteratec.osm.util.PerformanceLoggingService");
     }
 
-	/**
-	 * Tests whether {@link PerformanceLoggingService} doesn't logs to rootLogger with log-level {@link Level.INFO}.
-	 */
-	void testNoLoggingOfExecutionTimeDueToLogLevel() {
-		given:"We get access to the log output"
-		String message
-		Appender appender = addAppender {
-			String m -> message = m
-		}
-		String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
-
-		when: "We set the log level to Error and execute a operation which logs on Info"
-		serviceLogger.setLevel(Level.ERROR)
-		serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, IndentationDepth.NULL){
-			Thread.sleep(1)
-		}
-
-		then: "We should'nt receive a log entry"
-		message == null
-
-		cleanup: "Remove the Appender"
-		serviceLogger.detachAppender(appender)
-	}
-
-	/**
-	 * Create and adds an Appender to the serviceLogger.
-	 *
-	 * @param c Closure, which ist called when doAppend ist called.{String str -> }
-	 * @return
+    /**
+     * Tests whether {@link PerformanceLoggingService} logs to rootLogger with log-level {@link Level.ERROR}.
      */
-	private Appender addAppender(Closure c){
-		Appender mockAppender = new AppenderBase<ILoggingEvent>() {
-			@Override
-			protected void append(ILoggingEvent eventObject) {
-			}
+    void testLoggingOfExecutionTime() {
+        given: "We get access to the log output"
+        String message
+        Appender appender = addAppender { String m -> message = m }
+        String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
 
-			@Override
-			void doAppend(ILoggingEvent eventObject) {
-				c(eventObject.formattedMessage)
-				super.doAppend(eventObject)
-			}
-		}
-		mockAppender.setContext(serviceLogger.loggerContext)
-		serviceLogger.addAppender(mockAppender);
-		return mockAppender
+        when: "We set the log level to Info and execute a operation which logs on Fatal"
+        serviceLogger.setLevel(Level.INFO)
+        serviceUnderTest.logExecutionTime(LogLevel.FATAL, descriptionOfClosureToMeasure, IndentationDepth.NULL) {
+            Thread.sleep(1100)
+        }
 
-	}
+        then: "We should receive a log entry"
+        message.contains("Elapsed Sec")
+        message.indexOf(descriptionOfClosureToMeasure) > -1
+        String elapsedInSecondsAsString = message.tokenize().pop()
+        elapsedInSecondsAsString.isDouble()
+        Double.valueOf(elapsedInSecondsAsString) > 1
+
+        cleanup: "Remove the Appender"
+        serviceLogger.detachAppender(appender)
+    }
+
+    /**
+     * Tests whether {@link PerformanceLoggingService} doesn't logs to rootLogger with log-level {@link Level.INFO}.
+     */
+    void testNoLoggingOfExecutionTimeDueToLogLevel() {
+        given: "We get access to the log output"
+        String message
+        Appender appender = addAppender {
+            String m -> message = m
+        }
+        String descriptionOfClosureToMeasure = "descriptionOfClosureToMeasure"
+
+        when: "We set the log level to Error and execute a operation which logs on Info"
+        serviceLogger.setLevel(Level.ERROR)
+        serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, IndentationDepth.NULL) {
+            Thread.sleep(1)
+        }
+
+        then: "We should'nt receive a log entry"
+        message == null
+
+        cleanup: "Remove the Appender"
+        serviceLogger.detachAppender(appender)
+    }
+
+    void "logging silent works as expected for multiple loggings with same indentation depths"() {
+        given: "We get access to the log output and reset execution time logging session"
+        serviceLogger.setLevel(Level.DEBUG)
+        String message = ""
+        Appender appender = addAppender {
+            String m -> message += "${m}\n"
+        }
+        String descriptionLevel_1_1 = "descriptionLevel_1_1"
+        String descriptionLevel_1_2 = "descriptionLevel_1_2"
+        String descriptionLevel_1_3 = "descriptionLevel_1_3"
+        serviceUnderTest.resetExecutionTimeLoggingSession()
+
+        when: "We log execution times of nested code blocks"
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, IndentationDepth.ONE) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, IndentationDepth.ONE) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_3, IndentationDepth.ONE) {
+            Thread.sleep(10)
+        }
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
+            Thread.sleep(10)
+        }
+        List<String> loggingSessionDataLines = serviceUnderTest.getExecutionTimeLoggingSessionData(LogLevel.DEBUG).tokenize("\n")
+
+        then: "We should receive sensible logging session data"
+        loggingSessionDataLines.size() == 3
+        loggingSessionDataLines[0].startsWith(" - ${descriptionLevel_1_1}: 2 call(s) -> took")
+        loggingSessionDataLines[1].startsWith(" - ${descriptionLevel_1_2}: 2 call(s) -> took")
+        loggingSessionDataLines[2].startsWith(" - ${descriptionLevel_1_3}: 1 call(s) -> took")
+
+        cleanup: "Remove the Appender"
+        serviceLogger.detachAppender(appender)
+    }
+
+    void "logging silent works as expected for nested loggings with different indentation depths"() {
+        given: "We get access to the log output and reset execution time logging session"
+        serviceLogger.setLevel(Level.DEBUG)
+        String message = ""
+        Appender appender = addAppender {
+            String m -> message += "${m}\n"
+        }
+        String descriptionLevel_1_1 = "descriptionLevel_1"
+        String descriptionLevel_2_1 = "descriptionLevel_1_1"
+        String descriptionLevel_2_2 = "descriptionLevel_1_2"
+        String descriptionLevel_2_3 = "descriptionLevel_1_3"
+        serviceUnderTest.resetExecutionTimeLoggingSession()
+
+        when: "We log execution times of nested code blocks"
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
+            Thread.sleep(10)
+            10.times {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_1, IndentationDepth.TWO) {
+                    Thread.sleep(10)
+                }
+            }
+            10.times {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_2, IndentationDepth.TWO) {
+                    Thread.sleep(10)
+                }
+            }
+            10.times {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_3, IndentationDepth.TWO) {
+                    Thread.sleep(10)
+                }
+            }
+        }
+        List<String> loggingSessionDataLines = serviceUnderTest.getExecutionTimeLoggingSessionData(LogLevel.DEBUG).tokenize("\n")
+
+        then: "We should receive sensible logging session data"
+        loggingSessionDataLines.size() == 4
+        loggingSessionDataLines[0].startsWith(" -- ${descriptionLevel_2_1}: 10 call(s) -> took")
+        loggingSessionDataLines[1].startsWith(" -- ${descriptionLevel_2_2}: 10 call(s) -> took")
+        loggingSessionDataLines[2].startsWith(" -- ${descriptionLevel_2_3}: 10 call(s) -> took")
+        loggingSessionDataLines[3].startsWith(" - ${descriptionLevel_1_1}: 1 call(s) -> took")
+
+        cleanup: "Remove the Appender"
+        serviceLogger.detachAppender(appender)
+    }
+
+    /**
+     * Create and adds an Appender to the serviceLogger.
+     *
+     * @param c Closure, which ist called when doAppend ist called.{String str -> }* @return
+     */
+    private Appender addAppender(Closure c) {
+        Appender mockAppender = new AppenderBase<ILoggingEvent>() {
+            @Override
+            protected void append(ILoggingEvent eventObject) {
+            }
+
+            @Override
+            void doAppend(ILoggingEvent eventObject) {
+                c(eventObject.formattedMessage)
+                super.doAppend(eventObject)
+            }
+        }
+        mockAppender.setContext(serviceLogger.loggerContext)
+        serviceLogger.addAppender(mockAppender);
+        return mockAppender
+    }
 }

@@ -7,11 +7,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.security.User
 import geb.CustomUrlGebReportingSpec
 import geb.IgnoreGebLiveTest
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserAliasCreatePage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserCreatePage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserEditPage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserIndexPage
-import geb.pages.de.iteratec.osm.measurement.environment.BrowserShowPage
+import geb.pages.de.iteratec.osm.measurement.environment.*
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.openqa.selenium.Keys
@@ -21,7 +17,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 /**
- * Tests the CRUD View of @link{de.iteratec.osm.measurement.environment.Browser}*/
+ * Tests the CRUD View of {@link Browser}*/
 @Integration
 @Rollback
 @Stepwise
@@ -147,36 +143,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         }
     }
 
-    void "test delete browser"() {
-        given: "user is at detail page of browser"
-        go "/browser/show/" + browserId
-        at BrowserShowPage
-
-        when: "user clicks delete button"
-        deleteButton.click()
-        waitFor(5.0) {
-            deleteConfirmationDialog.isDisplayed()
-        }
-
-        then: "a modal confirmation dialog is show"
-        deleteConfirmationDialog.isDisplayed()
-
-        when: "user confirms"
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-        waitFor(10.0) {
-            at BrowserIndexPage
-        }
-
-        then: "user gets to index page"
-        successDiv.isDisplayed()
-        successDivText.contains(browserId.toString())
-    }
-
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 browsers"
@@ -194,50 +160,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
 
         cleanup:
         deleteBrowsers(browserIDs)
-    }
-
-    @IgnoreIf(IgnoreGebLiveTest)
-    void "test deleting browser impossible caused by foreignKey constraint"() {
-        given: "a browser"
-        Browser browser
-        Browser.withNewTransaction {
-            browser = TestDataUtil.createBrowser("a geb test browser foreign key")
-        }
-
-        and: "a browserConnectivityWeight using this browser"
-        ConnectivityProfile connectivityProfile
-        BrowserConnectivityWeight browserConnectivityWeight
-        ConnectivityProfile.withNewTransaction {
-            connectivityProfile = TestDataUtil.createConnectivityProfile("connectivity profile")
-            browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2.0)
-        }
-
-        when: "user tries to delete browser"
-        go "/browser/show/" + browser.id
-        at BrowserShowPage
-        deleteButton.click()
-        waitFor {
-            deleteConfirmationDialog.isDisplayed()
-        }
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-
-        then: "an error message is shown"
-        waitFor {
-            alertDivText.contains("could not be deleted")
-        }
-
-        cleanup:
-        Browser.withNewTransaction {
-            browserConnectivityWeight.delete(flush: true, failOnError: true)
-            connectivityProfile.delete(flush: true, failOnError: true)
-            browser.delete(flush: true, failOnError: true)
-        }
-
     }
 
     private List<Long> createManyBrowsers(int count) {

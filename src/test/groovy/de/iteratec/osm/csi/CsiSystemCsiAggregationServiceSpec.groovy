@@ -32,6 +32,7 @@ import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -50,7 +51,7 @@ import spock.lang.Specification
 @TestFor(CsiSystemCsiAggregationService)
 @Mock([MeanCalcService, CsiAggregation, CsiAggregationInterval, AggregatorType, Browser, JobGroup,
         Page, CsiAggregationUpdateEvent, CsiSystem, Job, ConnectivityProfile, JobResult, EventResult, WebPageTestServer,
-        Location, Script, MeasuredEvent, JobGroupWeight, CsiConfiguration, PageWeight, TimeToCsMapping, CsiDay])
+        Location, Script, MeasuredEvent, JobGroupWeight, CsiConfiguration, PageWeight, TimeToCsMapping, CsiDay, PerformanceLoggingService])
 class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     @Shared
@@ -68,7 +69,6 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     Page page1
     Browser browser
 
-    static final double DELTA = 1e-15
     DateTime startDate = new DateTime(2013, 5, 16, 0, 0, 0)
     String jobGroupName1 = 'myJobGroup1'
     String jobGroupName2 = 'myJobGroup2'
@@ -79,10 +79,10 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
     def doWithSpring = {
         csiAggregationUtilService(CsiAggregationUtilService)
         csiAggregationDaoService(CsiAggregationDaoService)
+        performanceLoggingService(PerformanceLoggingService)
     }
 
     void setup() {
-
         serviceUnderTest = service
 
         createTestDataCommonForAllTests()
@@ -137,7 +137,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     /**
      * Tests calculation of daily-CsiSystem{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test one single shop-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-csiSystem-{@link CsiAggregation}.
+     * In this test one single shopAggregator-{@link CsiAggregation}s exists, which should be the database of the calculation of the daily-csiSystem-{@link CsiAggregation}.
      */
     @Test
     void "don't calc daily-Mv if only findAll()"() {
@@ -183,7 +183,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     /**
      * Tests calculation of daily-csiSystem-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test shop-{@link CsiAggregation}s with different weights exist.
+     * In this test shopAggregator-{@link CsiAggregation}s with different weights exist.
      */
     @Test
     void "calc multiple daily-Mv"() {
@@ -222,7 +222,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
     /**
      * Tests calculation of daily-csiSystem-{@link CsiAggregation}s, which aren't calculated when new {@link EventResult}s get persisted.
-     * In this test no shop-{@link CsiAggregation}s exist, which are database of the calculation of daily-csiSystem-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
+     * In this test no shopAggregator-{@link CsiAggregation}s exist, which are database of the calculation of daily-csiSystem-{@link CsiAggregation}s. So all calculated values should have state {@link Calculated#YesNoData}
      */
     @Test
     void "calc multiple daily-Mv, but no value calculated"() {
@@ -264,9 +264,9 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
 
         then:
-        int expectedAfterSize = beforeList.size() + JobGroupWeight.findAllByJobGroup(eventResult.jobResult.job.jobGroup).size()
+        int expectedAfterSize = beforeList.size()
         afterList.size() == expectedAfterSize
-        int expectedAfterEventSize = JobGroupWeight.findAllByJobGroup(eventResult.jobResult.job.jobGroup).size()
+        int expectedAfterEventSize = JobGroupWeight.findAllByJobGroup(eventResult.jobResult.job.jobGroup)*.csiSystem.unique(false).size()
         beforeEventList.empty
         afterEventList.size() == expectedAfterEventSize
 
@@ -302,7 +302,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                         dateOfUpdate: new Date(),
                         csiAggregationId: csiAggregationId,
                         updateCause: cause
-                ).save(failOnError: true)
+                ).save(failOnError: true, flush: true)
 
         }
         serviceUnderTest.csiAggregationUpdateEventDaoService = csiAggregationUpdateEventDaoService.proxyInstance()
@@ -313,7 +313,6 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         serviceUnderTest.csiAggregationDaoService = grailsApplication.mainContext.getBean('csiAggregationDaoService')
 
         Map<String, JobGroup> idAsStringToJobGroupMap = ['1': jobGroup1, '2': jobGroup2, '3': jobGroup3]
-        SERVICE_MOCKER.mockCsiAggregationTagService(serviceUnderTest, idAsStringToJobGroupMap, [:], [:], [:], [:])
 
         SERVICE_MOCKER.mockShopCsiAggregationService(serviceUnderTest, [new CsiAggregation()])
 
@@ -321,16 +320,18 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
 
         mockCsiAggregationUpdateEventDaoService()
 
+        serviceUnderTest.performanceLoggingService = grailsApplication.mainContext.getBean('performanceLoggingService')
+
     }
 
     private void createTestDataCommonForAllTests() {
-        weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true)
-        dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true)
-        hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true)
+        weeklyInterval = new CsiAggregationInterval(name: 'weekly', intervalInMinutes: CsiAggregationInterval.WEEKLY).save(failOnError: true, flush: true)
+        dailyInterval = new CsiAggregationInterval(name: 'daily', intervalInMinutes: CsiAggregationInterval.DAILY).save(failOnError: true, flush: true)
+        hourlyInterval = new CsiAggregationInterval(name: 'hourly', intervalInMinutes: CsiAggregationInterval.HOURLY).save(failOnError: true, flush: true)
 
-        shop = new AggregatorType(name: AggregatorType.SHOP).save(validate: false)
-        csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM).save(validate: false)
-        new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
+        shop = new AggregatorType(name: AggregatorType.SHOP, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
+        csiSystemAggregator = new AggregatorType(name: AggregatorType.CSI_SYSTEM, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
+        new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true, flush: true)
 
         CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration()
 
@@ -347,23 +348,23 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0, csiSystem: csiSystem1))
         csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 1.0, csiSystem: csiSystem1))
         csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup3, weight: 1.0, csiSystem: csiSystem1))
-        csiSystem1.save(failOnError: true)
+        csiSystem1.save(failOnError: true, flush: true)
 
         csiSystem2 = new CsiSystem(label: "system2")
         csiSystem2.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0, csiSystem: csiSystem1))
         csiSystem2.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 2.0, csiSystem: csiSystem1))
         csiSystem2.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup3, weight: 3.0, csiSystem: csiSystem1))
-        csiSystem2.save(failOnError: true)
+        csiSystem2.save(failOnError: true, flush: true)
 
 
     }
 
     private void createCsiAggregations() {
         //with existing JobGroup:
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '1', csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '2', csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, csiSystem: csiSystem1, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, csiSystem: csiSystem2, started: startDate.toDate()).save(validate: false)
         //not with existing CsiSystem:
-        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, tag: '4', csiSystem: null, started: startDate.toDate()).save(validate: false)
+        new CsiAggregation(interval: weeklyInterval, aggregator: csiSystemAggregator, csiSystem: null, started: startDate.toDate()).save(validate: false)
     }
 
     private void createEventResult() {
@@ -374,7 +375,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 proxyIdentifier: 'server 1 - wpt server',
                 dateCreated: new Date(),
                 lastUpdated: new Date()
-        ).save(failOnError: true)
+        ).save(failOnError: true, flush: true)
         Location ffAgent1 = new Location(
                 active: true,
                 valid: 1,
@@ -384,7 +385,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 dateCreated: new Date(),
                 lastUpdated: new Date(),
                 wptServer: server
-        ).save(failOnError: true)
+        ).save(failOnError: true, flush: true)
 
         job1 = TestDataUtil.createJob("job1", TestDataUtil.createScript("script1", "", "auf gehts"), ffAgent1, jobGroup1, "", 1, false, 20)
         conn1 = TestDataUtil.createConnectivityProfile("conn1")
@@ -401,7 +402,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 locationLocation: job1.location.location,
                 locationBrowser: job1.location.browser.name,
                 httpStatusCode: 200,
-        ).save(failOnError: true)
+        ).save(failOnError: true, flush: true)
 
         page1 = TestDataUtil.createPage("page1")
 
@@ -431,11 +432,15 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 jobResult: jobResult1,
                 jobResultDate: startDate.toDate(),
                 jobResultJobConfigId: jobResult1.job.ident(),
+                jobGroup: jobGroup1,
                 measuredEvent: measuredEvent,
+                page: page1,
+                browser: browser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: conn1,
                 customConnectivityName: null,
                 noTrafficShapingAtAll: false
-        ).save(failOnError: true)
+        ).save(failOnError: true, flush: true)
     }
 }

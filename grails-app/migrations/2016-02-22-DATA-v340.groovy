@@ -1,11 +1,4 @@
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.report.chart.CsiAggregationUpdateEvent
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
 import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants
 
 databaseChangeLog = {
 

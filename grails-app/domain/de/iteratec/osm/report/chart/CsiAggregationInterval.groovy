@@ -43,7 +43,7 @@ class CsiAggregationInterval {
 		intervalInMinutes(unique: true)
 	}
 	static mapping = {
-		cache usage: 'nonstrict-read-write'
+        cache usage: 'read-only'
 	}
 
 	public String toString(){

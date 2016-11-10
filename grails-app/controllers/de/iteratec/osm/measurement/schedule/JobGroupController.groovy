@@ -191,25 +191,6 @@ class JobGroupController {
         respond jobGroup
     }
 
-
-
-    def delete(JobGroup jobGroup) {
-
-        if (jobGroup == null) {
-            notFound()
-            return
-        }
-
-        try {
-            jobGroup.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "index")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
     def updateTable(){
         params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"

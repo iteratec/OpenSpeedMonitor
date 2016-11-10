@@ -17,22 +17,23 @@
 
 package de.iteratec.osm.report.external
 
-import de.iteratec.osm.InMemoryConfigService
-import de.iteratec.osm.batch.BatchActivity
-import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
-import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.OsmConfiguration
+import de.iteratec.osm.batch.BatchActivity
 import de.iteratec.osm.csi.EventCsiAggregationService
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.csi.ShopCsiAggregationService
-import de.iteratec.osm.measurement.schedule.*
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.external.provider.DefaultGraphiteSocketProvider
+import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
@@ -64,7 +65,7 @@ class QuartzControlledGrailsReportsTests {
     static final Double firstWeeklyValueToSend = 1223d
     static final Double secondWeeklyValueToSend = 13234.2
     static final String pathPrefix = 'wpt'
-    static final String pageName = 'page'
+    static final String pageName = 'pageAggregator'
     static final String eventName = 'event'
     static final String browserName = 'browser'
     static final String locationLocation = 'location'
@@ -77,7 +78,6 @@ class QuartzControlledGrailsReportsTests {
         csiAggregationUtilService(CsiAggregationUtilService)
         configService(ConfigService)
         eventCsiAggregationService(EventCsiAggregationService)
-        csiAggregationTagService(CsiAggregationTagService)
         pageCsiAggregationService(PageCsiAggregationService)
         shopCsiAggregationService(ShopCsiAggregationService)
     }
@@ -117,7 +117,6 @@ class QuartzControlledGrailsReportsTests {
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockEventCsiAggregationService([firstHmv, secondHmv])
-        mockCsiAggregationTagService()
         mockPageCsiAggregationService([], CsiAggregationInterval.HOURLY)
         mockShopCsiAggregationService([], CsiAggregationInterval.HOURLY)
 
@@ -172,7 +171,6 @@ class QuartzControlledGrailsReportsTests {
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockEventCsiAggregationService([])
-        mockCsiAggregationTagService()
         mockPageCsiAggregationService([firstDpmv, secondDpmv], CsiAggregationInterval.DAILY)
         mockShopCsiAggregationService([], CsiAggregationInterval.DAILY)
 
@@ -228,7 +226,6 @@ class QuartzControlledGrailsReportsTests {
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockEventCsiAggregationService([])
-        mockCsiAggregationTagService()
         mockPageCsiAggregationService([], CsiAggregationInterval.DAILY)
         mockShopCsiAggregationService([firstDsmv, secondDsmv], CsiAggregationInterval.DAILY)
 
@@ -284,7 +281,6 @@ class QuartzControlledGrailsReportsTests {
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockEventCsiAggregationService([])
-        mockCsiAggregationTagService()
         mockPageCsiAggregationService([firstWpmv, secondWpmv], CsiAggregationInterval.WEEKLY)
         mockShopCsiAggregationService([], CsiAggregationInterval.WEEKLY)
 
@@ -340,7 +336,6 @@ class QuartzControlledGrailsReportsTests {
         mockJobGroupDaoService()
         mockGraphiteSocketProvider()
         mockEventCsiAggregationService([])
-        mockCsiAggregationTagService()
         mockPageCsiAggregationService([], CsiAggregationInterval.WEEKLY)
         mockShopCsiAggregationService([firstWsmv, secondWsmv], CsiAggregationInterval.WEEKLY)
 
@@ -438,38 +433,6 @@ class QuartzControlledGrailsReportsTests {
         serviceUnderTest.eventCsiAggregationService = eventCsiAggregationService
     }
     /**
-     * Mocks methods of {@linkplain de.iteratec.osm.result.CsiAggregationTagService}.
-     */
-    private void mockCsiAggregationTagService() {
-        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
-        csiAggregationTagService.metaClass.findPageOfHourlyEventTag = { String hourlyEventMvTag ->
-            Page page = new Page()
-            page.setName(pageName)
-            return page
-        }
-        csiAggregationTagService.metaClass.findMeasuredEventOfHourlyEventTag = { String hourlyEventMvTag ->
-            MeasuredEvent event = new MeasuredEvent()
-            event.setName(eventName)
-            return event
-        }
-        csiAggregationTagService.metaClass.findBrowserOfHourlyEventTag = { String hourlyEventMvTag ->
-            Browser browser = new Browser()
-            browser.setName(browserName)
-            return browser
-        }
-        csiAggregationTagService.metaClass.findLocationOfHourlyEventTag = { String hourlyEventMvTag ->
-            Location location = new Location()
-            location.setLocation(locationLocation)
-            return location
-        }
-        csiAggregationTagService.metaClass.findPageByPageTag = { String weeklyPageMvTag ->
-            Page page = new Page()
-            page.setName(pageName)
-            return page
-        }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
-    }
-    /**
      * Mocks {@linkplain PageCsiAggregationService#getOrCalculatePageCsiAggregations}.
      */
     private void mockPageCsiAggregationService(Collection<CsiAggregation> toReturnOnDemandForGetOrCalculateCsiAggregations, Integer expectedIntervalInMinutes) {
@@ -539,9 +502,13 @@ class QuartzControlledGrailsReportsTests {
         hmv.started = valueForStated.toDate()
         hmv.interval = interval
         hmv.aggregator = aggregator
-        hmv.tag = ''
         hmv.csByWptDocCompleteInPercent = value
         hmv.underlyingEventResultsByWptDocComplete = resultIds
+        hmv.page = new Page(name: pageName)
+        hmv.jobGroup = new JobGroup(name: jobGroupWithoutServersName)
+        hmv.measuredEvent = new MeasuredEvent(name: eventName)
+        hmv.browser = new Browser(name: browserName)
+        hmv.location = new Location(location: locationLocation)
         return hmv
     }
 

@@ -73,7 +73,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
     public static final Integer DOC_COMPLETE_REQUESTS = 24
     public static final Integer CUSTOMER_SATISFACTION = 0.86d
     public static final ErQueryParams QUERY_PARAMS = new ErQueryParams()
-    public static final String TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES = ';1;1'
     public static final String PROFILE_1_NAME = 'conn-profile 1'
     public static final String PROFILE_2_NAME = 'conn-profile 2'
     public static final String PROFILE_3_NAME = 'conn-profile 3'
@@ -88,12 +87,24 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         resultCsiAggregationService(ResultCsiAggregationService)
         eventResultDaoService(EventResultDaoService)
         jobResultDaoService(JobResultDaoService)
-        csiAggregationTagService(CsiAggregationTagService)
         csiAggregationUtilService(CsiAggregationUtilService)
         defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
         osmChartProcessingService(OsmChartProcessingService)
         i18nService(I18nService)
     }
+    private JobGroup jobGroup1
+    private JobGroup jobGroup2
+    private JobGroup jobGroup3
+    private JobGroup jobGroup4
+    private Page page
+    private MeasuredEvent measuredEvent1
+    private MeasuredEvent measuredEvent2
+    private MeasuredEvent measuredEvent3
+    private MeasuredEvent measuredEvent4
+    private Location location1
+    private Location location2
+    private Location location3
+    private Location location4
 
     void setup() {
         serviceUnderTest = service
@@ -111,8 +122,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
             [
-                createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                createEventResult("2;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME)
+                createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                createEventResult(jobGroup2, measuredEvent2, location2, PROFILE_2_NAME)
             ]
         )
 
@@ -142,8 +153,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME)
                 ]
         )
 
@@ -173,8 +184,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location1, PROFILE_1_NAME)
                 ]
         )
 
@@ -204,10 +215,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("3;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME),
-                        createEventResult("4;3${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};3", PROFILE_3_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup3, measuredEvent2, location2, PROFILE_2_NAME),
+                        createEventResult(jobGroup4, measuredEvent3, location3, PROFILE_3_NAME)
                 ]
         )
 
@@ -243,8 +254,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent2, location2, PROFILE_2_NAME)
                 ]
         )
 
@@ -273,8 +284,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME)
                 ]
         )
 
@@ -304,8 +315,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_2_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location1, PROFILE_2_NAME)
                 ]
         )
 
@@ -335,10 +346,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("3;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME),
-                        createEventResult("4;3${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};3", PROFILE_3_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup3, measuredEvent2, location2, PROFILE_2_NAME),
+                        createEventResult(jobGroup4, measuredEvent3, location3, PROFILE_3_NAME)
                 ]
         )
 
@@ -374,8 +385,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent2, location2, PROFILE_2_NAME)
                 ]
         )
 
@@ -404,8 +415,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME),
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_2_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_2_NAME),
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_2_NAME)
                 ]
         )
 
@@ -435,8 +446,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult(jobGroup1, measuredEvent2, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent2, location1, PROFILE_1_NAME)
                 ]
         )
 
@@ -467,10 +478,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("3;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME),
-                        createEventResult("4;3${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};3", PROFILE_3_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup3, measuredEvent2, location2, PROFILE_2_NAME),
+                        createEventResult(jobGroup4, measuredEvent3, location3, PROFILE_3_NAME)
                 ]
         )
 
@@ -507,8 +518,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent2, location2, PROFILE_2_NAME)
                 ]
         )
 
@@ -537,8 +548,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME)
                 ]
         )
 
@@ -568,8 +579,8 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_1_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location2, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location2, PROFILE_1_NAME)
                 ]
         )
 
@@ -600,10 +611,10 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         setup:
         MOCKER.mockEventResultDaoService(serviceUnderTest,
                 [
-                        createEventResult("1;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("2;1${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};1", PROFILE_1_NAME),
-                        createEventResult("3;2${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};2", PROFILE_2_NAME),
-                        createEventResult("4;3${TAGPART_IRRELEVANT_FOR_LEGEND_ENTRIES};3", PROFILE_3_NAME)
+                        createEventResult(jobGroup1, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup2, measuredEvent1, location1, PROFILE_1_NAME),
+                        createEventResult(jobGroup3, measuredEvent2, location2, PROFILE_2_NAME),
+                        createEventResult(jobGroup4, measuredEvent3, location3, PROFILE_3_NAME)
                 ]
         )
 
@@ -634,7 +645,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         chart.osmChartGraphsCommonLabel == ''
     }
 
-    EventResult createEventResult(String tag, String connectivityProfileName){
+    EventResult createEventResult(JobGroup jobGroup, MeasuredEvent measuredEvent, Location location, String connectivityProfileName){
         ConnectivityProfile connProfile = ConnectivityProfile.findByName(connectivityProfileName) ?: TestDataUtil.createConnectivityProfile(connectivityProfileName)
         EventResult result = TestDataUtil.createEventResult(
                 Job.findByLabel(JOB_LABEL),
@@ -642,9 +653,12 @@ class SummarizedChartLegendEntriesSpec extends Specification{
                 DOC_COMPLETE_TIME,
                 CUSTOMER_SATISFACTION,
                 MeasuredEvent.findByName(EVENT_1_NAME),
+                Browser.findByName("FF"),
                 connProfile
         )
-        result.tag = tag
+        result.jobGroup = jobGroup
+        result.measuredEvent = measuredEvent
+        result.location = location
         result.docCompleteRequests = DOC_COMPLETE_REQUESTS
         return result.save(failOnError: true)
     }
@@ -657,7 +671,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         serviceUnderTest.jobResultDaoService = grailsApplication.mainContext.getBean('jobResultDaoService')
         MOCKER.mockI18nService(serviceUnderTest)
         MOCKER.mockPerformanceLoggingService(serviceUnderTest)
-        serviceUnderTest.csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
         serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
         serviceUnderTest.aggregatorTypeDaoService = grailsApplication.mainContext.getBean('defaultAggregatorTypeDaoService')
         serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
@@ -686,28 +699,28 @@ class SummarizedChartLegendEntriesSpec extends Specification{
 
         WebPageTestServer server = TestDataUtil.createWebPageTestServer('server', 'proxyIdentifier', true, 'http://baseurl.org')
 
-        Location location1 = TestDataUtil.createLocation(server, LOCATION_1_UNIQUE_IDENTIFIER, browsers[0], true)
-        TestDataUtil.createLocation(server, LOCATION_2_UNIQUE_IDENTIFIER, browsers[0], true)
-        TestDataUtil.createLocation(server, LOCATION_3_UNIQUE_IDENTIFIER, browsers[0], true)
-        TestDataUtil.createLocation(server, LOCATION_4_UNIQUE_IDENTIFIER, browsers[0], true)
+        location1 = TestDataUtil.createLocation(server, LOCATION_1_UNIQUE_IDENTIFIER, browsers[0], true)
+        location2 = TestDataUtil.createLocation(server, LOCATION_2_UNIQUE_IDENTIFIER, browsers[0], true)
+        location3 = TestDataUtil.createLocation(server, LOCATION_3_UNIQUE_IDENTIFIER, browsers[0], true)
+        location4 = TestDataUtil.createLocation(server, LOCATION_4_UNIQUE_IDENTIFIER, browsers[0], true)
 
-        JobGroup jobGroup1 = TestDataUtil.createJobGroup(JOB_GROUP_1_NAME)
-        TestDataUtil.createJobGroup(JOB_GROUP_2_NAME)
-        TestDataUtil.createJobGroup(JOB_GROUP_3_NAME)
-        TestDataUtil.createJobGroup(JOB_GROUP_4_NAME)
+        jobGroup1 = TestDataUtil.createJobGroup(JOB_GROUP_1_NAME)
+        jobGroup2 = TestDataUtil.createJobGroup(JOB_GROUP_2_NAME)
+        jobGroup3 = TestDataUtil.createJobGroup(JOB_GROUP_3_NAME)
+        jobGroup4 = TestDataUtil.createJobGroup(JOB_GROUP_4_NAME)
 
-        Page page = TestDataUtil.createPage('pageName')
+        page = TestDataUtil.createPage('pageName')
 
-        TestDataUtil.createMeasuredEvent(EVENT_1_NAME, page)
-        TestDataUtil.createMeasuredEvent(EVENT_2_NAME, page)
-        TestDataUtil.createMeasuredEvent(EVENT_3_NAME, page)
-        TestDataUtil.createMeasuredEvent(EVENT_4_NAME, page)
+        measuredEvent1 = TestDataUtil.createMeasuredEvent(EVENT_1_NAME, this.page)
+        measuredEvent2 = TestDataUtil.createMeasuredEvent(EVENT_2_NAME, this.page)
+        measuredEvent3 = TestDataUtil.createMeasuredEvent(EVENT_3_NAME, this.page)
+        measuredEvent4 = TestDataUtil.createMeasuredEvent(EVENT_4_NAME, this.page)
 
         Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 
-        Job job = TestDataUtil.createJob(JOB_LABEL, script, location1, jobGroup1, 'job description', 1, false, 60)
+        Job job = TestDataUtil.createJob(JOB_LABEL, script, this.location1, this.jobGroup1, 'job description', 1, false, 60)
 
-        TestDataUtil.createJobResult(TEST_ID, RUN_DATE.toDate(), job, location1)
+        TestDataUtil.createJobResult(TEST_ID, RUN_DATE.toDate(), job, this.location1)
     }
 
 }

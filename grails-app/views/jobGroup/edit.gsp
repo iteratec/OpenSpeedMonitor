@@ -5,7 +5,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="kickstart"/>
+    <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="default.edit.label" args="[jobGroup.name]"/></title>
 
     <asset:stylesheet src="tagit.css"/>
@@ -13,7 +13,7 @@
 </head>
 
 <body>
-
+<g:render template="/_menu/submenubarWithoutDelete"/>
 <section id="edit-jobGroup" class="first">
 
     <g:hasErrors bean="${jobGroup}">
@@ -32,8 +32,7 @@
         <div>
             <g:actionSubmit class="btn btn-primary" action="update"
                             value="${message(code: 'default.button.update.label', default: 'Update')}"/>
-            <g:render template="/_common/modals/deleteSymbolLink"/>
-            <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
+            <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset"/></button>
         </div>
     </g:form>
 

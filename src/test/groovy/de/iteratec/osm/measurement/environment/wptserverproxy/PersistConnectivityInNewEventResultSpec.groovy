@@ -104,7 +104,6 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
         mocker = ServiceMocker.create()
         mocker.mockProxyService(serviceUnderTest)
         serviceUnderTest.pageService = grailsApplication.mainContext.getBean('pageService')
-        mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }

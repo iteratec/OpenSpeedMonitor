@@ -21,19 +21,19 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.util.DateValueConverter
 import de.iteratec.osm.util.DoubleValueConverter
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
+import org.junit.Test
 
 import static org.hamcrest.MatcherAssert.assertThat
-import static org.hamcrest.Matchers.*
+import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertTrue
-
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-import org.junit.*
 
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
@@ -66,7 +66,7 @@ class CsiDashboardControllerActualIntervalSpec{
         command.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')
     }
 
-// daily page ////////////////////////////////////////////////////////////////////////////////////////////////////
+// daily pageAggregator ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
     public void testIncludingActualInterval_DailyPageAggregation() {
@@ -260,7 +260,7 @@ class CsiDashboardControllerActualIntervalSpec{
         )
     }
 
-    // daily shop ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // daily shopAggregator ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
     public void testIncludingActualInterval_DailyShopAggregation() {
@@ -455,7 +455,7 @@ class CsiDashboardControllerActualIntervalSpec{
         )
     }
 
-    // weekly page ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // weekly pageAggregator ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
     public void testIncludingActualInterval_WeeklyPageAggregation() {
@@ -650,7 +650,7 @@ class CsiDashboardControllerActualIntervalSpec{
         )
     }
 
-    // weekly shop ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // weekly shopAggregator ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Test
     public void testIncludingActualInterval_WeeklyShopAggregation() {

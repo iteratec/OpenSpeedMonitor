@@ -13,7 +13,6 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.result.CsiAggregationTagService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
@@ -38,7 +37,6 @@ import spock.lang.Stepwise
 @Rollback
 @Stepwise
 class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
-    CsiAggregationTagService csiAggregationTagService
     @Shared
     String script1Name = "TestScript1-564892#Afef1"
     @Shared
@@ -58,7 +56,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
     @Shared
     String csiConfigurationName = "CsiConfiguration1-564892#Afef1"
 
-    void cleanupSpec(){
+    void cleanupSpec() {
         cleanUpData()
     }
 
@@ -78,7 +76,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
-    void "Graph for \"Daily mean per Page\""(){
+    void "Graph for \"Daily mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
         to CsiDashboardPage
         timeFrameSelect.click()
@@ -91,130 +89,154 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         when: "User clicks on \"Show\" button"
         js.exec("window.scrollTo(0,0);") // otherwise the fixed navbar overlaps the button
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
+        waitFor { graphLines.displayed }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
 
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x: timestampOfDate(2016, 5, 31), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:timestampOfDate(2016, 6, 5), y:14], [x:timestampOfDate(2016, 6, 6), y:22], [x:timestampOfDate(2016, 6, 7), y:33], [x:timestampOfDate(2016, 6, 8), y:44],
-                [x:timestampOfDate(2016, 6, 9), y:55], [x:timestampOfDate(2016, 6, 10), y:66], [x:timestampOfDate(2016, 6, 11), y:73]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 31), y: 90], [x: timestampOfDate(2016, 6, 12), y: 90]]
+        graphSeries[1].data.collect { [x: it.x, y: it.y] } == [
+                [x: timestampOfDate(2016, 6, 5), y: 14], [x: timestampOfDate(2016, 6, 6), y: 22], [x: timestampOfDate(2016, 6, 7), y: 33], [x: timestampOfDate(2016, 6, 8), y: 44],
+                [x: timestampOfDate(2016, 6, 9), y: 55], [x: timestampOfDate(2016, 6, 10), y: 66], [x: timestampOfDate(2016, 6, 11), y: 73]
         ]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
-                [x:timestampOfDate(2016, 6, 5), y:55], [x:timestampOfDate(2016, 6, 6), y:58], [x:timestampOfDate(2016, 6, 7), y:68], [x:timestampOfDate(2016, 6, 8), y:81],
-                [x:timestampOfDate(2016, 6, 9), y:88], [x:timestampOfDate(2016, 6, 10), y:48], [x:timestampOfDate(2016, 6, 11), y:88]
+        graphSeries[2].data.collect { [x: it.x, y: it.y] } == [
+                [x: timestampOfDate(2016, 6, 5), y: 55], [x: timestampOfDate(2016, 6, 6), y: 58], [x: timestampOfDate(2016, 6, 7), y: 68], [x: timestampOfDate(2016, 6, 8), y: 81],
+                [x: timestampOfDate(2016, 6, 9), y: 88], [x: timestampOfDate(2016, 6, 10), y: 48], [x: timestampOfDate(2016, 6, 11), y: 88]
         ]
 
     }
 
-    void "Graph for \"Weekly mean per Page\""(){
+    void "Graph for \"Weekly mean per Page\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "weekly_page"
+        aggregationRadioButtons.aggrGroupAndInterval = "weekly_page"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
+        waitFor { graphLines.displayed }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 26), y:90],   [x:timestampOfDate(2016, 6, 11), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70],   [x:timestampOfDate(2016, 6, 10), y:72.86]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 26), y: 90], [x: timestampOfDate(2016, 6, 11), y: 90]]
+        graphSeries[1].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 33.6], [x: timestampOfDate(2016, 6, 10), y: 66.57]]
+        graphSeries[2].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-    void "Graph for \"Daily mean per Job Group\""(){
+    void "Graph for \"Daily mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "daily_shop"
+        aggregationRadioButtons.aggrGroupAndInterval = "daily_shop"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
+        waitFor { graphLines.displayed }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 30), y:90], [x:timestampOfDate(2016, 6, 13), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:timestampOfDate(2016, 6, 5), y:14], [x:timestampOfDate(2016, 6, 6), y:22], [x:timestampOfDate(2016, 6, 7), y:33], [x:timestampOfDate(2016, 6, 8), y:44],
-                [x:timestampOfDate(2016, 6, 9), y:55], [x:timestampOfDate(2016, 6, 10), y:66], [x:timestampOfDate(2016, 6, 11), y:73]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 30), y: 90], [x: timestampOfDate(2016, 6, 13), y: 90]]
+        graphSeries[1].data.collect { [x: it.x, y: it.y] } == [
+                [x: timestampOfDate(2016, 6, 5), y: 14], [x: timestampOfDate(2016, 6, 6), y: 22], [x: timestampOfDate(2016, 6, 7), y: 33], [x: timestampOfDate(2016, 6, 8), y: 44],
+                [x: timestampOfDate(2016, 6, 9), y: 55], [x: timestampOfDate(2016, 6, 10), y: 66], [x: timestampOfDate(2016, 6, 11), y: 73]
         ]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
-                [x:timestampOfDate(2016, 6, 5), y:55], [x:timestampOfDate(2016, 6, 6), y:58], [x: timestampOfDate(2016, 6, 7), y: 68], [x: timestampOfDate(2016, 6, 8), y: 81],
-                [x: timestampOfDate(2016, 6, 9), y:88], [x:timestampOfDate(2016, 6, 10), y:48], [x:timestampOfDate(2016, 6, 11), y:88]
+        graphSeries[2].data.collect { [x: it.x, y: it.y] } == [
+                [x: timestampOfDate(2016, 6, 5), y: 55], [x: timestampOfDate(2016, 6, 6), y: 58], [x: timestampOfDate(2016, 6, 7), y: 68], [x: timestampOfDate(2016, 6, 8), y: 81],
+                [x: timestampOfDate(2016, 6, 9), y: 88], [x: timestampOfDate(2016, 6, 10), y: 48], [x: timestampOfDate(2016, 6, 11), y: 88]
         ]
     }
 
-    void "Graph for \"Weekly mean per Job Group\""(){
+    void "Graph for \"Weekly mean per Job Group\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "weekly_shop"
+        aggregationRadioButtons.aggrGroupAndInterval = "weekly_shop"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
+        waitFor { graphLines.displayed }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 25), y: 90], [x: timestampOfDate(2016, 6, 12), y: 90]]
+        graphSeries[1].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 33.6], [x: timestampOfDate(2016, 6, 10), y: 66.57]]
+        graphSeries[2].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
-    void "Graph for \"Daily mean per CSI System\""(){
+    void "Graph for \"Daily mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        waitFor {aggregationRadioButtons.displayed}
-        aggregationRadioButtons.aggrGroupAndInterval= "daily_system"
+        waitFor { aggregationRadioButtons.displayed }
+        aggregationRadioButtons.aggrGroupAndInterval = "daily_system"
         csiSystem[0].click()
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
+        waitFor { graphLines.displayed }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 30), y:90], [x:timestampOfDate(2016, 6, 13), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [
-                [x:timestampOfDate(2016, 6, 5), y:14], [x:timestampOfDate(2016, 6, 6), y:22], [x:timestampOfDate(2016, 6, 7), y:33], [x:timestampOfDate(2016, 6, 8), y:44],
-                [x:timestampOfDate(2016, 6, 9), y:55], [x:timestampOfDate(2016, 6, 10), y:66], [x:timestampOfDate(2016, 6, 11), y:73]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 30), y: 90], [x: timestampOfDate(2016, 6, 13), y: 90]]
+        graphSeries[1].data.collect { [x: it.x, y: it.y] } == [
+                [x: timestampOfDate(2016, 6, 5), y: 14], [x: timestampOfDate(2016, 6, 6), y: 22], [x: timestampOfDate(2016, 6, 7), y: 33], [x: timestampOfDate(2016, 6, 8), y: 44],
+                [x: timestampOfDate(2016, 6, 9), y: 55], [x: timestampOfDate(2016, 6, 10), y: 66], [x: timestampOfDate(2016, 6, 11), y: 73]
         ]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [
-                [x:timestampOfDate(2016, 6, 5), y:55], [x:timestampOfDate(2016, 6, 6), y:58], [x:timestampOfDate(2016, 6, 7), y:68], [x:timestampOfDate(2016, 6, 8), y:81],
-                [x:timestampOfDate(2016, 6, 9), y:88], [x:timestampOfDate(2016, 6, 10), y:48], [x:timestampOfDate(2016, 6, 11), y:88]
+        graphSeries[2].data.collect { [x: it.x, y: it.y] } == [
+                [x: timestampOfDate(2016, 6, 5), y: 55], [x: timestampOfDate(2016, 6, 6), y: 58], [x: timestampOfDate(2016, 6, 7), y: 68], [x: timestampOfDate(2016, 6, 8), y: 81],
+                [x: timestampOfDate(2016, 6, 9), y: 88], [x: timestampOfDate(2016, 6, 10), y: 48], [x: timestampOfDate(2016, 6, 11), y: 88]
         ]
     }
 
-    void "Graph for \"Weekly mean per CSI System\""(){
+    void "Graph for \"Weekly mean per CSI System\""() {
         given: "User selects appropriate timeframe, aggregation type, job group and page"
-        aggregationRadioButtons.aggrGroupAndInterval= "weekly_system"
+        aggregationRadioButtons.aggrGroupAndInterval = "weekly_system"
         when: "User clicks on \"Show\" button"
-        waitFor{showButton.displayed}
+        waitFor { showButton.displayed }
         showButton.click()
 
         then: "Graphs are displayed"
-        waitFor {graphLines.displayed}
+        waitFor { graphLines.displayed }
         graphLines.size() == 3
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 25), y: 90], [x: timestampOfDate(2016, 6, 12), y: 90]]
+        graphSeries[1].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 33.6], [x: timestampOfDate(2016, 6, 10), y: 66.57]]
+        graphSeries[2].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
     void "Adjust Chart Title"() {
@@ -257,12 +279,16 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 25), y: 90], [x: timestampOfDate(2016, 6, 12), y: 90]]
+        graphSeries[1].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 33.6], [x: timestampOfDate(2016, 6, 10), y: 66.57]]
+        graphSeries[2].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
-
-
 
 
     void "Adjust Chart Section"() {
@@ -362,14 +388,20 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 3
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 5, 25), y:90], [x:timestampOfDate(2016, 6, 12), y:90]]
-        graphSeries[1].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:33.6], [x:timestampOfDate(2016, 6, 10), y:66.57]]
-        graphSeries[2].data.collect { [x:it.x, y:it.y]} == [[x:timestampOfDate(2016, 6, 3), y:70], [x:timestampOfDate(2016, 6, 10), y:72.86]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 5, 25), y: 90], [x: timestampOfDate(2016, 6, 12), y: 90]]
+        graphSeries[1].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 33.6], [x: timestampOfDate(2016, 6, 10), y: 66.57]]
+        graphSeries[2].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: timestampOfDate(2016, 6, 3), y: 70], [x: timestampOfDate(2016, 6, 10), y: 72.86]]
     }
 
 
-    private void createData(){
-        Job.withNewTransaction{
+    private void createData() {
+        Job.withNewTransaction {
             TestDataUtil.createOsmConfig()
             TestDataUtil.createAdminUser()
             initChartData()
@@ -379,51 +411,52 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
     }
 
-    private void createTestSpecificData(){
+    private void createTestSpecificData() {
 
 
-        Script script1 = TestDataUtil.createScript(script1Name,"This is for test purposes","stuff")
+        Script script1 = TestDataUtil.createScript(script1Name, "This is for test purposes", "stuff")
         Browser browser = TestDataUtil.createBrowser("TestFireFox")
-        ConnectivityProfile connectivityProfile =TestDataUtil.createConnectivityProfile(connectivityProfileName)
+        ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
         BrowserConnectivityWeight browserConnectivityWeight = TestDataUtil.createBrowserConnectivityWeight(browser, connectivityProfile, 2)
-        Page page1 =TestDataUtil.createPage(page1Name)
-        PageWeight pageWeight = TestDataUtil.createPageWeight(page1,3)
+        Page page1 = TestDataUtil.createPage(page1Name)
+        PageWeight pageWeight = TestDataUtil.createPageWeight(page1, 3)
         TimeToCsMapping timeToCsMapping = TestDataUtil.createTimeToCsMapping(page1)
-        CsiDay csiDay = TestDataUtil.createCsiDay([0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,10:10,11:11,12:11,13:10,14:9,15:8,16:7,17:6,18:5,19:4,20:3,21:2,22:1,23:0])
-        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName,"TestDescription",csiDay,[browserConnectivityWeight],[pageWeight], [timeToCsMapping])
-        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(),TestDataUtil.createCsTargetValue())
-        JobGroup jobGroup1 = new JobGroup([csiConfiguration:csiConfiguration, name: jobGroup1Name]).save()
-        JobGroup jobGroup2 = new JobGroup([csiConfiguration:csiConfiguration, name: jobGroup2Name]).save()
-        WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1","TestIdentifier",true,"http://internet.de")
-        Location location1 = TestDataUtil.createLocation(wpt,location1Name,browser,true)
-        Job job1=TestDataUtil.createJob(job1Name,script1,location1,jobGroup1,"This is the first test job",1,false,12)
-        CsiSystem csiSystem =  new CsiSystem([label:"TestCsiSystem"])
+        CsiDay csiDay = TestDataUtil.createCsiDay([0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10, 11: 11, 12: 11, 13: 10, 14: 9, 15: 8, 16: 7, 17: 6, 18: 5, 19: 4, 20: 3, 21: 2, 22: 1, 23: 0])
+        CsiConfiguration csiConfiguration = TestDataUtil.createCsiConfiguration(csiConfigurationName, "TestDescription", csiDay, [browserConnectivityWeight], [pageWeight], [timeToCsMapping])
+        TestDataUtil.createCsTargetGraph(TestDataUtil.createCsTargetValue(), TestDataUtil.createCsTargetValue())
+        JobGroup jobGroup1 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup1Name]).save()
+        JobGroup jobGroup2 = new JobGroup([csiConfiguration: csiConfiguration, name: jobGroup2Name]).save()
+        WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
+        Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
+        Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
+        CsiSystem csiSystem = new CsiSystem([label: "TestCsiSystem"])
         csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 50))
-        csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight : 60))
-        csiSystem.save(failOnError:true)
-        JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016,06,22,3,13, DateTimeZone.UTC).toDate(),job1,location1)
+        csiSystem.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup2, weight: 60))
+        csiSystem.save(failOnError: true)
+        JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
         MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
         CsiAggregationInterval hourly = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.HOURLY)
         AggregatorType aggregatorType = AggregatorType.findByName(AggregatorType.MEASURED_EVENT)
-        new CsiAggregation([started:new DateTime(2016,6,5 ,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:14,csByWptVisuallyCompleteInPercent:55,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,6 ,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:22,csByWptVisuallyCompleteInPercent:58,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,7 ,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:33,csByWptVisuallyCompleteInPercent:68,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,8 ,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:44,csByWptVisuallyCompleteInPercent:81,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,9 ,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:55,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,10,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:66,csByWptVisuallyCompleteInPercent:48,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,11,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:73,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,12,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:24,csByWptVisuallyCompleteInPercent:98,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,13,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:39,csByWptVisuallyCompleteInPercent:65,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,14,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:77,csByWptVisuallyCompleteInPercent:61,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,15,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:88,csByWptVisuallyCompleteInPercent:72,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,16,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:99,csByWptVisuallyCompleteInPercent:78,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,17,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent: 1,csByWptVisuallyCompleteInPercent:84,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
-        new CsiAggregation([started:new DateTime(2016,6,18,7,10, DateTimeZone.UTC).toDate(),interval:hourly,aggregator:aggregatorType,tag:csiAggregationTagService.createHourlyEventTag(jobGroup1,measuredEvent1,page1,browser,location1),csByWptDocCompleteInPercent:31,csByWptVisuallyCompleteInPercent:88,underlyingEventResultsByWptDocComplete:jobResult1.id as String, closedAndCalculated:true,connectivityProfile:connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 5, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 14, csByWptVisuallyCompleteInPercent: 55, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 6, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 22, csByWptVisuallyCompleteInPercent: 58, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 7, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 33, csByWptVisuallyCompleteInPercent: 68, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 8, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 44, csByWptVisuallyCompleteInPercent: 81, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 9, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 55, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 10, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 66, csByWptVisuallyCompleteInPercent: 48, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 11, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 73, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 12, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 24, csByWptVisuallyCompleteInPercent: 98, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 13, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 39, csByWptVisuallyCompleteInPercent: 65, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 14, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 77, csByWptVisuallyCompleteInPercent: 61, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 15, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 88, csByWptVisuallyCompleteInPercent: 72, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 16, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 99, csByWptVisuallyCompleteInPercent: 78, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 17, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 1, csByWptVisuallyCompleteInPercent: 84, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
+        new CsiAggregation([started: new DateTime(2016, 6, 18, 7, 10, DateTimeZone.UTC).toDate(), interval: hourly, aggregator: aggregatorType, jobGroup: jobGroup1, measuredEvent: measuredEvent1, page: page1, browser: browser, location: location1, csByWptDocCompleteInPercent: 31, csByWptVisuallyCompleteInPercent: 88, underlyingEventResultsByWptDocComplete: jobResult1.id as String, closedAndCalculated: true, connectivityProfile: connectivityProfile]).save(failOnError: true)
         Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
         TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
-        TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
+        TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
     }
+
     private void selectDateInDatepicker(def datePicker, String date) {
         datePicker.click()
         datePicker << Keys.chord(Keys.CONTROL, "a")
@@ -518,7 +551,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
         ).save(failOnError: true)
 
         String labelTargetCsi_EN = 'Target-CSI'
-        String descriptionTargetCsi_EN =  'Customer satisfaction index defined as target.'
+        String descriptionTargetCsi_EN = 'Customer satisfaction index defined as target.'
         CsTargetGraph.findByLabel(labelTargetCsi_EN) ?: new CsTargetGraph(
                 label: labelTargetCsi_EN,
                 description: descriptionTargetCsi_EN,
@@ -529,7 +562,7 @@ class CsiDashboardDifferentAggregatorsGebSpec extends CustomUrlGebReportingSpec 
 
 
 
-        if(CsiConfiguration.count <= 0) {
+        if (CsiConfiguration.count <= 0) {
             CsiConfiguration initCsiConfiguration = new CsiConfiguration()
             initCsiConfiguration.with {
                 label = "initial csi configuration"

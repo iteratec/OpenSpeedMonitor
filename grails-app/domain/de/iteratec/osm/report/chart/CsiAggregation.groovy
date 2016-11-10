@@ -18,10 +18,14 @@
 package de.iteratec.osm.report.chart
 
 import de.iteratec.osm.csi.CsiSystem
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.csi.CsiValue
-
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.MeasuredEvent
 import org.grails.databinding.BindUsing
 
 /**
@@ -62,10 +66,12 @@ class CsiAggregation implements CsiValue {
     CsiAggregationInterval interval
     AggregatorType aggregator
 
-    @BindUsing({
-        obj, source -> source['tag']
-    })
-    String tag
+    JobGroup jobGroup
+    MeasuredEvent measuredEvent
+    Page page
+    Browser browser
+    Location location
+
     CsiSystem csiSystem
     ConnectivityProfile connectivityProfile
     Double csByWptDocCompleteInPercent
@@ -102,7 +108,20 @@ class CsiAggregation implements CsiValue {
         started(nullable: false)
         interval(nullable: false)
         aggregator(nullable: false)
-        tag(maxSize: 255)
+
+        // JobGroup can be null if aggregatorType == csiSystem
+        jobGroup(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || val })
+        // measuredEvent can be null if aggregatorType in (csiSystem, shop, page)
+        measuredEvent(nullable: true, validator: { val, obj ->
+            return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val
+        })
+        //page can be null if aggregatorType in (csiSystem, shop)
+        page(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || val })
+        // browser can be null if aggregatorType in (csiSystem, shop, page)
+        browser(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val })
+        // location can be null if aggregatorType in (csiSystem, shop, page)
+        location(nullable: true, validator: { val, obj -> return (obj.aggregator.name == AggregatorType.CSI_SYSTEM) || (obj.aggregator.name == AggregatorType.SHOP) || (obj.aggregator.name == AggregatorType.PAGE) || val })
+
         csByWptDocCompleteInPercent(nullable: true)
         csByWptVisuallyCompleteInPercent(nullable: true)
         underlyingEventResultsByWptDocComplete(nullable: false)
@@ -131,17 +150,19 @@ class CsiAggregation implements CsiValue {
      *         The result is never <code>null</code>.
      * @see #countUnderlyingEventResultsByWptDocComplete()
      */
-    List<Long> getUnderlyingEventResultsByWptDocCompleteAsList(){
-        return underlyingEventResultsByWptDocComplete ? underlyingEventResultsByWptDocComplete.tokenize(DELIMITER_RESULTIDS).collect({ Long.parseLong(it) }) : []
+    List<Long> getUnderlyingEventResultsByWptDocCompleteAsList() {
+        return underlyingEventResultsByWptDocComplete ? underlyingEventResultsByWptDocComplete.tokenize(DELIMITER_RESULTIDS).collect({
+            Long.parseLong(it)
+        }) : []
     }
     /**
      * Adds the newResultId to the list of {@link EventResult}-identifiers, this value was calculated from.
      * The newResultId is just added, no identifiers are removed previously.
      * @param newResultId
      */
-    void addToUnderlyingEventResultsByWptDocComplete(Long newResultId){
+    void addToUnderlyingEventResultsByWptDocComplete(Long newResultId) {
         List<Long> list = getUnderlyingEventResultsByWptDocCompleteAsList()
-        if(list.contains(newResultId)) log.error("Didn't add EventResult to CsiAggregation because it was already in the list! (EventResult-ID=${newResultId}, CsiAggregation-ID=${this.ident()})")
+        if (list.contains(newResultId)) log.error("Didn't add EventResult to CsiAggregation because it was already in the list! (EventResult-ID=${newResultId}, CsiAggregation-ID=${this.ident()})")
         list.add(newResultId)
         underlyingEventResultsByWptDocComplete = list.join(DELIMITER_RESULTIDS)
     }
@@ -150,7 +171,7 @@ class CsiAggregation implements CsiValue {
      * @param resultId
      * @return true if the result already in the list
      */
-    boolean containsInUnderlyingEventResultsByWptDocComplete(Long resultId){
+    boolean containsInUnderlyingEventResultsByWptDocComplete(Long resultId) {
         return getUnderlyingEventResultsByWptDocCompleteAsList().contains(resultId)
     }
     /**
@@ -158,10 +179,10 @@ class CsiAggregation implements CsiValue {
      * The results are just added, no identifiers are removed previously.
      * @param resultIdsToAddAsList
      */
-    void addAllToUnderlyingEventResultsByWptDocComplete(List<Long> resultIdsToAddAsList){
+    void addAllToUnderlyingEventResultsByWptDocComplete(List<Long> resultIdsToAddAsList) {
         List<Long> list = getUnderlyingEventResultsByWptDocCompleteAsList()
         List<Long> intersection = list.intersect(resultIdsToAddAsList)
-        if(intersection.size() > 0) {
+        if (intersection.size() > 0) {
             log.error("EventResults were added to CsiAggregation although some of them were already in the list! (id's which were already in the list=${intersection}, CsiAggregation-ID=${this.ident()})")
         }
         list.addAll(resultIdsToAddAsList)
@@ -173,10 +194,10 @@ class CsiAggregation implements CsiValue {
      * @param resultIdsToAddAsString
      * @see #underlyingEventResultsByWptDocComplete
      */
-    void addAllToResultIds(String resultIdsToAddAsString){
+    void addAllToResultIds(String resultIdsToAddAsString) {
         List<Long> list = getUnderlyingEventResultsByWptDocCompleteAsList()
         List<Long> intersection = list.intersect(resultIdsToAddAsString.tokenize(DELIMITER_RESULTIDS))
-        if(intersection.size() > 0) {
+        if (intersection.size() > 0) {
             log.error("EventResults were added to CsiAggregation although some of them were already in the list! (id's which were already in the list=${intersection}, CsiAggregation-ID=${this.ident()})")
         }
         list.addAll(resultIdsToAddAsString.tokenize(DELIMITER_RESULTIDS))
@@ -185,7 +206,7 @@ class CsiAggregation implements CsiValue {
     /**
      * Removes all {@link EventResult}-identifiers from the list of identifiers, this value was calculated from.
      */
-    void clearUnderlyingEventResultsByWptDocComplete(){
+    void clearUnderlyingEventResultsByWptDocComplete() {
         this.underlyingEventResultsByWptDocComplete = ''
     }
 
@@ -200,7 +221,7 @@ class CsiAggregation implements CsiValue {
      *         The result is >= 0.
      * @see #getUnderlyingEventResultsByWptDocCompleteAsList()
      */
-    int countUnderlyingEventResultsByWptDocComplete(){
+    int countUnderlyingEventResultsByWptDocComplete() {
         return getUnderlyingEventResultsByWptDocCompleteAsList().size()
     }
 
@@ -211,7 +232,7 @@ class CsiAggregation implements CsiValue {
      * @return True if latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} requires recalculation
      * 	or there is no event at all. Otherwise false.
      */
-    public boolean hasToBeCalculated(){
+    public boolean hasToBeCalculated() {
         if (this.closedAndCalculated) {
             return false
         }
@@ -227,17 +248,17 @@ class CsiAggregation implements CsiValue {
      * @return True if latest {@link CsiAggregationUpdateEvent} for this {@link CsiAggregation} requires recalculation
      * 	or there is no event at all. Otherwise false.
      */
-    public boolean hasToBeCalculatedAccordingEvents(List<CsiAggregationUpdateEvent> updateEvents){
+    public boolean hasToBeCalculatedAccordingEvents(List<CsiAggregationUpdateEvent> updateEvents) {
         if (this.closedAndCalculated) {
             return false
         }
         boolean hasToBeCalculated = true
 
-        updateEvents.inject(null){ Long maxDateOfUpdate, CsiAggregationUpdateEvent actualEvent ->
-            if (actualEvent.csiAggregationId == this.ident() && ( !maxDateOfUpdate || actualEvent.dateOfUpdate.getTime() > maxDateOfUpdate )) {
+        updateEvents.inject(null) { Long maxDateOfUpdate, CsiAggregationUpdateEvent actualEvent ->
+            if (actualEvent.csiAggregationId == this.ident() && (!maxDateOfUpdate || actualEvent.dateOfUpdate.getTime() > maxDateOfUpdate)) {
                 hasToBeCalculated = actualEvent.updateCause.requiresRecalculation
                 return actualEvent.dateOfUpdate.getTime()
-            }else{
+            } else {
                 return maxDateOfUpdate
             }
         }
@@ -249,7 +270,7 @@ class CsiAggregation implements CsiValue {
      * <b>Note:</b> If no underlying data exists the value of the CsiAggregation is null although it is calculated and this method returns true.
      * @return True if the CsiAggregation was calculated at least one time and never outdated afterwards.
      */
-    public boolean isCalculated(){
+    public boolean isCalculated() {
         return !hasToBeCalculated()
     }
 
@@ -257,7 +278,7 @@ class CsiAggregation implements CsiValue {
      * Checks whether this CsiAggregation was calculated based on underlying data at least one time and never outdated afterwards.
      * @return True if the CsiAggregation was calculated based on underlying data at least one time and never outdated afterwards.
      */
-    public boolean isCalculatedWithData(){
+    public boolean isCalculatedWithData() {
         return this.isCalculated() && this.csByWptDocCompleteInPercent != null
     }
 
@@ -265,7 +286,7 @@ class CsiAggregation implements CsiValue {
      * Checks whether this CsiAggregation was calculated without existing underlying data at least one time and never outdated afterwards.
      * @return True if the CsiAggregation was calculated without existing underlying data at least one time and never outdated afterwards.
      */
-    public boolean isCalculatedWithoutData(){
+    public boolean isCalculatedWithoutData() {
         return this.isCalculated() && this.csByWptDocCompleteInPercent == null
     }
 
@@ -275,7 +296,7 @@ class CsiAggregation implements CsiValue {
      */
     private CsiAggregationUpdateEvent getLatestUpdateEvent() {
         def c = CsiAggregationUpdateEvent.createCriteria()
-        List<CsiAggregationUpdateEvent> listWithLastUpdateEvent = c.list{
+        List<CsiAggregationUpdateEvent> listWithLastUpdateEvent = c.list {
             eq("csiAggregationId", this.ident())
             maxResults(1)
             order("dateOfUpdate", "desc")
@@ -299,30 +320,40 @@ class CsiAggregation implements CsiValue {
     }
 
     @Override
-    public String retrieveTag() {
-        return this.tag
-    }
-
-    @Override
     ConnectivityProfile retrieveConnectivityProfile() {
-        return  this.connectivityProfile
+        return this.connectivityProfile
     }
 
     @Override
-    public List<Long> retrieveUnderlyingEventResultsByDocComplete(){
+    public List<Long> retrieveUnderlyingEventResultsByDocComplete() {
         return this.getUnderlyingEventResultsByWptDocCompleteAsList()
     }
 
     @Override
-    public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete(){
+    public List<EventResult> retrieveUnderlyingEventResultsByVisuallyComplete() {
         return this.underlyingEventResultsByVisuallyComplete.toList()
+    }
+
+    @Override
+    JobGroup retrieveJobGroup() {
+        return jobGroup
+    }
+
+    @Override
+    Page retrievePage() {
+        return page
+    }
+
+    @Override
+    Browser retrieveBrowser() {
+        return browser
     }
 
     public List<CsiAggregationUpdateEvent> getCsiAggregationUpdateEvents() {
         return CsiAggregationUpdateEvent.findAllByCsiAggregationId(this.ident())
     }
 
-    public String toString(){
+    public String toString() {
         return "${aggregator} | ${interval} | ${started} | ${csByWptDocCompleteInPercent}"
     }
 }

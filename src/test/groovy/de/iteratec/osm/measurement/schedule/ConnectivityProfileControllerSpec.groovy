@@ -32,7 +32,8 @@ class ConnectivityProfileControllerSpec extends Specification {
 
         TestDataUtil.createCsiAggregationIntervals()
         TestDataUtil.createAggregatorTypes()
-        mvWithOldConnectiviyProfile = TestDataUtil.createCsiAggregation(new Date(), CsiAggregationInterval.get(1), AggregatorType.get(1), "",1, "", true, existingConnectivityProfile)
+        mvWithOldConnectiviyProfile = TestDataUtil.createSimpleCsiAggregation(new Date(), CsiAggregationInterval.get(1), AggregatorType.get(1), true)
+        mvWithOldConnectiviyProfile.connectivityProfile = existingConnectivityProfile
         jobWithOldConnectivityProfile = TestDataUtil.createJob("existingJob", new Script(), new Location(), new JobGroup(), "description", 1, false, 50, existingConnectivityProfile)
     }
 
