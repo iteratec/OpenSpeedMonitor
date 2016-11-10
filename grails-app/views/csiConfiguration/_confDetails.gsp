@@ -18,6 +18,31 @@
 </div>--}%
 
 
+%{-- nav tabs for the mapping and the weights --}%
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" href="#csiMappingDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#csiConnectivityWeightDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.connectivityWeights" default="Connectivity Weights"/>
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#csiPageWeightDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.pageWeights" default="Page Weights"/>
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#csiTimeWeightDetailsTabContent">
+            <g:message code="de.iteratec.osm.csi.navTab.timeWeights" default="Time Weights"/>
+        </a>
+    </li>
+</ul>
+
+
 <div class="tab-content">
     <div id="csiMappingDetailsTabContent" class="tab-pane active">
         <h3 class="section">
@@ -28,20 +53,22 @@
         </h3>
 
         <div class="row">
-            <div class="col-md-2">
-                <ul class="nav nav-pills nav-stacked">
-                    <li class="active">
-                        <a data-toggle="tab" href="#csiAssignedMappingTabContent">
-                            Assigned Mappings
-                        </a>
-                    </li>
-                    <li>
-                        <a data-toggle="tab" href="#csiAvailableMappingTabContent">
-                            Available Mappings
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <g:if test="${params.controller != 'jobGroup'}">
+                <div class="col-md-2">
+                    <ul class="nav nav-pills nav-stacked">
+                        <li class="active">
+                            <a data-toggle="tab" href="#csiAssignedMappingTabContent">
+                                Assigned Mappings
+                            </a>
+                        </li>
+                        <li>
+                            <a data-toggle="tab" href="#csiAvailableMappingTabContent">
+                                Available Mappings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </g:if>
 
             <div class="col-md-10">
                 <div class="tab-content">
@@ -388,3 +415,14 @@
         </g:if>
     </div>
 </div>
+
+<content tag="include.bottom">
+    <asset:script type="text/javascript">
+        $(document).ready(function () {
+
+            createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
+            createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
+            createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
+        });
+    </asset:script>
+</content>

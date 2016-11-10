@@ -259,28 +259,28 @@
 
 
 %{-- nav tabs for the mapping and the weights --}%
-<ul class="nav nav-tabs">
-    <li class="active">
-        <a data-toggle="tab" href="#csiMappingDetailsTabContent">
-            <g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>
-        </a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#csiConnectivityWeightDetailsTabContent">
-            <g:message code="de.iteratec.osm.csi.navTab.connectivityWeights" default="Connectivity Weights"/>
-        </a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#csiPageWeightDetailsTabContent">
-            <g:message code="de.iteratec.osm.csi.navTab.pageWeights" default="Page Weights"/>
-        </a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#csiTimeWeightDetailsTabContent">
-            <g:message code="de.iteratec.osm.csi.navTab.timeWeights" default="Time Weights"/>
-        </a>
-    </li>
-</ul>
+%{--<ul class="nav nav-tabs">--}%
+    %{--<li class="active">--}%
+        %{--<a data-toggle="tab" href="#csiMappingDetailsTabContent">--}%
+            %{--<g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>--}%
+        %{--</a>--}%
+    %{--</li>--}%
+    %{--<li>--}%
+        %{--<a data-toggle="tab" href="#csiConnectivityWeightDetailsTabContent">--}%
+            %{--<g:message code="de.iteratec.osm.csi.navTab.connectivityWeights" default="Connectivity Weights"/>--}%
+        %{--</a>--}%
+    %{--</li>--}%
+    %{--<li>--}%
+        %{--<a data-toggle="tab" href="#csiPageWeightDetailsTabContent">--}%
+            %{--<g:message code="de.iteratec.osm.csi.navTab.pageWeights" default="Page Weights"/>--}%
+        %{--</a>--}%
+    %{--</li>--}%
+    %{--<li>--}%
+        %{--<a data-toggle="tab" href="#csiTimeWeightDetailsTabContent">--}%
+            %{--<g:message code="de.iteratec.osm.csi.navTab.timeWeights" default="Time Weights"/>--}%
+        %{--</a>--}%
+    %{--</li>--}%
+%{--</ul>--}%
 
 
 %{-- mapping and weights details --}%
@@ -289,7 +289,10 @@
                                          errorMessagesCsi        : errorMessagesCsi,
                                          defaultTimeToCsMappings : defaultTimeToCsMappings,
                                          selectedCsiConfiguration: selectedCsiConfiguration,
-                                         pageMappingsExist       : pageMappingsExist]"/>
+                                         pageMappingsExist       : pageMappingsExist,
+                                         matrixViewData          : matrixViewData,
+                                         treemapData             : treemapData,
+                                         barchartData            : barchartData]"/>
 
 
 %{-- initially invisible modal dialog to update csi configuratuion via ajax --}%
@@ -356,11 +359,11 @@
             $("#warnAboutOverwritingBox").hide();
             $("#errorBoxDefaultMappingCsv").hide();
             $("#defaultMappingUploadButton").prop("disabled", true);
-            if (${showCsiWeights}) {
+            %{--if (${showCsiWeights}) {
                 $("#btn-csi-weights").click();
             } else {
                 $("#btn-csi-mapping").click();
-            }
+            }--}%
         };
 
         var prepareConfigurationListAndCopy = function(){
@@ -400,16 +403,17 @@
 
         $(document).ready(function () {
 
-            createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
-            createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
-            createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
+            %{--createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");--}%
+            %{--createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");--}%
+            %{--createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");--}%
 
-            registerEventHandlers();
+            %{--registerEventHandlers();--}%
 
             initializeSomeControls();
             %{--refreshCsiConfigurationSwitchMenu();--}%
 
         });
+
         $( window ).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript(
                 '<g:assetPath src="csi/configurationPost.js" absolute="true"/>',

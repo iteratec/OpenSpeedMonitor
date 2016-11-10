@@ -115,7 +115,7 @@ class CsiConfigurationController {
         CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
 
         [errorMessagesCsi        : params.list('errorMessagesCsi'),
-         showCsiWeights          : params.get('showCsiWeights') ?: false,
+//         showCsiWeights          : params.get('showCsiWeights') ?: false,
          mappingsToOverwrite     : params.list('mappingsToOverwrite'),
          csiConfigurations       : csi_configurations,
          selectedCsiConfiguration: config,

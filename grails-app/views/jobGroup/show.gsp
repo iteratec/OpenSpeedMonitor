@@ -88,6 +88,7 @@
     }
 
     #tooltipMatrixView,
+    #tooltipTreemap,
     #tooltip {
         position: absolute;
         width: auto;
@@ -104,6 +105,7 @@
     }
 
     #tooltipMatrixView.hidden,
+    #tooltipTreemap.hidden,
     #tooltip.hidden {
         display: none;
     }
@@ -149,18 +151,14 @@
 
     <table class="table">
         <tbody>
-
         <tr class="prop">
             <td valign="top" class="name"><g:message code="jobGroup.name.label" default="Name"/></td>
 
             <td valign="top" class="value">${fieldValue(bean: jobGroup, field: "name")}</td>
-
         </tr>
-
         <tr class="prop">
             <td valign="top" class="name"><g:message code="jobGroup.graphiteServers.label"
                                                      default="Graphite Servers"/></td>
-
             <td valign="top" style="text-align: left;" class="value">
                 <ul>
                     <g:each in="${jobGroup.graphiteServers}" var="g">
@@ -169,66 +167,49 @@
                     </g:each>
                 </ul>
             </td>
-
         </tr>
-
         <g:if test="${jobGroup.csiConfiguration}">
-
             <tr class="prop">
                 <td valign="top" class="name"><g:message code="jobGroup.csiConfiguration.label"
                                                          default="Csi Configuration"/></td>
                 <td>${selectedCsiConfiguration.label} <br/><br/>
-                    <g:if test="${jobGroup.csiConfiguration}">
+                    %{--<g:if test="${jobGroup.csiConfiguration}">
                         <g:set var="renderCsiConfiguration" value="true"></g:set>
                         <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
                                                                                    showDefaultMappings    : false,
                                                                                    defaultTimeToCsMappings: defaultTimeToCsMappings,
                                                                                    pageMappingsExist      : pageMappingsExist]"/>
-                    </g:if>
+                    </g:if>--}%
                 </td>
             </tr>
         </g:if>
         </tbody>
     </table>
-
+</section>
+<section>
+    <g:if test="${jobGroup.csiConfiguration}">
+        <g:set var="renderCsiConfiguration" value="true"></g:set>
+        <g:render template="/csiConfiguration/confDetails" model="[readOnly               : true,
+                                                                   showDefaultMappings    : false,
+                                                                   defaultTimeToCsMappings: defaultTimeToCsMappings,
+                                                                   pageMappingsExist      : pageMappingsExist]"/>
+    </g:if>
 </section>
 <content tag="include.bottom">
     <asset:javascript src="d3/matrixView.js"/>
     <asset:javascript src="d3/barChart.js"/>
     <asset:javascript src="d3/treemap.js"/>
     <asset:script type="text/javascript">
-        var registerEventHandlers = function () {
-            $("#btn-csi-mapping").click(function () {
-                $('#csi-mapping').show();
-                $('#csi-weights').hide();
-            });
-            $("#btn-csi-weights").click(function () {
-                $('#csi-mapping').hide();
-                $('#csi-weights').show();
-            });
+        %{--$(document).ready(function () {
 
-        };
-
-        $(document).ready(function () {
-
-            if (${renderCsiConfiguration?:false}) {
-                createMatrixView(${matrixViewData?:"null"}, "browserConnectivityMatrixView");
-                createTreemap(1200, 750, ${treemapData?:"null"}, "rect", "pageWeightTreemap");
-                createBarChart(1000, 750, ${barchartData?:"null"}, "clocks", "hoursOfDayBarchart");
+            if (${renderCsiConfiguration ?: false}) {
+                createMatrixView(${matrixViewData ?: "null"}, "browserConnectivityMatrixView");
+                createTreemap(1200, 750, ${treemapData ?: "null"}, "rect", "pageWeightTreemap");
+                createBarChart(1000, 750, ${barchartData ?: "null"}, "clocks", "hoursOfDayBarchart");
             }
-
-            registerEventHandlers();
-
-            $("#warnAboutOverwritingBox").hide();
-            $("#errorBoxDefaultMappingCsv").hide();
-            $("#defaultMappingUploadButton").prop("disabled", true);
-            $("#btn-csi-mapping").click();
-
-        });
-
+        });--}%
     </asset:script>
 </content>
-
 
 </body>
 
