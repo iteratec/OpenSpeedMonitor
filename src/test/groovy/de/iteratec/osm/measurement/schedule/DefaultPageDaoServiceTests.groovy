@@ -51,8 +51,8 @@ class DefaultPageDaoServiceTests {
 	
 	@Test
 	void testFindAll() {
-		new Page(name: 'Page1', weight: 0).save(failOnError: true)
-		new Page(name: 'Page2', weight: 0).save(failOnError: true)
+		new Page(name: 'Page1').save(failOnError: true)
+		new Page(name: 'Page2').save(failOnError: true)
 		
 		Set<Page> result = serviceUnderTest.findAll();
 		
@@ -61,7 +61,7 @@ class DefaultPageDaoServiceTests {
 		assertEquals(1, result.count( { it.name == 'Page1' } ));
 		assertEquals(1, result.count( { it.name == 'Page2' } ));
 		
-		new Page(name: 'Page3', weight: 0).save(failOnError: true)
+		new Page(name: 'Page3').save(failOnError: true)
 		
 		Set<Page> resultAfterAdding = serviceUnderTest.findAll();
 		
@@ -77,10 +77,10 @@ class DefaultPageDaoServiceTests {
 		
 		//create test-specific data
 		
-		Page page1 = new Page(name: namePage1, weight: 0).save(failOnError: true)
-		Page page2 = new Page(name: namePage2, weight: 0).save(failOnError: true)
-		Page page3 = new Page(name: namePage3, weight: 0).save(failOnError: true)
-		Page page4 = new Page(name: namePage4, weight: 0).save(failOnError: true)
+		Page page1 = new Page(name: namePage1).save(failOnError: true)
+		Page page2 = new Page(name: namePage2).save(failOnError: true)
+		Page page3 = new Page(name: namePage3).save(failOnError: true)
+		Page page4 = new Page(name: namePage4).save(failOnError: true)
 		
 		//execute test
 		

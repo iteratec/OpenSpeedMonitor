@@ -178,7 +178,6 @@ class CustomerSatisfactionWeightService {
      */
     def persistNewWeights(WeightFactor weightFactor, InputStream csv, CsiConfiguration changedCsiConfiguration) {
         switch (weightFactor) {
-            case WeightFactor.BROWSER: persistBrowserWeights(csv); break
             case WeightFactor.PAGE: persistPageWeights(csv, changedCsiConfiguration); break
             case WeightFactor.HOUROFDAY: persistCsiDay(csv, changedCsiConfiguration); break
             case WeightFactor.BROWSER_CONNECTIVITY_COMBINATION: persistBrowserConnectivityWeights(csv, changedCsiConfiguration); break
@@ -186,27 +185,6 @@ class CustomerSatisfactionWeightService {
         changedCsiConfiguration.save(failOnError: true)
     }
 
-    /**
-     * @deprecated better use {@link persistBrowserConnectivityWeights()}
-     */
-    private persistBrowserWeights(InputStream csv) {
-        Integer lineCounter = 0
-        csv.eachLine { line ->
-            if (lineCounter > 0) {
-                List tokenized = line.tokenize(";")
-                Browser browser = Browser.findByName(tokenized[0])
-                if (browser) {
-                    log.info("update browser-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-                    browser.weight = Double.valueOf(tokenized[1])
-                    browser.save(failOnError: true)
-                } else {
-                    log.info("save new browser-weight: name=${tokenized[0]}, weight=${tokenized[1]}")
-                    new Browser(name: tokenized[0], weight: Double.valueOf(tokenized[1])).save(failOnError: true)
-                }
-            }
-            lineCounter++
-        }
-    }
 
     private persistBrowserConnectivityWeights(InputStream csv, CsiConfiguration changedCsiConfiguration) {
         Integer lineCounter = 0

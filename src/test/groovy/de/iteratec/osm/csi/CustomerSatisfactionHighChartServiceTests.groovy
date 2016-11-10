@@ -469,15 +469,9 @@ class CustomerSatisfactionHighChartServiceTests extends Specification{
 				).save(failOnError: true, validate: false)
 	}
 	private void createPages(){
-		new Page(
-				name: expectedPageNames[0],
-				weight: 1.0
-				).save(failOnError: true)
+		new Page(name: expectedPageNames[0]).save(failOnError: true)
+		new Page(name: expectedPageNames[1]).save(failOnError: true)
 
-		new Page(
-				name: expectedPageNames[1],
-				weight: 1.0
-				).save(failOnError: true)
 		assertNotNull( Page.findByName(expectedPageNames[0]))
 		assertNotNull( Page.findByName(expectedPageNames[1]))
 	}

@@ -498,25 +498,19 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
 
     private createBrowsers() {
         String browserName = Browser.UNDEFINED
-        undefinedBrowser = new Browser(
-                name: browserName,
-                weight: 0)
+        undefinedBrowser = new Browser(name: browserName)
                 .addToBrowserAliases(alias: Browser.UNDEFINED)
                 .save(failOnError: true)
 
         browserName = "IE"
-        new Browser(
-                name: browserName,
-                weight: 45)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
         browserName = "FF"
-        new Browser(
-                name: browserName,
-                weight: 55)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "FF7")
                 .addToBrowserAliases(alias: "Firefox")
@@ -524,9 +518,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
                 .save(failOnError: true)
 
         browserName = "Chrome"
-        new Browser(
-                name: browserName,
-                weight: 55)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "Chrome")
                 .save(failOnError: true)
     }
@@ -542,9 +534,7 @@ class WptInfrastructurePersistenceWithIncomingResultsTests {
                 case 'WKBS': weight = 3; break
                 case 'WK': weight = 3; break
             }
-            new Page(
-                    name: pageName,
-                    weight: weight).save(failOnError: true)
+            new Page(name: pageName).save(failOnError: true)
         }
     }
 

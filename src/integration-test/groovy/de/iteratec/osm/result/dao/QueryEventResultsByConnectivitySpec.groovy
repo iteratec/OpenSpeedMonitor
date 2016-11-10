@@ -357,11 +357,11 @@ class QueryEventResultsByConnectivitySpec extends NonTransactionalIntegrationSpe
 
         JobGroup jobGroup = TestDataUtil.createJobGroup("TestGroup")
 
-        Browser fireFoxBrowser = TestDataUtil.createBrowser('FF', 0.55d)
+        Browser fireFoxBrowser = TestDataUtil.createBrowser('FF')
 
         Location ffAgent1 = TestDataUtil.createLocation(server, 'physNetLabAgent01-FF', fireFoxBrowser, true)
 
-        Page homepage = TestDataUtil.createPage('homepage', 0.5d)
+        Page homepage = TestDataUtil.createPage('homepage')
 
         Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
         jobWithPredefinedConnectivity = TestDataUtil.createJob('job with predefined connectivity', script, ffAgent1, jobGroup, 'irrelevantDescription', 1, false, 60)

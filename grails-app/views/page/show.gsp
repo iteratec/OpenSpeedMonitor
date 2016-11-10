@@ -21,16 +21,9 @@
 				<td valign="top" class="name"><g:message code="page.name.label" default="Name" /></td>
 				
 				<td valign="top" class="value">${fieldValue(bean: pageInstance, field: "name")}</td>
-				
+
 			</tr>
 		
-			<tr class="prop">
-				<td valign="top" class="name"><g:message code="page.weight.label" default="Weight" /></td>
-				
-				<td valign="top" class="value">${fieldValue(bean: pageInstance, field: "weight")}</td>
-				
-			</tr>
-
 		</tbody>
 	</table>
 </section>

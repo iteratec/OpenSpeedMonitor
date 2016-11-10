@@ -247,7 +247,7 @@ class EventCsiAggregationServiceTests {
 			MvQueryParams mvQueryParams ->
 			return irrelevantPatternCauseDbCallIsMockedToo
 		}
-		MeasuredEvent eventToReturn = new MeasuredEvent(name: 'testEvent', testedPage: new Page(name: 'testPage', weight: 0.5))
+		MeasuredEvent eventToReturn = new MeasuredEvent(name: 'testEvent', testedPage: new Page(name: 'testPage'))
 		csiAggregationTagService.demand.findMeasuredEventOfHourlyEventTag(1..10000) {
 			String hourlyEventMvTag ->
 			return eventToReturn

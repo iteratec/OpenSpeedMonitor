@@ -327,11 +327,11 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     private void createCommonTestData() {
         connectivityProfile = TestDataUtil.createConnectivityProfile("Conn1")
 
-        browser1 = TestDataUtil.createBrowser(browserName1,0.0)
-        browser2 = TestDataUtil.createBrowser(browserName2,0.0)
+        browser1 = TestDataUtil.createBrowser(browserName1)
+        browser2 = TestDataUtil.createBrowser(browserName2)
 
-        page1 = TestDataUtil.createPage(pageName1,0.0)
-        page2 = TestDataUtil.createPage(pageName2,0.0)
+        page1 = TestDataUtil.createPage(pageName1)
+        page2 = TestDataUtil.createPage(pageName2)
 
         csiConfiguration = TestDataUtil.createCsiConfiguration()
         csiConfiguration.timeToCsMappings = TestDataUtil.createTimeToCsMappingForAllPages([page1,page2])

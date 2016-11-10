@@ -67,7 +67,7 @@ class LocationTests {
                 uniqueIdentifierForServer: "Test",
                 location: "Test",
                 label: testStringValide,
-                browser: TestDataUtil.createBrowser("Test",123.123),
+                browser: TestDataUtil.createBrowser("Test"),
                 wptServer: TestDataUtil.createServer(),
                 dateCreated: new Date(),
                 lastUpdated: new Date())

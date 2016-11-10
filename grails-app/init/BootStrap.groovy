@@ -391,17 +391,13 @@ class BootStrap {
 
         //undefined
         String browserName = Browser.UNDEFINED
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 0)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias(Browser.UNDEFINED))
                 .save(failOnError: true)
 
         //IE
         browserName = "IE"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 1)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("IE"))
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("IE8"))
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Internet Explorer"))
@@ -410,9 +406,7 @@ class BootStrap {
 
         //FF
         browserName = "Firefox"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 1)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("FF"))
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("FF7"))
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Firefox"))
@@ -421,9 +415,7 @@ class BootStrap {
 
         //Chrome
         browserName = "Chrome"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 1)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Chrome"))
                 .save(failOnError: true)
 

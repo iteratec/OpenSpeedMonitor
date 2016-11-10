@@ -554,7 +554,7 @@ class PageCsiAggregationServiceTests {
         pageAggregator = new AggregatorType(name: AggregatorType.PAGE, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
         new AggregatorType(name: AggregatorType.MEASURED_EVENT, measurandGroup: MeasurandGroup.NO_MEASURAND).save(failOnError: true)
 
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
+        browser = new Browser(name: "Test").save(failOnError: true);
 
         connectivityProfile = TestDataUtil.createConnectivityProfile("DSL1")
 

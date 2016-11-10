@@ -67,7 +67,7 @@ class BrowserService {
     }
 	
 	private Browser findByAlias(browserNameOrAlias){
-		Browser ret = Browser.findByName('undefined')?:new Browser(name:'undefined', weight: 0d).save(failOnError:true)
+		Browser ret = Browser.findByName('undefined')?:new Browser(name:'undefined').save(failOnError:true)
 		Browser.list().each{currBrowser ->
 			def query = BrowserAlias.where{
 				browser == currBrowser

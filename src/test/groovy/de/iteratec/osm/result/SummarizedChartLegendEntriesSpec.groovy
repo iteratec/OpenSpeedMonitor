@@ -696,7 +696,7 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         TestDataUtil.createJobGroup(JOB_GROUP_3_NAME)
         TestDataUtil.createJobGroup(JOB_GROUP_4_NAME)
 
-        Page page = TestDataUtil.createPage('pageName', 12d)
+        Page page = TestDataUtil.createPage('pageName')
 
         TestDataUtil.createMeasuredEvent(EVENT_1_NAME, page)
         TestDataUtil.createMeasuredEvent(EVENT_2_NAME, page)

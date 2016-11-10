@@ -87,9 +87,9 @@ class ShopCsiAggregationServiceTests {
         jobGroup2 = new JobGroup(name: jobGroupName2).save(validate: false)
         jobGroup3 = new JobGroup(name: jobGroupName3).save(validate: false)
 
-        page1 = new Page(name: "page1", weight: 1).save(failOnError: true)
+        page1 = new Page(name: "page1").save(failOnError: true)
 
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
+        browser = new Browser(name: "Test").save(failOnError: true);
 
         //with existing JobGroup:
         new CsiAggregation(interval: weeklyInterval, aggregator: shop, tag: '1', started: startDate.toDate()).save(validate: false)

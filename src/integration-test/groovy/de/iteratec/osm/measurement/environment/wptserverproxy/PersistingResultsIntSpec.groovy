@@ -168,7 +168,7 @@ class PersistingResultsIntSpec extends NonTransactionalIntegrationSpec {
     private createTestDataCommonToAllTests() {
 
         TestDataUtil.createPages(['HP', 'MES', Page.UNDEFINED])
-        Browser undefBrowser = TestDataUtil.createBrowser(Browser.UNDEFINED, 1)
+        Browser undefBrowser = TestDataUtil.createBrowser(Browser.UNDEFINED)
         JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
         server1 = TestDataUtil.createWebPageTestServer(
                 "TestServer 1",

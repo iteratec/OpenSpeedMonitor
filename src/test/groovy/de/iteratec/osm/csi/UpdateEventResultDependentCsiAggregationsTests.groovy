@@ -358,15 +358,11 @@ class UpdateEventResultDependentCsiAggregationsTests {
     }
 
     private void createPages() {
-        new Page(
-                name: pageNameHp,
-                weight: 6).save(failOnError: true)
+        new Page(name: pageNameHp).save(failOnError: true)
     }
 
     private void createBrowsers() {
-        new Browser(
-                name: browserName,
-                weight: 45)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")

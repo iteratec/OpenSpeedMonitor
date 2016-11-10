@@ -30,18 +30,11 @@ class Browser {
     public static final String UNDEFINED = 'undefined'
 
     String name
-    /**
-     * @deprecated Replaced by {@link BrowserConnectivityWeight}.
-     */
-    @Deprecated
-    Double weight
-    static final Double minWeight = 0
 
     static hasMany = [browserAliases: BrowserAlias]
 
     static constraints = {
         name(unique:true, maxSize: 255)
-        weight(min: this.minWeight)
     }
 
     static transients = ['undefinedBrowser']
@@ -62,6 +55,6 @@ class Browser {
 
     @Override
     public String toString(){
-        return "${name} (weight=${weight})"
+        return "${name}"
     }
 }

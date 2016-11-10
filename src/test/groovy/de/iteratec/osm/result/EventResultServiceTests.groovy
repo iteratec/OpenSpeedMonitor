@@ -80,17 +80,9 @@ class EventResultServiceTests {
 				lastUpdated: new Date()
 				).save(failOnError: true)
 
-		ffBrowser = new Browser(
-				name:'FF',
-				weight: 0.55).save(failOnError:true)
-
-		ieBrowser = new Browser(
-				name:'IE',
-				weight: 0.25).save(failOnError:true)
-
-		i8eBrowser = new Browser(
-				name:'I8E',
-				weight: 0.20).save(failOnError:true)
+		ffBrowser = new Browser(name:'FF').save(failOnError:true)
+		ieBrowser = new Browser(name:'IE').save(failOnError:true)
+		i8eBrowser = new Browser(name:'I8E').save(failOnError:true)
 
 		ffAgent1 = new Location(
 				active: true,
@@ -703,7 +695,7 @@ class EventResultServiceTests {
 		Date toDate = new Date(1375966799999L);
 
 		// Define a MeasuredEvent:
-		Page pageOfEvent = new Page(name: 'Testpage', /*Not of interest but required by constraint: */weight: 0).save(failOnError:true);
+		Page pageOfEvent = new Page(name: 'Testpage').save(failOnError:true);
 		MeasuredEvent theEventToLookFor = new MeasuredEvent(name: 'Testevent', testedPage: pageOfEvent).save(failOnError:true);
 		MeasuredEvent anotherEventNotOfInterest = new MeasuredEvent(name: 'Testevent-2', testedPage: pageOfEvent).save(failOnError:true);
 
@@ -711,7 +703,7 @@ class EventResultServiceTests {
 		JobGroup jobGroupCsiLhotse = new JobGroup(name: 'CSI Lhotse').save(failOnError:true);
 		
 		// Define a Browser and a Location (not relevant, because query works on copied data, but required on constraints):
-		Browser browser = new Browser(name: 'FF-w0', weight:0).save(failOnError:true);
+		Browser browser = new Browser(name: 'FF-w0').save(failOnError:true);
 		WebPageTestServer wptServer = new WebPageTestServer(label:'Testserver', proxyIdentifier:'testproxy', baseUrl:'http://example.com/', active:true,dateCreated: new Date(),lastUpdated: new Date()).save(failOnError:true);
 		Location location = new Location(active: true, location: 'agent1.example.com', browser: browser, label: 'Test-location', wptServer: wptServer,dateCreated: new Date(),lastUpdated: new Date()).save(failOnError:true);
 		Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)

@@ -123,15 +123,9 @@ class ResultCsiAggregationServiceTests {
 				name: "TestGroup"
 				).save(failOnError: true)
 
-		Browser fireFoxBrowser = new Browser(
-				name:'FF',
-				weight: 0.55).save(failOnError:true)
-		Browser ieBrowser = new Browser(
-				name:'IE',
-				weight: 0.25).save(failOnError:true)
-		Browser i8eBrowser = new Browser(
-				name:'I8E',
-				weight: 0.20).save(failOnError:true)
+		Browser fireFoxBrowser = new Browser(name:'FF').save(failOnError:true)
+		Browser ieBrowser = new Browser(name:'IE').save(failOnError:true)
+		Browser i8eBrowser = new Browser(name:'I8E').save(failOnError:true)
 
 		Location ffAgent1 = new Location(
 				active: true,
@@ -145,10 +139,7 @@ class ResultCsiAggregationServiceTests {
 				).save(failOnError: true)
 
 
-		Page homepage = new Page(
-				name: 'homepage',
-				weight: 0.5
-				).save(failOnError: true)
+		Page homepage = new Page(name: 'homepage').save(failOnError: true)
 
 		connectivityProfile = TestDataUtil.createConnectivityProfile("Test")
 

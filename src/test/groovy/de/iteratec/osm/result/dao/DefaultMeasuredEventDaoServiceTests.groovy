@@ -142,11 +142,11 @@ class DefaultMeasuredEventDaoServiceTests extends Specification {
 	}
 	
 	private void createPages(){
-		new Page(name: nameHp, weight: 1).save(failOnError: true)
-		new Page(name: nameMes, weight: 1).save(failOnError: true)
-		new Page(name: nameSe, weight: 1).save(failOnError: true)
-		new Page(name: nameAds, weight: 1).save(failOnError: true)
-		new Page(name: nameWkbs, weight: 1).save(failOnError: true)
-		new Page(name: nameWk, weight: 1).save(failOnError: true)
+		new Page(name: nameHp).save(failOnError: true)
+		new Page(name: nameMes).save(failOnError: true)
+		new Page(name: nameSe).save(failOnError: true)
+		new Page(name: nameAds).save(failOnError: true)
+		new Page(name: nameWkbs).save(failOnError: true)
+		new Page(name: nameWk).save(failOnError: true)
 	}
 }

@@ -817,18 +817,12 @@ class TestDataUtil implements OsmTestLogin {
     static List<Browser> createBrowsersAndAliases() {
         List<Browser> browsers = []
         String browserName = "undefined"
-        browsers.add(
-                new Browser(
-                        name: browserName,
-                        weight: 0)
+        browsers.add(new Browser(name: browserName)
                         .addToBrowserAliases(alias: "undefined"
                 ).save(failOnError: true)
         )
         browserName = "IE"
-        browsers.add(
-                new Browser(
-                        name: browserName,
-                        weight: 45)
+        browsers.add(new Browser(name: browserName)
                         .addToBrowserAliases(alias: "IE")
                         .addToBrowserAliases(alias: "IE8")
                         .addToBrowserAliases(alias: "Internet Explorer")
@@ -836,10 +830,7 @@ class TestDataUtil implements OsmTestLogin {
                 ).save(failOnError: true)
         )
         browserName = "FF"
-        browsers.add(
-                new Browser(
-                        name: browserName,
-                        weight: 55)
+        browsers.add(new Browser(name: browserName)
                         .addToBrowserAliases(alias: "FF")
                         .addToBrowserAliases(alias: "FF7")
                         .addToBrowserAliases(alias: "Firefox")
@@ -849,13 +840,10 @@ class TestDataUtil implements OsmTestLogin {
         return browsers
     }
 
-    static Browser createBrowser(String name, double weight) {
+    static Browser createBrowser(String name) {
         Browser browser = Browser.findByName(name)
         browser = browser == null ?
-                new Browser(
-                        name: name,
-                        weight: weight
-                ).save(failOnError: true) : browser
+                new Browser(name: name).save(failOnError: true) : browser
         return browser
     }
 
@@ -874,10 +862,7 @@ class TestDataUtil implements OsmTestLogin {
     }
 
     static Page createUndefinedPage() {
-        return new Page(
-                name: Page.UNDEFINED,
-                weight: 0
-        ).save(failOnError: true)
+        return new Page(name: Page.UNDEFINED).save(failOnError: true)
     }
 
     static List<Page> createPages(List<String> allPageNames) {
@@ -886,11 +871,8 @@ class TestDataUtil implements OsmTestLogin {
         }
     }
 
-    static Page createPage(String name, Double weight) {
-        return new Page(
-                name: name,
-                weight: weight
-        ).save(failOnError: true)
+    static Page createPage(String name) {
+        return new Page(name: name).save(failOnError: true)
     }
 
     static List<JobGroup> createJobGroups() {
@@ -1077,7 +1059,7 @@ class TestDataUtil implements OsmTestLogin {
             MeasuredEvent event,
             ConnectivityProfile connectivityProfile) {
         CsiAggregationTagService csiAggregationTagService = new CsiAggregationTagService()
-        Browser dummyBrowser = createBrowser("bro", 0)
+        Browser dummyBrowser = createBrowser("bro")
         EventResult eventResult = new EventResult(
                 numberOfWptRun: 1,
                 cachedView: CachedView.UNCACHED,
@@ -1558,7 +1540,7 @@ class TestDataUtil implements OsmTestLogin {
     public static Job createSimpleJob() {
         JobGroup group = createJobGroup("group")
         Location location = createLocation(createWebPageTestServer("label2", "proxyId", true, "http://server1.iteratec.de/"), "veryUnique",
-                createBrowser("FF", 1), true)
+                createBrowser("FF"), true)
         return createJob("label", createScript("label1", "description", "navi",),
                 location, group, "description", 1, false, 10)
     }

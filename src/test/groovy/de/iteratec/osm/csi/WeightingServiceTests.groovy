@@ -737,8 +737,8 @@ class WeightingServiceTests {
     private createTestDataCommonToAllTests() {
         page_50 = new Page(name: 'page_50')
         page_70 = new Page(name: 'page_70')
-        browserToReturn_50 = new Browser(name: 'browser_50', weight: 0.5d)
-        browserToReturn_70 = new Browser(name: 'browser_70', weight: 0.7d)
+        browserToReturn_50 = new Browser(name: 'browser_50')
+        browserToReturn_70 = new Browser(name: 'browser_70')
         CsiDay day = new CsiDay()
         day.with {
             hour0Weight = 2.9d

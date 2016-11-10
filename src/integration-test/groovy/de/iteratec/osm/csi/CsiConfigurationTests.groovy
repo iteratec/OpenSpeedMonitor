@@ -35,8 +35,8 @@ class CsiConfigurationTests extends NonTransactionalIntegrationSpec {
     }
 
     private void createTestDataCommonForAllTests() {
-        Page page = TestDataUtil.createPage("aPage",0)
-        Browser browser = TestDataUtil.createBrowser("a",0)
+        Page page = TestDataUtil.createPage("aPage")
+        Browser browser = TestDataUtil.createBrowser("a")
         ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile("testCon")
 
         csiConfiguration = TestDataUtil.createCsiConfiguration()

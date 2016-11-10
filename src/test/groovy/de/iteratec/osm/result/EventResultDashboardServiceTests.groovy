@@ -497,14 +497,10 @@ class EventResultDashboardServiceTests {
     }
 
     void createBrowser() {
-        browser = new Browser(
-                name: "Test",
-                weight: 1)
+        browser = new Browser(name: "Test")
                 .addToBrowserAliases(new BrowserAlias(alias: "Test"))
                 .save(failOnError: true)
-        new Browser(
-                name: "Test2",
-                weight: 1)
+        new Browser(name: "Test2")
                 .addToBrowserAliases(new BrowserAlias(alias: "Test2"))
                 .save(failOnError: true)
     }
@@ -562,12 +558,8 @@ class EventResultDashboardServiceTests {
     }
 
     void createPages() {
-        page = new Page(
-                name: page1Name,
-                weight: 0).save(failOnError: true)
-        new Page(
-                name: page2Name,
-                weight: 0).save(failOnError: true)
+        page = new Page(name: page1Name).save(failOnError: true)
+        new Page(name: page2Name).save(failOnError: true)
     }
 
     void createJobResults() {

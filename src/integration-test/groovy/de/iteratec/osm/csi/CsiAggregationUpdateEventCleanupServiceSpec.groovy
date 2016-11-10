@@ -181,7 +181,7 @@ class CsiAggregationUpdateEventCleanupServiceSpec extends NonTransactionalIntegr
             page = aggregators.find { it.name.equals(AggregatorType.PAGE) }
             shop = aggregators.find { it.name.equals(AggregatorType.SHOP) }
 
-            new Page(id: 1, name: "unused page", weight: 1.0).save(failOnError: true, flush: true)
+            new Page(id: 1, name: "unused page").save(failOnError: true, flush: true)
             new JobGroup(id: 1, name: "unused JobGroup").save(failOnError: true, flush: true)
         }
     }

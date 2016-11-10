@@ -65,9 +65,7 @@ class PaginationServiceTest {
 				).save(failOnError: true)
 
 		String browserName="FF"
-		Browser browserFF = Browser.findByName(browserName)?:new Browser(
-				name: browserName,
-				weight: 55)
+		Browser browserFF = Browser.findByName(browserName)?:new Browser(name: browserName)
 				.addToBrowserAliases(alias: "FF")
 				.addToBrowserAliases(alias: "FF7")
 				.addToBrowserAliases(alias: "Firefox")

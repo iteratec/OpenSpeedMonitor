@@ -84,8 +84,8 @@ class PersistConnectivityInNewEventResultSpec extends Specification {
     void createTestDataCommonForAllTests() {
         JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
-        Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
-        Browser ie = TestDataUtil.createBrowser('IE', 1d)
+        Browser ff = TestDataUtil.createBrowser('Firefox')
+        Browser ie = TestDataUtil.createBrowser('IE')
         Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-win7:Firefox', ff, true)
         Location locationIe = TestDataUtil.createLocation(wptServer, 'NewYork:IE 11', ie, true)
         UNDEFINED_PAGE = TestDataUtil.createUndefinedPage()

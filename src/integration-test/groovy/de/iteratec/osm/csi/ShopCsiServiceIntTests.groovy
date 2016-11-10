@@ -199,7 +199,7 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
         JobGroup group = JobGroup.list()[0]
         Script script = TestDataUtil.createScript("label${groups}", "description", "navigationScript")
         WebPageTestServer webPageTestServer = TestDataUtil.createWebPageTestServer("label", "1", true, "http://www.url.de")
-        Browser browser = TestDataUtil.createBrowser("browser${groups}", 1)
+        Browser browser = TestDataUtil.createBrowser("browser${groups}")
         Location location = TestDataUtil.createLocation(webPageTestServer, "id", browser, true)
         Job job = TestDataUtil.createJob("Label${groups++}", script, location, group, "descirpiton", 1, false, 20)
 
@@ -237,9 +237,7 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     private void createPagesAndEvents() {
         ['HP', 'MES', 'SE', 'ADS', 'WKBS', 'WK', Page.UNDEFINED].each { pageName ->
             Double weight = 0
-            Page page = Page.findByName(pageName) ?: new Page(
-                    name: pageName,
-                    weight: weight).save(failOnError: true)
+            Page page = Page.findByName(pageName) ?: new Page(name: pageName).save(failOnError: true)
 
             // Simply create one event
             new MeasuredEvent(
@@ -252,24 +250,18 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
     private void createBrowsers() {
         String browserName = "undefined"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 0)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "undefined")
                 .save(failOnError: true)
         browserName = "IE"
-        Browser browserIE = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 45)
+        Browser browserIE = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
         browserName = "FF"
-        Browser browserFF = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 55)
+        Browser browserFF = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "FF7")
                 .addToBrowserAliases(alias: "Firefox")

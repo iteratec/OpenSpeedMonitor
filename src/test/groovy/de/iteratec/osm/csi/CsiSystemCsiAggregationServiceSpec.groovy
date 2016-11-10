@@ -341,7 +341,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
         jobGroup3 = new JobGroup(name: jobGroupName3).save(validate: false)
         jobGroup3.csiConfiguration = csiConfiguration
 
-        browser = new Browser(name: "Test", weight: 1).save(failOnError: true);
+        browser = new Browser(name: "Test").save(failOnError: true);
 
         csiSystem1 = new CsiSystem(label: "system1")
         csiSystem1.addToJobGroupWeights(new JobGroupWeight(jobGroup: jobGroup1, weight: 1.0, csiSystem: csiSystem1))
@@ -403,7 +403,7 @@ class CsiSystemCsiAggregationServiceSpec extends Specification {
                 httpStatusCode: 200,
         ).save(failOnError: true)
 
-        page1 = TestDataUtil.createPage("page1", 0.0)
+        page1 = TestDataUtil.createPage("page1")
 
         MeasuredEvent measuredEvent = TestDataUtil.createMeasuredEvent("meEvent1", page1)
 

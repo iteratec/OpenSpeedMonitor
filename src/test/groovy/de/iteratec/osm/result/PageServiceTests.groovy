@@ -119,13 +119,13 @@ class PageServiceTests {
 	}
 
 	private createPages(){
-		new Page(name: 'HP', weight: 6.0d).save(failOnError: true)
-		new Page(name: 'MES', weight: 9.0d).save(failOnError: true)
-		new Page(name: 'SE', weight: 36.0d).save(failOnError: true)
-		new Page(name: 'ADS', weight: 43.0d).save(failOnError: true)
-		new Page(name: 'WKBS', weight: 3.0d).save(failOnError: true)
-		new Page(name: 'WK', weight: 3.0d).save(failOnError: true)
-		new Page(name: Page.UNDEFINED, weight: 0.0d).save(failOnError: true)
+		new Page(name: 'HP').save(failOnError: true)
+		new Page(name: 'MES').save(failOnError: true)
+		new Page(name: 'SE').save(failOnError: true)
+		new Page(name: 'ADS').save(failOnError: true)
+		new Page(name: 'WKBS').save(failOnError: true)
+		new Page(name: 'WK').save(failOnError: true)
+		new Page(name: Page.UNDEFINED).save(failOnError: true)
 	}
 
 	private createMeasuredEvents() {

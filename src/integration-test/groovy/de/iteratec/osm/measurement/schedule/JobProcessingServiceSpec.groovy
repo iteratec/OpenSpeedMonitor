@@ -113,9 +113,7 @@ class JobProcessingServiceSpec extends NonTransactionalIntegrationSpec {
                 lastUpdated: new Date(),
                 active: true,
                 baseUrl: 'http://example.com').save(failOnError: true)
-        Browser browser = new Browser(
-                name: 'browser',
-                weight: 1.0).save(failOnError: true)
+        Browser browser = new Browser(name: 'browser').save(failOnError: true)
         jobGroup = new JobGroup(
                 name: 'Unnamed group',
                 graphiteServers: []).save(failOnError: true)
