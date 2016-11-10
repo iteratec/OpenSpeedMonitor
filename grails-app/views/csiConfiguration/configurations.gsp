@@ -7,7 +7,6 @@
     <style>
     .chart {
         display: block;
-        margin: 0 auto;
     }
     %{--Styles for MatrixView--}%
     .xAxisMatrix path,

@@ -51,14 +51,11 @@ function createTreemap(altWidth, altHeight, data, design, id) {
 
     $('#treemapSpan')
         .css("display", "flex")
-        .css("justify-content", "center");
 
     // Set attributes of the treemap container
     container
         .style("width", width + margin.left + margin.right + "px")
         .style("height", height + margin.top + margin.bottom + "px")
-        // .style("display", "flex")
-        // .style("float", "left");
 
 
     // does tooltip at mouse position
