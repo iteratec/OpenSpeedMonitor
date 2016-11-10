@@ -141,8 +141,8 @@
                 <div class="pull-right">
                     <button class="btn btn-primary"
                             onclick="prepareConfigurationListAndCopy()">
-                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                        ${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Save')}
+                        <i class="fa fa-files-o" aria-hidden="true"></i>
+                        ${message(code: 'de.iteratec.osm.csiConfiguration.saveAs', default: 'Save a copy')}
                     </button>
                     <a href="#" onclick="return validatedDeletion()" id="deleteCsiConfigurationHref" class="btn btn-danger">
                         <i class="fa fa-trash-o" aria-hidden="true"></i> ${message(code: 'de.iteratec.osm.csiConfiguration.deleteCsiConfiguration', default: 'Delete')}
