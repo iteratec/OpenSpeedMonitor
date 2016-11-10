@@ -44,13 +44,12 @@ import static org.junit.Assert.assertThat
  */
 @TestMixin(GrailsUnitTestMixin)
 @TestFor(CsiAggregationDaoService)
-@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval, AggregatorType])
+@Mock([CsiAggregationUpdateEvent, CsiAggregation, CsiAggregationInterval, AggregatorType, JobGroup, MeasuredEvent, Page, Browser, Location])
 class CsiAggregationDaoServiceSpec {
 
     CsiAggregationDaoService serviceUnderTest
     CsiAggregationInterval weeklyInterval, dailyInterval, hourlyInterval
     AggregatorType pageAggregator, shopAggregator, eventAggregator
-    ServiceMocker mockGenerator
 
     def doWithSpring = {
         csiAggregationUtilService(CsiAggregationUtilService)

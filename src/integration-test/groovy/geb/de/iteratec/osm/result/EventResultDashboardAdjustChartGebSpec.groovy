@@ -466,7 +466,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false,
-                    jobGrou: jobGroup1,
+                    jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1

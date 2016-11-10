@@ -37,7 +37,7 @@ import static org.junit.Assert.assertThat
  * Test-suite for {@link CsiAggregation}.
  */
 @TestMixin(GrailsUnitTestMixin)
-@Mock([CsiAggregation, AggregatorType, CsiAggregationInterval, CsiAggregationUpdateEvent])
+@Mock([CsiAggregation, AggregatorType, CsiAggregationInterval, CsiAggregationUpdateEvent, JobGroup, MeasuredEvent, Page, Browser, Location])
 class CsiAggregationTests {
 
     Date dateOfMv1
