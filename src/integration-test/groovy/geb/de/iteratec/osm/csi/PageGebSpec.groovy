@@ -50,7 +50,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         to PageCreatePage
 
         and: "does not fill all required fields"
-        pageWeightTextField << pageWeight
         createPageButton.click()
 
         then: "an error message is shown on create page"
@@ -64,7 +63,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         to PageCreatePage
 
         and: "does fill form correctly"
-        pageWeightTextField << pageWeight
         pageNameTextField << pageName
         createPageButton.click()
         // save page id for following tests
@@ -84,7 +82,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         then: "the page data is shown"
         at PageShowPage
         name == pageName
-        weight == pageWeight
     }
 
     void "test editPage with invalid data"() {
@@ -109,7 +106,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         then: "form is prefilled"
         at PageEditPage
         nameTextField.value() == pageName
-        weightTextField.value() == pageWeight
 
         when: "user inserts new name"
         String newPageName = "a new geb test page name"

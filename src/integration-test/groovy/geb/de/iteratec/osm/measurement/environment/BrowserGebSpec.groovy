@@ -15,6 +15,7 @@ import geb.pages.de.iteratec.osm.measurement.environment.BrowserShowPage
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
 import spock.lang.IgnoreIf
 import spock.lang.Shared
 import spock.lang.Stepwise
@@ -27,7 +28,6 @@ import spock.lang.Stepwise
 class BrowserGebSpec extends CustomUrlGebReportingSpec {
 
     private final String browserName = "a geb test browser"
-    private final String browserWeight = "2.0"
 
     @Shared
     int browserId
@@ -52,7 +52,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         to BrowserCreatePage
 
         and: "does not fill all required fields"
-        browserWeightTextField << browserWeight
         createBrowserButton.click()
 
         then: "an error message is shown on create page"
@@ -66,7 +65,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         to BrowserCreatePage
 
         and: "does fill form correctly"
-        browserWeightTextField << browserWeight
         browserNameTextField << browserName
         createBrowserButton.click()
         // save browser id for following tests
@@ -86,7 +84,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         then: "the browser data is shown"
         at BrowserShowPage
         name == browserName
-        weight == browserWeight
     }
 
     void "test editBrowser with invalid data"() {
@@ -111,7 +108,6 @@ class BrowserGebSpec extends CustomUrlGebReportingSpec {
         then: "form is prefilled"
         at BrowserEditPage
         nameTextField.value() == browserName
-        weightTextField.value() == browserWeight
 
         when: "user inserts new name"
         String newBrowserName = "a new geb test browser name"
