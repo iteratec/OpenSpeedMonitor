@@ -272,7 +272,7 @@
                             </div>
                         </fieldset>
                     </div>
-                    <g:render template="/dateSelection/startAndEnddateSelection"
+                    <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                               model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
                                         'fromHour': fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': true,
                                         'includeInterval': includeInterval]}"/>
@@ -287,7 +287,7 @@
                                   optionValue="label" value="${selectedCsiSystems}" multiple="true"/>
                     </div>
                     <div id="filter-navtab-jobGroup">
-                        <g:render template="/eventResultDashboard/selectJobGroup"
+                        <g:render template="/_resultSelection/selectJobGroupCard"
                                   model="['folders': folders, 'selectedFolder': selectedFolder,
                                           'tagToJobGroupNameMap': tagToJobGroupNameMap]" />
                     </div>
@@ -317,7 +317,7 @@
                 </div>
                 %{--the rest----------------------------------------------------------------------------------------------}%
                 <div id="filter-complete-tabbable" class="col-md-5">
-                    <g:render template="/eventResultDashboard/selectPageLocation"
+                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
                               model="['locationsOfBrowsers'             : locationsOfBrowsers,
                                       'eventsOfPages'                   : eventsOfPages,
                                       'pages'                           : pages,

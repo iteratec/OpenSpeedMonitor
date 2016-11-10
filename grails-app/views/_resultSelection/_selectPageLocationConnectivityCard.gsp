@@ -1,4 +1,7 @@
 <%@ page defaultCodec="none" %></page>
+<%--
+A card to select page & measured step, browser & location, and the connectivity
+--%>
 
 <div class="card" id="select-page-location">
     <ul class="nav nav-tabs">

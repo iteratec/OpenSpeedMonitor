@@ -1,5 +1,7 @@
 <%@ page defaultCodec="none" %></page>
-
+<%--
+A card with controls to select a job group
+--%>
 <div class="card" id="select-jobgroup">
     %{--JobGroups----------------------------------------------------------------------------------------------}%
     <legend>

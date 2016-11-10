@@ -1,3 +1,6 @@
+<%--
+A row with 3 cards to select the measured variables for first view, repeat view, and to filter them by min/max values
+--%>
 <div class="row">
     <div class="col-md-4">
         <div class="card">

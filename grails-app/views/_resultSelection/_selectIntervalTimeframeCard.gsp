@@ -1,7 +1,7 @@
 <%@page defaultCodec="none" %>
 <%-- 
-This template contains controls to set a time frame in terms of a start and an end date.
-These two can either be set manually or via pre-selections like 'last hour', 'last three days' or 'last 4 weeks'.
+A card with controls to select a time frame (manual, or presets like 'last 12 hours') and optionally
+a control to select an aggregation interval (if csiAggregationIntervals is set)
 --%>
 <div class="card form-horizontal" id="select-timeframe">
     <legend>

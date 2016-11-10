@@ -1,5 +1,8 @@
 <%@ page defaultCodec="none" %></page>
-<%-- 
+<%--
+Two columns (span 3 and span 5) to with cards selectJobGroupCard and selectPageLocationConnectivityCard
+
+
 GSP-Template Mappings:
 
 * folders List<JobGroup>: all Folders for selection 
@@ -21,13 +24,13 @@ GSP-Template Mappings:
 * selectedAllLocations
  --%>
 <div class="col-md-3" id="filter-navtab-jobGroup">
-    <g:render template="/eventResultDashboard/selectJobGroup"
+    <g:render template="/_resultSelection/selectJobGroupCard"
               model="['folders': folders, 'selectedFolder': selectedFolder, 'tagToJobGroupNameMap': tagToJobGroupNameMap]"/>
 </div>
 
 %{--the rest----------------------------------------------------------------------------------------------}%
 <div id="filter-complete-tabbable" class="col-md-5">
-    <g:render template="/eventResultDashboard/selectPageLocation"
+    <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
               model="['locationsOfBrowsers'             : locationsOfBrowsers,
                       'eventsOfPages'                   : eventsOfPages,
                       'pages'                           : pages,

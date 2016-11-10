@@ -223,7 +223,7 @@
             </ul>
             <div class="tab-content card-well">
                 <div class="tab-pane in active" id="tabJobSelection">
-                    <g:render template="selectMeasuringsAndTimeFrame"
+                    <g:render template="/_resultSelection/selectMeasuringsAndTimeFrame"
                               model="${['selectedTimeFrameInterval'       : selectedTimeFrameInterval,
                                         'from'                            : from,
                                         'fromHour'                        : fromHour,
@@ -252,7 +252,7 @@
                                         'showExtendedConnectivitySettings': true]}"/>
                 </div>
                 <div class="tab-pane" id="tabVariableSelection">
-                    <g:render template="selectMeasuredVariables"
+                    <g:render template="/_resultSelection/selectMeasuredVariables"
                               model="${['selectedAggrGroupValuesUnCached' : selectedAggrGroupValuesUnCached,
                                         'docCompleteTimeInMillisecsUncached': docCompleteTimeInMillisecsUncached,
                                         'aggrGroupValuesUnCached': aggrGroupValuesUnCached,
