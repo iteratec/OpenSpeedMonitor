@@ -3,9 +3,9 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('prefix'); return false;" >${message(code: 'graphitePath.prefix.label', default: 'Prefix')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('prefix'); return false;" >${message(code: 'graphitePath.prefix.label', default: 'Prefix')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('measurand'); return false;" >${message(code: 'graphitePath.measurand.label', default: 'Measurand')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('measurand'); return false;" >${message(code: 'graphitePath.measurand.label', default: 'Measurand')}</g:link></th>
 
     </tr>
     </thead>

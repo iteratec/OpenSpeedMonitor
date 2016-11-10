@@ -96,24 +96,19 @@ class BrowserAliasController {
     }
 
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "alias"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<Browser> result
-        int count
-        result = BrowserAlias.createCriteria().list(params) {
+
+        List<Browser> result = BrowserAlias.createCriteria().list(params) {
             if(params.filter)ilike("alias","%"+params.filter+"%")
         }
-        count = BrowserAlias.createCriteria().list(paramsForCount) {
-            if(params.filter)ilike("alias","%"+params.filter+"%")
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'browserAliasTable',
                 model: [browserAliases: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

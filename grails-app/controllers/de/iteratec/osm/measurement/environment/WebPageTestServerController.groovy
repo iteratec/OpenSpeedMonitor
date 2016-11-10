@@ -123,14 +123,11 @@ class WebPageTestServerController {
     }
 
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "label"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<WebPageTestServer> result
-        int count
-        result = WebPageTestServer.createCriteria().list(params) {
+        List<WebPageTestServer> result = WebPageTestServer.createCriteria().list(params) {
             if(params.filter)
                 or{
                     ilike("label","%"+params.filter+"%")
@@ -138,19 +135,11 @@ class WebPageTestServerController {
                     ilike("description","%"+params.filter+"%")
                 }
         }
-        count = WebPageTestServer.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{
-                    ilike("label","%"+params.filter+"%")
-                    ilike("proxyIdentifier","%"+params.filter+"%")
-                    ilike("description","%"+params.filter+"%")
-                }
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'webPageTestServerTable',
                 model: [webPageTestServers: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

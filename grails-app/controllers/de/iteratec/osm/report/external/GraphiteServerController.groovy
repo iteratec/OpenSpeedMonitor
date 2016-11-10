@@ -100,14 +100,11 @@ class GraphiteServerController {
         }
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "serverAdress"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<GraphiteServer> result
-        int count
-        result = GraphiteServer.createCriteria().list(params) {
+        List<GraphiteServer> result = GraphiteServer.createCriteria().list(params) {
             if(params.filter)
                 or{
                     ilike("serverAdress","%"+params.filter+"%")
@@ -117,21 +114,11 @@ class GraphiteServerController {
 
                 }
         }
-        count = GraphiteServer.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{
-                    ilike("serverAdress","%"+params.filter+"%")
-                    if(params.filter.isInteger())eq("port",Integer.valueOf(params.filter))
-                    ilike("webappUrl","%"+params.filter+"%")
-                    ilike("webappPathToRenderingEngine","%"+params.filter+"%")
-
-                }
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'graphiteServerTable',
                 model: [graphiteServers: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

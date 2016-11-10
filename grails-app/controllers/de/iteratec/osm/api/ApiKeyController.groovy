@@ -96,30 +96,23 @@ class ApiKeyController {
     }
 
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "secretKey"
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
 
-        List<ApiKey> result
-        int count
-        result = ApiKey.createCriteria().list(params) {
+        List<ApiKey> result = ApiKey.createCriteria().list(params) {
             if(params.filter)
                 or{ ilike("secretKey","%"+params.filter+"%")
                     ilike("description","%"+params.filter+"%")}
 
         }
-        count = ApiKey.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{ ilike("secretKey","%"+params.filter+"%")
-                    ilike("description","%"+params.filter+"%")}
-        }.size()
+
         String templateAsPlainText = g.render(
                 template: 'apiKeyTable',
                 model: [apiKeys: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

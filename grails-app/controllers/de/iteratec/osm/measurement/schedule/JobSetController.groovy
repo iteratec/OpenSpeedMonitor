@@ -95,25 +95,19 @@ class JobSetController {
         }
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.sort = params.sort == "jobs" ? "name" :  params.sort // cannot order by a list
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<JobSet> result
-        int count
-        result = JobSet.createCriteria().list(params) {
+        List<JobSet> result = JobSet.createCriteria().list(params) {
             if(params.filter)ilike("name","%"+params.filter+"%")
         }
-        count = JobSet.createCriteria().list(paramsForCount) {
-            if(params.filter)ilike("name","%"+params.filter+"%")
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'jobSetTable',
                 model: [jobSets: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

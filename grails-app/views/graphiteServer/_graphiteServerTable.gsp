@@ -3,19 +3,19 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('serverAdress'); return false;" >${message(code: 'graphiteServer.serverAdress.label', default: 'Server Adress')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('serverAdress'); return false;" >${message(code: 'graphiteServer.serverAdress.label', default: 'Server Adress')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('port'); return false;" >${message(code: 'graphiteServer.port.label', default: 'Port')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('port'); return false;" >${message(code: 'graphiteServer.port.label', default: 'Port')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('webappUrl'); return false;" >${message(code: 'graphiteServer.webappUrl.label', default: 'Webapp Url')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('webappUrl'); return false;" >${message(code: 'graphiteServer.webappUrl.label', default: 'Webapp Url')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('webappProtocol'); return false;" >${message(code: 'graphiteServer.webappProtocol.label', default: 'Webapp Protocol')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('webappProtocol'); return false;" >${message(code: 'graphiteServer.webappProtocol.label', default: 'Webapp Protocol')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('webappPathToRenderingEngine'); return false;" >${message(code: 'graphiteServer.webappPathToRenderingEngine.label', default: 'Webapp Path To Rendering Engine')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('webappPathToRenderingEngine'); return false;" >${message(code: 'graphiteServer.webappPathToRenderingEngine.label', default: 'Webapp Path To Rendering Engine')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('graphitePaths'); return false;" >${message(code: 'graphiteServer.graphitePaths.label', default: 'Graphite Paths')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('graphitePaths'); return false;" >${message(code: 'graphiteServer.graphitePaths.label', default: 'Graphite Paths')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('reportHealthMetrics'); return false;" >${message(code: 'graphiteServer.reportHealthMetrics.label', default: 'Report Health Metrics')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('reportHealthMetrics'); return false;" >${message(code: 'graphiteServer.reportHealthMetrics.label', default: 'Report Health Metrics')}</g:link></th>
 
     </tr>
     </thead>

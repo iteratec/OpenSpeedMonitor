@@ -3,9 +3,9 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('name'); return false;" >${message(code: 'measuredEvent.name.label', default: 'Name')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('name'); return false;" >${message(code: 'measuredEvent.name.label', default: 'Name')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('testedPage'); return false;" >${message(code: 'measuredEvent.testedPage.label', default: 'Tested Page')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('testedPage'); return false;" >${message(code: 'measuredEvent.testedPage.label', default: 'Tested Page')}</g:link></th>
 
     </tr>
     </thead>

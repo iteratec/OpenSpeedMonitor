@@ -39,7 +39,7 @@ class BatchActivityController {
     I18nService i18nService
 
     def list(){
-        params.order = params.order?:"desc"
+        params.order = params.order?:"asc"
         params.sort = params.sort?:"startDate"
         [batchActivities:BatchActivity.list(params), batchActivityCount:BatchActivity.count(), dbCleanupEnabled:inMemoryConfigService.isDatabaseCleanupEnabled()]
     }
@@ -67,9 +67,7 @@ class BatchActivityController {
      * @return new Content from BatchActivityTable
      */
     def updateTable(){
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
-
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "startDate"
         params.sort = params.sort == "remainingTime"? "status":params.sort  // remainingTime is a transient value - mysql
                                                                             // can't sort by it. But sorting by status should
@@ -77,22 +75,17 @@ class BatchActivityController {
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         params.onlyActive = params.onlyActive=="true"?true:false
-        List<BatchActivity> result
-        int count
-        result = BatchActivity.createCriteria().list(params) {
+
+        List<BatchActivity> result = BatchActivity.createCriteria().list(params) {
             if(params.filter)ilike("name","%"+params.filter+"%")
             if(params.onlyActive)eq("status",Status.ACTIVE)
         }
-        count = BatchActivity.createCriteria().list(paramsForCount) {
-            if(params.filter)ilike("name","%"+params.filter+"%")
-            if(params.onlyActive)eq("status",Status.ACTIVE)
-        }.size()
 
         String templateAsPlainText = g.render(
                 template: 'batchActivityTable',
                 model: [batchActivities: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
 
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }

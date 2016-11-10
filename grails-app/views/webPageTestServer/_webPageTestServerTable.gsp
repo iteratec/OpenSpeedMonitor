@@ -3,17 +3,17 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('label'); return false;" >${message(code: 'webPageTestServer.label.label', default: 'label')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('label'); return false;" >${message(code: 'webPageTestServer.label.label', default: 'label')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('proxyIdentifier'); return false;" >${message(code: 'webPageTestServer.proxyIdentifier.label', default: 'proxyIdentifier')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('proxyIdentifier'); return false;" >${message(code: 'webPageTestServer.proxyIdentifier.label', default: 'proxyIdentifier')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('dateCreated'); return false;" >${message(code: 'webPageTestServer.dateCreated.label', default: 'dateCreated')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('dateCreated'); return false;" >${message(code: 'webPageTestServer.dateCreated.label', default: 'dateCreated')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('lastUpdated'); return false;" >${message(code: 'webPageTestServer.lastUpdated.label', default: 'lastUpdated')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('lastUpdated'); return false;" >${message(code: 'webPageTestServer.lastUpdated.label', default: 'lastUpdated')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('active'); return false;" >${message(code: 'webPageTestServer.active.label', default: 'active')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('active'); return false;" >${message(code: 'webPageTestServer.active.label', default: 'active')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('description'); return false;" >${message(code: 'webPageTestServer.description.label', default: 'description')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('description'); return false;" >${message(code: 'webPageTestServer.description.label', default: 'description')}</g:link></th>
 
     </tr>
     </thead>

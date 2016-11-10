@@ -3,9 +3,9 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('name'); return false;" >${message(code: 'jobSet.name.label', default: 'Name')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('name'); return false;" >${message(code: 'jobSet.name.label', default: 'Name')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('jobs'); return false;" >${message(code: 'jobSet.jobs.label', default: 'Jobs')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('jobs'); return false;" >${message(code: 'jobSet.jobs.label', default: 'Jobs')}</g:link></th>
 
 
     </tr>

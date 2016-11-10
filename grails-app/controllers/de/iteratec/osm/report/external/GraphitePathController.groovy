@@ -96,14 +96,12 @@ class GraphitePathController {
         }
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "prefix"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<GraphitePath> result
-        int count
-        result = GraphitePath.createCriteria().list(params) {
+
+        List<GraphitePath> result = GraphitePath.createCriteria().list(params) {
             if(params.filter)
                 or{
                     ilike("prefix","%"+params.filter+"%")
@@ -111,19 +109,11 @@ class GraphitePathController {
                         ilike("name","%"+params.filter+"%")
                     }}
         }
-        count = GraphitePath.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{
-                    ilike("prefix","%"+params.filter+"%")
-                    measurand {
-                        ilike("name","%"+params.filter+"%")
-                    }}
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'graphitePathTable',
                 model: [graphitePaths: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

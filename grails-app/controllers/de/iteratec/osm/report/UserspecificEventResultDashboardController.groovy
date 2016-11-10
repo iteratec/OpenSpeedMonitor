@@ -94,32 +94,22 @@ class UserspecificEventResultDashboardController {
         }
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "dashboardName"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<UserspecificEventResultDashboard> result
-        int count
-        result = UserspecificEventResultDashboard.createCriteria().list(params) {
+        List<UserspecificEventResultDashboard> result = UserspecificEventResultDashboard.createCriteria().list(params) {
             if(params.filter)
                 or{
                     ilike("dashboardName","%"+params.filter+"%")
                     ilike("username","%"+params.filter+"%")
                 }
         }
-        count = UserspecificEventResultDashboard.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{
-                    ilike("dashboardName","%"+params.filter+"%")
-                    ilike("username","%"+params.filter+"%")
-                }
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'userspecificEventResultDashboardTable',
                 model: [userspecificEventResultDashboards: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

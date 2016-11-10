@@ -3,11 +3,11 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('staticPrefix'); return false;" >${message(code: 'graphiteEventSourcePath.staticPrefix.label', default: 'Static Prefix')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('staticPrefix'); return false;" >${message(code: 'graphiteEventSourcePath.staticPrefix.label', default: 'Static Prefix')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('targetMetricName'); return false;" >${message(code: 'graphiteEventSourcePath.targetMetricName.label', default: 'Target Metric Name')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('targetMetricName'); return false;" >${message(code: 'graphiteEventSourcePath.targetMetricName.label', default: 'Target Metric Name')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('jobGroups'); return false;" >${message(code: 'graphiteEventSourcePath.jobGroups.label', default: 'Job Groups')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('jobGroups'); return false;" >${message(code: 'graphiteEventSourcePath.jobGroups.label', default: 'Job Groups')}</g:link></th>
 
     </tr>
     </thead>

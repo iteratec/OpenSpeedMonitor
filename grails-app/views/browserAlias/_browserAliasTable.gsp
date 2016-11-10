@@ -3,9 +3,9 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('alias'); return false;" >${message(code: 'browserAlias.alias.label', default: 'Alias')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('alias'); return false;" >${message(code: 'browserAlias.alias.label', default: 'Alias')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('browser'); return false;" >${message(code: 'browserAlias.browser.label', default: 'Browser')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('browser'); return false;" >${message(code: 'browserAlias.browser.label', default: 'Browser')}</g:link></th>
 
 
     </tr>
