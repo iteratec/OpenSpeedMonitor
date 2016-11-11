@@ -118,7 +118,7 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
             return;
         }
         setDate(formatDateInternal(date));
-        setTime(date.getHours() + ":" + date.getMinutes());
+        setTime(twoDigitString(date.getHours()) + ":" + twoDigitString(date.getMinutes()));
     };
 
 	var getValues = function() {
@@ -143,7 +143,12 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 	};
 
 	var setStartDate = function(startDate) {
-		var dateObject = startDate ? parseDateInternal(startDate) : null;
+		var dateObject = null;
+        if (startDate instanceof Date) {
+            dateObject = startDate;
+        } else if (startDate) {
+            dateObject = parseDateInternal(startDate);
+        }
 		dateInput.datepicker("setStartDate", dateObject);
 	};
 

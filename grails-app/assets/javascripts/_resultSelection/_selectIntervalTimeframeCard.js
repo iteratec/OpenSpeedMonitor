@@ -9,9 +9,11 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     var endDateTimePicker = OpenSpeedMonitor.DateTimePicker(endDateTimePickerElement, "23:59");
     var timeFrameSelectElement = $("#timeframeSelect");
     var manualTimeFrameFieldSet = $("#manual-timeframe-selection");
+    var intervalSelectElement = $("#selectedIntervalHtmlId");
 
     var clientStorage = OpenSpeedMonitor.clientSideStorageUtils();
     var clientStorageTimeFramePresetKey = "de.iteratec.osm.result.dashboard.timeframeselection";
+    var clientStorageIntervalKey = "de.iteratec.osm.result.dashboard.intervalselection";
     var clientStorageStartObjectKeys = {
         date: 'de.iteratec.osm.result.dashboard.from',
         manualTime: 'de.iteratec.osm.result.dashboard.manualFromHour',
@@ -24,6 +26,8 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     };
 
     var init = function() {
+        intervalSelectElement.val(clientStorage.getFromLocalStorage(clientStorageIntervalKey));
+
         startDateTimePicker.setValues(clientStorage.getObjectFromLocalStorage(clientStorageStartObjectKeys));
         endDateTimePicker.setValues(clientStorage.getObjectFromLocalStorage(clientStorageEndObjectKeys));
 
@@ -35,7 +39,11 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     };
 
     var registerEvents = function() {
-        timeFrameSelectElement.on("change", function(ev) {
+        intervalSelectElement.on("change", function () {
+            clientStorage.setToLocalStorage(clientStorageIntervalKey, this.value);
+        });
+
+        timeFrameSelectElement.on("change", function() {
             clientStorage.setToLocalStorage(clientStorageTimeFramePresetKey, this.value);
             setTimeFramePreselection(this.value);
         });
@@ -61,8 +69,10 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         // timeframe preselection based on current date
         manualTimeFrameFieldSet.prop("disabled", true);
         var now = new Date();
-        startDateTimePicker.setValuesByDate(new Date(now.getTime() - (value * 1000)));
+        var startDate = new Date(now.getTime() - (value * 1000));
+        startDateTimePicker.setValuesByDate(startDate);
         endDateTimePicker.setValuesByDate(now);
+        endDateTimePicker.setStartDate(startDate);
     };
 
     var timeFrameChanged = function() {
