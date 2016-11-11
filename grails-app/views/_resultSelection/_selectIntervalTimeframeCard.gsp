@@ -50,22 +50,19 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 						code="de.iteratec.isr.wptrd.labels.timeframes.start"
 						default="Start" />:
 			</label>
-			<div class="col-md-8" id="startDateTimePicker">
-				<div class="input-group bootstrap-timepicker time-control">
-					<span class="input-group-addon">
-						<g:checkBox name="setFromHour" id="setFromHour" checked="${setFromHour}"/>
-					</span>
-					<input id="fromHourTimepicker" type="text" class="form-control"
-						   value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled/>
-					<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-				</div>
-				<div class="date-control">
-					<input class="form-control" type="text" id="fromDatepicker"
-						data-date-format="${dateFormat}" data-date-week-start="${weekStart}"
-					    placeholder="start date" value="${from}" />
-				</div>
-				<input type="hidden" name="from" id="from" class="date-hidden" value="${from}" />
-				<input type="hidden" name="fromHour" id="fromHour" class="time-hidden" value="${fromHour}" />
+			<div class="col-md-8">
+				<g:render template="/_resultSelection/dateTimePicker" model="[
+				        id: 'startDateTimePicker',
+						manualTimeName: 'setFromHour',
+						manualTimeValue: setFromHour,
+						timeName: 'fromHour',
+						time: fromHour,
+						dateControlId: 'fromDatepicker',
+						dateName: 'from',
+						date: from,
+						dateFormat: dateFormat,
+						weekStart: weekStart
+				]" />
 			</div>
 		</div>
 	<%--------------------------------------------------------------------- manual end date --%>
@@ -75,21 +72,19 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 						code="de.iteratec.isr.wptrd.labels.timeframes.end"
 						default="End" />:
 			</label>
-			<div class="col-md-8" id="endDateTimePicker">
-				<div class="input-group bootstrap-timepicker time-control">
-					<span class="input-group-addon">
-						<g:checkBox name="setToHour" id="setToHour" checked="${setToHour}"/>
-					</span>
-					<input id="toHourTimepicker" type="text" class="form-control"
-						   value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled/>
-					<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-				</div>
-				<div class="date-control">
-					<input class="form-control" type="text" id="toDatepicker" placeholder="end date" value="${to}"
-						   data-date-format="${dateFormat}" data-date-week-start="${weekStart}" />
-				</div>
-				<input type="hidden" name="to" value="${to}" id="to" class="date-hidden" />
-				<input type="hidden" name="toHour" value="${toHour}" id="toHour" class="time-hidden" />
+			<div class="col-md-8">
+				<g:render template="/_resultSelection/dateTimePicker" model="[
+						id: 'endDateTimePicker',
+						manualTimeName: 'setToHour',
+						manualTimeValue: setToHour,
+						timeName: 'toHour',
+						time: toHour,
+						dateControlId: 'toDatepicker',
+						dateName: 'to',
+						date: to,
+						dateFormat: dateFormat,
+						weekStart: weekStart
+				]" />
 			</div>
 		</div>
 	</fieldset>
