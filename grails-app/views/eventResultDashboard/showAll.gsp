@@ -116,33 +116,33 @@
     </g:else>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv">
-            <g:message
-                    code="de.iteratec.ism.ui.labels.save.success"
-                    default="Successfully saved these settings as custom dashboard."/>
-        </div>
-        <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
-        <g:if test="${warnAboutLongProcessingTime}">
-            <div class="alert alert-warning">
-                <strong><g:message
-                        code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
-                <p></p>
-                <p>
-                    <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
-                                style="display:none;"/>
-                    <g:actionSubmit id="override-long-processing-time"
-                                    value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
-                                    action="showAll" class="btn btn-warning"/>
-                </p>
+<form method="get" action="" id="dashBoardParamsForm">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="alert alert-success renderInvisible" id="saveDashboardSuccessDiv">
+                <g:message
+                        code="de.iteratec.ism.ui.labels.save.success"
+                        default="Successfully saved these settings as custom dashboard."/>
             </div>
-        </g:if>
+            <div class="alert alert-danger renderInvisible" id="saveDashboardErrorDiv"></div>
+            <g:if test="${warnAboutLongProcessingTime}">
+                <div class="alert alert-warning">
+                    <strong><g:message
+                            code="de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.title"/></strong>
+                    <p></p>
+                    <p>
+                        <g:checkBox name="overwriteWarningAboutLongProcessingTime" value="${true}" checked="${true}"
+                                    style="display:none;"/>
+                        <g:actionSubmit id="override-long-processing-time"
+                                        value="${g.message(code: 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime.checkbox.label', 'default': 'Go on')}"
+                                        action="showAll" class="btn btn-warning"/>
+                    </p>
+                </div>
+            </g:if>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <form method="get" action="" id="dashBoardParamsForm">
+    <div class="row">
+        <div class="col-md-12">
             <!-- Split button to show/download/detail analysis, etc -->
             <div class="btn-group pull-right">
                 <g:actionSubmit value="${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}"
@@ -266,9 +266,9 @@
                                         'trimAboveRequestSizes': trimAboveRequestSizes]}"/>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+</form>
 
 <g:render template="/_common/modals/createUserspecifiedDashboard" model="[item: item]"/>
 <g:render template="/_common/modals/chartContextMenuErrorDialog" />
