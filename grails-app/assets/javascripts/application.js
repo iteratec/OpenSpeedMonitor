@@ -163,7 +163,7 @@ OpenSpeedMonitor.clientSideStorageUtils = function(){
     var setObjectToLocalStorage = function(keyObject, value) {
         for (var property in keyObject) {
             if (keyObject.hasOwnProperty(property)) {
-                setToLocalStorage(keyObject[property], value);
+                setToLocalStorage(keyObject[property], value[property]);
             }
         }
     };
