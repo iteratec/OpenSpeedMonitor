@@ -15,232 +15,128 @@
 * limitations under the License.
 */
 
-/**
- * Initializes bootstrap-datepickers and registers events for changes on datpicker-inputs.
- */
-var initDatepicker = function(dateformatToSet, weekstartToSet, timespanFromNowInHours) {
+"use strict";
 
-    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
+OpenSpeedMonitor = OpenSpeedMonitor || {};
 
-	//read previous selections from local storage///////////////////////////////////////////////////////////////////
+OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
+	dateTimePickerElement = $(dateTimePickerElement);
+	autoTime = autoTime || "00:00";
 
-	var lastTimeframeSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.timeframeselection')
-	var lastFromSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.from');
-	var lastToSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.to');
+	var dateInput = dateTimePickerElement.find(".date-control input[type='text']");
+	var timeInput = dateTimePickerElement.find(".time-control input[type='text']");
+	var timeManualCheckbox = dateTimePickerElement.find(".time-control input[type='checkbox']");
+	var dateHiddenValue = dateTimePickerElement.find("input.date-hidden");
+	var timeHiddenValue = dateTimePickerElement.find("input.time-hidden");
+    var defaultDatePickerOptions = { endDate: "+0d" };
 
-	//initialization///////////////////////////////////////////////////////////////////
+	var init = function () {
+		dateInput.datepicker(defaultDatePickerOptions);
+		timeInput.timepicker({showMeridian: false});
+
+		registerEvents();
+	};
+
+	var registerEvents = function () {
+		dateInput.datepicker().on('changeDate', function(ev){
+			if (!ev.date) { // invalid date set
+				return;
+			}
+			dateHiddenValue.val(formatDateForHiddenValue(ev.date));
+			dateInput.datepicker("hide");
+			if (!timeManualCheckbox.is(':checked')) {
+				setTime(autoTime);
+			}
+			triggerChangeEvent();
+		});
+		timeManualCheckbox.on('change', function(ev) {
+			var manualSelection = timeManualCheckbox.is(':checked');
+			timeInput.attr("disabled", !manualSelection);
+			triggerChangeEvent();
+		});
+		timeInput.on('changeTime.timepicker', function(ev) {
+			timeHiddenValue.val(ev.time.value);
+			triggerChangeEvent();
+		});
+	};
+
+	var setTime = function(time) {
+		var pattern = new RegExp("([0-9]|[01][0-9]|2[0-3]):([0-5][0-9])");
+		if (!pattern.test(time)) {
+			console.log("Invalid time to set. Expected in format hh:mm");
+			time = autoTime;
+		}
+
+		timeInput.val(time);
+		timeHiddenValue.val(time);
+		var timePickerValue = time;
+
+		// workaround for the bootstrap timepicker
+		if (timePickerValue == '00:00' || timePickerValue == '0:00') {
+			timePickerValue = "00:001";
+		}
+
+		timeInput.timepicker('setTime', timePickerValue);
+	};
+
+	var setDate = function (date) {
+		var dateObject = parseDateFromHiddenValue(date);
+		dateHiddenValue.val(date);
+		dateInput.datepicker("setDate", dateObject);
+	};
+
+	var parseDateFromHiddenValue = function (dateString) {
+		var pattern = new RegExp("([0-2][0-9]|3[01]).(0[1-9]|1[0-2]).[0-9]{4}");
+		if (!pattern.test(dateString)) {
+			console.log("Invalid date to set. Expected in format dd.mm.yyyy");
+			return new Date();
+		}
+		var parts = dateString.split(".");
+		return new Date(parts[2], parts[1] - 1, parts[0]);
+	};
+
+	var formatDateForHiddenValue = function(date) {
+		return twoDigitString(date.getDate()) + "." + twoDigitString(date.getMonth() + 1) + "." + date.getFullYear();
+	};
+
+	var twoDigitString = function(number) {
+		return ("00" + number).substr(-2,2);
+	};
+
+	var triggerChangeEvent = function() {
+		dateTimePickerElement.trigger("changeDateTime", values());
+	};
 	
-	var now = new Date();
-	var dateInPastToSetAsFrom = new Date(now.getTime()-(1000*60*60*timespanFromNowInHours));
+	var values = function(newValues) {
+		if (newValues === undefined) {
+			return {
+				date: dateHiddenValue.val(),
+				manualTime: timeManualCheckbox.is(':checked'),
+				time: timeHiddenValue.val()
+			};
+		}
 
-	$("#fromDatepicker").datepicker({
-		format: dateformatToSet,
-		weekStart: weekstartToSet,
-		endDate: '+1'
-	});
-	if (!$("#from").val()) {
-		var toSet = getDateAs_ddMMyyyy(dateInPastToSetAsFrom);
-		$("#fromDatepicker").val(toSet);
-		$("#fromDatepicker").datepicker("update");
-		$("#from").val(toSet)
-	}
-	$("#toDatepicker").datepicker({
-		format: dateformatToSet,
-		weekStart: weekstartToSet,
-		endDate: '+1d'
-	});
-	if (!$("#to").val()) {
-		var toSet = getDateAs_ddMMyyyy(now);
-		$("#toDatepicker").val(toSet);
-		$("#toDatepicker").datepicker("update");
-		$("#to").val(toSet);
-	}
+		if (newValues.manualTime !== undefined) {
+			var isManual = OpenSpeedMonitor.stringUtils().stringToBoolean(newValues.manualTime);
+			timeManualCheckbox.prop('checked', isManual);
+			timeInput.attr("disabled", !isManual);
+		}
+		if (newValues.time) {
+			setTime(newValues.time);
+		}
+		if (newValues.date) {
+			setDate(newValues.date);
+		}
+	};
 
-	//set previous selections ///////////////////////////////////////////////////////////////////
+	var setStartDate = function(startDate) {
+		var dateObject = startDate ? parseDateFromHiddenValue(startDate) : null;
+		dateInput.datepicker("setStartDate", dateObject);
+	};
 
-	var fromDateFromQueryParams = $.getUrlVar('from');
-	var toDateFromQueryParams = $.getUrlVar('to');
-	var selectedTimeFrameIntervalFromQueryParams = $.getUrlVar('selectedTimeFrameInterval');
-
-	if(fromDateFromQueryParams != null) setFrom(fromDateFromQueryParams);
-	else if(lastFromSelection != null) setFrom(lastFromSelection);
-
-	if(selectedTimeFrameIntervalFromQueryParams != null) $('#timeframeSelect').val(selectedTimeFrameIntervalFromQueryParams);
-	else if(lastTimeframeSelection != null) $('#timeframeSelect').val(lastTimeframeSelection);
-
-	if(toDateFromQueryParams != null) setTo(toDateFromQueryParams);
-	else if(lastToSelection != null) setTo(lastToSelection);
-
-	//register events///////////////////////////////////////////////////////////////////
-	
-	$('#fromDatepicker').datepicker().on('changeDate', function(ev){
-		var dateAsDdMMyyyy = getDateAs_ddMMyyyy(ev.date);
-        $('#from').val(dateAsDdMMyyyy);
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.from', dateAsDdMMyyyy);
-	    if(!$('#setFromHour').is(':checked')){setFromHour("00:00");}
-	    $("#toDatepicker").datepicker('setStartDate', ev.date);
-	    $("#fromDatepicker").datepicker("hide");
-	});
-	$('#toDatepicker').datepicker().on('changeDate', function(ev){
-		var dateAsDdMMyyyy = getDateAs_ddMMyyyy(ev.date);
-        $('#to').val(dateAsDdMMyyyy);
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.to', dateAsDdMMyyyy);
-		if(!$('#setToHour').is(':checked')){setToHour("23:59");}
-	    $("#toDatepicker").datepicker("hide");
-	});
-	
-	$('#timeframeSelect').on('change', function(ev){
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.timeframeselection', this.value);
-		var preSelection = this.value>0;
-		
-		if(preSelection) setDateAndTimeRespectivePreselection();
-		disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
-		
-	})
-	
+	init();
+	return {
+		values : values,
+		setStartDate : setStartDate
+	};
 };
-/**
- * Initializes bootstrap-timepickers and registers events for changes on timepicker-inputs.
- */
-var initTimepicker = function(whetherToShowMeridian) {
-
-    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
-
-	//read previous selections from local storage///////////////////////////////////////////////////////////////////
-
-	var lastFromHourSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.fromHour');
-	var lastToHourSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.toHour');
-	var lastManualFromHourSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.manualFromHour');
-	var lastManualToHourSelection = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.result.dashboard.manualToHour');
-
-	//initialization///////////////////////////////////////////////////////////////////
-	
-	$('#fromHourTimepicker').timepicker({
-    showMeridian: whetherToShowMeridian
-	});
-	$('#toHourTimepicker').timepicker({
-		showMeridian: whetherToShowMeridian
-	});
-	setFromHour($('#fromHourTimepicker').val());
-	setToHour($('#toHourTimepicker').val());
-
-	//set previous selections ///////////////////////////////////////////////////////////////////
-
-	var fromHourFromQueryParams = $.getUrlVar('fromHour');
-	var toHourFromQueryParams = $.getUrlVar('toHour');
-	var setFromHourFromQueryParam = $.getUrlVar('setFromHour');
-	var setToHourFromQueryParam = $.getUrlVar('setToHour');
-
-	if(window.location.href.indexOf("event/edit") > -1) {
-	  fromHourFromQueryParams = $('#eventTime').val();
-	  setFromHourFromQueryParam = $('#eventTime').val();
-	}
-	
-	if(fromHourFromQueryParams != null) setFromHour(fromHourFromQueryParams);
-	else if(lastFromHourSelection != null) setFromHour(lastFromHourSelection);
-
-	if(toHourFromQueryParams != null) setToHour(toHourFromQueryParams);
-	else if(lastToHourSelection != null) setToHour(lastToHourSelection);
-
-	if(setFromHourFromQueryParam !=null) setManualFromHourCheckbox(setFromHourFromQueryParam);
-	else if(lastManualFromHourSelection !=null) setManualFromHourCheckbox(lastManualFromHourSelection);
-
-	if(setToHourFromQueryParam != null) setManualToHourCheckbox(setToHourFromQueryParam)
-	else if(lastManualToHourSelection !=null) setManualToHourCheckbox(lastManualToHourSelection);
-
-	//register events///////////////////////////////////////////////////////////////////
-
-	$('#setFromHour').on('change', function(ev){
-		var manualFromHourSelection = $('#setFromHour').is(':checked');
-		$('#fromHourTimepicker').attr("disabled", !manualFromHourSelection);
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.manualFromHour', manualFromHourSelection);
-	});
-	$('#setToHour').on('change', function(ev){
-		var manualToHourSelection = $('#setToHour').is(':checked');
-		$('#toHourTimepicker').attr("disabled", !manualToHourSelection);
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.manualToHour', manualToHourSelection);
-	});
-	$('#fromHourTimepicker').on('changeTime.timepicker', function(ev){
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.fromHour', ev.time.value);
-		$("#fromHour").val(ev.time.value);
-	});
-	$('#toHourTimepicker').on('changeTime.timepicker', function(ev){
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.toHour', ev.time.value);
-		$("#toHour").val(ev.time.value);
-	});
-};
-var getDateAs_ddMMyyyy = function(date){
-	return addLeadingZeroIfNecessary(addLeadingZeroIfNecessary(date.getDate())+"."+addLeadingZeroIfNecessary(date.getMonth()+1)+"."+date.getFullYear())
-};
-var addLeadingZeroIfNecessary = function(date) {
-	if(date<10) {
-		date="0"+date;
-	}
-	return date;
-};
-var disOrEnableFieldsetsOfManualDateTimeSelection = function(preSelection){
-	//dis-/enable hole fieldset of manual date/time selection
-	$('#fldset-startdate').attr("disabled", preSelection);
-	$('#fldset-enddate').attr("disabled", preSelection);
-	//disable input for manual time selection if there is a preSelection or the checkbox isn't checked
-	$('#fromHourTimepicker').attr("disabled", preSelection || !$('#setFromHour').is(':checked'));
-	$('#toHourTimepicker').attr("disabled", preSelection || !$('#setToHour').is(':checked'));
-};
-
-var setDateAndTimeRespectivePreselection = function() {
-	var now=new Date();
-	var start=new Date(now.getTime() - ( $('#timeframeSelect').val() * 1000));
-	var day, month;
-
-	setFrom(getDateAs_ddMMyyyy(start));
-	setFromHour(start.getHours().toString() + ":" + start.getMinutes().toString())
-
-  setTo(getDateAs_ddMMyyyy(now));
-	setToHour(now.getHours().toString() + ":" + now.getMinutes().toString())
-
-};
-var setTo = function(toToSet){
-	OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.to', toToSet);
-	$("#to").val(toToSet);
-	$("#toDatepicker").val(toToSet);
-	$("#toDatepicker").datepicker("update");
-};
-var setFrom = function(fromToSet){
-	OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.from', fromToSet);
-	$("#from").val(fromToSet);
-	$("#fromDatepicker").val(fromToSet);
-	$("#fromDatepicker").datepicker("update");
-};
-var setToHour = function(toHourToSet){
-	OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.toHour', toHourToSet);
-	$("#toHour").val(toHourToSet);
-	toHourToSet = toHourToSet=='00:00'?'00:001':toHourToSet;	//hack to fix a bug in bootstrap timepicker
-	$("#toHourTimepicker").timepicker('setTime', toHourToSet);
-};
-var setFromHour = function(fromHourToSet){
-	OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.fromHour', fromHourToSet);
-	$("#fromHour").val(fromHourToSet);
-	fromHourToSet = (fromHourToSet=='00:00'||fromHourToSet=='0:00')?'00:001':fromHourToSet;	//hack to fix a bug in bootstrap timepicker
-	$("#fromHourTimepicker").timepicker('setTime', fromHourToSet);
-};
-var setManualFromHourCheckbox = function(lastManualFromHourSelection){
-    var stringUtils = OpenSpeedMonitor.stringUtils();
-	$('#setFromHour').attr('checked', stringUtils.stringToBoolean(lastManualFromHourSelection));
-	$('#setFromHourTimepicker').attr("disabled", !stringUtils.stringToBoolean(lastManualFromHourSelection));
-};
-var setManualToHourCheckbox = function(lastManualToHourSelection){
-    var stringUtils = OpenSpeedMonitor.stringUtils();
-	$('#setToHour').attr('checked', stringUtils.stringToBoolean(lastManualToHourSelection));
-	$('#setToHourTimepicker').attr("disabled", !stringUtils.stringToBoolean(lastManualToHourSelection));
-};
-
-function updateDateTimePicker(from, to, fromHour, toHour, timeFrameInterval) {
-	var fromToSet = new Date(from);
-	var toToSet = new Date(to);
-	setFrom(getDateAs_ddMMyyyy(fromToSet));
-	setTo(getDateAs_ddMMyyyy(toToSet));
-	setFromHour(fromHour);
-	setToHour(toHour);
-	$('#timeframeSelect').val(timeFrameInterval);
-}
-

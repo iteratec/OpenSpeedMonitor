@@ -19,14 +19,8 @@
  * Called on jquerys DOM-ready.
  * Initializes DOM-nodes and registers events.
  */
-function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
-    initDatepicker(dateFormat, weekStart, 24*3);
-    initTimepicker(false);
+function doOnDomReady(noResultsTextForChosenSelects){
 
-    var preSelection = $('#timeframeSelect').val()>0;
-    disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
-
-    initIntervalSelect();
     initChosenSelects(noResultsTextForChosenSelects);
 
     updateSelectionConstraints();
@@ -156,14 +150,3 @@ function getTextList(selectedOptions, max){
     return text.length > max ? (text.substring(0, max-3) + '...') : text;
 }
 
-function initIntervalSelect() {
-	//initialization///////////////////////
-	var lastIntervalSelection = OpenSpeedMonitor.clientSideStorageUtils().getFromLocalStorage('de.iteratec.osm.result.dashboard.intervalselection');
-	var intervalSelectionFromQueryParam = $.getUrlVar('selectedInterval');
-	if(intervalSelectionFromQueryParam != null) $('#selectedIntervalHtmlId').val(intervalSelectionFromQueryParam);
-	else if(lastIntervalSelection != null) $('#selectedIntervalHtmlId').val(lastIntervalSelection);
-	//register events///////////////////////
-	$('#selectedIntervalHtmlId').on("change", function(event){
-		OpenSpeedMonitor.clientSideStorageUtils().setToLocalStorage('de.iteratec.osm.result.dashboard.intervalselection', $('#selectedIntervalHtmlId').val());
-	});
-}

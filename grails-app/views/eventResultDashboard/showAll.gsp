@@ -230,6 +230,8 @@
                                         'to'                              : to,
                                         'toHour'                          : toHour,
                                         'selectedInterval'                : selectedInterval,
+                                        'dateFormat'                      : dateFormat,
+                                        'weekStart'                       : weekStart,
                                         'csiAggregationIntervals'         : csiAggregationIntervals,
                                         'locationsOfBrowsers'             : locationsOfBrowsers,
                                         'eventsOfPages'                   : eventsOfPages,
@@ -332,14 +334,8 @@
             initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
 
             doOnDomReady(
-                    '${dateFormat}',
-                    ${weekStart},
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
-
-            <g:if test="${dashboardName}">
-                updateDateTimePicker(${from.getTime()}, ${to.getTime()}, '${fromHour}', '${toHour}', ${selectedTimeFrameInterval});
-            </g:if>
 
             if (navigator.userAgent.indexOf('MSIE') !== -1 || navigator.appVersion.indexOf('Trident/') > 0 || navigator.appVersion.indexOf('Edge/') > 0) {
                 $("#dia-save-chart-as-png").removeClass("btn-primary");

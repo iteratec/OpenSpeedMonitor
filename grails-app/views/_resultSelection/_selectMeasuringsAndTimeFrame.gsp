@@ -6,6 +6,7 @@ A row with the three cards: selectIntervalTimeframeCard, selectJobGroupCard, and
         <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                   model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
                             'fromHour': fromHour, 'to': to, 'toHour': toHour,
+                            'dateFormat': dateFormat, 'weekStart': weekStart,
                             'csiAggregationIntervals': csiAggregationIntervals,
                             'selectedInterval': selectedInterval]}"/>
     </div>

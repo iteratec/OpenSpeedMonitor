@@ -25,9 +25,6 @@ function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
 	
 	initTimepicker(false);
 
-    var preSelection = $('#timeframeSelect').val()>0;
-    disOrEnableFieldsetsOfManualDateTimeSelection(preSelection);
-
     initChosenSelects(noResultsTextForChosenSelects);
 	
 }

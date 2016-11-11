@@ -50,7 +50,7 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 						code="de.iteratec.isr.wptrd.labels.timeframes.start"
 						default="Start" />:
 			</label>
-			<div class="col-md-8">
+			<div class="col-md-8" id="startDateTimePicker">
 				<fieldset id="fldset-startdate-hour" class="time-control">
 					<div class="input-group bootstrap-timepicker">
 						<span class="input-group-addon">
@@ -62,12 +62,14 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 					</div>
 				</fieldset>
 				<div class="date-control">
-					<input class="form-control" type="text" id="fromDatepicker" placeholder="start ..." value="${from}" />
+					<input class="form-control" type="text" id="fromDatepicker"
+						data-date-format="${dateFormat}" data-date-week-start="${weekStart}"
+						   placeholder="start date" value="${from}" />
 				</div>
+				<input type="hidden" name="from" id="from" class="date-hidden" value="${from}" />
+				<input type="hidden" name="fromHour" id="fromHour" class="time-hidden" value="${fromHour}" />
 			</div>
 		</div>
-		<input type="hidden" name="from" id="from" value="${from}">
-		<input type="hidden" name="fromHour" id="fromHour" value="${fromHour}">
 	</fieldset>
 
 	<%--------------------------------------------------------------------- manual end date --%>
@@ -78,7 +80,7 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 						code="de.iteratec.isr.wptrd.labels.timeframes.end"
 						default="End" />:
 			</label>
-			<div class="col-md-8">
+			<div class="col-md-8" id="endDateTimePicker">
 				<fieldset id="fldset-enddate-hour" class="time-control">
 					<div class="input-group bootstrap-timepicker">
 						<span class="input-group-addon">
@@ -90,12 +92,13 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 					</div>
 				</fieldset>
 				<div class="date-control">
-					<input class="form-control" type="text" id="toDatepicker" placeholder="end ..." value="${to}" />
+					<input class="form-control" type="text" id="toDatepicker" placeholder="end date" value="${to}"
+						   data-date-format="${dateFormat}" data-date-week-start="${weekStart}" />
 				</div>
+				<input type="hidden" name="to" value="${to}" id="to" class="date-hidden" />
+				<input type="hidden" name="toHour" value="${toHour}" id="toHour" class="time-hidden" />
 			</div>
 		</div>
-		<input type="hidden" name="to" value="${to}" id="to">
-		<input type="hidden" name="toHour" value="${toHour}" id="toHour">
 	</fieldset>
 	<g:if test="${showIncludeInterval}">
 		<div class="row">
@@ -111,3 +114,9 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 		</div>
 	</g:if>
 </div>
+
+<asset:script type="text/javascript">
+	$(window).load(function() {
+      OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="/_resultSelection/_selectIntervalTimeframeCard.js" absolute="true"/>')
+    });
+</asset:script>
