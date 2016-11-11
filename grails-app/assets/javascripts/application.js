@@ -102,41 +102,80 @@ OpenSpeedMonitor.stringUtils = function(){
  * Global module providing functionalities for storage of data in the browser.
  *
  * @returns {{
- *      setCookie: publicAPI.setCookie,
- *      getCookie: publicAPI.getCookie,
- *      setToLocalStorage: publicAPI.setToLocalStorage,
- *      getFromLocalStorage: publicAPI.getFromLocalStorage}}
+ *      setCookie: setCookie,
+ *      getCookie: getCookie,
+ *      setToLocalStorage: setToLocalStorage,
+ *      getFromLocalStorage: getFromLocalStorage,
+ *      getObjectFromLocalStorage: getObjectFromLocalStorage,
+ *      setObjectToLocalStorage: setObjectToLocalStorage}}
  */
 OpenSpeedMonitor.clientSideStorageUtils = function(){
-    var publicAPI = {
-        setCookie: function(key, value, path, shouldExpireInMillisecsFromNow) {
-            var expires = new Date();
-            expires.setTime(expires.getTime() + shouldExpireInMillisecsFromNow);
-            var cookieToSet = key + '=' + btoa(value)  + ';expires=' + expires.toUTCString() + ';path=' + path;
-            console.log(cookieToSet);
-            document.cookie = cookieToSet;
-        },
-        getCookie: function(key) {
-            var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
-            return keyValue ? atob(keyValue[2]) : null;
-        },
-        setToLocalStorage: function(key, value) {
-            try{
-                localStorage.setItem(key, value)
-            }catch(e){
-                console.log('Can\'t write data to local storage: ' + e.message);
-            }
-        },
-        getFromLocalStorage: function(key) {
-            try{
-                return localStorage.getItem(key);
-            }catch(e){
-                console.log('Can\'t read data from local storage: ' + e.message);
-            }
-            return null;
+    var setCookie = function(key, value, path, shouldExpireInMillisecsFromNow) {
+        var expires = new Date();
+        expires.setTime(expires.getTime() + shouldExpireInMillisecsFromNow);
+        var cookieToSet = key + '=' + btoa(value)  + ';expires=' + expires.toUTCString() + ';path=' + path;
+        console.log(cookieToSet);
+        document.cookie = cookieToSet;
+    };
+
+    var getCookie = function(key) {
+        var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+        return keyValue ? atob(keyValue[2]) : null;
+    };
+
+    var setToLocalStorage = function(key, value) {
+        try{
+            localStorage.setItem(key, value)
+        }catch(e){
+            console.log('Can\'t write data to local storage: ' + e.message);
         }
-    }
-    return publicAPI;
+    };
+
+    var getFromLocalStorage = function(key) {
+        try{
+            return localStorage.getItem(key);
+        }catch(e){
+            console.log('Can\'t read data from local storage: ' + e.message);
+        }
+        return null;
+    };
+
+    /**
+     * Reads a whole object in local storage.
+     * @param keyObject An object with different properties whose values are the local storage keys.
+     * @return object A new object with the same properties as keyObject and values from the local storage.
+     */
+    var getObjectFromLocalStorage = function(keyObject) {
+        var values = {};
+        for (var property in keyObject) {
+            if (keyObject.hasOwnProperty(property)) {
+                values[property] = getFromLocalStorage(keyObject[property]);
+            }
+        }
+        return values;
+    };
+
+    /**
+     * Saves a whole object in local storage
+     * @param keyObject An object whose properties are the same as in value. The value of each property is the local storage key.
+     * @param value The object to save with the same properties as in keyObject.
+     */
+    var setObjectToLocalStorage = function(keyObject, value) {
+        for (var property in keyObject) {
+            if (keyObject.hasOwnProperty(property)) {
+                setToLocalStorage(keyObject[property], value);
+            }
+        }
+    };
+
+    return {
+        setCookie: setCookie,
+        getCookie: getCookie,
+        setToLocalStorage: setToLocalStorage,
+        getFromLocalStorage: getFromLocalStorage,
+        getObjectFromLocalStorage: getObjectFromLocalStorage,
+        setObjectToLocalStorage: setObjectToLocalStorage
+    };
 };
 
 $.extend({
