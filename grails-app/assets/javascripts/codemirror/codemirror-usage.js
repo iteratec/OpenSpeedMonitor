@@ -62,6 +62,7 @@ function CodemirrorEditor(data) {
         CodeMirror.measuredEvents.sort(function(a, b) {
             return a.displayText.localeCompare(b.displayText);
         });
+        codemirrorEditor.editor.refresh();
     };
 
     this.warningMsgs = {
