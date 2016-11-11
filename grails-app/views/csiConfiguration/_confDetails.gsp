@@ -155,11 +155,12 @@
                                                     </a>
                                                 </span>
                                                 <input id="defaultTimeToCsMappingCsvFileVisible"
-                                                       class="form-control" type="text">
+                                                       class="form-control" type="text" readonly>
                                                 <span class="input-group-btn">
                                                     <button type="submit" class="btn btn-default"
                                                             id="defaultMappingUploadButton"
-                                                            onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);">
+                                                            onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);"
+                                                            disabled="true">
                                                         <g:message code="de.iteratec.isocsi.upload_file"
                                                                    default="Upload"/>
                                                     </button>
@@ -242,7 +243,7 @@
                                         <i class="fa fa-folder-open-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
-                                <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text">
+                                <input id="theBrowserConnectivityCsvFileTwitter" class="form-control" type="text" readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
                                         <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
@@ -294,7 +295,7 @@
                                         <i class="fa fa-folder-open-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
-                                <input id="thePageCsvFileTwitter" class="form-control" type="text">
+                                <input id="thePageCsvFileTwitter" class="form-control" type="text" readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
                                         <g:message code="de.iteratec.isocsi.upload_file" default="Hochladen"/>
@@ -346,7 +347,7 @@
                                         <i class="fa fa-folder-open-o" aria-hidden="true"></i>
                                     </a>
                                 </span>
-                                <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text">
+                                <input id="theHourOfDayCsvFileTwitter" class="form-control" type="text" readonly>
                                 <span class="input-group-btn">
                                     <button type="submit" class="btn btn-default">
                                         <g:message code="de.iteratec.isocsi.upload_file" default="Upload"/>
@@ -370,38 +371,76 @@
     </div>
 </div>
 
-<content tag="include.bottom">
-    <asset:script type="text/javascript">
-        var legendEntryClickCallback = function(nameOfClickedLegendEntry){
-            var btnRemovePageMapping = $('#removePageMapping');
-            if (nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
-                btnRemovePageMapping.show();
-            } else if (btnRemovePageMapping){
-                btnRemovePageMapping.hide();
-            }
-        };
-        var graphData = ${pageTimeToCsMappings};
-        var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
+<asset:script type="text/javascript">
+    var registerEventHandlers = function () {
 
-        function defaultSelectChange(){
-                var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
-                $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
-                $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
-                changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
-        }
+        registerEventHandlersForFileUploadControls();
 
-        function showMappingDialog(){
-            var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
-            showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
-        }
+        $('#defaultTimeToCsMappingCsvFile').bind('change', function () {
+            $("#warnAboutOverwritingBox").hide();
+            $("#errorBoxDefaultMappingCsv").hide();
+            $("#defaultMappingUploadButton").prop("disabled", true);
 
-        $(document).ready(function () {
-
-            createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
-            createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
-            createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
-
-            $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
+            validateDefaultMappingCsv(this.files[0])
         });
-    </asset:script>
-</content>
+    };
+
+    var registerEventHandlersForFileUploadControls = function () {
+        $('input[id=theBrowserConnectivityCsvFile]').change(function () {
+            $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
+        });
+        $('input[id=theBrowserCsvFile]').change(function () {
+            $('#theBrowserCsvFileTwitter').val($(this).val());
+        });
+        $('input[id=thePageCsvFile]').change(function () {
+            $('#thePageCsvFileTwitter').val($(this).val());
+        });
+        $('input[id=theHourOfDayCsvFile]').change(function () {
+            $('#theHourOfDayCsvFileTwitter').val($(this).val());
+        });
+        $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
+            $('#defaultTimeToCsMappingCsvFileVisible').val($(this).val());
+        });
+    };
+
+    var prepareConfigurationListAndCopy = function(){
+        return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
+    };
+
+    var legendEntryClickCallback = function(nameOfClickedLegendEntry){
+
+        var btnRemovePageMapping = $('#removePageMapping');
+
+        if (nameOfClickedLegendEntry != undefined && btnRemovePageMapping){
+            btnRemovePageMapping.show();
+        } else if (btnRemovePageMapping){
+            btnRemovePageMapping.hide();
+        }
+    };
+
+    var graphData = ${pageTimeToCsMappings};
+    var pageMappingDiagram = createMultiLineGraph(graphData, 'page_csi_mappings', true, null, legendEntryClickCallback);
+
+    function defaultSelectChange(){
+        var possibleChosen = d3.select("#${defaultIdentifier}").select("[chosen=true]");
+        $('#btn-delete-default').prop('disabled', possibleChosen[0][0] == null);
+        $('#btn-apply-mapping').prop('disabled', possibleChosen[0][0] == null);
+        changeValueToDelete($(this).find("text").html(), '${customDefaultCsiMappingDeletePrefix}');
+    }
+
+    function showMappingDialog(){
+        var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
+        showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
+    }
+
+    $(document).ready(function () {
+
+        registerEventHandlers();
+
+        createMatrixView(${matrixViewData}, "browserConnectivityMatrixView");
+        createTreemap(1200, 750, ${treemapData}, "rect", "pageWeightTreemap");
+        createBarChart(1000, 750, ${barchartData}, "clocks", "hoursOfDayBarchart");
+
+        $("#${defaultIdentifier}").find(".diagramKey").click(defaultSelectChange);
+    });
+</asset:script>

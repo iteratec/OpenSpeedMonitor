@@ -168,14 +168,14 @@
         </div>
 
         <g:if test="${!readOnly}">
-            <div class="alert alert-warning" id="warnAboutOverwritingBox">
+            <div class="alert alert-warning" id="warnAboutOverwritingBox" style="display: none">
                 <strong>
                     <g:message code="de.iteratec.osm.defaults.confirmationMessage"/>
                 </strong>
                 <p id="warningsOverwriting"></p>
             </div>
 
-            <div class="alert alert-danger" id="errorBoxDefaultMappingCsv">
+            <div class="alert alert-danger" id="errorBoxDefaultMappingCsv" style="display: none">
                 <strong>
                     <g:message code="de.iteratec.osm.csi.csvErrors.title"/>
                 </strong>
@@ -237,55 +237,6 @@
     <asset:javascript src="csi/defaultMappingCsvValidator.js"/>
     <asset:script type="text/javascript">
 
-        var registerEventHandlers = function () {
-
-            registerEventHandlersForFileUploadControls();
-
-            $('#updateCsiConfModal').on('shown', function () {
-                $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
-                $('#confDescriptionFromModal').val( $('#headerCsiConfDescription').text() );
-                $('#updatingCsiConfigurationErrors').text('');
-                $('#errorUpdatingCsiConfiguration').hide();
-            });
-
-            $('#defaultTimeToCsMappingCsvFile').bind('change', function () {
-                $("#warnAboutOverwritingBox").hide();
-                $("#errorBoxDefaultMappingCsv").hide();
-                $("#defaultMappingUploadButton").prop("disabled", true);
-
-                validateDefaultMappingCsv(this.files[0])
-            });
-
-        };
-
-        var registerEventHandlersForFileUploadControls = function () {
-            $('input[id=theBrowserConnectivityCsvFile]').change(function () {
-                $('#theBrowserConnectivityCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=theBrowserCsvFile]').change(function () {
-                $('#theBrowserCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=thePageCsvFile]').change(function () {
-                $('#thePageCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=theHourOfDayCsvFile]').change(function () {
-                $('#theHourOfDayCsvFileTwitter').val($(this).val());
-            });
-            $('input[id=defaultTimeToCsMappingCsvFile]').change(function () {
-                $('#defaultTimeToCsMappingCsvFileVisible').val($(this).val());
-            });
-        };
-
-        var initializeSomeControls = function(){
-            $("#warnAboutOverwritingBox").hide();
-            $("#errorBoxDefaultMappingCsv").hide();
-            $("#defaultMappingUploadButton").prop("disabled", true);
-        };
-
-        var prepareConfigurationListAndCopy = function(){
-            return copyCsiConfiguration(${csiConfigurations as grails.converters.JSON})
-        };
-
         var osm = {};
         osm.actualCsiConfigurationId = ${selectedCsiConfiguration.ident()};
 
@@ -294,11 +245,15 @@
         var allCsiConfigurations = ${csiConfigurations as grails.converters.JSON};
 
         $(document).ready(function () {
-
-            initializeSomeControls();
+            $('#updateCsiConfModal').on('shown', function () {
+                $('#confLabelFromModal').val( $('#headerCsiConfLabel').text() );
+                $('#confDescriptionFromModal').val( $('#headerCsiConfDescription').text() );
+                $('#updatingCsiConfigurationErrors').text('');
+                $('#errorUpdatingCsiConfiguration').hide();
+            });
         });
 
-        $( window ).load(function() {
+        $(window).load(function() {
             OpenSpeedMonitor.postLoader.loadJavascript(
                 '<g:assetPath src="csi/configurationPost.js" absolute="true"/>',
                 true
