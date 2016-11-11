@@ -204,6 +204,7 @@ task bowerSyncJavascript(type: Sync) {
     include 'tagit/js/tag-it.min.js'
     include 'codemirror/lib/codemirror.js'
     include 'codemirror/addon/hint/show-hint.js'
+    include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
     dependsOn bowerInstall
 }
 
@@ -225,6 +226,7 @@ task bowerSyncStylesheets(type: Sync) {
     include 'tagit/css/jquery.tagit.css'
     include 'jquery-ui/themes/smoothness/jquery-ui.min.css'
     include 'jquery-ui/themes/smoothness/images/'
+    include 'bootstrap-timepicker/css/timepicker.less'
     dependsOn bowerInstall
 }
 

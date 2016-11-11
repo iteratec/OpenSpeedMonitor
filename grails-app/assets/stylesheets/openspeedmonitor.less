@@ -407,3 +407,22 @@ a.control-label {
 .required-indicator {
   margin-right: -0.5em;
 }
+
+// fix bootstrap timepicker to use font awesome instead of glyphicons
+.bootstrap-timepicker-widget .glyphicon-chevron-up,
+.bootstrap-timepicker-widget .glyphicon-chevron-down{
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+
+}
+
+.bootstrap-timepicker-widget .glyphicon-chevron-up:before {
+  content: "\f077";
+}
+
+.bootstrap-timepicker-widget .glyphicon-chevron-down:before {
+  content: "\f078";
+}

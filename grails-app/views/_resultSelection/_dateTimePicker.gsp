@@ -1,7 +1,7 @@
 <%@page defaultCodec="none" %>
 <%--
 A UI component to select date and time. _dateTimePicker.js works with this component, but needs to be initialized
-explicitly. See _selectIntervalTimeframeCard.js as an example.
+explicitly. See selectIntervalTimeframeCard.js as an example.
 --%>
 <div id="${id}">
     <div class="input-group bootstrap-timepicker time-control">
