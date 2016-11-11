@@ -275,7 +275,8 @@
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                               model="${['selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from,
                                         'fromHour': fromHour, 'to': to, 'toHour': toHour, 'showIncludeInterval': true,
-                                        'includeInterval': includeInterval]}"/>
+                                        'includeInterval': includeInterval, 'dateFormat': dateFormat,
+                                        'weekStart': weekStart]}"/>
                 </div>
                 <div class="col-md-3">
                     <div class="card" id="filter-navtab-csiSystem">

@@ -19,12 +19,6 @@
  * Called on jquerys DOM-ready.
  * Initializes DOM-nodes and registers events. 
  */
-function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects){
-	
-	initDatepicker(dateFormat, weekStart, 24*3);
-	
-	initTimepicker(false);
-
+function doOnDomReady(noResultsTextForChosenSelects){
     initChosenSelects(noResultsTextForChosenSelects);
-	
 }

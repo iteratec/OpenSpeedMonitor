@@ -1052,7 +1052,7 @@ class CsiDashboardController {
         result.put('csiSystems', csiSystems)
 
         // JavaScript-Utility-Stuff:
-        result.put("dateFormatString", DATE_FORMAT_STRING_FOR_HIGH_CHART)
+        result.put("dateFormat", DATE_FORMAT_STRING_FOR_HIGH_CHART)
         result.put("weekStart", MONDAY_WEEKSTART)
 
         // --- Map<PageID, Set<MeasuredEventID>> for fast view filtering:

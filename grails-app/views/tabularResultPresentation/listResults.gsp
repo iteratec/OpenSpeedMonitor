@@ -36,7 +36,8 @@
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                         model="${['selectedTimeFrameInterval':selectedTimeFrameInterval, 'from':from,
-                                  'fromHour':fromHour, 'to':to, 'toHour':toHour]}"/>
+                                  'fromHour':fromHour, 'to':to, 'toHour':toHour, 'dateFormat': dateFormat,
+                                  'weekStart': weekStart]}"/>
                 </div>
                 <g:if test="${showSpecificJob}">
                     <g:render template="filterJob" model="${['job': job]}" />
@@ -100,8 +101,6 @@
 
                 $(document).ready(
                     doOnDomReady(
-                        '${dateFormat}',
-                        ${weekStart},
                         '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default':'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
                     )
                 );
