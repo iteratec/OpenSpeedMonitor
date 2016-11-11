@@ -370,7 +370,7 @@ class JobListGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
             JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
             JobGroup jobGroup2 = TestDataUtil.createJobGroup(jobGroup2Name)
             WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-            Browser browser = TestDataUtil.createBrowser(browserName, 1d)
+            Browser browser = TestDataUtil.createBrowser(browserName)
             Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
             Location location2 = TestDataUtil.createLocation(wpt, location2Name, browser, true)
             TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)

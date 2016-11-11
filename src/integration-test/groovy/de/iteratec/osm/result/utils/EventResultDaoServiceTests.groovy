@@ -19,6 +19,7 @@ package de.iteratec.osm.result.utils
 
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.TestDataUtil
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
@@ -33,7 +34,6 @@ import de.iteratec.osm.result.dao.EventResultDaoService
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.apache.commons.lang.time.DateUtils
-import de.iteratec.osm.csi.TestDataUtil
 
 @Integration
 @Rollback
@@ -42,125 +42,119 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
     public static final String CONN_PROFILE_NAME = 'connProfile 1: name'
     EventResultDaoService eventResultDaoService
 
-	Date runDatePlus_Zero, runDatePlus_Ten, runDatePlus_Twenty, runDatePlus_Thirty, runDatePlus_Day
+    Date runDatePlus_Zero, runDatePlus_Ten, runDatePlus_Twenty, runDatePlus_Thirty, runDatePlus_Day
 
-	EventResult resultRunDatePlus_Zero, resultRunDatePlus_Ten, resultRunDatePlus_Twenty, resultRunDatePlus_Thirty, resultRunDatePlus_Day
+    EventResult resultRunDatePlus_Zero, resultRunDatePlus_Ten, resultRunDatePlus_Twenty, resultRunDatePlus_Thirty, resultRunDatePlus_Day
 
-	private Job job
-	
-	private MeasuredEvent measuredEvent
-	private static final String MEASURAND_AGGREGATOR_TYPE_NAME_1 = 'measurand1'
-	private static final String MEASURAND_AGGREGATOR_TYPE_NAME_2 = 'measurand2'
-	private static final String MEASURAND_AGGREGATOR_TYPE_NAME_3 = 'measurand3'
-	private static final String NON_MEASURAND_AGGREGATOR_TYPE_NAME = 'nonMeasurand'
+    private Job job
+
+    private MeasuredEvent measuredEvent
+    private static final String MEASURAND_AGGREGATOR_TYPE_NAME_1 = 'measurand1'
+    private static final String MEASURAND_AGGREGATOR_TYPE_NAME_2 = 'measurand2'
+    private static final String MEASURAND_AGGREGATOR_TYPE_NAME_3 = 'measurand3'
+    private static final String NON_MEASURAND_AGGREGATOR_TYPE_NAME = 'nonMeasurand'
 
 
-	def setup() {
+    def setup() {
         EventResult.withNewTransaction {
             initTestData();
         }
-	}
+    }
 
-	void "Test getByStartAndEndTimeAndMvQueryParams with JUST_ONE_DATE" (){
-		given:
-		MvQueryParams qp=new MvQueryParams();
-		qp.browserIds.add(job.location.browser.id);
-		qp.jobGroupIds.add(job.jobGroup.id);
-		qp.measuredEventIds.add(measuredEvent.id);
-		qp.pageIds.add(measuredEvent.testedPage.id);
-		qp.locationIds.add(job.location.id);
+    void "Test getByStartAndEndTimeAndMvQueryParams with JUST_ONE_DATE"() {
+        given:
+        MvQueryParams qp = new MvQueryParams();
+        qp.browserIds.add(job.location.browser.id);
+        qp.jobGroupIds.add(job.jobGroup.id);
+        qp.measuredEventIds.add(measuredEvent.id);
+        qp.pageIds.add(measuredEvent.testedPage.id);
+        qp.locationIds.add(job.location.id);
 
         when:
-		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Zero, [
-			CachedView.CACHED,
-			CachedView.UNCACHED
-		], qp)
+        Collection<EventResult> results = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Zero, [
+                CachedView.CACHED,
+                CachedView.UNCACHED
+        ], qp)
 
         then:
-		results.size() == 1
-		results.getAt(0).id == resultRunDatePlus_Zero.id
-	}
+        results.size() == 1
+        results.getAt(0).id == resultRunDatePlus_Zero.id
+    }
 
-	void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN"() {
+    void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN"() {
         given:
-		MvQueryParams qp=new MvQueryParams();
-		qp.browserIds.add(job.location.browser.id);
-		qp.jobGroupIds.add(job.jobGroup.id);
-		qp.measuredEventIds.add(measuredEvent.id);
-		qp.pageIds.add(measuredEvent.testedPage.id);
-		qp.locationIds.add(job.location.id);
+        MvQueryParams qp = new MvQueryParams();
+        qp.browserIds.add(job.location.browser.id);
+        qp.jobGroupIds.add(job.jobGroup.id);
+        qp.measuredEventIds.add(measuredEvent.id);
+        qp.pageIds.add(measuredEvent.testedPage.id);
+        qp.locationIds.add(job.location.id);
 
         when:
-		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
-			CachedView.CACHED,
-			CachedView.UNCACHED
-		], qp)
+        Collection<EventResult> results = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
+                CachedView.CACHED,
+                CachedView.UNCACHED
+        ], qp)
 
         then:
         results.size() == 2
-        results.find{it.jobResultDate == runDatePlus_Zero}.id == resultRunDatePlus_Zero.id
-        results.find{it.jobResultDate == runDatePlus_Ten}.id == resultRunDatePlus_Ten.id
-	}
+        results.find { it.jobResultDate == runDatePlus_Zero }.id == resultRunDatePlus_Zero.id
+        results.find { it.jobResultDate == runDatePlus_Ten }.id == resultRunDatePlus_Ten.id
+    }
 
 
     void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_BROWSER"() {
         given:
-		MvQueryParams qp=new MvQueryParams();
-		qp.browserIds.add(job.location.browser.id);
-		qp.jobGroupIds.add(job.jobGroup.id);
-		qp.measuredEventIds.add(measuredEvent.id);
-		qp.pageIds.add(measuredEvent.testedPage.id);
-		qp.locationIds.add(job.location.id);
+        MvQueryParams qp = new MvQueryParams();
+        qp.browserIds.add(job.location.browser.id);
+        qp.jobGroupIds.add(job.jobGroup.id);
+        qp.measuredEventIds.add(measuredEvent.id);
+        qp.pageIds.add(measuredEvent.testedPage.id);
+        qp.locationIds.add(job.location.id);
 
         when:
-		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
-			CachedView.CACHED,
-			CachedView.UNCACHED
-		], qp)
+        Collection<EventResult> results = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
+                CachedView.CACHED,
+                CachedView.UNCACHED
+        ], qp)
 
         then:
         results.size() == 2
-        results.find{it.jobResultDate == runDatePlus_Zero}.id == resultRunDatePlus_Zero.id
-        results.find{it.jobResultDate == runDatePlus_Ten}.id == resultRunDatePlus_Ten.id
-	}
+        results.find { it.jobResultDate == runDatePlus_Zero }.id == resultRunDatePlus_Zero.id
+        results.find { it.jobResultDate == runDatePlus_Ten }.id == resultRunDatePlus_Ten.id
+    }
 
-	void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_EMPTY_MV_PARAMS"() {
+    void "Test getByStartAndEndTimeAndMvQueryParams with ZERO_TO_TEN_AND_EMPTY_MV_PARAMS"() {
         given:
-		MvQueryParams qp=new MvQueryParams();
+        MvQueryParams qp = new MvQueryParams();
 
         when:
-		Collection<EventResult> results=eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
-			CachedView.CACHED,
-			CachedView.UNCACHED
-		], qp)
+        Collection<EventResult> results = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(runDatePlus_Zero, runDatePlus_Ten, [
+                CachedView.CACHED,
+                CachedView.UNCACHED
+        ], qp)
 
         then:
         results.size() == 2
-	}
+    }
 
     private void initTestData() {
 
         ConnectivityProfile profile = TestDataUtil.createConnectivityProfile('irrelevant in these tests')
 
-        WebPageTestServer server= new WebPageTestServer(
-                baseUrl : 'http://server1.wpt.server.de',
-                active : true,
-                label : 'server 1 - wpt server',
-                proxyIdentifier : 'server 1 - wpt server'
+        WebPageTestServer server = new WebPageTestServer(
+                baseUrl: 'http://server1.wpt.server.de',
+                active: true,
+                label: 'server 1 - wpt server',
+                proxyIdentifier: 'server 1 - wpt server'
         ).save(failOnError: true);
 
         JobGroup jobGroup = new JobGroup(
                 name: "TestGroup").save(failOnError: true)
 
-        Browser fireFoxBrowser = new Browser(
-                name:'FF',
-                weight: 0.55).save(failOnError:true)
-        Browser ieBrowser = new Browser(
-                name:'IE',
-                weight: 0.25).save(failOnError:true)
-        Browser i8eBrowser = new Browser(
-                name:'I8E',
-                weight: 0.20).save(failOnError:true)
+        Browser fireFoxBrowser = new Browser(name:'FF').save(failOnError:true)
+        Browser ieBrowser = new Browser(name:'IE').save(failOnError:true)
+        Browser i8eBrowser = new Browser(name:'I8E').save(failOnError:true)
 
         Location ffAgent1 = new Location(
                 active: true,
@@ -171,10 +165,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 wptServer: server
         ).save(failOnError: true)
 
-        Page homepage = new Page(
-                name: 'homepage',
-                weight: 0.5
-        ).save(failOnError: true)
+        Page homepage = new Page(name: 'homepage').save(failOnError: true)
 
         Script script = Script.createDefaultScript('Unnamed').save(failOnError: true)
 
@@ -208,9 +199,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
         measuredEvent = new MeasuredEvent()
         measuredEvent.setName('Test event')
         measuredEvent.setTestedPage(homepage)
-        measuredEvent.save(failOnError:true)
-
-        String eventResultTag = "$jobGroup.id;$measuredEvent.id;$homepage.id;$fireFoxBrowser.id;$ffAgent1.id";
+        measuredEvent.save(failOnError: true)
 
         /* Create TestData */
         /*  2013-05-29T10:13:02.564+02:00   1369815182564 */
@@ -219,7 +208,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
         Date runDatePlus_TenOneSec = DateUtils.addSeconds(runDatePlus_Zero, +1)
         runDatePlus_Twenty = DateUtils.addMinutes(runDatePlus_Zero, +20)
         runDatePlus_Thirty = DateUtils.addMinutes(runDatePlus_Zero, +20)
-        runDatePlus_Day =  DateUtils.addDays(runDatePlus_Zero, +1)
+        runDatePlus_Day = DateUtils.addDays(runDatePlus_Zero, +1)
 
         /* Runs in Hour */
         JobResult jobRunDatePlus_Zero = new JobResult(
@@ -233,7 +222,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode : 200,
+                httpStatusCode: 200,
         ).save(failOnError: true)
 
         resultRunDatePlus_Zero = new EventResult(
@@ -254,15 +243,18 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 firstStatusUpdate: jobRunDatePlus_Zero.date,
                 lastStatusUpdate: jobRunDatePlus_Zero.date,
                 wptStatus: 0,
-                validationState : 'validationState',
+                validationState: 'validationState',
                 harData: 'harData',
-                csByWptDocCompleteInPercent:  1,
+                csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Zero,
                 jobResultDate: jobRunDatePlus_Zero.date,
                 jobResultJobConfigId: jobRunDatePlus_Zero.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: measuredEvent,
+                page: homepage,
+                browser: fireFoxBrowser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: eventResultTag,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -280,7 +272,7 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode : 200,
+                httpStatusCode: 200,
         ).save(failOnError: true)
 
         resultRunDatePlus_Ten = new EventResult(
@@ -301,15 +293,18 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 firstStatusUpdate: jobRunDatePlus_Ten.date,
                 lastStatusUpdate: jobRunDatePlus_Ten.date,
                 wptStatus: 0,
-                validationState : 'validationState',
+                validationState: 'validationState',
                 harData: 'harData',
-                csByWptDocCompleteInPercent:  1,
+                csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Ten,
                 jobResultDate: jobRunDatePlus_Ten.date,
                 jobResultJobConfigId: jobRunDatePlus_Ten.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: measuredEvent,
+                page: homepage,
+                browser: fireFoxBrowser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: eventResultTag,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -348,15 +343,18 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 firstStatusUpdate: jobRunDatePlus_Twenty.date,
                 lastStatusUpdate: jobRunDatePlus_Twenty.date,
                 wptStatus: 0,
-                validationState : 'validationState',
+                validationState: 'validationState',
                 harData: 'harData',
-                csByWptDocCompleteInPercent:  1,
+                csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Twenty,
                 jobResultDate: jobRunDatePlus_Twenty.date,
                 jobResultJobConfigId: jobRunDatePlus_Twenty.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: measuredEvent,
+                page: homepage,
+                browser: fireFoxBrowser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: eventResultTag,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
@@ -395,20 +393,22 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 firstStatusUpdate: jobRunDatePlus_Thirty.date,
                 lastStatusUpdate: jobRunDatePlus_Thirty.date,
                 wptStatus: 0,
-                validationState : 'validationState',
+                validationState: 'validationState',
                 harData: 'harData',
-                csByWptDocCompleteInPercent:  1,
+                csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Thirty,
                 jobResultDate: jobRunDatePlus_Thirty.date,
                 jobResultJobConfigId: jobRunDatePlus_Thirty.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: measuredEvent,
+                page: homepage,
+                browser: fireFoxBrowser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: eventResultTag,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
         jobRunDatePlus_Thirty.save(failOnError: true)
-
 
         /* + 1 Day */
         JobResult jobRunDatePlus_Day = new JobResult(
@@ -443,26 +443,29 @@ class EventResultDaoServiceTests extends NonTransactionalIntegrationSpec {
                 firstStatusUpdate: jobRunDatePlus_Day.date,
                 lastStatusUpdate: jobRunDatePlus_Day.date,
                 wptStatus: 0,
-                validationState : 'validationState',
+                validationState: 'validationState',
                 harData: 'harData',
-                csByWptDocCompleteInPercent:  1,
+                csByWptDocCompleteInPercent: 1,
                 jobResult: jobRunDatePlus_Day,
                 jobResultDate: jobRunDatePlus_Day.date,
                 jobResultJobConfigId: jobRunDatePlus_Day.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: measuredEvent,
+                page: homepage,
+                browser: fireFoxBrowser,
+                location: ffAgent1,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
-                tag: eventResultTag,
                 connectivityProfile: profile
         ).save(failOnError: true)
 
         jobRunDatePlus_Day.save(failOnError: true)
 
-        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_1, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError:true)
-        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_2, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError:true)
-        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_3, measurandGroup: MeasurandGroup.REQUEST_COUNTS]).save(failOnError:true)
-        new AggregatorType([name: NON_MEASURAND_AGGREGATOR_TYPE_NAME, measurandGroup: MeasurandGroup.NO_MEASURAND]).save(failOnError:true)
+        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_1, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError: true)
+        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_2, measurandGroup: MeasurandGroup.LOAD_TIMES]).save(failOnError: true)
+        new AggregatorType([name: MEASURAND_AGGREGATOR_TYPE_NAME_3, measurandGroup: MeasurandGroup.REQUEST_COUNTS]).save(failOnError: true)
+        new AggregatorType([name: NON_MEASURAND_AGGREGATOR_TYPE_NAME, measurandGroup: MeasurandGroup.NO_MEASURAND]).save(failOnError: true)
 
         TestDataUtil.createConnectivityProfile(CONN_PROFILE_NAME)
     }
-	
+
 }

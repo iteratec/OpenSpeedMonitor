@@ -43,17 +43,13 @@ class BrowserServiceTests extends Specification{
 		// Test data
 		//undefined browser
 		String browserName="undefined"
-		new Browser(
-				name: browserName,
-				weight: 0)
+		new Browser(name: browserName)
 				.addToBrowserAliases(alias: "undefined")
 				.save(failOnError: true)
 
 		//IE
 		browserName="IE"
-		new Browser(
-				name: browserName,
-				weight: 45)
+		new Browser(name: browserName)
 				.addToBrowserAliases(alias: "IE")
 				.addToBrowserAliases(alias: "IE8")
 				.addToBrowserAliases(alias: "Internet Explorer")
@@ -62,9 +58,7 @@ class BrowserServiceTests extends Specification{
 
 		//FF
 		browserName="Firefox"
-		new Browser(
-				name: browserName,
-				weight: 55)
+		new Browser(name: browserName)
 				.addToBrowserAliases(alias: "FF")
 				.addToBrowserAliases(alias: "FF7")
 				.addToBrowserAliases(alias: "Firefox")

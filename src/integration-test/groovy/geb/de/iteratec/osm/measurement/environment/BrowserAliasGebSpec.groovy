@@ -18,7 +18,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 /**
- * Tests the CRUD View of @link{de.iteratec.osm.measurement.environment.BrowserAlias}*
+ * Tests the CRUD View of {@link BrowserAlias}*
  * Most tests can't be run against live instance because an existing browserAlias is precondition
  */
 @Integration
@@ -35,7 +35,7 @@ class BrowserAliasGebSpec extends CustomUrlGebReportingSpec {
 
     def setupData() {
         Browser.withNewTransaction {
-            existingBrowser = TestDataUtil.createBrowser("a geb test browserAlias", 2.0)
+            existingBrowser = TestDataUtil.createBrowser("a geb test browserAlias")
         }
     }
 

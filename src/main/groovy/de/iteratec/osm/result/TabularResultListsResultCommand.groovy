@@ -200,19 +200,6 @@ public class TabularResultListResultsCommand extends TabularResultEventResultsCo
         super.copyRequestDataToViewModelMap(viewModelToCopyTo)
     }
 
-    /**
-     * <p>
-     * Creates a query tag to find results matching the selections made
-     * with this command.
-     * </p>
-     *
-     * @param csiAggregationTagService
-     *         The {@link CsiAggregationTagService} to create the tag with.
-     * @return Never <code>null</code>.
-     */
-    public Pattern createResultsQueryPattern(CsiAggregationTagService csiAggregationTagService) {
-        return csiAggregationTagService.getTagPatternForHourlyCsiAggregations(createMvQueryParams());
-    }
 
     /**
      * <p>

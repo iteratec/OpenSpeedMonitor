@@ -2,7 +2,7 @@
 <table class="table table-bordered">
     <thead>
     <tr>
-        <th><g:link action="index" onclick="sortBy('label'); return false;" >${message(code: 'csiSystem.label.label', default: 'Label')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('label'); return false;" >${message(code: 'csiSystem.label.label', default: 'Label')}</g:link></th>
     </tr>
     </thead>
     <tbody>

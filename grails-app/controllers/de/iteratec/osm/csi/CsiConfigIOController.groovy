@@ -39,22 +39,7 @@ class CsiConfigIOController {
 
     // export ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     *
-     * @deprecated
-     */
-    def downloadBrowserWeights() {
-        DateTimeFormatter dtFormater = DateTimeFormat.forPattern("yyyyMMdd")
-        response.setHeader("Content-disposition",
-                "attachment; filename=${dtFormater.print(new DateTime())}browser_weights.csv")
-        response.contentType = "text/csv"
-        StringBuilder builder = new StringBuilder()
-        builder.append('name;weight\n')
-        browserDaoService.findAll().each {
-            builder.append("${it.name};${it.weight}\n")
-        }
-        response.outputStream << builder.toString()
-    }
+
 
     def downloadBrowserConnectivityWeights() {
         CsiConfiguration selectedCsiConfiguration = CsiConfiguration.findById(params['id'])

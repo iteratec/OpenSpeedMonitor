@@ -77,33 +77,12 @@ class LocationController {
         }
     }
 
-    def delete(Location location) {
-
-        if (location == null) {
-            notFound()
-            return
-        }
-
-        try {
-            location.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
-            redirect(action: "index")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'location.label', default: 'Location'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
-
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "label"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<Location> result
-        int count
-        result = Location.createCriteria().list(params) {
+        List<Location> result = Location.createCriteria().list(params) {
             if(params.filter)
                 or{
                     ilike("label","%"+params.filter+"%")
@@ -114,22 +93,11 @@ class LocationController {
                     }
                 }
         }
-        count = Location.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{
-                    ilike("label","%"+params.filter+"%")
-                    ilike("uniqueIdentifierForServer","%"+params.filter+"%")
-                    ilike("location","%"+params.filter+"%")
-                    wptServer{
-                        ilike("label","%"+params.filter+"%")
-                    }
-                }
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'locationTable',
                 model: [locations: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

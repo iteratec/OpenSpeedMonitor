@@ -29,12 +29,12 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.ServiceMocker
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
-import org.joda.time.DateTime
 import org.junit.Before
 import org.junit.Test
 
+import static de.iteratec.osm.result.CachedView.CACHED
+import static de.iteratec.osm.result.CachedView.UNCACHED
 import static org.junit.Assert.*
-import static de.iteratec.osm.result.CachedView.*
 
 /**
  * Tests the saving of EventResults.
@@ -62,7 +62,6 @@ class PersistingNewEventResultsTests {
         browserService(BrowserService)
         csiAggregationUpdateService(CsiAggregationUpdateService)
         pageService(PageService)
-        csiAggregationTagService(CsiAggregationTagService)
         csiValueService(CsiValueService)
         jobDaoService(JobDaoService)
     }
@@ -92,7 +91,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -123,7 +122,7 @@ class PersistingNewEventResultsTests {
         assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
         assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
 
-        //TestDetailsUrl uncached and without page
+        //TestDetailsUrl uncached and without pageAggregator
         EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
         String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -131,7 +130,7 @@ class PersistingNewEventResultsTests {
                 detailsUrl
         )
 
-        //TestDetailsUrl cached and without page
+        //TestDetailsUrl cached and without pageAggregator
         EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
         detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -154,7 +153,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -185,7 +184,7 @@ class PersistingNewEventResultsTests {
         assertEquals('docCompleteRequests of median cached-EventResults for single event, third run - ', 36, medianCachedResultsOfsingleEventRun3[0].docCompleteRequests)
         assertEquals('wptStatus of median cached-EventResults for single event, third run - ', 0, medianCachedResultsOfsingleEventRun3[0].wptStatus)
 
-        //TestDetailsUrl uncached and without page
+        //TestDetailsUrl uncached and without pageAggregator
         EventResult eventResultUncachedTest = medianUncachedResultsOfsingleEvent[0]
         String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -193,7 +192,7 @@ class PersistingNewEventResultsTests {
                 detailsUrl
         )
 
-        //TestDetailsUrl cached and without page
+        //TestDetailsUrl cached and without pageAggregator
         EventResult eventResultCachedTest = medianCachedResultsOfsingleEventRun3[0]
         detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -216,7 +215,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -258,7 +257,7 @@ class PersistingNewEventResultsTests {
         assertEquals('docCompleteRequests of median cached-EventResults for event 2, first run  - ', 6, medianCachedResultsOfEvent2Run1[0].docCompleteRequests)
         assertEquals('wptStatus of median cached-EventResults for event 2, first run  - ', 99999, medianCachedResultsOfEvent2Run1[0].wptStatus)
 
-        //TestDetailsUrl uncached and without page
+        //TestDetailsUrl uncached and without pageAggregator
         EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
         String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -266,7 +265,7 @@ class PersistingNewEventResultsTests {
             detailsUrl
         )
 
-        //TestDetailsUrl cached and without page
+        //TestDetailsUrl cached and without pageAggregator
         EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
         detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -289,7 +288,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -331,7 +330,7 @@ class PersistingNewEventResultsTests {
         assertEquals('docCompleteRequests of median cached-EventResults for event 2, first run - ', 6, medianCachedResultsOfEvent2Run1[0].docCompleteRequests)
         assertEquals('wptStatus of median cached-EventResults for event 2, first run - ', 99999, medianCachedResultsOfEvent2Run1[0].wptStatus)
 
-        //TestDetailsUrl uncached and without page
+        //TestDetailsUrl uncached and without pageAggregator
         EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
         String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         //replacing check: in database with a dot 'Produkt ausw.aehlen'
@@ -340,7 +339,7 @@ class PersistingNewEventResultsTests {
             detailsUrl
         )
 
-        //TestDetailsUrl cached and without page
+        //TestDetailsUrl cached and without pageAggregator
         EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
         detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
@@ -363,7 +362,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -398,7 +397,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -502,7 +501,7 @@ class PersistingNewEventResultsTests {
         mockCsiAggregationUpdateService()
         ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
         mockPageService()
-        mockCsiAggregationTagService('notTheConcernOfThisTest')
+
         deleteAllRelevantDomains()
 
         //test execution
@@ -573,23 +572,6 @@ class PersistingNewEventResultsTests {
         serviceUnderTest.pageService = pageServiceMocked
     }
 
-    private void mockCsiAggregationTagService(String tagToReturn) {
-        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
-        csiAggregationTagService.metaClass.createEventResultTag = {
-            JobGroup jobGroup,
-            MeasuredEvent measuredEvent,
-            Page page,
-            Browser browser,
-            Location location ->
-                return tagToReturn
-        }
-        csiAggregationTagService.metaClass.findJobGroupOfEventResultTag = {
-            String tag ->
-                return undefinedJobGroup
-        }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
-    }
-
     private void mockMetricReportingService() {
         def metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
         metricReportingService.metaClass.reportEventResultToGraphite = {
@@ -603,25 +585,19 @@ class PersistingNewEventResultsTests {
 
     private createBrowsers() {
         String browserName = Browser.UNDEFINED
-        undefinedBrowser = new Browser(
-                name: browserName,
-                weight: 0)
+        undefinedBrowser = new Browser(name: browserName)
                 .addToBrowserAliases(alias: Browser.UNDEFINED)
                 .save(failOnError: true)
 
         browserName = "IE"
-        new Browser(
-                name: browserName,
-                weight: 45)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
         browserName = "FF"
-        new Browser(
-                name: browserName,
-                weight: 55)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "FF7")
                 .addToBrowserAliases(alias: "Firefox")
@@ -629,27 +605,14 @@ class PersistingNewEventResultsTests {
                 .save(failOnError: true)
 
         browserName = "Chrome"
-        new Browser(
-                name: browserName,
-                weight: 55)
+        new Browser(name: browserName)
                 .addToBrowserAliases(alias: "Chrome")
                 .save(failOnError: true)
     }
 
     private void createPages() {
         ['HP', 'MES', Page.UNDEFINED].each { pageName ->
-            Double weight = 0
-            switch (pageName) {
-                case 'HP': weight = 6; break
-                case 'MES': weight = 9; break
-                case 'SE': weight = 36; break
-                case 'ADS': weight = 43; break
-                case 'WKBS': weight = 3; break
-                case 'WK': weight = 3; break
-            }
-            new Page(
-                    name: pageName,
-                    weight: weight).save(failOnError: true)
+            new Page(name: pageName).save(failOnError: true)
         }
     }
 

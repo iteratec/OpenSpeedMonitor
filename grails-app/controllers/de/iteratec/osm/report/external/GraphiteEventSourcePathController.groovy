@@ -98,29 +98,21 @@ class GraphiteEventSourcePathController {
         }
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "staticPrefix"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.sort = params.sort=="jobGroups" ? "staticPrefix": params.sort // mysql cannot sort by a list
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<GraphiteEventSourcePath> result
-        int count
-        result = GraphiteEventSourcePath.createCriteria().list(params) {
+        List<GraphiteEventSourcePath> result = GraphiteEventSourcePath.createCriteria().list(params) {
             if(params.filter)
                 or{ilike("staticPrefix","%"+params.filter+"%")
                    ilike("targetMetricName","%"+params.filter+"%")}
         }
-        count = GraphiteEventSourcePath.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{ilike("staticPrefix","%"+params.filter+"%")
-                   ilike("targetMetricName","%"+params.filter+"%")}
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'graphiteEventSourcePathTable',
                 model: [graphiteEventSourcePaths: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

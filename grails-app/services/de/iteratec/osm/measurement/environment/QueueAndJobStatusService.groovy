@@ -25,7 +25,10 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MvQueryParams
+import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
 import grails.transaction.Transactional
@@ -43,7 +46,6 @@ import org.quartz.CronExpression
 class QueueAndJobStatusService {
 
     HttpRequestService httpRequestService
-    CsiAggregationTagService csiAggregationTagService
     EventResultDaoService eventResultDaoService
     I18nService i18nService
     JobService jobService

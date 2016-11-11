@@ -31,6 +31,16 @@
                         <g:message code="default.systeminfo.label" locale="${lang}"/>
                     </a>
                 </li>
+            </sec:ifAnyGranted>
+            <g:if env="development">
+                <li>
+                    <a href="${createLink(uri: '/admin/dbconsole')}" target="_blank">
+                        <i class="fa fa-tachometer"></i>
+                        <g:message code="de.iteratec.osm.persistence.dbconsole.label" locale="${lang}"/>
+                    </a>
+                </li>
+            </g:if>
+            <sec:ifAnyGranted roles="ROLE_SUPER_ADMIN,ROLE_ADMIN">
                 <li class="dropdown-submenu">
                     <a tabindex="-1" href="#">
                         <i class="fa fa-sitemap"></i>
@@ -67,13 +77,5 @@
                     </ul>
                 </li>
             </sec:ifAnyGranted>
-            <g:if env="development">
-                <li>
-                    <a href="${createLink(uri: '/admin/dbconsole')}" target="_blank">
-                        <i class="fa fa-tachometer"></i>
-                        <g:message code="de.iteratec.osm.persistence.dbconsole.label" locale="${lang}"/>
-                    </a>
-                </li>
-            </g:if>
         </ul>
     </li>

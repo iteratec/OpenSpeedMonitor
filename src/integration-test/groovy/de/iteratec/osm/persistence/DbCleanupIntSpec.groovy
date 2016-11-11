@@ -82,9 +82,7 @@ class DbCleanupIntSpec extends NonTransactionalIntegrationSpec{
 		
 		//creating test-specific data
 		String browserName="my-browser"
-		Browser mybrowser = new Browser(
-			name: browserName,
-			weight: 55)
+		Browser mybrowser = new Browser(name: browserName)
 			.addToBrowserAliases(alias: "my-browser-a")
 			.addToBrowserAliases(alias: "my-browser-b")
 			.addToBrowserAliases(alias: "my-browser-c")

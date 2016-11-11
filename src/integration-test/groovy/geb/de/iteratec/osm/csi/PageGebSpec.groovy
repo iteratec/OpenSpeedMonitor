@@ -50,7 +50,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         to PageCreatePage
 
         and: "does not fill all required fields"
-        pageWeightTextField << pageWeight
         createPageButton.click()
 
         then: "an error message is shown on create page"
@@ -64,7 +63,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         to PageCreatePage
 
         and: "does fill form correctly"
-        pageWeightTextField << pageWeight
         pageNameTextField << pageName
         createPageButton.click()
         // save page id for following tests
@@ -84,7 +82,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         then: "the page data is shown"
         at PageShowPage
         name == pageName
-        weight == pageWeight
     }
 
     void "test editPage with invalid data"() {
@@ -109,7 +106,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         then: "form is prefilled"
         at PageEditPage
         nameTextField.value() == pageName
-        weightTextField.value() == pageWeight
 
         when: "user inserts new name"
         String newPageName = "a new geb test page name"
@@ -135,34 +131,6 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         name == newPageName
     }
 
-    void "test delete page"() {
-        given: "user is at detail page of page"
-        go "/page/show/" + pageId
-        waitFor {at PageShowPage}
-
-        when: "user clicks delete button"
-        deleteButton.click()
-        waitFor(5.0) {
-            deleteConfirmationDialog.isDisplayed()
-        }
-
-        then: "a modal confirmation dialog is show"
-        deleteConfirmationDialog.isDisplayed()
-
-        when: "user confirms"
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-
-        then: "user gets to index page"
-        waitFor {
-            at PageIndexPage
-        }
-    }
-
     @IgnoreIf(IgnoreGebLiveTest)
     void "test pagination"() {
         when: "there are more than 10 pages"
@@ -182,53 +150,12 @@ class PageGebSpec extends CustomUrlGebReportingSpec {
         deletePages(pageIDs)
     }
 
-    @IgnoreIf(IgnoreGebLiveTest)
-    void "test deleting page impossible caused by foreignKey constraint"() {
-        given: "a page"
-        Page testPage
-        Page.withNewTransaction {
-            testPage = TestDataUtil.createPage("a geb test page foreign key", 2.0)
-        }
-
-        and: "a pageWeight using this page"
-        PageWeight pageWeight
-        PageWeight.withNewTransaction {
-            pageWeight = TestDataUtil.createPageWeight(testPage, 2.0)
-        }
-
-        when: "user tries to delete page"
-        go "/page/show/" + testPage.id
-        at PageShowPage
-        deleteButton.click()
-        waitFor {
-            deleteConfirmationDialog.isDisplayed()
-        }
-        waitFor {
-            deleteConfirmButton.displayed
-        }
-        waitFor {
-            deleteConfirmButton.click()
-        }
-
-        then: "an error message is shown"
-        waitFor {
-            alertDivText.contains("could not be deleted")
-        }
-
-        cleanup:
-        Page.withNewTransaction {
-            pageWeight.delete(flush: true, failOnError: true)
-            testPage.delete(flush: true, failOnError: true)
-        }
-
-    }
-
     private List<Long> createManyPages(int count) {
         List<Long> pageIDs = []
 
         Page.withNewTransaction {
             count.times {
-                pageIDs << TestDataUtil.createPage("gebPage" + it, it).id
+                pageIDs << TestDataUtil.createPage("gebPage" + it).id
             }
         }
 

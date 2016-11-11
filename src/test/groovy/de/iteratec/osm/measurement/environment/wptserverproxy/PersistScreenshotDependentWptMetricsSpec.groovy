@@ -91,8 +91,8 @@ class PersistScreenshotDependentWptMetricsSpec {
     void createTestDataCommonForAllTests() {
         JobGroup jobGroup = TestDataUtil.createJobGroup(JobGroup.UNDEFINED_CSI)
         WebPageTestServer wptServer = TestDataUtil.createWebPageTestServer(PROXY_IDENTIFIER_WPT_SERVER, PROXY_IDENTIFIER_WPT_SERVER, true, "http://${PROXY_IDENTIFIER_WPT_SERVER}/")
-        Browser ff = TestDataUtil.createBrowser('Firefox', 1d)
-        Browser ie = TestDataUtil.createBrowser('IE', 1d)
+        Browser ff = TestDataUtil.createBrowser('Firefox')
+        Browser ie = TestDataUtil.createBrowser('IE')
         Location locationFirefox = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-win7:Firefox', ff, true)
         Location locationFirefox_old = TestDataUtil.createLocation(wptServer, 'iteratec-dev-hetzner-64bit-ssd:Firefox', ff, true)
         Location locationIe = TestDataUtil.createLocation(wptServer, 'NewYork:IE 11', ie, true)
@@ -109,7 +109,6 @@ class PersistScreenshotDependentWptMetricsSpec {
         mocker.mockProxyService(serviceUnderTest)
         mocker.mockMetricReportingService(serviceUnderTest)
         serviceUnderTest.pageService = grailsApplication.mainContext.getBean('pageService')
-        mocker.mockCsiAggregationTagService(serviceUnderTest, [:], [:], [:], [:], [:])
         serviceUnderTest.metaClass.informDependents = { List<EventResult> results ->
             // not the concern of this test
         }

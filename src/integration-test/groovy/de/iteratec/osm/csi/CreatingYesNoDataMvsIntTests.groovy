@@ -17,24 +17,20 @@
 
 package de.iteratec.osm.csi
 
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import grails.test.mixin.integration.Integration
-import grails.transaction.Rollback
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
-
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.AggregatorType
+import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
+import de.iteratec.osm.result.MeasuredEvent
+import grails.test.mixin.integration.Integration
+import grails.transaction.Rollback
+import org.joda.time.DateTime
 
 /**
  * Contains tests which test the creation of {@link de.iteratec.osm.report.chart.CsiAggregation}s without the existence of corresponding {@link EventResult}s.<br>
@@ -106,14 +102,13 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
         Integer countWeeks = 2
         Integer countPages = 7
         when:
-        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateWeeklyShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate())
-        Date endOfLastWeek = csiAggregationUtilService.resetToEndOfActualInterval(endDate, CsiAggregationInterval.WEEKLY).toDate()
+        List<CsiAggregation> wsmvs = shopCsiAggregationService.getOrCalculateShopCsiAggregations(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list())
         then:
         wsmvs.size() == countWeeks
         wsmvs.each {
             it.isCalculated()
         }
-        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY)).size() == countWeeks * countPages
+        pageCsiAggregationService.findAll(startOfCreatingWeeklyShopValues.toDate(), endDate.toDate(), CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.WEEKLY), JobGroup.list(), Page.list()).size() == countWeeks * countPages
 
     }
 
@@ -209,9 +204,7 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
                 case 'WKBS': weight = 3; break
                 case 'WK': weight = 3; break
             }
-            Page page = Page.findByName(pageName) ?: new Page(
-                    name: pageName,
-                    weight: weight).save(failOnError: true)
+            Page page = Page.findByName(pageName) ?: new Page(name: pageName).save(failOnError: true)
 
             // Simply create one event
             new MeasuredEvent(
@@ -223,24 +216,18 @@ class CreatingYesNoDataMvsIntTests extends NonTransactionalIntegrationSpec {
 
     private static void createBrowsers() {
         String browserName = "undefined"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 0)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "undefined")
                 .save(failOnError: true)
         browserName = "IE"
-        Browser browserIE = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 45)
+        Browser browserIE = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
         browserName = "FF"
-        Browser browserFF = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 55)
+        Browser browserFF = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "FF7")
                 .addToBrowserAliases(alias: "Firefox")

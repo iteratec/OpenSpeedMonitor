@@ -84,7 +84,7 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 		}
 		//*/
 
-		Page page = new Page(name: 'HP', weight: 0.8).save(failOnError: true, flush: true)
+		Page page = new Page(name: 'HP').save(failOnError: true, flush: true)
 		new MeasuredEvent(name: 'event', testedPage: page).save(failOnError: true, flush: true)
 //		look at ToDo below
 //		JobGroup jobGroup = new JobGroup(name: 'group', groupType: JobGroupType.CSI_AGGREGATION).save(failOnError: true, flush: true)
@@ -109,10 +109,7 @@ class HighfrequencyCsiAggregationUpdateIntSpec extends NonTransactionalIntegrati
 				dateCreated: new Date(),
 				lastUpdated: new Date()
 		).save(failOnError: true, flush: true)
-		Browser browser = new Browser(
-				name: 'browser',
-				weight: 0.8
-		).save(failOnError: true, flush: true)
+		Browser browser = new Browser(name: 'browser').save(failOnError: true, flush: true)
 		Location location = new Location(
 				label: 'location',
 				active: true,

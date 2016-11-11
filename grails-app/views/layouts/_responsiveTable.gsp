@@ -17,15 +17,5 @@
         </div>
     </div>
 </div>
-<div style="display: none;" id="limitResultsCheckboxContainer">
-    <label  class="checkbox-inline">
-        <g:checkBox  name="limitResultsCheckbox" id="limitResultsCheckbox"
-                    checked="${true}" value="${true}"/>
-        <g:message code="de.iteratec.osm.responsiveTable.limitedResults.lable"
-                   default="Show only 1000 elements"/>
-    </label>
-    <br>
-    <br>
-</div>
 
 <div id="elementTable"/>

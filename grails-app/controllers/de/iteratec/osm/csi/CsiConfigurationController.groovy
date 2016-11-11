@@ -155,7 +155,7 @@ class CsiConfigurationController {
         CsiConfiguration newCsiConfig
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
-                "coppy CSI Configuration",
+                "copy CSI Configuration",
                 PerformanceLoggingService.IndentationDepth.ONE
         ) {
             newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
@@ -163,7 +163,7 @@ class CsiConfigurationController {
 
         performanceLoggingService.logExecutionTime(
                 PerformanceLoggingService.LogLevel.DEBUG,
-                "saave copieed CSI Configuration",
+                "save copied CSI Configuration",
                 PerformanceLoggingService.IndentationDepth.ONE
         ) {
             newCsiConfig.label = params.label

@@ -146,15 +146,15 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
         when:
         //duplicate hp-results which shouldn't change system-csi at all (should just improve accuracy of hp-proportion of csi)
         MeasuredEvent eventHomepage = MeasuredEvent.findByName('event-HP')
-        String pageHP_ID = Page.findByName('HP').ident().toString()
-        String browserIE_ID = Browser.findByName('IE').ident().toString()
-        String browserFF_ID = Browser.findByName('FF').ident().toString()
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe2)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe3)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf1)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3)
+        Page pageHP_ID = Page.findByName('HP')
+        Browser browserIE_ID = Browser.findByName('IE')
+        Browser browserFF_ID = Browser.findByName('FF')
+        createEventResult(eventHomepage, pageHP_ID, browserIE_ID, csiHpIe1)
+        createEventResult(eventHomepage, pageHP_ID, browserIE_ID, csiHpIe2)
+        createEventResult(eventHomepage, pageHP_ID, browserIE_ID, csiHpIe3)
+        createEventResult(eventHomepage, pageHP_ID, browserFF_ID, csiHpFf1)
+        createEventResult(eventHomepage, pageHP_ID, browserFF_ID, csiHpFf2)
+        createEventResult(eventHomepage, pageHP_ID, browserFF_ID, csiHpFf3)
 
         CsiByEventResultsDto systemCsi = csiByEventResultsService.retrieveCsi(START, END, queryParams, [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
 
@@ -172,41 +172,44 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
     private void createEventResults() {
         MeasuredEvent eventHomepage = MeasuredEvent.findByName('event-HP')
         MeasuredEvent eventMes = MeasuredEvent.findByName('event-MES')
-        String pageHP_ID = Page.findByName('HP').ident().toString()
-        String pageMES_ID = Page.findByName('MES').ident().toString()
-        String browserIE_ID = Browser.findByName('IE').ident().toString()
-        String browserFF_ID = Browser.findByName('FF').ident().toString()
+        Page pageHP = Page.findByName('HP')
+        Page pageMES = Page.findByName('MES')
+        Browser browserIE = Browser.findByName('IE')
+        Browser browserFF = Browser.findByName('FF')
         // HP|IE
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe1)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe2)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserIE_ID};1", csiHpIe3)
+        createEventResult(eventHomepage, pageHP, browserIE, csiHpIe1)
+        createEventResult(eventHomepage, pageHP, browserIE, csiHpIe2)
+        createEventResult(eventHomepage, pageHP, browserIE, csiHpIe3)
         // HP|FF
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf1)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf2)
-        createEventResult(eventHomepage, "1;${eventHomepage.ident().toString()};${pageHP_ID};${browserFF_ID};1", csiHpFf3)
+        createEventResult(eventHomepage, pageHP, browserFF, csiHpFf1)
+        createEventResult(eventHomepage, pageHP, browserFF, csiHpFf2)
+        createEventResult(eventHomepage, pageHP, browserFF, csiHpFf3)
         // MES|IE
-        createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe1)
-        createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe2)
-        createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserIE_ID};1", csiMesIe3)
+        createEventResult(eventMes, pageMES, browserIE, csiMesIe1)
+        createEventResult(eventMes, pageMES, browserIE, csiMesIe2)
+        createEventResult(eventMes, pageMES, browserIE, csiMesIe3)
         // MES|FF
-        createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf1)
-        createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf2)
-        createEventResult(eventMes, "1;${eventMes.ident().toString()};${pageMES_ID};${browserFF_ID};1", csiMesFf3)
+        createEventResult(eventMes, pageMES, browserFF, csiMesFf1)
+        createEventResult(eventMes, pageMES, browserFF, csiMesFf2)
+        createEventResult(eventMes, pageMES, browserFF, csiMesFf3)
     }
 
-    private void createEventResult(MeasuredEvent event, String tag, double value) {
+    private void createEventResult(MeasuredEvent event, Page page, Browser browser, double value) {
         //data is needed to create a JobResult
         JobGroup group = JobGroup.list()[0]
         Script script = TestDataUtil.createScript("label${groups}", "description", "navigationScript")
         WebPageTestServer webPageTestServer = TestDataUtil.createWebPageTestServer("label", "1", true, "http://www.url.de")
-        Browser browser = TestDataUtil.createBrowser("browser${groups}", 1)
         Location location = TestDataUtil.createLocation(webPageTestServer, "id", browser, true)
         Job job = TestDataUtil.createJob("Label${groups++}", script, location, group, "descirpiton", 1, false, 20)
 
         JobResult expectedResult = new JobResult(jobGroupName: "Group", jobConfigLabel: "label", jobConfigRuns: 1, httpStatusCode: 200, job: job, description: "description", date: new Date(), testId: "TestJob").save(validate: false);
 
         new EventResult(
+                jobGroup: group,
                 measuredEvent: event,
+                page: page,
+                browser: browser,
+                location: location,
                 wptStatus: 200,
                 medianValue: true,
                 numberOfWptRun: 1,
@@ -214,7 +217,6 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
                 jobResult: expectedResult,
                 jobResultDate: START.plusDays(1).toDate(),
                 jobResultJobConfigId: 1,
-                tag: tag,
                 speedIndex: 1,
                 csByWptDocCompleteInPercent: value,
                 docCompleteTimeInMillisecs: 1000,
@@ -236,10 +238,7 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
     private void createPagesAndEvents() {
         ['HP', 'MES', 'SE', 'ADS', 'WKBS', 'WK', Page.UNDEFINED].each { pageName ->
-            Double weight = 0
-            Page page = Page.findByName(pageName) ?: new Page(
-                    name: pageName,
-                    weight: weight).save(failOnError: true)
+            Page page = Page.findByName(pageName) ?: new Page(name: pageName).save(failOnError: true)
 
             // Simply create one event
             new MeasuredEvent(
@@ -252,24 +251,18 @@ class ShopCsiServiceIntTests extends NonTransactionalIntegrationSpec {
 
     private void createBrowsers() {
         String browserName = "undefined"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 0)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "undefined")
                 .save(failOnError: true)
         browserName = "IE"
-        Browser browserIE = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 45)
+        Browser browserIE = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
         browserName = "FF"
-        Browser browserFF = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 55)
+        Browser browserFF = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "FF7")
                 .addToBrowserAliases(alias: "Firefox")

@@ -110,7 +110,7 @@ class PageController {
         redirect(action: "show", id: pageInstance.id)
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"
         def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
@@ -119,17 +119,11 @@ class PageController {
         int count
         result = Page.createCriteria().list(params) {
             if(params.filter)
-                or{
                     ilike("name","%"+params.filter+"%")
-                    if(params.filter.isNumber())eq("weight",Double.valueOf(params.filter))
-                }
         }
         count = Page.createCriteria().list(paramsForCount) {
             if(params.filter)
-                or{
                     ilike("name","%"+params.filter+"%")
-                    if(params.filter.isNumber())eq("weight",Double.valueOf(params.filter))
-                }
         }.size()
         String templateAsPlainText = g.render(
                 template: 'pageTable',
@@ -150,24 +144,5 @@ class PageController {
         textOut.flush()
         response.getOutputStream().flush()
 
-    }
-    
-    def delete() {
-        def pageInstance = Page.get(params.id)
-        if (!pageInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'page.label', default: 'Page'), params.id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            pageInstance.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'page.label', default: 'Page'), params.id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'page.label', default: 'Page'), params.id])
-            redirect(action: "show", id: params.id)
-        }
     }
 }

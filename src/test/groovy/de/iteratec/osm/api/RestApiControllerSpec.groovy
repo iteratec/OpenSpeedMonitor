@@ -46,8 +46,8 @@ class RestApiControllerSpec extends Specification {
         page2 = new Page(name: "testPage2").save(failOnError: true)
 
 
-        browser1 = TestDataUtil.createBrowser("browser1", 0)
-        browser2 = TestDataUtil.createBrowser("browser2", 0)
+        browser1 = TestDataUtil.createBrowser("browser1")
+        browser2 = TestDataUtil.createBrowser("browser2")
 
         csiConfigurationLabel = "csiConfiguration"
         csiConfiguration = TestDataUtil.createCsiConfiguration()

@@ -17,46 +17,31 @@
 
 package de.iteratec.osm.result
 
-import de.iteratec.osm.dao.CriteriaSorting
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import de.iteratec.osm.report.chart.DefaultAggregatorTypeDaoService
-import de.iteratec.osm.report.chart.OsmChartProcessingService
-import de.iteratec.osm.report.chart.OsmRickshawChart
-import grails.test.mixin.*
-import grails.test.mixin.support.*
-import grails.web.mapping.LinkGenerator
-import groovy.mock.interceptor.MockFor
-import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
-import org.junit.*
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito
-
-import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.report.chart.OsmChartGraph
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
-import de.iteratec.osm.measurement.schedule.DefaultJobGroupDaoService
-import de.iteratec.osm.measurement.schedule.DefaultPageDaoService
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.report.chart.CsiAggregation
-import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.dao.CriteriaSorting
+import de.iteratec.osm.measurement.environment.*
+import de.iteratec.osm.measurement.schedule.*
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.dao.EventResultDaoService
+import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
-import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
-import de.iteratec.osm.measurement.environment.DefaultBrowserDaoService
-import de.iteratec.osm.measurement.environment.DefaultLocationDaoService
-import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.util.I18nService
+import grails.test.mixin.Mock
+import grails.test.mixin.TestFor
+import grails.test.mixin.TestMixin
+import grails.test.mixin.support.GrailsUnitTestMixin
+import grails.web.mapping.LinkGenerator
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.junit.Before
+import org.junit.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito
+
 import static org.junit.Assert.*
+
 /**
  * See the API for {@link grails.test.mixin.support.GrailsUnitTestMixin} for usage instructions
  */
@@ -107,7 +92,6 @@ class EventResultDashboardServiceTests {
         defaultPageDaoService(DefaultPageDaoService)
         defaultBrowserDaoService(DefaultBrowserDaoService)
         defaultLocationDaoService(DefaultLocationDaoService)
-        csiAggregationTagService(CsiAggregationTagService)
         i18nService(I18nService)
         defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
     }
@@ -132,7 +116,6 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -166,7 +149,6 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -218,7 +200,6 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -264,7 +245,6 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockCsiAggregationTagService()
 
         ErQueryParams queryParams = new ErQueryParams();
         queryParams.browserIds.add(browser.id)
@@ -311,7 +291,6 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockCsiAggregationTagService()
         mockAggregatorTypeDaoService()
 
         //test-specific data
@@ -352,7 +331,6 @@ class EventResultDashboardServiceTests {
         mockPageDaoService()
         mockBrowserDaoService()
         mockLocationDaoService()
-        mockCsiAggregationTagService()
         mockAggregatorTypeDaoService()
 
         //test-specific data
@@ -497,14 +475,10 @@ class EventResultDashboardServiceTests {
     }
 
     void createBrowser() {
-        browser = new Browser(
-                name: "Test",
-                weight: 1)
+        browser = new Browser(name: "Test")
                 .addToBrowserAliases(new BrowserAlias(alias: "Test"))
                 .save(failOnError: true)
-        new Browser(
-                name: "Test2",
-                weight: 1)
+        new Browser(name: "Test2")
                 .addToBrowserAliases(new BrowserAlias(alias: "Test2"))
                 .save(failOnError: true)
     }
@@ -562,12 +536,8 @@ class EventResultDashboardServiceTests {
     }
 
     void createPages() {
-        page = new Page(
-                name: page1Name,
-                weight: 0).save(failOnError: true)
-        new Page(
-                name: page2Name,
-                weight: 0).save(failOnError: true)
+        page = new Page(name: page1Name).save(failOnError: true)
+        new Page(name: page2Name).save(failOnError: true)
     }
 
     void createJobResults() {
@@ -637,8 +607,11 @@ class EventResultDashboardServiceTests {
                 jobResult: jobResult,
                 jobResultDate: jobResult.date,
                 jobResultJobConfigId: jobResult.job.ident(),
+                jobGroup: jobGroup,
                 measuredEvent: measuredEvent,
-                tag: '1;1;1;1;1',
+                page: page,
+                browser: browser,
+                location: location,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: mockConnectivity,
                 customConnectivityName: null,
@@ -658,8 +631,11 @@ class EventResultDashboardServiceTests {
                 jobResult: jobResult2,
                 jobResultDate: jobResult2.date,
                 jobResultJobConfigId: jobResult2.job.ident(),
+                jobGroup: JobGroup.findByName(group2Name),
                 measuredEvent: measuredEvent,
-                tag: '2;1;1;1;1',
+                page: page,
+                browser: browser,
+                location: location,
                 speedIndex: EventResult.SPEED_INDEX_DEFAULT_VALUE,
                 connectivityProfile: mockConnectivity,
                 customConnectivityName: null,
@@ -781,33 +757,6 @@ class EventResultDashboardServiceTests {
             return [1: Location.get(1), 2: Location.get(2)]
         }
         serviceUnderTest.locationDaoService = locationDaoService
-    }
-    /**
-     * Mocks {@linkplain EventCsiAggregationService#locationDaoService}.
-     */
-    private void mockCsiAggregationTagService() {
-        def csiAggregationTagService = grailsApplication.mainContext.getBean('csiAggregationTagService')
-        csiAggregationTagService.metaClass.findJobGroupIdOfHourlyEventTag= {
-            String hourlyEventMvTag ->
-                return Long.valueOf(hourlyEventMvTag.tokenize(';')[0]) as Serializable
-        }
-        csiAggregationTagService.metaClass.findPageIdOfHourlyEventTag= {
-            String hourlyEventMvTag ->
-                return Long.valueOf(hourlyEventMvTag.tokenize(';')[1]) as Serializable
-        }
-        csiAggregationTagService.metaClass.findMeasuredEventIdOfHourlyEventTag= {
-            String hourlyEventMvTag ->
-                return Long.valueOf(hourlyEventMvTag.tokenize(';')[2]) as Serializable
-        }
-        csiAggregationTagService.metaClass.findBrowserIdOfHourlyEventTag= {
-            String hourlyEventMvTag ->
-                return Long.valueOf(hourlyEventMvTag.tokenize(';')[3]) as Serializable
-        }
-        csiAggregationTagService.metaClass.findLocationIdOfHourlyEventTag= {
-            String hourlyEventMvTag ->
-                return Long.valueOf(hourlyEventMvTag.tokenize(';')[4]) as Serializable
-        }
-        serviceUnderTest.csiAggregationTagService = csiAggregationTagService
     }
     private void mockI18nService() {
         def i18nService = grailsApplication.mainContext.getBean('i18nService')

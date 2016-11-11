@@ -3,11 +3,9 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('date'); return false;" >${message(code: 'csTargetValue.date.label', default: 'Date')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('date'); return false;" >${message(code: 'csTargetValue.date.label', default: 'Date')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('csInPercent'); return false;" >${message(code: 'csTargetValue.csInPercent.label', default: 'Cs In Percent')}</g:link></th>
-
-
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('csInPercent'); return false;" >${message(code: 'csTargetValue.csInPercent.label', default: 'Cs In Percent')}</g:link></th>
 
     </tr>
     </thead>

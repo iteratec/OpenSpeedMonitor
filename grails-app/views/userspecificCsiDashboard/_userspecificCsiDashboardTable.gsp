@@ -3,19 +3,19 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('dashboardName'); return false;" >${message(code: 'userspecificCsiDashboard.dashboardName.label', default: 'Dashboard Name')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('dashboardName'); return false;" >${message(code: 'userspecificCsiDashboard.dashboardName.label', default: 'Dashboard Name')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('username'); return false;" >${message(code: 'userspecificCsiDashboard.username.label', default: 'Username')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('username'); return false;" >${message(code: 'userspecificCsiDashboard.username.label', default: 'Username')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('publiclyVisible'); return false;" >${message(code: 'userspecificCsiDashboard.publiclyVisible.label', default: 'Publicly Visible')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('publiclyVisible'); return false;" >${message(code: 'userspecificCsiDashboard.publiclyVisible.label', default: 'Publicly Visible')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('fromDate'); return false;" >${message(code: 'userspecificCsiDashboard.fromDate.label', default: 'From Date')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('fromDate'); return false;" >${message(code: 'userspecificCsiDashboard.fromDate.label', default: 'From Date')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('toDate'); return false;" >${message(code: 'userspecificCsiDashboard.toDate.label', default: 'To Date')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('toDate'); return false;" >${message(code: 'userspecificCsiDashboard.toDate.label', default: 'To Date')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('fromHour'); return false;" >${message(code: 'userspecificCsiDashboard.fromHour.label', default: 'From Hour')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('fromHour'); return false;" >${message(code: 'userspecificCsiDashboard.fromHour.label', default: 'From Hour')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('toHour'); return false;" >${message(code: 'userspecificCsiDashboard.toHour.label', default: 'To Hour')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('toHour'); return false;" >${message(code: 'userspecificCsiDashboard.toHour.label', default: 'To Hour')}</g:link></th>
 
     </tr>
     </thead>

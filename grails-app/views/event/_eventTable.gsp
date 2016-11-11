@@ -3,13 +3,13 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('eventDate'); return false;" >${message(code: 'event.date.label', default: 'Date')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('eventDate'); return false;" >${message(code: 'event.date.label', default: 'Date')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('shortName'); return false;" >${message(code: 'event.shortName.label', default: 'Short Name')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('shortName'); return false;" >${message(code: 'event.shortName.label', default: 'Short Name')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('description'); return false;" >${message(code: 'event.description.label', default: 'Description')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('description'); return false;" >${message(code: 'event.description.label', default: 'Description')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('globallyVisible'); return false;" >${message(code: 'event.globallyVisible.label', default: 'Globally Visible')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('globallyVisible'); return false;" >${message(code: 'event.globallyVisible.label', default: 'Globally Visible')}</g:link></th>
 
     </tr>
     </thead>

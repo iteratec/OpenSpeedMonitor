@@ -36,7 +36,6 @@ import spock.lang.Stepwise
 @Stepwise
 class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
-    CsiAggregationTagService csiAggregationTagService
     @Shared
     String script1Name = "TestScript1-564892#Afef1"
     @Shared
@@ -99,7 +98,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
     }
 
     void "Adjust Chart Title"() {
@@ -120,7 +121,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     void "Adjust Chart Size to illegal values"() {
         given: "User edits chart size"
-        waitFor {adjustChartButton.click()}
+        waitFor { adjustChartButton.click() }
         sleep(200)
         chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
         chartWidthInputField << Keys.chord(Keys.DELETE)
@@ -131,7 +132,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         when: "User clicks \"apply\""
         sleep(100)
-        def result = withAlert{adjustChartApply.click()}
+        def result = withAlert { adjustChartApply.click() }
 
         then: "Error message is shown"
         result == "Width and height of diagram must be numeric values. Maximum is 5.000 x 3.000 pixels, minimum width is 540 pixels."
@@ -156,7 +157,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
 
         chartContainer.width == 600
         chartContainer.height == 650
@@ -199,7 +202,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     void "Adjust Chart Section"() {
         given: "User edits chart size"
-        waitFor {adjustChartButton.click()}
+        waitFor { adjustChartButton.click() }
         sleep(200)
         diaYAxisMinInputField << Keys.chord(Keys.CONTROL, "a")
         diaYAxisMinInputField << Keys.chord(Keys.DELETE)
@@ -218,7 +221,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
 
         graphYGridFirstTick == "200"
         graphYGridLastTick == "600"
@@ -226,7 +231,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     void "Enable Data-Markers"() {
         given: "User clicked adjust chart"
-        waitFor {adjustChartButton.click()}
+        waitFor { adjustChartButton.click() }
         sleep(200)
 
         when: "User clicks \"Show data-marker\""
@@ -246,7 +251,7 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     void "Enable Data-Labels"() {
         given: "User clicked adjust chart"
-        waitFor {adjustChartButton.click()}
+        waitFor { adjustChartButton.click() }
         sleep(200)
 
 
@@ -285,7 +290,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
     }
 
     void "Load custom dashboard"() {
@@ -302,7 +309,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
         def graphSeries = js."window.rickshawGraphBuilder.graph.series"
         graphSeries.size() == 1
-        graphSeries[0].data.collect { [x:it.x, y:it.y]} == [[x:1466565180, y:838], [x:1466565300, y:238], [x:1466565480, y:638]]
+        graphSeries[0].data.collect {
+            [x: it.x, y: it.y]
+        } == [[x: 1466565180, y: 838], [x: 1466565300, y: 238], [x: 1466565480, y: 638]]
 
         waitFor { dataLabel }
         waitFor {
@@ -384,21 +393,21 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
             JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
             WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-            Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen", 1d)
+            Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen")
             Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
             Location location2 = TestDataUtil.createLocation(wpt, location2Name, browser, true)
             Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
             Job job2 = TestDataUtil.createJob(job2Name, script2, location2, jobGroup1, "This is the second test job", 1, false, 12)
-            Page page1 = TestDataUtil.createPage(page1Name, 1.0)
+            Page page1 = TestDataUtil.createPage(page1Name)
             JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
             JobResult jobResult2 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job1, location1)
             JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job1, location1)
             ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
             MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
 
-            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser",0)
+            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
             TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
-            TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
+            TestDataUtil.createLocation(wpt, "NotUsedLocation", notUsedBrowser, true)
 
             new EventResult(
                     numberOfWptRun: 1,
@@ -426,7 +435,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
             new EventResult(
                     numberOfWptRun: 1,
@@ -454,7 +466,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
 
             new EventResult(
@@ -483,7 +498,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
 
             new EventResult(
@@ -511,7 +529,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     measuredEvent: measuredEvent1,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: true,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
 
             new EventResult(
@@ -539,7 +560,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     measuredEvent: measuredEvent1,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: true,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
 
             new EventResult(
@@ -567,7 +591,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     measuredEvent: measuredEvent1,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
                     noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
 
             new EventResult(
@@ -595,7 +622,10 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     measuredEvent: measuredEvent1,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
                     noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    jobGroup: jobGroup1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1
             ).save()
         }
 

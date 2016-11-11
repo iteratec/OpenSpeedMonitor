@@ -29,7 +29,7 @@ class JobDaoServiceSpec extends Specification {
     void "setup"() {
         Script script = TestDataUtil.createScript()
         wptServer = TestDataUtil.createUnusedWptServer()
-        browser = TestDataUtil.createBrowser("ff", 1.0)
+        browser = TestDataUtil.createBrowser("ff")
         location = TestDataUtil.createLocation(wptServer, "uniqueLocation", this.browser, false)
         jobGroup = TestDataUtil.createJobGroup("jobGroup")
         job1 = TestDataUtil.createJob("job1", script, this.location, this.jobGroup, "a job", 1, false, 100)

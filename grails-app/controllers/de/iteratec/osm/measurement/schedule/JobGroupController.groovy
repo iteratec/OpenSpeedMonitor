@@ -191,34 +191,12 @@ class JobGroupController {
         respond jobGroup
     }
 
-
-
-    def delete(JobGroup jobGroup) {
-
-        if (jobGroup == null) {
-            notFound()
-            return
-        }
-
-        try {
-            jobGroup.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "index")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), params.id])
-            redirect(action: "show", id: params.id)
-        }
-    }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "name"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<JobGroup> result
-        int count
-        result = JobGroup.createCriteria().list(params) {
+        List<JobGroup> result = JobGroup.createCriteria().list(params) {
             if(params.filter)
                 or{
                     ilike("name","%"+params.filter+"%")
@@ -227,20 +205,11 @@ class JobGroupController {
                     }
                 }
         }
-        count = JobGroup.createCriteria().list(paramsForCount) {
-            if(params.filter)
-                or{
-                    ilike("name","%"+params.filter+"%")
-                    csiConfiguration{
-                        ilike("label","%"+params.filter+"%")
-                    }
-                }
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'jobGroupTable',
                 model: [jobGroups: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

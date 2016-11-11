@@ -4,13 +4,13 @@
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="layout" content="kickstart" />
+        <meta name="layout" content="kickstart_osm" />
         <g:set var="entityName" value="${message(code: 'page.label', default: 'Page')}" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
     </head>
 
     <body>
-
+    <g:render template="/_menu/submenubarWithoutDelete"/>
         <section id="edit-page" class="first">
 
             <g:hasErrors bean="${pageInstance}">
@@ -26,8 +26,7 @@
                 </fieldset>
                 <div>
                     <g:actionSubmit class="btn btn-primary" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-                    <g:render template="/_common/modals/deleteSymbolLink"/>
-                    <button class="btn btn-default" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
+                    <button class="btn" type="reset"><g:message code="default.button.reset.label" default="Reset" /></button>
                 </div>
             </g:form>
 

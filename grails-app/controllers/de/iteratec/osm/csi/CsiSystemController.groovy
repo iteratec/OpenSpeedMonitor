@@ -220,26 +220,19 @@ class CsiSystemController {
         render("$first$last" + "${g.message(code: "de.iteratec.osm.measurement.schedule.JobController.resultAmount", default: "Amount of results")}: ${count}")
     }
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "label"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
 
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<CsiSystem> result
-        int count
-        println(params.filter)
-        result = CsiSystem.createCriteria().list(params) {
+        List<CsiSystem> result = CsiSystem.createCriteria().list(params) {
             if(params.filter)ilike("label","%"+params.filter+"%")
         }
-        count = CsiSystem.createCriteria().list(paramsForCount) {
-            if(params.filter)ilike("label","%"+params.filter+"%")
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'csiSystemTable',
                 model: [csiSystems: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

@@ -3,15 +3,15 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('label'); return false;" >${message(code: 'csTargetGraph.label.label', default: 'Label')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('label'); return false;" >${message(code: 'csTargetGraph.label.label', default: 'Label')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('description'); return false;" >${message(code: 'csTargetGraph.description.label', default: 'Description')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('description'); return false;" >${message(code: 'csTargetGraph.description.label', default: 'Description')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('pointOne'); return false;" >${message(code: 'csTargetGraph.pointOne.label', default: 'Point One')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('pointOne'); return false;" >${message(code: 'csTargetGraph.pointOne.label', default: 'Point One')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('pointTwo'); return false;" >${message(code: 'csTargetGraph.pointTwo.label', default: 'Point Two')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('pointTwo'); return false;" >${message(code: 'csTargetGraph.pointTwo.label', default: 'Point Two')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('defaultVisibility'); return false;" >${message(code: 'csTargetGraph.defaultVisibility.label', default: 'Default Visibility')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('defaultVisibility'); return false;" >${message(code: 'csTargetGraph.defaultVisibility.label', default: 'Default Visibility')}</g:link></th>
 
     </tr>
     </thead>

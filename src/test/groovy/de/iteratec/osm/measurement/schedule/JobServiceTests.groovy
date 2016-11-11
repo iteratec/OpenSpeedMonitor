@@ -186,24 +186,18 @@ class JobServiceTests extends Specification {
         ).save(failOnError: true)
 
         String browserName = "undefined"
-        Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 0)
+        Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "undefined")
                 .save(failOnError: true)
         browserName = "IE"
-        Browser browserIE = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 45)
+        Browser browserIE = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "IE")
                 .addToBrowserAliases(alias: "IE8")
                 .addToBrowserAliases(alias: "Internet Explorer")
                 .addToBrowserAliases(alias: "Internet Explorer 8")
                 .save(failOnError: true)
         browserName = "FF"
-        Browser browserFF = Browser.findByName(browserName) ?: new Browser(
-                name: browserName,
-                weight: 55)
+        Browser browserFF = Browser.findByName(browserName) ?: new Browser(name: browserName)
                 .addToBrowserAliases(alias: "FF")
                 .addToBrowserAliases(alias: "FF7")
                 .addToBrowserAliases(alias: "Firefox")

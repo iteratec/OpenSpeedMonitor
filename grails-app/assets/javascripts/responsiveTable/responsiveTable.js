@@ -9,26 +9,27 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || {
     sortBy: function(columnToSortByParameter)
     {
         if (OpenSpeedMonitor.responsiveTable.columnToSortBy == columnToSortByParameter) {
+            console.log(OpenSpeedMonitor.responsiveTable.sortingDirection);
             OpenSpeedMonitor.responsiveTable.sortingDirection = OpenSpeedMonitor.responsiveTable.sortingDirection == "asc" ? "desc" : "asc";
+            console.log(OpenSpeedMonitor.responsiveTable.sortingDirection);
         } else {
             OpenSpeedMonitor.responsiveTable.columnToSortBy = columnToSortByParameter;
-            OpenSpeedMonitor.responsiveTable.sortingDirection = "desc";
+            OpenSpeedMonitor.responsiveTable.sortingDirection = "asc";
         }
-        OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl);
+        OpenSpeedMonitor.responsiveTable.updateElementTable();
     },
 
     init: function(updateTableUrlParameter, i18nParameter, columnToSortByParameter) {
         OpenSpeedMonitor.responsiveTable.updateInProgress = false;
         OpenSpeedMonitor.responsiveTable.updateRequired = false;
-        var updateTableUrl = updateTableUrlParameter;
+        OpenSpeedMonitor.responsiveTable.updateTableUrl = updateTableUrlParameter;
         OpenSpeedMonitor.responsiveTable.columnToSortBy = columnToSortByParameter;
-        OpenSpeedMonitor.responsiveTable.sortingDirection = "desc";
+        OpenSpeedMonitor.responsiveTable.sortingDirection = "asc";
         OpenSpeedMonitor.responsiveTable.i18n = i18nParameter;
         OpenSpeedMonitor.responsiveTable.curr = 0;
         OpenSpeedMonitor.responsiveTable.max = $('#elementsPerPage').val();
         OpenSpeedMonitor.responsiveTable.lastFilter = $('#elementNameFilter').val();
         OpenSpeedMonitor.responsiveTable.offset = 0;
-        OpenSpeedMonitor.responsiveTable.limitResults = true;
         OpenSpeedMonitor.responsiveTable.onlyActive = false;
 
         $('#elementsPerPage').on("input", function (element) {
@@ -37,32 +38,24 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || {
                 OpenSpeedMonitor.responsiveTable.max = max_temp;
                 OpenSpeedMonitor.responsiveTable.curr = 0;
                 OpenSpeedMonitor.responsiveTable.offset = 0;
-                OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl);
+                OpenSpeedMonitor.responsiveTable.updateElementTable();
             }
         });
         $('#elementFilter').on("input", function (element) {
             OpenSpeedMonitor.responsiveTable.lastFilter = $('#elementFilter').val();
             OpenSpeedMonitor.responsiveTable.curr = 0;
             OpenSpeedMonitor.responsiveTable.offset = 0;
-            OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl);
+            OpenSpeedMonitor.responsiveTable.updateElementTable();
         });
 
-        $('#limitResultsCheckbox').change(function () {
-            OpenSpeedMonitor.responsiveTable.limitResults = $('#limitResultsCheckbox').is(":checked");
-            OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrlParameter);
-        });
-        OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl);
+        OpenSpeedMonitor.responsiveTable.updateElementTable();
     },
 
     // Based on http://stackoverflow.com/questions/17390179/using-bootstrap-to-paginate-a-set-number-of-p-elements-on-a-webpage
-    createPagination: function(size, updateTableUrl) {
+    createPagination: function(size) {
         var perPage = OpenSpeedMonitor.responsiveTable.max;
         var numItems = size;
         var numPages = Math.ceil(numItems / perPage);
-        if (numItems >= 1000) {
-            var limitResultsCheckboxContainer = document.getElementById("limitResultsCheckboxContainer");
-            limitResultsCheckboxContainer.style.display = 'block';
-        }
 
         var myNode = document.getElementById("elementPager");
         myNode.innerHTML = '';
@@ -133,7 +126,7 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || {
                 endOn = startAt + perPage;
             OpenSpeedMonitor.responsiveTable.offset = (page) * perPage;
             OpenSpeedMonitor.responsiveTable.curr = page;
-            OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl)
+            OpenSpeedMonitor.responsiveTable.updateElementTable()
 
         }
     },
@@ -142,14 +135,14 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || {
      * updates the batchActivity table
      * @param updateTableUrl url to updateTableMethod within BatchActivityController
      */
-    updateElementTable: function(updateTableUrl) {
+    updateElementTable: function() {
         if (OpenSpeedMonitor.responsiveTable.updateInProgress) {
             OpenSpeedMonitor.responsiveTable.updateRequired = true;
         } else {
             OpenSpeedMonitor.responsiveTable.updateInProgress = true;
             jQuery.ajax({
                 type: 'GET',
-                url: updateTableUrl,
+                url: OpenSpeedMonitor.responsiveTable.updateTableUrl,
                 data: {
                     filter: OpenSpeedMonitor.responsiveTable.lastFilter,
                     offset: OpenSpeedMonitor.responsiveTable.offset,
@@ -157,17 +150,16 @@ OpenSpeedMonitor.responsiveTable = OpenSpeedMonitor.responsiveTable || {
                     onlyActive: OpenSpeedMonitor.responsiveTable.onlyActive,
                     sort: OpenSpeedMonitor.responsiveTable.columnToSortBy,
                     order: OpenSpeedMonitor.responsiveTable.sortingDirection,
-                    limitResults: OpenSpeedMonitor.responsiveTable.limitResults
                 },
                 success: function (content) {
                     var jsonResponse = JSON.parse(content);
                     $("#elementTable").html(jsonResponse.table);
-                    OpenSpeedMonitor.responsiveTable.createPagination(jsonResponse.count, updateTableUrl)
+                    OpenSpeedMonitor.responsiveTable.createPagination(jsonResponse.count)
                     $('#elementFilter').focus();
                     OpenSpeedMonitor.responsiveTable.updateInProgress = false;
                     if (OpenSpeedMonitor.responsiveTable.updateRequired) {
                         OpenSpeedMonitor.responsiveTable.updateRequired = false;
-                        OpenSpeedMonitor.responsiveTable.updateElementTable(updateTableUrl);
+                        OpenSpeedMonitor.responsiveTable.updateElementTable();
                     }
                 },
                 error: function (content) {

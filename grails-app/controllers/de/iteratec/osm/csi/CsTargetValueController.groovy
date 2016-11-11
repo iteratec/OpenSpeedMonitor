@@ -100,27 +100,20 @@ class CsTargetValueController {
     }
 
     def updateTable(){
-        params.order = params.order ? params.order : "desc"
+        params.order = params.order ? params.order : "asc"
         params.sort = params.sort ? params.sort : "label"
-        def paramsForCount = Boolean.valueOf(params.limitResults) ? [max:1000]:[:]
         params.max = params.max as Integer
         params.offset = params.offset as Integer
-        List<CsTargetValue> result
-        int count
-        println(params.sort)
-        result = CsTargetValue.createCriteria().list(params) {
+
+        List<CsTargetValue> result = CsTargetValue.createCriteria().list(params) {
             if(params.filter &&params.filter.isNumber())
                 or{ eq("csInPercent",Double.valueOf(params.filter)) }
         }
-        count = CsTargetValue.createCriteria().list(paramsForCount) {
-            if(params.filter && params.filter.isNumber())
-                or{ eq("csInPercent",Double.valueOf(params.filter)) }
-        }.size()
         String templateAsPlainText = g.render(
                 template: 'csTargetValueTable',
                 model: [csTargetValues: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
+        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
         sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
     }
 

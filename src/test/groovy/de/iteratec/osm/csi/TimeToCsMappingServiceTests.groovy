@@ -96,14 +96,14 @@ class TimeToCsMappingServiceTests {
 
         def differences = [:].withDefault{[]}
 
-        // run test for each page
+        // run test for each pageAggregator
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks, test execution and assertions
             mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
-                Page page = new Page(name: pageName, weight: 1)
+                Page page = new Page(name: pageName)
                 Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page, csiConfiguration)
                 Double difference = Math.abs(csCalculated - expected.customerSatisfaction)
 
@@ -119,14 +119,14 @@ class TimeToCsMappingServiceTests {
     @Test
     void testGetCustomerSatisfactionPercentRank() {
 
-        // run test for each page
+        // run test for each pageAggregator
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks, test execution and assertions
             mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
-                Page page = new Page(name: pageName, weight: 1)
+                Page page = new Page(name: pageName)
 
                 Double csCalculated = serviceUnderTest.getCustomerSatisfactionPercentRank(expected.loadTimeInMillisec, page)
                 Double difference = Math.abs(csCalculated - expected.customerSatisfaction)
@@ -143,14 +143,14 @@ class TimeToCsMappingServiceTests {
         Double totalDeviation = 0.0
         int runs = 0
 
-        // run test for each page
+        // run test for each pageAggregator
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks and test execution
             mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
-                Page page = new Page(name: pageName, weight: 1)
+                Page page = new Page(name: pageName)
                 Double csCalculated = serviceUnderTest.getCustomerSatisfactionPercentRank(expected.loadTimeInMillisec, page)
                 totalDeviation += Math.abs(csCalculated - expected.customerSatisfaction)
                 runs++
@@ -170,14 +170,14 @@ class TimeToCsMappingServiceTests {
 
         Map<String, DeviationToBuildMeanFrom> deviationsByPage = [:].withDefault { new DeviationToBuildMeanFrom() }
 
-        // run test for each page
+        // run test for each pageAggregator
         expectedCustomerSatisfactions.each { pageName, expectedCustomerSatisfactionForPage ->
 
             //test specific mocks and test execution
             mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(new Page(name: pageName)), frustrations.get(pageName))
             expectedCustomerSatisfactionForPage.each { ExpectedCustomerSatisfaction expected ->
 
-                Page page = new Page(name: pageName, weight: 1)
+                Page page = new Page(name: pageName)
                 Double csCalculated = serviceUnderTest.getCustomerSatisfactionInPercentViaMapping(expected.loadTimeInMillisec, page, csiConfiguration)
                 deviationsByPage[pageName].deviation += Math.abs(csCalculated - expected.customerSatisfaction)
                 deviationsByPage[pageName].runs++
@@ -197,33 +197,33 @@ class TimeToCsMappingServiceTests {
     void testValidFrustrationsExistFor() {
 
         //test data
-        Page page = new Page(name: "HP_entry", weight: 1)
+        Page page = new Page(name: "HP_entry")
 
-        //with valid frustrations for page
+        //with valid frustrations for pageAggregator
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
         assertThat(service.validFrustrationsExistFor(page), is(true))
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100, 200])
         assertThat(service.validFrustrationsExistFor(page), is(true))
 
-        //without frustrations for page
+        //without frustrations for pageAggregator
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
-        //with invalid frustrations for page: just one frustration
+        //with invalid frustrations for pageAggregator: just one frustration
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [100])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
-        //with invalid frustrations for page: just one frustration
+        //with invalid frustrations for pageAggregator: just one frustration
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), [1000, 1000, 1000, 1000])
         assertThat(service.validFrustrationsExistFor(page), is(false))
 
-        //with valid frustrations but null as page
+        //with valid frustrations but null as pageAggregator
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations.get(page.name))
         assertThat(service.validFrustrationsExistFor(null), is(false))
 
-        //with valid frustrations but UNDEFINED page
+        //with valid frustrations but UNDEFINED pageAggregator
         mocker.mockTimeToCsMappingCacheService(serviceUnderTest, csiConfiguration.getTimeToCsMappingByPage(page), frustrations)
-        assertThat(service.validFrustrationsExistFor(new Page(name: Page.UNDEFINED, weight: 0)), is(false))
+        assertThat(service.validFrustrationsExistFor(new Page(name: Page.UNDEFINED)), is(false))
 
     }
 

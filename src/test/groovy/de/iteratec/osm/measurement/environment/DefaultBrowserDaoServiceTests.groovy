@@ -47,8 +47,8 @@ class DefaultBrowserDaoServiceTests {
 	
 	@Test
 	void testFindAll() {
-		new Browser(name: 'FindAllBrowser1', weight: 0.1d).save(validate: false)
-		new Browser(name: 'FindAllBrowser2', weight: 0.54d).save(validate: false)
+		new Browser(name: 'FindAllBrowser1').save(validate: false)
+		new Browser(name: 'FindAllBrowser2').save(validate: false)
 		
 		Set<Browser> result = serviceUnderTest.findAll()
 		
@@ -57,7 +57,7 @@ class DefaultBrowserDaoServiceTests {
 		assertEquals(1, result.count( { it.name == 'FindAllBrowser1' } ));
 		assertEquals(1, result.count( { it.name == 'FindAllBrowser2' } ));
 		
-		new Browser(name: 'FindAllBrowser3', weight: 0.54d).save(validate: false)
+		new Browser(name: 'FindAllBrowser3').save(validate: false)
 		
 		Set<Browser> resultAfterAdding = serviceUnderTest.findAll()
 		
@@ -73,10 +73,10 @@ class DefaultBrowserDaoServiceTests {
 		
 		//create test-specific data
 		
-		Browser browser1 = new Browser(name: nameBrowser1, weight: 0).save(failOnError: true)
-		Browser browser2 = new Browser(name: nameBrowser2, weight: 0).save(failOnError: true)
-		Browser browser3 = new Browser(name: nameBrowser3, weight: 0).save(failOnError: true)
-		Browser browser4 = new Browser(name: nameBrowser4, weight: 0).save(failOnError: true)
+		Browser browser1 = new Browser(name: nameBrowser1).save(failOnError: true)
+		Browser browser2 = new Browser(name: nameBrowser2).save(failOnError: true)
+		Browser browser3 = new Browser(name: nameBrowser3).save(failOnError: true)
+		Browser browser4 = new Browser(name: nameBrowser4).save(failOnError: true)
 		
 		//execute test
 		

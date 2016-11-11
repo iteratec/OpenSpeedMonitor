@@ -3,9 +3,9 @@
     <thead>
     <tr>
 
-        <th><g:link action="index" onclick="sortBy('name'); return false;" >${message(code: 'jobGroup.name.label', default: 'Name')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('name'); return false;" >${message(code: 'jobGroup.name.label', default: 'Name')}</g:link></th>
 
-        <th><g:link action="index" onclick="sortBy('csiConfiguration'); return false;" >${message(code: 'jobGroup.csiConfiguration.label', default: 'CSI Configuration')}</g:link></th>
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('csiConfiguration'); return false;" >${message(code: 'jobGroup.csiConfiguration.label', default: 'CSI Configuration')}</g:link></th>
 
 
     </tr>

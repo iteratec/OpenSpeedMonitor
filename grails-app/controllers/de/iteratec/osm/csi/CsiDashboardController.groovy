@@ -18,7 +18,6 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.transformation.DefaultTimeToCsMappingService
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
@@ -28,28 +27,22 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfileDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificCsiDashboard
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
-import de.iteratec.osm.result.EventResultService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.AnnotationUtil
-import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.I18nService
-import de.iteratec.osm.util.TreeMapOfTreeMaps
+import de.iteratec.osm.util.*
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
 import org.joda.time.Days
-import org.joda.time.Duration
 import org.joda.time.Interval
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -81,19 +74,17 @@ class CsiDashboardController {
     LocationDaoService locationDaoService
     I18nService i18nService
 
-    EventResultService eventResultService
     CustomerSatisfactionHighChartService customerSatisfactionHighChartService
     CsiHelperService csiHelperService
     CsiAggregationUtilService csiAggregationUtilService
-    CookieBasedSettingsService cookieBasedSettingsService
     EventService eventService
     SpringSecurityService springSecurityService
     ConnectivityProfileDaoService connectivityProfileDaoService
-    DefaultTimeToCsMappingService defaultTimeToCsMappingService
     TimeToCsMappingService timeToCsMappingService
     ConfigService configService
     CustomDashboardService customDashboardService
     UserspecificDashboardService userspecificDashboardService
+    PerformanceLoggingService performanceLoggingService
 
     /**
      * The Grails engine to generate links.
@@ -311,10 +302,10 @@ class CsiDashboardController {
         return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
     }
 /**
-     * Gets data for the showAllCommand from a saved userspecificCsiDashboard
-     * @param cmd the command where the attribute gets set
-     * @param dashboardID the id of the saved userspecificCsiDashboard
-     */
+ * Gets data for the showAllCommand from a saved userspecificCsiDashboard
+ * @param cmd the command where the attribute gets set
+ * @param dashboardID the id of the saved userspecificCsiDashboard
+ */
     private void fillWithUserspecificDashboardValues(CsiDashboardShowAllCommand cmd, String dashboardID) {
         UserspecificCsiDashboard dashboard = UserspecificCsiDashboard.get(Long.parseLong(dashboardID))
 
@@ -530,9 +521,13 @@ class CsiDashboardController {
 
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, CsiAggregationInterval.HOURLY)
 
-        OsmRickshawChart chart = customerSatisfactionHighChartService.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
-                fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams, csiType
-        )
+        OsmRickshawChart chart
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'CsiDashboardController: getHourlies', PerformanceLoggingService.IndentationDepth.ONE) {
+
+            chart = customerSatisfactionHighChartService.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
+                    fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams, csiType
+            )
+        }
 
         DateTime resetFromDate = fixedTimeFrame.getStart()
         DateTime resetToDate = fixedTimeFrame.getEnd()
@@ -840,19 +835,19 @@ class CsiDashboardController {
         Collection<Long> selectedLocations = customDashboardService.getValuesFromJSON(dashboardValues, "selectedLocations")
         Collection<Long> selectedCsiSystems = customDashboardService.getValuesFromJSON(dashboardValues, "selectedCsiSystems")
         int timeFrameInterval = Integer.parseInt(dashboardValues.selectedTimeFrameInterval)
-        if ( !dashboardValues.graphAliases.isEmpty()) {
-            dashboardValues.graphAliases.each{
-                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.GERMAN)){
-                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.ENGLISH)] = it.value
+        if (!dashboardValues.graphAliases.isEmpty()) {
+            dashboardValues.graphAliases.each {
+                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label', Locale.GERMAN)) {
+                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label', Locale.ENGLISH)] = it.value
                 }
-                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.ENGLISH)){
-                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label',Locale.GERMAN)] = it.value
+                if (it.key == i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label', Locale.ENGLISH)) {
+                    dashboardValues.graphAliases[i18nService.msgInLocale('de.iteratec.isocsi.targetcsi.label', Locale.GERMAN)] = it.value
                 }
             }
         }
         // Create command for validation
         CsiDashboardShowAllCommand cmd = new CsiDashboardShowAllCommand(from: fromDate, to: toDate, fromHour: dashboardValues.fromHour,
-                toHour: dashboardValues.toHour,  aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
+                toHour: dashboardValues.toHour, aggrGroupAndInterval: dashboardValues.aggrGroupAndInterval, selectedFolder: selectedFolder,
                 selectedPages: selectedPages, selectedMeasuredEventIds: selectedMeasuredEventIds, selectedAllMeasuredEvents: dashboardValues.selectedAllMeasuredEvents,
                 selectedBrowsers: selectedBrowsers, selectedAllBrowsers: dashboardValues.selectedAllBrowsers, selectedLocations: selectedLocations, selectedCsiSystems: selectedCsiSystems,
                 selectedAllLocations: dashboardValues.selectedAllLocations, debug: dashboardValues.debug, selectedTimeFrameInterval: timeFrameInterval,

@@ -1,10 +1,6 @@
 package de.iteratec.osm.csi.transformation
 
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.DefaultTimeToCsMapping
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TimeToCsMapping
+import de.iteratec.osm.csi.*
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import spock.lang.Specification
@@ -21,8 +17,8 @@ class DefaultTimeToCsMappingServiceSpec extends Specification{
     CsiConfiguration csiConfiguration
 
     void "setup" () {
-        page1 = new Page(name: "page").save(failOnError: true)
-        page2 = new Page(name: "other page").save(failOnError: true)
+        page1 = new Page(name: "pageAggregator").save(failOnError: true)
+        page2 = new Page(name: "other pageAggregator").save(failOnError: true)
         csiConfiguration = new CsiConfiguration(label: "csiConfig", csiDay: new CsiDay()).save(failOnError: true)
         createDefaultTimeToCsMappings()
     }

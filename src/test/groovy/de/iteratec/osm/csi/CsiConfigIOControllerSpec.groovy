@@ -40,8 +40,8 @@ class CsiConfigIOControllerSpec extends Specification{
 
     void setup() {
         controller.customerSatisfactionWeightService = grailsApplication.mainContext.getBean('customerSatisfactionWeightService')
-        Browser browser1 = TestDataUtil.createBrowser("Browser1",0)
-        Browser browser2 = TestDataUtil.createBrowser("Browser2",0)
+        Browser browser1 = TestDataUtil.createBrowser("Browser1")
+        Browser browser2 = TestDataUtil.createBrowser("Browser2")
         ConnectivityProfile connectivityProfile1 = TestDataUtil.createConnectivityProfile("DSL1")
         ConnectivityProfile connectivityProfile2 = TestDataUtil.createConnectivityProfile("DSL2")
         TestDataUtil.createPages(['HP','MES','SE','ADS','WKBS','WK'])

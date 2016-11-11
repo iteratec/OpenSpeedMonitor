@@ -12,7 +12,10 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.MeasurandGroup
-import de.iteratec.osm.result.*
+import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.security.Role
 import de.iteratec.osm.security.User
 import de.iteratec.osm.security.UserRole
@@ -36,7 +39,6 @@ import spock.lang.Stepwise
 @Stepwise
 class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements OsmTestLogin {
 
-    CsiAggregationTagService csiAggregationTagService
     @Shared
     String script1Name = "TestScript1-564892#Afef1"
     @Shared
@@ -917,19 +919,19 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             Script script2 = TestDataUtil.createScript(script2Name, "This is also for test purposes", "stuff")
             JobGroup jobGroup1 = TestDataUtil.createJobGroup(jobGroup1Name)
             WebPageTestServer wpt = TestDataUtil.createWebPageTestServer("TestWPTServer-564892#Afef1", "TestIdentifier", true, "http://internet.de")
-            Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen", 1d)
+            Browser browser = TestDataUtil.createBrowser("This is the very best browser I've ever seen")
             Location location1 = TestDataUtil.createLocation(wpt, location1Name, browser, true)
             Location location2 = TestDataUtil.createLocation(wpt, location2Name, browser, true)
             Job job1 = TestDataUtil.createJob(job1Name, script1, location1, jobGroup1, "This is the first test job", 1, false, 12)
             Job job2 = TestDataUtil.createJob(job2Name, script2, location2, jobGroup1, "This is the second test job", 1, false, 12)
-            Page page1 = TestDataUtil.createPage(page1Name, 1.0)
+            Page page1 = TestDataUtil.createPage(page1Name)
             JobResult jobResult1 = TestDataUtil.createJobResult("Test1", new DateTime(2016, 06, 22, 3, 13, DateTimeZone.UTC).toDate(), job1, location1)
             JobResult jobResult2 = TestDataUtil.createJobResult("Test2", new DateTime(2016, 06, 22, 3, 18, DateTimeZone.UTC).toDate(), job1, location1)
             JobResult jobResult3 = TestDataUtil.createJobResult("Test3", new DateTime(2016, 06, 22, 3, 15, DateTimeZone.UTC).toDate(), job1, location1)
             ConnectivityProfile connectivityProfile = TestDataUtil.createConnectivityProfile(connectivityProfileName)
             MeasuredEvent measuredEvent1 = TestDataUtil.createMeasuredEvent(measureEvent1Name, page1)
 
-            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser",0)
+            Browser notUsedBrowser = TestDataUtil.createBrowser("NotUsedBrowser")
             TestDataUtil.createConnectivityProfile("NotUsedConnectivityProfile")
             TestDataUtil.createLocation(wpt,"NotUsedLocation",notUsedBrowser, true)
 
@@ -955,11 +957,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult1,
                     jobResultDate: jobResult1.date,
                     jobResultJobConfigId: jobResult1.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
-                    noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: false
             ).save()
             new EventResult(
                     numberOfWptRun: 1,
@@ -983,11 +988,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult2,
                     jobResultDate: jobResult2.date,
                     jobResultJobConfigId: jobResult2.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
-                    noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: false
             ).save()
 
             new EventResult(
@@ -1012,11 +1020,14 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult3,
                     jobResultDate: jobResult3.date,
                     jobResultJobConfigId: jobResult3.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
-                    noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: false
             ).save()
 
             new EventResult(
@@ -1041,10 +1052,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult3,
                     jobResultDate: jobResult3.date,
                     jobResultJobConfigId: jobResult3.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     customConnectivityName: null,
-                    noTrafficShapingAtAll: true,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: true
             ).save()
 
             new EventResult(
@@ -1069,10 +1083,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult2,
                     jobResultDate: jobResult2.date,
                     jobResultJobConfigId: jobResult2.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     customConnectivityName: null,
-                    noTrafficShapingAtAll: true,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: true
             ).save()
 
             new EventResult(
@@ -1097,10 +1114,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult3,
                     jobResultDate: jobResult3.date,
                     jobResultJobConfigId: jobResult3.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
-                    noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: false
             ).save()
 
             new EventResult(
@@ -1125,10 +1145,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
                     jobResult: jobResult2,
                     jobResultDate: jobResult2.date,
                     jobResultJobConfigId: jobResult2.job.ident(),
+                    jobGroup: jobGroup1,
                     measuredEvent: measuredEvent1,
+                    page: measuredEvent1.testedPage,
+                    browser: browser,
+                    location: location1,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
-                    noTrafficShapingAtAll: false,
-                    tag: csiAggregationTagService.createEventResultTag(jobGroup1, measuredEvent1, measuredEvent1.testedPage, browser, location1)
+                    noTrafficShapingAtAll: false
             ).save()
         }
 

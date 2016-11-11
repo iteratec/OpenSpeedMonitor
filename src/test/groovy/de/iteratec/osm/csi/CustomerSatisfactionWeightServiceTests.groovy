@@ -148,8 +148,8 @@ class CustomerSatisfactionWeightServiceTests {
     }
 
     private void createSomeBrowserAndConnectivitesAndPages() {
-        new Browser(name: "Browser1", weight: 0).save(failOnError: true)
-        new Browser(name: "Browser2", weight: 0).save(failOnError: true)
+        new Browser(name: "Browser1").save(failOnError: true)
+        new Browser(name: "Browser2").save(failOnError: true)
 
         new ConnectivityProfile(name: "DSL1", active: true, bandwidthDown: 0, bandwidthUp: 0, latency: 0, packetLoss: 0).save(failOnError: true)
         new ConnectivityProfile(name: "DSL2", active: true, bandwidthDown: 0, bandwidthUp: 0, latency: 0, packetLoss: 0).save(failOnError: true)

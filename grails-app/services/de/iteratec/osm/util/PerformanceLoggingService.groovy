@@ -22,23 +22,42 @@ import org.joda.time.DateTime
 
 class PerformanceLoggingService {
 
+    ThreadLocal<LoggedExecutionTimes> loggedExecutionTimesThreadLocal = new ThreadLocal<LoggedExecutionTimes>()
 
 	enum LogLevel{
-		FATAL, ERROR, WARN, INFO, DEBUG, TRACE
+		FATAL(5),
+        ERROR(4),
+        WARN(3),
+        INFO(2),
+        DEBUG(1),
+        TRACE(0)
+
+        private final Integer value
+        LogLevel(Integer value){
+            this.value = value
+        }
+        Integer getValue(){
+            return this.value
+        }
 	}
 	enum IndentationDepth {
-		singleIndentationChar('-'),
-		NULL (''),
-	    ONE (" ${singleIndentationChar.prefix*1}"),
-	    TWO (" ${singleIndentationChar.prefix*2}"),
-	    THREE (" ${singleIndentationChar.prefix*3}"),
-		FOUR (" ${singleIndentationChar.prefix*4}"),
-		FIVE (" ${singleIndentationChar.prefix*5}")
+		singleIndentationChar('-', -1),
+		NULL ('', 0),
+	    ONE (" ${singleIndentationChar.prefix*1}", 1),
+	    TWO (" ${singleIndentationChar.prefix*2}", 2),
+	    THREE (" ${singleIndentationChar.prefix*3}", 3),
+		FOUR (" ${singleIndentationChar.prefix*4}", 4),
+		FIVE (" ${singleIndentationChar.prefix*5}", 5)
 	
 	    private final String prefix
-	    IndentationDepth(String prefix) {
+        private final Integer value
+	    IndentationDepth(String prefix, Integer value) {
 	        this.prefix = prefix
+            this.value = value
 	    }
+        Integer getValue(){
+            return this.value
+        }
 	}
 
     def logExecutionTime(LogLevel level, String description, IndentationDepth indentation, Closure toMeasure) {
@@ -58,9 +77,26 @@ class PerformanceLoggingService {
 			log.trace(getMessage(started, description, indentation))
 		}
     }
+    void resetExecutionTimeLoggingSession(){
+        loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
+    }
+    void logExecutionTimeSilently(LogLevel level, String description, IndentationDepth indentation, Closure toMeasure) {
+        DateTime started = new DateTime()
+        toMeasure.call()
+        loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentation, level, getElapsedSeconds(started))
+    }
+    String getExecutionTimeLoggingSessionData(LogLevel level){
+        return loggedExecutionTimesThreadLocal.get().getRepresentation(level)
+    }
+
 	private String getMessage(DateTime started, String description, IndentationDepth indentation){
-		def elapsedInMillis = new DateTime().getMillis() - started.getMillis()
-		def eleapsedInSeconds = elapsedInMillis / 1000
+        Double eleapsedInSeconds = getElapsedSeconds(started)
 		return "${indentation.prefix}${description}  -> Elapsed Sec: ${eleapsedInSeconds}"
 	}
+
+    private Double getElapsedSeconds(DateTime started) {
+        Long elapsedInMillis = new DateTime().getMillis() - started.getMillis()
+        Double eleapsedInSeconds = elapsedInMillis / 1000
+        return eleapsedInSeconds
+    }
 }

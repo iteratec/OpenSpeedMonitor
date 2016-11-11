@@ -17,38 +17,30 @@
 
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.batch.Activity
 import de.iteratec.osm.batch.BatchActivityService
 import de.iteratec.osm.batch.BatchActivityUpdater
+import de.iteratec.osm.csi.EventCsiAggregationService
+import de.iteratec.osm.csi.Page
+import de.iteratec.osm.csi.PageCsiAggregationService
+import de.iteratec.osm.csi.ShopCsiAggregationService
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
-import grails.transaction.NotTransactional
-import grails.transaction.Transactional
-
-import org.joda.time.DateTime
-
-import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.ConfigService
 import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
-import de.iteratec.osm.csi.EventCsiAggregationService
-import de.iteratec.osm.csi.PageCsiAggregationService
-import de.iteratec.osm.csi.ShopCsiAggregationService
-import de.iteratec.osm.result.Contract
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.CsiAggregationTagService
-import de.iteratec.osm.result.MvQueryParams
-import de.iteratec.osm.result.ResultCsiAggregationService
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.I18nService
-
+import grails.transaction.NotTransactional
+import grails.transaction.Transactional
+import org.joda.time.DateTime
 
 /**
  * Reports osm-metrics to external tools.
@@ -59,7 +51,6 @@ class MetricReportingService {
     private static final List<String> INVALID_GRAPHITE_PATH_CHARACTERS = ['.', ' ']
     private static final String REPLACEMENT_FOR_INVALID_GRAPHITE_PATH_CHARACTERS = '_'
 
-    CsiAggregationTagService csiAggregationTagService
     ResultCsiAggregationService resultCsiAggregationService
     GraphiteSocketProvider graphiteSocketProvider
     I18nService i18nService
@@ -90,16 +81,16 @@ class MetricReportingService {
 
         log.info("reporting Eventresult");
 
-        JobGroup jobGroup = csiAggregationTagService.findJobGroupOfHourlyEventTag(result.tag)
+        JobGroup jobGroup = result.jobGroup
         Collection<GraphiteServer> servers = jobGroup.graphiteServers.findAll { it.reportEventResultsToGraphiteServer }
         if (servers.size() < 1) {
             return
         }
 
-        MeasuredEvent event = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(result.tag);
-        Page page = csiAggregationTagService.findPageOfHourlyEventTag(result.tag);
-        Browser browser = csiAggregationTagService.findBrowserOfHourlyEventTag(result.tag);
-        Location location = csiAggregationTagService.findLocationOfHourlyEventTag(result.tag);
+        MeasuredEvent event = result.measuredEvent
+        Page page = result.page
+        Browser browser = result.browser
+        Location location = result.location
 
         servers.each { GraphiteServer graphiteServer ->
             log.debug("Sending results to the following GraphiteServer: ${graphiteServer.getServerAdress()}: ")
@@ -410,10 +401,10 @@ class MetricReportingService {
     }
 
     private void reportHourlyCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
-        Page page = csiAggregationTagService.findPageOfHourlyEventTag(mv.tag)
-        MeasuredEvent event = csiAggregationTagService.findMeasuredEventOfHourlyEventTag(mv.tag)
-        Browser browser = csiAggregationTagService.findBrowserOfHourlyEventTag(mv.tag)
-        Location location = csiAggregationTagService.findLocationOfHourlyEventTag(mv.tag)
+        Page page = mv.page
+        MeasuredEvent event = mv.measuredEvent
+        Browser browser = mv.browser
+        Location location = mv.location
 
         List<String> pathElements = []
         pathElements.addAll(prefix.tokenize('.'))
@@ -432,7 +423,7 @@ class MetricReportingService {
     }
 
     private void reportDailyPageCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
-        Page page = csiAggregationTagService.findPageByPageTag(mv.tag)
+        Page page = mv.page
 
         List<String> pathElements = []
         pathElements.addAll(prefix.tokenize('.'))
@@ -461,7 +452,7 @@ class MetricReportingService {
     }
 
     private void reportWeeklyPageCsiAggregation(String prefix, JobGroup jobGroup, CsiAggregation mv, GraphiteSocket socket) {
-        Page page = csiAggregationTagService.findPageByPageTag(mv.tag)
+        Page page = mv.page
 
         List<String> pathElements = []
         pathElements.addAll(prefix.tokenize('.'))

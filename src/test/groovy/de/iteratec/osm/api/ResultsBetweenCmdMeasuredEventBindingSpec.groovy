@@ -127,8 +127,8 @@ class ResultsBetweenCmdMeasuredEventBindingSpec extends Specification {
     }
 
     private createTestData() {
-        TestDataUtil.createPage("homepage", 1)
-        TestDataUtil.createPage("category", 1)
+        TestDataUtil.createPage("homepage")
+        TestDataUtil.createPage("category")
         TestDataUtil.createJobGroup("my-job-group")
     }
 
