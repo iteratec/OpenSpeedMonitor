@@ -134,7 +134,8 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
             setDate(newValues.date);
         }
 		if (newValues.manualTime !== undefined) {
-			var isManual = OpenSpeedMonitor.stringUtils().stringToBoolean(newValues.manualTime);
+			var isManual = typeof newValues.manualTime == "string" ?
+                OpenSpeedMonitor.stringUtils().stringToBoolean(newValues.manualTime) : newValues.manualTime;
 			setManualTime(isManual);
 		}
 		if (newValues.time) {

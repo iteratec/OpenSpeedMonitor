@@ -178,9 +178,9 @@ OpenSpeedMonitor.clientSideStorageUtils = function(){
     };
 };
 
-$.extend({
-	getUrlVars: function(){
-		var vars = [], hash;
+OpenSpeedMonitor.urlUtils = (function() {
+	var getAllVars = function() {
+		var vars = [];
 		var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
 		for(var i = 0; i < hashes.length; i++)
 		{
@@ -190,11 +190,18 @@ $.extend({
 			vars[key] = decodeURIComponent(hash[1]);
 		}
 		return vars;
-	},
-	getUrlVar: function(name){
-		return $.getUrlVars()[name];
-	}
-});
+	};
+
+	var getVar = function(name) {
+		return getAllVars()[name];
+	};
+
+	return {
+        getAllVars: getAllVars,
+        getVar: getVar
+    };
+})();
+
 /**
  * This method will just return the given message. We use it,
  * so you can override it for a specialised delete conformation for the given domain

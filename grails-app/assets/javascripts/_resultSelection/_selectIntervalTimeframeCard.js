@@ -26,16 +26,40 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
     };
 
     var init = function() {
-        intervalSelectElement.val(clientStorage.getFromLocalStorage(clientStorageIntervalKey));
+        // initialize controls with values. Either from URL or from local storage
+        var interval = OpenSpeedMonitor.urlUtils.getVar("selectedInterval") ||
+                       clientStorage.getFromLocalStorage(clientStorageIntervalKey);
+        intervalSelectElement.val(interval);
 
-        startDateTimePicker.setValues(clientStorage.getObjectFromLocalStorage(clientStorageStartObjectKeys));
-        endDateTimePicker.setValues(clientStorage.getObjectFromLocalStorage(clientStorageEndObjectKeys));
+        var startDateTime = dateTimeValuesFromUrl("from", "setFromHour", "fromHour") ||
+                            clientStorage.getObjectFromLocalStorage(clientStorageStartObjectKeys);
+        startDateTimePicker.setValues(startDateTime);
 
-        var timeFramePreselection = clientStorage.getFromLocalStorage(clientStorageTimeFramePresetKey);
+        var endDateTime = dateTimeValuesFromUrl("to", "setToHour", "toHour") ||
+                          clientStorage.getObjectFromLocalStorage(clientStorageEndObjectKeys);
+        endDateTimePicker.setValues(endDateTime);
+        endDateTimePicker.setStartDate(startDateTime.date);
+
+        var timeFramePreselection = OpenSpeedMonitor.urlUtils.getVar("selectedTimeFrameInterval") ||
+                                    clientStorage.getFromLocalStorage(clientStorageTimeFramePresetKey);
         timeFrameSelectElement.val(timeFramePreselection);
         setTimeFramePreselection(timeFramePreselection);
 
         registerEvents();
+    };
+
+    var dateTimeValuesFromUrl = function(dateKey, manualTimeKey, timeKey) {
+        var date = OpenSpeedMonitor.urlUtils.getVar(dateKey);
+        var manualTime = OpenSpeedMonitor.urlUtils.getVar(manualTimeKey) == "on";
+        var time = OpenSpeedMonitor.urlUtils.getVar(timeKey);
+        if (!date || !time) {
+            return null;
+        }
+        return {
+            date: date,
+            manualTime: manualTime,
+            time: time
+        };
     };
 
     var registerEvents = function() {
