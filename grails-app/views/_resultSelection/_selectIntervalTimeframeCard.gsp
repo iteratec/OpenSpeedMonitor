@@ -43,7 +43,7 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 	</div>
 
 	<%--------------------------------------------------------------------- manual start date --%>
-	<fieldset id="fldset-startdate">
+	<fieldset id="manual-timeframe-selection">
 		<div class="form-group">
 			<label class="col-md-4 control-label" for="fromDatepicker">
 				<g:message
@@ -51,29 +51,24 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 						default="Start" />:
 			</label>
 			<div class="col-md-8" id="startDateTimePicker">
-				<fieldset id="fldset-startdate-hour" class="time-control">
-					<div class="input-group bootstrap-timepicker">
-						<span class="input-group-addon">
-							<g:checkBox name="setFromHour" id="setFromHour" checked="${setFromHour}"/>
-						</span>
-						<input id="fromHourTimepicker" type="text" class="form-control"
-							   value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled/>
-						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-					</div>
-				</fieldset>
+				<div class="input-group bootstrap-timepicker time-control">
+					<span class="input-group-addon">
+						<g:checkBox name="setFromHour" id="setFromHour" checked="${setFromHour}"/>
+					</span>
+					<input id="fromHourTimepicker" type="text" class="form-control"
+						   value="${(fromHour=='00:00'||fromHour=='0:00')?'00:001':fromHour}" disabled/>
+					<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+				</div>
 				<div class="date-control">
 					<input class="form-control" type="text" id="fromDatepicker"
 						data-date-format="${dateFormat}" data-date-week-start="${weekStart}"
-						   placeholder="start date" value="${from}" />
+					    placeholder="start date" value="${from}" />
 				</div>
 				<input type="hidden" name="from" id="from" class="date-hidden" value="${from}" />
 				<input type="hidden" name="fromHour" id="fromHour" class="time-hidden" value="${fromHour}" />
 			</div>
 		</div>
-	</fieldset>
-
 	<%--------------------------------------------------------------------- manual end date --%>
-	<fieldset id="fldset-enddate">
 		<div class="form-group">
 			<label class="col-md-4 control-label" for="toDatepicker">
 				<g:message
@@ -81,16 +76,14 @@ a control to select an aggregation interval (if csiAggregationIntervals is set)
 						default="End" />:
 			</label>
 			<div class="col-md-8" id="endDateTimePicker">
-				<fieldset id="fldset-enddate-hour" class="time-control">
-					<div class="input-group bootstrap-timepicker">
-						<span class="input-group-addon">
-							<g:checkBox name="setToHour" id="setToHour" checked="${setToHour}"/>
-						</span>
-						<input id="toHourTimepicker" type="text" class="form-control"
-							   value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled/>
-						<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-					</div>
-				</fieldset>
+				<div class="input-group bootstrap-timepicker time-control">
+					<span class="input-group-addon">
+						<g:checkBox name="setToHour" id="setToHour" checked="${setToHour}"/>
+					</span>
+					<input id="toHourTimepicker" type="text" class="form-control"
+						   value="${(toHour=='00:00'||toHour=='0:00')?'00:001':toHour}" disabled/>
+					<span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+				</div>
 				<div class="date-control">
 					<input class="form-control" type="text" id="toDatepicker" placeholder="end date" value="${to}"
 						   data-date-format="${dateFormat}" data-date-week-start="${weekStart}" />

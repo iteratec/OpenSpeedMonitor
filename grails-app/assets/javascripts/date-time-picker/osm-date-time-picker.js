@@ -42,7 +42,7 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 			if (!ev.date) { // invalid date set
 				return;
 			}
-			dateHiddenValue.val(formatDateForHiddenValue(ev.date));
+			dateHiddenValue.val(formatDateInternal(ev.date));
 			dateInput.datepicker("hide");
 			if (!timeManualCheckbox.is(':checked')) {
 				setTime(autoTime);
@@ -59,6 +59,11 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 			triggerChangeEvent();
 		});
 	};
+
+	var setManualTime = function(isManualTime) {
+        timeManualCheckbox.prop('checked', isManualTime);
+        timeInput.attr("disabled", !isManualTime);
+    };
 
 	var setTime = function(time) {
 		var pattern = new RegExp("([0-9]|[01][0-9]|2[0-3]):([0-5][0-9])");
@@ -80,12 +85,12 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 	};
 
 	var setDate = function (date) {
-		var dateObject = parseDateFromHiddenValue(date);
+		var dateObject = parseDateInternal(date);
 		dateHiddenValue.val(date);
 		dateInput.datepicker("setDate", dateObject);
 	};
 
-	var parseDateFromHiddenValue = function (dateString) {
+	var parseDateInternal = function (dateString) {
 		var pattern = new RegExp("([0-2][0-9]|3[01]).(0[1-9]|1[0-2]).[0-9]{4}");
 		if (!pattern.test(dateString)) {
 			console.log("Invalid date to set. Expected in format dd.mm.yyyy");
@@ -95,7 +100,7 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 		return new Date(parts[2], parts[1] - 1, parts[0]);
 	};
 
-	var formatDateForHiddenValue = function(date) {
+	var formatDateInternal = function(date) {
 		return twoDigitString(date.getDate()) + "." + twoDigitString(date.getMonth() + 1) + "." + date.getFullYear();
 	};
 
@@ -104,39 +109,49 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 	};
 
 	var triggerChangeEvent = function() {
-		dateTimePickerElement.trigger("changeDateTime", values());
+		dateTimePickerElement.trigger("changeDateTime", getValues());
 	};
-	
-	var values = function(newValues) {
-		if (newValues === undefined) {
-			return {
-				date: dateHiddenValue.val(),
-				manualTime: timeManualCheckbox.is(':checked'),
-				time: timeHiddenValue.val()
-			};
-		}
 
+	var setValuesByDate= function(date) {
+        if (!(date instanceof Date)) {
+            console.log("Invalid date object to set datepicker from.");
+            return;
+        }
+        setDate(formatDateInternal(date));
+        setTime(date.getHours() + ":" + date.getMinutes());
+    };
+
+	var getValues = function() {
+        return {
+            date: dateHiddenValue.val(),
+            manualTime: timeManualCheckbox.is(':checked'),
+            time: timeHiddenValue.val()
+        };
+    };
+
+    var setValues = function (newValues) {
+        if (newValues.date) {
+            setDate(newValues.date);
+        }
 		if (newValues.manualTime !== undefined) {
 			var isManual = OpenSpeedMonitor.stringUtils().stringToBoolean(newValues.manualTime);
-			timeManualCheckbox.prop('checked', isManual);
-			timeInput.attr("disabled", !isManual);
+			setManualTime(isManual);
 		}
 		if (newValues.time) {
 			setTime(newValues.time);
 		}
-		if (newValues.date) {
-			setDate(newValues.date);
-		}
 	};
 
 	var setStartDate = function(startDate) {
-		var dateObject = startDate ? parseDateFromHiddenValue(startDate) : null;
+		var dateObject = startDate ? parseDateInternal(startDate) : null;
 		dateInput.datepicker("setStartDate", dateObject);
 	};
 
 	init();
 	return {
-		values : values,
-		setStartDate : setStartDate
+		getValues: getValues,
+        setValues: setValues,
+        setValuesByDate: setValuesByDate,
+		setStartDate: setStartDate
 	};
 };
