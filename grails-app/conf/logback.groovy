@@ -98,7 +98,8 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     logger("org.grails.orm.hibernate", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.hibernate.SQL", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
     logger("org.hibernate.transaction", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    root(DEBUG, appenders)
+
+    root(ERROR, appenders)
 }
 
 if (Environment.isDevelopmentMode() && targetDir) {
@@ -202,7 +203,7 @@ if (Environment.isDevelopmentMode() && targetDir) {
     logger('grails.app.controllers.org.grails.plugins.LogHibernateStatsInterceptor', DEBUG, ['osmHibernateStatsAppender'], false)
     logger('org.hibernate.stat', DEBUG, ['osmHibernateStatsAppender'], false)
 
-    root(DEBUG, appenders)
+    root(ERROR, appenders)
 }
 if (Environment.getCurrent() == Environment.TEST && targetDir) {
     appender('CONSOLE', ConsoleAppender) {
@@ -230,5 +231,5 @@ if (Environment.getCurrent() == Environment.TEST && targetDir) {
     logger("org.hibernate.SQL", INFO)
 
 
-    root(DEBUG, appenders)
+    root(ERROR, appenders)
 }
