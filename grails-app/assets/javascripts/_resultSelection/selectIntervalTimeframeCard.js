@@ -7,6 +7,8 @@
 OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
+    var isInitialized = false;
+    var cardElement = $("#select-interval-timeframe-card");
     var startDateTimePickerElement = $("#startDateTimePicker");
     var startDateTimePicker = OpenSpeedMonitor.DateTimePicker(startDateTimePickerElement, "00:00");
     var endDateTimePickerElement = $("#endDateTimePicker");
@@ -46,6 +48,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         setTimeFramePreselection(timeFramePreselection);
 
         registerEvents();
+        isInitialized = true;
     };
 
     var defaultValueForInterval = function() {
@@ -133,9 +136,17 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         endDateTimePicker.setStartDate(startDate);
     };
 
-    var timeFrameChanged = function() {
+    var getTimeFrame = function () {
+      return [startDateTimePicker.getValuesAsDate(), endDateTimePicker.getValuesAsDate()];
+    };
 
+    var timeFrameChanged = function() {
+        cardElement.trigger("timeFrameChanged", getTimeFrame());
     };
 
     init();
+    return {
+        getTimeFrame : getTimeFrame,
+        isInitialized : isInitialized
+    }
 })();
