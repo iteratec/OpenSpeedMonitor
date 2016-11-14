@@ -1042,8 +1042,8 @@ class CsiDashboardControllerTests {
         assertEquals('Location3', locations.get(2).getLabel())
 
         // Data for java-script utilities:
-        assertTrue(result.containsKey('dateFormatString'))
-        assertEquals(CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormatString'))
+        assertTrue(result.containsKey('dateFormat'))
+        assertEquals(CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormat'))
         assertTrue(result.containsKey('weekStart'))
         assertEquals(CsiDashboardController.MONDAY_WEEKSTART, result.get('weekStart'))
 
@@ -1217,8 +1217,8 @@ class CsiDashboardControllerTests {
         assertEquals(102L, locations.get(2).getId())
 
         // Data for java-script utilities:
-        assertTrue(result.containsKey('dateFormatString'))
-        assertEquals(CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormatString'))
+        assertTrue(result.containsKey('dateFormat'))
+        assertEquals(CsiDashboardController.DATE_FORMAT_STRING_FOR_HIGH_CHART, result.get('dateFormat'))
         assertTrue(result.containsKey('weekStart'))
         assertEquals(CsiDashboardController.MONDAY_WEEKSTART, result.get('weekStart'))
 

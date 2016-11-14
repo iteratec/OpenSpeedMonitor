@@ -19,7 +19,7 @@
  * Called on jquerys DOM-ready.
  * Initializes DOM-nodes and registers events.
  */
-function doOnDomReady(dateFormat, weekStart, noResultsTextForChosenSelects) {
+function doOnDomReady(noResultsTextForChosenSelects) {
 
     initChosenSelects(noResultsTextForChosenSelects);
 
