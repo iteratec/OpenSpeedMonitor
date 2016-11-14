@@ -32,7 +32,7 @@ import java.util.regex.Pattern
  * @since IT-74
  */
 public class CsiDashboardShowAllCommand implements Validateable {
-
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING);
     CsiAggregationUtilService csiAggregationUtilService
 
     /**
@@ -47,8 +47,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
                 if (dateObject instanceof Date) {
                     return dateObject
                 } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
-                    return dateFormat.parse(dateObject)
+                    return SIMPLE_DATE_FORMAT.parse(dateObject)
                 }
             }
     })
@@ -67,8 +66,7 @@ public class CsiDashboardShowAllCommand implements Validateable {
                 if (dateObject instanceof Date) {
                     return dateObject
                 } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(CsiDashboardController.DATE_FORMAT_STRING)
-                    return dateFormat.parse(dateObject)
+                    return SIMPLE_DATE_FORMAT.parse(dateObject)
                 }
             }
     })
@@ -529,12 +527,12 @@ public class CsiDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('selectedConnectivityProfiles', this.selectedConnectivityProfiles)
         viewModelToCopyTo.put('selectedCsiSystems', this.selectedCsiSystems)
 
-        viewModelToCopyTo.put('from', this.from)
+        viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
         if (!this.fromHour.is(null)) {
             viewModelToCopyTo.put('fromHour', this.fromHour)
         }
 
-        viewModelToCopyTo.put('to', this.to)
+        viewModelToCopyTo.put('to', this.to ? SIMPLE_DATE_FORMAT.format(this.to) : null)
         if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }

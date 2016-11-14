@@ -31,6 +31,7 @@ import java.util.regex.Pattern
  * @since IT-6
  */
 public class EventResultDashboardShowAllCommand implements Validateable {
+    private final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING);
 
     public final static Integer LINE_CHART_SELECTION = 0;
     public final static Integer POINT_CHART_SELECTION = 1;
@@ -48,8 +49,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
                 if (dateObject instanceof Date) {
                     return dateObject
                 } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
-                    return dateFormat.parse(dateObject)
+                    return SIMPLE_DATE_FORMAT.parse(dateObject)
                 }
             }
     })
@@ -68,8 +68,7 @@ public class EventResultDashboardShowAllCommand implements Validateable {
                 if (dateObject instanceof Date) {
                     return dateObject
                 } else {
-                    SimpleDateFormat dateFormat = new SimpleDateFormat(EventResultDashboardController.DATE_FORMAT_STRING)
-                    return dateFormat.parse(dateObject)
+                    return SIMPLE_DATE_FORMAT.parse(dateObject)
                 }
             }
     })
@@ -491,12 +490,12 @@ public class EventResultDashboardShowAllCommand implements Validateable {
 
         DateValueConverter converter = DateValueConverter.getConverter()
 
-        viewModelToCopyTo.put('from', this.from)
+        viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
         if (!this.fromHour.is(null)) {
             viewModelToCopyTo.put('fromHour', this.fromHour)
         }
 
-        viewModelToCopyTo.put('to', this.to)
+        viewModelToCopyTo.put('to', this.to ? SIMPLE_DATE_FORMAT.format(this.to) : null)
         if (!this.toHour.is(null)) {
             viewModelToCopyTo.put('toHour', this.toHour)
         }
