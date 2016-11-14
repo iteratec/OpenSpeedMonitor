@@ -28,28 +28,58 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         manualTime: 'de.iteratec.osm.result.dashboard.manualToHour',
         time: 'de.iteratec.osm.result.dashboard.toHour'
     };
+    var defaultIntervalSelection = "-1"; // Raw data
+    var defaultTimeFramePreselect = (3 * 24 * 60 * 60).toString(); // 3 days
+    var isSavedDashboard = OpenSpeedMonitor.urlUtils.getVar("dashboardID") !== undefined;
 
     var init = function() {
-        // initialize controls with values. Either from URL or from local storage
-        var interval = OpenSpeedMonitor.urlUtils.getVar("selectedInterval") ||
-                       clientStorage.getFromLocalStorage(clientStorageIntervalKey);
-        intervalSelectElement.val(interval);
+        // initialize controls with values. Either from presets, from URL, from local storage or defaults
+        intervalSelectElement.val(defaultValueForInterval());
 
-        var startDateTime = dateTimeValuesFromUrl("from", "setFromHour", "fromHour") ||
-                            clientStorage.getObjectFromLocalStorage(clientStorageStartObjectKeys);
-        startDateTimePicker.setValues(startDateTime);
+        var startValues = defaultValueForStart();
+        startDateTimePicker.setValues(startValues);
+        endDateTimePicker.setValues(defaultValueForEnd());
+        endDateTimePicker.setStartDate(startValues.date);
 
-        var endDateTime = dateTimeValuesFromUrl("to", "setToHour", "toHour") ||
-                          clientStorage.getObjectFromLocalStorage(clientStorageEndObjectKeys);
-        endDateTimePicker.setValues(endDateTime);
-        endDateTimePicker.setStartDate(startDateTime.date);
-
-        var timeFramePreselection = OpenSpeedMonitor.urlUtils.getVar("selectedTimeFrameInterval") ||
-                                    clientStorage.getFromLocalStorage(clientStorageTimeFramePresetKey);
+        var timeFramePreselection = defaultValueForTimeFramePreselection();
         timeFrameSelectElement.val(timeFramePreselection);
         setTimeFramePreselection(timeFramePreselection);
 
         registerEvents();
+    };
+
+    var defaultValueForInterval = function() {
+        if (isSavedDashboard) {
+            return intervalSelectElement.val();
+        }
+        return OpenSpeedMonitor.urlUtils.getVar("selectedInterval") ||
+               clientStorage.getFromLocalStorage(clientStorageIntervalKey) ||
+               defaultIntervalSelection;
+    };
+
+    var defaultValueForStart = function() {
+        if (isSavedDashboard) {
+            return startDateTimePicker.getValues();
+        }
+        return dateTimeValuesFromUrl("from", "setFromHour", "fromHour") ||
+               clientStorage.getObjectFromLocalStorage(clientStorageStartObjectKeys);
+    };
+
+    var defaultValueForEnd = function() {
+        if (isSavedDashboard) {
+            return endDateTimePicker.getValues();
+        }
+        return dateTimeValuesFromUrl("to", "setToHour", "toHour") ||
+            clientStorage.getObjectFromLocalStorage(clientStorageEndObjectKeys);
+    };
+
+    var defaultValueForTimeFramePreselection = function() {
+        if (isSavedDashboard) {
+            return timeFrameSelectElement.val();
+        }
+        return OpenSpeedMonitor.urlUtils.getVar("selectedTimeFrameInterval") ||
+            clientStorage.getFromLocalStorage(clientStorageTimeFramePresetKey) ||
+            defaultTimeFramePreselect;
     };
 
     var dateTimeValuesFromUrl = function(dateKey, manualTimeKey, timeKey) {

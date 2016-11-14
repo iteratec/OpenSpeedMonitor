@@ -146,13 +146,16 @@ OpenSpeedMonitor.clientSideStorageUtils = function(){
      * @return object A new object with the same properties as keyObject and values from the local storage.
      */
     var getObjectFromLocalStorage = function(keyObject) {
+        var hasValues = false;
         var values = {};
         for (var property in keyObject) {
             if (keyObject.hasOwnProperty(property)) {
-                values[property] = getFromLocalStorage(keyObject[property]);
+                var value = getFromLocalStorage(keyObject[property]);
+                hasValues = hasValues || value !== null;
+                values[property] = value;
             }
         }
-        return values;
+        return hasValues ? values : null;
     };
 
     /**
