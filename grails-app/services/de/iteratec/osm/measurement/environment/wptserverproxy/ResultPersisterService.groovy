@@ -208,16 +208,19 @@ class ResultPersisterService implements iResultListener {
         Integer testStepCount = resultXml.getTestStepCount()
 
         log.debug("starting persistance of ${testStepCount} event results for test steps")
-        testStepCount.times { zeroBasedTeststepIndex ->
+        //TODO: possible to catch non median results at this position  and check if they should persist or not
 
-            //TODO: possible to catch non median results at this position  and check if they should persist or not
+        for (int zeroBasedTeststepIndex = 0; zeroBasedTeststepIndex < testStepCount; zeroBasedTeststepIndex++) {
+            if (resultXml.getStepNode(zeroBasedTeststepIndex)) {
+                try {
+                    persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml)
+                } catch (Exception e) {
+                    log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
+                }
 
-            try {
-                persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml)
-            } catch (Exception e) {
-                log.error("an error occurred while persisting EventResults of teststep ${zeroBasedTeststepIndex}", e)
+            } else {
+                throw new OsmResultPersistanceException("there is no testStep ${zeroBasedTeststepIndex + 1} for testId ${resultXml.getTestId()}")
             }
-
         }
     }
 
@@ -283,14 +286,14 @@ class ResultPersisterService implements iResultListener {
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
         GString waterfallAnchor = getWaterfallAnchor(resultXml, event.name, testStepZeroBasedIndex + 1)
         result = persistResult(
-            jobRun,
-            event,
-            cachedView,
-            runZeroBasedIndex + 1,
-            resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex),
-            viewResultsNodeOfThisRun,
-            testStepZeroBasedIndex + 1,
-            waterfallAnchor
+                jobRun,
+                event,
+                cachedView,
+                runZeroBasedIndex + 1,
+                resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex),
+                viewResultsNodeOfThisRun,
+                testStepZeroBasedIndex + 1,
+                waterfallAnchor
         )
 
         return result
@@ -417,7 +420,7 @@ class ResultPersisterService implements iResultListener {
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
                 return "${STATIC_PART_WATERFALL_ANCHOR}${eventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
             case WptXmlResultVersion.MULTISTEP:
-                return  "${STATIC_PART_WATERFALL_ANCHOR}_step${testStepOneBasedIndex}"
+                return "${STATIC_PART_WATERFALL_ANCHOR}_step${testStepOneBasedIndex}"
             default:
                 throw new IllegalStateException("Version of result xml isn't specified!")
         }

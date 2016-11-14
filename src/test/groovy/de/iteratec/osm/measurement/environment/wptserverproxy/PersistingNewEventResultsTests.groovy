@@ -83,7 +83,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_CsiRelevant.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -145,7 +145,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'BEFORE_MULTISTEP_3Runs_WithPageName_CsiRelevant.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -207,7 +207,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -261,16 +261,16 @@ class PersistingNewEventResultsTests {
         EventResult eventResultUncachedTest = medianUncachedResultsOfEvent4[0]
         String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
-            "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen",
-            detailsUrl
+                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen",
+                detailsUrl
         )
 
         //TestDetailsUrl cached and without pageAggregator
         EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
         detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
-            "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen",
-            detailsUrl
+                "http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen",
+                detailsUrl
         )
     }
 
@@ -280,7 +280,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_3Runs_6EventNames_WithPageName.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -335,16 +335,16 @@ class PersistingNewEventResultsTests {
         String detailsUrl = eventResultUncachedTest.getTestDetailsWaterfallURL().toString()
         //replacing check: in database with a dot 'Produkt ausw.aehlen'
         assertEquals(
-            'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen',
-            detailsUrl
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen',
+                detailsUrl
         )
 
         //TestDetailsUrl cached and without pageAggregator
         EventResult eventResultCachedTest = medianCachedResultsOfEvent2Run1[0]
         detailsUrl = eventResultCachedTest.getTestDetailsWaterfallURL().toString()
         assertEquals(
-            'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen',
-            detailsUrl
+                'http://wptUnitTest.dev.hh.iteratec.local/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen',
+                detailsUrl
         )
     }
 
@@ -354,7 +354,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_5Runs_3Events_JustFirstView_WithVideo.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -389,7 +389,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_2Run.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -493,7 +493,7 @@ class PersistingNewEventResultsTests {
         //create test-specific data
         String nameOfResultXmlFile = 'MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml'
         File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
-        WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(file))
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
 
         //mocking of inner services
@@ -518,6 +518,33 @@ class PersistingNewEventResultsTests {
         assertNotNull(event2)
 
     }
+
+
+    @Test
+    void testError_FailureInStep() {
+        //create test-specific data
+        String nameOfResultXmlFile = 'MULTISTEP_Error_Failure_In_Step.xml'
+        File file = new File("test/resources/WptResultXmls/${nameOfResultXmlFile}")
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
+        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), undefinedBrowser, server1);
+
+        //mocking of inner services
+        mockCsiAggregationUpdateService()
+        ServiceMocker.create().mockTTCsMappingService(serviceUnderTest)
+        mockPageService()
+
+        deleteAllRelevantDomains()
+
+        //test execution
+        shouldFail(OsmResultPersistanceException) {
+            serviceUnderTest.persistResultsForAllTeststeps(xmlResult)
+        }
+
+        //assertions
+        List<MeasuredEvent> events = MeasuredEvent.list()
+        assertEquals('Count of events', 0, events.size())
+    }
+
 
     private void deleteAllRelevantDomains() {
         JobResult.list()*.delete(flush: true)
