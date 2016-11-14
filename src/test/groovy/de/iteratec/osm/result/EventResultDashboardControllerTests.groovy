@@ -989,10 +989,10 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);
@@ -1064,9 +1064,9 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
 	}
 
@@ -1141,10 +1141,10 @@ class EventResultDashboardControllerTests {
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', "12:00");
 
-		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
+		assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', "13:00");
 		assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', true);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedConnectivityProfiles', []);

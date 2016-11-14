@@ -1303,10 +1303,10 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedDate);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
@@ -1358,9 +1358,9 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedBrowsers', [2L]);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedDate);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '18:00');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'debug', false);
@@ -1483,10 +1483,10 @@ class CsiDashboardControllerTests {
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedAllLocations', false);
         assertContainedAndNotNullAndEquals(dataUnderTest, 'selectedLocations', [17L]);
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', expectedFromDate);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'from', '18.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'fromHour', '12:00');
 
-        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', expectedToDate);
+        assertContainedAndNotNullAndEquals(dataUnderTest, 'to', '19.08.2013');
         assertContainedAndNotNullAndEquals(dataUnderTest, 'toHour', '13:00');
 
         assertContainedAndNotNullAndEquals(dataUnderTest, 'aggrGroupAndInterval', CsiDashboardController.HOURLY_MEASURED_EVENT);
