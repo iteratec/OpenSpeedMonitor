@@ -45,6 +45,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -57,6 +58,7 @@ import org.joda.time.Duration
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 import org.quartz.CronExpression
+import org.springframework.http.HttpStatus
 
 import javax.persistence.NoResultException
 
@@ -284,7 +286,7 @@ class RestApiController {
         DateTime startDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampFrom);
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
         if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
-            sendSimpleResponseAsStream(response, 400, 'End of requested time-frame may not be earlier that its requested start.')
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'End of requested time-frame may not be earlier that its requested start.')
             return
         }
 
@@ -294,7 +296,7 @@ class RestApiController {
             String errorMessage = 'The requested time-frame is longer than ' +
                     MAX_TIME_FRAME_DURATION_IN_HOURS +
                     ' hours. This is too large to process. Please choose a smaller time-frame.'
-            sendSimpleResponseAsStream(response, 413, errorMessage)
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.PAYLOAD_TOO_LARGE, errorMessage)
             return
         }
 
@@ -305,7 +307,7 @@ class RestApiController {
         try {
             queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
         } catch (NoResultException nre) {
-            sendSimpleResponseAsStream(response, 404, 'Some of the requests arguments caused an error: ' + nre.getMessage())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some of the requests arguments caused an error: ' + nre.getMessage())
             return
         }
 
@@ -329,14 +331,14 @@ class RestApiController {
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo);
 
         if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
-            sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')
             return
         }
 
         Duration requestedDuration = new Duration(startDateTimeInclusive, endDateTimeInclusive);
 
         if (requestedDuration.getStandardDays() > MAX_TIME_FRAME_DURATION_IN_DAYS_CSI) {
-            sendSimpleResponseAsStream(
+            ControllerUtils.sendSimpleResponseAsStream(
                     response,
                     413,
                     'The requested time-frame is wider than ' +
@@ -348,7 +350,7 @@ class RestApiController {
 
         JobGroup csiSystem = JobGroup.findByName(cmd.system)
         if (csiSystem?.csiConfiguration == null) {
-            sendSimpleResponseAsStream(response, 404, "The JobGroup ${csiSystem} has no csi configuration.")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "The JobGroup ${csiSystem} has no csi configuration.")
             return
         }
 
@@ -356,7 +358,7 @@ class RestApiController {
         try {
             queryParams = cmd.createMvQueryParams(measuredEventDaoService, browserDaoService);
         } catch (NoResultException nre) {
-            sendSimpleResponseAsStream(response, 404, 'Some request arguements could not be found: ' + nre.getMessage())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, 'Some request arguements could not be found: ' + nre.getMessage())
             return
         }
 
@@ -376,7 +378,7 @@ class RestApiController {
                         [WeightFactor.PAGE, WeightFactor.BROWSER_CONNECTIVITY_COMBINATION] as Set)
             }
         } catch (IllegalArgumentException e) {
-            sendSimpleResponseAsStream(response, 404, e.getMessage())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, e.getMessage())
             return
         }
 
@@ -403,19 +405,19 @@ class RestApiController {
     public Map<String, Object> translateToCustomerSatisfaction(TranslateCustomerSatisfactionCommand cmd) {
 
         if (cmd.loadTimeInMillisecs == null || cmd.pageName == null || (cmd.csiConfiguration == null && cmd.system == null)) {
-            sendSimpleResponseAsStream(response, 400, 'Params loadTimeInMillisecs AND pageName AND csiConfiguration must be set.\n')
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'Params loadTimeInMillisecs AND pageName AND csiConfiguration must be set.\n')
             return
         } else {
             Page page = Page.findByName(cmd.pageName)
             CsiConfiguration csiConfig = cmd.findCsiConfiguration()
             if (page == null) {
-                sendSimpleResponseAsStream(response, 400, "Page with name ${cmd.pageName} couldn't be found.\n")
+                ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "Page with name ${cmd.pageName} couldn't be found.\n")
                 return
             } else if (csiConfig == null) {
-                sendSimpleResponseAsStream(response, 400, "CsiConfiguration couldn't be found\n")
+                ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "CsiConfiguration couldn't be found\n")
                 return
             } else {
-                return sendObjectAsJSON(
+                sendObjectAsJSON(
                         ['loadTimeInMillisecs'          : cmd.loadTimeInMillisecs,
                          'customerSatisfactionInPercent': timeToCsMappingService.getCustomerSatisfactionInPercent(cmd.loadTimeInMillisecs, page, csiConfig)],
                         params.pretty && params.pretty == 'true'
@@ -434,19 +436,19 @@ class RestApiController {
 
         Job job = Job.get(params.id)
         if (job == null) {
-            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
             return
         }
 
         if (params.timestampFrom == null || params.timestampTo == null) {
-            sendSimpleResponseAsStream(response, 400, 'Params timestampFrom and timestampTo must be set.')
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'Params timestampFrom and timestampTo must be set.')
             return
         }
 
         DateTime start = API_DATE_FORMAT.parseDateTime(params.timestampFrom)
         DateTime end = API_DATE_FORMAT.parseDateTime(params.timestampTo)
         if (end.isBefore(start)) {
-            sendSimpleResponseAsStream(response, 400, 'The end of requested time-frame could not be before start of time-frame.')
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')
             return
         }
 
@@ -476,7 +478,7 @@ class RestApiController {
         if (csiConfiguration != null) {
             jsonCsiConfiguration = CsiConfigurationDto.create(csiConfiguration)
         } else {
-            sendSimpleResponseAsStream(response, 400, "CsiConfiguration with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "CsiConfiguration with id ${params.id} doesn't exist!")
             return
         }
 
@@ -511,7 +513,7 @@ class RestApiController {
                     }
                     break;
                 default:
-                    sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
+                    ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "Request not allowed or domain does not exist: ${domain}")
                     return null
             }
         }
@@ -558,7 +560,7 @@ class RestApiController {
                     }
                     break;
                 default:
-                    sendSimpleResponseAsStream(response, 400, "Request not allowed or domain does not exist: ${domain}")
+                    ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "Request not allowed or domain does not exist: ${domain}")
                     return null
             }
         }
@@ -580,7 +582,7 @@ class RestApiController {
             if(cmd.loadedAssets == cmd.countAssets) batchActivity.done()
         }
 
-        sendObjectAsJSON("ok",true)
+        return sendObjectAsJSON("ok",true)
     }
     /**
      * Activates the job of submitted id. It gets activated no matter whether it was active/inactive before.
@@ -590,19 +592,19 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeyActivateJob() {
 
         if (!params.validApiKey.allowedForJobActivation) {
-            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
 
         Job job = Job.get(params.id)
         if (job == null) {
-            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
             return
         }
 
         jobService.updateActivity(job, true)
 
-        sendObjectAsJSON(
+        return sendObjectAsJSON(
                 JobDto.create(job.refresh()),
                 params.pretty && params.pretty == 'true'
         )
@@ -615,11 +617,11 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeyHandleOldJobResults() {
 
         if (!params.validApiKey.allowedForMeasurementActivation) {
-            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
         def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
-        sendSimpleResponseAsStream(response, 200, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
     }
 
     /**
@@ -630,19 +632,19 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeyDeactivateJob() {
 
         if (!params.validApiKey.allowedForJobDeactivation) {
-            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
 
         Job job = Job.get(params.id)
         if (job == null) {
-            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
             return
         }
 
         jobService.updateActivity(job, false)
 
-        sendObjectAsJSON(
+        return sendObjectAsJSON(
                 JobDto.create(job.refresh()),
                 params.pretty && params.pretty == 'true'
         )
@@ -657,32 +659,32 @@ class RestApiController {
     public Map<String, Object> securedViaApiKeySetExecutionSchedule() {
 
         if (!params.validApiKey.allowedForJobSetExecutionSchedule) {
-            sendSimpleResponseAsStream(response, 403, DEFAULT_ACCESS_DENIED_MESSAGE)
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
             return
         }
 
         Job job = Job.get(params.id)
         if (job == null) {
-            sendSimpleResponseAsStream(response, 404, "Job with id ${params.id} doesn't exist!")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "Job with id ${params.id} doesn't exist!")
             return
         }
 
         JsonSlurper jsonSlurper = new JsonSlurper().parseText(request.getJSON().toString())
         String schedule = jsonSlurper.executionSchedule
         if (schedule == null) {
-            sendSimpleResponseAsStream(response, 400, "The body of your PUT request (JSON object) must contain executionSchedule.")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "The body of your PUT request (JSON object) must contain executionSchedule.")
             return
         }
 
         if (!CronExpression.isValidExpression(schedule)) {
-            sendSimpleResponseAsStream(response, 400, "The execution schedule you submitted in the body is invalid! " +
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, "The execution schedule you submitted in the body is invalid! " +
                     "(see http://www.quartz-scheduler.org/documentation/quartz-1.x/tutorials/crontrigger for details).")
             return
         }
 
         jobService.updateExecutionSchedule(job, schedule)
 
-        sendObjectAsJSON(
+        return sendObjectAsJSON(
                 JobDto.create(job.refresh()),
                 params.pretty && params.pretty == 'true'
         )
@@ -700,7 +702,7 @@ class RestApiController {
             cmd.errors.getFieldErrors().each { fieldError ->
                 sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
-            sendSimpleResponseAsStream(response, 400, sw.toString())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, sw.toString())
             return
         } else {
             render eventDaoService.createEvent(
@@ -725,11 +727,11 @@ class RestApiController {
             cmd.errors.getFieldErrors().each { fieldError ->
                 sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
-            sendSimpleResponseAsStream(response, 400, sw.toString())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, sw.toString())
             return
         } else {
             inMemoryConfigService.setActiveStatusOfMeasurementsGenerally(cmd.activationToSet)
-            sendSimpleResponseAsStream(response, 200, "Set measurements activation to: ${cmd.activationToSet}")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "Set measurements activation to: ${cmd.activationToSet}")
             return
         }
     }
@@ -746,19 +748,19 @@ class RestApiController {
             cmd.errors.getFieldErrors().each { fieldError ->
                 sw << "Error field ${fieldError.getField()}: ${fieldError.getCode()}\n"
             }
-            sendSimpleResponseAsStream(response, 400, sw.toString())
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, sw.toString())
             return
         } else {
             inMemoryConfigService.setDatabaseCleanupEnabled(cmd.activationToSet)
-            sendSimpleResponseAsStream(response, 200, "Set nightly-database-cleanup activation to: ${cmd.activationToSet}")
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, "Set nightly-database-cleanup activation to: ${cmd.activationToSet}")
             return
         }
     }
 
     /**
      * <p>
-     * Sends the object rendered as JSON. All public getters are used to
-     * render the result. This call should be placed as last statement, the
+     * Sends the object rendered as a JSON object with a 'target' member containing the converted object.
+     * All public getters are used to render the result. This call should be placed as last statement, the
      * return statement, of an action.
      * </p>
      *
@@ -773,24 +775,8 @@ class RestApiController {
      *         if {@code objectToSend} is <code>null</code>.
      */
     private void sendObjectAsJSON(Object objectToSend, boolean usePrettyPrintingFormat) {
-        JSON converter = new JSON(target: objectToSend)
-        converter.setPrettyPrint(usePrettyPrintingFormat)
-        render converter
+        ControllerUtils.sendObjectAsJSON(response, [target: objectToSend], usePrettyPrintingFormat)
     }
-
-    /**
-     * Sends error message with given error httpStatus and message as http response and breaks action (no subsequent
-     * action code is executed).
-     * @param response
-     * @param httpStatus
-     * @param message
-     */
-    private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, Integer httpStatus, String message) {
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status = httpStatus
-        render message
-    }
-
 }
 
 /**

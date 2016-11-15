@@ -19,6 +19,7 @@ package de.iteratec.osm.batch
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.api.dto.BatchActivityRowDto
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.joda.time.DateTime
@@ -85,9 +86,10 @@ class BatchActivityController {
                 template: 'batchActivityTable',
                 model: [batchActivities: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
-
-        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
+        ControllerUtils.sendObjectAsJSON(response, [
+                table: templateAsPlainText,
+                count: result.totalCount
+        ])
     }
 
     /**
@@ -150,17 +152,5 @@ class BatchActivityController {
     def deactivateDatabaseCleanup(){
         inMemoryConfigService.deactivateDatabaseCleanup()
         redirect(action: 'list', max: 10)
-    }
-
-    private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, HttpStatus httpStatus, String message) {
-
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status=httpStatus.value()
-
-        Writer textOut = new OutputStreamWriter(response.getOutputStream())
-        textOut.write(message)
-        textOut.flush()
-        response.getOutputStream().flush()
-
     }
 }

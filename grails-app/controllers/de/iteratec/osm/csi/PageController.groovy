@@ -17,6 +17,7 @@
 
 package de.iteratec.osm.csi
 
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
@@ -129,20 +130,9 @@ class PageController {
                 template: 'pageTable',
                 model: [pages: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:count]as JSON
-        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
-    }
-
-
-    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
-
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status=httpStatus.value()
-
-        Writer textOut = new OutputStreamWriter(response.getOutputStream())
-        textOut.write(message)
-        textOut.flush()
-        response.getOutputStream().flush()
-
+        ControllerUtils.sendObjectAsJSON(response, [
+                table: templateAsPlainText,
+                count: result.totalCount
+        ])
     }
 }

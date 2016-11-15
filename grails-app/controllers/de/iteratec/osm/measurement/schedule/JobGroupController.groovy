@@ -11,6 +11,7 @@ import de.iteratec.osm.d3Data.MultiLineChart
 import de.iteratec.osm.d3Data.TreemapData
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.report.external.GraphiteServer
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
@@ -209,21 +210,10 @@ class JobGroupController {
                 template: 'jobGroupTable',
                 model: [jobGroups: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
-        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
-    }
-
-
-    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
-
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status=httpStatus.value()
-
-        Writer textOut = new OutputStreamWriter(response.getOutputStream())
-        textOut.write(message)
-        textOut.flush()
-        response.getOutputStream().flush()
-
+        ControllerUtils.sendObjectAsJSON(response, [
+                table: templateAsPlainText,
+                count: result.totalCount
+        ])
     }
 
     protected void notFound() {

@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.environment
 
+import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -108,21 +109,10 @@ class BrowserAliasController {
                 template: 'browserAliasTable',
                 model: [browserAliases: result]
         )
-        def jsonResult = [table:templateAsPlainText, count:result.totalCount]as JSON
-        sendSimpleResponseAsStream(response, HttpStatus.OK, jsonResult.toString(false))
-    }
-
-
-    private void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
-
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status=httpStatus.value()
-
-        Writer textOut = new OutputStreamWriter(response.getOutputStream())
-        textOut.write(message)
-        textOut.flush()
-        response.getOutputStream().flush()
-
+        ControllerUtils.sendObjectAsJSON(response, [
+                table: templateAsPlainText,
+                count: result.totalCount
+        ])
     }
 
     protected void notFound() {

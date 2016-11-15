@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.script
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PageService
+import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
@@ -142,18 +143,7 @@ class ScriptController {
 		if(job && script){
 			content = script.getParsedNavigationScript(job)
 		}
-		sendSimpleResponseAsStream(response, HttpStatus.OK, content)
-	}
-
-	private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, HttpStatus httpStatus, String message) {
-		response.setContentType('text/plain;charset=UTF-8')
-		response.status = httpStatus.value()
-
-		Writer textOut = new OutputStreamWriter(response.getOutputStream())
-		textOut.write(message)
-
-		textOut.flush()
-		response.getOutputStream().flush()
+		ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, content)
 	}
 
 }

@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
@@ -100,7 +101,7 @@ class JobController {
         if (request.xhr) {
 //            render(template: 'jobTable', model: model)
             String templateAsPlainText = g.render(template: 'jobTable', model: model)
-            sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, templateAsPlainText)
         } else {
             return model
         }
@@ -327,20 +328,8 @@ class JobController {
 
     def getScriptSource(long scriptId) {
         Script script = Script.get(scriptId)
-        sendSimpleResponseAsStream(response, HttpStatus.OK, script?.navigationScript)
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, script?.navigationScript)
     }
-
-    private void sendSimpleResponseAsStream(javax.servlet.http.HttpServletResponse response, HttpStatus httpStatus, String message) {
-        response.setContentType('text/plain;charset=UTF-8')
-        response.status = httpStatus.value()
-
-        Writer textOut = new OutputStreamWriter(response.getOutputStream())
-        textOut.write(message)
-
-        textOut.flush()
-        response.getOutputStream().flush()
-    }
-
 
     def getRunningAndRecentlyFinishedJobs() {
         // the following does not work due to unresolved bug in Grails:
@@ -378,7 +367,7 @@ class JobController {
         Job job = Job.get(jobId)
         jobProcessingService.cancelJobRun(job, testId)
 
-        sendSimpleResponseAsStream(response, HttpStatus.OK, '')
+        ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.OK, '')
     }
 
     /**

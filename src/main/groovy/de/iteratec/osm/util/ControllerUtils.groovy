@@ -15,11 +15,11 @@
 * limitations under the License.
 */
 
-package de.iteratec.osm.util;
+package de.iteratec.osm.util
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import grails.converters.JSON;
+import org.springframework.http.HttpStatus;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * <p>
@@ -43,7 +43,7 @@ import java.util.Set;
  * @author mze
  * @since IT-106
  */
-public class ControllerUtils {
+class ControllerUtils {
 
 	/**
 	 * <p>
@@ -59,7 +59,7 @@ public class ControllerUtils {
 	 * @return <code>true</code> if and only if the request should be treagted
 	 *         as empty, <code>false</code> else.
 	 */
-	public static boolean isEmptyRequest(Map<String, Object> params) {
+	static boolean isEmptyRequest(Map<String, Object> params) {
 		if (params.isEmpty()) {
 			return true;
 		}
@@ -79,6 +79,47 @@ public class ControllerUtils {
 		}
 
 		return keys.isEmpty();
+	}
+
+	/**
+	 * Sends message with given httpStatus as http response and breaks action (no subsequent action code is executed).
+	 * @param response The servlet response
+	 * @param httpStatus Status code of the response
+	 * @param message The message to respond
+	 */
+	static void sendSimpleResponseAsStream(HttpServletResponse response, HttpStatus httpStatus, String message) {
+		response.setContentType('text/plain;charset=UTF-8')
+		response.status = httpStatus.value()
+
+		Writer textOut = new OutputStreamWriter(response.getOutputStream())
+		textOut.write(message)
+		textOut.flush()
+		response.getOutputStream().flush()
+	}
+
+	/**
+	 * <p>
+	 * Sends the object rendered as JSON. All public getters are used to
+	 * render the result. This call should be placed as last statement, the
+	 * return statement, of an action.
+	 * </p>
+	 *
+	 * @param response
+	 *         The servlet response
+	 *
+	 * @param objectToSend
+	 *         The object to render end to be sent to the client,
+	 *         not <code>null</code>.
+	 * @param prettyPrint
+	 *         Set to <code>true</code> if the JSON should be "pretty
+	 *         formated" (easy to read but larger file).
+	 * @throws NullPointerException
+	 *         if {@code objectToSend} is <code>null</code>.
+	 */
+	static void sendObjectAsJSON(HttpServletResponse response, Object objectToSend, boolean prettyPrint = false) {
+		JSON jsonObject = objectToSend as JSON
+		jsonObject.setPrettyPrint(prettyPrint)
+		sendSimpleResponseAsStream(response, HttpStatus.OK, jsonObject.toString())
 	}
 
 	/**
