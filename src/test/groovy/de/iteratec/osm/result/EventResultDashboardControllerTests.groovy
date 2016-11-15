@@ -26,12 +26,10 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
-import de.iteratec.osm.p13n.CookieBasedSettingsService
 import de.iteratec.osm.report.chart.AggregatorType
-import de.iteratec.osm.report.chart.ChartingLibrary
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.DateValueConverter
+
 import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -79,7 +77,6 @@ class EventResultDashboardControllerTests {
 		// Because spring resources not loaded in unit tests, declare them locally:
 		defineBeans {
             doubleValueConverter(DoubleValueConverter)
-            dateValueConverter(DateValueConverter)
         }
 
 		// Enable constraint tests:

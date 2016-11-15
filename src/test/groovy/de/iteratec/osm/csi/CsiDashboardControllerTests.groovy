@@ -33,7 +33,7 @@ import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
-import de.iteratec.osm.util.DateValueConverter
+
 import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
@@ -83,7 +83,6 @@ class CsiDashboardControllerTests {
         // Because spring resources not loaded in unit tests, declare them locally:
         defineBeans {
             doubleValueConverter(DoubleValueConverter)
-            dateValueConverter(DateValueConverter)
         }
 
         // The controller under test:

@@ -2,8 +2,6 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.report.chart.CsiAggregationInterval
-import de.iteratec.osm.util.ControllerUtils
-import de.iteratec.osm.util.DateValueConverter
 import grails.converters.JSON
 import grails.validation.Validateable
 import org.grails.databinding.BindUsing
@@ -487,8 +485,6 @@ public class EventResultDashboardShowAllCommand implements Validateable {
         viewModelToCopyTo.put('includeNativeConnectivity', this.includeNativeConnectivity)
         viewModelToCopyTo.put('includeCustomConnectivity', this.includeCustomConnectivity)
         viewModelToCopyTo.put('customConnectivityName', this.customConnectivityName)
-
-        DateValueConverter converter = DateValueConverter.getConverter()
 
         viewModelToCopyTo.put('from', this.from ? SIMPLE_DATE_FORMAT.format(this.from) : null)
         if (!this.fromHour.is(null)) {
