@@ -30,7 +30,6 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.dao.AggregatorTypeDaoService
 import de.iteratec.osm.result.dao.MeasuredEventDaoService
 
-import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.joda.time.DateTime
@@ -74,11 +73,6 @@ class EventResultDashboardControllerTests {
 	@Before
 	public void setUp()
 	{
-		// Because spring resources not loaded in unit tests, declare them locally:
-		defineBeans {
-            doubleValueConverter(DoubleValueConverter)
-        }
-
 		// Enable constraint tests:
 //		mockForConstraintsTests(EventResultDashboardShowAllCommand.class);
 

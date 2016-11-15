@@ -19,8 +19,6 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
-
-import de.iteratec.osm.util.DoubleValueConverter
 import grails.test.mixin.TestFor
 import grails.test.mixin.TestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
@@ -51,11 +49,10 @@ class CsiDashboardControllerActualIntervalSpec{
 
 
     void setUp() {
-
         defineBeans {
             csiAggregationUtilService(CsiAggregationUtilService)
-            doubleValueConverter(DoubleValueConverter)
         }
+
         // The controller under test:
         controllerUnderTest = controller;
 
