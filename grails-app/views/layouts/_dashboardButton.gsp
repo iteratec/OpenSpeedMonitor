@@ -1,6 +1,6 @@
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 <div class="btn-group">
-    <g:link controller="${affectedController}" action="showAll" class="btn btn-default"><i class="fa fa-signal"></i>
+    <g:link controller="${affectedController}" action="showAll" class="btn btn-default"><i class="fa fa-line-chart"></i>
         <g:message code="de.iteratec.isocsi.eventResultDashboard" default="Dashboard"/></g:link>
     <a class="dropdown-toggle btn btn-default" data-toggle="dropdown" href="#" role="button"
        aria-haspopup="true" aria-expanded="false" id="customDashboardDropdownButton">

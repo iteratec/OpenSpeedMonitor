@@ -1,7 +1,7 @@
 <%@ page import="de.iteratec.osm.report.UserspecificEventResultDashboard" %>
 
 <%-- determine main-tab an set variable respectively --%>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('detailAnalysis')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('pageAggregation') || controllerName.equals('detailAnalysis')}">
     <g:set var="mainTab" value="results"/></g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
 <g:elseif test="${controllerName.equals('csiConfiguration')}"><g:set var="mainTab" value="csi"/></g:elseif>
@@ -76,6 +76,12 @@
                             class="fa fa-th-list"></i> <g:message code="de.iteratec.result.title"
                                                                   default="Einzelergebnisse"/></g:link>
                 </li>
+                %{--Toggled until pageAggregation is finished--}%
+                %{--<li class="controller ${controllerName.equals('pageAggregation') ? 'active' : ''}">--}%
+                    %{--<g:link controller="pageAggregation" action="show"><i--}%
+                            %{--class="fa fa-bar-chart"></i> <g:message code="de.iteratec.pageAggregation.title"--}%
+                                                                  %{--default="Page Aggregation"/></g:link>--}%
+                %{--</li>--}%
             </g:elseif>
 
         <%-- CSI --%>

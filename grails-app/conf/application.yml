@@ -258,6 +258,7 @@ grails:
                             {pattern: '/csiConfigIO/downloadBrowserConnectivityWeights',access: ["permitAll"]},
                             {pattern: '/csiConfigIO/downloadDefaultTimeToCsMappings',   access: ["permitAll"]},
                             {pattern: '/detailAnalysis/**',                             access: ["permitAll"]},
+                            {pattern: '/pageAggregation/**',                            access: ["permitAll"]},
                             {pattern: '/eventResultDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
                             {pattern: '/highchartPointDetails/**',                      access: ["permitAll"]},
