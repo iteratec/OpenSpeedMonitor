@@ -25,9 +25,8 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.PageService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.I18nService
@@ -86,9 +85,7 @@ class QueueAndJobStatusService {
      * Get number of EventResults recorded for the specified location from sinceWhen until now.
      */
     int getEventResultCountBetween(Location location, Date from, Date to) {
-        MvQueryParams queryParams = new MvQueryParams()
-        queryParams.locationIds.add(location.id)
-        return eventResultDaoService.getMedianEventResultsBy(from, to, [CachedView.UNCACHED, CachedView.CACHED] as Set, queryParams).size()
+        return EventResult.countByLocationAndDateCreatedBetween(location, from, to)
     }
 
     /**

@@ -90,15 +90,14 @@ public class EventResultDaoService {
     }
 
     /**
-     * Gets {@link EventResult}s matching given params from db. tag-attribute is queried via rlike.
-     * This method is untested cause rlike-queries are supported just for mysql and oracle up to grails 2.2., not for h2-db :-(
+     * Gets {@link EventResult}s matching given params from db.
      * @param fromDate
      * @param toDate
      * @param cachedViews
      * @param rlikePattern
      * @return
      */
-    public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, List<Long> jobGroupIds, List<Long> measuredEventIds, List<Long> pageIds, List<Long> browserIds, List<Long> locationIds) {
+    public List<EventResult> getMedianEventResultsBy(Date fromDate, Date toDate, Set<CachedView> cachedViews, Collection<Long> jobGroupIds, Collection<Long> measuredEventIds, Collection<Long> pageIds, Collection<Long> browserIds, Collection<Long> locationIds) {
         def criteria = EventResult.createCriteria()
 
         return criteria.list {
@@ -121,26 +120,6 @@ public class EventResultDaoService {
                 'in'('id', locationIds)
             }
         }
-    }
-
-    /**
-     * Gets {@link EventResult}s matching given params from db. tag-attribute is queried via rlike.
-     * This method is untested cause rlike-queries are supported just for mysql and oracle up to grails 2.2., not for h2-db :-(
-     * @param fromDate
-     * @param toDate
-     * @param cachedViews
-     * @param rlikePattern
-     * @return
-     */
-    public List<EventResult> getMedianEventResultsBy(
-            Date fromDate, Date toDate, Set<CachedView> cachedViews, MvQueryParams mvQueryParams
-    ) {
-        List<EventResult> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - getMedianEventResultsBy - getMedianEventResultsBy', IndentationDepth.ONE) {
-            eventResults = getMedianEventResultsBy(fromDate, toDate, cachedViews, mvQueryParams.jobGroupIds, mvQueryParams.measuredEventIds, mvQueryParams.pageIds, mvQueryParams.browserIds, mvQueryParams.locationIds)
-        }
-        return eventResults
-
     }
 
     /**
