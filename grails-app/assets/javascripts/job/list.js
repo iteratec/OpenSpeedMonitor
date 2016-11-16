@@ -335,7 +335,8 @@ function doOnDomReady(
 			5000
     );
 
-	$('.table-fixed-header').fixedHeader();
+  var offsetFixedHeader = $('.navbar-header').height();
+  $("#jobtable").stickyTableHeaders({fixedOffset: offsetFixedHeader});
 
 }
 

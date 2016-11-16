@@ -1,14 +1,14 @@
 /*
-*= require table-fixed-header/table-fixed-header.css
 *= require_self
 */
-td,th {
-		border: 1px #ccc solid;
-		padding: 0.3em;
-	}
-	
-table#jobtable tr.highlight .status {
-		/* font-weight: bold; */
+
+td{
+  border: 1px #ccc solid;
+  padding: 0.3em;
+}
+th{
+  &:extend(td);
+  background-color: #ffffff;
 }
 
 table#jobtable tr.success td {

@@ -15,6 +15,9 @@
 * limitations under the License.
 */
 
+//= require bower_components/StickyTableHeaders/js/jquery.stickytableheaders.js
+//= require_self
+
 function filterScriptList() {
     var filterText = $.trim($('#filterByLabel').val());
     var reText = new RegExp(filterText, 'i');
@@ -26,3 +29,10 @@ function filterScriptList() {
     	tr.toggle(showRow);
     });
 }
+$(document).ready(function(){
+  var offsetFixedHeader = $('.navbar-header').height();
+  $("#script-table").stickyTableHeaders({
+    fixedOffset: offsetFixedHeader,
+    cacheHeaderHeight: true
+  });
+});

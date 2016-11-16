@@ -191,8 +191,7 @@
                 <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
             </div>
             <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-            <div class="table-responsive">
-            <table class="table-striped table-fixed-header table" id="jobtable">
+            <table class="table table-bordered table-striped" id="jobtable">
                 <thead class="header">
                 <tr>
                     <th><input type="checkbox" id="checkAll"/></th>

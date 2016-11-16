@@ -5,6 +5,9 @@
     <g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Skript')}" />
     <title><g:message code="de.iteratec.iss.scripts" /></title>
     <style>
+        th{
+            background-color: #ffffff;
+        }
         td, th {
             border: 1px #ccc solid;
             padding: 0.3em;
@@ -34,7 +37,7 @@
 	</g:if>
 	<g:else>
 
-	<table class="table-striped">
+	<table class="table-striped" id="script-table">
 		<thead>
 		<tr>
 			<g:sortableColumn property="label" titleKey="de.iteratec.iss.script" />

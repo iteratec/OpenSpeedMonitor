@@ -206,6 +206,7 @@ task bowerSyncJavascript(type: Sync) {
     include 'codemirror/addon/hint/show-hint.js'
     include 'bootstrap-timepicker/js/bootstrap-timepicker.js'
     include 'dimple/dist/dimple.latest.min.js'
+    include 'StickyTableHeaders/js/jquery.stickytableheaders.js'
     include 'file-saver/FileSaver.min.js'
     dependsOn bowerInstall
 }

@@ -1,2 +1,2 @@
-//= require table-fixed-header/table-fixed-header.js
 //= require list.js
+//= require bower_components/StickyTableHeaders/js/jquery.stickytableheaders.js
