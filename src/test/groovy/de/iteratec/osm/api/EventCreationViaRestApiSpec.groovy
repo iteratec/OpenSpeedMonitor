@@ -155,10 +155,10 @@ class EventCreationViaRestApiSpec extends Specification {
         Event.list().size() == 0
         //test json representation
         response.status == 400
-        response.text == "Error field system: You have to submit at least one system (technically: job group) for the event.\n"
+        response.text == "Error field system: You have to submit at least one job group for the event.\n"
     }
 
-    void "fails cause at least one of the submitted systems doesn't exist"(){
+    void "fails cause at least one of the submitted job gtoups doesn't exist"(){
 
         setup:
         //test specific data
@@ -184,7 +184,7 @@ class EventCreationViaRestApiSpec extends Specification {
         Event.list().size() == 0
         //test json representation
         response.status == 400
-        response.text == "Error field system: At least one of the submitted systems doesn't exist.\n"
+        response.text == "Error field system: At least one of the submitted job groups doesn't exist.\n"
     }
 
     //eventTimestamp constraint violation ////////////////////////////////////

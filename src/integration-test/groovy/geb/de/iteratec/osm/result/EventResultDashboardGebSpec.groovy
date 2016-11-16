@@ -80,7 +80,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec implements O
             $("div", class: "alert alert-danger")[0].attr("innerHTML").contains("Please check your selection, you made the following mistakes:")
         } //check that the error box appears
         waitFor {
-            $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one system")
+            $("div", class: "alert alert-danger")[0].find("li")[0].attr("innerHTML").contains("Please select at least one job group")
         } //check that the correct error message is displayed
         waitFor {
             $("div", class: "alert alert-danger")[0].find("li")[1].attr("innerHTML").contains("Please select at least one page")

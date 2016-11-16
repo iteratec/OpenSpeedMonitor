@@ -971,7 +971,7 @@ public class ResultsRequestCommand {
      * @throws IllegalStateException
      *         if called on an invalid instance.
      * @throws NoResultException
-     *         if at least one of the specified parameters (system, page,
+     *         if at least one of the specified parameters (job group, page,
      *         event, location) could not be found.
      */
     public MvQueryParams createMvQueryParams(
@@ -1131,12 +1131,12 @@ class CreateEventCommand {
         })
         shortName(nullable: false, blank: false)
         system(validator: { List<String> currentSystems, CreateEventCommand cmd ->
-            if (currentSystems.size() == 0) return ["You have to submit at least one system (technically: job group) for the event."]
+            if (currentSystems.size() == 0) return ["You have to submit at least one job group for the event."]
             int invalidJobGroups = 0
             currentSystems.each { String system ->
                 if (!JobGroup.findByName(system)) invalidJobGroups++
             }
-            if (invalidJobGroups > 0) return ["At least one of the submitted systems doesn't exist."]
+            if (invalidJobGroups > 0) return ["At least one of the submitted job groups doesn't exist."]
             else return true
         })
         eventTimestamp(nullable: true, validator: { String currentTimestamp, CreateEventCommand cmd ->
