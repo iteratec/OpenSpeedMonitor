@@ -20,13 +20,9 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.csi.weighting.WeightedCsiValue
 import de.iteratec.osm.csi.weighting.WeightingService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
-import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
-import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
 import org.joda.time.DateTime
 
 /**
@@ -39,7 +35,6 @@ class CsiSystemCsiAggregationService {
     ShopCsiAggregationService shopCsiAggregationService
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
-    JobResultDaoService jobResultDaoService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
     WeightingService weightingService

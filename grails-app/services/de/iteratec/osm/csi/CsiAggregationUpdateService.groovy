@@ -21,7 +21,6 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultDaoService
 import grails.transaction.Transactional
 import org.joda.time.DateTime
 import org.springframework.transaction.annotation.Propagation
@@ -39,7 +38,6 @@ class CsiAggregationUpdateService {
 	ShopCsiAggregationService shopCsiAggregationService
 	CsiSystemCsiAggregationService csiSystemCsiAggregationService
 	CsiAggregationUtilService csiAggregationUtilService
-	JobResultDaoService jobResultDaoService
 
     /**
      *

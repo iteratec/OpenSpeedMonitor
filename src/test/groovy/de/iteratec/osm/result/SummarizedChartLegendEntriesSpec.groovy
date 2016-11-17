@@ -86,7 +86,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
     def doWithSpring = {
         resultCsiAggregationService(ResultCsiAggregationService)
         eventResultDaoService(EventResultDaoService)
-        jobResultDaoService(JobResultDaoService)
         csiAggregationUtilService(CsiAggregationUtilService)
         defaultAggregatorTypeDaoService(DefaultAggregatorTypeDaoService)
         osmChartProcessingService(OsmChartProcessingService)
@@ -668,7 +667,6 @@ class SummarizedChartLegendEntriesSpec extends Specification{
         serviceUnderTest.resultCsiAggregationService = grailsApplication.mainContext.getBean('resultCsiAggregationService')
         serviceUnderTest.resultCsiAggregationService.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
         MOCKER.mockLinkGenerator(serviceUnderTest, 'http://not-the-concern-of-this-test.org')
-        serviceUnderTest.jobResultDaoService = grailsApplication.mainContext.getBean('jobResultDaoService')
         MOCKER.mockI18nService(serviceUnderTest)
         MOCKER.mockPerformanceLoggingService(serviceUnderTest)
         serviceUnderTest.csiAggregationUtilService = grailsApplication.mainContext.getBean('csiAggregationUtilService')

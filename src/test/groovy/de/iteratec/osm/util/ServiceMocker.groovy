@@ -120,24 +120,6 @@ class ServiceMocker {
 		}
 		serviceToMockIn.eventResultService = eventResultService
 	}
-	/**
-	 * Mocks methods in {@link JobResultDaoService}.
-	 * @param serviceToMockIn
-	 * 		Grails-Service with the service to mock as instance-variable.
-	 */
-	void mockJobResultDaoService(serviceToMockIn){
-		def jobResultDaoService = new JobResultDaoService()
-		jobResultDaoService.metaClass.findJobResultByEventResult = { EventResult eventResult ->
-			JobResult jobResult1 = JobResult.findByTestId(testIdOfJobRunCsiGroup1)
-			JobResult jobResult2 = JobResult.findByTestId(testIdOfJobRunCsiGroup2)
-
-			return (eventResult.jobResult.id == jobResult1.id) ?
-				jobResult1:
-				jobResult2
-
-		}
-		serviceToMockIn.jobResultDaoService = jobResultDaoService
-	}
 
 	/**
 	 * Mocks methods in {@link CsiAggregationUtilService}.

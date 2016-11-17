@@ -56,7 +56,6 @@ public class EventResultDashboardService {
     LocationDaoService locationDaoService
     ResultCsiAggregationService resultCsiAggregationService
     I18nService i18nService
-    JobResultDaoService jobResultDaoService
     EventResultDaoService eventResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
     PerformanceLoggingService performanceLoggingService

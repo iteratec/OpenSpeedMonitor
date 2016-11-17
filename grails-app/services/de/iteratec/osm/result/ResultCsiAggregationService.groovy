@@ -34,7 +34,6 @@ import de.iteratec.osm.util.PerformanceLoggingService
 class ResultCsiAggregationService {
 
     /** injected by grails */
-    JobResultDaoService jobResultDaoService
     CsiAggregationUtilService csiAggregationUtilService
     BrowserDaoService browserDaoService
     CsiAggregationDaoService csiAggregationDaoService

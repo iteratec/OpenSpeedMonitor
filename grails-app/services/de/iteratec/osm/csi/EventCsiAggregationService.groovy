@@ -39,7 +39,6 @@ class EventCsiAggregationService {
     PerformanceLoggingService performanceLoggingService
     JobService jobService
     OsmConfigCacheService osmConfigCacheService
-    JobResultDaoService jobResultDaoService
     CsiAggregationDaoService csiAggregationDaoService
     WeightingService weightingService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService

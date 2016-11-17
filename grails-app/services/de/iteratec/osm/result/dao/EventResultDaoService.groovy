@@ -38,7 +38,6 @@ import org.hibernate.criterion.CriteriaSpecification
 public class EventResultDaoService {
 
     OsmDataSourceService osmDataSourceService
-    JobResultDaoService jobResultDaoService
     PerformanceLoggingService performanceLoggingService
 
     /**

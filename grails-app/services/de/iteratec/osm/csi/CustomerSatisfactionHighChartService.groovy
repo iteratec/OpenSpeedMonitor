@@ -21,7 +21,6 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResultDashboardService
-import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import grails.web.mapping.LinkGenerator
@@ -53,7 +52,6 @@ class CustomerSatisfactionHighChartService {
     EventCsiAggregationService eventCsiAggregationService
     PageCsiAggregationService pageCsiAggregationService
     ShopCsiAggregationService shopCsiAggregationService
-    JobResultDaoService jobResultDaoService
     EventResultDashboardService eventResultDashboardService
     CsTargetGraphDaoService csTargetGraphDaoService
     CsiAggregationUtilService csiAggregationUtilService

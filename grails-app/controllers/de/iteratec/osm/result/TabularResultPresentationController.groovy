@@ -61,7 +61,6 @@ class TabularResultPresentationController {
     PerformanceLoggingService performanceLoggingService
 
     OsmDataSourceService osmDataSourceService
-    JobResultDaoService jobResultDaoService
     EventResultDaoService eventResultDaoService
     PaginationService paginationService
     EventResultDashboardService eventResultDashboardService

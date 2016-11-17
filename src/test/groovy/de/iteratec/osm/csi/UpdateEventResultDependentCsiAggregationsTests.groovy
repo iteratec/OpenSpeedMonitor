@@ -96,7 +96,6 @@ class UpdateEventResultDependentCsiAggregationsTests {
         mockGenerator = ServiceMocker.create()
         mockGenerator.mockOsmConfigCacheService(serviceUnderTest)
         mockGenerator.mockEventResultService(serviceUnderTest)
-        mockGenerator.mockJobResultDaoService(serviceUnderTest)
         mockGenerator.mockCsiAggregationUpdateEventDaoService(serviceUnderTest)
         serviceUnderTest.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
         serviceUnderTest.csiValueService.osmConfigCacheService = grailsApplication.mainContext.getBean('osmConfigCacheService')

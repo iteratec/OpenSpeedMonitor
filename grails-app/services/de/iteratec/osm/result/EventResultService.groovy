@@ -33,8 +33,6 @@ import java.util.zip.GZIPInputStream
 @Transactional
 class EventResultService {
 	
-	JobResultDaoService jobResultDaoService
-	
 	List<EventResult> findSinceDate(Date timestamp) {
 		
 		def query = EventResult.where {

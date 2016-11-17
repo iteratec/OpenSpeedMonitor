@@ -427,7 +427,6 @@ class EventResultDashboardServiceTests {
         serviceUnderTest.resultCsiAggregationService = grailsApplication.mainContext.getBean('resultCsiAggregationService')
         serviceUnderTest.resultCsiAggregationService.eventResultDaoService = grailsApplication.mainContext.getBean('eventResultDaoService')
         serviceUnderTest.grailsLinkGenerator = Mockito.mock(LinkGenerator.class);
-        serviceUnderTest.jobResultDaoService = Mockito.mock(JobResultDaoService.class);
         serviceUnderTest.osmChartProcessingService = grailsApplication.mainContext.getBean('osmChartProcessingService')
         mockI18nService()
         serviceUnderTest.osmChartProcessingService.i18nService = [

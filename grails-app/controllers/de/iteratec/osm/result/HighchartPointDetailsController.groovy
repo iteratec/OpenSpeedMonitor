@@ -42,7 +42,6 @@ class HighchartPointDetailsController {
 
     CsiAggregationDaoService csiAggregationDaoService;
     EventResultDaoService eventResultDaoService
-    JobResultDaoService jobResultDaoService;
     PerformanceLoggingService performanceLoggingService;
     /**
      * The Grails engine to generate links.

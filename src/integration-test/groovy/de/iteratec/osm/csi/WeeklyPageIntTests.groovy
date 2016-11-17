@@ -22,19 +22,15 @@ import de.iteratec.osm.report.chart.AggregatorType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultDaoService
 import grails.test.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
 import spock.lang.Ignore
-import spock.util.mop.ConfineMetaClassChanges
 
 import static org.junit.Assert.*
 
 @Integration
 @Rollback
-@ConfineMetaClassChanges([JobResultDaoService])
 class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 	/** injected by grails */
 	PageCsiAggregationService pageCsiAggregationService
@@ -74,19 +70,6 @@ class WeeklyPageIntTests  extends NonTransactionalIntegrationSpec {
 			System.out.println('Loading CSV-data... DONE');
 
 			System.out.println('Create some common test-data... DONE');
-		}
-//		mapToFindJobResultByEventResult = TestDataUtil.generateMapToFindJobResultByEventResultId(JobResult.list())
-//		JobResultService.metaClass.findJobResultByEventResult{EventResult eventResult ->
-//			return mapToFindJobResultByEventResult[eventResult.ident()]
-//		}
-		JobResultDaoService.metaClass.findJobResultByEventResult = {EventResult eventResult ->
-			JobResult jobResultToReturn
-			JobResult.list().each {jobResult ->
-				if(jobResult.eventResults*.ident().contains(eventResult.ident())) {
-					jobResultToReturn = jobResult
-				}
-			}
-			return jobResultToReturn
 		}
 
 		pageAggregatorType = AggregatorType.findByName(AggregatorType.PAGE)

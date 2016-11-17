@@ -25,7 +25,6 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.report.chart.*
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
@@ -42,7 +41,6 @@ class ShopCsiAggregationService {
     MeanCalcService meanCalcService
     PerformanceLoggingService performanceLoggingService
     JobService jobService
-    JobResultDaoService jobResultDaoService
     CsiAggregationDaoService csiAggregationDaoService
     CsiAggregationUtilService csiAggregationUtilService
     WeightingService weightingService
