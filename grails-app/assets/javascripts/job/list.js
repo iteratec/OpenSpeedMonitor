@@ -1,27 +1,27 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 JobStatusUpdater = function() {
 	var getJobsUrl = '';
 	var getLastRunUrl = '';
 	var cancelJobUrl = '';
-	
+
 	var finishedJobs = [];
 	var repeatFnTimer = null;
-	
+
 	function cancelJobRun(jobId, testId) {
 		jQuery.ajax({
 			type : 'POST',
@@ -32,7 +32,7 @@ JobStatusUpdater = function() {
 			}
 		});
 	}
-	
+
 	function updateDateLastRun(jobId) {
 		jQuery.ajax({
 			type : 'POST',
@@ -46,7 +46,7 @@ JobStatusUpdater = function() {
 			}
 		});
 	}
-	
+
 	// from http://stackoverflow.com/a/19519701
 	var vis = (function(){
 	    var stateKey, eventKey, keys = {
@@ -66,7 +66,7 @@ JobStatusUpdater = function() {
 	        return !document[stateKey];
 	    }
 	})();
-	
+
 	function repeatFn(firstRun) {
 		jQuery.ajax({
 			type : 'POST',
@@ -85,8 +85,8 @@ JobStatusUpdater = function() {
 							if (!firstRun) {
 								updateDateLastRun(jobId);
 							}
-						}							
-						
+						}
+
 						$('#runningstatus-' + jobId).append('<span class="status ' + cssClass + '">' + status + cancelLink + '</span>');
 					}
 				});
@@ -97,7 +97,7 @@ JobStatusUpdater = function() {
 			}
 		});
 	}
-	
+
 	function initLoop(getJobsUrl, cancelJobUrl, getLastRunUrl, repeatAfterMs) {
 		this.getJobsUrl = getJobsUrl;
 		this.getLastRunUrl = getLastRunUrl;
@@ -105,7 +105,7 @@ JobStatusUpdater = function() {
 		this.finishedJobs = [];
 		repeatFn(true);
 		this.repeatFnTimer = setInterval('JobStatusUpdater.repeatFn(false)', repeatAfterMs);
-		
+
 		// Poll server only when current page is visible, else pause:
 		vis(function(){
 			  if (vis() && !JobStatusUpdater.repeatFnTimer) {
@@ -116,7 +116,7 @@ JobStatusUpdater = function() {
 			  }
 		});
 	}
-	
+
 	return {
 		initLoop: initLoop,
 		cancelJobRun: cancelJobRun,
@@ -172,7 +172,7 @@ function filterJobList() {
     var reLocation = new RegExp(filterLocation, 'i');
     var reBrowser = new RegExp(filterBrowser, 'i');
     var reSkript = new RegExp(filterSkript, 'i');
-    
+
 	$('table tbody tr').each(function() {
         var tr = $(this);
         var jobName = $('.jobName', tr).text();
@@ -212,10 +212,10 @@ function initTable(nextExecutionLink) {
 }
 
 InactiveJobLoader = function(listLink, nextExecutionLink) {
-	
+
 	var listJobsLink = listLink;
 	var nextJobExecutionLink = nextExecutionLink;
-	
+
 	this.loadJobs = function() {
 		var opts = {
 				lines: 15, // The number of lines to draw
@@ -251,17 +251,15 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 				// to prevent flickering:
 				JobStatusUpdater.repeatFn(false);
 				spinner.stop();
-				
+
 				var o = $('#jobtable');
 				var $win = $(window)
 		    , $head = $('thead.header', o)
 		    , isFixed = 0;
-			  o.find('thead.header-copy').width($head.width());
 			  o.find('thead.header > tr > th').each(function (i, h) {
 			    var w = $(h).width();
-			    o.find('thead.header-copy> tr > th:eq('+i+')').width(w)
 			  });
-			  
+
 			},
 			error: function(result) {
 				console.log(result);
@@ -273,7 +271,7 @@ InactiveJobLoader = function(listLink, nextExecutionLink) {
 
 /**
  * Called on jquerys DOM-ready.
- * Initializes DOM-nodes and registers events. 
+ * Initializes DOM-nodes and registers events.
  */
 function doOnDomReady(
 	getRunningAndRecentlyFinishedJobsLink,
@@ -282,10 +280,13 @@ function doOnDomReady(
 	nextExecutionLink){
 
     var stringUtils = OpenSpeedMonitor.stringUtils();
-    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils()
-	
+    var osmClientSideStorageUtils = OpenSpeedMonitor.clientSideStorageUtils();
+
 	$('#updateHints').popover();
 	$('#checkAll').on('click', function() {
+	    // set checked attribute on fixed-header
+		$('#checkAll').prop("checked", this.checked);
+		$('#checkAll-copy').prop("checked", this.checked);
 		$('.jobCheckbox').filter(function (index, elem) { return $(elem).parent().parent().is(':visible') }).prop('checked', this.checked);
 	});
 
@@ -300,7 +301,7 @@ function doOnDomReady(
 	} else {
 		$('#filterTags').chosen({ no_results_text: '' }).change(filterJobList);
 	}
-	
+
     var filterValueJobname = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobname');
     var filterValueJobgroup = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.jobgroup');
     var filterValueLocation = osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.location');
@@ -312,30 +313,30 @@ function doOnDomReady(
 	var filterValueInactiveJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.inactivejobs'));
 	var filterValueHighlightedJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.highlightedjobs'));
 	var filterValueRunningJobs = stringUtils.stringToBoolean(osmClientSideStorageUtils.getFromLocalStorage('de.iteratec.osm.job.list.filters.runningjobs'));
-	
+
     if(filterValueJobname != null) $('#filterByLabel').val(filterValueJobname);
     if(filterValueJobgroup != null) $('#filterByJobGroup').val(filterValueJobgroup);
     if(filterValueLocation != null) $('#filterByLocation').val(filterValueLocation);
     if(filterValueSkript != null) $('#filterBySkript').val(filterValueSkript);
     if(filterValueBrowser != null) $('#filterByBrowser').val(filterValueBrowser);
-	
+
 	if(filterValueCheckedJobs != null) $('#filterCheckedJobs').prop("checked",filterValueCheckedJobs);
 	if(filterValueInactiveJobs != null) $('#filterInactiveJobs').prop("checked",filterValueInactiveJobs);
 	if(filterValueHighlightedJobs != null) $('#filterHighlightedJobs').prop("checked",filterValueHighlightedJobs);
 	if(filterValueRunningJobs != null) $('#filterRunningJobs').prop("checked",filterValueRunningJobs);
 	if(filterJobSetName != null) $('#jobSetButton ').html(filterJobSetName  + '<span class="caret"></span>');
-	
+
 	initTable(nextExecutionLink);
-	
+
 	JobStatusUpdater.initLoop(
 			getRunningAndRecentlyFinishedJobsLink,
 			cancelJobRunLink,
 			getLastRunLink,
 			5000
     );
-	 
+
 	$('.table-fixed-header').fixedHeader();
-	
+
 }
 
 function doOnWindowLoad(listLink, nextExecutionLink){

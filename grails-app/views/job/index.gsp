@@ -191,7 +191,8 @@
                 <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
             </div>
             <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-            <table class="table-striped table-fixed-header" id="jobtable">
+            <div class="table-responsive">
+            <table class="table-striped table-fixed-header table" id="jobtable">
                 <thead class="header">
                 <tr>
                     <th><input type="checkbox" id="checkAll"/></th>
@@ -215,6 +216,7 @@
                 </thead>
                 <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
             </table>
+            </div>
         </g:form>
 <content tag="include.bottom">
     <asset:javascript src="prettycron/prettycronManifest.js"/>
