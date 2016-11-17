@@ -11,6 +11,8 @@ import de.iteratec.osm.measurement.script.Script
 import grails.test.mixin.Mock
 import grails.test.mixin.TestFor
 import org.grails.web.json.JSONArray
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import spock.lang.Specification
 /**
  * See the API for {@link grails.test.mixin.web.ControllerUnitTestMixin} for usage instructions
@@ -67,7 +69,6 @@ class ResultSelectionControllerSpec extends Specification {
     }
 
     void "get JobGroups as DTOs for correct time frame"() {
-        // the service mock used in the controller simply returns all job groups for a time frame in 2016
         given:
         def allJobGroups = JobGroup.findAll()
         controller.jobGroupDaoService = Stub(JobGroupDaoService) {
@@ -84,5 +85,39 @@ class ResultSelectionControllerSpec extends Specification {
         JSONArray resultArray = response.json
         resultArray.length() == allJobGroups.size()
         (resultArray.collect { [it.id, it.name] } as Set) == (allJobGroups.collect { [it.id, it.name] } as Set)
+    }
+
+
+    void "narrow timeframe is valid"() {
+        given:
+        controller.jobGroupDaoService = Stub(JobGroupDaoService) {
+            findByJobResultsInTimeFrame(_, _) >> [jobGroup1]
+        }
+
+        when:
+        params.from = "2016-11-15T08:30:00Z"
+        params.to = "2016-11-15T08:30:02Z"
+        controller.getJobGroupsInTimeFrame()
+
+        then:
+        response.status == 200
+        JSONArray resultArray = response.json
+        resultArray.length() == 1
+        resultArray[0].id == jobGroup1.id
+        resultArray[0].name == jobGroup1.name
+    }
+
+    void "iso timestamp can be bound to joda DateTime object"() {
+        given:
+        params.from = "2016-11-15T08:30:00.23Z"
+        params.to = "2016-11-15" // local time zone
+        def command = new ResultSelectionTimeFrameCommand()
+
+        when:
+        controller.bindData(command, params)
+
+        then:
+        command.from == new DateTime(2016, 11, 15, 8, 30, 0, 230, DateTimeZone.UTC)
+        command.to== new DateTime(2016, 11, 15, 0, 0) // local time zone
     }
 }
