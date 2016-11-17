@@ -94,4 +94,13 @@ public interface JobGroupDaoService {
      * a list of all {@link JobGroup} names which contain that tag.
      */
     public Map<String, List<String>> getTagToJobGroupNameMap();
+
+	/**
+	 * Returns a Collection with all {@link JobGroup} which are linked to
+	 * JobResults in a specified time frame
+	 * @param from Start date of time frame
+	 * @param to End date of time frame
+	 * @return Collection of JobGroups with results in the specified time frame
+	 */
+	Collection<JobGroup> findByJobResultsInTimeFrame(Date from, Date to);
 }

@@ -311,6 +311,10 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
+    static Job createJob(String label, Script script, Location location, JobGroup group) {
+        return createJob(label, script, location, group, "Test Job", 1, true, 60, null);
+    }
+
     static Job createJob(String label, Script script, Location location, JobGroup group, String description, int runs, boolean active, Integer maxDownloadTimeInMinutes, ConnectivityProfile profile = null) {
         return createJobWithoutSaving(label, script, location, group, description, runs, active, maxDownloadTimeInMinutes, profile).save(failOnError: true)
     }
@@ -710,6 +714,13 @@ class TestDataUtil implements OsmTestLogin {
         ).save(failOnError: true)
     }
 
+    static Location createLocation() {
+        return createLocation(
+                createWebPageTestServer("For Sample Location", "proxyId", true, "http://testwpt.org/"),
+                "sampleLocationWPT", createBrowser("TestLocationBrowser"), true
+        );
+    }
+
     static List<Browser> createBrowsersAndAliases() {
         List<Browser> browsers = []
         String browserName = "undefined"
@@ -910,14 +921,15 @@ class TestDataUtil implements OsmTestLogin {
      * @param dateOfJobRun The date of the test run.
      * @param parentJob The job the result belongs to.
      * @param agentLocation The location where the agent is working.
+     * @param httpStatusCode Optional httpStatusCode, 200 by default
      *
      * @return A newly created result, not <code>null</code>.
      */
-    static JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation) {
+    static JobResult createJobResult(String testId, Date dateOfJobRun, Job parentJob, Location agentLocation, int httpStatusCode = 200) {
         return new JobResult(
                 date: dateOfJobRun,
                 testId: testId,
-                httpStatusCode: 200,
+                httpStatusCode: httpStatusCode,
                 jobConfigLabel: parentJob.label,
                 jobConfigRuns: 1,
                 description: '',

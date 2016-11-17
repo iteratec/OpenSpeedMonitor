@@ -18,6 +18,8 @@
 package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
+import de.iteratec.osm.result.JobResult
+import org.hibernate.FetchMode
 
 /**
  * <p>
@@ -70,4 +72,19 @@ class DefaultJobGroupDaoService implements JobGroupDaoService {
             return map
         }
     }
+
+	@Override
+	public Collection<JobGroup> findByJobResultsInTimeFrame(Date from, Date to) {
+		return (Collection<JobGroup>) JobResult.createCriteria().list {
+			fetchMode('job', FetchMode.JOIN)
+			fetchMode('job.jobGroup', FetchMode.JOIN)
+			between("date", from, to)
+			eq("httpStatusCode", 200)
+			projections {
+				job {
+					distinct('jobGroup')
+				}
+			}
+		}
+	}
 }
