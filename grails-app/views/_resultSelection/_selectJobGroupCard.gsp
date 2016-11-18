@@ -2,7 +2,7 @@
 <%--
 A card with controls to select a job group
 --%>
-<div class="card" id="select-jobgroup">
+<div class="card" id="select-jobgroup-card" data-tagToJobGroupNameMap="${tagToJobGroupNameMap as grails.converters.JSON}">
     %{--JobGroups----------------------------------------------------------------------------------------------}%
     <legend>
         <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>
@@ -13,14 +13,14 @@ A card with controls to select a job group
               multiple="true"/>
     <div data-toggle="buttons" class="filter-buttons">
         <div class="btn-group">
-            <button type="button" class="btn btn-xs btn-default" onclick="filterJobGroupSelect('')">
+            <button type="button" class="btn btn-xs btn-default filter-button" data-tag="">
                 <i class="fa fa-remove"></i>&nbsp;<g:message code="de.iteratec.osm.ui.filter.clear" default="Clear filter"/>
             </button>
         </div>
         <g:each in="${tagToJobGroupNameMap.keySet().collate(5)}" var="tagSubset">
             <div class="btn-group">
                 <g:each in="${tagSubset}" var="tag">
-                    <button type="button" class="btn btn-xs btn-default" onclick="filterJobGroupSelect('${tag}')">
+                    <button type="button" class="btn btn-xs btn-default filter-button" data-tag="${tag}">
                         <i class="fa fa-filter"></i>&nbsp;${tag}
                     </button>
                 </g:each>
@@ -29,18 +29,7 @@ A card with controls to select a job group
     </div>
 </div>
 <asset:script type="text/javascript">
-
-    var tagToJobGroupNameMap = ${tagToJobGroupNameMap as grails.converters.JSON};
-    var jobGroupOptions = $('#folderSelectHtmlId option').clone();
-
-    var filterJobGroupSelect = function(filterText){
-
-        $('#folderSelectHtmlId').empty();
-
-        var jobGroupNamesToShow = tagToJobGroupNameMap[filterText];
-        jobGroupOptions.filter(function (idx, jobGroupOption) {
-            return (filterText === '' || $.inArray($(jobGroupOption).text(), jobGroupNamesToShow) > -1);
-        }).appendTo('#folderSelectHtmlId');
-
-    }
+    $(window).load(function() {
+        OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/selectJobGroupCard.js" absolute="true"/>');
+    });
 </asset:script>

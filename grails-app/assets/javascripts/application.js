@@ -28,6 +28,12 @@
  * Global namespace for OpenSpeedMonitor application.
  */
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
+
+/**
+ * Map for URLs to use
+ */
+OpenSpeedMonitor.urls = OpenSpeedMonitor.urls || {};
+
 /**
  * Loads all registered JavaScript files. Used by microservices.
  * @type {Array}

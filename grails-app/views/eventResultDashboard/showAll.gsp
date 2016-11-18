@@ -346,8 +346,12 @@
             }
             setAdjustments();
         });
+
         $(window).load(function() {
+           OpenSpeedMonitor.urls.resultSelection = OpenSpeedMonitor.urls.resultSelection || {}
+           OpenSpeedMonitor.urls.resultSelection.getJobGroups = "${createLink(controller: 'resultSelection', action: 'getJobGroupsInTimeFrame')}"
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js" absolute="true"/>')
+           OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });
 
     </asset:script>

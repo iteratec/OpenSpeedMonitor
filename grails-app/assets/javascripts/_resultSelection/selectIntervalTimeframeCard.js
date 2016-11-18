@@ -47,6 +47,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         setTimeFramePreselection(timeFramePreselection);
 
         registerEvents();
+        triggerTimeFrameChanged(); // initial event
     };
 
     var defaultValueForInterval = function() {
@@ -110,12 +111,12 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
         startDateTimePickerElement.on("changeDateTime", function(ev, dateTimeValues) {
             clientStorage.setObjectToLocalStorage(clientStorageStartObjectKeys, dateTimeValues);
             endDateTimePicker.setStartDate(dateTimeValues.date);
-            timeFrameChanged();
+            triggerTimeFrameChanged();
         });
 
         endDateTimePickerElement.on("changeDateTime", function(ev, dateTimeValues) {
             clientStorage.setObjectToLocalStorage(clientStorageEndObjectKeys, dateTimeValues);
-            timeFrameChanged();
+            triggerTimeFrameChanged();
         });
     };
 
@@ -138,7 +139,7 @@ OpenSpeedMonitor.selectIntervalTimeframeCard = (function(){
       return [startDateTimePicker.getValuesAsDate(), endDateTimePicker.getValuesAsDate()];
     };
 
-    var timeFrameChanged = function() {
+    var triggerTimeFrameChanged = function() {
         cardElement.trigger("timeFrameChanged", getTimeFrame());
     };
 
