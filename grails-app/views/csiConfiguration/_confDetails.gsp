@@ -429,6 +429,9 @@
     }
 
     function showMappingDialog(){
+        %{-- Resize the modal dialog because the width of the chart is initialized with half the width of the screen --}%
+        var newModalWidth = parseFloat($('#csiMappingModalDialogSVG').attr('width'));
+        $('#csiMappingModalDialog').width(newModalWidth);
         var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
         showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
     }

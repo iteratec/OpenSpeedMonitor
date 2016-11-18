@@ -62,6 +62,7 @@ function createMultiLineGraph(
 
         // Create SVG Container
         var svg = div.append("svg")
+            .attr("id", "csiMappingModalDialogSVG")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")

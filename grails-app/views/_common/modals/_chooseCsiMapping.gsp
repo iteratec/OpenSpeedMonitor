@@ -4,7 +4,7 @@ This is a dialog to choose from different default csi mappings.
 <%@ defaultCodec="none" %>
 <!-- Modal dialog -->
 <div id="CsiMappingModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true" onshow="POSTLOADED.setDeleteConfirmationInformations('${controllerLink}')";>
-    <div class="modal-dialog">
+    <div id="csiMappingModalDialog" class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
@@ -18,26 +18,24 @@ This is a dialog to choose from different default csi mappings.
                                     'yAxisTopOffset': 8, 'bottomOffsetLegend': 220, 'modal': true]}" />
             </div>
             <div class="modal-footer">
-                <g:form>
-                    <g:hiddenField name="page" value="${pageInstance}"></g:hiddenField>
-                    <label for="selectPageMapping">
-                        <g:message code="de.iteratec.osm.csi.mapping.demand" default="Choose one of the following pages"/>:
-                    </label>
-                    <g:select from="${pages.sort{it.name}}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${["-1":message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
+                <g:form class="form-inline">
+                    <div class="form-group">
+                        <g:hiddenField name="page" value="${pageInstance}"></g:hiddenField>
+                        <label for="selectPageMapping">
+                            <g:message code="de.iteratec.osm.csi.mapping.demand" default="Choose one of the following pages"/>:
+                        </label>
+                        <g:select class="form-control" from="${pages.sort{it.name}}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${["-1":message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
 
-                    <button href="#" type="button" class="btn btn-primary"  disabled="true" id="applyMapping">
-                        <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
-                    </button>
+                        <button href="#" %{--type="button"--}% class="btn btn-primary"  disabled="true" id="applyMapping">
+                            <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
+                        </button>
+                    </div>
                 </g:form>
             </div>
         </div>
     </div>
 </div>
-<style>
-    #selectPageMapping {
-        margin-top: 5px;
-    }
-</style>
+
 <asset:script>
     modalGraph = createMultiLineGraph(${defaultMultiLineChart}, 'choose_default_csi');
     function showPageSelect(newLine, color){
