@@ -109,13 +109,15 @@ grails:
         bean:
             packages: []
     databinding.dateFormats:
-        - 'dd.MM.yyyy'
-        - 'yyyy-MM-dd'
-        - 'yyyy/MM/dd'
-        - 'MMddyyyy'
+        - "yyyy-MM-dd'T'HH:mm:ssX" # ISO8601
+        - "yyyy-MM-dd'T'HH:mm:ss.SX" # ISO8601
         - 'yyyy-MM-dd HH:mm:ss.S'
         - 'yyyy-MM-dd HH:mm:ss'
-        - "yyyy-MM-dd'T'hh:mm:ss'Z'"
+        - 'yyyy-MM-dd'
+        - 'dd.MM.yyyy'
+        - 'yyyy/MM/dd'
+        - 'MMddyyyy'
+
 
 info:
     app:
@@ -128,6 +130,10 @@ spring:
         template:
             check-template-location: false
 
+# necessary for the joda datetime plugin to parse ISO timestamps
+jodatime:
+    format:
+         html5: true
 ---
 grails:
     mail:
@@ -263,6 +269,7 @@ grails:
                             {pattern: '/tabularResultPresentation/**',                  access: ["permitAll"]},
                             {pattern: '/highchartPointDetails/**',                      access: ["permitAll"]},
                             {pattern: '/rest/**',                                       access: ["permitAll"]},
+                            {pattern: '/resultSelection/**',                            access: ["permitAll"]},
                             {pattern: '/login/**',                                      access: ["permitAll"]},
                             {pattern: '/logout/**',                                     access: ["permitAll"]},
                             {pattern: '/job/index',                                     access: ["permitAll"]},
