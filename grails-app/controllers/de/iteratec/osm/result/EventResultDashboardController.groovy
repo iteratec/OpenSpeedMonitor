@@ -923,6 +923,7 @@ class EventResultDashboardController {
         }
         def batchIsQueued = assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
         modelToRender.put("startedBatchActivity",batchIsQueued)
+        fillWithI18N(modelToRender)
         render(view: "showAll", model: modelToRender)
     }
 }
