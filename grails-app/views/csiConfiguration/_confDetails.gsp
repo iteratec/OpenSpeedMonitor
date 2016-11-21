@@ -3,7 +3,7 @@
 
 
 %{-- nav tabs for the mapping and the weights --}%
-<ul class="nav nav-tabs">
+<ul id="csiConfigurationDetailsTabs" class="nav nav-tabs">
     <li class="active">
         <a data-toggle="tab" href="#csiMappingDetailsTabContent">
             <g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>
@@ -436,7 +436,20 @@
         showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
     }
 
+    %{-- show the nav tab anchor id as hash in the url --}%
+    $('#csiConfigurationDetailsTabs > li > a').on('shown.bs.tab', function (e) {
+        scrollposition = $(document).scrollTop();
+        var id = $(e.target).attr('href').substr(1);
+        window.location.hash = id;
+        $(document).scrollTop(scrollposition);
+    });
+
     $(document).ready(function () {
+        %{-- if passed, show the given nav tab at the start --}%
+        var hash = window.location.hash;
+        $('#csiConfigurationDetailsTabs a[href="' + hash + '"]').tab('show', function() {
+        $(document).scrollTop();
+        });
 
         registerEventHandlers();
 
