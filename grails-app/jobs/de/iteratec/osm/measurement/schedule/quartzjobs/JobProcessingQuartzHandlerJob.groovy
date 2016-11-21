@@ -104,7 +104,7 @@ class JobProcessingQuartzHandlerJob {
                     jobProcessingService.pollJobRun(job, testId)
                 }
             }finally{
-                pollingLocks[lockKey].unlock()
+                if(pollingLocks[lockKey]) pollingLocks[lockKey].unlock()
             }
         }
     }
