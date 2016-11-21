@@ -869,6 +869,7 @@ class EventResultDashboardController {
 
                 cmd.copyRequestDataToViewModelMap(modelToRender);
                 modelToRender.put('command', cmd)
+                fillWithI18N(modelToRender)
                 render(view: "showAll", model: modelToRender)
             } else {
                 params.remove("action")
