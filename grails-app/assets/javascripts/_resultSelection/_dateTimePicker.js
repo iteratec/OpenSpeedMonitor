@@ -133,9 +133,8 @@ OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 		var values = getValues();
 		var date = parseDateInternal(values.date);
 		if (values.manualTime) {
-			var hoursMinutes = date.time.split(":");
-			date.setHours(hoursMinutes[0]);
-			date.setMinutes(hoursMinutes[1]);
+			date.setHours(date.getUTCHours());
+			date.setMinutes(date.getUTCMinutes());
 		}
 		return date;
 	};
