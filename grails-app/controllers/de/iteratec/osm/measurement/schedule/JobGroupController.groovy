@@ -14,10 +14,7 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import grails.converters.JSON
-import org.springframework.dao.DataIntegrityViolationException
-import org.springframework.http.HttpStatus
-
-import javax.servlet.http.HttpServletResponse
+import org.hibernate.sql.JoinType
 
 import static org.springframework.http.HttpStatus.*
 
@@ -198,12 +195,11 @@ class JobGroupController {
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         List<JobGroup> result = JobGroup.createCriteria().list(params) {
+            createAlias('csiConfiguration', 'csiConfigurationAlias', JoinType.LEFT_OUTER_JOIN)
             if(params.filter)
                 or{
                     ilike("name","%"+params.filter+"%")
-                    csiConfiguration{
-                        ilike("label","%"+params.filter+"%")
-                    }
+                    ilike("csiConfigurationAlias.label", "%" + params.filter + "%")
                 }
         }
         String templateAsPlainText = g.render(

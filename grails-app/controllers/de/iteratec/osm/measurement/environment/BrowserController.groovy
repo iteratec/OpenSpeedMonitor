@@ -87,10 +87,7 @@ class BrowserController {
         params.offset = params.offset as Integer
 
         List<Browser> result = Browser.createCriteria().list(params) {
-            if(params.filter)
-                or{
-                    ilike("name","%"+params.filter+"%")
-                }
+            if(params.filter)ilike("name","%"+params.filter+"%")
         }
         String templateAsPlainText = g.render(
                 template: 'browserTable',

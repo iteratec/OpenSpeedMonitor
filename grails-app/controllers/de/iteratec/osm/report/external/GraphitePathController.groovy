@@ -3,6 +3,7 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
 import org.hibernate.Criteria
+import org.hibernate.sql.JoinType
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
@@ -103,12 +104,12 @@ class GraphitePathController {
         params.offset = params.offset as Integer
 
         List<GraphitePath> result = GraphitePath.createCriteria().list(params) {
+            createAlias('csiConfiguration', 'measurandAlias', JoinType.LEFT_OUTER_JOIN)
             if(params.filter)
                 or{
                     ilike("prefix","%"+params.filter+"%")
-                    measurand {
-                        ilike("name","%"+params.filter+"%")
-                    }}
+                    ilike("measurandAlias.name","%"+params.filter+"%")
+                }
         }
         String templateAsPlainText = g.render(
                 template: 'graphitePathTable',

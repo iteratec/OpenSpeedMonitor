@@ -2,6 +2,7 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
+import org.hibernate.sql.JoinType
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
@@ -87,12 +88,12 @@ class MeasuredEventController {
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         List<MeasuredEvent> result = MeasuredEvent.createCriteria().list(params) {
+            createAlias('csiConfiguration', 'testedPageAlias', JoinType.LEFT_OUTER_JOIN)
+
             if(params.filter)
                 or{
                     ilike("name","%"+params.filter+"%")
-                    testedPage{
-                        ilike("name","%"+params.filter+"%")
-                    }
+                    ilike("testedPageAlias.name","%"+params.filter+"%")
                 }
         }
         String templateAsPlainText = g.render(

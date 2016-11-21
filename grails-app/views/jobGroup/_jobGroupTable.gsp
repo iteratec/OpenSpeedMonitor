@@ -23,6 +23,3 @@
     </g:each>
     </tbody>
 </table>
-String name
-
-CsiConfiguration csiConfiguration
