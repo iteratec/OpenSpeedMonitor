@@ -93,9 +93,10 @@ class AssetRequestPersisterService implements iResultListener {
      * @param resultXml
      */
     private void persistAssetRequests(WptResultXml resultXml, WebPageTestServer wptServerOfResult) {
-        if (!persistenceOfAssetRequestsEnabled)
+        if (!persistenceOfAssetRequestsEnabled){
+            log.debug("Can not send persistAssetRequests since persistenceOfAssetRequests is disabled")
             return
-
+        }
         final String jobLabel = resultXml.getLabel()
         Job job = jobDaoService.getJob(jobLabel)
         if (!job) {
@@ -125,7 +126,8 @@ class AssetRequestPersisterService implements iResultListener {
                 resp = client.post(path: 'restApi/persistAssetsForWptResult',
                         body: [osmUrl: osmUrl, jobId: jobId, wptVersion: wptVersion, wptTestId: wptTestIds, wptServerBaseUrl: wptServerBaseUrl, jobGroupId: jobGroupId, apiKey: apiKey],
                         requestContentType: URLENC)
-            } catch (ConnectException) {
+            } catch (ConnectException ex) {
+                log.error("Couldn't queue persistAssetRequests", ex)
                 sleep(1000 * TIMEOUT_IN_SECONDS)
             }
 
