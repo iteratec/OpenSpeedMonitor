@@ -285,9 +285,6 @@
     <asset:javascript src="iteratecChartRickshaw.js"/>
     <asset:script type="text/javascript">
 
-        var pagesToEvents = ${(eventsOfPages as grails.converters.JSON)}
-        var browserToLocation = ${(locationsOfBrowsers as grails.converters.JSON)}
-
         var chartContextMenuI18N = ${i18n};
 
         function setAdjustments() {
@@ -319,7 +316,7 @@
 
         $(document).ready(function () {
 
-            initSelectMeasuringsControls(pagesToEvents, browserToLocation);
+            initSelectMeasuringsControls();
 
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'

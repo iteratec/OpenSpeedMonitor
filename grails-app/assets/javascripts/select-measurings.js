@@ -18,10 +18,9 @@
 /*
  * Contains functionality used in template /eventResultDashboard/_selectMeasurings.gsp
 */
-var initSelectMeasuringsControls = function(
-    pagesToEvents,
-    browserToLocation
-){
+var initSelectMeasuringsControls = function(){
+	var pagesToEvents = $("#selectedMeasuredEventsHtmlId").data('pagesToEvents') || {};
+	var browserToLocation = $("#selectedLocationsHtmlId").data('browserToLocation') || {};
 	var allMeasuredEventElements = [];
 	var allBrowsers = [];
 	var allLocations = [];
