@@ -13,7 +13,7 @@ class DetailAnalysisController {
 
     public final static String DATE_FORMAT_STRING = 'dd.mm.yyyy';
 
-    def show() {
+    def show(EventResultDashboardShowAllCommand cmd) {
         Map modelToRender = [:]
 
         String osmUrl = grailsLinkGenerator.getServerBaseURL()
@@ -36,9 +36,10 @@ class DetailAnalysisController {
         }
         if (osmUrl && microServiceUrl && apiKey) {
             try {
-
                 if (osmUrl.endsWith("/")) osmUrl = osmUrl.substring(0, osmUrl.length() - 1)
-                String detailDataWebPageAsString = new URL(microServiceUrl + "detailAnalysisDashboard/show" + "?apiKey=" + apiKey + "&osmUrl=" + osmUrl + "&" + request.queryString).getText()
+                def timeFrame = cmd.getSelectedTimeFrame()
+                String queryString = "?apiKey=${apiKey}&osmUrl=${osmUrl}&toDate=${timeFrame.endMillis}&fromDate=${timeFrame.startMillis}&" + request.queryString
+                String detailDataWebPageAsString = new URL(microServiceUrl + "detailAnalysisDashboard/show" + queryString).getText()
                 modelToRender.put("osmDetailAnalysisRequest", detailDataWebPageAsString)
             } catch (InvocationTargetException ex) {
                 errorList << message(code: 'default.microService.osmDetailAnalysis.unreachable', args: [message(code: 'default.microService.osmDetailAnalysis.unreachable', default: 'Microservice unreachable\n')])
