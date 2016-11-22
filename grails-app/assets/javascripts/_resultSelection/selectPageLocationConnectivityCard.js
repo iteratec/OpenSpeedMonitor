@@ -39,9 +39,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var initBrowserAndLocationControls = function () {
-        if (browsersAllCheckboxElement.length && browsersSelectElement.length > 0) {
-            initSelectAndCheckBoxFunction(browsersAllCheckboxElement, browsersSelectElement);
-        }
+        initSelectAndCheckBoxFunction(browsersAllCheckboxElement, browsersSelectElement);
         if (!locationsAllCheckboxElement.length || !locationsSelectElement.length) {
             return;
         }
@@ -58,16 +56,8 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var initConnectivityControls = function () {
-        var selectAllCheckbox = $("#selectedAllConnectivityProfiles");
-        var selectElement = $("#selectedConnectivityProfilesHtmlId");
-        if (selectAllCheckbox.length > 0 && selectElement.length > 0 ){
-            initSelectAndCheckBoxFunction(selectAllCheckbox, selectElement);
-        }
-        var includeCustomCheckbox = $("#includeCustomConnectivity");
-        var customNameInput = $("#customConnectivityName");
-        if (includeCustomCheckbox.length > 0 && customNameInput.length > 0 ){
-            initTextFieldAndCheckBoxFunction(includeCustomCheckbox, customNameInput);
-        }
+        initSelectAndCheckBoxFunction("#selectedAllConnectivityProfiles", "#selectedConnectivityProfilesHtmlId");
+        initTextFieldAndCheckBoxFunction("#includeCustomConnectivity", "#customConnectivityName");
     };
 
     var registerEvents = function() {
@@ -87,38 +77,32 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
-        $(checkBox).on('change', function(event) {
+        checkBox = $(checkBox);
+        selectBox = $(selectBox);
+        checkBox.on('change', function(event) {
             if(event.currentTarget.checked == true) {
-                $(selectBox).css({opacity: 0.5});
-                $(selectBox + " option").prop('selected', false);
-                $(selectBox).trigger("chosen:updated");
+                selectBox.css({opacity: 0.5});
+                selectBox.find("option").prop('selected', false);
+                selectBox.trigger("chosen:updated");
             } else {
-                $(selectBox).css({opacity: 1});
+                selectBox.css({opacity: 1});
             }
         });
 
-        $(selectBox).on('change', function(event) {
-            if ($(selectBox).find('option:selected').length > 0) {
-                $(checkBox).prop('checked', false);
-                $(selectBox).css({opacity: 1});
-            } else {
-                $(checkBox).prop('checked', true);
-                $(selectBox).css({opacity: 0.5});
-            }
-            $(selectBox).trigger("chosen:updated");
+        selectBox.on('change', function() {
+            var hasSelection = selectBox.find('option:selected').length;
+            checkBox.prop('checked', !hasSelection);
+            selectBox.css({opacity: hasSelection ? 1.0 : 0.5});
+            selectBox.trigger("chosen:updated");
         });
-        if($(checkBox).is(':checked')){
-            $(selectBox).css({opacity: 0.5});
+        if(checkBox.is(':checked')){
+            selectBox.css({opacity: 0.5});
         }
     };
 
     var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
         $(checkBox).on('change', function(event) {
-            if(event.currentTarget.checked == true) {
-                $(textField).prop('disabled', false);
-            } else {
-                $(textField).prop('disabled', true);
-            }
+            $(textField).prop('disabled', !event.currentTarget.checked);
         });
     };
 
