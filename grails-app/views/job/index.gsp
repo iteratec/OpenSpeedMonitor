@@ -9,7 +9,7 @@
 
     <g:set var="entityName" value="${message(code: 'de.iteratec.isj.job', default: 'Job')}"/>
 
-    <asset:stylesheet src="job/list.css"/>
+    <asset:stylesheet src="job/list"/>
 
 </head>
 
