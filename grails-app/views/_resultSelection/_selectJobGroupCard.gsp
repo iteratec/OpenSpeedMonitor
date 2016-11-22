@@ -2,7 +2,7 @@
 <%--
 A card with controls to select a job group
 --%>
-<div class="card" id="select-jobgroup-card" data-tagToJobGroupNameMap="${tagToJobGroupNameMap as grails.converters.JSON}">
+<div class="card" id="select-jobgroup-card" data-tag-to-job-group-name-map='${tagToJobGroupNameMap as grails.converters.JSON}'>
     %{--JobGroups----------------------------------------------------------------------------------------------}%
     <legend>
         <g:message code="de.iteratec.isr.wptrd.labels.filterFolder" default="Folder"/>
