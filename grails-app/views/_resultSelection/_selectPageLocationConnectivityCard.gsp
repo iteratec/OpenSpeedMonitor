@@ -3,7 +3,7 @@
 A card to select page & measured step, browser & location, and the connectivity
 --%>
 
-<div class="card" id="select-page-location">
+<div class="card" id="select-page-location-connectivity">
     <ul class="nav nav-tabs">
         <li class="active" id="filter-navtab-page">
             <a href="#tab1" data-toggle="tab">

@@ -285,20 +285,8 @@
     <asset:javascript src="iteratecChartRickshaw.js"/>
     <asset:script type="text/javascript">
 
-        var pagesToEvents = [];
-        <g:each var="page" in="${pages}">
-        <g:if test="${eventsOfPages[page.id] != null}">
-        pagesToEvents[${page.id}] = [<g:each var="event" in="${eventsOfPages[page.id]}">${event}, </g:each>];
-        </g:if>
-        </g:each>
-
-        var browserToLocation = [];
-        <g:each var="browser" in="${browsers}">
-        <g:if test="${locationsOfBrowsers[browser.id] != null}">
-        browserToLocation[${browser.id}] = [<g:each var="location"
-                                                           in="${locationsOfBrowsers[browser.id]}">${location}, </g:each>];
-        </g:if>
-        </g:each>
+        var pagesToEvents = ${(eventsOfPages as grails.converters.JSON)}
+        var browserToLocation = ${(locationsOfBrowsers as grails.converters.JSON)}
 
         var chartContextMenuI18N = ${i18n};
 
@@ -331,7 +319,7 @@
 
         $(document).ready(function () {
 
-            initSelectMeasuringsControls(pagesToEvents, browserToLocation, allMeasuredEventElements, allBrowsers, allLocations);
+            initSelectMeasuringsControls(pagesToEvents, browserToLocation);
 
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'

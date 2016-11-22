@@ -20,11 +20,11 @@
 */
 var initSelectMeasuringsControls = function(
     pagesToEvents,
-    browserToLocation,
-    allMeasuredEventElements,
-    allBrowsers,
-    allLocations
+    browserToLocation
 ){
+	var allMeasuredEventElements = [];
+	var allBrowsers = [];
+	var allLocations = [];
 	if ($("#selectedAllMeasuredEvents").length > 0 && $("#selectedMeasuredEventsHtmlId").length > 0 ){
 		collectAllValues(allMeasuredEventElements, "#selectedMeasuredEventsHtmlId");
 		initSelectAndCheckBoxFunction("#selectedAllMeasuredEvents", "#selectedMeasuredEventsHtmlId");
@@ -97,21 +97,6 @@ var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
 };
 
 /*
- * array of all selectable measured events
- */
-var allMeasuredEventElements =  [];
-
-/*
- * array of all selectable browsers
- */
-var allBrowsers =  [];
-
-/*
- * set of all selectable locations
- */
-var allLocations =  [];
-
-/*
  * Collects All values of an selectBox
  */
 var collectAllValues = function(allElementVar, selector) {
@@ -137,16 +122,15 @@ var updateSelectFields = function(fromSelector, toSelector, fromTo, allElements)
 	$(toSelector).empty();
 
 	if(selectedFrom != null) {
-		for( var k=0; k<fromTo.length; k++ ) {
-            
-		    if($.inArray(k+"", selectedFrom)!=-1 && fromTo[k]!=null) {
-                for( var i=0; i<fromTo[k].length; i++ ) {
-		    		if(allElements[fromTo[k][i]]!="") {
-						$(toSelector).append('<option value="'+ fromTo[k][i] +'">'+ allElements[fromTo[k][i]] + '</option>');
-					} 
-			    
-		    	}
-		    }
+		for( var key in fromTo ) {
+			if (!fromTo.hasOwnProperty(key) || !fromTo[key] || $.inArray(key, selectedFrom) < 0) {
+				continue;
+			}
+			for( var i=0; i<fromTo[key].length; i++ ) {
+				if (allElements[fromTo[key][i]] != "") {
+					$(toSelector).append('<option value="' + fromTo[key][i] + '">' + allElements[fromTo[key][i]] + '</option>');
+				}
+			}
 		}
 	} else {
 	 	for(var key in allElements) {
@@ -167,11 +151,3 @@ var initChosenSelects = function(noResultsTextForChosenSelects){
 	$('#selectedMeasuredEventsHtmlId').chosen({ search_contains: true, width: "100%", no_results_text: noResultsTextForChosenSelects });
 	$('#selectedLocationsHtmlId').chosen({ search_contains: true, width: "100%", no_results_text: noResultsTextForChosenSelects });
 }
-
-$('#simple-job-filter').click(function(){
-	$("#advanced-filter-row").fadeOut();
-});
-
-$('#advanced-job-filter').click(function(){ 
-	$("#advanced-filter-row").fadeIn();
-});

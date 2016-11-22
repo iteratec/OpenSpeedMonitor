@@ -20,7 +20,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
            filterByTag($(this).data('tag'));
         });
         jobGroupSelectElement.on("change", function() {
-            cardElement.trigger("jobGroupSelectionChanged", this.val())
+            cardElement.trigger("jobGroupSelectionChanged", $(this).val())
         });
     };
 
