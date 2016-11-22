@@ -5,9 +5,10 @@ OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
     var noResultsText = "No results"; // TODO(sburnicki): Use i18n string
+    var pageSelectElement = $("#pageSelectHtmlId");
 
     var init = function() {
-        initParentChildSelectionControls($("#pageSelectHtmlId"), $(), $("#selectedMeasuredEventsHtmlId"), $("#selectedAllMeasuredEvents"));
+        initParentChildSelectionControls(pageSelectElement, $(), $("#selectedMeasuredEventsHtmlId"), $("#selectedAllMeasuredEvents"));
         initParentChildSelectionControls($("#selectedBrowsersHtmlId"), $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
         initConnectivityControls();
         fixChosen();
@@ -53,6 +54,11 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var initSelectAndCheckBoxFunction = function(checkBox, selectBox) {
         checkBox = $(checkBox);
         selectBox = $(selectBox);
+
+        if (!checkBox.length || !selectBox.length) {
+            return;
+        }
+
         checkBox.on('change', function(event) {
             if(event.currentTarget.checked == true) {
                 selectBox.css({opacity: 0.5});
@@ -122,9 +128,15 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         $(toSelector).scrollTop();
     };
 
+    var updatePages = function(pages) {
+        pageSelectElement.empty();
+        pageSelectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(pages));
+        pageSelectElement.trigger("change");
+    };
+
     init();
     return {
-
+        updatePages: updatePages
     };
 })();
 

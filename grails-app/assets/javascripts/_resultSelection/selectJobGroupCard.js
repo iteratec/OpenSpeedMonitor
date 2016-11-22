@@ -20,7 +20,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
            filterByTag($(this).data('tag'));
         });
         jobGroupSelectElement.on("change", function() {
-            cardElement.trigger("jobGroupSelectionChanged", $(this).val())
+            cardElement.trigger("jobGroupSelectionChanged", [$(this).val()])
         });
     };
 
@@ -42,16 +42,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     };
 
     var updateJobGroups = function(jobGroups) {
-        currentOptions = [];
-        jobGroups.sort(function(a, b) {
-            return a.name.localeCompare(b.name);
-        });
-        jobGroups.forEach(function(jobGroup) {
-            currentOptions.push($("<option/>", {
-                value: jobGroup.id,
-                text: jobGroup.name
-            }));
-        });
+        currentOptions = OpenSpeedMonitor.domUtils.createOptionsByIdAndName(jobGroups);
         filterByTag(selectedTag);
     };
 

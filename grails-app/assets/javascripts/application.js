@@ -211,6 +211,31 @@ OpenSpeedMonitor.urlUtils = (function() {
     };
 })();
 
+OpenSpeedMonitor.domUtils = (function () {
+    /**
+     * Creates option elements by a list of values which all contain an 'id' and a 'name'
+     * @param values Array with objects containing id and name
+     * @return The list of newly created option elements, sorted by name
+     */
+    var createOptionsByIdAndName = function (values) {
+        var options = [];
+        values.sort(function(a, b) {
+            return a.name.localeCompare(b.name);
+        });
+        values.forEach(function(value) {
+            options.push($("<option/>", {
+                value: value.id,
+                text: value.name
+            }));
+        });
+        return options;
+    };
+
+    return {
+        createOptionsByIdAndName: createOptionsByIdAndName
+    };
+})();
+
 /**
  * This method will just return the given message. We use it,
  * so you can override it for a specialised delete conformation for the given domain
