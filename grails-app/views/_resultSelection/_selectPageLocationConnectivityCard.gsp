@@ -44,7 +44,7 @@ A card to select page & measured step, browser & location, and the connectivity
                           from="${measuredEvents}"
                           optionKey="id"
                           optionValue="name"
-                          data-pages-to-events='${eventsOfPages as grails.converters.JSON}'
+                          data-parent-child-mapping='${eventsOfPages as grails.converters.JSON}'
                           value="${selectedMeasuredEventIds}"
                           multiple="true"/>
                 <label class="checkbox-inline">
@@ -80,7 +80,7 @@ A card to select page & measured step, browser & location, and the connectivity
                 </label>
                 <g:select id="selectedLocationsHtmlId"
                           class="chosen"
-                          data-browser-to-locations='${locationsOfBrowsers as grails.converters.JSON}'
+                          data-parent-child-mapping='${locationsOfBrowsers as grails.converters.JSON}'
                           data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Bitte ausw&auml;hlen')}"
                           name="selectedLocations" from="${locations}" optionKey="id"
                           optionValue="${it}"

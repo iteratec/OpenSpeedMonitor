@@ -6,53 +6,27 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
     var noResultsText = "No results"; // TODO(sburnicki): Use i18n string
 
-    var pagesSelectElement = $("#pageSelectHtmlId");
-    var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
-    var measuredEventsAllCheckboxElement = $("#selectedAllMeasuredEvents");
-
-    var browsersAllCheckboxElement = $("#selectedAllBrowsers");
-    var browsersSelectElement = $("#selectedBrowsersHtmlId");
-    var locationsSelectElement = $("#selectedLocationsHtmlId");
-    var locationsAllCheckboxElement = $("#selectedAllLocations");
-
     var init = function() {
-        initPageMeasuredEventsControls();
-        initBrowserAndLocationControls();
+        initParentChildSelectionControls($("#pageSelectHtmlId"), $(), $("#selectedMeasuredEventsHtmlId"), $("#selectedAllMeasuredEvents"));
+        initParentChildSelectionControls($("#selectedBrowsersHtmlId"), $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
         initConnectivityControls();
         fixChosen();
         registerEvents();
     };
 
-    var initPageMeasuredEventsControls = function () {
-        if (!measuredEventsAllCheckboxElement.length || !measuredEventsSelectElement.length) {
-            return;
-        }
-        var allMeasuredEvents = collectAllValues(measuredEventsSelectElement);
-        var pagesToEventsMap = measuredEventsSelectElement.data('pagesToEvents') || {};
-        initSelectAndCheckBoxFunction(measuredEventsAllCheckboxElement, measuredEventsSelectElement);
-        var updateMeasuredEvents = function() {
-            updateSelectFields(pagesSelectElement, measuredEventsSelectElement, pagesToEventsMap, allMeasuredEvents);
-        };
-        pagesSelectElement.change(updateMeasuredEvents);
-        updateMeasuredEvents();
-        measuredEventsSelectElement.chosen({ search_contains: true, width: "100%", no_results_text: noResultsText });
-    };
+    var initParentChildSelectionControls = function (parentSelect, parentSelectAllCheckbox, childSelect, childSelectAllCheckbox) {
+        initSelectAndCheckBoxFunction(parentSelectAllCheckbox, parentSelect);
+        initSelectAndCheckBoxFunction(childSelectAllCheckbox, childSelect);
 
-    var initBrowserAndLocationControls = function () {
-        initSelectAndCheckBoxFunction(browsersAllCheckboxElement, browsersSelectElement);
-        if (!locationsAllCheckboxElement.length || !locationsSelectElement.length) {
-            return;
-        }
-        var allLocations = collectAllValues(locationsSelectElement);
-        var browserToLocationMap = locationsSelectElement.data('browserToLocation') || {};
-        initSelectAndCheckBoxFunction(locationsAllCheckboxElement, locationsSelectElement);
-        var updateLocations = function () {
-            updateSelectFields(browsersSelectElement, locationsSelectElement, browserToLocationMap, allLocations);
+        var allChildValues = collectAllValues(childSelect);
+        var parentChildMapping = childSelect.data('parent-child-mapping') || {};
+        var updateChildValues = function () {
+            updateSelectFields(parentSelect, childSelect, parentChildMapping, allChildValues);
         };
-        browsersSelectElement.change(updateLocations);
-        browsersAllCheckboxElement.change(updateLocations);
-        updateLocations();
-        locationsSelectElement.chosen({ search_contains: true, width: "100%", no_results_text: noResultsText });
+        parentSelect.change(updateChildValues);
+        parentSelectAllCheckbox.change(updateChildValues);
+        updateChildValues();
+        childSelect.chosen({ search_contains: true, width: "100%", no_results_text: noResultsText });
     };
 
     var initConnectivityControls = function () {
