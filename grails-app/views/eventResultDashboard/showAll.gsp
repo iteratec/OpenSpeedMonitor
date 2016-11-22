@@ -316,8 +316,6 @@
 
         $(document).ready(function () {
 
-            initSelectMeasuringsControls();
-
             doOnDomReady(
                     '${g.message(code: 'web.gui.jquery.chosen.multiselect.noresultstext', 'default': 'Keine Eintr&auml;ge gefunden f&uuml;r ')}'
             );
