@@ -333,7 +333,7 @@
         $(window).load(function() {
            OpenSpeedMonitor.urls.resultSelection = OpenSpeedMonitor.urls.resultSelection || {}
            OpenSpeedMonitor.urls.resultSelection.getJobGroups = "${createLink(controller: 'resultSelection', action: 'getJobGroupsInTimeFrame')}"
-           OpenSpeedMonitor.urls.resultSelection.getPages = "${createLink(controller: 'resultSelection', action: 'getPagesInTimeFrame')}"
+           OpenSpeedMonitor.urls.resultSelection.getMeasuredEvents = "${createLink(controller: 'resultSelection', action: 'getMeasuredEvents')}"
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="charts/chartContextUtilities.js" absolute="true"/>')
            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js" absolute="true"/>')
         });

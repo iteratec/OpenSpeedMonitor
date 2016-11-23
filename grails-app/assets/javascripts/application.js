@@ -215,7 +215,7 @@ OpenSpeedMonitor.domUtils = (function () {
     /**
      * Creates option elements by a list of values which all contain an 'id' and a 'name'
      * @param values Array with objects containing id and name
-     * @return The list of newly created option elements, sorted by name
+     * @return Array The list of newly created option elements, sorted by name
      */
     var createOptionsByIdAndName = function (values) {
         var options = [];
@@ -223,16 +223,30 @@ OpenSpeedMonitor.domUtils = (function () {
             return a.name.localeCompare(b.name);
         });
         values.forEach(function(value) {
-            options.push($("<option/>", {
-                value: value.id,
-                text: value.name
-            }));
+            if (value && value.id && value.name) {
+                options.push($("<option/>", {
+                    value: value.id,
+                    text: value.name
+                }));
+            }
         });
         return options;
     };
 
+    /**
+     * Gets all values of all option elements in a select element
+     * @param selectElement The select element with options as children
+     * @returns Array An array with all values of all options
+     */
+    var getAllOptionValues = function (selectElement) {
+        return $.map($(selectElement).find("option"), function (option) {
+            return option.value;
+        });
+    };
+
     return {
-        createOptionsByIdAndName: createOptionsByIdAndName
+        createOptionsByIdAndName: createOptionsByIdAndName,
+        getAllOptionValues: getAllOptionValues
     };
 })();
 

@@ -10,7 +10,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var selectJobGroupCard = $("#select-jobgroup-card");
     var selectPageLocationConnectivityCard = $('#select-page-location-connectivity');
     var getJobGroupsUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getJobGroups;
-    var getPagesUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getPages;
+    var getMeasuredEventsUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getMeasuredEvents;
     var currentQueryArgs = {};
     var updatesEnabled = true;
 
@@ -18,8 +18,8 @@ OpenSpeedMonitor.resultSelection = (function(){
         console.log("No OpenSpeedMonitor.urls.resultSelection.getJobGroups needs to be defined");
         return;
     }
-    if (!getPagesUrl) {
-        console.log("No OpenSpeedMonitor.urls.resultSelection.getPages needs to be defined");
+    if (!getMeasuredEventsUrl) {
+        console.log("No OpenSpeedMonitor.urls.resultSelection.getMeasuredEvents needs to be defined");
         return;
     }
 
@@ -53,29 +53,12 @@ OpenSpeedMonitor.resultSelection = (function(){
         if (!updatesEnabled) {
             return;
         }
-        updateJobGroups();
-        updatePages();
-    };
-
-    var updateJobGroups = function() {
-        $.ajax({
-            url: getJobGroupsUrl,
-            type: 'GET',
-            data: currentQueryArgs,
-            dataType: "json",
-            success: function (jobGroups) {
-                var updateWasEnabled = enableUpdates(false);
-                if (selectJobGroupCard) {
-                    OpenSpeedMonitor.selectJobGroupCard.updateJobGroups(jobGroups);
-                }
-                enableUpdates(updateWasEnabled);
-            },
-            error: function (e) {
-                // TODO(sburnicki): Show a proper error in the UI
-                throw e;
-            },
-            traditional: true // grails compatible parameter array encoding
-        });
+        if (selectJobGroupCard) {
+            updateCard(getJobGroupsUrl, OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
+        }
+        if (selectPageLocationConnectivityCard) {
+            updateCard(getMeasuredEventsUrl, OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
+        }
     };
 
     var enableUpdates = function (enable) {
@@ -84,17 +67,15 @@ OpenSpeedMonitor.resultSelection = (function(){
         return oldValue;
     };
 
-    var updatePages = function() {
+    var updateCard = function(url, handler) {
         $.ajax({
-            url: getPagesUrl,
+            url: url,
             type: 'GET',
             data: currentQueryArgs,
             dataType: "json",
-            success: function (pages) {
+            success: function (data) {
                 var updateWasEnabled = enableUpdates(false);
-                if (selectPageLocationConnectivityCard) {
-                    OpenSpeedMonitor.selectPageLocationConnectivityCard.updatePages(pages);
-                }
+                handler(data);
                 enableUpdates(updateWasEnabled);
             },
             error: function (e) {

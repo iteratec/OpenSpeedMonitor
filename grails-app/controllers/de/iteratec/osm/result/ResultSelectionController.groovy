@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.JobGroupDto
+import de.iteratec.osm.api.dto.MeasuredEventDto
 import de.iteratec.osm.api.dto.PageDto
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
@@ -27,10 +28,12 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, JobGroupDto.create(availableJobGroups))
     }
 
-    def getPagesInTimeFrame(ResultSelectionCommand command) {
+    def getMeasuredEvents(ResultSelectionCommand command) {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
-        def pages = EventResult.createCriteria().list {
+        def start = DateTime.now().getMillis()
+        def measuredEvents = EventResult.createCriteria().list {
             fetchMode('page', FetchMode.JOIN)
+            fetchMode('measuredEvent', FetchMode.JOIN)
             and {
                 between("jobResultDate", command.from.toDate(), command.to.toDate())
                 if (command.jobGroupIds) {
@@ -41,13 +44,23 @@ class ResultSelectionController {
             }
 
             projections {
-                page {
+                measuredEvent {
                     distinct('id')
+                    property('name')
+                }
+                page {
+                    property('id')
                     property('name')
                 }
             }
         }
-        ControllerUtils.sendObjectAsJSON(response, pages.collect { [id: it[0], name: it[1]] as PageDto })
+        def measuredEventDtos = measuredEvents.collect { [
+                id: it[0],
+                name: it[1],
+                testedPage: ([id: it[2], name: it[3]] as PageDto)
+        ] as MeasuredEventDto }
+        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
     }
 }
 
