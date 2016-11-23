@@ -219,6 +219,9 @@ OpenSpeedMonitor.domUtils = (function () {
      */
     var createOptionsByIdAndName = function (values) {
         var options = [];
+        if (!values) {
+            return [];
+        }
         values.sort(function(a, b) {
             return a.name.localeCompare(b.name);
         });

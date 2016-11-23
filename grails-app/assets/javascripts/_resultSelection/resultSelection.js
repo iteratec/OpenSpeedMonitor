@@ -53,10 +53,10 @@ OpenSpeedMonitor.resultSelection = (function(){
         if (!updatesEnabled) {
             return;
         }
-        if (selectJobGroupCard) {
+        if (OpenSpeedMonitor.selectJobGroupCard) {
             updateCard(getJobGroupsUrl, OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
         }
-        if (selectPageLocationConnectivityCard) {
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard) {
             updateCard(getMeasuredEventsUrl, OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
         }
     };

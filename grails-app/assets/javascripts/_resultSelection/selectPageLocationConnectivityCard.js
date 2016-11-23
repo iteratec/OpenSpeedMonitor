@@ -9,9 +9,12 @@ OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
     var pageSelectElement = $("#pageSelectHtmlId");
+    var pageEventsConnectedSelects;
+
 
     var init = function() {
-        OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(), $("#selectedMeasuredEventsHtmlId"), $("#selectedAllMeasuredEvents"));
+        pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(),
+            $("#selectedMeasuredEventsHtmlId"), $("#selectedAllMeasuredEvents"));
         OpenSpeedMonitor.ConnectedSelects($("#selectedBrowsersHtmlId"), $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
         initConnectivityControls();
         fixChosen();
@@ -53,9 +56,10 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
                 uniquePages.push(page);
                 pageToEvents[page.id] = [];
             }
-            pageToEvents[page.id] = {id: measuredEvent.id, name: measuredEvent.name};
+            pageToEvents[page.id].push({id: measuredEvent.id, name: measuredEvent.name});
         });
         updatePages(uniquePages);
+        pageEventsConnectedSelects.updateMapping(pageToEvents);
     };
 
     init();

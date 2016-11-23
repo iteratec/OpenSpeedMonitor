@@ -71,9 +71,6 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
             if (!parentChildMapping.hasOwnProperty(parentId) || !parentChildMapping[parentId] || $.inArray(parentId, parentSelection) < 0) {
                 continue;
             }
-            parentChildMapping[parentId].forEach(function(el) {
-
-            });
             newOptions = newOptions.concat(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(parentChildMapping[parentId]));
         }
 
@@ -82,5 +79,13 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         $(childSelect).trigger("chosen:updated");
     };
 
+    var updateMapping = function (newParentChildMapping) {
+        parentChildMapping = newParentChildMapping;
+        updateChildValues();
+    };
+
     init();
+    return {
+        updateMapping: updateMapping
+    };
 };
