@@ -19,10 +19,9 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         initSelectAndCheckBoxFunction(parentSelectAllCheckbox, parentSelect);
         initSelectAndCheckBoxFunction(childSelectAllCheckbox, childSelect);
 
-        var allChildValues = collectAllValues(childSelect);
         var parentChildMapping = childSelect.data('parent-child-mapping') || {};
         var updateChildValues = function () {
-            updateSelectFields(parentSelect, childSelect, parentChildMapping, allChildValues);
+            updateSelectFields(parentSelect, childSelect, parentChildMapping);
         };
         parentSelect.change(updateChildValues);
         parentSelectAllCheckbox.change(updateChildValues);
@@ -94,11 +93,11 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
      * @param: fromSelector the css selector for relation select, select for page in the example
      * @param: toSelector  the css selector for target select, select for browser in the example
      * @param: fromTo array that contains the relations, example: key: page -> value: browser
-     * @param: allElements all elements that can be contained in the target select box.
      */
-    var updateSelectFields = function(fromSelector, toSelector, fromTo, allElements) {
+    var updateSelectFields = function(fromSelector, toSelector, fromTo) {
         var selectedFrom = $(fromSelector).val();
         var selectedTo = $(toSelector).val();
+        var allElements = collectAllValues(toSelector);
         var key;
         $(toSelector).empty();
 
@@ -129,8 +128,10 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var updatePages = function(pages) {
+        var selection = pageSelectElement.val();
         pageSelectElement.empty();
         pageSelectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(pages));
+        pageSelectElement.val(selection);
         pageSelectElement.trigger("change");
     };
 

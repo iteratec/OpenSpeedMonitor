@@ -9,6 +9,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     var initialOptions = jobGroupSelectElement.find('option').clone();
     var currentOptions = initialOptions;
     var selectedTag = '';
+    var triggerEventsEnabled = true;
 
 
     var init = function() {
@@ -20,12 +21,15 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
            filterByTag($(this).data('tag'));
         });
         jobGroupSelectElement.on("change", function() {
-            cardElement.trigger("jobGroupSelectionChanged", [$(this).val()])
+            if (triggerEventsEnabled) {
+                cardElement.trigger("jobGroupSelectionChanged", [$(this).val()]);
+            }
         });
     };
 
     var filterByTag = function(tag) {
         selectedTag = tag;
+        var oldSelection = jobGroupSelectElement.val();
         jobGroupSelectElement.empty();
         var jobGroupNamesToShow = tagToJobGroupNameMap[tag];
         currentOptions.forEach(function (option) {
@@ -39,11 +43,22 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
                 text: "No results. Please select a different time frame."
             }));
         }
+        jobGroupSelectElement.val(oldSelection);
+    };
+
+    var enableEventTrigger = function(enable) {
+        var oldValue = triggerEventsEnabled;
+        triggerEventsEnabled = enable;
+        return oldValue;
     };
 
     var updateJobGroups = function(jobGroups) {
+        var wasTriggerEventsEnabled = enableEventTrigger(false);
+
         currentOptions = OpenSpeedMonitor.domUtils.createOptionsByIdAndName(jobGroups);
         filterByTag(selectedTag);
+
+        enableEventTrigger(wasTriggerEventsEnabled);
     };
 
     init();

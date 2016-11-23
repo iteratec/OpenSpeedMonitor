@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus
 class ResultSelectionController {
     JobGroupDaoService jobGroupDaoService;
 
-    def getJobGroupsInTimeFrame(ResultSelectionTimeFrameCommand command) {
+    def getJobGroupsInTimeFrame(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
                     "Invalid parameters: " + command.getErrors().fieldErrors.each{it.field}.join(", "))
@@ -27,7 +27,7 @@ class ResultSelectionController {
         ControllerUtils.sendObjectAsJSON(response, JobGroupDto.create(availableJobGroups))
     }
 
-    def getPagesInTimeFrame(ResultSelectionGetPagesCommand command) {
+    def getPagesInTimeFrame(ResultSelectionCommand command) {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
         def pages = EventResult.createCriteria().list {
             fetchMode('page', FetchMode.JOIN)
@@ -51,12 +51,7 @@ class ResultSelectionController {
     }
 }
 
-class ResultSelectionTimeFrameCommand {
-    DateTime from;
-    DateTime to;
-}
-
-class ResultSelectionGetPagesCommand {
+class ResultSelectionCommand {
     DateTime from;
     DateTime to;
     List<Long> jobGroupIds;

@@ -12,6 +12,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var getJobGroupsUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getJobGroups;
     var getPagesUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getPages;
     var currentQueryArgs = {};
+    var updatesEnabled = true;
 
     if (!getJobGroupsUrl) {
         console.log("No OpenSpeedMonitor.urls.resultSelection.getJobGroups needs to be defined");
@@ -38,7 +39,7 @@ OpenSpeedMonitor.resultSelection = (function(){
             updateCards();
         });
         selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, values) {
-            currentQueryArgs.jobGroups = values;
+            currentQueryArgs.jobGroupIds = values;
             updateCards();
         })
     };
@@ -49,6 +50,9 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var updateCards = function () {
+        if (!updatesEnabled) {
+            return;
+        }
         updateJobGroups();
         updatePages();
     };
@@ -60,15 +64,24 @@ OpenSpeedMonitor.resultSelection = (function(){
             data: currentQueryArgs,
             dataType: "json",
             success: function (jobGroups) {
+                var updateWasEnabled = enableUpdates(false);
                 if (selectJobGroupCard) {
                     OpenSpeedMonitor.selectJobGroupCard.updateJobGroups(jobGroups);
                 }
+                enableUpdates(updateWasEnabled);
             },
             error: function (e) {
                 // TODO(sburnicki): Show a proper error in the UI
                 throw e;
-            }
+            },
+            traditional: true // grails compatible parameter array encoding
         });
+    };
+
+    var enableUpdates = function (enable) {
+        var oldValue = updatesEnabled;
+        updatesEnabled = enable;
+        return oldValue;
     };
 
     var updatePages = function() {
@@ -78,14 +91,17 @@ OpenSpeedMonitor.resultSelection = (function(){
             data: currentQueryArgs,
             dataType: "json",
             success: function (pages) {
+                var updateWasEnabled = enableUpdates(false);
                 if (selectPageLocationConnectivityCard) {
                     OpenSpeedMonitor.selectPageLocationConnectivityCard.updatePages(pages);
                 }
+                enableUpdates(updateWasEnabled);
             },
             error: function (e) {
                 // TODO(sburnicki): Show a proper error in the UI
                 throw e;
-            }
+            },
+            traditional: true // grails compatible parameter array encoding
         });
     };
 
