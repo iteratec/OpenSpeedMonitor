@@ -23,9 +23,41 @@ class ResultSelectionController {
                     "Invalid time frame: 'from' value needs to be before 'to'")
             return
         }
+        if (command.measuredEventIds == null && command.pageIds == null) {
+            def availableJobGroups = jobGroupDaoService.findByJobResultsInTimeFrame(command.from.toDate(), command.to.toDate())
+            ControllerUtils.sendObjectAsJSON(response, JobGroupDto.create(availableJobGroups))
+            return
+        }
+        def start = DateTime.now().getMillis()
+        def availableJobGroups = EventResult.createCriteria().list {
+            fetchMode('page', FetchMode.JOIN)
+            fetchMode('measuredEvent', FetchMode.JOIN)
+            fetchMode('jobGroup', FetchMode.JOIN)
 
-        def availableJobGroups = jobGroupDaoService.findByJobResultsInTimeFrame(command.from.toDate(), command.to.toDate())
-        ControllerUtils.sendObjectAsJSON(response, JobGroupDto.create(availableJobGroups))
+            and {
+                between("jobResultDate", command.from.toDate(), command.to.toDate())
+
+                if (command.measuredEventIds) {
+                    measuredEvent {
+                        'in'("id", command.measuredEventIds)
+                    }
+                } else if (command.pageIds) {
+                    page {
+                        'in'("id", command.pageIds)
+                    }
+                }
+            }
+
+            projections {
+                jobGroup {
+                    distinct('id')
+                    property('name')
+                }
+            }
+        }
+        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        def jobGroupDtos = availableJobGroups.collect { ([id: it[0], name: it[1]] as JobGroupDto) }
+        ControllerUtils.sendObjectAsJSON(response, jobGroupDtos)
     }
 
     def getMeasuredEvents(ResultSelectionCommand command) {
@@ -68,4 +100,6 @@ class ResultSelectionCommand {
     DateTime from;
     DateTime to;
     List<Long> jobGroupIds;
+    List<Long> pageIds;
+    List<Long> measuredEventIds;
 }
