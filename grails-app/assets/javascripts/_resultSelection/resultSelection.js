@@ -13,6 +13,7 @@ OpenSpeedMonitor.resultSelection = (function(){
     var getMeasuredEventsUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getMeasuredEvents;
     var currentQueryArgs = {};
     var updatesEnabled = true;
+    var ajaxRequests = {};
 
     if (!getJobGroupsUrl) {
         console.log("No OpenSpeedMonitor.urls.resultSelection.getJobGroups needs to be defined");
@@ -38,16 +39,16 @@ OpenSpeedMonitor.resultSelection = (function(){
             setQueryArgsFromTimeFrame([start, end]);
             updateCards("timeFrame");
         });
-        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroups) {
-            currentQueryArgs.jobGroupIds = jobGroups;
+        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroups, allSelected) {
+            currentQueryArgs.jobGroupIds =  allSelected ? null : jobGroups;
             updateCards("jobGroups");
         });
-        selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pages) {
-            currentQueryArgs.pageIds = pages;
+        selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pages, allSelected) {
+            currentQueryArgs.pageIds = allSelected ? null : pages;
             updateCards("pages");
         });
-        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", function (ev, measuredEvents) {
-            currentQueryArgs.measuredEventIds = measuredEvents;
+        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", function (ev, measuredEvents, allSelected) {
+            currentQueryArgs.measuredEventIds =  allSelected ? null : measuredEvents;
             updateCards("pages");
         });
     };
@@ -76,7 +77,10 @@ OpenSpeedMonitor.resultSelection = (function(){
     };
 
     var updateCard = function(url, handler) {
-        $.ajax({
+        if (ajaxRequests[url]) {
+            ajaxRequests[url].abort();
+        }
+        ajaxRequests[url] = $.ajax({
             url: url,
             type: 'GET',
             data: currentQueryArgs,
@@ -86,9 +90,11 @@ OpenSpeedMonitor.resultSelection = (function(){
                 handler(data);
                 enableUpdates(updateWasEnabled);
             },
-            error: function (e) {
-                // TODO(sburnicki): Show a proper error in the UI
-                throw e;
+            error: function (e, statusText) {
+                if (statusText != "abort") {
+                    // TODO(sburnicki): Show a proper error in the UI
+                    throw e;
+                }
             },
             traditional: true // grails compatible parameter array encoding
         });

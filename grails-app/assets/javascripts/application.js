@@ -247,9 +247,15 @@ OpenSpeedMonitor.domUtils = (function () {
         });
     };
 
+    var hasAllOptionsSelected = function (selectElement) {
+        selectElement = $(selectElement);
+        return selectElement.find(":not(:selected)").length == 0 && selectElement.find("option").length > 0;
+    };
+
     return {
         createOptionsByIdAndName: createOptionsByIdAndName,
-        getAllOptionValues: getAllOptionValues
+        getAllOptionValues: getAllOptionValues,
+        hasAllOptionsSelected: hasAllOptionsSelected
     };
 })();
 

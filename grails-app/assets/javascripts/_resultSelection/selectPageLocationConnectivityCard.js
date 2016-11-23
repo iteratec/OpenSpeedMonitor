@@ -31,16 +31,18 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
     var registerEvents = function() {
         pageSelectElement.on("change", function () {
-            triggerChangeEvent("pageSelectionChanged", pageSelectElement.val());
+            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(pageSelectElement);
+            triggerChangeEvent("pageSelectionChanged", [pageSelectElement.val(), hasAllSelected]);
         });
         measuredEventsSelectElement.on("change", function () {
-            triggerChangeEvent("measuredEventSelectionChanged", measuredEventsSelectElement.val());
+            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement);
+            triggerChangeEvent("measuredEventSelectionChanged", [measuredEventsSelectElement.val(), hasAllSelected]);
         });
     };
 
-    var triggerChangeEvent = function (eventType, value) {
+    var triggerChangeEvent = function (eventType, values) {
         if (triggerEventsEnabled) {
-            cardElement.trigger(eventType, [value]);
+            cardElement.trigger(eventType, values);
         }
     };
 
