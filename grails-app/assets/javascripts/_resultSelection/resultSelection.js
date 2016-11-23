@@ -36,12 +36,20 @@ OpenSpeedMonitor.resultSelection = (function(){
     var registerEvents = function() {
         selectIntervalTimeframeCard.on("timeFrameChanged", function (ev, start, end) {
             setQueryArgsFromTimeFrame([start, end]);
-            updateCards(OpenSpeedMonitor.selectIntervalTimeframeCard);
+            updateCards("timeFrame");
         });
-        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, values) {
-            currentQueryArgs.jobGroupIds = values;
-            updateCards(OpenSpeedMonitor.selectJobGroupCard);
-        })
+        selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, jobGroups) {
+            currentQueryArgs.jobGroupIds = jobGroups;
+            updateCards("jobGroups");
+        });
+        selectPageLocationConnectivityCard.on("pageSelectionChanged", function (ev, pages) {
+            currentQueryArgs.pageIds = pages;
+            updateCards("pages");
+        });
+        selectPageLocationConnectivityCard.on("measuredEventSelectionChanged", function (ev, measuredEvents) {
+            currentQueryArgs.measuredEventIds = measuredEvents;
+            updateCards("pages");
+        });
     };
 
     var setQueryArgsFromTimeFrame = function(timeFrame) {
@@ -53,12 +61,10 @@ OpenSpeedMonitor.resultSelection = (function(){
         if (!updatesEnabled) {
             return;
         }
-        if (OpenSpeedMonitor.selectJobGroupCard &&
-            initiator != OpenSpeedMonitor.selectJobGroupCard) {
+        if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
             updateCard(getJobGroupsUrl, OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
         }
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard &&
-            initiator != OpenSpeedMonitor.selectPageLocationConnectivityCard) {
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "pages") {
             updateCard(getMeasuredEventsUrl, OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
         }
     };

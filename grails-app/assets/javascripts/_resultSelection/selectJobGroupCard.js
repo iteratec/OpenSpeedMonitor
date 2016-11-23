@@ -10,6 +10,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
     var currentOptions = initialOptions;
     var selectedTag = '';
     var triggerEventsEnabled = true;
+    var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use i18n
 
 
     var init = function() {
@@ -38,10 +39,7 @@ OpenSpeedMonitor.selectJobGroupCard = (function() {
             }
         });
         if (!jobGroupSelectElement.children().length) {
-            jobGroupSelectElement.append($("<option/>", {
-                disabled: "disabled",
-                text: "No results. Please select a different time frame."
-            }));
+            jobGroupSelectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
         }
         jobGroupSelectElement.val(oldSelection);
     };

@@ -9,19 +9,20 @@ OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
     var pageSelectElement = $("#pageSelectHtmlId");
+    var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
+    var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use 18n
     var pageEventsConnectedSelects;
+    var triggerEventsEnabled = true;
 
 
     var init = function() {
         pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(),
-            $("#selectedMeasuredEventsHtmlId"), $("#selectedAllMeasuredEvents"));
+            measuredEventsSelectElement, $("#selectedAllMeasuredEvents"));
         OpenSpeedMonitor.ConnectedSelects($("#selectedBrowsersHtmlId"), $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
         initConnectivityControls();
         fixChosen();
         registerEvents();
     };
-
-
 
     var initConnectivityControls = function () {
         OpenSpeedMonitor.SelectWithSelectAllCheckBox("#selectedConnectivityProfilesHtmlId", "#selectedAllConnectivityProfiles");
@@ -29,9 +30,25 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var registerEvents = function() {
-
+        pageSelectElement.on("change", function () {
+            triggerChangeEvent("pageSelectionChanged", pageSelectElement.val());
+        });
+        measuredEventsSelectElement.on("change", function () {
+            triggerChangeEvent("measuredEventSelectionChanged", measuredEventsSelectElement.val());
+        });
     };
 
+    var triggerChangeEvent = function (eventType, value) {
+        if (triggerEventsEnabled) {
+            cardElement.trigger(eventType, [value]);
+        }
+    };
+
+    var enableTriggerEvents = function(enable) {
+        var oldValue = triggerEventsEnabled;
+        triggerEventsEnabled = enable;
+        return oldValue;
+    };
 
     var initTextFieldAndCheckBoxFunction = function(checkBox, textField) {
         $(checkBox).on('change', function(event) {
@@ -40,16 +57,22 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     };
 
     var updatePages = function(pages) {
+        var wasTriggerEnabled = enableTriggerEvents(false);
         var selection = pageSelectElement.val();
         pageSelectElement.empty();
         pageSelectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(pages));
+        if (!pageSelectElement.children().length) {
+            pageSelectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
+        }
         pageSelectElement.val(selection);
         pageSelectElement.trigger("change");
+        enableTriggerEvents(wasTriggerEnabled);
     };
 
     var updateMeasuredEvents = function (measuredEvents) {
         var uniquePages = [];
         var pageToEvents = {};
+        var wasTriggerEnabled = enableTriggerEvents(false);
         measuredEvents.forEach(function (measuredEvent) {
             var page = measuredEvent.testedPage;
             if (!pageToEvents[page.id]) {
@@ -60,6 +83,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         });
         updatePages(uniquePages);
         pageEventsConnectedSelects.updateMapping(pageToEvents);
+        enableTriggerEvents(wasTriggerEnabled);
     };
 
     init();
