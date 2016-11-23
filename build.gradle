@@ -139,7 +139,7 @@ assets {
     minifyJs = true
     minifyCss = true
     configOptions = [:]
-    includes = ['bootstrap-custom.less']
+    includes = ['bootstrap-custom.less', 'job/list.less']
     excludes = ['**/*.less']
 }
 
