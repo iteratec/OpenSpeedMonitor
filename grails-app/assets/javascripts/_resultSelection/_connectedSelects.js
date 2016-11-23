@@ -15,8 +15,8 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
 
 
     var init = function () {
-        OpenSpeedMonitor.SelectWithSelectAllCheckBox(parentSelectAllCheckbox, parentSelect);
-        OpenSpeedMonitor.SelectWithSelectAllCheckBox(childSelectAllCheckbox, childSelect);
+        OpenSpeedMonitor.SelectWithSelectAllCheckBox(parentSelect, parentSelectAllCheckbox);
+        OpenSpeedMonitor.SelectWithSelectAllCheckBox(childSelect, childSelectAllCheckbox);
         initParentChildMapping();
         parentSelect.change(updateChildValues);
         parentSelectAllCheckbox.change(updateChildValues);
@@ -61,10 +61,10 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
      * @param: allElements all elements that can be contained in the target select box.
      */
     var updateChildValues = function() {
-        var parentSelection = $(parentSelect).val() || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
-        var childSelection = $(childSelect).val();
+        var parentSelection = parentSelect.val() || OpenSpeedMonitor.domUtils.getAllOptionValues(parentSelect);
+        var childSelection = childSelect.val();
         var parentId;
-        $(childSelect).empty();
+        childSelect.empty();
 
         var newOptions = [];
         for (parentId in parentChildMapping) {
@@ -74,9 +74,10 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
             newOptions = newOptions.concat(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(parentChildMapping[parentId]));
         }
 
-        $(childSelect).append(newOptions.sort(sortAlpha));
-        $(childSelect).val(childSelection);
-        $(childSelect).trigger("chosen:updated");
+        childSelect.append(newOptions.sort(sortAlpha));
+        childSelect.val(childSelection);
+        childSelect.trigger("chosen:updated");
+        childSelectAllCheckbox.prop('checked', !childSelect.val());
     };
 
     var updateMapping = function (newParentChildMapping) {

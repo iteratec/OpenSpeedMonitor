@@ -24,7 +24,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
 
 
     var initConnectivityControls = function () {
-        OpenSpeedMonitor.SelectWithSelectAllCheckBox("#selectedAllConnectivityProfiles", "#selectedConnectivityProfilesHtmlId");
+        OpenSpeedMonitor.SelectWithSelectAllCheckBox("#selectedConnectivityProfilesHtmlId", "#selectedAllConnectivityProfiles");
         initTextFieldAndCheckBoxFunction("#includeCustomConnectivity", "#customConnectivityName");
     };
 

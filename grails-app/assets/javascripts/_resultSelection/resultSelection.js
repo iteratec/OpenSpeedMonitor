@@ -36,11 +36,11 @@ OpenSpeedMonitor.resultSelection = (function(){
     var registerEvents = function() {
         selectIntervalTimeframeCard.on("timeFrameChanged", function (ev, start, end) {
             setQueryArgsFromTimeFrame([start, end]);
-            updateCards();
+            updateCards(OpenSpeedMonitor.selectIntervalTimeframeCard);
         });
         selectJobGroupCard.on("jobGroupSelectionChanged", function (ev, values) {
             currentQueryArgs.jobGroupIds = values;
-            updateCards();
+            updateCards(OpenSpeedMonitor.selectJobGroupCard);
         })
     };
 
@@ -49,14 +49,16 @@ OpenSpeedMonitor.resultSelection = (function(){
         currentQueryArgs.to = timeFrame[1].toISOString();
     };
 
-    var updateCards = function () {
+    var updateCards = function (initiator) {
         if (!updatesEnabled) {
             return;
         }
-        if (OpenSpeedMonitor.selectJobGroupCard) {
+        if (OpenSpeedMonitor.selectJobGroupCard &&
+            initiator != OpenSpeedMonitor.selectJobGroupCard) {
             updateCard(getJobGroupsUrl, OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
         }
-        if (OpenSpeedMonitor.selectPageLocationConnectivityCard) {
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard &&
+            initiator != OpenSpeedMonitor.selectPageLocationConnectivityCard) {
             updateCard(getMeasuredEventsUrl, OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
         }
     };
