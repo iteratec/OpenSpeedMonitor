@@ -30,7 +30,7 @@ class D3HtmlCreator {
         StringWriter writer = new StringWriter()
 
         if(modal){
-            return writer << """<div class="col-md-4" id="${chartIdentifier}">
+            return writer << """<div class="col-md-12" id="${chartIdentifier}">
                                     <div id="tooltip" class="hidden">
                                         <p><strong id="heading"></strong></p>
                                         <p><span id="info"></span></p>
