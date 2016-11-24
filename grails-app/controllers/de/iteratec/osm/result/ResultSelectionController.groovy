@@ -10,6 +10,15 @@ import org.springframework.http.HttpStatus
 class ResultSelectionController {
     JobGroupDaoService jobGroupDaoService
 
+    enum MetaConnectivityProfileId {
+        Custom(-2), Native(1)
+
+        MetaConnectivityProfileId(int value) {
+            this.value = value
+        }
+        int value
+    }
+
     def getJobGroups(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
@@ -136,6 +145,16 @@ class ResultSelectionController {
                         'in'("id", command.pageIds)
                     }
                 }
+                if (command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                } else if (command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
+                    }
+                }
+
             }
 
             projections {
@@ -160,6 +179,131 @@ class ResultSelectionController {
         ] }
         println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
+    }
+
+    def getConnectivityProfiles(ResultSelectionCommand command) {
+        // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
+        def start = DateTime.now().getMillis()
+        def connectivityProfiles = EventResult.createCriteria().list {
+            fetchMode('connectivityProfile', FetchMode.JOIN)
+            and {
+                between("jobResultDate", command.from.toDate(), command.to.toDate())
+                if (command.jobGroupIds) {
+                    jobGroup {
+                        'in'("id", command.jobGroupIds)
+                    }
+                }
+                if (command.measuredEventIds) {
+                    measuredEvent {
+                        'in'("id", command.measuredEventIds)
+                    }
+                } else if (command.pageIds) {
+                    page {
+                        'in'("id", command.pageIds)
+                    }
+                }
+                if (command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                } else if (command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
+                    }
+                }
+            }
+
+            projections {
+                connectivityProfile {
+                    distinct('id')
+                    property('name')
+                    property('bandwidthDown')
+                    property('bandwidthUp')
+                    property('latency')
+                    property('packetLoss')
+                }
+            }
+        }
+
+        def dtos = connectivityProfiles.collect { [
+                id: it[0],
+                name: "${it[1]}: ${it[2]}/${it[3]} Kbps, ${it[4]}ms Latency" + (it[5] ? "${it[5]}% PLR" : "")
+        ] }
+
+        def customProfiles = EventResult.createCriteria().list {
+            and {
+                between("jobResultDate", command.from.toDate(), command.to.toDate())
+                if (command.jobGroupIds) {
+                    jobGroup {
+                        'in'("id", command.jobGroupIds)
+                    }
+                }
+                if (command.measuredEventIds) {
+                    measuredEvent {
+                        'in'("id", command.measuredEventIds)
+                    }
+                } else if (command.pageIds) {
+                    page {
+                        'in'("id", command.pageIds)
+                    }
+                }
+                if (command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                } else if (command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
+                    }
+                }
+                isNotNull('customConnectivityName')
+            }
+
+            projections {
+                distinct('customConnectivityName')
+            }
+        }
+        dtos.addAll(customProfiles.collect {[id:MetaConnectivityProfileId.Custom.value, name: it]})
+
+        def nativeConnectivity = EventResult.createCriteria().list(max: 1) {
+            and {
+                between("jobResultDate", command.from.toDate(), command.to.toDate())
+                if (command.jobGroupIds) {
+                    jobGroup {
+                        'in'("id", command.jobGroupIds)
+                    }
+                }
+                if (command.measuredEventIds) {
+                    measuredEvent {
+                        'in'("id", command.measuredEventIds)
+                    }
+                } else if (command.pageIds) {
+                    page {
+                        'in'("id", command.pageIds)
+                    }
+                }
+                if (command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                } else if (command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
+                    }
+                }
+                eq('noTrafficShapingAtAll', true)
+            }
+
+            projections {
+                property('id')
+            }
+        }
+        if (nativeConnectivity) {
+            dtos.add([id: MetaConnectivityProfileId.Native.value, name: "Native"])
+        }
+
+        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 }
 
