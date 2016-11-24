@@ -94,6 +94,50 @@ class ResultSelectionController {
         println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
     }
+
+    def getBrowsers(ResultSelectionCommand command) {
+        // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
+        def start = DateTime.now().getMillis()
+        def measuredEvents = EventResult.createCriteria().list {
+            fetchMode('location', FetchMode.JOIN)
+            fetchMode('browser', FetchMode.JOIN)
+            and {
+                between("jobResultDate", command.from.toDate(), command.to.toDate())
+                if (command.jobGroupIds) {
+                    jobGroup {
+                        'in'("id", command.jobGroupIds)
+                    }
+                }
+                if (command.measuredEventIds) {
+                    measuredEvent {
+                        'in'("id", command.measuredEventIds)
+                    }
+                } else if (command.pageIds) {
+                    page {
+                        'in'("id", command.pageIds)
+                    }
+                }
+            }
+
+            projections {
+                location {
+                    distinct('id')
+                    property('label')
+                }
+                browser {
+                    property('id')
+                    property('name')
+                }
+            }
+        }
+        def measuredEventDtos = measuredEvents.collect { [
+                id: it[0],
+                name: it[1],
+                browser: [id: it[2], name: it[3]]
+        ] }
+        println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
+        ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
+    }
 }
 
 class ResultSelectionCommand {
