@@ -132,7 +132,8 @@
         dashboardName = dashboardName ? dashboardName : name
         if (dashboardName.trim() !== "") {
 
-            var spinner = startSpinner(document.getElementById('spinner-position'));
+            var spinner = OpenSpeedMonitor.Spinner();
+            spinner.start();
 
             dashBoardParamsFormValues = {};
 
