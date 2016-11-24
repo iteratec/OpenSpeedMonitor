@@ -57,11 +57,6 @@
         var csiConfLabel = document.getElementById("confLabelFromModal").value;
         var csiConfDescription = document.getElementById("confDescriptionFromModal").value;
 
-        var spinnerParent = document.getElementById('spinner-position');
-        var spinner = POSTLOADED.getLargeSpinner('#000', '50%', '50%');
-        spinnerParent.appendChild(spinner.el);
-
-
         $.ajax({
             type: 'POST',
             url: '${createLink(controller: 'csiConfiguration', action: 'updateConfiguration', absolute: true)}',
@@ -71,7 +66,6 @@
                 csiConfNewDescription: csiConfDescription
             },
             success: function(data) {
-                spinner.stop();
                 $('#updateCsiConfModal').modal('hide');
                 window.scrollTo(0, 0);
                 document.getElementById('headerCsiConfLabel').innerHTML = csiConfLabel;
@@ -82,7 +76,6 @@
                 $('#updatingCsiConfigurationErrors').text('');
                 $('#updatingCsiConfigurationErrors').append(result.responseText);
                 $('#errorUpdatingCsiConfiguration').show();
-                spinner.stop();
                 window.scrollTo(0, 0);
                 return false;
             }
