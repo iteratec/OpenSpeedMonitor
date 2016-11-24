@@ -159,7 +159,7 @@
                                                 <span class="input-group-btn">
                                                     <button type="submit" class="btn btn-default"
                                                             id="defaultMappingUploadButton"
-                                                            onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);"
+                                                            onclick="showSpinnerAtDefaultMappingUpload()"
                                                             disabled="true">
                                                         <g:message code="de.iteratec.isocsi.upload_file"
                                                                    default="Upload"/>
@@ -434,6 +434,11 @@
         $('#csiMappingModalDialog').width(newModalWidth);
         var chosen = d3.select("${defaultIdentifier}").selectAll(".diagramKey").select("")
         showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
+    }
+
+    function showSpinnerAtDefaultMappingUpload () {
+        var spinner = new OpenSpeedMonitor.Spinner();
+        spinner.start();
     }
 
     %{-- show the nav tab anchor id as hash in the url --}%
