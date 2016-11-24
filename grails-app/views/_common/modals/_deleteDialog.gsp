@@ -6,7 +6,7 @@ This is the standard dialog that initiates the delete action.
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" ria-hidden="true">×</button>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 <h4 class="modal-title" id="DeleteModalLabel">
                     <g:message code="default.button.delete.confirm.title" default="Delete Item"/>
                 </h4>
@@ -15,8 +15,6 @@ This is the standard dialog that initiates the delete action.
             <div class="modal-body">
                 <p><g:message code="default.button.delete.confirm.messageWithArgument" args="[entityName]"
                               default="Do you really want to delete this item?"/></p>
-
-                <div id="spinner-position"></div>
             </div>
 
             <div class="modal-footer">

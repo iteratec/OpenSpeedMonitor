@@ -11,7 +11,6 @@ This is the standard dialog that initiates the delete action.
             <div class="modal-body">
                 <p><g:message code="custom.button.delete.confirm"  default="Do you really want to delete this item?"/></p>
                 <p id="itemConfirm" style="font-weight: bold"></p>
-                <div id="spinner-position"></div>
             </div>
             <div class="modal-footer">
                 <g:form controller="${customController}">

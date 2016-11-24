@@ -186,14 +186,16 @@
                                                 disabled="true"
                                                 id="btn-apply-mapping" onclick="showMappingDialog()">
                                             <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
-                                                       default="Apply Mapping"/></button>
+                                                       default="Apply Mapping"/>
+                                        </button>
                                         <button type="button" class="btn btn-danger" data-toggle="modal"
                                                 href="#DeleteModal${customDefaultCsiMappingDeletePrefix}"
                                                 disabled="true"
                                                 id="btn-delete-default">
                                             <g:message
                                                     code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
-                                                    default="Delete Default Mapping"/></button>
+                                                    default="Delete Default Mapping"/>
+                                        </button>
                                     </g:if>
                                     <g:render template="/_common/modals/deleteDialogCustomAction"
                                               model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>

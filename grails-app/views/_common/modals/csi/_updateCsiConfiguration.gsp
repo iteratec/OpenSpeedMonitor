@@ -21,7 +21,6 @@
                 %{--controls for attributes to update--}%
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <div id="spinner-position"></div>
                         <label class="control-label col-md-3" for="confLabelFromModal">
                             ${message(code: 'de.iteratec.osm.gui.label.notation', default: 'Label')}:
                         </label>
