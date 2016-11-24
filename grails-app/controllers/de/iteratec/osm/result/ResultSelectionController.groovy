@@ -1,8 +1,6 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.JobGroupDto
-import de.iteratec.osm.api.dto.MeasuredEventDto
-import de.iteratec.osm.api.dto.PageDto
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.util.ControllerUtils
 import org.hibernate.FetchMode
@@ -10,9 +8,9 @@ import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
 class ResultSelectionController {
-    JobGroupDaoService jobGroupDaoService;
+    JobGroupDaoService jobGroupDaoService
 
-    def getJobGroupsInTimeFrame(ResultSelectionCommand command) {
+    def getJobGroups(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
                     "Invalid parameters: " + command.getErrors().fieldErrors.each{it.field}.join(", "))
@@ -86,16 +84,16 @@ class ResultSelectionController {
                 }
             }
         }
-        def measuredEventDtos = measuredEvents.collect { [
+        def measuredEventDtos = measuredEvents.collect {[
                 id: it[0],
                 name: it[1],
-                testedPage: ([id: it[2], name: it[3]] as PageDto)
-        ] as MeasuredEventDto }
+                parent: [id: it[2], name: it[3]]
+        ]}
         println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)
     }
 
-    def getBrowsers(ResultSelectionCommand command) {
+    def getLocations(ResultSelectionCommand command) {
         // need to explicitly select id an name, since gorm/hibernate takes 10x as long for fetching the page
         def start = DateTime.now().getMillis()
         def measuredEvents = EventResult.createCriteria().list {
@@ -123,6 +121,10 @@ class ResultSelectionController {
                 location {
                     distinct('id')
                     property('label')
+
+                    wptServer {
+                        property('label')
+                    }
                 }
                 browser {
                     property('id')
@@ -132,8 +134,8 @@ class ResultSelectionController {
         }
         def measuredEventDtos = measuredEvents.collect { [
                 id: it[0],
-                name: it[1],
-                browser: [id: it[2], name: it[3]]
+                name: it[1] + " @ " + it[2] + " (" + it[4] + ")",
+                parent: [id: it[3], name: it[4]]
         ] }
         println "Took " + ((DateTime.now().getMillis() - start) / 1000) + " seconds"
         ControllerUtils.sendObjectAsJSON(response, measuredEventDtos)

@@ -12,13 +12,15 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
     var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use 18n
     var pageEventsConnectedSelects;
+    var browserLocationConnectedSelects;
     var triggerEventsEnabled = true;
 
 
     var init = function() {
         pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(),
             measuredEventsSelectElement, $("#selectedAllMeasuredEvents"));
-        OpenSpeedMonitor.ConnectedSelects($("#selectedBrowsersHtmlId"), $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
+        browserLocationConnectedSelects = OpenSpeedMonitor.ConnectedSelects($("#selectedBrowsersHtmlId"),
+            $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
         initConnectivityControls();
         fixChosen();
         registerEvents();
@@ -58,40 +60,22 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         });
     };
 
-    var updatePages = function(pages) {
+    var updateMeasuredEvents = function (measuredEventsWithPages) {
         var wasTriggerEnabled = enableTriggerEvents(false);
-        var selection = pageSelectElement.val();
-        pageSelectElement.empty();
-        pageSelectElement.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(pages));
-        if (!pageSelectElement.children().length) {
-            pageSelectElement.append($("<option/>", { disabled: "disabled", text: noResultsText }));
-        }
-        pageSelectElement.val(selection);
-        pageSelectElement.trigger("change");
+        pageEventsConnectedSelects.updateOptions(measuredEventsWithPages);
         enableTriggerEvents(wasTriggerEnabled);
     };
 
-    var updateMeasuredEvents = function (measuredEvents) {
-        var uniquePages = [];
-        var pageToEvents = {};
+    var updateLocations = function (locationsWithBrowsers) {
         var wasTriggerEnabled = enableTriggerEvents(false);
-        measuredEvents.forEach(function (measuredEvent) {
-            var page = measuredEvent.testedPage;
-            if (!pageToEvents[page.id]) {
-                uniquePages.push(page);
-                pageToEvents[page.id] = [];
-            }
-            pageToEvents[page.id].push({id: measuredEvent.id, name: measuredEvent.name});
-        });
-        updatePages(uniquePages);
-        pageEventsConnectedSelects.updateMapping(pageToEvents);
+        browserLocationConnectedSelects.updateOptions(locationsWithBrowsers);
         enableTriggerEvents(wasTriggerEnabled);
     };
 
     init();
     return {
-        updatePages: updatePages,
-        updateMeasuredEvents: updateMeasuredEvents
+        updateMeasuredEvents: updateMeasuredEvents,
+        updateLocations: updateLocations
     };
 })();
 

@@ -80,13 +80,33 @@ OpenSpeedMonitor.ConnectedSelects = function(parentSelect, parentSelectAllCheckb
         childSelectAllCheckbox.prop('checked', !childSelect.val());
     };
 
-    var updateMapping = function (newParentChildMapping) {
-        parentChildMapping = newParentChildMapping;
+    var updateParentSelect = function (parentList) {
+        var selection = parentSelect.val();
+        parentSelect.empty();
+        parentSelect.append(OpenSpeedMonitor.domUtils.createOptionsByIdAndName(parentList));
+        if (!parentSelect.children().length) {
+            parentSelect.append($("<option/>", { disabled: "disabled", text: noResultsText }));
+        }
+        parentSelect.val(selection);
+    };
+
+    var updateOptions = function (childWithParentList) {
+        var parentList = [];
+        parentChildMapping = {};
+        childWithParentList.forEach(function (child) {
+            var parent = child.parent;
+            if (!parentChildMapping[parent.id]) {
+                parentList.push(parent);
+                parentChildMapping[parent.id] = [];
+            }
+            parentChildMapping[parent.id].push(child);
+        });
+        updateParentSelect(parentList);
         updateChildValues();
     };
 
     init();
     return {
-        updateMapping: updateMapping
+        updateOptions: updateOptions
     };
 };

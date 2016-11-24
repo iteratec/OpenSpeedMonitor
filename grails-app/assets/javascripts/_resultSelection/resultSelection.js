@@ -9,19 +9,13 @@ OpenSpeedMonitor.resultSelection = (function(){
     var selectIntervalTimeframeCard = $("#select-interval-timeframe-card");
     var selectJobGroupCard = $("#select-jobgroup-card");
     var selectPageLocationConnectivityCard = $('#select-page-location-connectivity');
-    var getJobGroupsUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getJobGroups;
-    var getMeasuredEventsUrl = ((OpenSpeedMonitor.urls || {}).resultSelection || {}).getMeasuredEvents;
+    var resultSelectionUrls = (OpenSpeedMonitor.urls || {}).resultSelection;
     var currentQueryArgs = {};
     var updatesEnabled = true;
     var ajaxRequests = {};
 
-    if (!getJobGroupsUrl) {
-        console.log("No OpenSpeedMonitor.urls.resultSelection.getJobGroups needs to be defined");
-        return;
-    }
-    if (!getMeasuredEventsUrl) {
-        console.log("No OpenSpeedMonitor.urls.resultSelection.getMeasuredEvents needs to be defined");
-        return;
+    if (!resultSelectionUrls["jobGroups"] || !resultSelectionUrls["pages"] || !resultSelectionUrls["browsers"]) {
+        throw "No OpenSpeedMonitor.urls.resultSelection needs to be an object with URLs for all controller actions";
     }
 
     var init = function() {
@@ -63,10 +57,13 @@ OpenSpeedMonitor.resultSelection = (function(){
             return;
         }
         if (OpenSpeedMonitor.selectJobGroupCard && initiator != "jobGroups") {
-            updateCard(getJobGroupsUrl, OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
+            updateCard(resultSelectionUrls["jobGroups"], OpenSpeedMonitor.selectJobGroupCard.updateJobGroups);
         }
         if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "pages") {
-            updateCard(getMeasuredEventsUrl, OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
+            updateCard(resultSelectionUrls["pages"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateMeasuredEvents);
+        }
+        if (OpenSpeedMonitor.selectPageLocationConnectivityCard && initiator != "browsers") {
+            updateCard(resultSelectionUrls["browsers"], OpenSpeedMonitor.selectPageLocationConnectivityCard.updateLocations);
         }
     };
 
