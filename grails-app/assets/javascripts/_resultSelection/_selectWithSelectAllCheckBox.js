@@ -18,6 +18,7 @@ OpenSpeedMonitor.SelectWithSelectAllCheckBox = function(selectElement, checkBoxE
         } else {
             selectElement.css({opacity: 1});
         }
+        selectElement.trigger("change");
     });
 
     selectElement.on('change', function() {
@@ -26,6 +27,7 @@ OpenSpeedMonitor.SelectWithSelectAllCheckBox = function(selectElement, checkBoxE
         selectElement.css({opacity: hasSelection ? 1.0 : 0.5});
         selectElement.trigger("chosen:updated");
     });
+
     if(checkBoxElement.is(':checked')){
         selectElement.css({opacity: 0.5});
     }
