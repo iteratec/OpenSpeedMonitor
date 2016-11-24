@@ -253,16 +253,31 @@ body {
 .spinner-content-message {
   padding-top: 10px;
 }
-.spinnerBackground {
-  display: block;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
+
+@spinnerContainerTemplate: {
+  display: none;
+  position: absolute;
+  top: 0;
   z-index: 3;
-  opacity: 0.3;
-  background-color: #000;
+};
+.spinnerDefaultContainer {
+  @spinnerContainerTemplate();
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+.spinnerSmallContainer {
+  @spinnerContainerTemplate();
+  right: 0;
+  height: 40px;
+  width: 40px;
+}
+.spinnerBackground {
+  height: inherit;
+  width: inherit;
+  z-index: 3;
+  opacity: 0.8;
+  background-color: #ffffff;
 }
 
 .iteratec-tab-content {
