@@ -118,8 +118,7 @@
                                               'selectedAllLocations'            : selectedAllLocations,
                                               'connectivityProfiles'            : connectivityProfiles,
                                               'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                                              'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                                              'showExtendedConnectivitySettings': false]"/>
+                                              'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles]"/>
                         </div>
                     </div>
                 </div>

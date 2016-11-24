@@ -28,6 +28,5 @@ A row with the three cards: selectIntervalTimeframeCard, selectJobGroupCard, and
                         'selectedAllLocations'            : selectedAllLocations,
                         'connectivityProfiles'            : connectivityProfiles,
                         'selectedConnectivityProfiles'    : selectedConnectivityProfiles,
-                        'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles,
-                        'showExtendedConnectivitySettings': true]}"/>
+                        'selectedAllConnectivityProfiles' : selectedAllConnectivityProfiles]}"/>
 </div>

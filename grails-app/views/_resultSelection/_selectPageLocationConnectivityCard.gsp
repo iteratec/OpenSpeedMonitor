@@ -107,38 +107,13 @@ A card to select page & measured step, browser & location, and the connectivity
                                 checked="${selectedAllConnectivityProfiles}" value="${true}"/>
                     <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
                                default="Select all Connectivity Profiles"/>
-                    (<a href="${g.createLink(controller: 'ConnectivityProfile', action: 'list', absolute: true)}">
-                    <g:message code="de.iteratec.osm.result.predefined.linktext"
-                               default="predefined"/>
-                </a>)
                 </label>
-                <g:if test="${showExtendedConnectivitySettings}">
-                    <br>
-                    <label class="checkbox-inline">
-                        <g:checkBox name="includeNativeConnectivity" id="includeNativeConnectivity"
-                                    checked="${includeNativeConnectivity}" value="${true}"/>
-                        <g:message code="de.iteratec.osm.result.include-native-connectivity.label"
-                                   default="Show measurements with native connectivity"/>
-                    </label>
-                    <br>
-                    <label class="checkbox-inline" for="customConnectivityName">
-                        <g:checkBox name="includeCustomConnectivity" id="includeCustomConnectivity"
-                                    checked="${includeCustomConnectivity}" value="${true}"/>
-                        <g:message code="de.iteratec.osm.result.include-custom-connectivity.label"
-                                   default="Show measurements with custom connectivity (filter by regex expression):"/>
-                    </label>
-                    <br>
-                    <g:textField name="customConnectivityName" class="form-control"
-                                 value="${customConnectivityName}" id="customConnectivityName"
-                                 placeholder="${g.message(code: 'de.iteratec.osm.result.filter-custom-connectivity.placeholder', default: 'Search via regex')}"
-                                 disabled="${!includeCustomConnectivity}">
-                    </g:textField>
-                    <br>
-                    <a href="${g.message(code: 'de.iteratec.osm.result.connectivity.regex.link.href', default: 'https://en.wikipedia.org/wiki/Regular_expression#Syntax')}"
-                       target="_blank">
-                        <g:message code="de.iteratec.osm.result.connectivity.regex.link.label" default="https://en.wikipedia.org/wiki/Regular_expression#Syntax" />
-                    </a>
-                </g:if>
+                <input type="hidden" name="includeNativeConnectivity" id="includeNativeConnectivity"
+                       value="${includeCustomConnectivity ? true : false}" />
+                <input type="hidden" name="includeCustomConnectivity" id="includeCustomConnectivity"
+                       value="${includeCustomConnectivity ? true : false}" />
+                <input type="hidden" name="customConnectivityName" id="customConnectivityName"
+                       value="${customConnectivityName}" />
             </div>
         </div>
     </div>

@@ -63,8 +63,7 @@
                                     'selectedAllLocations'              :selectedAllLocations,
                                     'connectivityProfiles'              :connectivityProfiles,
                                     'selectedConnectivityProfiles'      :selectedConnectivityProfiles,
-                                    'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles,
-                                    'showExtendedConnectivitySettings'  : true]}"/>
+                                    'selectedAllConnectivityProfiles'   :selectedAllConnectivityProfiles]}"/>
                 </g:else>
             </div>
         </form>
