@@ -27,33 +27,18 @@ function removeSelectedPageMapping(removePageMappingLink, csiConfId){
         var btnRemovePageMapping = $('#removePageMapping');
         btnRemovePageMapping.prop("disabled",true);
 
-        var rowDiv = document.createElement("div");
-        rowDiv.classList.add("row");
-        var spanDiv = document.createElement("div");
-        spanDiv.classList.add("col-md-10");
-
-        var spinnerDiv = document.createElement("div");
-        spinnerDiv.classList.add("col-md-1");
-        spinnerDiv.id = "spinner-position";
-        spinnerDiv.classList.add("spinner-content-spinner");
+        var spinner = new OpenSpeedMonitor.Spinner('#page_csi_mappings');
 
         var messageDiv = document.createElement("div");
-        messageDiv.classList.add("col-md-11");
         messageDiv.classList.add("spinner-content-message");
         messageDiv.classList.add("text-info");
         messageDiv.classList.add("text-left");
         messageDiv.id="spinner-message";
 
-        spanDiv.appendChild(spinnerDiv);
-        spanDiv.appendChild(messageDiv);
-        rowDiv.appendChild(spanDiv);
-
         var mappingDeletionList = document.getElementById('page-mapping-deletions');
-        mappingDeletionList.insertBefore(rowDiv, mappingDeletionList.childNodes[0]);
+        mappingDeletionList.insertBefore(messageDiv, mappingDeletionList.childNodes[0]);
 
-        var spinnerParent = document.getElementById('spinner-position');
-        var spinner = POSTLOADED.getSmallSpinner('#3a87ad', '0', '0');
-        spinnerParent.appendChild(spinner.el);
+        spinner.start();
 
         var strongMessage = document.createElement("strong");
         var textNodeWaitingToFinish = document.createTextNode(
