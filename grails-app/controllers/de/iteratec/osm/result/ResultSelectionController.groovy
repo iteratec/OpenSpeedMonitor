@@ -21,11 +21,12 @@ class ResultSelectionController {
                     "Invalid time frame: 'from' value needs to be before 'to'")
             return
         }
-        if (command.measuredEventIds == null && command.pageIds == null) {
+        if (!command.measuredEventIds && !command.pageIds && !command.browserIds && !command.locationIds) {
             def availableJobGroups = jobGroupDaoService.findByJobResultsInTimeFrame(command.from.toDate(), command.to.toDate())
             ControllerUtils.sendObjectAsJSON(response, JobGroupDto.create(availableJobGroups))
             return
         }
+
         def start = DateTime.now().getMillis()
         def availableJobGroups = EventResult.createCriteria().list {
             fetchMode('page', FetchMode.JOIN)
@@ -42,6 +43,16 @@ class ResultSelectionController {
                 } else if (command.pageIds) {
                     page {
                         'in'("id", command.pageIds)
+                    }
+                }
+
+                if (command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                } else if (command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
                     }
                 }
             }
@@ -69,6 +80,16 @@ class ResultSelectionController {
                 if (command.jobGroupIds) {
                     jobGroup {
                         'in'("id", command.jobGroupIds)
+                    }
+                }
+
+                if (command.locationIds) {
+                    location {
+                        'in'("id", command.locationIds)
+                    }
+                } else if (command.browserIds) {
+                    browser {
+                        'in'("id", command.browserIds)
                     }
                 }
             }
@@ -143,9 +164,11 @@ class ResultSelectionController {
 }
 
 class ResultSelectionCommand {
-    DateTime from;
-    DateTime to;
-    List<Long> jobGroupIds;
-    List<Long> pageIds;
-    List<Long> measuredEventIds;
+    DateTime from
+    DateTime to
+    List<Long> jobGroupIds
+    List<Long> pageIds
+    List<Long> measuredEventIds
+    List<Long> browserIds
+    List<Long> locationIds
 }

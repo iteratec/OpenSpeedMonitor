@@ -10,6 +10,8 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var cardElement = $('#select-page-location-connectivity');
     var pageSelectElement = $("#pageSelectHtmlId");
     var measuredEventsSelectElement = $("#selectedMeasuredEventsHtmlId");
+    var browserSelectElement = $("#selectedBrowsersHtmlId");
+    var locationsSelectElement =  $("#selectedLocationsHtmlId");
     var noResultsText = "No results. Please select a different time frame."; // TODO(sburnicki): use 18n
     var pageEventsConnectedSelects;
     var browserLocationConnectedSelects;
@@ -19,8 +21,8 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var init = function() {
         pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(),
             measuredEventsSelectElement, $("#selectedAllMeasuredEvents"));
-        browserLocationConnectedSelects = OpenSpeedMonitor.ConnectedSelects($("#selectedBrowsersHtmlId"),
-            $("#selectedAllBrowsers"), $("#selectedLocationsHtmlId"), $("#selectedAllLocations"));
+        browserLocationConnectedSelects = OpenSpeedMonitor.ConnectedSelects(browserSelectElement,
+            $("#selectedAllBrowsers"), locationsSelectElement, $("#selectedAllLocations"));
         initConnectivityControls();
         fixChosen();
         registerEvents();
@@ -39,6 +41,14 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
         measuredEventsSelectElement.on("change", function () {
             var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(measuredEventsSelectElement);
             triggerChangeEvent("measuredEventSelectionChanged", [measuredEventsSelectElement.val(), hasAllSelected]);
+        });
+        browserSelectElement.on("change", function () {
+            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(browserSelectElement);
+            triggerChangeEvent("browserSelectionChanged", [browserSelectElement.val(), hasAllSelected]);
+        });
+        locationsSelectElement.on("change", function () {
+            var hasAllSelected = OpenSpeedMonitor.domUtils.hasAllOptionsSelected(locationsSelectElement);
+            triggerChangeEvent("locationSelectionChanged", [locationsSelectElement.val(), hasAllSelected]);
         });
     };
 

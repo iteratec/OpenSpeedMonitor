@@ -45,6 +45,14 @@ OpenSpeedMonitor.resultSelection = (function(){
             currentQueryArgs.measuredEventIds =  allSelected ? null : measuredEvents;
             updateCards("pages");
         });
+        selectPageLocationConnectivityCard.on("browserSelectionChanged", function (ev, browsers, allSelected) {
+            currentQueryArgs.browserIds = allSelected ? null : browsers;
+            updateCards("browsers");
+        });
+        selectPageLocationConnectivityCard.on("locationSelectionChanged", function (ev, locations, allSelected) {
+            currentQueryArgs.locationIds =  allSelected ? null : locations;
+            updateCards("browsers");
+        });
     };
 
     var setQueryArgsFromTimeFrame = function(timeFrame) {
