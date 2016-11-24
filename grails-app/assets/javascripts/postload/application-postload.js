@@ -81,50 +81,6 @@ function PostLoaded(dataFromGsp){
             $('#DeleteModal').find('p').html(text);
         },10);
     };
-
-
-    this.getLargeSpinner = function(color, relativePositionTop, relativePositionLeft){
-        return this.getSpinner(color, 20, 10, 30, relativePositionTop, relativePositionLeft)
-    };
-
-    /**
-     * Appends a spinner with color color to parent html element.
-     * See http://fgnass.github.io/spin.js/ for options.
-     *
-     * @param parentElement
-     *          Html element the spinner will be added to.
-     * @param color
-     *          Color of the spinner
-     * @param lineLength
-     *          Radial length of single lines in spinner.
-     * @param lineWidth
-     *          Width of single spinner lines.
-     * @param innerRadius
-     *          Inner radius of spinner.
-     */
-    this.getSpinner = function(color, lineLength, lineWidth, innerRadius, relativePositionTop, relativePositionLeft){
-        var opts = {
-            lines: 18,              // The number of lines to draw
-            length: lineLength,     // The length of each line
-            width: lineWidth,       // The line thickness
-            radius: innerRadius,    // The radius of the inner circle
-            corners: 1,             // Corner roundness (0..1)
-            rotate: 0,              // The rotation offset
-            direction: 1,           // 1: clockwise, -1: counterclockwise
-            color: color,           // #rgb or #rrggbb or array of colors
-            opacity: 0.10,          // opacity
-            speed: 1,               // Rounds per second
-            trail: 60,              // Afterglow percentage
-            shadow: false,          // Whether to render a shadow
-            hwaccel: false,         // Whether to use hardware acceleration
-            className: 'spinner',   // The CSS class to assign to the spinner
-            zIndex: 2e9,            // The z-index (defaults to 2000000000)
-            top: relativePositionTop,               // Top position relative to parent in px
-            left: relativePositionLeft               // Left position relative to parent in px
-        };
-        return new Spinner(opts).spin();
-    }
-
 }
 
 $('.dropdown-toggle').dropdown();
