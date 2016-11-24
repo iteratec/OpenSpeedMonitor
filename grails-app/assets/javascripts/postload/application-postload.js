@@ -83,9 +83,6 @@ function PostLoaded(dataFromGsp){
     };
 
 
-    this.getSmallSpinner = function(color, relativePositionTop, relativePositionLeft){
-        return this.getSpinner(color, 5, 1.5, 4, relativePositionTop, relativePositionLeft)
-    };
     this.getLargeSpinner = function(color, relativePositionTop, relativePositionLeft){
         return this.getSpinner(color, 20, 10, 30, relativePositionTop, relativePositionLeft)
     };
