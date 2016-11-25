@@ -52,7 +52,7 @@ class D3ChartTagLibSpec extends Specification {
         chartContainerNode.attributes['class'] == "col-md-8"
     }
 
-    def "HTML provided by taglib iteratec:multiLineChart creates smaller container for modal dialog"() {
+    def "HTML provided by taglib iteratec:multiLineChart creates modal filling container for modal dialog"() {
         given:
         String identifier = "ChartIdentifier"
 
@@ -63,7 +63,7 @@ class D3ChartTagLibSpec extends Specification {
         then:
         NodeChild testHtmlAsNode = new XmlSlurper(HTML_FRAGMENT_PARSER).parseText(testHTML)
         def chartContainerNode = testHtmlAsNode.getAt(0)
-        chartContainerNode.attributes['class'] == "col-md-4"
+        chartContainerNode.attributes['class'] == "col-md-12"
     }
 
     def "HTML provided by taglib iteratec:barChart returns svg container with correct identifier"() {
