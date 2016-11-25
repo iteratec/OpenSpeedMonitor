@@ -100,27 +100,7 @@ databaseChangeLog = {
     changeSet(author: "mmi", id: "1472807664001-3") {
         grailsChange {
             change {
-                int batchSize = 10000
-                int count = sql.firstRow("SELECT COUNT(1) FROM  csi_aggregation where aggregator_id = (select id from aggregator_type where name = 'shop')").getAt(0)
-                def log = LogFactory.getLog("liquibase")
-                log.debug("split shopTag: Migrating csi_aggregation table (${count} rows, batchSize ${batchSize}")
-                for (int offset = 0; offset < count; offset += batchSize) {
-                    int limit = offset + batchSize
-
-                    sql.eachRow("select id, tag from csi_aggregation where aggregator_id = (select id from aggregator_type where name = 'shop') LIMIT ${offset},${limit};") { csiAggregation ->
-                        String currentTag = csiAggregation.tag
-
-                        def jobGroupId = currentTag.split(";")[0]
-
-                        sql.executeUpdate("update csi_aggregation set job_group_id = :jobGroupId where id = :currentId",
-                                [currentId: csiAggregation.id, jobGroupId: jobGroupId])
-
-                    }
-
-                    float percent = ((float) limit) / count * 100
-                    log.debug("Migrated ${percent} percent (${limit}/${count} rows)... ")
-                }
-                log.debug("split shopTag migration finished")
+                sql.executeUpdate("update csi_aggregation set job_group_id = tag where aggregator_id = (select id from aggregator_type where name = 'shop') AND tag in (SELECT distinct id from job_group)")
             }
         }
     }
