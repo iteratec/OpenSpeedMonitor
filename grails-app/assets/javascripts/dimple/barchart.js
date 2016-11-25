@@ -3,7 +3,7 @@
 
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
 OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {

@@ -1,6 +1,6 @@
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.resultSelection = (function(){
     var selectIntervalTimeframeCard = $("#select-interval-timeframe-card");

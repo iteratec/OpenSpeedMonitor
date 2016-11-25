@@ -16,16 +16,21 @@
  */
 
 //= require bower_components/spin.js/spin.js
+//= require_self
 
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 /**
  * This class creates a spinner which can be hooked into dom elements in the following manner and sizes:
  * - Spinner():                 Default spinner (large): Blocking the sites content
  * - Spinner(element):          Default spinner (large): Hooked into 'element' and blocking its content
  * - Spinner(element, 'small'): Small spinner; Hooked into 'element' indicating loading in the top right corner
+ *
+ * * * This spinner sets the position of the spinnerTargteElement to 'position: relative' for correct placement.
+ * * * After the spinner stopped the position gets reset to the previous state.
+ *
  */
 
 OpenSpeedMonitor.Spinner = function(spinnerTargetElement, size) {
@@ -142,5 +147,5 @@ OpenSpeedMonitor.Spinner = function(spinnerTargetElement, size) {
         spinner: spinner,
         start: start,
         stop: stop
-    };
+    }
 };

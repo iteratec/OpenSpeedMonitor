@@ -23,7 +23,7 @@
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
 //= require spinner
-// = require_self
+//= require_self
 
 /**
  * Global namespace for OpenSpeedMonitor application.
