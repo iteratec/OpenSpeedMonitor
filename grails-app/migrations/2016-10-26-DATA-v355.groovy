@@ -8,18 +8,25 @@ databaseChangeLog = {
                 int batchSize = 10000
                 int count = sql.firstRow("SELECT COUNT(1) FROM event_result").getAt(0)
                 def log = LogFactory.getLog("liquibase")
+
+                def jobGroupIds = sql.rows("SELECT DISTINCT id FROM job_group").collect { it[0] as Integer }
+                def measuredEventIds = sql.rows("SELECT DISTINCT id FROM measured_event").collect { it[0] as Integer }
+                def pageIdS = sql.rows("SELECT DISTINCT id FROM page").collect { it[0] as Integer }
+                def browserIds = sql.rows("SELECT DISTINCT id FROM browser").collect { it[0] as Integer }
+                def locationIds = sql.rows("SELECT DISTINCT id FROM location").collect { it[0] as Integer }
+
                 log.debug("split eventResultTag: Migrating event_result table (${count} rows, batchSize ${batchSize}")
+
                 for (int offset = 0; offset < count; offset += batchSize) {
                     int limit = offset + batchSize
 
                     sql.eachRow("select id, tag from event_result LIMIT ${offset},${limit};") { csiAggregation ->
-                        String currentTag = csiAggregation.tag
-
-                        def jobGroupId = currentTag.split(";")[0]
-                        def measuredEventId = currentTag.split(";")[1]
-                        def pageId = currentTag.split(";")[2]
-                        def browserId = currentTag.split(";")[3]
-                        def locationId = currentTag.split(";")[4]
+                        def tags = csiAggregation.tag.split(";").collect { it as Integer }
+                        def jobGroupId = tags[0] in jobGroupIds ? tags[0] : null
+                        def measuredEventId = tags[1] in measuredEventIds ? tags[1] : null
+                        def pageId = tags[2] in pageIdS ? tags[2] : null
+                        def browserId = tags[3] in browserIds ? tags[3] : null
+                        def locationId = tags[4] in locationIds ? tags[4] : null
 
                         sql.executeUpdate("update event_result set job_group_id = :jobGroupId, measured_event_id = :measuredEventId, page_id = :pageId, browser_id = :browserId, location_id = :locationId where id = :currentId",
                                 [currentId: csiAggregation.id, jobGroupId: jobGroupId, measuredEventId: measuredEventId, pageId: pageId, browserId: browserId, locationId: locationId])
@@ -41,18 +48,24 @@ databaseChangeLog = {
                 int batchSize = 10000
                 int count = sql.firstRow("SELECT COUNT(1) FROM  csi_aggregation where aggregator_id = (select id from aggregator_type where name = 'measuredEvent')").getAt(0)
                 def log = LogFactory.getLog("liquibase")
+
+                def jobGroupIds = sql.rows("SELECT DISTINCT id FROM job_group").collect { it[0] as Integer }
+                def measuredEventIds = sql.rows("SELECT DISTINCT id FROM measured_event").collect { it[0] as Integer }
+                def pageIdS = sql.rows("SELECT DISTINCT id FROM page").collect { it[0] as Integer }
+                def browserIds = sql.rows("SELECT DISTINCT id FROM browser").collect { it[0] as Integer }
+                def locationIds = sql.rows("SELECT DISTINCT id FROM location").collect { it[0] as Integer }
+
                 log.debug("split measuredEventTag: Migrating csi_aggregation table (${count} rows, batchSize ${batchSize}")
                 for (int offset = 0; offset < count; offset += batchSize) {
                     int limit = offset + batchSize
 
                     sql.eachRow("select id, tag from csi_aggregation where aggregator_id = (select id from aggregator_type where name = 'measuredEvent') LIMIT ${offset},${limit};") { csiAggregation ->
-                        String currentTag = csiAggregation.tag
-
-                        def jobGroupId = currentTag.split(";")[0]
-                        def measuredEventId = currentTag.split(";")[1]
-                        def pageId = currentTag.split(";")[2]
-                        def browserId = currentTag.split(";")[3]
-                        def locationId = currentTag.split(";")[4]
+                        def tags = csiAggregation.tag.split(";").collect { it as Integer }
+                        def jobGroupId = tags[0] in jobGroupIds ? tags[0] : null
+                        def measuredEventId = tags[1] in measuredEventIds ? tags[1] : null
+                        def pageId = tags[2] in pageIdS ? tags[2] : null
+                        def browserId = tags[3] in browserIds ? tags[3] : null
+                        def locationId = tags[4] in locationIds ? tags[4] : null
 
                         sql.executeUpdate("update csi_aggregation set job_group_id = :jobGroupId, measured_event_id = :measuredEventId, page_id = :pageId, browser_id = :browserId, location_id = :locationId where id = :currentId",
                                 [currentId: csiAggregation.id, jobGroupId: jobGroupId, measuredEventId: measuredEventId, pageId: pageId, browserId: browserId, locationId: locationId])
@@ -73,6 +86,10 @@ databaseChangeLog = {
                 int batchSize = 10000
                 int count = sql.firstRow("SELECT COUNT(1) FROM  csi_aggregation where aggregator_id = (select id from aggregator_type where name = 'page')").getAt(0)
                 def log = LogFactory.getLog("liquibase")
+
+                def jobGroupIds = sql.rows("SELECT DISTINCT id FROM job_group").collect { it[0] as Integer }
+                def pageIds = sql.rows("SELECT DISTINCT id FROM page").collect { it[0] as Integer }
+
                 log.debug("split pageTag: Migrating csi_aggregation table (${count} rows, batchSize ${batchSize}")
                 for (int offset = 0; offset < count; offset += batchSize) {
                     int limit = offset + batchSize
@@ -80,8 +97,9 @@ databaseChangeLog = {
                     sql.eachRow("select id, tag from csi_aggregation where aggregator_id = (select id from aggregator_type where name = 'page') LIMIT ${offset},${limit};") { csiAggregation ->
                         String currentTag = csiAggregation.tag
 
-                        def jobGroupId = currentTag.split(";")[0]
-                        def pageId = currentTag.split(";")[1]
+                        def tags = csiAggregation.tag.split(";").collect { it as Integer }
+                        def jobGroupId = tags[0] in jobGroupIds ? tags[0] : null
+                        def pageId = tags[1] in pageIds ? tags[1] : null
 
                         sql.executeUpdate("update csi_aggregation set job_group_id = :jobGroupId, page_id = :pageId where id = :currentId",
                                 [currentId: csiAggregation.id, jobGroupId: jobGroupId, pageId: pageId])
