@@ -4,6 +4,11 @@ databaseChangeLog = {
     // ### BEGIN Refactoring of tag attribute ###
     // split eventResultTag
     changeSet(author: "mmi", id: "1472807664005-1") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck(expectedResult: 0, 'select count(*) from event_result')
+            }
+        }
         grailsChange {
             change {
                 int minID = sql.firstRow("SELECT MIN(ID) FROM event_result").getAt(0)
@@ -35,6 +40,11 @@ databaseChangeLog = {
 
     // split measuredEventTag
     changeSet(author: "mmi", id: "1472807664001-1") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+            }
+        }
         grailsChange {
             change {
                 int minID = sql.firstRow("SELECT MIN(ID) FROM csi_aggregation").getAt(0)
@@ -65,6 +75,11 @@ databaseChangeLog = {
 
     // split pageTag
     changeSet(author: "mmi", id: "1472807664001-2") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+            }
+        }
         grailsChange {
             change {
                 int minID = sql.firstRow("SELECT MIN(ID) FROM csi_aggregation").getAt(0)
@@ -92,6 +107,11 @@ databaseChangeLog = {
 
     // split shopTag
     changeSet(author: "mmi", id: "1472807664001-3") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+            }
+        }
         grailsChange {
             change {
                 int minID = sql.firstRow("SELECT MIN(ID) FROM csi_aggregation").getAt(0)
@@ -128,6 +148,11 @@ databaseChangeLog = {
 
     // cleanup foreign key constraints
     changeSet(author: "mmi", id: "1472807664001-15") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck(expectedResult: 0, 'select count(*) from csi_aggregation')
+            }
+        }
         grailsChange {
             change {
                 sql.executeUpdate('''
@@ -155,6 +180,11 @@ databaseChangeLog = {
         }
     }
     changeSet(author: "mmi", id: "1472807664001-16") {
+        preConditions(onFail: 'MARK_RAN') {
+            not {
+                sqlCheck(expectedResult: 0, 'select count(*) from event_result')
+            }
+        }
         grailsChange {
             change {
                 sql.executeUpdate('''
