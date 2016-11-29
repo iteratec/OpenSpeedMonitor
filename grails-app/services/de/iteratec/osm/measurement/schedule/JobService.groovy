@@ -159,4 +159,29 @@ class JobService {
         }
         return executionDates
     }
+
+    String createResultLinkForJob(Job it){
+        String url = "http://localhost:8080/eventResultDashboard/showAll?_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on&_action_showAll=Anzeigen"
+
+        url+= "&selectedInterval=-1&selectedTimeFrameInterval=604800"+ // One Week
+                "&selectedFolder=$it.jobGroupId"
+        it.script.testedPages.each {page ->
+            url+="&selectedPages=$page.id"
+        }
+        url+= "&_selectedAllMeasuredEvents=&selectedAllMeasuredEvents=on"+
+                "&selectedBrowsers=$it.location.browserId"+
+                "&_selectedAllBrowsers="+
+                "&selectedLocations=$it.location.id"+
+                "&_selectedAllLocations="+
+                "&selectedConnectivityProfiles=$it.connectivityProfileId"+
+                //Default Stuff
+                "&_selectedAllConnectivityProfiles="+
+                "&_includeNativeConnectivity="+
+                "&_includeCustomConnectivity="+
+                "&selectedAggrGroupValuesUnCached=docCompleteTimeInMillisecsUncached"+
+                "&trimBelowLoadTimes=&trimAboveLoadTimes=&trimBelowRequestCounts=&trimAboveRequestCounts=&trimBelowRequestSizes=&trimAboveRequestSizes="
+    }
+
+
+
 }

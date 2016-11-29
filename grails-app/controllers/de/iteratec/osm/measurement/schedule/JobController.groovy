@@ -107,6 +107,7 @@ class JobController {
         }
     }
 
+
     def list() {
         redirect(action: 'index')
     }

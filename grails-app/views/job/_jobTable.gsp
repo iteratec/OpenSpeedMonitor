@@ -1,4 +1,5 @@
 <%@ defaultCodec="none" %>
+<g:set var="jobService" bean="jobService"/>
 <tbody>
 	<g:each var="job" in="${jobs}">
 		<g:set var="tags" value="${jobsWithTags.findAll { it.jobId == job.id }.collect { it.tag }}" />
@@ -54,6 +55,14 @@
 			</td>
 			<td>
 				${ job.firstViewOnly ? '' : message(code: 'job.2x.label') }
+			</td>
+			<td>
+				<g:if test="${job.lastRun}" >
+					<a href="${jobService.createResultLinkForJob(job)}">Show</a>
+				</g:if>
+				<g:else>
+					nope
+				</g:else>
 			</td>
 		</tr>
 	</g:each>
