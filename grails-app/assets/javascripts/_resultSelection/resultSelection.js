@@ -1,6 +1,6 @@
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 /**
  * Requires OpenSpeedMonitor.urls.resultSelection.getJobGroups to be defined

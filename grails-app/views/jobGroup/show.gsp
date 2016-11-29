@@ -156,6 +156,14 @@
 
             <td valign="top" class="value">${fieldValue(bean: jobGroup, field: "name")}</td>
         </tr>
+        <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
+            <tr class="prop">
+                <td valign="top" class="name"><g:message code="job.jobGroup.persistHar.label" default="Persist Detaildata"/></td>
+
+                <td valign="top" class="value"><g:formatBoolean boolean="${jobGroup.persistDetailData}" /></td>
+            </tr>
+        </g:if>
+
         <tr class="prop">
             <td valign="top" class="name"><g:message code="jobGroup.graphiteServers.label"
                                                      default="Graphite Servers"/></td>

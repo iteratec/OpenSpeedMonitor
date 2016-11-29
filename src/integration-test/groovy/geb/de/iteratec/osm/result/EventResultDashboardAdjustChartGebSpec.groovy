@@ -123,11 +123,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         given: "User edits chart size"
         waitFor { adjustChartButton.click() }
         sleep(200)
-        chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
-        chartWidthInputField << Keys.chord(Keys.DELETE)
+        chartWidthInputField.firstElement().clear()
         chartWidthInputField << "0"
-        chartheightInputField << Keys.chord(Keys.CONTROL, "a")
-        chartheightInputField << Keys.chord(Keys.DELETE)
+        chartheightInputField.firstElement().clear()
         chartheightInputField << "9999999"
 
         when: "User clicks \"apply\""
@@ -140,11 +138,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
 
     void "Adjust Chart Size"() {
         given: "User edits chart size"
-        chartWidthInputField << Keys.chord(Keys.CONTROL, "a")
-        chartWidthInputField << Keys.chord(Keys.DELETE)
+        chartWidthInputField.firstElement().clear()
         chartWidthInputField << "600"
-        chartheightInputField << Keys.chord(Keys.CONTROL, "a")
-        chartheightInputField << Keys.chord(Keys.DELETE)
+        chartheightInputField.firstElement().clear()
         chartheightInputField << "600"
 
         when: "User clicks \"apply\""
@@ -204,11 +200,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
         given: "User edits chart size"
         waitFor { adjustChartButton.click() }
         sleep(200)
-        diaYAxisMinInputField << Keys.chord(Keys.CONTROL, "a")
-        diaYAxisMinInputField << Keys.chord(Keys.DELETE)
+        diaYAxisMinInputField.firstElement().clear()
         diaYAxisMinInputField << "200"
-        diaYAxisMaxInputField << Keys.chord(Keys.CONTROL, "a")
-        diaYAxisMaxInputField << Keys.chord(Keys.DELETE)
+        diaYAxisMaxInputField.firstElement().clear()
         diaYAxisMaxInputField << "600"
 
         when: "User clicks \"apply\""

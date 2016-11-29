@@ -33,20 +33,12 @@ function copyCsiConfiguration(csiConfigurations) {
     var linkToCopyCsiConfig = promptForNewName(
         POSTLOADED.link_CsiConfigurationSaveCopy, POSTLOADED.i18n_nameAlreadyExistMsg, csiConfigurations);
 
-    var spinnerParent = document.getElementById('copyCsiConfigurationSpinner');
-    var spinnerBackground = document.createElement('div');
-
     if(linkToCopyCsiConfig) {
-        var runningSpinner;
+        var spinner = new OpenSpeedMonitor.Spinner();
         $.ajax({
             url: linkToCopyCsiConfig,
             beforeSend: function() {
-                spinnerBackground.classList.add('spinnerBackground');
-                spinnerParent.appendChild(spinnerBackground);
-
-                runningSpinner = POSTLOADED.getLargeSpinner('#000', '50%', '50%');
-                runningSpinner.el.style.position = 'fixed';
-                spinnerParent.appendChild(runningSpinner.el);
+                spinner.start();
             },
             complete: function(xhr, textStatus) {
 
@@ -59,10 +51,7 @@ function copyCsiConfiguration(csiConfigurations) {
                 $('#uploadPageWeightsCsiConfigurationId').val(actualCsiConfigurationId);
                 $('#uploadHourOfDayWeightsCsiConfigurationId').val(actualCsiConfigurationId);
 
-                // refreshCsiConfigurationSwitchMenu();
-                spinnerParent.removeChild(spinnerBackground);
-                runningSpinner.stop();
-
+                spinner.stop();
             }
         })
     }

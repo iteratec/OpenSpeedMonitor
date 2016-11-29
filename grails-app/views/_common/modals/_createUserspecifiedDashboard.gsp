@@ -12,7 +12,6 @@
 
             <div class="modal-body form-horizontal">
                 <div class="alert alert-danger renderInvisible" id="validateDashboardNameErrorDiv"></div>
-                <div id="spinner-position"></div>
                 <div class="form-group">
                     <label class="control-label col-md-3" for="dashboardNameFromModal">
                         ${message(code: 'de.iteratec.isocsi.dashBoardControllers.custom.dashboardName.label', default: 'Dashboard name')}:
@@ -133,7 +132,8 @@
         dashboardName = dashboardName ? dashboardName : name
         if (dashboardName.trim() !== "") {
 
-            var spinner = startSpinner(document.getElementById('spinner-position'));
+            var spinner = new OpenSpeedMonitor.Spinner();
+            spinner.start();
 
             dashBoardParamsFormValues = {};
 

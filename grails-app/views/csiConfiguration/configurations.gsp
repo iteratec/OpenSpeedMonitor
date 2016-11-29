@@ -153,9 +153,6 @@
 <g:render template="/layouts/mainMenu"/>
 
 
-<div id="copyCsiConfigurationSpinner"></div>
-
-
 %{-- container for errors --}%
 <div class="row">
     <div class="col-md-12">

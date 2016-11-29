@@ -11,7 +11,6 @@ This is a dialog to choose from different default csi mappings.
                 <h4 id="ModalLabel" class="modal-title"><g:message code="de.iteratec.osm.csi.mapping.title" default="Mapping: load time &rarr; customer satisfaction"/></h4>
             </div>
             <div class="modal-body row">
-                <div id="chose-csi-mapping-spinner-position" class="spinner-large-content-spinner"></div>
                 <g:render template="/chart/csi-mappings"
                           model="${['chartData': defaultMultiLineChart, 'chartIdentifier': 'choose_default_csi',
                                     'bottomOffsetXAxis': 364, 'yAxisRightOffset': 44, 'chartBottomOffset': 250,
@@ -26,7 +25,7 @@ This is a dialog to choose from different default csi mappings.
                         </label>
                         <g:select class="form-control" from="${pages.sort{it.name}}" optionValue="name" optionKey="id" id="selectPageMapping" name="selectPage" noSelection="${["-1":message(code:'de.iteratec.osm.csi.mapping.select.page.default')]}"/>
 
-                        <button href="#" %{--type="button"--}% class="btn btn-primary"  disabled="true" id="applyMapping">
+                        <button href="#" class="btn btn-primary"  disabled="true" id="applyMapping">
                             <g:message code="de.iteratec.osm.mapping.applydefault.button.label" default="Apply mapping"/>
                         </button>
                     </div>
@@ -68,9 +67,8 @@ This is a dialog to choose from different default csi mappings.
         function applyPageMapping(){
             var select = $("#CsiMappingModal").find("#selectPageMapping");
             select.prop('disabled', true);
-            var spinnerParent = document.getElementById('chose-csi-mapping-spinner-position');
-            var spinner = POSTLOADED.getLargeSpinner('#000', '50%', '50%');
-            spinnerParent.appendChild(spinner.el);
+            var spinner = OpenSpeedMonitor.Spinner('#choose_default_csi');
+            spinner.start();
             $("#applyMapping").prop('disabled', true);
             var pageId = select.find(":selected").val()
             jQuery.ajax({

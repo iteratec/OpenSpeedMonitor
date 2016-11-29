@@ -869,6 +869,7 @@ class EventResultDashboardController {
 
                 cmd.copyRequestDataToViewModelMap(modelToRender);
                 modelToRender.put('command', cmd)
+                fillWithI18N(modelToRender)
                 render(view: "showAll", model: modelToRender)
             } else {
                 params.remove("action")
@@ -923,6 +924,7 @@ class EventResultDashboardController {
         }
         def batchIsQueued = assetRequestPersisterService.sendFetchAssetsAsBatchCommand(jobResults)
         modelToRender.put("startedBatchActivity",batchIsQueued)
+        fillWithI18N(modelToRender)
         render(view: "showAll", model: modelToRender)
     }
 }

@@ -22,7 +22,8 @@
 //= require_tree bower_components/clipboard
 //= require kickstart/kickstart
 //= require kickstart/checkboxes
-// = require_self
+//= require spinner
+//= require_self
 
 /**
  * Global namespace for OpenSpeedMonitor application.

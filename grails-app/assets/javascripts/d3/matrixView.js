@@ -19,8 +19,10 @@ function createMatrixView(data, chartDivIdentifier) {
 
     // Define color scale
     var color = "#DC381F";
+    // without this conditional request the tile would be white in case all weights have the same value
+    var dataWeightMin = data.weightMin == data.weightMax ? 0 : data.weightMin;
     var colorScale = d3.scale.linear()
-        .domain([data.weightMin, data.weightMax])
+        .domain([dataWeightMin, data.weightMax])
         .range([0,1]);
 
     // does tooltip at mouse position

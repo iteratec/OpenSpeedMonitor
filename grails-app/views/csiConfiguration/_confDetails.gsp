@@ -3,7 +3,7 @@
 
 
 %{-- nav tabs for the mapping and the weights --}%
-<ul class="nav nav-tabs">
+<ul id="csiConfigurationDetailsTabs" class="nav nav-tabs">
     <li class="active">
         <a data-toggle="tab" href="#csiMappingDetailsTabContent">
             <g:message code="de.iteratec.osm.csi.navTab.mapping" default="Mappings"/>
@@ -159,7 +159,7 @@
                                                 <span class="input-group-btn">
                                                     <button type="submit" class="btn btn-default"
                                                             id="defaultMappingUploadButton"
-                                                            onclick="document.getElementById('copyCsiConfigurationSpinner').appendChild(POSTLOADED.getLargeSpinner().el);"
+                                                            onclick="showSpinnerAtDefaultMappingUpload()"
                                                             disabled="true">
                                                         <g:message code="de.iteratec.isocsi.upload_file"
                                                                    default="Upload"/>
@@ -186,14 +186,16 @@
                                                 disabled="true"
                                                 id="btn-apply-mapping" onclick="showMappingDialog()">
                                             <g:message code="de.iteratec.osm.csiConfiguration.applyMapping"
-                                                       default="Apply Mapping"/></button>
+                                                       default="Apply Mapping"/>
+                                        </button>
                                         <button type="button" class="btn btn-danger" data-toggle="modal"
                                                 href="#DeleteModal${customDefaultCsiMappingDeletePrefix}"
                                                 disabled="true"
                                                 id="btn-delete-default">
                                             <g:message
                                                     code="de.iteratec.osm.csiConfiguration.deleteDefaultCsiConfiguration"
-                                                    default="Delete Default Mapping"/></button>
+                                                    default="Delete Default Mapping"/>
+                                        </button>
                                     </g:if>
                                     <g:render template="/_common/modals/deleteDialogCustomAction"
                                               model="[itemLabel: message(code: 'de.iteratec.osm.csi.DefaultTimeToCsMapping.label'), actionName: 'deleteDefaultCsiMapping', customPrefix: customDefaultCsiMappingDeletePrefix, customID: 'name', customController: 'CsiConfiguration']"/>
@@ -436,7 +438,25 @@
         showPageSelect(defaultGraphObject.getSelectedName(), defaultGraphObject.getColorForName(defaultGraphObject.getSelectedName()));
     }
 
+    function showSpinnerAtDefaultMappingUpload () {
+        var spinner = new OpenSpeedMonitor.Spinner();
+        spinner.start();
+    }
+
+    %{-- show the nav tab anchor id as hash in the url --}%
+    $('#csiConfigurationDetailsTabs > li > a').on('shown.bs.tab', function (e) {
+        scrollposition = $(document).scrollTop();
+        var id = $(e.target).attr('href').substr(1);
+        window.location.hash = id;
+        $(document).scrollTop(scrollposition);
+    });
+
     $(document).ready(function () {
+        %{-- if passed, show the given nav tab at the start --}%
+        var hash = window.location.hash;
+        $('#csiConfigurationDetailsTabs a[href="' + hash + '"]').tab('show', function() {
+        $(document).scrollTop();
+        });
 
         registerEventHandlers();
 

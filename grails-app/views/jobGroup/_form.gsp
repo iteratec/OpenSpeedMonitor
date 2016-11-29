@@ -54,7 +54,7 @@
 
 <div>
     <g:if test="${grailsApplication.config.getProperty('grails.de.iteratec.osm.assetRequests.enablePersistenceOfAssetRequests')?.toLowerCase() == "true"}">
-        <label for="csiConfiguration" class="control-label"><g:message code="job.jobGroup.persistHar.label"
+        <label for="persistDetailData" class="control-label"><g:message code="job.jobGroup.persistHar.label"
                                                                        default="Persist Detaildata"/></label>
 
         <div>

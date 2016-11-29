@@ -17,7 +17,7 @@
 
 "use strict";
 
-OpenSpeedMonitor = OpenSpeedMonitor || {};
+var OpenSpeedMonitor = OpenSpeedMonitor || {};
 
 OpenSpeedMonitor.DateTimePicker = function(dateTimePickerElement, autoTime) {
 	dateTimePickerElement = $(dateTimePickerElement);

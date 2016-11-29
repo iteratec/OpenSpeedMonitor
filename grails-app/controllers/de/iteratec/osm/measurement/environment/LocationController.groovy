@@ -2,6 +2,7 @@ package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
+import org.hibernate.sql.JoinType
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.http.HttpStatus
 
@@ -84,14 +85,14 @@ class LocationController {
         params.max = params.max as Integer
         params.offset = params.offset as Integer
         List<Location> result = Location.createCriteria().list(params) {
+            createAlias('csiConfiguration', 'wptServerAlias', JoinType.LEFT_OUTER_JOIN)
+
             if(params.filter)
                 or{
                     ilike("label","%"+params.filter+"%")
                     ilike("uniqueIdentifierForServer","%"+params.filter+"%")
                     ilike("location","%"+params.filter+"%")
-                    wptServer{
-                        ilike("label","%"+params.filter+"%")
-                    }
+                    ilike("wptServerAlias.label","%"+params.filter+"%")
                 }
         }
         String templateAsPlainText = g.render(
