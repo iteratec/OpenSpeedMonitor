@@ -56,8 +56,8 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="#" id="dia-save-chart-as-png" class="btn btn-primary btn-sm disabled" role="button"
-                           style="vertical-align: top;" onclick="downloadBarchart()">
+                        <a href="#downloadAsPngModal" id="dia-save-chart-as-png" class="btn btn-primary btn-sm disabled" data-toggle="modal" role="button"
+                           style="vertical-align: top;" onclick="setDefaultValues('svg-container')">
                             <g:message code="de.iteratec.ism.ui.button.save.name"/>
                         </a>
                     </li>
@@ -149,6 +149,8 @@
     </div>
 </div>
 
+<g:render template="/_common/modals/downloadAsPngDialog" model="['chartContainerID': 'svg-container']" />
+
 <content tag="include.bottom">
     <asset:javascript src="csidashboard/csiDashboard.js"/>
     <asset:javascript src="pngDownloader.js"/>
@@ -203,12 +205,6 @@
                 }
             });
         }
-
-        function downloadBarchart() {
-            var svgNode = d3.select("svg").node();
-            downloadAsPNG(svgNode, "barchart.png", parseInt(svgNode.getAttribute("width"), 10), parseInt(svgNode.getAttribute("height"), 10));
-        }
-
     </asset:script>
 </content>
 
