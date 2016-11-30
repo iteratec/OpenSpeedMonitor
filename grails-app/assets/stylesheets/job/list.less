@@ -2,8 +2,9 @@
 *= require_self
 */
 
+@import "../bower_components/bootstrap/less/variables.less";
+
 td{
-  border: 1px #ccc solid;
   padding: 0.3em;
 }
 th{
@@ -67,7 +68,6 @@ display: block;
 	height: 32px;
 }
 
-
 .inactiveJob {
 	font-weight: normal;
 }
@@ -79,4 +79,22 @@ display: block;
 #updateHints {
 	line-height: 21px;
 	padding: 6px;
+}
+
+.show-chart-buttons {
+	float: right;
+	height: 100%;
+	display: flex;
+}
+
+.show-chart-buttons a {
+	vertical-align: middle;
+	display: table-cell;
+	//color: @gray-light;
+	padding: 5px 8px;
+	border-radius: 4px;
+	&:hover, &:focus {
+		//color: white;
+		background: @gray-lighter;
+	}
 }

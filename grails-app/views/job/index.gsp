@@ -191,7 +191,7 @@
                 <g:message code="job.getRunningAndRecentlyFinishedJobs.error"/>
             </div>
             <div id="spinner-joblist" class="spinner-large-content-spinner"></div>
-            <table class="table table-bordered table-striped" id="jobtable">
+            <table class="table table-striped" id="jobtable">
                 <thead class="header">
                 <tr>
                     <th><input type="checkbox" id="checkAll"/></th>
@@ -211,7 +211,6 @@
                     <g:sortableColumn property="executionSchedule" title="${executionScheduleLabel}"/>
                     <g:sortableColumn property="runs" titleKey="job.runs.label" title="Runs"/>
                     <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
-                    <g:sortableColumn property="lastRun" titleKey="job.data.lastWeek" title="Data"/>
                 </tr>
                 </thead>
                 <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>

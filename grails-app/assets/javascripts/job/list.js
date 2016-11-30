@@ -203,6 +203,10 @@ function filterJobList() {
         }
         tr.toggle(showRow);
     });
+	// reapply striping
+    $("#joblist tr:not(.hidden)").each(function (index) {
+        $(this).toggleClass("stripe", !!(index & 1));
+    });
 }
 
 function initTable(nextExecutionLink) {

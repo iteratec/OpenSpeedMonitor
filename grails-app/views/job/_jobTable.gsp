@@ -10,6 +10,11 @@
 					checked="${ selectedIds?.contains(job.id) }"
 					class="jobCheckbox" /></td>
 			<td>
+				<div class="show-chart-buttons">
+				<g:if test="${job.lastRun}" >
+					<a href="${jobService.createResultLinkForJob(job)}" class="show-chart"><i class="fa fa-line-chart"></i></a>
+				</g:if>
+				</div>
 				<strong><a
 					href="${createLink(action: 'edit', id: job.id, absolute: true)}" class="jobName ${job.active==false?'inactiveJob':''}"> ${job.label}
 				</a></strong>
@@ -55,14 +60,6 @@
 			</td>
 			<td>
 				${ job.firstViewOnly ? '' : message(code: 'job.2x.label') }
-			</td>
-			<td>
-				<g:if test="${job.lastRun}" >
-					<a href="${jobService.createResultLinkForJob(job)}">Show</a>
-				</g:if>
-				<g:else>
-					nope
-				</g:else>
 			</td>
 		</tr>
 	</g:each>
