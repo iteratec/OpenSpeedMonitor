@@ -1,4 +1,4 @@
-<select multiple="${multiple}" id="${id}" class="${cssClass}" style="${style}" name="${name}">
+<select ${multiple} id="${id}" class="${cssClass}" style="${style}" name="${name}">
 	<g:each in="${dataMap}" var="data">
 		<optgroup label="${message(code: 'de.iteratec.isr.measurand.group.'+data.key)}">
 			<g:each in="${data.value}" var="value">

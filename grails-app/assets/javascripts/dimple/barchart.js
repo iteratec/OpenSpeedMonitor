@@ -9,10 +9,14 @@ OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
     var chart = null,
         height = 400,
-        legendPosition = {x: 200, y: 10, width: 380, height: 20},
-        maxWidthPerBar = 300,
-        series = null,
-        svg = null;
+        legendPosition = {x: 200, y: 10, width: 100, height: 100},
+        margins = {left: 60, right: 100, top: 110, bottom: 70},
+        maxWidthPerBar = 150,
+        allMeasurandSeries = {},
+        svg = null,
+        seriesCount = 0,
+        xAxis = null,
+        yAxes = {};
 
     var init = function () {
         // add eventHandler
@@ -27,59 +31,91 @@ OpenSpeedMonitor.ChartModules.PageAggregation = function (chartIdentifier) {
 
         svg = dimple.newSvg("#" + chartIdentifier, "100%", height);
         chart = new dimple.chart(svg, null);
-        chart.setMargins("60px", "30px", "110px", "70px");
+        chart.setMargins(margins.left, margins.right, margins.top, margins.bottom);
         svg = svg.node();
+        seriesCount = Object.keys(barchartData['series']).length;
 
-        chart.data = barchartData.data;
-        setYValueAccessor(barchartData.yValueAccessor, barchartData.yValueUnit);
+        xAxis = chart.addCategoryAxis("x", "grouping");
+        xAxis.title = barchartData['groupingLabel'];
 
-        addXCategory(barchartData.xGroupings);
+        var seriesId = 0;
+        for (var currentSeriesId in barchartData.series) {
+            var currentSeries = barchartData.series[currentSeriesId];
 
-        barchartData.stackedAttributes.forEach(function (stack) {
-            addStackAttribute(stack)
-        });
+            // get correct y axis
+            var yAxis = yAxes[currentSeries['dimensionalUnit']];
+            if (!yAxis) {
+                yAxis = chart.addMeasureAxis("y", "indexValue");
+                yAxis.title = currentSeries['dimensionalUnit'];
+                yAxes[currentSeries['dimensionalUnit']] = yAxis;
+            }
 
-        chart.addLegend(legendPosition.x, legendPosition.y, legendPosition.width, legendPosition.height);
-        chart.addSeries(series, dimple.plot.bar);
+            allMeasurandSeries[currentSeriesId] = [];
+            if (currentSeries.stacked === true) {
+                var s = chart.addSeries("index", dimple.plot.bar, [xAxis, yAxis]);
+                s.data = currentSeries.data;
+                allMeasurandSeries[currentSeriesId].push(seriesId);
+                seriesId += 1;
+            } else {
+                var allMeasurands = removeDuplicatesFromArray(currentSeries.data.map(function (value) {
+                    return value.index;
+                }));
+                allMeasurands.forEach(function (measurand) {
+                    var s = chart.addSeries("index", dimple.plot.bar, [xAxis, yAxis]);
+                    s.data = currentSeries.data.filter(function (datum) {
+                        return datum.index === measurand;
+                    });
+                    allMeasurandSeries[currentSeriesId].push(seriesId);
+                    seriesId += 1;
+                })
+            }
+        }
+
+        chart.addLegend(legendPosition.x, legendPosition.y, legendPosition.width, legendPosition.height, "right");
         chart.draw();
         resize();
     };
 
-    addXCategory = function (category) {
-        if (series == null) {
-            series = []
-        }
-        category.forEach(function (c) {
-            series.push(c);
-        });
-        chart.addCategoryAxis("x", category);
-    };
 
-    setYValueAccessor = function (accessor, unit) {
-        var axis = chart.addMeasureAxis("y", accessor);
-        axis.title = accessor + " (" + unit + ")"
-    };
+    var positionBars = function () {
+        // Move Bars side to side
+        for (var s in allMeasurandSeries) {
+            var i = Object.keys(allMeasurandSeries).indexOf(s);
+            allMeasurandSeries[s].forEach(function (seriesId) {
+                var currentSeriesRects = d3.selectAll(".dimple-series-group-" + seriesId).selectAll("rect");
+                var oldWidth = parseInt(currentSeriesRects.attr("width"));
+                var translateX = i * oldWidth / seriesCount;
+                currentSeriesRects.attr("transform", "translate(" + translateX + ", 0)");
+                currentSeriesRects.attr("width", oldWidth / seriesCount);
+            })
 
-    addStackAttribute = function (stackAccessor) {
-        if (series == null) {
-            series = []
         }
-        series.push(stackAccessor);
     };
 
     var resize = function () {
         var svgWidth, maxWidth, containerWidth;
 
         containerWidth = $("#" + chartIdentifier).width();
-        maxWidth = $(".dimple-series-0").length * maxWidthPerBar;
+        maxWidth = Object.keys(allMeasurandSeries).length * $(".dimple-axis-x .tick").length * maxWidthPerBar;
         svgWidth = containerWidth < maxWidth ? "100%" : "" + maxWidth + "px";
 
         svg.setAttribute("width", svgWidth);
 
-        // second parameter here allows you to draw without reprocessing data.
+        chart.legends[0].x = (containerWidth < maxWidth) ? (containerWidth - legendPosition.width - margins.right) : (maxWidth - legendPosition.width - margins.right);
+        // second parameter allows to draw without reprocessing data.
         chart.draw(0, true);
+
+        positionBars();
     };
-    
+
+    // returns a new array without removed duplicates
+    var removeDuplicatesFromArray = function (array) {
+        return array.reduce(function (p, c) {
+            if (p.indexOf(c) < 0) p.push(c);
+            return p;
+        }, []);
+    };
+
     init();
     return {
         drawChart: drawChart

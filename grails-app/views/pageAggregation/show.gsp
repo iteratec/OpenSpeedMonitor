@@ -127,10 +127,8 @@
                 <div class="tab-pane" id="tabVariableSelection">
                     <div class="row">
                         <div class="col-md-4">
-                            <g:render template="/_resultSelection/firstViewCard" model="[
-                                    selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached,
-                                    aggrGroupValuesUnCached        : aggrGroupValuesUnCached,
-                                    selectedAggrGroupValuesUnCached: selectedAggrGroupValuesUnCached
+                            <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
+                                    aggrGroupValuesUnCached: aggrGroupValuesUnCached
                             ]"/>
                         </div>
 
@@ -166,6 +164,9 @@
 
         function drawGraph() {
             var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
+            var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
+            var spinner = OpenSpeedMonitor.Spinner("#svg-container");
+            spinner.start();
             $.ajax({
                 type: 'POST',
                 data: {
@@ -176,25 +177,27 @@
                     })),
                     selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
                         return $(e).text()
-                    }))
+                    })),
+                    selectedSeries: JSON.stringify(selectedSeries)
                 },
                 url: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
                 dataType: "json",
-                complete: function() {
-                },
                 success: function (data) {
+                    spinner.stop();
+                    if (!$("#error-div").hasClass("hidden"))
+                        $("#error-div").addClass("hidden");
+
                     if (!$.isEmptyObject(data)) {
-                        OpenSpeedMonitor.ChartModules.PageAggregation("svg-container").drawChart(data);
-                        $("#dia-save-chart-as-png").removeClass("disabled");
                         if (!$("#no-data-div").hasClass("hidden"))
                             $("#no-data-div").addClass("hidden");
-                        if (!$("#error-div").hasClass("hidden"))
-                            $("#error-div").addClass("hidden")
+                        OpenSpeedMonitor.ChartModules.PageAggregation("svg-container").drawChart(data);
+                        $("#dia-save-chart-as-png").removeClass("disabled");
                     } else {
                         $("#no-data-div").removeClass("hidden")
                     }
                 },
                 error: function (e) {
+                    spinner.stop();
                     $("#error-div").removeClass("hidden");
                     $("#error-message").html(e.responseText);
                 }

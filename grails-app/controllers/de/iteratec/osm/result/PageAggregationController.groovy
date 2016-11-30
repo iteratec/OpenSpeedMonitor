@@ -1,8 +1,10 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.dimple.BarchartDTO
+import de.iteratec.osm.dimple.BarchartDatum
+import de.iteratec.osm.dimple.BarchartSeries
 import de.iteratec.osm.dimple.GetBarchartCommand
-import de.iteratec.osm.dimple.barchartDTO
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.dao.BrowserDaoService
@@ -10,6 +12,7 @@ import de.iteratec.osm.measurement.environment.dao.LocationDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.dao.JobGroupDaoService
 import de.iteratec.osm.measurement.schedule.dao.PageDaoService
+import de.iteratec.osm.report.chart.MeasurandGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import org.springframework.http.HttpStatus
@@ -101,7 +104,7 @@ class PageAggregationController {
         modelToRender.put('selectedAllBrowsers', true)
         modelToRender.put('selectedAllLocations', true)
         modelToRender.put('selectedAllConnectivityProfiles', true)
-        modelToRender.put('selectedAggrGroupValuesUnCached',[])
+        modelToRender.put('selectedAggrGroupValuesUnCached', [])
 
         modelToRender.put("tagToJobGroupNameMap", jobGroupDaoService.getTagToJobGroupNameMap())
 
@@ -112,7 +115,7 @@ class PageAggregationController {
     /**
      * Rest Method for ajax call.
      * @param cmd The requested data.
-     * @return barchartDTO as JSON or string message if an error occurred
+     * @return BarchartDTO as JSON or string message if an error occurred
      */
     def getBarchartData(GetBarchartCommand cmd) {
         String errorMessages = getErrorMessages(cmd)
@@ -126,17 +129,40 @@ class PageAggregationController {
 
         def data = []
 
+        List<String> allMeasurands = cmd.selectedSeries*.measurands.flatten()*.replace("Uncached", "")
+
         allJobGroups.each { currentJobGroup ->
             allPages.each { currentPage ->
                 List<EventResult> eventResults = EventResult.findAllByDateCreatedBetweenAndJobGroupAndPage(cmd.from, cmd.to, currentJobGroup, currentPage)
                 if (eventResults) {
-                    double average = eventResults.sum { it.docCompleteTimeInMillisecs } / eventResults.size()
-                    data.add(['jobGroup': currentJobGroup.name, 'page': currentPage.name, 'docComplete': average])
+                    Map<String, String> datum = ['jobGroup': currentJobGroup.name, 'page': currentPage.name]
+                    allMeasurands.each { m ->
+                        List allValues = eventResults*.getAt(m).findAll { it != null }
+                        Double mAverage = allValues ? (allValues.sum { it } / allValues.size()) : null
+                        datum.put(m, mAverage)
+                    }
+                    data.add(datum)
                 }
             }
         }
 
-        def result = data ? new barchartDTO(data: data, yValueAccessor: "docComplete", xGroupings: ["page", "jobGroup"], yValueUnit: "ms") : [:]
+        List allSeries = cmd.selectedSeries
+        BarchartDTO barchartDTO = new BarchartDTO(groupingLabel: "Page / JobGroup")
+
+        allSeries.each { series ->
+            BarchartSeries barchartSeries = new BarchartSeries(dimensionalUnit: getDimensionalUnit(series.measurands[0]), stacked: series.stacked)
+            series.measurands.each { currentMeasurand ->
+                data.each { datum ->
+                    barchartSeries.data.add(
+                            new BarchartDatum(index: currentMeasurand.replace("Uncached", ""), indexValue: datum[currentMeasurand.replace("Uncached", "")], grouping: "${datum['page']} / ${datum['jobGroup']}"))
+                }
+            }
+
+            barchartDTO.series.add(barchartSeries)
+        }
+
+
+        def result = data ? barchartDTO : [:]
         ControllerUtils.sendObjectAsJSON(response, result)
     }
 
@@ -156,5 +182,26 @@ class PageAggregationController {
             result += "<br />"
         }
         return result
+    }
+
+    /**
+     * Returns the dimensional unit for the given measurand
+     * @param measurand the {@link MeasurandGroup}
+     * @return the dimensional unit as string
+     */
+    private String getDimensionalUnit(String measurand) {
+        def aggregatorGroup = AGGREGATOR_GROUP_VALUES.get(CachedView.UNCACHED)
+        if (aggregatorGroup.get(MeasurandGroup.LOAD_TIMES).contains(measurand)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.loadTimes.dimensionalUnit", "ms")
+        } else if (aggregatorGroup.get(MeasurandGroup.PERCENTAGES).contains(measurand)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.percentages.dimensionalUnit", "percent %")
+        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_COUNTS)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.requestCounts.dimensionalUnit", "count")
+        } else if (aggregatorGroup.get(MeasurandGroup.REQUEST_SIZES)) {
+            return i18nService.msg("de.iteratec.osm.measurandGroup.requestSize.dimensionalUnit", "kb")
+        } else {
+            return ""
+        }
+
     }
 }
