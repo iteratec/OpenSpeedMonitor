@@ -19,7 +19,7 @@
         </div>
         <section id="list-connectivityProfile" class="first">
 
-            <table class="table table-bordered">
+            <table class="table table-striped">
                 <thead>
                     <tr>
 

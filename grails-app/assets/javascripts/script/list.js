@@ -28,6 +28,10 @@ function filterScriptList() {
     	if (showRow && filterText !== '') { showRow = scriptLabel.search(reText) > -1; }
     	tr.toggle(showRow);
     });
+	// reapply striping
+    $("#script-table tr:not(.hidden)").each(function (index) {
+        $(this).toggleClass("stripe", !!(index & 1));
+    });
 }
 $(document).ready(function(){
   var offsetFixedHeader = $('.navbar-header').height();

@@ -4,14 +4,6 @@
 
 @import "../bower_components/bootstrap/less/variables.less";
 
-td{
-  padding: 0.3em;
-}
-th{
-  &:extend(td);
-  background-color: #ffffff;
-}
-
 table#jobtable tr.success td {
 	background: rgb(171, 248, 171) !important;
 }
@@ -83,18 +75,12 @@ display: block;
 
 .show-chart-buttons {
 	float: right;
-	height: 100%;
-	display: flex;
 }
 
 .show-chart-buttons a {
-	vertical-align: middle;
-	display: table-cell;
-	//color: @gray-light;
 	padding: 5px 8px;
 	border-radius: 4px;
 	&:hover, &:focus {
-		//color: white;
 		background: @gray-lighter;
 	}
 }

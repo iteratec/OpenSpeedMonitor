@@ -4,15 +4,6 @@
     <meta name="layout" content="kickstart_osm" />
     <g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Skript')}" />
     <title><g:message code="de.iteratec.iss.scripts" /></title>
-    <style>
-        th{
-            background-color: #ffffff;
-        }
-        td, th {
-            border: 1px #ccc solid;
-            padding: 0.3em;
-        }
-    </style>
 </head>
 <body>
 	<%-- main menu --%>
@@ -37,7 +28,7 @@
 	</g:if>
 	<g:else>
 
-	<table class="table-striped" id="script-table">
+	<table class="table table-striped" id="script-table">
 		<thead>
 		<tr>
 			<g:sortableColumn property="label" titleKey="de.iteratec.iss.script" />
