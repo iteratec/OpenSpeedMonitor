@@ -21,9 +21,12 @@ import grails.transaction.Transactional
 import org.joda.time.DateTime
 import org.quartz.CronExpression
 
+import grails.web.mapping.LinkGenerator
+
 class JobService {
 
     JobDaoService jobDaoService
+    LinkGenerator grailsLinkGenerator
 
     /**
      * <p>
@@ -161,25 +164,35 @@ class JobService {
     }
 
     String createResultLinkForJob(Job it){
-        String url = "http://localhost:8080/eventResultDashboard/showAll?_overwriteWarningAboutLongProcessingTime=&overwriteWarningAboutLongProcessingTime=on&_action_showAll=Anzeigen"
-
-        url+= "&selectedInterval=-1&selectedTimeFrameInterval=604800"+ // One Week
-                "&selectedFolder=$it.jobGroupId"
+        Map<String,Object> params = [:]
+        params["_overwriteWarningAboutLongProcessingTime"] = ""
+        params["&overwriteWarningAboutLongProcessingTime"] = "on"
+        params["_action_showAll"] = "Anzeigen"
+        params["selectedInterval"] = "-1"
+        params["selectedTimeFrameInterval"] = "604800"// One Week
+        params["selectedFolder"] = "$it.jobGroupId"
+        Set pages = []
         it.script.testedPages.each {page ->
-            url+="&selectedPages=$page.id"
+            pages << "$page.id"
         }
-        url+= "&_selectedAllMeasuredEvents=&selectedAllMeasuredEvents=on"+
-                "&selectedBrowsers=$it.location.browserId"+
-                "&_selectedAllBrowsers="+
-                "&selectedLocations=$it.location.id"+
-                "&_selectedAllLocations="+
-                "&selectedConnectivityProfiles=$it.connectivityProfileId"+
-                //Default Stuff
-                "&_selectedAllConnectivityProfiles="+
-                "&_includeNativeConnectivity="+
-                "&_includeCustomConnectivity="+
-                "&selectedAggrGroupValuesUnCached=docCompleteTimeInMillisecsUncached"+
-                "&trimBelowLoadTimes=&trimAboveLoadTimes=&trimBelowRequestCounts=&trimAboveRequestCounts=&trimBelowRequestSizes=&trimAboveRequestSizes="
+        params["selectedPages"] = pages
+        params["_selectedAllMeasuredEvents"] = ""
+        params["selectedAllMeasuredEvents"] = "on"
+        params["selectedBrowsers"] = "$it.location.browserId"
+        params["_selectedAllBrowsers"] = ""
+        params["selectedLocations"] = "$it.location.id"
+        params["_selectedAllLocations"] = ""
+        params["selectedConnectivityProfiles"] = "$it.connectivityProfileId"
+        params["_selectedAllConnectivityProfiles"] = ""
+        params["_includeNativeConnectivity"] = ""
+        params["selectedAggrGroupValuesUnCached"] = "docCompleteTimeInMillisecsUncached"
+        params["trimBelowLoadTimes"] = ""
+        params["trimAboveLoadTimes"] = ""
+        params["trimBelowRequestCounts"] = ""
+        params["trimAboveRequestCounts"] = ""
+        params["trimBelowRequestSizes"] = ""
+        params["trimAboveRequestSizes"] = ""
+        return grailsLinkGenerator.link(controller: 'EventResultDashboard', action: 'showAll',absolute: true, params: params)
     }
 
 
